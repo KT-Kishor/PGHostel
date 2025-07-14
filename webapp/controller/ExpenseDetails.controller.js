@@ -462,6 +462,51 @@ sap.ui.define([
                 }
             },
 
+            Exp_Det_onPressDownloadAttachment: function () {
+                try {
+                    if (!this.SelectedData || !this.SelectedData.Attachment) {
+                        MessageToast.show("Please select an item with an attachment before downloading.");
+                        return;
+                    }
+
+                    const oData = this.SelectedData;
+                    const sMimeType = oData.AttachmentType || "application/octet-stream";
+                    const sBase64 = oData.Attachment;
+                    const sFileName = oData.AttachmentName || "attachment";
+
+                    // Convert base64 to binary
+                    const byteCharacters = atob(sBase64);
+                    const byteArrays = [];
+
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                            byteNumbers[i] = slice.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        byteArrays.push(byteArray);
+                    }
+
+                    const blob = new Blob(byteArrays, { type: sMimeType });
+                    const sBlobUrl = URL.createObjectURL(blob);
+
+                    // Trigger file download
+                    const link = document.createElement("a");
+                    link.href = sBlobUrl;
+                    link.download = sFileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Clean up
+                    URL.revokeObjectURL(sBlobUrl);
+                    this.SelectedData = null; 
+                } catch (e) {
+                    MessageToast.show("Download failed.");
+                }
+            },
+
             Exp_Frg_onItemTypeChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 var oText = oEvent.getSource().getSelectedItem().getText();

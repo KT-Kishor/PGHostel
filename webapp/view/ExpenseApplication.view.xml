@@ -50,10 +50,15 @@
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
+					<fb:FilterGroupItem name="ExpenseDate" label="{i18n>expDetExpenseDate}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection id="Exp_id_InvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 
-<Table id="exp_Id_ExpenseTable"
+<Table id="exp_Id_Expense"
        items="{path: 'ExpenseModel>/', sorter: {path: 'Status',descending: false,group: true}}"
        class="sapUiResponsiveMargin"
        growing="true"

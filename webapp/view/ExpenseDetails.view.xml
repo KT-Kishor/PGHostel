@@ -112,6 +112,7 @@
 											<m:Button type="Emphasized"  text="{i18n>edit}" tooltip="{i18n>expenseEditTooltipItem}" press="Exp_Det_onPressExpenseItemEdit" id="idExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" />											
 											<m:Button type="Reject"  text="{i18n>delete}" tooltip="{i18n>expenseDeleteTooltipItem}" press="Exp_Det_onPressExpenseItemDelete" visible="{viewModel>/status}"  id="idExpDeleteBtn" enabled="{viewModel>/enable}" />										
 											<m:Button type="Ghost" text="{i18n>download}" tooltip="{i18n>downloadPerdiem}"  press="Exp_Det_onPressExpenseDownload" visible="{viewModel>/status}" enabled="{viewModel>/enable}"/>
+											<m:Button type="Ghost" text="{i18n>download}" tooltip="{i18n>downloadAttachment}"  press="Exp_Det_onPressDownloadAttachment" visible="{viewModel>/status}" enabled="{viewModel>/enable}"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 										<m:columns>

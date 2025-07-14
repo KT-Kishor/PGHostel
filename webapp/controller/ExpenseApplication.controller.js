@@ -265,33 +265,74 @@ sap.ui.define([
                 },
                 function () { that.closeBusyDialog(); })
         },
+        
         //Filter Function
-        Exp_onSearch: async function () {
-            try {
-                this.getBusyDialog();
-                var oTable = this.getView().byId("exp_Id_ExpenseTable");
-                oTable.setEnableBusyIndicator(true);
-                const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
-                const params = { "EmployeeID": this.LoginModel.getProperty("/EmployeeID") };
+       Exp_onSearch: async function () {
+        try {
+            this.getBusyDialog();
+            var oTable = this.getView().byId("exp_Id_Expense");
+            oTable.setEnableBusyIndicator(true);
 
-                aFilterItems.forEach(function (oItem) {
-                    const oControl = oItem.getControl();
-                    const sKey = oItem.getName();
+            const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
+            const params = {
+            "EmployeeID": this.LoginModel.getProperty("/EmployeeID")
+            };
 
-                    if (oControl && typeof oControl.getValue === "function") {
-                        const sValue = oControl.getValue().trim();
+            let dateRangeProvided = false;
 
-                        if (sValue) {
-                            params[sKey] = sValue;
-                        }
-                    }
-                });
-                await this._fetchCommonData("Expense", "ExpenseModel", params, ["exp_Id_ExpenseTable"]);
-                this.closeBusyDialog();
-            } catch (error) {
-                this.closeBusyDialog();
-                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            // Loop through filter items
+            aFilterItems.forEach((oItem) => {
+            const oControl = oItem.getControl();
+            const sKey = oItem.getName();
+
+            if (oControl && typeof oControl.getValue === "function") {
+                const sValue = oControl.getValue().trim();
+
+                if (sKey === "ExpenseDate" && sValue.includes("-")) {
+                const [start, end] = sValue.split("-").map(date =>
+                    date.trim().split("/").reverse().join("-")
+                );
+                params.startDate = start;
+                params.endDate = end;
+                dateRangeProvided = true;
+                } else if (sValue) {
+                params[sKey] = sValue;
+                }
             }
+            });
+
+            // Set default date range if not provided (financial year)
+            const currentYear = new Date().getFullYear();
+            let fyStart, fyEnd;
+            if (new Date().getMonth() >= 3) {
+            fyStart = new Date(currentYear, 3, 1);  // April 1st
+            fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
+            } else {
+            fyStart = new Date(currentYear - 1, 3, 1);
+            fyEnd = new Date(currentYear, 2, 31);
+            }
+
+            const formatDate = (date) => date.toISOString().split("T")[0];
+
+            if (!dateRangeProvided) {
+            params.startDate = formatDate(fyStart);
+            params.endDate = formatDate(fyEnd);
+
+            // Set default value in UI
+            const dateRangeControl = this.byId("Exp_id_InvoiceDatePicker");
+            if (dateRangeControl) {
+                dateRangeControl.setDateValue(fyStart);
+                dateRangeControl.setSecondDateValue(fyEnd);
+            }
+            }
+
+            // Fetch data from backend
+            await this._fetchCommonData("Expense", "ExpenseModel", params, ["exp_Id_Expense"]);
+            this.closeBusyDialog();
+        } catch (error) {
+            this.closeBusyDialog();
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+        }
         },
 
         Exp_onPressClear: async function () {
@@ -300,6 +341,7 @@ sap.ui.define([
             this.byId("Exp_id_SourceFilter").setSelectedKey("");
             this.byId("Exp_id_DestinationFilter").setSelectedKey("");
             this.byId("Exp_id_StatusFilter").setSelectedKey("");
+            this.byId("Exp_id_InvoiceDatePicker").setValue("");
         },
 
         Exp_onChangeExpenseType: function (oEvent) {
