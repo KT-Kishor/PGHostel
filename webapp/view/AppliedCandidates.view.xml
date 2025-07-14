@@ -53,7 +53,7 @@
                     <fb:control>
                         <Input
                             id="filterNoticePeriod"
-                            placeholder="e.g., 30, Immediate"
+                            placeholder="{i18n>LabelNoticePeriod}"
                             showClearIcon="true"
                         />
                     </fb:control>
@@ -68,7 +68,7 @@
                     <fb:control>
                        <Input
                             id="filterSkills"
-                            placeholder="Type skill..."
+                            placeholder="{i18n>TableColSkills}"
                             showSuggestion="true"
                             suggest="onSuggestSkills"
                             suggestionItems="{path: 'skillModel>/skills'}"
@@ -163,8 +163,7 @@
                         <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
                         <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
-                         <Button icon="sap-icon://display-more" text="{i18n>View}" press="AC_onShowSkills" />
-
+                        <ExpandableText text="{DataTableModel>Skills}" maxCharacters="60"/>
                     </cells>
                 </ColumnListItem>
             </items>

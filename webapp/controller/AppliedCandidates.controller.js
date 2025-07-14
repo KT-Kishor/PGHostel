@@ -37,21 +37,16 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({
                 isEditMode: false, busy: false
             }), "viewModel");
-            this.initializeBirthdayCarousel();
             this._makeDatePickersReadOnly(["filterExperience"]);
+            this.initializeBirthdayCarousel();
         },
         AC_ReadCall: async function () {
             this.getBusyDialog();
             try {
                 // the columns you need for the table view.
                 const aSelectFields = [
-                    "ID",
                     "FullName",
-                    "CurrentSalary",
-                    "ExpectedSalary",
                     "NoticePeriod",
-                    "ISD",
-                    "Mobile",
                     "Email",
                     "Experience"
                 ];
@@ -383,22 +378,6 @@ sap.ui.define([
             };
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
-        },
-        //Show skills in a dialog
-        AC_onShowSkills: function (oEvent) {
-            var oBindingContext = oEvent.getSource().getBindingContext("DataTableModel");
-            if (!this._oSkillsDialog) {
-                this._oSkillsDialog = sap.ui.xmlfragment(
-                    "sap.kt.com.minihrsolution.fragment.Skills",
-                    this
-                );
-                this.getView().addDependent(this._oSkillsDialog);
-            }
-            this._oSkillsDialog.bindElement({
-                path: oBindingContext.getPath(),
-                model: "DataTableModel"
-            });
-            this._oSkillsDialog.open();
         },
 
         onCloseSkillsDialog: function () {
