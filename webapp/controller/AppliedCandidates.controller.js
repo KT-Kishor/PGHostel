@@ -43,9 +43,26 @@ sap.ui.define([
         AC_ReadCall: async function () {
             this.getBusyDialog();
             try {
-                const data = await this.ajaxReadWithJQuery("JobApplications");
-                const aCandidates = data.data || [];
-                this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");
+                // the columns you need for the table view.
+                const aSelectFields = [
+                    "ID",
+                    "FullName",
+                    "CurrentSalary",
+                    "ExpectedSalary",
+                    "NoticePeriod",
+                    "ISD",
+                    "Mobile",
+                    "Email",
+                    "Experience"
+                ];
+                const oQueryParameters = {
+                    "$select": aSelectFields.join(",")
+                };
+
+                const response = await this.ajaxReadWithJQuery("JobApplications", { parameters: oQueryParameters });
+          
+                const aCandidates = response.data || [];
+                this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");             
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
                 this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))), "UniqueNamesModel");
             } catch (err) {
@@ -53,14 +70,14 @@ sap.ui.define([
             } finally {
                 this.closeBusyDialog();
             }
-        },
+          },   
         onPressback: function () {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
         onLogout: function () {
             this.CommonLogoutFunction();
         },
-        onCandidatePress: function (oEvent) {
+       onCandidatePress: function (oEvent) {
             const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
             this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", { id: id });
         },
