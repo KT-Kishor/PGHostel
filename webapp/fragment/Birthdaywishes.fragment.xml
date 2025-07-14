@@ -3,31 +3,23 @@
     xmlns="sap.m"
     xmlns:c="sap.ui.core"
 >
-    <Dialog title="{i18n>BirthdayWish}">
-        <!-- <TextArea
-            value="🎉 Happy Birthday!
-Wishing you a day filled with laughter, success, and joy.
-Your dedication and positivity make the workplace better every day.
-May this year bring new achievements and happiness your way.
-Have a fantastic birthday and a wonderful year ahead! 🎂"
-            rows="6"
-            cols="50"
-        /> -->
+    <Dialog title="{i18n>BirthdayWish}"
+   
+    >
 
-       <richtexteditor:RichTextEditor
-    xmlns:richtexteditor="sap.ui.richtexteditor"
-    value="🎉🎉&lt;b&gt;Happy Birthday!🎉🎉&lt;/b&gt;&lt;br/&gt;
-Wishing you a day filled with laughter, success, and joy.&lt;br/&gt;
-Your dedication and positivity make the workplace better every day.&lt;br/&gt;
-May this year bring new achievements and happiness your way.&lt;br/&gt;
-Have a fantastic birthday and a wonderful year ahead! 🎂"
-/>
+        <VBox class="sapUiSmallMargin">
+            <richtexteditor:RichTextEditor
+                id="NT_id_richtexteditor"
+                value="{BirthdayMailModel>/emailBody}"
+              height="330px"
+              />
+        </VBox>
 
         <beginButton>
             <Button
                 text="{i18n>sendbutton}"
                 type="Accept"
-                press=""
+                press="Tile_sendMail"
             />
         </beginButton>
         <endButton>

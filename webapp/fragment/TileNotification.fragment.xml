@@ -14,12 +14,11 @@
     >
         <customHeader>
             <Toolbar>
-                <Title text="Notifications" />
+                <Title text="{i18n>TilenotificationfragName}" />
                 <ToolbarSpacer />
                 <Button
                     icon="sap-icon://decline"
                     press=".onClosePopover"
-                    tooltip="Close"
                 />
             </Toolbar>
         </customHeader>
