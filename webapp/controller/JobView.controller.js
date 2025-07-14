@@ -229,14 +229,7 @@ sap.ui.define(
       },
 
       onNavBack: function () {
-        var oHistory = sap.ui.core.routing.History.getInstance();
-        var sPreviousHash = oHistory.getPreviousHash();
-
-        if (sPreviousHash !== undefined) {
-          window.history.go(-1);
-        } else {
-          this.getOwnerComponent().getRouter().navTo("RouteHomePage", {}, true); // fallback
-        }
+        this.getOwnerComponent().getRouter().navTo("RouteHomePage"); 
       },
 
       anySkillPresent: function (primary, secondary, required) {
@@ -1086,24 +1079,27 @@ sap.ui.define(
       },
 
       onUniversityChange: function (oEvent) {
-        const oInput = oEvent.getSource();
-        const university = oInput.getValue().trim();
-        const isValidFormat = /^[A-Za-z\s\-]+$/.test(university); // Only letters, spaces, hyphens
+          const oInput = oEvent.getSource();
+          const university = oInput.getValue().trim();
 
-        if (!university) {
-          oInput.setValueState("Error");
-          oInput.setValueStateText("University cannot be empty.");
-          return;
-        }
+          // Allow letters, numbers, spaces, hyphens, commas, periods, and parentheses
+          const isValidFormat = /^[A-Za-z0-9\s\-.,()]+$/.test(university);
 
-        if (!isValidFormat) {
-          oInput.setValueState("Error");
-          oInput.setValueStateText(
-            "Only letters, spaces, and hyphens allowed."
-          );
-          return;
-        }
-        oInput.setValueState("None");
+          if (!university) {
+              oInput.setValueState("Error");
+              oInput.setValueStateText("University cannot be empty.");
+              return;
+          }
+
+          if (!isValidFormat) {
+              oInput.setValueState("Error");
+              oInput.setValueStateText(
+                  "Only letters, numbers, spaces, hyphens, commas, periods, and parentheses allowed."
+              );
+              return;
+          }
+
+          oInput.setValueState("None");
       },
 
       onGenderChange: function (oEvent) {
