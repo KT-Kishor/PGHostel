@@ -144,14 +144,14 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>compName}" /></Column>
+                <Column  demandPopin="true"><Text text="{i18n>compName}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColCurrentPackage}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExpectedPackage}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColNoticePeriod}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>mobilenumber}" /></Column>
-                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>emailId}" /></Column>
-                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
-                <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true" width="200px"><Text text="{i18n>emailId}" /></Column>
+                <Column  demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
+                <Column demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
             <items>
                 <ColumnListItem type="Navigation" press="onCandidatePress">
@@ -163,7 +163,8 @@
                         <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
                         <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
-                        <Text text="{DataTableModel>Skills}" />
+                         <Button icon="sap-icon://display-more" text="{i18n>View}" press="AC_onShowSkills" />
+
                     </cells>
                 </ColumnListItem>
             </items>

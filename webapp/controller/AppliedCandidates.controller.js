@@ -32,7 +32,7 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ Editable: true }), "EditableModeltruefalse");
             this.getView().setModel(new JSONModel({ results: [{ key: "YES", text: "YES" }, { key: "NO", text: "NO" }] }), "setInterviewYesNo");
             this.AC_ReadCall();
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", "Recruitment Dashboard");
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18na.getText("TableHeader"));
             this.onFilterBarClear();
             this.getView().setModel(new JSONModel({
                 isEditMode: false, busy: false
@@ -306,11 +306,9 @@ sap.ui.define([
                     utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
-                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_AvlInterview"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
                     utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_DateAvlForInterview"), "ID") &&
                     utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
@@ -323,6 +321,22 @@ sap.ui.define([
                 MessageToast.show("An error occurred during validation.");
                 return false;
             }
+        },
+        noticePeriodPress: function (oEvent) {
+            if (!this._oPopover) {
+                this._oPopover = new sap.m.Popover({
+                    contentWidth: "300px",
+                    contentHeight: "auto",
+                    showHeader: false,
+                    placement: sap.m.PlacementType.Bottom,
+                    content: [new sap.m.VBox({
+                        alignItems: "Center", justifyContent: "Center", width: "100%",
+                        items: [new sap.m.Text({ text: this.i18na.getText("noticePeriodInfo"), wrapping: true })]
+                    }).addStyleClass("customPopoverContent")]
+                });
+                this.getView().addDependent(this._oPopover);
+            }
+            this._oPopover.openBy(oEvent.getSource());
         },
 
         // validation handlers 
@@ -352,7 +366,42 @@ sap.ui.define([
             };
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
-        }
+        },
+        //Show skills in a dialog
+        AC_onShowSkills: function (oEvent) {
+            var oBindingContext = oEvent.getSource().getBindingContext("DataTableModel");
+            if (!this._oSkillsDialog) {
+                this._oSkillsDialog = sap.ui.xmlfragment(
+                    "sap.kt.com.minihrsolution.fragment.Skills",
+                    this
+                );
+                this.getView().addDependent(this._oSkillsDialog);
+            }
+            this._oSkillsDialog.bindElement({
+                path: oBindingContext.getPath(),
+                model: "DataTableModel"
+            });
+            this._oSkillsDialog.open();
+        },
 
+        onCloseSkillsDialog: function () {
+            this._oSkillsDialog.close();
+        },
+        SalaryInfoPress: function (oEvent) {
+            if (!this._oPopover) {
+                this._oPopover = new sap.m.Popover({
+                    contentWidth: "300px",
+                    contentHeight: "auto",
+                    showHeader: false,
+                    placement: sap.m.PlacementType.Bottom,
+                    content: [new sap.m.VBox({
+                        alignItems: "Center", justifyContent: "Center", width: "100%",
+                        items: [new sap.m.Text({ text: this.i18na.getText("salaryPackageInfo"), wrapping: true })]
+                    }).addStyleClass("customPopoverContent")]
+                });
+                this.getView().addDependent(this._oPopover);
+            }
+            this._oPopover.openBy(oEvent.getSource());
+        },
     })
 })

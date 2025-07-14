@@ -5,7 +5,7 @@
 	xmlns:core="sap.ui.core"
 	xmlns:f="sap.ui.layout.form"
 >
-	<Page  title="Recruitment Dashboard" navButtonPress="onPageNavButtonPress" showNavButton="true">
+	<Page  title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
 		<headerContent>
 		<Button
                 press="Tile_NotifictionBTN"
