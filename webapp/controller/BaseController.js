@@ -1159,11 +1159,19 @@ sap.ui.define([
     },
 
     Tile_NotifictionBTN: function (oEvent) {
-      if (sap.ui.getCore().byId("TN_id_Carousel")) sap.ui.getCore().byId("TN_id_Carousel").destroy();
-      // this.onClosePopover();/
       var oView = this.getView();
       var oButton = oEvent.getSource();
-      
+
+      var oOldCarousel = sap.ui.getCore().byId("TN_id_Carousel");
+      if (oOldCarousel) {
+        oOldCarousel.destroy(true);
+      }
+
+      if (this.oPopover) {
+        this.oPopover.destroy();
+        this.oPopover = null;
+      }
+
       if (!this.oPopover) {
         sap.ui.core.Fragment.load({
           name: "sap.kt.com.minihrsolution.fragment.TileNotification",
@@ -1171,18 +1179,16 @@ sap.ui.define([
         }).then(function (oPopover) {
           this.oPopover = oPopover;
           oView.addDependent(this.oPopover);
-          // this.getBusyDialog();
+          this.oPopover.attachAfterOpen(this.initializeBirthdayCarousel.bind(this));
           this.oPopover.openBy(oButton);
-          // this.closeBusyDialog();
-          this.initializeBirthdayCarousel();
+          // this.initializeBirthdayCarousel();
         }.bind(this));
       } else {
-        // this.getBusyDialog();
         this.oPopover.openBy(oButton);
-        // this.closeBusyDialog();
-        this.initializeBirthdayCarousel();
+        // this.initializeBirthdayCarousel();
       }
     },
+
     onClosePopover: function () {
       if (this.oPopover) {
         this.oPopover.attachAfterClose(function () {
@@ -1190,28 +1196,27 @@ sap.ui.define([
           this.oPopover = null;
         }.bind(this));
         this.oPopover.close();
-        sap.ui.getCore().byId("TN_id_Carousel").destroy();
       }
     },
 
     onPressCC: function (oEvent) {
-    // Step 1: Get selected employee ID from BirthdayModel
-    let data = oEvent.getSource().getBindingContext("BirthdayModel");
-    let selectedEmployee = data.getObject();
-    let employeeID = selectedEmployee.ID;
+      // Step 1: Get selected employee ID from BirthdayModel
+      let data = oEvent.getSource().getBindingContext("BirthdayModel");
+      let selectedEmployee = data.getObject();
+      let employeeID = selectedEmployee.ID;
 
-    // Step 2: Store selected ID in idPassModel
-    const idModel = new sap.ui.model.json.JSONModel({
+      // Step 2: Store selected ID in idPassModel
+      const idModel = new sap.ui.model.json.JSONModel({
         id: employeeID
-    });
-    this.getView().setModel(idModel, "idPassModel");
+      });
+      this.getView().setModel(idModel, "idPassModel");
 
-    // Step 3: Get sender name from LoginModel
-    let loginData = this.getOwnerComponent().getModel("LoginModel").getData();
-    let senderName = loginData.EmployeeName;
+      // Step 3: Get sender name from LoginModel
+      let loginData = this.getOwnerComponent().getModel("LoginModel").getData();
+      let senderName = loginData.EmployeeName;
 
-    // Step 4: Create email content
-    let birthdayMessage =
+      // Step 4: Create email content
+      let birthdayMessage =
         `Dear <b>${selectedEmployee.EmployeeName},</b><br/><br/>
         🎉🎉<b>Happy Birthday!</b><br/>
         Wishing you a day filled with laughter, success, and joy.<br/>
@@ -1222,56 +1227,56 @@ sap.ui.define([
         ${senderName}<br/>
         Kalapavriksha Technologies`;
 
-    // Step 5: Set content in BirthdayMailModel
-    const mailModel = new sap.ui.model.json.JSONModel({
+      // Step 5: Set content in BirthdayMailModel
+      const mailModel = new sap.ui.model.json.JSONModel({
         emailBody: birthdayMessage
-    });
-    this.getView().setModel(mailModel, "BirthdayMailModel");
+      });
+      this.getView().setModel(mailModel, "BirthdayMailModel");
 
-    // Step 6: Open Fragment
-    var oView = this.getView();
-    if (!this.oAboutusDialog) {
+      // Step 6: Open Fragment
+      var oView = this.getView();
+      if (!this.oAboutusDialog) {
         sap.ui.core.Fragment.load({
-            id: oView.getId(),
-            name: "sap.kt.com.minihrsolution.fragment.Birthdaywishes",
-            controller: this
+          id: oView.getId(),
+          name: "sap.kt.com.minihrsolution.fragment.Birthdaywishes",
+          controller: this
         }).then(function (oDialog) {
-            this.oAboutusDialog = oDialog;
-            oView.addDependent(this.oAboutusDialog);
-            this.oAboutusDialog.open();
+          this.oAboutusDialog = oDialog;
+          oView.addDependent(this.oAboutusDialog);
+          this.oAboutusDialog.open();
         }.bind(this));
-    } else {
+      } else {
         this.oAboutusDialog.open();
-    }
-},
+      }
+    },
 
 
     Tile_sendMail: function () {
-    // Step 1: Get selected ID from idPassModel
-    let idData = this.getView().getModel("idPassModel").getData();
-    let id = idData.id;
+      // Step 1: Get selected ID from idPassModel
+      let idData = this.getView().getModel("idPassModel").getData();
+      let id = idData.id;
 
-    // Step 2: Get selected employee data from BirthdayModel
-    let BirthdayModelData = this.getView().getModel("BirthdayModel").getData();
-    let finalId = BirthdayModelData.find((data) => data.ID === id);
+      // Step 2: Get selected employee data from BirthdayModel
+      let BirthdayModelData = this.getView().getModel("BirthdayModel").getData();
+      let finalId = BirthdayModelData.find((data) => data.ID === id);
 
-    // Step 3: Get final email body from RichTextEditor
-    let bodyValue = this.getView().byId("NT_id_richtexteditor");
-    let valueOfBody = bodyValue ? bodyValue.getValue() : "";
+      // Step 3: Get final email body from RichTextEditor
+      let bodyValue = this.getView().byId("NT_id_richtexteditor");
+      let valueOfBody = bodyValue ? bodyValue.getValue() : "";
 
-    // Step 4: Create payload
-    const payload = {
+      // Step 4: Create payload
+      const payload = {
         toEmailID: finalId.EmployeeEmail,
         toName: finalId.EmployeeName,
         subject: `🎂 Happy Birthday, ${finalId.EmployeeName}!`,
         body: valueOfBody
-    };
-    this.getBusyDialog();
-    this.ajaxCreateWithJQuery("HappayBdayEmail", payload).then((response) => {
+      };
+      this.getBusyDialog();
+      this.ajaxCreateWithJQuery("HappayBdayEmail", payload).then((response) => {
         this.closeBusyDialog();
         this.NT_BirtdayDialogCancel();
-    });
-},
+      });
+    },
 
     NT_BirtdayDialogCancel: function () {
       this.oAboutusDialog.close();
