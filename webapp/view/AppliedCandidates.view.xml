@@ -51,13 +51,17 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <Input
+                        <ComboBox
+                            items="{NoticePeriod>/}"
                             id="filterNoticePeriod"
-                            placeholder="{i18n>LabelNoticePeriod}"
-                            showClearIcon="true"
-                        />
-                    </fb:control>
-                </fb:FilterGroupItem>
+                            showClearIcon="true">
+                            <core:Item
+                                key="{NoticePeriod>key}"
+                        text="{NoticePeriod>text}"
+                    />
+                </ComboBox>
+            </fb:control>
+        </fb:FilterGroupItem>
 
                 <fb:FilterGroupItem
                     name="skills"
@@ -68,7 +72,6 @@
                     <fb:control>
                        <Input
                             id="filterSkills"
-                            placeholder="{i18n>TableColSkills}"
                             showSuggestion="true"
                             suggest="onSuggestSkills"
                             suggestionItems="{path: 'skillModel>/skills'}"
@@ -151,6 +154,7 @@
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>mobilenumber}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true" width="200px"><Text text="{i18n>emailId}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
+                <Column  demandPopin="true"><Text text="{i18n>createdBy}" /></Column>
                 <Column demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
             <items>
@@ -163,6 +167,7 @@
                         <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
                         <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
+                        <Text text="{DataTableModel>CreatedBy}" />
                         <ExpandableText text="{DataTableModel>Skills}" maxCharacters="20"/>
                     </cells>
                 </ColumnListItem>

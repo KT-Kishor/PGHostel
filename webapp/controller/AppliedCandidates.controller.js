@@ -38,6 +38,7 @@ sap.ui.define([
                 isEditMode: false, busy: false
             }), "viewModel");
             this._makeDatePickersReadOnly(["filterExperience"]);
+            this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
             this.initializeBirthdayCarousel();
         },
         AC_ReadCall: async function () {
@@ -214,16 +215,21 @@ sap.ui.define([
                 }
             );
         },
-        _preparePayload: function () {
+      _preparePayload: function () {
             if (!this._validateAllDialogFields()) {
                 return null;
             }
-            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
+            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());          
             let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
-            oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;
+            oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;          
             let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
             if (dateValue) {
                 oPayload.Date = dateValue.split(".").reverse().join("/");
+            }
+            if (!oPayload.ID) { 
+                const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
+                const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+                oPayload.CreatedBy = `${sUserName} (${sUserID})`;
             }
             return oPayload;
         },
@@ -318,7 +324,7 @@ sap.ui.define([
                     utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
                     utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
                     utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&

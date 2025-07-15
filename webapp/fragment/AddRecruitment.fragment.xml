@@ -87,20 +87,20 @@
                 </ComboBox>
 
                 <Label text="{i18n>LabelNoticePeriod}" required="true" />
-                <Input
-                    value="{stuDataModel>/NoticePeriod}" 
-                    placeholder="{i18n>noticePeriodPlaceholder}"
+                 <ComboBox
+                    items="{NoticePeriod>/}"
                     id="FM_RE_NoticePeriod"
-                    maxLength="15"
-                    type="Number"
+                    selectedKey="{stuDataModel>/NoticePeriod}"
                     valueState="{modelValuStateError>/NoticePeriodState}"
-                    valueStateText="{i18n>NoticePeriod}"
                     editable="{EditableModeltruefalse>/Editable}"
-                    liveChange="onValidateMandatoryField"
-                    showValueHelp="true"
-                    valueHelpRequest="noticePeriodPress"
-                    valueHelpIconSrc="sap-icon://message-information"
-                />
+                    valueStateText="{i18n>NoticePeriod}"
+                    change="onDropdownChange"
+                >
+                    <core:Item
+                        key="{NoticePeriod>key}"
+                        text="{NoticePeriod>text}"
+                    />
+                </ComboBox>
                 <Label text="{i18n>expCountry}" required="true" />
                 <Select
                     items="{CountryModel>/}"

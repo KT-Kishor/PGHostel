@@ -267,6 +267,11 @@
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Experience.json",
                 "preload": true
+            },
+              "NoticePeriod": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/noticePeriod.json",
+                "preload": true
             }
         },
         "resources": {

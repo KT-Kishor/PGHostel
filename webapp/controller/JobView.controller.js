@@ -1504,6 +1504,7 @@ sap.ui.define(
           jsonData.HighestQualifaction = value || "";
         }
         // Add base64 file data
+        jsonData.CreatedBy = "Candidate";
         jsonData.ResumeFile = fileBase64;
 
         $.ajax({
