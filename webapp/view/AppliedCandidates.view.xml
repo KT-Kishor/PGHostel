@@ -163,7 +163,7 @@
                         <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
                         <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
-                        <ExpandableText text="{DataTableModel>Skills}" maxCharacters="60"/>
+                        <ExpandableText text="{DataTableModel>Skills}" maxCharacters="20"/>
                     </cells>
                 </ColumnListItem>
             </items>
