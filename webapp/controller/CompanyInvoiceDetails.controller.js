@@ -1508,7 +1508,7 @@ sap.ui.define([
                     headStyles: { fillColor: [41, 128, 185] },
                     styles: {
                         font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
-                        halign: "center", overflow: "ellipsize"
+                        halign: "center"
                     },
                     columnStyles: {
                         0: { halign: 'center' },
