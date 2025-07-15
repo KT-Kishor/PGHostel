@@ -105,13 +105,14 @@
 
         <Table
             id="appliedCandidatesTable"
-            items="{DataTableModel>/}"
+            items="{path:'DataTableModel>/', sorter: {path: 'CreatedBy', descending: false, group: true}}"
             mode="SingleSelectLeft"
             class="sapUiResponsiveMargin"
             width="auto"
             noDataText="{i18n>noData}"
-        >
-            <headerToolbar>
+            growingScrollToLoad="true"
+             growingThreshold="50"  alternateRowColors="true">
+			 <headerToolbar>
                 <OverflowToolbar>
                     <content>
                         <Title
@@ -152,7 +153,7 @@
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColExpectedPackage}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>TableColNoticePeriod}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>mobilenumber}" /></Column>
-                <Column minScreenWidth="Tablet" demandPopin="true" width="200px"><Text text="{i18n>emailId}" /></Column>
+                <Column minScreenWidth="Tablet" demandPopin="true" width="250px"><Text text="{i18n>emailId}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>createdBy}" /></Column>
                 <Column demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>

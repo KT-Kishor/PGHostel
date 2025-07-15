@@ -94,7 +94,7 @@
                     valueState="{modelValuStateError>/NoticePeriodState}"
                     editable="{EditableModeltruefalse>/Editable}"
                     valueStateText="{i18n>NoticePeriod}"
-                    change="onDropdownChange"
+                    change="onValidateMandatoryField"
                 >
                     <core:Item
                         key="{NoticePeriod>key}"

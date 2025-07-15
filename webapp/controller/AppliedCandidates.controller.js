@@ -37,7 +37,7 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({
                 isEditMode: false, busy: false
             }), "viewModel");
-            this._makeDatePickersReadOnly(["filterExperience"]);
+            //this._makeDatePickersReadOnly(["filterExperience"]);
             this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
             this.initializeBirthdayCarousel();
         },
@@ -56,9 +56,9 @@ sap.ui.define([
                 };
 
                 const response = await this.ajaxReadWithJQuery("JobApplications", { parameters: oQueryParameters });
-          
+
                 const aCandidates = response.data || [];
-                this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");             
+                this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
                 this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))), "UniqueNamesModel");
             } catch (err) {
@@ -66,14 +66,14 @@ sap.ui.define([
             } finally {
                 this.closeBusyDialog();
             }
-          },   
+        },
         onPressback: function () {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
         onLogout: function () {
             this.CommonLogoutFunction();
         },
-       onCandidatePress: function (oEvent) {
+        onCandidatePress: function (oEvent) {
             const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
             this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", { id: id });
         },
@@ -98,35 +98,73 @@ sap.ui.define([
                     if (sName) {
                         aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
                     }
-                    // 2. Notice Period Filter
+                    // 2. Notice Period Filter 
                     const sNoticePeriod = this.byId("filterNoticePeriod").getValue().trim();
                     if (sNoticePeriod) {
-                        let sNoticeValue = sNoticePeriod.toLowerCase();
-                        aFilters.push(new Filter({
-                            path: "NoticePeriod",
-                            test: function (sValue) {
-                                let sDataValue = String(sValue);
-                                if (sDataValue === '0') {
-                                    sDataValue = 'immediate';
+                        const aRange = sNoticePeriod.split("-").map(s => parseInt(s.trim(), 10));
+                        if (aRange.length === 2 && !isNaN(aRange[1])) {
+                            const maxFilter = aRange[1];
+
+                            aFilters.push(new Filter({
+                                path: "NoticePeriod",
+                                test: function (v) {
+                                    if (!v) return false;
+                                    const digits = v.match(/\d+/g);
+                                    if (!digits || digits.length === 0) return false;
+                                    const candidateMin = parseInt(digits[0], 10);
+                                    return !isNaN(candidateMin) && candidateMin < maxFilter;
                                 }
-                                return sDataValue.includes(sNoticeValue);
+                            }));
+                        } else {
+                            const typedValue = parseInt(sNoticePeriod, 10);
+                            if (!isNaN(typedValue)) {
+                                aFilters.push(new Filter({
+                                    path: "NoticePeriod",
+                                    test: function (v) {
+                                        if (!v) return false;
+                                        const digits = v.match(/\d+/g);
+                                        if (!digits || digits.length === 0) return false;
+                                        const candidateMin = parseInt(digits[0], 10);
+                                        return !isNaN(candidateMin) && candidateMin === typedValue;
+                                    }
+                                }));
                             }
-                        }));
+                        }
                     }
                     // 3. Skills Filter
                     const sSkills = this.byId("filterSkills").getValue().trim();
                     if (sSkills) {
                         aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
                     }
-                    // 4. Experience Filter 
-                    const sExperienceValue = this.byId("filterExperience").getValue().trim(); // Use getValue() to get the text like "2-4"
+                    // 4. Experience Filter
+                    const sExperienceValue = this.byId("filterExperience").getValue().trim();
                     if (sExperienceValue) {
-                        const aRange = sExperienceValue.split("-");
-                        if (aRange.length === 2) {
-                            const min = parseInt(aRange[0].trim(), 10);
-                            const max = parseInt(aRange[1].trim(), 10);
-                            if (!isNaN(min) && !isNaN(max)) {
-                                aFilters.push(new Filter("Experience", FilterOperator.BT, min, max));
+                        const aExpRange = sExperienceValue.split("-").map(v => parseFloat(v.trim()));
+                        if (aExpRange.length === 2 && !isNaN(aExpRange[0]) && !isNaN(aExpRange[1])) {
+                            const [minExp, maxExp] = aExpRange;
+                            aFilters.push(new Filter({
+                                path: "Experience",
+                                test: function (v) {
+                                    if (!v) return false;
+                                    const match = v.toString().match(/[\d.]+/);
+                                    if (!match) return false;
+                                    const value = parseFloat(match[0]);
+                                    return !isNaN(value) && value >= minExp && value <= maxExp;
+                                }
+                            }));
+                        } else {
+                            const valExp = parseFloat(sExperienceValue);
+                            if (!isNaN(valExp)) {
+                                aFilters.push(new Filter({
+                                    path: "Experience",
+                                    test: function (v) {
+                                        if (!v) return false;
+                                        const match = v.toString().match(/[\d.]+/);
+                                        if (!match) return false;
+                                        const value = parseFloat(match[0]);
+                                        return !isNaN(value) && value === valExp;
+                                    }
+                                }));
                             }
                         }
                     }
@@ -215,18 +253,18 @@ sap.ui.define([
                 }
             );
         },
-      _preparePayload: function () {
+        _preparePayload: function () {
             if (!this._validateAllDialogFields()) {
                 return null;
             }
-            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());          
+            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
             let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
-            oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;          
+            oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;
             let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
             if (dateValue) {
                 oPayload.Date = dateValue.split(".").reverse().join("/");
             }
-            if (!oPayload.ID) { 
+            if (!oPayload.ID) {
                 const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
                 const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
                 oPayload.CreatedBy = `${sUserName} (${sUserID})`;
@@ -324,7 +362,7 @@ sap.ui.define([
                     utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
-                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
                     utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
                     utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
@@ -339,22 +377,6 @@ sap.ui.define([
                 MessageToast.show("An error occurred during validation.");
                 return false;
             }
-        },
-        noticePeriodPress: function (oEvent) {
-            if (!this._oPopover) {
-                this._oPopover = new sap.m.Popover({
-                    contentWidth: "300px",
-                    contentHeight: "auto",
-                    showHeader: false,
-                    placement: sap.m.PlacementType.Bottom,
-                    content: [new sap.m.VBox({
-                        alignItems: "Center", justifyContent: "Center", width: "100%",
-                        items: [new sap.m.Text({ text: this.i18na.getText("noticePeriodInfo"), wrapping: true })]
-                    }).addStyleClass("customPopoverContent")]
-                });
-                this.getView().addDependent(this._oPopover);
-            }
-            this._oPopover.openBy(oEvent.getSource());
         },
 
         // validation handlers 
@@ -386,9 +408,7 @@ sap.ui.define([
             oSheet.build().finally(() => oSheet.destroy());
         },
 
-        onCloseSkillsDialog: function () {
-            this._oSkillsDialog.close();
-        },
+
         SalaryInfoPress: function (oEvent) {
             if (!this._oPopover) {
                 this._oPopover = new sap.m.Popover({
