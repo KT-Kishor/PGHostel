@@ -443,30 +443,9 @@ sap.ui.define(
                 },
 
                 v1_filClear: function() {
-                    this.byId("V1_ID_SkillsInput").setValue(""); // not setSelectedKey
+                    this.byId("V1_ID_SkillsInput").setValue(""); 
                     this.byId("V1_ID_LocationComboBox").setSelectedKey("");
                     this.byId("V1_ID_ExpComboBox").setSelectedKey("");
-
-                    // Optional: reload original unfiltered data (via GET)
-                    $.ajax({
-                        url: "https://rest.kalpavrikshatechnologies.com/JobOpenings",
-                        method: "GET",
-                        contentType: "application/json",
-                        dataType: "json",
-                        headers: {
-                            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-                        },
-                        success: function(data) {
-                            const oModel = new sap.ui.model.json.JSONModel({
-                                Candidates: data.data,
-                            });
-                            this.getView().setModel(oModel, "JobApplicationModel");
-                        }.bind(this),
-                        error: function() {
-                            MessageToast.show("Error resetting filter.");
-                        },
-                    });
                 },
 
                 onSuggestSkills: function(oEvent) {
@@ -501,21 +480,10 @@ sap.ui.define(
                     const oSkillInput = this.byId("V1_ID_SkillsInput")?.getValue()?.trim();
                     const oLocationKey = this.byId(
                         "V1_ID_LocationComboBox"
-                    )?.getSelectedKey();
+                    )?.getValue();
                     const oExpCombo = this.byId("V1_ID_ExpComboBox")
                         ?.getSelectedItem()
                         ?.getText();
-
-                    const oResourceBundle = this.getView()
-                        .getModel("i18n")
-                        .getResourceBundle();
-
-                    // Check: if all filters are empty
-                    if (!oSkillInput && !oLocationKey && !oExpCombo) {
-                        const sMessage = oResourceBundle.getText("v1_m_go");
-                        MessageToast.show(sMessage);
-                        return;
-                    }
 
                     // --- Build payload ---
                     const oFilterPayload = {
@@ -525,6 +493,7 @@ sap.ui.define(
                     };
 
                     // --- Send POST to backend ---
+                   this.getBusyDialog();
                     $.ajax({
                         url: "https://rest.kalpavrikshatechnologies.com/JobOpenings" +
                             "?" +
@@ -544,11 +513,12 @@ sap.ui.define(
                             const oFilteredModel = new sap.ui.model.json.JSONModel({
                                 Candidates: aFilteredData,
                             });
-
                             this.getView().setModel(oFilteredModel, "JobApplicationModel");
+                            this.closeBusyDialog();
                         }.bind(this),
 
                         error: function(err) {
+                        this.closeBusyDialog();
                             if (err?.responseJSON?.message) {
                                 MessageToast.show("Error: " + err.responseJSON.message);
                             } else {
