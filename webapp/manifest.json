@@ -174,34 +174,34 @@
                 "preload": true
             },
             "GenderModel": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/Gender.json",
-                "preload":true
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Gender.json",
+                "preload": true
             },
-              "EmpType": {
+            "EmpType": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/EmployeeType.json",
                 "preload": true
             },
-              "ContractpaymentModel": {
+            "ContractpaymentModel": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/PaymentTerms.json",
                 "preload": true
             },
             "SowModel": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/SowStatus.json",
-                "preload":true
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/SowStatus.json",
+                "preload": true
             },
-              "codeModel": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/STDCode.json",
-                "preload":true
+            "codeModel": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/STDCode.json",
+                "preload": true
             },
             "SowStatusModel": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/SowFilter.json",
-                "preload":true
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/SowFilter.json",
+                "preload": true
             },
             "InvoiceSAC": {
                 "type": "sap.ui.model.json.JSONModel",
@@ -209,14 +209,14 @@
                 "preload": true
             },
             "StatusEmp": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/StatusEmp.json",
-                "preload":true
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/StatusEmp.json",
+                "preload": true
             },
-               "DocumentJson": {
-                "type":"sap.ui.model.json.JSONModel",
-                "uri":"model/Document.json",
-                "preload":true
+            "DocumentJson": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/Document.json",
+                "preload": true
             },
             "TypeModel": {
                 "type": "sap.ui.model.json.JSONModel",
@@ -248,27 +248,27 @@
                 "uri": "model/PaySlip.json",
                 "preload": true
             },
-             "TStatusModel": {
+            "TStatusModel": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TimesheetStatus.json",
                 "preload": true
             },
-               "TApprovalModel": {
+            "TApprovalModel": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/TimesheetApprovalStatus.json",
                 "preload": true
             },
-             "ExpectedCTC": {
+            "ExpectedCTC": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/ExpectedctcRange.json",
                 "preload": true
             },
-             "Experience": {
+            "Experience": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/Experience.json",
                 "preload": true
             },
-              "NoticePeriod": {
+            "NoticePeriod": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "model/noticePeriod.json",
                 "preload": true
@@ -576,7 +576,6 @@
                     "target": [
                         "TargetSchemeUpload"
                     ]
-                   
                 },
                 {
                     "name": "RouteSchemeUploadDetails",
@@ -584,7 +583,6 @@
                     "target": [
                         "TargetSchemeUploadDetails"
                     ]
-                   
                 },
                 {
                     "name": "RouteIncomeAsset",
@@ -592,7 +590,6 @@
                     "target": [
                         "TargetIncomeAsset"
                     ]
-                   
                 },
                 {
                     "name": "RouteAssetAssignment",
@@ -600,96 +597,105 @@
                     "target": [
                         "TargetAssetAssignment"
                     ]
-                   
                 },
                 {
-                    "name":"RouteAssetDetails",
+                    "name": "RouteAssetDetails",
                     "pattern": "AssetDetails/{SerialNumber}",
-                    "target":[
+                    "target": [
                         "TargetAssetDetails"
                     ]
                 },
                 {
-                    "name":"RouteHrQuotation",
-                    "pattern":"HrQuotation",
+                    "name": "RouteHrQuotation",
+                    "pattern": "HrQuotation",
                     "target": [
                         "TargetHrQuotation"
                     ]
                 },
                 {
-                    "name":"RouteHrQuotationDetails",
-                    "pattern":"HrQuotationDetails/{sQuotationNo}",
+                    "name": "RouteHrQuotationDetails",
+                    "pattern": "HrQuotationDetails/{sQuotationNo}",
                     "target": [
                         "TargetHrQuotationDetails"
                     ]
                 },
-                 {
-                    "name":"AssetObjectPage",
+                {
+                    "name": "AssetObjectPage",
                     "pattern": "Page/{sPath}/{Name}",
-                    "target":[
+                    "target": [
                         "TargetAssetObjectPage"
                     ]
                 },
-                 {
-                    "name":"MyAsset",
+                {
+                    "name": "MyAsset",
                     "pattern": "MyAsset",
-                    "target":[
+                    "target": [
                         "TargetMyAsset"
                     ]
                 },
-                 {
-                    "name":"PurchaseOrder",
+                {
+                    "name": "PurchaseOrder",
                     "pattern": "PurchaseOrder",
-                    "target":[
+                    "target": [
                         "TargetPurchaseOrder"
                     ]
                 },
-                   {
-                    "name":"PurchaseOrderObject",
+                {
+                    "name": "PurchaseOrderObject",
                     "pattern": "PurchaseOrderObjectPage/{sPath}",
-                    "target":[
+                    "target": [
                         "TargetPurchaseOrderObject"
                     ]
                 },
                 {
-                    "name":"Recruitment",
+                    "name": "Recruitment",
                     "pattern": "Recruitment",
-                    "target":[
+                    "target": [
                         "TargetRecruitment"
                     ]
                 },
                 {
-                    "name":"AppliedCandidates",
+                    "name": "AppliedCandidates",
                     "pattern": "AppliedCandidates",
-                    "target":[
+                    "target": [
                         "TargetAppliedCandidates"
                     ]
                 },
-                 {
+                {
                     "name": "RouteKTChat",
                     "pattern": "KTChat",
                     "target": [
                         "TargetChat"
                     ]
                 },
-                 {
-          "name": "RouteJobView",
-          "pattern": "JobView:?query:",
-          "target": ["TargetJobView"]
-        },
-                 {
-          "name": "AppliedCanDetail",
-          "pattern": "AppliedCanDetail/{id}",
-          "target": ["TargetAppliedCanDetail"]
-        }
-
+                {
+                    "name": "RouteJobView",
+                    "pattern": "JobView:?query:",
+                    "target": [
+                        "TargetJobView"
+                    ]
+                },
+                {
+                    "name": "AppliedCanDetail",
+                    "pattern": "AppliedCanDetail/{id}",
+                    "target": [
+                        "TargetAppliedCanDetail"
+                    ]
+                },
+                {
+                    "name": "RouteInvoiceDashboard",
+                    "pattern": "InvoiceDashboard",
+                    "target": [
+                        "TargetInvoiceDashboard"
+                    ]
+                }
             ],
             "targets": {
                 "TargetView1": {
                     "id": "View1",
                     "name": "View1"
                 },
-                  "TargetAssetObjectPage": {
+                "TargetAssetObjectPage": {
                     "id": "AssetObjectPage",
                     "name": "AssetObjectPage"
                 },
@@ -705,7 +711,6 @@
                     "id": "PurchaseOrderObject",
                     "name": "PurchaseOrderObject"
                 },
-
                 "TargetHomePage": {
                     "viewType": "XML",
                     "transition": "slide",
@@ -995,62 +1000,69 @@
                     "viewId": "AssetAssignment",
                     "viewName": "AssetAssignment"
                 },
-                "TargetAssetDetails":{
+                "TargetAssetDetails": {
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "AssetDetails",
                     "viewName": "AssetDetails"
                 },
-                "TargetHrQuotation":{
+                "TargetHrQuotation": {
                     "viewType": "XML",
-                    "transition":"slide",
+                    "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "HrQuotation",
                     "viewName": "HrQuotation"
                 },
-                "TargetHrQuotationDetails":{
+                "TargetHrQuotationDetails": {
                     "viewType": "XML",
-                    "transition":"slide",
+                    "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "HrQuotationDetails",
                     "viewName": "HrQuotationDetails"
                 },
-                "TargetRecruitment":{
+                "TargetRecruitment": {
                     "viewType": "XML",
-                    "transition":"slide",
+                    "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "Recruitment",
                     "viewName": "Recruitment"
                 },
-                 "TargetAppliedCandidates":{
+                "TargetAppliedCandidates": {
                     "viewType": "XML",
-                    "transition":"slide",
+                    "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "AppliedCandidates",
                     "viewName": "AppliedCandidates"
                 },
-                 "TargetChat":{
+                "TargetChat": {
                     "viewType": "XML",
-                    "transition":"slide",
+                    "transition": "slide",
                     "clearControlAggregation": false,
                     "viewId": "KTChat",
                     "viewName": "KTChat"
                 },
                 "TargetAppliedCanDetail": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "AppliedCanDetail",
-          "viewName": "AppliedCanDetail"
-        },
-        "TargetJobView": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "JobView",
-          "viewName": "JobView"
-        }
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AppliedCanDetail",
+                    "viewName": "AppliedCanDetail"
+                },
+                "TargetJobView": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "JobView",
+                    "viewName": "JobView"
+                },
+                "TargetInvoiceDashboard": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "InvoiceDashboard",
+                    "viewName": "InvoiceDashboard"
+                }
             }
         },
         "rootView": {

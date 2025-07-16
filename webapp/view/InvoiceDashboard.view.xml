@@ -1,0 +1,103 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.InvoiceDashboard"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.f"
+	xmlns:layout="sap.ui.layout"
+	xmlns:viz="sap.viz.ui5.controls"
+	xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vizData="sap.viz.ui5.data"
+>
+	<f:DynamicPage id="dashboardPage" headerExpanded="{/headerExpanded}">
+		<!-- DynamicPage Title -->
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="Invoice Dashboard" />
+				</f:heading>
+			</f:DynamicPageTitle>
+		</f:title>
+		<!-- DynamicPage Header (for Filters) -->
+		<f:header>
+			<f:DynamicPageHeader>
+				<Toolbar>
+					<Label text="Company:" class="sapUiSmallMarginEnd"/>
+					<MultiComboBox
+                        id="companyFilter"
+                        width="300px"
+                        items="{path: 'companies>/'}"
+                        selectionChange="onFilterChange">
+						<items>
+							<core:Item key="{companies>key}" text="{companies>key}"/>
+						</items>
+					</MultiComboBox>
+					<ToolbarSpacer />
+					<Label text="Period:" class="sapUiSmallMarginEnd"/>
+					<SegmentedButton id="timePeriodFilter" selectedKey="Yearly" selectionChange="onFilterChange">
+						<items>
+							<SegmentedButtonItem text="Quarterly" key="Quarterly" />
+							<SegmentedButtonItem text="Half-Yearly" key="HalfYearly" />
+							<SegmentedButtonItem text="Yearly" key="Yearly" />
+						</items>
+					</SegmentedButton>
+				</Toolbar>
+			</f:DynamicPageHeader>
+		</f:header>
+		<!-- DynamicPage Content (for Charts) -->
+		<f:content>
+			<layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiSmallMarginTop">
+				<layout:content>
+					<!-- Bar Chart: Invoice Count by Period -->
+					<viz:VizFrame
+                        id="barChartCount"
+                        vizType="column"
+                        width="100%"
+                        height="400px"
+                        vizProperties="{ title: { text: 'Invoice Count by Period' } }">
+						<viz:dataset>
+							<!-- Using corrected 'vizData' prefix -->
+							<vizData:FlattenedDataset data="{chartData>/invoiceCounts}">
+								<vizData:dimensions>
+									<vizData:DimensionDefinition name="Period" value="{chartData>periodLabel}" />
+								</vizData:dimensions>
+								<vizData:measures>
+									<vizData:MeasureDefinition name="Invoice Count" value="{chartData>count}" />
+								</vizData:measures>
+							</vizData:FlattenedDataset>
+						</viz:dataset>
+						<viz:feeds>
+							<!-- Using corrected 'vizFeeds' prefix -->
+							<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Invoice Count" />
+							<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Period" />
+						</viz:feeds>
+					</viz:VizFrame>
+					<!-- Pie Chart: Invoice Total Amount by Company -->
+					<viz:VizFrame
+                        id="pieChartTotal"
+                        vizType="pie"
+                        width="100%"
+                        height="400px"
+                        vizProperties="{ title: { text: 'Invoice Value by Company' } }">
+						<viz:dataset>
+							<!-- Using corrected 'vizData' prefix -->
+							<vizData:FlattenedDataset data="{chartData>/companyTotals}">
+								<vizData:dimensions>
+									<vizData:DimensionDefinition name="Company" value="{chartData>companyName}" />
+								</vizData:dimensions>
+								<vizData:measures>
+									<vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmount}" />
+								</vizData:measures>
+							</vizData:FlattenedDataset>
+						</viz:dataset>
+						<viz:feeds>
+							<!-- Using corrected 'vizFeeds' prefix -->
+							<vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
+							<vizFeeds:FeedItem uid="color" type="Dimension" values="Company" />
+						</viz:feeds>
+					</viz:VizFrame>
+				</layout:content>
+			</layout:Grid>
+		</f:content>
+	</f:DynamicPage>
+</mvc:View>

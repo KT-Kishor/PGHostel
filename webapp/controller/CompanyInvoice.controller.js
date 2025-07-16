@@ -160,6 +160,9 @@ sap.ui.define(
         onPressback: function () {
           this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
+        CI_onPressDashboard: function () {
+          this.getOwnerComponent().getRouter().navTo("RouteInvoiceDashboard");
+        },
 
         onLogout: function () {
           this.getOwnerComponent().getRouter().navTo("RouteLoginPage");
