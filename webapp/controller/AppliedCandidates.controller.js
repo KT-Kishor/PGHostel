@@ -98,38 +98,39 @@ sap.ui.define([
                     if (sName) {
                         aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
                     }
-                    // 2. Notice Period Filter 
-                    const sNoticePeriod = this.byId("filterNoticePeriod").getValue().trim();
-                    if (sNoticePeriod) {
-                        const aRange = sNoticePeriod.split("-").map(s => parseInt(s.trim(), 10));
-                        if (aRange.length === 2 && !isNaN(aRange[1])) {
-                            const maxFilter = aRange[1];
-
-                            aFilters.push(new Filter({
-                                path: "NoticePeriod",
-                                test: function (v) {
-                                    if (!v) return false;
-                                    const digits = v.match(/\d+/g);
-                                    if (!digits || digits.length === 0) return false;
-                                    const candidateMin = parseInt(digits[0], 10);
-                                    return !isNaN(candidateMin) && candidateMin < maxFilter;
+                    // 2. Notice Period Filter
+                    const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
+                    if (sNoticePeriodInput) {
+                        aFilters.push(new Filter({
+                            path: "NoticePeriod",
+                            test: function (sDataValue) {
+                                if (!sDataValue || !sNoticePeriodInput) return false;
+                                const data = sDataValue.toString().trim();
+                                const input = sNoticePeriodInput.toString().trim();
+                                // User typed a single number or non-range string
+                                if (!input.includes('-')) {
+                                    return data.toLowerCase() === input.toLowerCase();
                                 }
-                            }));
-                        } else {
-                            const typedValue = parseInt(sNoticePeriod, 10);
-                            if (!isNaN(typedValue)) {
-                                aFilters.push(new Filter({
-                                    path: "NoticePeriod",
-                                    test: function (v) {
-                                        if (!v) return false;
-                                        const digits = v.match(/\d+/g);
-                                        if (!digits || digits.length === 0) return false;
-                                        const candidateMin = parseInt(digits[0], 10);
-                                        return !isNaN(candidateMin) && candidateMin === typedValue;
+                                // User selected a range (e.g., "0-15")
+                                else {
+                                    if (data.toLowerCase() === input.toLowerCase()) {
+                                        return true;
                                     }
-                                }));
+                                    if (!data.includes('-')) {
+                                        try {
+                                            const numData = parseInt(data, 10);
+                                            if (isNaN(numData)) return false;
+                                            const rangeParts = input.split('-');
+                                            const min = parseInt(rangeParts[0].trim(), 10);
+                                            const max = parseInt(rangeParts[1].trim(), 10);
+                                            if (isNaN(min) || isNaN(max)) return false;
+                                            return numData >= min && numData <= max;
+                                        } catch (e) { return false; }
+                                    }
+                                    return false;
+                                }
                             }
-                        }
+                        }));
                     }
                     // 3. Skills Filter
                     const sSkills = this.byId("filterSkills").getValue().trim();
@@ -137,36 +138,36 @@ sap.ui.define([
                         aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
                     }
                     // 4. Experience Filter
-                    const sExperienceValue = this.byId("filterExperience").getValue().trim();
-                    if (sExperienceValue) {
-                        const aExpRange = sExperienceValue.split("-").map(v => parseFloat(v.trim()));
-                        if (aExpRange.length === 2 && !isNaN(aExpRange[0]) && !isNaN(aExpRange[1])) {
-                            const [minExp, maxExp] = aExpRange;
-                            aFilters.push(new Filter({
-                                path: "Experience",
-                                test: function (v) {
-                                    if (!v) return false;
-                                    const match = v.toString().match(/[\d.]+/);
-                                    if (!match) return false;
-                                    const value = parseFloat(match[0]);
-                                    return !isNaN(value) && value >= minExp && value <= maxExp;
+                    const sExperienceInput = this.byId("filterExperience").getValue().trim();
+                    if (sExperienceInput) {
+                        aFilters.push(new Filter({
+                            path: "Experience",
+                            test: function (sDataValue) {
+                                if (!sDataValue || !sExperienceInput) return false;
+                                const data = sDataValue.toString().trim();
+                                const input = sExperienceInput.toString().trim();
+                                // User typed a single number
+                                if (!input.includes('-')) {
+                                    return data.toLowerCase() === input.toLowerCase();
                                 }
-                            }));
-                        } else {
-                            const valExp = parseFloat(sExperienceValue);
-                            if (!isNaN(valExp)) {
-                                aFilters.push(new Filter({
-                                    path: "Experience",
-                                    test: function (v) {
-                                        if (!v) return false;
-                                        const match = v.toString().match(/[\d.]+/);
-                                        if (!match) return false;
-                                        const value = parseFloat(match[0]);
-                                        return !isNaN(value) && value === valExp;
+                                // User selected a range
+                                else {
+                                    if (data.toLowerCase() === input.toLowerCase()) return true;
+                                    if (!data.includes('-')) {
+                                        try {
+                                            const numData = parseFloat(data);
+                                            if (isNaN(numData)) return false;
+                                            const rangeParts = input.split('-');
+                                            const min = parseFloat(rangeParts[0].trim());
+                                            const max = parseFloat(rangeParts[1].trim());
+                                            if (isNaN(min) || isNaN(max)) return false;
+                                            return numData >= min && numData <= max;
+                                        } catch (e) { return false; }
                                     }
-                                }));
+                                    return false;
+                                }
                             }
-                        }
+                        }));
                     }
                     oTableBinding.filter(aFilters);
                 } catch (error) {
@@ -174,7 +175,7 @@ sap.ui.define([
                 } finally {
                     setTimeout(() => this.closeBusyDialog(), 300);
                 }
-            }, 0);
+            }, 50);
         },
 
         onSuggestSkills: function (oEvent) {
