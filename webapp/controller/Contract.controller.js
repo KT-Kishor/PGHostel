@@ -104,17 +104,11 @@ sap.ui.define(
 
                 _getFinancialYearDates: function () {
                     var today = new Date();
-                    var currentMonth = today.getMonth() + 1;
                     var currentYear = today.getFullYear();
 
-                    var fyStart, fyEnd;
-                    if (currentMonth >= 4) {
-                        fyStart = new Date(currentYear, 3, 1);
-                        fyEnd = new Date(currentYear + 1, 2, 31);
-                    } else {
-                        fyStart = new Date(currentYear - 1, 3, 1);
-                        fyEnd = new Date(currentYear, 2, 31);
-                    }
+                    var fyStart = new Date(currentYear, 0, 1); // January 1st
+                    var fyEnd = new Date(currentYear, 11, 31); // December 31st
+
                     return { start: fyStart, end: fyEnd };
                 },
 
