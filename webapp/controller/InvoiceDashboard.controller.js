@@ -1,15 +1,19 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/model/json/JSONModel"
-], function (BaseController, JSONModel) {
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast"
+], function (BaseController, JSONModel, MessageToast) {
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
 
         onInit: function () {
+            // Model for all chart data
             this.getView().setModel(new JSONModel({
-                invoiceCounts: [],
-                companyTotals: []
+                statusDistribution: [],
+                monthlyValue: [],
+                companyTotals: [],
+                yearlyTrend: []
             }), "chartData");
 
             this.getView().setModel(new JSONModel([]), "companies");
@@ -23,110 +27,116 @@ sap.ui.define([
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
-            this._fetchAndProcessData();
-        },
-        onPressback: function () {
-            this.getRouter().navTo("RouteTilePage");
-        },
-        onLogout: function () {
-            this.getRouter().navTo("RouteLoginPage");
+            this.readInvoiceData();
         },
 
-        _fetchAndProcessData: async function () {
-            // const rawInvoiceData = await this.ajaxReadWithJQuery("CompanyInvoice", "InvoiceData");
-            const rawInvoiceData = this._getMockInvoiceData();
-            this.rawInvoiceData = rawInvoiceData; // Store raw data on the controller
+        readInvoiceData: async function () {
+            this.getBusyDialog();
+            try {
+                const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
+                const rawBackendData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-            // Populate the company filter dropdown with unique company names
-            const uniqueCompanies = [...new Set(rawInvoiceData.map(item => item.CompanyName))];
-            this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c })));
+                // Map data once on load
+                this.rawInvoiceData = rawBackendData.map(item => ({
+                    CompanyName: item.CustomerName,
+                    Amount: parseFloat(item.TotalAmount || 0),
+                    Status: item.Status || "Unknown",
+                    InvoiceDate: new Date(item.InvoiceDate) // Convert to Date object for easier filtering
+                }));
 
-            // Initial processing of data
+                // Populate company filter dropdown
+                const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CompanyName))];
+                this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c, text: c })));
+
+                // Set default year filter to current year
+                this.byId("yearFilter").setValue(new Date().getFullYear().toString());
+
+                // Perform initial data aggregation
+                this.onFilterChange();
+
+            } catch (error) {
+                MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+        
+        onFilterChange: function () {
+            if (!this.rawInvoiceData) return;
+
+            const aSelectedCompanies = this.byId("companyFilter").getSelectedKeys();
+            const sSelectedYear = this.byId("yearFilter").getValue();
+
+            // --- Filter data for the first 3 charts based on all filters ---
+            let aFilteredData = this.rawInvoiceData;
+            if (aSelectedCompanies.length > 0) {
+                aFilteredData = aFilteredData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
+            }
+            if (sSelectedYear) {
+                aFilteredData = aFilteredData.filter(invoice => invoice.InvoiceDate.getFullYear().toString() === sSelectedYear);
+            }
+
+            // --- Filter data for the Yearly Trend chart (ignores year filter) ---
+            let aYearlyTrendData = this.rawInvoiceData;
+            if (aSelectedCompanies.length > 0) {
+                aYearlyTrendData = aYearlyTrendData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
+            }
+            
+            this._aggregateAndSetChartData(aFilteredData, aYearlyTrendData);
+        },
+
+        _aggregateAndSetChartData: function (aFilteredData, aYearlyTrendData) {
+            // 1. Status Distribution (Donut Chart)
+            const statusDistribution = aFilteredData.reduce((acc, item) => {
+                acc[item.Status] = (acc[item.Status] || 0) + 1;
+                return acc;
+            }, {});
+
+            // 2. Monthly Value (Line Chart)
+            const monthlyValue = aFilteredData.reduce((acc, item) => {
+                const month = item.InvoiceDate.getMonth(); // 0-11
+                acc[month] = (acc[month] || 0) + item.Amount;
+                return acc;
+            }, {});
+
+            // 3. Company Totals (Bar Chart)
+            const companyTotals = aFilteredData.reduce((acc, item) => {
+                acc[item.CompanyName] = (acc[item.CompanyName] || 0) + item.Amount;
+                return acc;
+            }, {});
+
+            // 4. Yearly Trend (Line Chart)
+            const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
+                const year = item.InvoiceDate.getFullYear();
+                if (!acc[year]) acc[year] = { totalAmount: 0, count: 0 };
+                acc[year].totalAmount += item.Amount;
+                acc[year].count++;
+                return acc;
+            }, {});
+
+            // --- Format data for models ---
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const formattedMonthly = Array.from({ length: 12 }, (_, i) => ({
+                month: monthNames[i],
+                totalAmount: monthlyValue[i] || 0
+            }));
+            
+            this.getView().getModel("chartData").setData({
+                statusDistribution: Object.entries(statusDistribution).map(([st, co]) => ({ status: st, count: co })),
+                monthlyValue: formattedMonthly,
+                companyTotals: Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmount: total })).sort((a,b) => b.totalAmount - a.totalAmount),
+                yearlyTrend: Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a,b) => a.year - b.year)
+            });
+        },
+
+        onClearFilters: function() {
+            this.byId("companyFilter").setSelectedKeys(null);
+            this.byId("yearFilter").setValue(new Date().getFullYear().toString()); // Reset to current year
             this.onFilterChange();
         },
 
-        onFilterChange: function () {
-            const oCompanyFilter = this.byId("companyFilter");
-            const oTimeFilter = this.byId("timePeriodFilter");
-
-            const aSelectedCompanies = oCompanyFilter.getSelectedKeys();
-            const sSelectedPeriod = oTimeFilter.getSelectedKey();
-
-            // 1. Filter the raw data based on selected companies
-            let aFilteredData = this.rawInvoiceData;
-            if (aSelectedCompanies.length > 0) {
-                aFilteredData = this.rawInvoiceData.filter(invoice =>
-                    aSelectedCompanies.includes(invoice.CompanyName)
-                );
-            }
-
-            // 2. Aggregate the filtered data for the charts
-            const oAggregatedData = this._aggregateData(aFilteredData, sSelectedPeriod);
-
-            // 3. Set the new data to the chart model, which updates the UI
-            this.getView().getModel("chartData").setData(oAggregatedData);
-        },
-
-        _aggregateData: function (aData, sPeriodType) {
-            // This is the core logic for data aggregation
-
-            // Aggregation for Bar Chart (Count by Period)
-            const periodCounts = aData.reduce((acc, invoice) => {
-                const dInvoiceDate = new Date(invoice.InvoiceDate);
-                const sPeriodLabel = this._getPeriodLabel(dInvoiceDate, sPeriodType);
-
-                if (!acc[sPeriodLabel]) {
-                    acc[sPeriodLabel] = { periodLabel: sPeriodLabel, count: 0 };
-                }
-                acc[sPeriodLabel].count++;
-                return acc;
-            }, {});
-
-            // Aggregation for Pie Chart (Total by Company)
-            const companyTotals = aData.reduce((acc, invoice) => {
-                const sCompanyName = invoice.CompanyName;
-                if (!acc[sCompanyName]) {
-                    acc[sCompanyName] = { companyName: sCompanyName, totalAmount: 0 };
-                }
-                acc[sCompanyName].totalAmount += parseFloat(invoice.Amount);
-                return acc;
-            }, {});
-
-            return {
-                // Convert objects to arrays for the model
-                invoiceCounts: Object.values(periodCounts).sort((a, b) => a.periodLabel.localeCompare(b.periodLabel)),
-                companyTotals: Object.values(companyTotals)
-            };
-        },
-
-        _getPeriodLabel: function (oDate, sPeriodType) {
-            const year = oDate.getFullYear();
-            const month = oDate.getMonth(); // 0-11
-
-            switch (sPeriodType) {
-                case "Quarterly":
-                    const quarter = Math.floor(month / 3) + 1;
-                    return `${year}-Q${quarter}`;
-                case "HalfYearly":
-                    const half = month < 6 ? "H1" : "H2";
-                    return `${year}-${half}`;
-                case "Yearly":
-                default:
-                    return year.toString();
-            }
-        },
-
-        _getMockInvoiceData: function () {
-            return [
-                { "InvoiceDate": "2023-01-15", "CompanyName": "Company A", "Amount": "1500.00" },
-                { "InvoiceDate": "2023-02-20", "CompanyName": "Company B", "Amount": "2500.50" },
-                { "InvoiceDate": "2023-04-10", "CompanyName": "Company A", "Amount": "3000.00" },
-                { "InvoiceDate": "2023-05-05", "CompanyName": "Company C", "Amount": "1200.75" },
-                { "InvoiceDate": "2023-08-18", "CompanyName": "Company B", "Amount": "4000.00" },
-                { "InvoiceDate": "2023-11-25", "CompanyName": "Company A", "Amount": "2200.00" },
-                { "InvoiceDate": "2024-02-01", "CompanyName": "Company C", "Amount": "1800.00" },
-                { "InvoiceDate": "2024-03-30", "CompanyName": "Company B", "Amount": "3200.25" }
-            ];
-        }
+        // --- Navigation and Standard Functions ---
+        onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
+        onLogout: function () { this.getRouter().navTo("RouteLoginPage"); }
     });
 });
