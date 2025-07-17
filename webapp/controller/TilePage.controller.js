@@ -402,6 +402,11 @@ sap.ui.define(
           var Path = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
         },
+
+         TileV_onpressInvoiceDashboard: function () {
+          this.getRouter().navTo("RouteInvoiceDashboard");
+        },
+       
        
 
       }

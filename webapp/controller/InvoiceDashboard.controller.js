@@ -17,19 +17,30 @@ sap.ui.define([
             oRouter.getRoute("RouteInvoiceDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
 
-        _onObjectMatched: function () {
+        _onObjectMatched: async function () {
+            var LoginFunction = await this.commonLoginFunction("InvoiceDashboard");
+            if (!LoginFunction) return;
+
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
             this._fetchAndProcessData();
         },
+        onPressback: function () {
+            this.getRouter().navTo("RouteTilePage");
+        },
+        onLogout: function () {
+            this.getRouter().navTo("RouteLoginPage");
+        },
 
-        _fetchAndProcessData: async function() {
+        _fetchAndProcessData: async function () {
             // const rawInvoiceData = await this.ajaxReadWithJQuery("CompanyInvoice", "InvoiceData");
-            const rawInvoiceData = this._getMockInvoiceData(); 
+            const rawInvoiceData = this._getMockInvoiceData();
             this.rawInvoiceData = rawInvoiceData; // Store raw data on the controller
 
             // Populate the company filter dropdown with unique company names
             const uniqueCompanies = [...new Set(rawInvoiceData.map(item => item.CompanyName))];
             this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c })));
-            
+
             // Initial processing of data
             this.onFilterChange();
         },
@@ -44,7 +55,7 @@ sap.ui.define([
             // 1. Filter the raw data based on selected companies
             let aFilteredData = this.rawInvoiceData;
             if (aSelectedCompanies.length > 0) {
-                aFilteredData = this.rawInvoiceData.filter(invoice => 
+                aFilteredData = this.rawInvoiceData.filter(invoice =>
                     aSelectedCompanies.includes(invoice.CompanyName)
                 );
             }
@@ -55,8 +66,8 @@ sap.ui.define([
             // 3. Set the new data to the chart model, which updates the UI
             this.getView().getModel("chartData").setData(oAggregatedData);
         },
-        
-        _aggregateData: function(aData, sPeriodType) {
+
+        _aggregateData: function (aData, sPeriodType) {
             // This is the core logic for data aggregation
 
             // Aggregation for Bar Chart (Count by Period)
@@ -83,12 +94,12 @@ sap.ui.define([
 
             return {
                 // Convert objects to arrays for the model
-                invoiceCounts: Object.values(periodCounts).sort((a,b) => a.periodLabel.localeCompare(b.periodLabel)),
+                invoiceCounts: Object.values(periodCounts).sort((a, b) => a.periodLabel.localeCompare(b.periodLabel)),
                 companyTotals: Object.values(companyTotals)
             };
         },
 
-        _getPeriodLabel: function(oDate, sPeriodType) {
+        _getPeriodLabel: function (oDate, sPeriodType) {
             const year = oDate.getFullYear();
             const month = oDate.getMonth(); // 0-11
 
@@ -104,8 +115,8 @@ sap.ui.define([
                     return year.toString();
             }
         },
-        
-        _getMockInvoiceData: function() {
+
+        _getMockInvoiceData: function () {
             return [
                 { "InvoiceDate": "2023-01-15", "CompanyName": "Company A", "Amount": "1500.00" },
                 { "InvoiceDate": "2023-02-20", "CompanyName": "Company B", "Amount": "2500.50" },
