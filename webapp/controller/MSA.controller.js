@@ -1,13 +1,13 @@
 sap.ui.define([
-    "./BaseController",
-],
-    function (BaseController,) {
+        "./BaseController",
+    ],
+    function(BaseController, ) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function() {
                 try {
                     var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                     if (!LoginFUnction) return;
@@ -20,77 +20,124 @@ sap.ui.define([
                 } finally {
                     this.closeBusyDialog(); // Close after async call finishes
                 }
-                 this.initializeBirthdayCarousel();
+                this.initializeBirthdayCarousel();
             },
-            onPressback: function () {
+            onPressback: function() {
                 this.getRouter().navTo("RouteTilePage");
             },
-            onPressClear: function () {
+            onPressClear: function() {
                 this.byId("MSA_id_CompanyName").setValue('');
                 this.byId("MSA_id_Type").setValue('');
                 this.byId("id_msa_date").setValue('');
             },
-            MSA_onAddCustomer: function () {
-                this.getRouter().navTo("RouteManageCustomer", { value: "MSA" });
+            MSA_onAddCustomer: function() {
+                this.getRouter().navTo("RouteManageCustomer", {
+                    value: "MSA"
+                });
             },
-            onLogout: function () {
+            onLogout: function() {
                 this.CommonLogoutFunction();
             },
-            MSA_AddmsaDetails: function () {
+            MSA_AddmsaDetails: function() {
                 this.getRouter().navTo("RouteMSADetails");
             },
 
-            OnPressNavigationMsaDet: function (oEvent) {
+            OnPressNavigationMsaDet: function(oEvent) {
                 var MsaID = oEvent.getSource().getBindingContext("MSADisplayModel").getProperty("MsaID");
-                this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
+                this.getRouter().navTo("RouteMSAEdit", {
+                    sPath: MsaID
+                })
             },
 
-            MSA_onSearch: async function () {
+            MSA_onSearch: async function() {
                 try {
                     this.getBusyDialog();
-                    var aFilterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" })
-                    var params = {};
-                    aFilterItems.forEach(function (oItem) {
-                        var oControl = oItem.getControl();
-                        var sValue = oItem.getName();
-                        if (oControl && oControl.getValue()) {
-                            if (sValue === "CreateMSADate") {
-                                params["StartDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0].trim().split('/').reverse().join('-')));
-                                params["EndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1].trim().split('/').reverse().join('-')));
+                    const filterItems = this.byId("MSA_id_AdminFilter").getFilterGroupItems();
+                    const params = {};
+
+                    let msaDateProvided = false;
+
+                    filterItems.forEach((item) => {
+                        const control = item.getControl();
+                        const key = item.getName();
+
+                        if (control && typeof control.getValue === "function") {
+                            const value = control.getValue().trim();
+
+                            if (key === "CreateMSADate" && value.includes("-")) {
+                                const [start, end] = value.split("-").map(date =>
+                                    date.trim().split("/").reverse().join("-")
+                                );
+                                params.StartDate = start;
+                                params.EndDate = end;
+                                msaDateProvided = true;
                             } else {
-                                params[sValue] = oControl.getValue();
+                                params[key] = value;
                             }
                         }
                     });
-                    if (params && Object.keys(params).length > 0) {
-                        this.Filter = false;
+
+                    // Compute current financial year
+                    const currentYear = new Date().getFullYear();
+                    let fyStart, fyEnd, financialYearLabel;
+
+                    if (new Date().getMonth() >= 3) { // April or later
+                        fyStart = new Date(currentYear, 3, 1); // April 1st
+                        fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
+                        financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                    } else {
+                        fyStart = new Date(currentYear - 1, 3, 1); // April 1st last year
+                        fyEnd = new Date(currentYear, 2, 31); // March 31st this year
+                        financialYearLabel = `${currentYear - 1}-${currentYear}`;
                     }
-                    // Fetch the data
+
+                    const formatDate = (date) => date.toISOString().split("T")[0]; // yyyy-MM-dd
+
+                    // If no dates selected by user, apply financial year range
+                    if (!params.StartDate && !params.EndDate) {
+                        params.StartDate = formatDate(fyStart);
+                        params.EndDate = formatDate(fyEnd);
+                        params.FinancialYear = financialYearLabel;
+
+                        // Set in the DateRangeSelection control visually
+                        const dateRangeControl = this.byId("id_msa_date");
+                        if (dateRangeControl) {
+                            dateRangeControl.setDateValue(fyStart);
+                            dateRangeControl.setSecondDateValue(fyEnd);
+                        }
+                    } else {
+                        // Add FinancialYear if selected range matches FY
+                        const startDate = new Date(params.StartDate);
+                        const endDate = new Date(params.EndDate);
+
+                        if (
+                            startDate.getTime() === fyStart.getTime() &&
+                            endDate.getTime() === fyEnd.getTime()
+                        ) {
+                            params.FinancialYear = financialYearLabel;
+                        }
+                    }
+
+                    // Fetch data
                     await this._fetchCommonData("MSADetails", "MSADisplayModel", params);
 
-                    // Get the loaded data from the model
-                    var oModel = this.getView().getModel("MSADisplayModel");
-                    var aData = oModel.getData();
+                    const oModel = this.getView().getModel("MSADisplayModel");
+                    const aData = oModel.getData();
 
-                    // Loop and format each CreateMSADate
                     aData.forEach(item => {
                         if (item.CreateMSADate) {
                             item.CreateMSADate = this.Formatter.formatDate(item.CreateMSADate);
                         }
                     });
 
-                    // Update model with new formatted field
                     oModel.setData(aData);
-
                     this.closeBusyDialog();
+
                 } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                } finally {
                     this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            },
-
+            }
 
         });
     });

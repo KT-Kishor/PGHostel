@@ -1,34 +1,27 @@
-
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "../utils/validation",
     "../model/formatter",
     "sap/m/MessageToast",
-], function (
+], function(
     BaseController,
     JSONModel,
     utils,
     formatter,
     MessageToast) {
     "use strict";
-
     return BaseController.extend("sap.kt.com.minihrsolution.controller.PurchaseOrder", {
         formatter: formatter,
-        onInit: function () {
+        onInit: function() {
             this.getRouter().getRoute("PurchaseOrder").attachPatternMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: async function () {
-
+        _onRouteMatched: async function() {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var LoginFUnction = await this.commonLoginFunction("PurchaseOrder");
             if (!LoginFUnction) return;
-            this.finacial()
+            this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
             await this.PO_onSearch()
-
-            await this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
-            // this._fetchCommonData("Currency", "CurrencyModel");
-
             var model = new JSONModel({
                 "CustomerName": "",
                 "Type": "",
@@ -43,63 +36,37 @@ sap.ui.define([
                 "Currency": "",
                 "Notes": "",
                 "PurchaseOrders": [],
-
             })
             this.getView().setModel(model, "PurchaseOrderModel");
             this.getView().getModel("LoginModel").setProperty("/HeaderName", "Purchase Order");
-            this._ViewDatePickersReadOnly(["PO_idECreationDatePicker"], this.getView());
             this.initializeBirthdayCarousel();
         },
-        finacial: function () {
-            var oDateRange = this.byId("PO_idECreationDatePicker");
-            var today = new Date();
-            var currentYear = today.getFullYear();
-            var currentMonth = today.getMonth();
-
-            var startYear = currentMonth >= 3 ? currentYear : currentYear - 1;
-            var endYear = startYear + 1;
-
-            var oStartDate = new Date(startYear, 3, 1);
-            var oEndDate = new Date(endYear, 2, 31);
-
-            oDateRange.setDateValue(oStartDate);
-            oDateRange.setSecondDateValue(oEndDate)
-        },
-        onPressback: function () {
+        onPressback: function() {
             this.getRouter().navTo("RouteTilePage");
         },
-        onLogout: function () {
+        onLogout: function() {
             this.CommonLogoutFunction()
         },
-        PO_onCreatePurchaseOrder: function () {
-
-            this.getRouter().navTo("PurchaseOrderObject", { sPath: "PurchaseOrder" });
-
+        PO_onCreatePurchaseOrder: function() {
+            this.getRouter().navTo("PurchaseOrderObject", {
+                sPath: "PurchaseOrder"
+            });
         },
-
-
-        PO_onCloseFrag: function () {
+        PO_onCloseFrag: function() {
             this.PO_oDialog.close();
             var oModel = this.getView().getModel("PurchaseOrderModel");
-
-            // Clear the PurchaseOrders array
             oModel.setProperty("/PurchaseOrders", []);
-
-
         },
-
-        PO_onAmountInputChange: function (oEvent) {
+        PO_onAmountInputChange: function(oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
-        onDescriptionInputLiveChange: function (oEvent) {
+        onDescriptionInputLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
-        FPO_onDateChange: function (oEvent) {
+        FPO_onDateChange: function(oEvent) {
             utils._LCvalidateDate(oEvent)
         },
-
-
-        PO_ReadCall: async function () {
+        PO_ReadCall: async function() {
             this.getBusyDialog()
             await this.ajaxReadWithJQuery("PurchaseOrder").then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -108,82 +75,113 @@ sap.ui.define([
             });
 
         },
-        PO_onDeleteButtonPress: function () {
-
+        PO_onDeleteButtonPress: function() {
             var Table = this.getView().byId("idPOTable");
             var selectedItem = Table.getSelectedItem();
             if (!selectedItem) {
                 MessageToast.show(this.i18nModel.getText("selectPurchaseOrder"));
                 return;
             }
-
             var PoNumber = selectedItem.getBindingContext("POModel").getProperty("PoNumber");
             this.showConfirmationDialog(
                 "Delete Confirmation",
                 "Are you sure you want to delete this Purchase Order?",
                 () => {
                     this.getBusyDialog()
-                    this.ajaxDeleteWithJQuery("PurchaseOrder", { filters: { PoNumber: PoNumber } }).then(() => {
+                    this.ajaxDeleteWithJQuery("PurchaseOrder", {
+                        filters: {
+                            PoNumber: PoNumber
+                        }
+                    }).then(() => {
                         MessageToast.show(this.i18nModel.getText("purchaseOrderDeleted"));
                         this.PO_ReadCall();
-                     
+
                     });
                 },
-                function () { Table.removeSelections() }
+                function() {
+                    Table.removeSelections()
+                }
             );
 
         },
-        onColumnListItemPress: function (oEvent) {
-
+        onColumnListItemPress: function(oEvent) {
             var PoNumber = oEvent.getSource().getBindingContext("POModel").getObject().PoNumber;
             var onav = this.getOwnerComponent().getRouter()
             onav.navTo("PurchaseOrderObject", {
                 sPath: PoNumber
             })
         },
-        PO_onSearch: function () {
-            var CustName1 = this.getView().byId("PO_id_CustomerName")
-            var CustName = CustName1.getSelectedKey() ? CustName1.getSelectedKey() : CustName1.getValue()
+        PO_onSearch: async function() {
+            try {
+                this.getBusyDialog();
 
-            var Po = this.getView().byId("PO_id_PoNumber").getSelectedKey() ? this.getView().byId("PO_id_PoNumber").getSelectedKey() : this.getView().byId("PO_id_PoNumber").getValue()
-            var oDateRange = this.getView().byId("PO_idECreationDatePicker")
-            var odateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-            var oStartDate = oDateRange.getDateValue();
-            var oEndDate = oDateRange.getSecondDateValue();
+                const PoControl = this.byId("PO_id_PoNumber");
+                const Po = PoControl.getSelectedKey() || PoControl.getValue();
 
+                const oDateRange = this.byId("PO_idECreationDatePicker");
+                const odateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "yyyy-MM-dd"
+                });
 
-            var filters = {}
+                const oStartDate = oDateRange.getDateValue();
+                const oEndDate = oDateRange.getSecondDateValue();
 
-            if (CustName) {
-                filters.CustomerName = CustName;
+                const filters = {};
+
+                if (Po) {
+                    filters.PoNumber = Po;
+                }
+
+                // Financial Year calculation
+                const currentYear = new Date().getFullYear();
+                let fyStart, fyEnd, financialYearLabel;
+
+                if (new Date().getMonth() >= 3) {
+                    fyStart = new Date(currentYear, 3, 1);
+                    fyEnd = new Date(currentYear + 1, 2, 31);
+                    financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1);
+                    fyEnd = new Date(currentYear, 2, 31);
+                    financialYearLabel = `${currentYear - 1}-${currentYear}`;
+                }
+
+                if (oStartDate && oEndDate) {
+                    filters.StartDate = odateFormat.format(oStartDate);
+                    filters.EndDate = odateFormat.format(oEndDate);
+
+                    if (
+                        oStartDate.getTime() === fyStart.getTime() &&
+                        oEndDate.getTime() === fyEnd.getTime()
+                    ) {
+                        filters.FinancialYear = financialYearLabel;
+                    }
+                } else {
+                    filters.StartDate = odateFormat.format(fyStart);
+                    filters.EndDate = odateFormat.format(fyEnd);
+                    filters.FinancialYear = financialYearLabel;
+
+                    oDateRange.setDateValue(fyStart);
+                    oDateRange.setSecondDateValue(fyEnd);
+                }
+                this._fetchCommonData("PurchaseOrder", "POModelfilter", {
+                    StartDate: filters.StartDate,
+                    EndDate: filters.EndDate
+                });
+                await this._fetchCommonData("PurchaseOrder", "POModel", filters);
+                this.closeBusyDialog();
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show("Technical error occurred");
             }
-            if (Po) {
-                filters.PoNumber = Po;
-            }
-            if (oStartDate && oEndDate) {
-                filters.StartDate = odateFormat.format(oStartDate);
-                filters.EndDate = odateFormat.format(oEndDate);
-            }
-            this.getBusyDialog()
-            this.ajaxReadWithJQuery("PurchaseOrder", filters).then((oData) => {
-                var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                this.getOwnerComponent().setModel(new JSONModel(PoData), "POModel");
-                 this.ajaxReadWithJQuery("PurchaseOrder").then((oData) => {
-                var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                this.getOwnerComponent().setModel(new JSONModel(PoData), "POModelfilter");
-                this.closeBusyDialog()
-            });
-                this.closeBusyDialog()
-            });
         },
-        PO_onPressClear: function () {
+        PO_onPressClear: function() {
             this.getView().byId("PO_id_CustomerName").setSelectedKey("");
             this.getView().byId("PO_id_PoNumber").setSelectedKey("");
-          this.finacial()
+            this.byId("PO_idECreationDatePicker").setValue("");
         },
-        onClearNotesPress: function () {
+        onClearNotesPress: function() {
             this.getView().getModel("PurchaseOrderModel").setProperty("/Notes", "")
         }
-
     });
 });
