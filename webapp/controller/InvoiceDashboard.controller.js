@@ -27,6 +27,7 @@ sap.ui.define([
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
+            this.onClearFilters()
             this.readInvoiceData();
         },
 
@@ -132,7 +133,7 @@ sap.ui.define([
         onClearFilters: function() {
             this.byId("companyFilter").setSelectedKeys(null);
             this.byId("yearFilter").setValue(new Date().getFullYear().toString()); // Reset to current year
-            this.onFilterChange();
+           // this.onFilterChange();
         },
 
         // --- Navigation and Standard Functions ---
