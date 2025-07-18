@@ -16,30 +16,29 @@
 		</headerContent>
 		<content>
             <VBox class="sapUiSmallMargin">
-                <!-- Global Filter Bar -->
+                <!-- Filter Bar -->
                 <fb:FilterBar id="dashboardFilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Company" label="Company" groupName="Group1" visibleInFilterBar="true" >
                             <fb:control>
-                                <MultiComboBox id="companyFilter" width="400px" placeholder="All Companies" items="{path: 'companies>/'}" selectionChange="onFilterChange">
+                                <MultiComboBox id="companyFilter" width="400px" placeholder="{i18n>companyName}" items="{path: 'companies>/'}" selectionChange="onFilterChange">
                                     <items><core:Item key="{companies>key}" text="{companies>text}"/></items>
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
-                        <fb:FilterGroupItem name="Year" label="Year" groupName="Group1" visibleInFilterBar="true">
+                        <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
-                                <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="Current Year" change="onFilterChange"/>
+                                <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>currentYear}" change="onFilterChange"/>
                             </fb:control>
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
                 </fb:FilterBar>
 
-                <!-- 2x2 Grid for Charts -->
+                <!--  Grid for Charts -->
                 <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiSmallMarginTop">
                     <layout:content>
-                        <!-- Chart 1: Top-Left (Status Overview) -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="Invoice Status Overview" /></f:header>
+                            <f:header><Title text="{i18n>invoiceStatusDash}" /></f:header>
                             <f:content>
                                 <viz:VizFrame id="donutChartStatus" vizType="donut" width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, type: 'value' } } }">
@@ -61,9 +60,9 @@
                             </f:content>
                         </f:Card>
 
-                        <!-- Chart 2: Top-Right (Monthly Trend) -->
+                        <!-- (Monthly Trend) -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="Monthly Invoice Value" /></f:header>
+                            <f:header><Title text="{i18n>invoiceMonthly}" /></f:header>
                             <f:content>
                                 <viz:VizFrame id="lineChartMonthly" vizType="line" width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
@@ -85,9 +84,9 @@
                             </f:content>
                         </f:Card>
                         
-                        <!-- Chart 3: Bottom-Left (Value by Company) -->
+                        <!--  (Value by Company) -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="Total Value by Company" /></f:header>
+                            <f:header><Title text="{i18n>companytotalinvoice}" /></f:header>
                             <f:content>
                                 <viz:VizFrame id="barChartCompany" vizType="bar" width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
@@ -109,9 +108,9 @@
                             </f:content>
                         </f:Card>
 
-                        <!-- Chart 4: Bottom-Right (Yearly Trend) -->
+                        <!--(Yearly Trend) -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="Yearly Performance Trend" /></f:header>
+                            <f:header><Title text="{i18n>yearlyInvoiceTrend}" /></f:header>
                             <f:content>
                                 <viz:VizFrame id="lineChartYearly" vizType="line" width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, legend: { visible: true } }">
