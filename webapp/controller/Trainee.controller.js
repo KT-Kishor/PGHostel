@@ -1,86 +1,90 @@
 sap.ui.define([
-    "./BaseController", //call base controller
-    "../utils/validation", // call validation function
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "sap/m/MessageBox",
-    "../model/formatter"],
-    function (BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+        "./BaseController", //call base controller
+        "../utils/validation", // call validation function
+        "sap/ui/model/json/JSONModel",
+        "sap/m/MessageToast",
+        "sap/m/MessageBox",
+        "../model/formatter"
+    ],
+    function(BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteTrainee").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function (oEvent) {
+            _onRouteMatched: async function(oEvent) {
                 var LoginFunction = await this.commonLoginFunction("Trainee");
                 if (!LoginFunction) return;
+
                 this.getBusyDialog();
                 this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                // common company emails read call
+
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 this.byId("T_id_Download").setVisible(false);
                 this.byId("T_id_EmpOnBoard").setVisible(false);
                 this.byId("T_id_Cermail").setVisible(false);
+
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("traineeEdit"));
                 this.oValue = oEvent.getParameter("arguments").value;
                 this.Filter = true;
                 this._fetchCommonData("EmployeeDetailsData", "empModel");
-                if (this.oValue === "Trainee") {
-                    await this.T_onPressClear();// clear the filter bar
-                    await this.readCallForTrainee("");
-                }
-                else {
-                    this.T_onSearch();// filter function for trainee 
-                }
-                this._makeDatePickersReadOnly(["T_id_JoiningDate"]);
-                this.initializeBirthdayCarousel();
-            },
 
-            //read call for trainee
-            readCallForTrainee: async function (filter) {
-                try {
-                    // this.getBusyDialog();
-                    await this.ajaxReadWithJQuery("Trainee", filter).then((oData) => {
-                        var offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                        this.getOwnerComponent().setModel(new JSONModel(offerData), "traineeModel");
-                        if (this.Filter) {
-                            var oFilterData = [...new Map(offerData.filter(item => item.TraineeName && item.TraineeName.trim() !== "").map(item => [item.TraineeName.trim(), item])).values()];
-                            this.getView().setModel(new JSONModel(oFilterData), "traineeNameModel");
-                            this.getView().getModel("traineeNameModel").refresh(true);
-                            this.Filter = true;
-                        }
-                        this.closeBusyDialog();
-                    }).catch((error) => {
-                        this.closeBusyDialog();
-                        MessageToast.show(error.message || error.responseText);
-                    });
-                } catch (error) {
-                    this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                const {startDate,endDate} = this._getCurrentYearDates();
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({pattern: "yyyy-MM-dd"});
+                const params = {
+                    startDate: oDateFormat.format(startDate),
+                    endDate: oDateFormat.format(endDate)
+                };
+                // Set default date range
+                const oDateControl = this.byId("T_id_JoiningDate");
+                if (oDateControl) {
+                    oDateControl.setDateValue(startDate);
+                    oDateControl.setSecondDateValue(endDate);
                 }
+                if (this.oValue === "Trainee") {
+                    await this._fetchCommonData("Trainee", "traineeNameModel", {
+                        startDate: params.startDate,
+                        endDate: params.endDate
+                    });
+                    await this._fetchCommonData("Trainee", "traineeModel", params);
+                } else {
+                    this.T_onSearch(); // triggers date fallback logic inside
+                }
+                this.initializeBirthdayCarousel();
+                this.closeBusyDialog();
+            },
+            //  current year start and end dates
+            _getCurrentYearDates: function() {
+                var year = new Date().getFullYear();
+                var startDate = new Date(year, 0, 1); // Jan 1
+                var endDate = new Date(year, 11, 31); // Dec 31
+                return {
+                    startDate,
+                    endDate
+                };
             },
             //validation function for mandatory fields
-            T_ValidateCommonFields: function (oEvent) {
+            T_ValidateCommonFields: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
             //validation function for email
-            T_validateEmail: function (oEvent) {
+            T_validateEmail: function(oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
             //validation function for date
-            onPressback: function () {
+            onPressback: function() {
                 this.getRouter().navTo("RouteTilePage");
             },
             //validation function for date
-            onLogout: function () {
+            onLogout: function() {
                 this.getRouter().navTo("RouteLoginPage");
                 this.CommonLogoutFunction();
             },
             //Trainee creation button
-            T_onPressAddTrainee: function (oEvent) {
+            T_onPressAddTrainee: function(oEvent) {
                 var oParValue;
                 // Check if the button pressed is the "Add Trainee" button by looking at its ID
                 if (oEvent.getSource().getId().lastIndexOf("T_id_AddBtn") !== -1) {
@@ -89,27 +93,27 @@ sap.ui.define([
                     // Else navigation to existing trainee details
                     oParValue = oEvent.getSource().getBindingContext("traineeModel").getModel().getData()[oEvent.getSource().getBindingContextPath().split("/")[1]].ID
                 }
-                this.getRouter().navTo("RouteTraineeDetails", { sParTrainee: oParValue });
+                this.getRouter().navTo("RouteTraineeDetails", {
+                    sParTrainee: oParValue
+                });
             },
             // common open the dialog function
-            T_commonOpenDialog: function (dialogProperty, fragmentName) {
+            T_commonOpenDialog: function(dialogProperty, fragmentName) {
                 if (!this[dialogProperty]) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
                         controller: this
-                    }).then(function (oDialog) {
+                    }).then(function(oDialog) {
                         this[dialogProperty] = oDialog;
                         this.getView().addDependent(this[dialogProperty]);
                         this[dialogProperty].open();
-                    }.bind(this)).catch(function (oError) {
-                    });
+                    }.bind(this)).catch(function(oError) {});
                 } else {
                     this[dialogProperty].open();
                 }
             },
-
             //Trainee table selection change function for button visibility
-            T_onTableSelectionChange: function (oEvent) {
+            T_onTableSelectionChange: function(oEvent) {
                 var oSelectedItem = oEvent.getParameter("listItem");
                 this.SelectedData = oSelectedItem.getBindingContext("traineeModel").getObject();
                 if (oSelectedItem) {
@@ -128,7 +132,7 @@ sap.ui.define([
                 }
             },
             //update call for trainee
-            updateCallForTrainee: async function (oTraineeData, text) {
+            updateCallForTrainee: async function(oTraineeData, text) {
                 try {
                     this.getBusyDialog();
                     var that = this;
@@ -154,15 +158,15 @@ sap.ui.define([
                 }
             },
             //trainee onboard confirmation 
-            T_onOnboardPress: function () {
+            T_onOnboardPress: function() {
                 this.onHandleTraineeAction("onboard");
             },
             //trainee reject confirmation
-            T_onRejectPress: function () {
+            T_onRejectPress: function() {
                 this.onHandleTraineeAction("reject");
             },
             //confirmation dialog function for trainee onboard and reject
-            onHandleTraineeAction: function (action) {
+            onHandleTraineeAction: function(action) {
                 try {
                     var that = this;
                     var oContext = this.byId("T_id_TraineeTable").getSelectedItem()?.getBindingContext("traineeModel");
@@ -171,13 +175,13 @@ sap.ui.define([
                         return;
                     }
                     var sName = oContext.getProperty("NameSalutation") + " " + oContext.getProperty("TraineeName");
-                    var sMessage = (action === "onboard")
-                        ? this.i18nModel.getText("OnboardMessage", [sName])
-                        : this.i18nModel.getText("RejectMessage", [sName]);
+                    var sMessage = (action === "onboard") ?
+                        this.i18nModel.getText("OnboardMessage", [sName]) :
+                        this.i18nModel.getText("RejectMessage", [sName]);
                     this.showConfirmationDialog(
                         this.i18nModel.getText("ConfirmActionTitle"),
                         sMessage,
-                        function () {
+                        function() {
                             // On Confirm
                             if (action === "onboard") {
                                 that.T_commonOpenDialog("TOb_oDialog", "sap.kt.com.minihrsolution.fragment.OnboardTrainee");
@@ -187,7 +191,7 @@ sap.ui.define([
                             // Clear selection after confirm
                             that.byId("T_id_TraineeTable").removeSelections(true);
                         },
-                        function () {
+                        function() {
                             that.T_ButtonVisibility();
                         }
                     );
@@ -195,13 +199,13 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
-            T_ButtonVisibility: function () {
+            T_ButtonVisibility: function() {
                 this.byId("T_id_OnboardBtn").setEnabled(false);
                 this.byId("T_id_RejectBtn").setEnabled(false);
                 this.byId("T_id_TraineeTable").removeSelections(true);
             },
             //Reject trainee function
-            _handleReject: async function (oContext) {
+            _handleReject: async function(oContext) {
                 this.getBusyDialog();
                 oContext.getModel().setProperty(oContext.getPath() + "/Status", "Rejected");
                 await this.updateCallForTrainee(oContext.getObject(), "traineeRejectSucess");
@@ -209,7 +213,7 @@ sap.ui.define([
                 this.T_onSearch();
             },
             //Onboard trainee function
-            OTF_onPressOnboard: async function (oTraineeData) {
+            OTF_onPressOnboard: async function(oTraineeData) {
                 try {
                     if (utils._LCvalidateEmail(sap.ui.getCore().byId("OTF_id_TraineeMail"), "ID")) {
                         var oTraineeData = this.SelectedData;
@@ -227,23 +231,22 @@ sap.ui.define([
                     MessageToast.show(error.message || error.responseText);
                 }
             },
-            T_Button: function () {
+            T_Button: function() {
                 this.byId("T_id_OnboardBtn").setVisible(true);
                 this.byId("T_id_RejectBtn").setVisible(true);
                 this.byId("T_id_Download").setVisible(false);
                 this.byId("T_id_EmpOnBoard").setVisible(false);
                 this.byId("T_id_Cermail").setVisible(false);
             },
-
             //Close the  onboarding dialog function
-            OTF_onPressClose: function () {
+            OTF_onPressClose: function() {
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValueState("None");
                 sap.ui.getCore().byId("OTF_id_TraineeMail").setValue("");
                 this.T_ButtonVisibility()
                 this.TOb_oDialog.close();
             },
             //Trainee  certificate  dialog function
-            T_onCertDownload: function () {
+            T_onCertDownload: function() {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                 var oJoiningDate = new Date(oTraineeModel.JoiningDate);
@@ -255,7 +258,7 @@ sap.ui.define([
                     return;
                 }
                 var oCalculatedEndDate = new Date(oJoiningDate);
-                oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + months);  // Add the number of months
+                oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + months); // Add the number of months
                 var sFormattedEndDate = oCalculatedEndDate.toISOString().split("T")[0];
                 oTraineeModel.EndDate = new Date(sFormattedEndDate);
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
@@ -264,7 +267,7 @@ sap.ui.define([
             },
 
             //Close the certificate dialog function
-            TCF_onPressCloseDialog: function () {
+            TCF_onPressCloseDialog: function() {
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
                 this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
                 sap.ui.getCore().byId("TCF_id_ProjectName").setValueState("None");
@@ -274,7 +277,7 @@ sap.ui.define([
                 this.T_Button();
             },
             //Preview and download certificate function
-            TCF_onPressHandlePreview: function () {
+            TCF_onPressHandlePreview: function() {
                 const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
                 if (bPreviewFlag) {
                     this.TCF_onPressDownload();
@@ -283,7 +286,7 @@ sap.ui.define([
                 }
             },
             //download certificate
-            TCF_onPressPreview: function () {
+            TCF_onPressPreview: function() {
                 if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("TCF_id_ProjectName"), "ID")) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
@@ -317,11 +320,13 @@ sap.ui.define([
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
             },
             //generate PDF function
-            TCF_onPressDownload: async function () {
+            TCF_onPressDownload: async function() {
                 var oRTE = sap.ui.getCore().byId("myRTE");
                 var oEditor = oRTE._oEditor?.editorManager?.activeEditor;
                 if (oEditor) {
-                    var plainText = oEditor.getContent({ format: 'text' });
+                    var plainText = oEditor.getContent({
+                        format: 'text'
+                    });
                     var charCount = plainText.length;
                     var lines = plainText.split(/\r\n|\r|\n/);
                     var lineCount = lines.length;
@@ -366,7 +371,7 @@ sap.ui.define([
                 }
             },
             //Trainee onboard function        
-            T_onBoardTrainee: function () {
+            T_onBoardTrainee: function() {
                 var oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                 var oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                 this.getRouter().navTo("RouteEmployeeOfferDetails", {
@@ -374,40 +379,73 @@ sap.ui.define([
                     sParEmployee: oTraineeModel.NameSalutation
                 });
             },
-            //Trainee search function for filtering
-            T_onSearch: async function () {
+            T_onSearch: async function() {
                 try {
                     this.getBusyDialog();
+
                     var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                        pattern: "yyyy-MM-dd"
+                    });
                     var params = {};
-                    aFilterItems.forEach(function (oItem) {
+
+                    var oStartDate, oEndDate;
+                    var dateProvided = false;
+
+                    aFilterItems.forEach(function(oItem) {
                         var oControl = oItem.getControl();
                         var sValue = oItem.getName();
-                        if (oControl && oControl.getValue()) {
-                            if (sValue === "JoiningDate") {
-                                params["startDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[0]));
-                                params["endDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
-                            } else {
-                                params[sValue] = oControl.getValue();
+
+                        if (sValue === "JoiningDate" && oControl) {
+                            oStartDate = oControl.getDateValue();
+                            oEndDate = oControl.getSecondDateValue();
+
+                            if (oStartDate && oEndDate) {
+                                dateProvided = true;
                             }
+                        } else if (oControl && oControl.getValue) {
+                            var val = oControl.getValue();
+                            if (val) params[sValue] = val;
                         }
                     });
+
+                    // If no date selected, apply default year
+                    if (!dateProvided) {
+                        const { startDate, endDate} = this._getCurrentYearDates();
+                        oStartDate = startDate;
+                        oEndDate = endDate;
+
+                        const oDateControl = this.byId("T_id_JoiningDate");
+                        if (oDateControl) {
+                            oDateControl.setDateValue(startDate);
+                            oDateControl.setSecondDateValue(endDate);
+                        }
+                    }
+
+                    if (oStartDate && oEndDate) {
+                        params["startDate"] = oDateFormat.format(oStartDate);
+                        params["endDate"] = oDateFormat.format(oEndDate);
+                    }
+
                     if (params && Object.keys(params).length > 0) {
                         this.Filter = false;
                     }
-                    await this.readCallForTrainee(params); // read call for trainee after filter
+
+                    await this._fetchCommonData("Trainee", "traineeNameModel", {
+                    startDate: params.startDate, endDate: params.endDate});
+                    await this._fetchCommonData("Trainee", "traineeModel", params);
                     this.T_ButtonVisibility();
                     this.T_Button();
+                    this.closeBusyDialog();
                 } catch (error) {
+                    this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
-
             //clear the filterbar
-            T_onPressClear: async function () {
+            T_onPressClear: async function() {
                 var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
-                aFilterItems.forEach(function (oItem) {
+                aFilterItems.forEach(function(oItem) {
                     var oControl = oItem.getControl(); // Get the associated control
                     if (oControl) {
                         if (oControl.setValue) {
@@ -423,10 +461,13 @@ sap.ui.define([
                 });
             },
             //Traniee certificate mail function
-            T_onCerMail:async function () {
+            T_onCerMail: async function() {
                 try {
                     this.getBusyDialog();
-                    await  this._fetchCommonData("EmailContent", "CCMailModel", { Type: "TraineeCertificate", Action: "CC" });
+                    await this._fetchCommonData("EmailContent", "CCMailModel", {
+                        Type: "TraineeCertificate",
+                        Action: "CC"
+                    });
                     var oTraineeEmail = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject().TraineeEmail;
                     if (!oTraineeEmail || oTraineeEmail.length === 0) {
                         MessageBox.error("To Email is missing");
@@ -451,7 +492,7 @@ sap.ui.define([
                 }
             },
             //Close the mail dialog function
-            Mail_onPressClose: function () {
+            Mail_onPressClose: function() {
                 try {
                     if (this.T_MailDialog) {
                         this.T_MailDialog.destroy();
@@ -464,7 +505,7 @@ sap.ui.define([
                 }
             },
             //Handle the file upload function
-            Mail_onUpload: function (oEvent) {
+            Mail_onUpload: function(oEvent) {
                 this.handleFileUpload(
                     oEvent, this,
                     "UploaderData", "/attachments", "/name", "/isFileUploaded", "uploadSuccessfull", "fileAlreadyUploaded", "noFileSelected", "fileReadError",
@@ -472,7 +513,7 @@ sap.ui.define([
                 );
             },
             //validation for send button
-            validateSendButton: function () {
+            validateSendButton: function() {
                 try {
                     const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                     const emailField = sap.ui.getCore().byId("CCMail_TextArea");
@@ -489,11 +530,11 @@ sap.ui.define([
             },
 
             //validation for email change        
-            Mail_onEmailChange: function () {
+            Mail_onEmailChange: function() {
                 this.validateSendButton();
             },
             //send mail function
-            Mail_onSendEmail: function () {
+            Mail_onSendEmail: function() {
                 try {
                     var oModel = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject();
                     var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");

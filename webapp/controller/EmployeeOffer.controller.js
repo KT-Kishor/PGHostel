@@ -34,10 +34,6 @@ sap.ui.define([
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("pageTitleemployee"));
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
-
-                // Clear filter fields
-                this.EO_onPressClear();
-
                 try {
                     if (this.oValue === "EmployeeOffer") {
                         const {
