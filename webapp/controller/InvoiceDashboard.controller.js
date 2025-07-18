@@ -21,7 +21,7 @@ sap.ui.define([
         },
         // --- Data Fetching and Filtering ---
         readInvoiceData: async function () {
-            this.getBusyDialog();
+            // this.getBusyDialog();
             try {
                 const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
                 const rawBackendData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -42,28 +42,39 @@ sap.ui.define([
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
             } finally {
-                this.closeBusyDialog();
+                // this.closeBusyDialog();
             }
         },
         // --- Filter and Aggregate Data ---
         onFilterChange: function () {
-            if (!this.rawInvoiceData) return;
-            const aSelectedCompanies = this.byId("companyFilter").getSelectedKeys();
-            const sSelectedYear = this.byId("yearFilter").getValue();
-            // --- Filter data for the first 3 charts based on all filters ---
-            let aFilteredData = this.rawInvoiceData;
-            if (aSelectedCompanies.length > 0) {
-                aFilteredData = aFilteredData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
+            if (!this.rawInvoiceData) {
+                return;
             }
-            if (sSelectedYear) {
-                aFilteredData = aFilteredData.filter(invoice => invoice.InvoiceDate.getFullYear().toString() === sSelectedYear);
-            }
-            // --- Filter data for the Yearly Trend chart (ignores year filter) ---
-            let aYearlyTrendData = this.rawInvoiceData;
-            if (aSelectedCompanies.length > 0) {
-                aYearlyTrendData = aYearlyTrendData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
-            }
-            this._aggregateAndSetChartData(aFilteredData, aYearlyTrendData);
+            this.getBusyDialog();
+            setTimeout(function () {
+                try {
+                    const aSelectedCompanies = this.byId("companyFilter").getSelectedKeys();
+                    const sSelectedYear = this.byId("yearFilter").getValue();
+                    // --- Filter data for the first 3 charts based on all filters ---
+                    let aFilteredData = this.rawInvoiceData;
+                    if (aSelectedCompanies.length > 0) {
+                        aFilteredData = aFilteredData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
+                    }
+                    if (sSelectedYear) {
+                        aFilteredData = aFilteredData.filter(invoice => invoice.InvoiceDate.getFullYear().toString() === sSelectedYear);
+                    }
+                    // --- Filter data for the Yearly Trend chart (ignores year filter) ---
+                    let aYearlyTrendData = this.rawInvoiceData;
+                    if (aSelectedCompanies.length > 0) {
+                        aYearlyTrendData = aYearlyTrendData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
+                    }
+                    this._aggregateAndSetChartData(aFilteredData, aYearlyTrendData);
+                } catch (error) {
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                } finally {
+                    this.closeBusyDialog();
+                }
+            }.bind(this), 500); // The .bind(this) is crucial to maintain the controller's context
         },
         // --- Aggregate and Set Chart Data ---
         _aggregateAndSetChartData: function (aFilteredData, aYearlyTrendData) {

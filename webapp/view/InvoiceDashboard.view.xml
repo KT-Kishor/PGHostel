@@ -16,19 +16,19 @@
 		</headerContent>
 		<content>
             <VBox class="sapUiSmallMargin">
-                <!-- Filter Bar -->
-                <fb:FilterBar id="dashboardFilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" >
+                            <!-- Filter Bar -->
+                <fb:FilterBar id="dashboardFilterBar"  liveMode="false"  useToolbar="false"  clear="onClearFilters" showClearOnFB="true"  search="onFilterChange" >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Company" label="Company" groupName="Group1" visibleInFilterBar="true" >
                             <fb:control>
-                                <MultiComboBox id="companyFilter" width="400px" placeholder="{i18n>companyName}" items="{path: 'companies>/'}" selectionChange="onFilterChange">
+                                <MultiComboBox id="companyFilter" width="400px" placeholder="{i18n>companyName}" items="{path: 'companies>/'}" >
                                     <items><core:Item key="{companies>key}" text="{companies>text}"/></items>
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
                         <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
-                                <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>currentYear}" change="onFilterChange"/>
+                                <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>currentYear}" />
                             </fb:control>
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
