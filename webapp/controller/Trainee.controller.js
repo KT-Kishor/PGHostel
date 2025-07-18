@@ -44,7 +44,8 @@ sap.ui.define([
                     oDateControl.setDateValue(startDate);
                     oDateControl.setSecondDateValue(endDate);
                 }
-                if (this.oValue === "Trainee") {
+                try {
+                    if (this.oValue === "Trainee") {
                     await this._fetchCommonData("Trainee", "traineeNameModel", {
                         startDate: params.startDate,
                         endDate: params.endDate
@@ -55,6 +56,11 @@ sap.ui.define([
                 }
                 this.initializeBirthdayCarousel();
                 this.closeBusyDialog();
+                } catch (error) {
+                    this.closeBusyDialog();
+                } finally {
+                    this.closeBusyDialog(); // Close after async call finishes
+                }
             },
             //  current year start and end dates
             _getCurrentYearDates: function() {

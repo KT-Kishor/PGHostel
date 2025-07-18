@@ -83,7 +83,7 @@ sap.ui.define([
                     this.initializeBirthdayCarousel();
                     this.closeBusyDialog(); // Close busy dialog after data fetch
                 } catch (error) {
-                    sap.m.MessageToast.show(error.message || error.responseText);
+                  this.closeBusyDialog();
                 } finally {
                     this.closeBusyDialog(); // Close after async call finishes
                 }
