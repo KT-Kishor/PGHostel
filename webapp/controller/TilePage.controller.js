@@ -28,20 +28,37 @@ sap.ui.define(
         },
 
         _onRouteMatched: async function () {
-          if (!this.that) this.that = this.getOwnerComponent().getModel("ThisModel")?.getData().that;
+          if (!this.that)
+            this.that = this.getOwnerComponent()
+              .getModel("ThisModel")
+              ?.getData().that;
           var LoginFunction = await this.commonLoginFunction("TilePage");
           if (!LoginFunction) return;
           this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
-          this.getView().getModel("CompanyInvoiceModelData").setProperty("/length", this.getView().getModel("CompanyInvoiceModelData").getData().length);
+          await this._fetchCommonData(
+            "getCompanyInvoice",
+            "CompanyInvoiceModelData"
+          );
+          this.getView()
+            .getModel("CompanyInvoiceModelData")
+            .setProperty(
+              "/length",
+              this.getView().getModel("CompanyInvoiceModelData").getData()
+                .length
+            );
           await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
-          this.getView().getModel("MSASOWModel").setProperty("/length", this.getView().getModel("MSASOWModel").getData().length);
+          this.getView()
+            .getModel("MSASOWModel")
+            .setProperty(
+              "/length",
+              this.getView().getModel("MSASOWModel").getData().length
+            );
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
-          await this._fetchCommonData("EmployeeDetails", "EmpDetails");      
-          
+          await this._fetchCommonData("EmployeeDetails", "EmpDetails");
+
           this.CreateEmployeeModel();
           this.initializeBirthdayCarousel();
         },
@@ -49,7 +66,6 @@ sap.ui.define(
         // onPressCC: function () {
         //   MessageToast.show("Implementation in progress");
         // },
-
 
         CreateEmployeeModel: function () {
           var empData = this.getView().getModel("EmpModel").getData() || [];
@@ -81,7 +97,17 @@ sap.ui.define(
               "AppVisibilityModel"
             );
 
-            const tileNames = ["Home", "Timesheet", "Payslip", "OfferGeneration", "Invoice", "Quotation", "Expense", "ManageAsset", "Recruitment"];
+            const tileNames = [
+              "Home",
+              "Timesheet",
+              "Payslip",
+              "OfferGeneration",
+              "Invoice",
+              "Quotation",
+              "Expense",
+              "ManageAsset",
+              "Recruitment",
+            ];
 
             const tileKeys = firstEntry.TileKey?.split(",") || [];
             const tileMapping = tileNames.reduce((map, name, i) => {
@@ -89,7 +115,10 @@ sap.ui.define(
               return map;
             }, {});
 
-            this.getView().setModel(new JSONModel(tileMapping), "TileAccessModel");
+            this.getView().setModel(
+              new JSONModel(tileMapping),
+              "TileAccessModel"
+            );
           } catch (oError) {
             MessageToast.show("Error in AppVisibilityReadCall");
           }
@@ -188,14 +217,26 @@ sap.ui.define(
         },
         RP_onPressCanclePW: function () {
           sap.ui
-            .getCore().byId("RP_id_userid").setValue("").setSelectedKey("").setValueState("None");
+            .getCore()
+            .byId("RP_id_userid")
+            .setValue("")
+            .setSelectedKey("")
+            .setValueState("None");
           sap.ui.getCore().byId("RP_id_userid").setSelectedKey(null);
           var oUserNameInput = sap.ui.getCore().byId("RP_id_userName");
           // Reset all input fields
           oUserNameInput.setValue("");
           oUserNameInput.setValueState("None");
-          sap.ui.getCore().byId("RP_id_NewPW").setValue("").setValueState("None");
-          sap.ui.getCore().byId("RP_id_ConfirmPW").setValue("").setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_NewPW")
+            .setValue("")
+            .setValueState("None");
+          sap.ui
+            .getCore()
+            .byId("RP_id_ConfirmPW")
+            .setValue("")
+            .setValueState("None");
           // Close dialog
           if (this.oUpdatePass) {
             this.oUpdatePass.close();
@@ -316,7 +357,10 @@ sap.ui.define(
           this.getRouter().navTo("RouteAdminPaySlip");
         },
         TileV_onpressSelfservice: function () {
-          this.getRouter().navTo("SelfService", { sPath: "SelfService", Role: "Role" });
+          this.getRouter().navTo("SelfService", {
+            sPath: "SelfService",
+            Role: "Role",
+          });
         },
         TileV_onpressInbox: function () {
           this.getRouter().navTo("RouteMyInbox", { sMyInBox: "MyInboxView" });
@@ -330,18 +374,17 @@ sap.ui.define(
         },
         TileV_onpressAssignment: function () {
           this.getRouter().navTo("RouteManageAssignment");
-        }, TileV_onpresstimesheet: function () {
+        },
+        TileV_onpresstimesheet: function () {
           this.getRouter().navTo("RouteTimesheet");
         },
         TileV_onPressTimesheetApp: function () {
           this.getRouter().navTo("RouteTimesheetApproval");
         },
         TileV_onPressGenerateSalary: function () {
-
           this.getRouter().navTo("RouteGenerateSalary");
         },
         TileV_onPressManagePayroll: function () {
-
           this.getRouter().navTo("RouteManagePayroll");
         },
         TileV_onpressEmployeeDetails: function () {
@@ -380,7 +423,6 @@ sap.ui.define(
         },
         TileV_MyAsset: function () {
           this.getRouter().navTo("MyAsset");
-
         },
         TileV_onpressPoApp: function () {
           this.getRouter().navTo("PurchaseOrder");
@@ -391,24 +433,31 @@ sap.ui.define(
         TileV_RecruitementDashbord: function () {
           this.getRouter().navTo("AppliedCandidates");
         },
-       
+        TileV_JobPosting: function () {
+          this.getRouter().navTo("RouteHP_View");
+        },
 
         OnPressNavigationMsaDet: function (oEvent) {
-          var MsaID = oEvent.getSource().getBindingContext("MSASOWModel").getProperty("MsaID");
-          this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID })
+          var MsaID = oEvent
+            .getSource()
+            .getBindingContext("MSASOWModel")
+            .getProperty("MsaID");
+          this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
         },
 
         CI_onPressInvoiceRow: function (oEvent) {
-          var Path = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
+          var Path = encodeURIComponent(
+            oEvent
+              .getSource()
+              .getBindingContext("CompanyInvoiceModelData")
+              .getObject().InvNo
+          );
           this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
         },
 
-         TileV_onpressInvoiceDashboard: function () {
+        TileV_onpressInvoiceDashboard: function () {
           this.getRouter().navTo("RouteInvoiceDashboard");
         },
-       
-       
-
       }
     );
   }

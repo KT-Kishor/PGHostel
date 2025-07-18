@@ -100,6 +100,7 @@ sap.ui.define([
             "PurchaseOrder": "/PurchaseOrder",
             "A_Quotations": "/A_Quotations",
             "AppliedCandidates": "/AppliedCandidates",
+            "JobPosting": "/JobPosting"
           };
 
           const modelPath = tileMap[value];

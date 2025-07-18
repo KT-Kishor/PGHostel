@@ -45,26 +45,7 @@
 				<Label text="{i18n>customerEmail}" required="true"/>
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 
-				<Label text="{i18n>expCountry}" required="true"/>
-				<ComboBox change="MC_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="MC_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}" showSecondaryValues="true">
-					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
-				</ComboBox>
-
-				<Label text="{i18n>contractLocation}" required="true"/>
-				<ComboBox items="{BaseLocationModel>/}" change="MC_onBaseLocationChange" id="MC_id_BaseCity" showSecondaryValues="true" selectedKey="{CustomerModel>/baseLocation}" valueStateText="{i18n>combovalueState}">
-					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-				</ComboBox>
-
-				<Label text="{i18n>mobileNo}"/>
-				<HBox width="100%" justifyContent="Start" alignItems="Center">
-					<VBox width="22%">
-						<ComboBox selectedKey="{CustomerModel>/stdCode}" showSecondaryValues="true" change="MC_ValidateComboBox" id="MC_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}">
-							<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
-						</ComboBox>
-					</VBox>
-					<VBox width="78%">
-						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
-					</VBox>
+			"codeModel": {        "type": "sap.ui.model.json.JSONModel",        "uri": "model/STDCode.json",        "preload": true      },"codeModel": {        "type": "sap.ui.model.json.JSONModel",        "uri": "model/STDCode.json",        "preload": true      },		</VBox>
 				</HBox>
 
 				<Label text="{i18n>custLut}"/>

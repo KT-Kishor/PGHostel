@@ -1126,3 +1126,23 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border: none !important; 
   box-shadow: none !important; 
 }
+
+/* JOB POSTING */
+.rteError .sapUiRteToolbar, 
+.rteError .sapUiRteCnt {
+    border: 1px solid red !important;
+}
+
+.rteError .sapUiRteCnt {
+    border-top: none !important;
+}
+
+
+.blockInputTyping .sapMInputBaseInner {
+    pointer-events: none !important;
+  }
+
+  .sapUiRTEErrorBorder {
+    border: 2px solid red !important;
+    border-radius: 4px;
+}

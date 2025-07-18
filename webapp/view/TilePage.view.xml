@@ -278,6 +278,12 @@
                                         />
                                     </TileContent>
                                 </GenericTile>
+                                <GenericTile visible="{= ${AppVisibilityModel>/JobPosting} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>JobPosting}" press="TileV_JobPosting">
+	<TileContent unit="{i18n>careers}">
+		<!-- <ImageContent src="sap-icon://employee-lookup" /> -->
+		<ImageContent src="sap-icon://visits" />
+	</TileContent>
+</GenericTile>
                                         </layout:HorizontalLayout>
                                     </ux:blocks>
                                 </ux:ObjectPageSubSection>
