@@ -127,6 +127,13 @@
                             tooltip="{i18n>editassigntask}"
                             type="Emphasized"
                         />
+                        <Button
+                            text="{i18n>delete}"
+                            press="AT_onDeleteTask"
+                            id="AT_id_DeleteTask"
+                            tooltip="{i18n>deleteassigntask}"
+                            type="Reject"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

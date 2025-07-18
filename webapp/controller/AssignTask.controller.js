@@ -264,7 +264,7 @@ sap.ui.define(
               this.getView().setModel(new JSONModel(taskData), "AssignModel");
             }
           } catch (error) {
-            this.getBusyDialog();
+           this.closeBusyDialog();
             MessageToast.show(this.i18nModel.getText("smgerrorassigntask"));
           }
         },
@@ -428,6 +428,70 @@ sap.ui.define(
             }
           }
         },
+
+      // Unassign Employee from Task
+      AT_onDeleteTask: function () {
+        const oTable = this.byId("AT_id_TaskTable");
+        const oSelectedItem = oTable.getSelectedItem();
+
+        if (!oSelectedItem) {
+          MessageToast.show(this.i18nModel.getText("smgSelecttask"));
+          return;
+        }
+
+        const oData = oSelectedItem.getBindingContext("AssignModel").getObject();
+        const sTaskID = oData.TaskID;
+        const sEmployeeID = oData.EmployeeID;
+        const that = this;
+
+        // Build payload as required by backend
+        const oPayload = {
+          filters: {
+            EmployeeID: sEmployeeID,
+            TaskID: sTaskID
+          },
+          data: {
+            EmployeeID: oData.EmployeeID,
+            EmployeeName: oData.EmployeeName,
+            TaskID: oData.TaskID,
+            TaskName: oData.TaskName,
+            StartDate: oData.StartDate, // assuming already in yyyy-MM-dd or ISO format
+            EndDate: oData.EndDate,
+            HoursWorked: oData.HoursWorked
+          }
+        };
+
+        this.showConfirmationDialog(
+          this.i18nModel.getText("msgBoxConfirm"),
+          this.i18nModel.getText("smgconfirmdeleteassignedemployee"),
+
+          // onConfirm
+          function () {
+            that.getBusyDialog();
+            that.ajaxDeleteWithJQuery("/AssignedTask", oPayload)
+              .then((response) => {
+                if (response.success) {
+                  that.FAT_onPressClear();
+                  that.FAT_onSearch();
+                  oTable.removeSelections(true);
+                  MessageToast.show(that.i18nModel.getText("smgassignedemployeedeleted"));
+                } else {
+                  that.closeBusyDialog();
+                  MessageToast.show(that.i18nModel.getText("smgfaildeleteassignedemployee"));
+                }
+              })
+              .catch((error) => {
+                that.closeBusyDialog();
+                MessageToast.show(that.i18nModel.getText("smgerrorassigntask"));
+                oTable.removeSelections(true);
+              });
+          },
+          // onCancel
+          function () {
+            oTable.removeSelections(true);
+          }
+        );
+      }
       }
     );
   }
