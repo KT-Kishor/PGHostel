@@ -26,6 +26,23 @@ sap.ui.define(
 
                     this.getView().setModel(oFormData, "formData");
 
+
+                    const oAppConfigModel = new JSONModel({
+                      url: "https://rest.kalpavrikshatechnologies.com/",
+                      headers: {
+                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                        password:
+                          "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                      },
+                    });
+
+                    // Set globally — like LoginModel
+                    this.getOwnerComponent().setModel(
+                      oAppConfigModel,
+                      "AppConfigModel"
+                    );
+
+
                     var oTData = new JSONModel({
                         Name: "",
                         CollegeName: "",
