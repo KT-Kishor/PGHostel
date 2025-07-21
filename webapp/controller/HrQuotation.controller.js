@@ -40,12 +40,6 @@ sap.ui.define(
                 this.getView().getModel("filters").setProperty("/DateTo", sDateTo);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                // Fetch data with financial year filter
-                this._fetchCommonData("Quotation", "CompanyQuotationModel", {
-                    DateFrom: sDateFrom,
-                    DateTo: sDateTo
-                });
-
                 // SECOND: Apply the FY filter to the table immediately
                 var oTable = this.byId("HQ_id_QuotationItemTable");
                 var oBinding = oTable.getBinding("items");
@@ -57,10 +51,10 @@ sap.ui.define(
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
 
                 if (this.oValue === "HrQuotation") {
-                    await this.HQ_onSearch();
+                     this.HQ_onSearch();
                 } else {
                     // Ensure search is called even if not HrQuotation
-                    await this.HQ_onSearch();
+                     this.HQ_onSearch();
                 }
                 this.closeBusyDialog();
                 this.initializeBirthdayCarousel();

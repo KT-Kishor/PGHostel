@@ -1401,14 +1401,14 @@ sap.ui.define(
                                     "mailto:?subject=Check this out&body=" +
                                     encodeURIComponent(window.location.href);
                             }),
-                            createItem("image/whatsapp.png", "WhatsApp", () => {
+                            createItem("image/Whatsapp.png", "WhatsApp", () => {
                                 window.open(
                                     "https://wa.me/?text=" +
                                     encodeURIComponent(window.location.href),
                                     "_blank"
                                 );
                             }),
-                            createItem("image/link.png", "Copy Link", () => {
+                            createItem("image/Link.png", "Copy Link", () => {
                                 navigator.clipboard.writeText(window.location.href);
                                 sap.m.MessageToast.show("Link copied!");
                             }),
