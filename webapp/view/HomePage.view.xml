@@ -59,9 +59,9 @@
 						<l:VerticalLayout width="100%">
 							<l:BlockLayout background="Dashboard">
 								<l:BlockLayoutRow>
-									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}">
-										<Text text="{i18n>careersDes}" class="carrer-Des" />
-									</l:BlockLayoutCell>
+											<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}">
+												<Text text="{i18n>careersDes}" class="carrer-Des" />
+											</l:BlockLayoutCell>
 								</l:BlockLayoutRow>
 							</l:BlockLayout>
 							<VBox height="1rem"/>
@@ -131,7 +131,9 @@
 									<ColumnListItem>
 										<cells>
 											<Link text="{JobApplicationModel>JobTitle}" press="v1_onViewItem" />
-											<Text text="{JobApplicationModel>PrimarySkills}" />
+											<!-- <Text text="{JobApplicationModel>PrimarySkills}" /> -->
+											<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="20"/>
+											
 											<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
 											<Text text="{JobApplicationModel>Location}" />
 											<Text text="{JobApplicationModel>Experience}" />

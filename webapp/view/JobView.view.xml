@@ -9,74 +9,82 @@
 	xmlns:form="sap.ui.layout.form" height="100%">
 	<Page class="myAppBackground" id="page2" title="{i18n>JobAppHeader}" showNavButton="true" navButtonPress=".onNavBack">
 		<headerContent>
-			<Label class="Strong" text="Carriers" />
+			<Label class="Strong" text="Carriers" design="Bold" />
 			<ToolbarSpacer />
-			<Button icon="sap-icon://action" press="onSharePress" />
 		</headerContent>
 		<content>
-			<VBox class="sapUiResponsiveMargin sapUiSmallMargin" width="100%">
-				<FlexBox wrap="Wrap" direction="Row" class="sapUiSmallMargin" alignItems="Start" justifyContent="SpaceBetween" width="100%">
-					<!-- Left Panel -->
-					<VBox class="sapUiResponsiveMargin sapUiSmallMargin" width="100%">
-						<VBox class="sapUiSmallMargin">
-							<Title text="Job Description" level="H1" titleStyle="H1" />
-							<Title id="jobTitleTest" text="{SelectedCandidate>JobTitle}" wrapping="true" level="H2" titleStyle="H2" class="sapUiSmallMarginBottom sapUiLargeMarginTop" />
-							<Title text="Job Summary" level="H2" titleStyle="H2" class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
-							<!-- Job Info Blocks -->
-							<HBox visible="{ path: 'SelectedCandidate>Location', formatter: '.hasValue' }">
-								<Title text="Location" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>Location}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<HBox visible="{ path: 'SelectedCandidate>JobTitle', formatter: '.hasValue' }">
-								<Title text="Job Title:" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>JobTitle}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<HBox visible="{ path: 'SelectedCandidate>Qualification', formatter: '.hasValue' }">
-								<Title text="Qualification:" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>Qualification}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<HBox visible="{ path: 'SelectedCandidate>Experience', formatter: '.hasValue' }">
-								<Title text="Experience:" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>Experience}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<HBox visible="{ path: 'SelectedCandidate>Certifications', formatter: '.hasValue' }">
-								<Title text="Certifications:" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>Certifications}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<HBox visible="{ path: 'SelectedCandidate>NoOfPositions', formatter: '.hasValue' }">
-								<Title text="Positions:" width="150px" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-								<Title text="{SelectedCandidate>NoOfPositions}" wrapping="true" class="sapUiTinyMargin" level="H4" titleStyle="H4" />
-							</HBox>
-							<VBox>
-								<HBox visible="{ path: 'SelectedCandidate>PrimarySkills', formatter: '.hasValue' }" class="sapUiTinyMargin">
-									<Title text="Primary Skills:" width="150px" class="sapMTextBold" level="H4" titleStyle="H4" />
-									<Title class="sapUiSmallMarginBegin" text="{SelectedCandidate>PrimarySkills}" wrapping="true" level="H4" titleStyle="H4" />
+			<ScrollContainer height="100%" horizontal="false" vertical="true">
+				<HBox id="mainContainer" class="mainJobContainer">
+					<VBox class="leftColumn">
+						<Panel expandable="false" expanded="true" class="contentPanel">
+							<VBox class="sapUiSmallMargin">
+								<HBox justifyContent="End" width="100%">
+									<Button icon="sap-icon://action" class="myCustomIconBtn sapUiSmallMarginTop sapUiSmallMarginEnd" press="onSharePress" />
 								</HBox>
-								<VBox visible="{ path: 'SelectedCandidate>SecondarySkills', formatter: '.hasValue' }" class="sapUiTinyMargin sapUiLargeMarginTop">
-									<Title text="Secondary Skills:" class="sapUiTinyMarginEnd sapMTextBold" level="H4" titleStyle="H4" />
-									<FormattedText class="myFormattedText sapUiSmallMargin" htmlText="{SelectedCandidate>SecondarySkills}" />
+								<!-- Left Panel -->
+								<Title text="Job Description" class="sapUiLargeMarginBegin" level="H1" titleStyle="H1" wrapping="true" />
+								<Title id="jobTitleTest" text="{SelectedCandidate>JobTitle}" wrapping="true" level="H2" titleStyle="H2" class="sapUiSmallMarginBottom sapUiLargeMarginTop sapUiLargeMarginBegin" />
+								<Title text="Job Summary" level="H2" titleStyle="H2" class="sapUiLargeMarginBegin sapUiSmallMarginBottom sapUiSmallMarginTop" />
+								<!-- Job Info Blocks -->
+								<HBox visible="{ path: 'SelectedCandidate>Location', formatter: '.hasValue' }">
+									<Title text="Location" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>Location}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<HBox visible="{ path: 'SelectedCandidate>JobTitle', formatter: '.hasValue' }">
+									<Title text="Job Title" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>JobTitle}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<HBox visible="{ path: 'SelectedCandidate>Qualification', formatter: '.hasValue' }">
+									<Title text="Qualification" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>Qualification}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<HBox visible="{ path: 'SelectedCandidate>Experience', formatter: '.hasValue' }">
+									<Title text="Experience" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>Experience}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<HBox visible="{ path: 'SelectedCandidate>Certifications', formatter: '.hasValue' }">
+									<Title text="Certifications" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>Certifications}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<HBox visible="{ path: 'SelectedCandidate>NoOfPositions', formatter: '.hasValue' }">
+									<Title text="Positions" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+									<Title text="{SelectedCandidate>NoOfPositions}" wrapping="true" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+								</HBox>
+								<VBox>
+									<HBox visible="{ path: 'SelectedCandidate>PrimarySkills', formatter: '.hasValue' }">
+										<Title text="Primary Skills" width="150px" class="sapUiSmallMargin sapUiLargeMarginBegin" level="H4" titleStyle="H4" />
+										<Title class="sapUiSmallMargin sapUiLargeMarginBegin" text="{SelectedCandidate>PrimarySkills}" wrapping="true" level="H4" titleStyle="H4" />
+									</HBox>
+									<VBox visible="{ path: 'SelectedCandidate>SecondarySkills', formatter: '.hasValue' }" class="sapUiSmallMargin sapUiLargeMarginBegin">
+										<Title text="Secondary Skills" level="H2" titleStyle="H2" />
+										<FormattedText class="myFormattedText" htmlText="{SelectedCandidate>SecondarySkills}" />
+									</VBox>
+									<VBox visible="{ path: 'SelectedCandidate>SkillRequirements', formatter: '.hasValue' }" class="sapUiSmallMargin sapUiLargeMarginBegin">
+										<Title text="Required Skills" level="H2" titleStyle="H2" />
+										<FormattedText class="myFormattedText" htmlText="{SelectedCandidate>SkillRequirements}" />
+									</VBox>
 								</VBox>
-								<VBox visible="{ path: 'SelectedCandidate>SkillRequirements', formatter: '.hasValue' }" class="sapUiTinyMargin sapUiLargeMarginTop">
-									<Title text="Required Skills:" level="H3" titleStyle="H3" />
-									<FormattedText class="myFormattedText sapUiSmallMargin" htmlText="{SelectedCandidate>SkillRequirements}" />
+								<VBox visible="{ path: 'SelectedCandidate>KeyResponsibilities', formatter: '.hasValue' }" class="sapUiSmallMargin sapUiLargeMarginBegin">
+									<Title text="Key Responsibilities" level="H2" titleStyle="H2" />
+									<FormattedText class="myFormattedText" htmlText="{SelectedCandidate>KeyResponsibilities}" />
+								</VBox>
+								<VBox visible="{ path: 'SelectedCandidate>JobDescription', formatter: '.hasValue' }" class="sapUiSmallMargin sapUiLargeMarginBegin">
+									<Title text="Job Description" level="H2" titleStyle="H2" />
+									<FormattedText class="myFormattedText" htmlText="{SelectedCandidate>JobDescription}" />
 								</VBox>
 							</VBox>
-							<VBox visible="{ path: 'SelectedCandidate>KeyResponsibilities', formatter: '.hasValue' }" class="sapUiTinyMargin">
-								<Title text="Key Responsibilities:" level="H3" titleStyle="H3" />
-								<FormattedText class="myFormattedText sapUiSmallMargin" htmlText="{SelectedCandidate>KeyResponsibilities}" />
-							</VBox>
-							<VBox visible="{ path: 'SelectedCandidate>JobDescription', formatter: '.hasValue' }" class="sapUiTinyMargin">
-								<Title text="Job Description:" level="H3" titleStyle="H3" />
-								<FormattedText class="myFormattedText sapUiSmallMargin" htmlText="{SelectedCandidate>JobDescription}" />
-							</VBox>
-						</VBox>
+						</Panel>
 					</VBox>
 					<!-- Right Panel -->
-					<VBox width="100%" class="sapUiResponsiveMargin sapUiSmallMargin" alignItems="Center">
-						<Button text="Apply Now" press="onApply" class="myCustomButton sapUiSmallMargin sapUiTinyMarginTop" />
+					<VBox class="rightColumn">
+						<Panel class="actionPanel">
+							<VBox alignItems="Center" class="sapUiSmallMargin">
+								<Button text="Apply Now" press="onApply" class="myCustomButton" />
+							</VBox>
+						</Panel>
 					</VBox>
-				</FlexBox>
-			</VBox>
+				</HBox>
+			</ScrollContainer>
 		</content>
 	</Page>
 </mvc:View>

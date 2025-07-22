@@ -850,56 +850,47 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     height: auto;
   }
 }
-
-.myCustomButton {
-  height: 60px !important;
-  width: 345px !important;
-  font-size: 20px !important; 
-  padding: 0 !important;
-}
-
-.myCustomButton .sapMBtnInner {
-  background-color: #141f7d !important; 
-  height: 100% !important;
-  line-height: normal !important;
-  padding: 16px !important;
-  font-size: 24px !important;
-  border-radius: 8px;
-}
-
-.myCustomButton .sapMBtnContent {
-  color: white !important;
-  font-size: 18px;
-}
-
+/*Share button styles*/
 .myCustomIconBtn {
-  height: 60px !important;
-  width: 60px !important;
-  padding: 0 !important;
+ height: 60px !important;
+ width: 60px !important;
+ padding: 0 !important;
+ transition: all 0.2s ease-in-out;
 }
 
 .myCustomIconBtn .sapMBtnInner {
-  background-color: white !important;
-  height: 100% !important;
-  width: 100% !important;
-  border-radius: 8px;
-  border: 3px solid white !important;
-  border-color: #141f7d !important;
-  padding: 0 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
+ background-color: white !important;
+ height: 100% !important;
+ width: 100% !important;
+ border-radius: 8px;
+ border: 3px solid #141f7d !important;
+ padding: 0 !important;
+ display: flex !important;
+ justify-content: center !important;
+ align-items: center !important;
+ transition: background-color 0.2s ease-in-out;
 }
 
 .myCustomIconBtn .sapMBtnIcon {
-  color: #141f7d !important;
-  font-size: 30px !important;
-  margin-left: -12px !important;
-  margin-top: 4px !important;
+ color: #141f7d !important;
+ font-size: 30px !important;
+ margin-left: -12px !important;
+ margin-top: 4px !important;
+ transition: color 0.2s ease-in-out;
+}
+/* Share button hover effect */
+.myCustomIconBtn:hover .sapMBtnInner {
+  background-color: #141f7d !important; 
+  box-shadow: 0 0 0.5rem #17191884 !important; /* Yahan dark green shadow */
 }
 
+.myCustomIconBtn:hover .sapMBtnIcon {
+ color: #ffffff !important; 
+}
+
+
 .myFormattedText {
-  width: 60%;
+  width: 100% !important;
   max-width: 100%;
   min-width: 280px;
   font-size: 1rem;
@@ -907,7 +898,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-family: "Helvetica Neue", Arial, sans-serif !important;
   text-align: justify;
   margin: 0 auto; /* centers it horizontally */
-  padding: 0;
+  padding: 1rem;
   color: #222 !important;
   display: block;
   box-sizing: border-box;
@@ -921,6 +912,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     padding-right: 1rem;
   }
 }
+
 
 
 /* Paragraphs and lists */
@@ -939,6 +931,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding-left: 1.5rem !important;
   margin: 0 0 1rem 0;
 }
+
 
 /* List items */
 .myFormattedText li {
@@ -1065,31 +1058,32 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 
 /* Common box */
 .shareItemBox {
-  padding: 0.5rem 0.7rem;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+ padding: 0.5rem 0.7rem;
+ border-bottom: 1px solid #e0e0e0;
+ border-radius: 6px;
+ transition: background-color 0.2s;
 }
 
 .shareItemBox:hover {
-  background-color: #f4f4f4;
-  cursor: pointer;
+ background-color: #f4f4f4;
+ cursor: pointer;
 }
 
 /* Last item without bottom border */
 .shareItemBoxLast {
-  padding: 0.5rem 0.7rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+ padding: 0.5rem 0.7rem;
+ border-radius: 6px;
+ transition: background-color 0.2s;
 }
 
 .shareItemBoxLast:hover {
-  background-color: #f4f4f4;
-  cursor: pointer;
+ background-color: #f4f4f4;
+ cursor: pointer;
 }
 
+/* Optional spacing between icon and text */
 .shareText {
-  margin-left: 0.5rem;
+ margin-left: 0.5rem;
 }
 
 .myAppBackground {
@@ -1115,6 +1109,107 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   bottom: 0;
   z-index: -1 !important;
 }
+
+/*#############################################################################*/
+/*
+Apply now button and reference button styles
+*/
+.myCustomButton {
+height: 60px !important;
+width: 345px !important;
+font-size: 20px !important; 
+padding: 0 !important;
+transition: all 0.2s ease-in-out;
+}
+
+.myCustomButton .sapMBtnInner {
+background-color: #141f7d !important; 
+height: 100% !important;
+line-height: normal !important;
+padding: 16px !important;
+font-size: 24px !important;
+border-radius: 8px;
+transition: background-color 0.2s ease-in-out;
+}
+
+.myCustomButton .sapMBtnContent {
+color: white !important;
+font-size: 20px !important; 
+transition: font-size 0.2s ease-in-out;
+}
+/* Apply Now button hover effect */
+.myCustomButton:hover .sapMBtnInner {
+ 
+ background-color: #182493dc !important; 
+ box-shadow: 0 0 0.5rem #17191884 !important; 
+}
+
+.myCustomButton:hover .sapMBtnContent {
+  font-size: 20px !important;
+  font-weight: bold !important; 
+  /* color: ##182493d5  !important ; */
+  /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif  !important; */
+}
+
+
+/* Main container */
+.mainJobContainer {
+width: 100%;
+display: flex;
+box-sizing: border-box;
+padding: 0.5rem 1rem;
+align-items: flex-start;
+}
+
+/* Left column (main content) */
+.leftColumn {
+flex-grow: 1; 
+box-sizing: border-box;
+margin: 1rem; 
+margin-right: 32.5rem; 
+}
+
+/* Right column (Fixed position) */
+.rightColumn {
+width: 30rem;
+box-sizing: border-box;
+position: fixed !important;
+top: 3rem !important;
+right: 1.5rem !important;
+margin: 1rem;
+}
+
+/* Panel styling - consistent on all devices */
+.contentPanel,
+.actionPanel {
+background: transparent !important;
+padding: 0.5rem !important; 
+width: 100%;
+border-radius: 0.5rem; 
+ box-shadow: 0 0 0.5rem #17191884 !important; 
+ /* overflow: hidden; -- Yahan se hata diya hai takki content cut off na ho aur ScrollContainer kaam kare */
+}
+
+/* Mobile layout */
+@media (max-width: 1200px) {
+.mainJobContainer {
+ flex-wrap: wrap;
+}
+
+.leftColumn {
+ width: 100%;
+ margin-right: 0;
+ margin: 1rem;
+}
+
+.rightColumn {
+ width: 100%;
+ position: static !important;
+ margin-top: 1rem;
+ right: auto !important;
+ margin: 1rem;
+} 
+}/*#############################################################################*/
 
 .myCustomFilterBar.sapUiCompFilterBarNonPhone {
   background-image: none !important;

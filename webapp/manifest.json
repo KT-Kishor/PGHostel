@@ -690,7 +690,7 @@
                 },
                 {
                     "name": "RouteJobView",
-                    "pattern": "JobView:?query:",
+                    "pattern": "JobView",
                     "target": [
                         "TargetJobView"
                     ]

@@ -57,23 +57,23 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column demandPopin="true">
-						<Text text="{i18n>HP_t_job_title}" />
+					<Column demandPopin="true" width="20%">
+						<Text text="{i18n>HP_t_job_title}"/>
 					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>HP_t_PriSkill}" />
-					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>HP_t_Exp}" />
+					<Column demandPopin="true" width="20%">
+						<Text text="{i18n>HP_t_PriSkill}"/>
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>HP_t_loc}" />
+						<Text text="{i18n>HP_t_Exp}"/>
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>HP_t_NoOfPos}" />
+						<Text text="{i18n>HP_t_loc}"/>
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>HP_t_PostDate}" />
+						<Text text="{i18n>HP_t_NoOfPos}"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>HP_t_PostDate}"/>
 					</Column>
 					<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 						<Text text="Status" />
@@ -83,7 +83,8 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{JobApplicationModel>JobTitle}" />
-							<Text text="{JobApplicationModel>PrimarySkills}" />
+							<!-- <Text text="{JobApplicationModel>PrimarySkills}" /> -->
+							<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="20"/>
 							<Text text="{JobApplicationModel>Experience} Years" />
 							<Text text="{JobApplicationModel>Location}" />
 							<Text text="{JobApplicationModel>NoOfPositions}" />
