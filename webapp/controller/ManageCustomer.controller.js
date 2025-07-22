@@ -102,7 +102,8 @@ sap.ui.define([
       },
 
       _resetDialogFields: function (bIsEdit) {
-        sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None"); // Clear error state
+        // Clear all ValueStates
+        sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustCustomerName").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustomGst").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustomPan").setValueState("None");
@@ -113,15 +114,26 @@ sap.ui.define([
         sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
         sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
         sap.ui.getCore().byId("MC_id_HeadPosition").setValueState("None");
+
         if (bIsEdit && this._originalCustomerData) {
-          this._originalCustomerData.stdCode !== "" ? this._originalCustomerData.stdCode : "+91"; 
-          this._originalCustomerData.GST !== null ? this._originalCustomerData.GST : ""; 
-          this._originalCustomerData.LUT !== null ? this._originalCustomerData.LUT : ""; 
-          this._originalCustomerData.mobileNo !== null ? this._originalCustomerData.mobileNo : ""; 
-          this._originalCustomerData.type !== null ? this._originalCustomerData.type : ""; 
-          this._originalCustomerData.value !== null ? this._originalCustomerData.value : ""; 
+          // Set fallback/default values if fields are missing or empty
+          this._originalCustomerData.stdCode = this._originalCustomerData.stdCode || "+91";
+          this._originalCustomerData.GST = this._originalCustomerData.GST || "";
+          this._originalCustomerData.LUT = this._originalCustomerData.LUT || "";
+          this._originalCustomerData.mobileNo = this._originalCustomerData.mobileNo || "";
+          this._originalCustomerData.type = this._originalCustomerData.type || "CGST/SGST";
+          this._originalCustomerData.value = this._originalCustomerData.value || "9";
+
+          // Set data back to CustomerModel
           this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));
-        } // Reset fields to original data
+
+          // Set selected index of radio group based on type
+          if (this._originalCustomerData.type === "IGST") {
+            sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
+          } else {
+            sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
+          }
+        }
       },
 
       MC_onPressClose: function () {
