@@ -1533,17 +1533,16 @@ sap.ui.define([
 
                 const summaryBody = [];
 
-                if (oModel.SubTotalNotGST > 0) {
-                    summaryBody.push([
-                        `Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(oModel.SubTotalNotGST)
+                if (parseFloat(oModel.SubTotalNotGST) > 0) {
+                    summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
+                        Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
                     ]);
                 }
 
-                if (oModel.SubTotalInGST > 0) {
+                if (parseFloat(oModel.SubTotalInGST) > 0) {
                     summaryBody.push([
                         `Sub-Total ( Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(oModel.SubTotalInGST)
+                        Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
                     ]);
                 }
 
@@ -1557,20 +1556,21 @@ sap.ui.define([
                     const sgstValue = parseFloat(oModel.SGST) || 0;
                     const igstValue = parseFloat(oModel.IGST) || 0;
 
-                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && (oModel.CGST > 0)) {
+                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
                         summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && (oModel.IGST > 0)) {
+                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && 
+                    igstValue > 0) {
                         summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }
 
-                if (data.RoundOf) {
-                    summaryBody.push([`Round Off (${data.Currency}) :`, (data.RoundOf)]);
+                if (data.RoundOf && data.RoundOf !== "0") {
+                    summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                 }
 
                 const totalRowIndex = summaryBody.length;
-                summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(oModel.TotalAmount)]);
+                summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
                 doc.autoTable({
                     startY: currentY,
