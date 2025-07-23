@@ -292,7 +292,12 @@
             "type": "sap.ui.model.json.JSONModel",
             "uri": "model/JobTitles.json",
             "preload": true
-          }
+          },
+          "universities": {
+          "type": "sap.ui.model.json.JSONModel",
+          "uri": "model/universities.json",
+          "preload": true
+        }
         },
         "resources": {
             "js": [
