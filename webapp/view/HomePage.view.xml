@@ -130,7 +130,7 @@
 								<items>
 									<ColumnListItem>
 										<cells>
-											<Link text="{JobApplicationModel>JobTitle}" press="v1_onViewItem" />
+											<Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
 										<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
 											<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
 											<Text text="{JobApplicationModel>Location}" />

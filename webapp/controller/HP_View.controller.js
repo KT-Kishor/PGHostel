@@ -35,8 +35,8 @@ sap.ui.define(
 
         _onObjectMatched: async function () {
           try {
-              var LoginFUnction = await this.commonLoginFunction("JobPosting");
-              if (!LoginFUnction) return;
+            var LoginFUnction = await this.commonLoginFunction("JobPosting");
+            if (!LoginFUnction) return;
 
             // 🏷️ Initialize i18n
             this.i18na = this.getView().getModel("i18n")?.getResourceBundle();
@@ -293,6 +293,7 @@ sap.ui.define(
             Experience: "",
             Certifications: "",
             SelectedLocation: "",
+            SelectedWorkMode: "",
             NoOfPositions: "",
             PostDate: "",
             Status: "true",
@@ -336,6 +337,13 @@ sap.ui.define(
             (loc) => loc.city === oData.Location
           );
           const selectedLocationId = matchingLocation?.id || "";
+          const workingModes =
+            this.getView().getModel("WorkingMode")?.getProperty("/location") ||
+            [];
+          const matchedWorkMode = workingModes.find(
+            (mode) => mode.Location === oData.LocationService
+          );
+          const selectedWorkModeId = matchedWorkMode?.ID || "";
 
           const oTempModel = new JSONModel({
             dialogTitle: "Edit Post — " + (oData.JobTitle || ""),
@@ -349,6 +357,7 @@ sap.ui.define(
             SecondarySkills: oData.SecondarySkills || "",
             SkillRequirements: oData.SkillRequirements || "",
             Certifications: oData.Certifications || "",
+            SelectedWorkMode: selectedWorkModeId,
             NoOfPositions: oData.NoOfPositions || "",
             PostDate: oData.PostDate ? oData.PostDate.split("T")[0] : "",
             Status: oData.Status || "false",
@@ -386,6 +395,7 @@ sap.ui.define(
             "positionsInput",
             "postDateDP",
             "jobDescRTE",
+            "workModeCombo",
             "keyRespRTE",
             "secondarySkillsRTE",
             "skillReqRTE",
@@ -490,6 +500,8 @@ sap.ui.define(
             experience: oData.SelectedExperienceKey,
             certifications: oData.Certifications || "",
             location: this.byId("idlocationcombo")?.getValue()?.trim(),
+            LocationService:
+              this.byId("workModeCombo")?.getSelectedItem()?.getText() || "",
             NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
             postDate: oData.PostDate,
             Status: oData.Status,
@@ -501,6 +513,7 @@ sap.ui.define(
           const validation = this.validation;
           const fieldLabels = {
             idlocationcombo: "Location",
+            workModeCombo: "Work Mode",
             positionsInput: "Number of Positions",
             postDateDP: "Post Date",
             primarySkillsInput: "Primary Skills",
@@ -538,6 +551,10 @@ sap.ui.define(
           const firstFields = [
             { id: "idlocationcombo", validator: validation._LCvalidateName },
             {
+              id: "workModeCombo",
+              validator: validation._LCstrictValidationComboBox,
+            },
+            {
               id: "positionsInput",
               validator: validation._LCvalidateAmountZeroTaking,
             },
@@ -545,6 +562,7 @@ sap.ui.define(
               id: "postDateDP",
               validator: validation._LCvalidateMandatoryField,
             },
+
             {
               id: "primarySkillsInput",
               validator: validation._LCvalidateMandatoryField,
@@ -988,6 +1006,9 @@ sap.ui.define(
         },
 
         onLocationChange: function (oEvent) {
+          this.validation._LCstrictValidationComboBox(oEvent);
+        },
+        onWorkModeChange: function (oEvent) {
           this.validation._LCstrictValidationComboBox(oEvent);
         },
 

@@ -57,14 +57,17 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column demandPopin="true" width="20%">
+					<Column demandPopin="true">
 						<Text text="{i18n>HP_t_job_title}"/>
 					</Column>
-					<Column demandPopin="true" width="20%">
+					<Column demandPopin="true">
 						<Text text="{i18n>HP_t_PriSkill}"/>
 					</Column>
-					<Column minScreenWidth="Desktop" demandPopin="true">
-						<Text text="{i18n>HP_t_Exp}"/>
+					<Column demandPopin="true">
+						<Text text="{i18n>HP_t_Workmode}"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+						<Text text="{i18n>HP_t_Exp}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>HP_t_loc}"/>
@@ -83,8 +86,8 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{JobApplicationModel>JobTitle}" />
-							<!-- <Text text="{JobApplicationModel>PrimarySkills}" /> -->
 							<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="20"/>
+							<Text text="{JobApplicationModel>LocationService}" />
 							<Text text="{JobApplicationModel>Experience} Years" />
 							<Text text="{JobApplicationModel>Location}" />
 							<Text text="{JobApplicationModel>NoOfPositions}" />

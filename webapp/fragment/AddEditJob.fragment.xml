@@ -20,9 +20,24 @@
 				<f:content>
 					<Title text="Administrative Details" level="H4" class="sapUiSmallMargin" />
 					<Label text="Location" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedLocation}" items="{BaseLocationModel>/}" change="onLocationChange" valueStateText="{i18n>jpLOcationValueState}" >
+					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" 
+					class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" 
+					selectedKey="{temporaryModel>/SelectedLocation}" items="{BaseLocationModel>/}" 
+					change="onLocationChange" valueStateText="{i18n>jpLocationValueState}" >
 						<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</ComboBox>
+
+
+<Label text="Work Mode" required="true" class="sapUiSmallMarginTop" />
+<ComboBox id="workModeCombo"  placeholder="Select Work Mode" required="true" class="sapUiSmallMarginTop" 
+items="{WorkingMode>/location}" selectedKey="{temporaryModel>/SelectedWorkMode}" showClearIcon="true" 
+change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
+	<core:ListItem key="{WorkingMode>ID}" text="{WorkingMode>Location}" />
+</ComboBox>
+
+
+
+
 					<Label text="Number of Positions" required="true" class="sapUiSmallMarginTop" />
 					<Input id="positionsInput" value="{temporaryModel>/NoOfPositions}" type="Text" placeholder="e.g., 5" liveChange="onNoOfPositionsChange" class="sapUiSmallMarginTop" maxLength="2" required="true"/>
 
