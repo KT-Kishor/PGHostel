@@ -42,18 +42,16 @@
 			</fb:FilterBar>
 			<Table id="CI_id_InvoiceTable" items="{CompanyInvoiceModel>/}">
 				<headerToolbar>
-					<Toolbar>
+					  <OverflowToolbar >
 						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${CompanyInvoiceModel>/}.length})"/>
-						<ToolbarSpacer />
-						<!-- <ToolbarSeparator /> -->
+						 <ToolbarSpacer/>
 						<Button text="{i18n>download}" type="Ghost" tooltip="{i18n>invoicedownload}" press="CI_onPressDownload" />
 
 						<Button text="{i18n>InvoiceAddBtn}" type="Accept" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
 						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" visible="false" type="Reject" press="CI_OnPressDeleteInvoice" enabled="false" />
-						<!-- <ToolbarSeparator /> -->
 						<Button text="{i18n>msasow}" type="Ghost" press="CI_onPressMSASOW"/>
-					</Toolbar>
+					  </OverflowToolbar >
 				</headerToolbar>
 				<columns>
 					<Column  demandPopin="true">

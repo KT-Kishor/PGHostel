@@ -1,11 +1,10 @@
-
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "../utils/validation",
     "sap/m/MessageToast",
     "../utils/CommonAgreementPDF"
-], function (
+], function(
     BaseController,
     JSONModel,
     utils,
@@ -15,10 +14,10 @@ sap.ui.define([
     "use strict";
 
     return BaseController.extend("sap.kt.com.minihrsolution.controller.PurchaseOrderObject", {
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("PurchaseOrderObject").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             //   await   this._fetchCommonData("BaseLocation", "BaseLocationModel");
 
 
@@ -56,13 +55,16 @@ sap.ui.define([
             //  this._fetchCommonData("Currency", "CurrencyModel");
             // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
             //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
-            this._fetchCommonData("EmailContent", "CCMailModel", { Type: "PurchaseOrder", Action: "CC" })
+            this._fetchCommonData("EmailContent", "CCMailModel", {
+                Type: "PurchaseOrder",
+                Action: "CC"
+            })
 
             this.getView().byId("FPO_id_StartDate").setMinDate(null)
             var sdate = this.getView().byId("FPO_id_StartDate")
             var enddate = this.getView().byId("FPO_id_EndDate");
 
-            this.getView().byId("FPO_id_StartDate").attachChange(function (oEvent) {
+            this.getView().byId("FPO_id_StartDate").attachChange(function(oEvent) {
                 var startDate = oEvent.getSource().getDateValue();
                 enddate.setMinDate(startDate);
                 sdate.setMinDate(startDate)
@@ -113,7 +115,9 @@ sap.ui.define([
             })
             this.getView().setModel(model, "PurchaseOrderModel");
 
-            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", { branchCode: "KLB01" }).then((oData) => {
+            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
+                branchCode: "KLB01"
+            }).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 return PoData[0]
             });
@@ -135,7 +139,9 @@ sap.ui.define([
                 this.getView().byId("POO_ideditButton").setVisible(true)
 
                 this.PoNumber = oEvent.getParameter("arguments").sPath;
-                await this.ajaxReadWithJQuery("PurchaseOrderItems", { PoNumber: this.PoNumber }).then((oData) => {
+                await this.ajaxReadWithJQuery("PurchaseOrderItems", {
+                    PoNumber: this.PoNumber
+                }).then((oData) => {
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     this.getOwnerComponent().setModel(new JSONModel(oFCIAerData), "objectModel");
 
@@ -178,9 +184,6 @@ sap.ui.define([
                     purchaseOrderModel.setProperty("/City", purchaseOrderData.PurchaseOrder[0].City);
                     purchaseOrderModel.setProperty("/CustomerDesignation", purchaseOrderData.PurchaseOrder[0].CustomerDesignation);
 
-
-
-
                     var length = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
                     if (length == false) {
                         var oModel = this.getView().getModel("PurchaseOrderModel")
@@ -214,27 +217,30 @@ sap.ui.define([
                     this.getView().byId("POO_idmailButton").setVisible(true)
                     this.getView().byId("POO_idPDFButton").setVisible(true)
 
-                    
-                  
                     purchaseOrderModel.setProperty("/Editable", false);
 
                 });
             }
             this.closeBusyDialog()
         },
-        PO_onButtonPress: function () {
-            this.showConfirmationDialog(
-           "Confirm Action",
-           "Are you sure you want to go back?",
-           ()=>{
-               this.getRouter().navTo("PurchaseOrder");
-             }
-            )
+        PO_onButtonPress: function() {
+            const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
 
+            if (purchaseOrderModel.getProperty("/Editable")) {
+                this.showConfirmationDialog(
+                    "Confirm Action",
+                    "Are you sure you want to go back?",
+                    () => {
+                        this.getRouter().navTo("PurchaseOrder");
+                    }
+                )
+            } else {
+                this.getRouter().navTo("PurchaseOrder");
+            }
         },
-        PO_onComboBoxChange: function () {
+        PO_onComboBoxChange: function() {
             var selectedkey = this.byId("FPO_id_CustomerName").getSelectedKey();
-            var Customer = this.getView().getModel("ManageCustomerModel").getData().find(function (cust) {
+            var Customer = this.getView().getModel("ManageCustomerModel").getData().find(function(cust) {
                 return cust.companyName === selectedkey
             });
             this.getView().getModel("PurchaseOrderModel").setProperty("/Address", Customer.address);
@@ -251,7 +257,6 @@ sap.ui.define([
 
 
             this.getView().getModel("PurchaseOrderModel").setProperty("/CustomerHeadName", Customer.name);
-
 
             if (Customer.LUT && Customer.LUT.trim() !== "") {
                 this.getView().byId("FPO_id_LUT").setVisible(true)
@@ -273,10 +278,12 @@ sap.ui.define([
 
             this.byId("FPO_id_CustomerName").setValueState("None");
         },
-        PO_onComboBoxBranchChange: async function () {
+        PO_onComboBoxBranchChange: async function() {
             var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
             this.getBusyDialog()
-            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", { branchCode: selectedkey }).then((oData) => {
+            var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
+                branchCode: selectedkey
+            }).then((oData) => {
                 var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 return PoData[0]
             });
@@ -287,11 +294,9 @@ sap.ui.define([
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", PoData.gstin);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", PoData.carrerEmail);
             this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
-
-
             this.byId("FPO_id_BranchCode").setValueState("None");
         },
-        onAddItemButtonPress: function () {
+        onAddItemButtonPress: function() {
             var oModel = this.getView().getModel("PurchaseOrderModel");
             var aData = oModel.getProperty("/PurchaseOrders") || [];
 
@@ -309,11 +314,11 @@ sap.ui.define([
             oModel.setProperty("/PurchaseOrders", aData);
         },
 
-        onSelectCurrencyChange: function () {
+        onSelectCurrencyChange: function() {
             this._calculateGSTandTotal();
         },
 
-        PO_onAmountInputChange: function (oEvent) {
+        PO_onAmountInputChange: function(oEvent) {
             this.unit = utils._LCvalidateAmount(oEvent);
 
             var oInput = oEvent.getSource();
@@ -339,12 +344,12 @@ sap.ui.define([
             this._calculateGSTandTotal();
         },
 
-        _calculateGSTandTotal: function () {
+        _calculateGSTandTotal: function() {
             var model = this.getView().getModel("PurchaseOrderModel");
 
             var aPOs = model.getProperty("/PurchaseOrders") || [];
             var fSubTotal = 0;
-            aPOs.forEach(function (item) {
+            aPOs.forEach(function(item) {
                 var fItemTotal = parseFloat(item.TotalAmount);
                 if (!isNaN(fItemTotal)) {
                     fSubTotal += fItemTotal;
@@ -373,7 +378,7 @@ sap.ui.define([
                 model.setProperty("/GrantTotal", fSubTotal.toFixed(2));
             }
         },
-        POO_onSubmitButtonPress: async function () {
+        POO_onSubmitButtonPress: async function() {
 
             var purchaseOrders = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders");
 
@@ -383,14 +388,12 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
-                    utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID")
-                    && utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
+                    utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                     this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
-
-
                 ) {
 
-                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item, index) {
+                    var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function(item, index) {
                         if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
 
                             sap.m.MessageBox.error("Please complete all the fields in row " + (index + 1))
@@ -411,8 +414,7 @@ sap.ui.define([
                         return;
                     }
 
-                    var data =
-                    {
+                    var data = {
                         "CustomerName": oModel.CustomerName,
                         "Address": oModel.Address,
                         "StartDate": oModel.StartDate.split('/').reverse().join('-'),
@@ -445,11 +447,8 @@ sap.ui.define([
                         "Country": oModel.Country,
                         "City": oModel.City,
                         "CustomerDesignation": oModel.CustomerDesignation,
-
-
-
                     };
-                    var Items = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").map(function (item, index) {
+                    var Items = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").map(function(item, index) {
 
                         var itemObj = {
                             data: {
@@ -460,7 +459,6 @@ sap.ui.define([
                                 "Currency": oModel.Currency || "INR",
                                 "Period": item.Period || "Per Day",
                                 "TotalAmount": item.TotalAmount
-
                             }
                         };
 
@@ -478,20 +476,17 @@ sap.ui.define([
                     this.closeBusyDialog();
 
 
-                }
-
-                else {
+                } else {
                     MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
 
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 MessageToast.show(this.i18nModel.getText("technicalError"));
 
                 console.error(e);
             }
         },
-           onSuccessDialog  : function () {
+        onSuccessDialog: function() {
             if (!this._oDialog) {
                 this._oDialog = new sap.m.Dialog({
                     title: "Success",
@@ -503,7 +498,7 @@ sap.ui.define([
                     endButton: new sap.m.Button({
                         text: "Generate PDF",
                         type: "Attention",
-                        press: function () {
+                        press: function() {
                             this.PoNumber
                             this.POO_onPDFButtonPress();
                             this._oDialog.close();
@@ -514,7 +509,7 @@ sap.ui.define([
                     beginButton: new sap.m.Button({
                         text: "OK",
                         type: "Accept",
-                        press: function () {
+                        press: function() {
                             this._oDialog.close();
                             this.getRouter().navTo("PurchaseOrder");
 
@@ -526,13 +521,11 @@ sap.ui.define([
             }
             this._oDialog.open();
         },
-        POO_onSaveButtonPress: async function (oEvent) {
+        POO_onSaveButtonPress: async function(oEvent) {
             this.getRouter().getRoute("PurchaseOrder")
             const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
 
             var oModel = this.getView().getModel("PurchaseOrderModel").getData()
-
-
             if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") &&
                 utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
@@ -542,7 +535,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {
-                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function (item, index) {
+                var isValid = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").every(function(item, index) {
                     if (!item.Description || !item.Unit || !item.Amount || !item.ConsultantName) {
                         sap.m.MessageBox.error("Please fill in all required fields for each row " + (index + 1))
                         return false;
@@ -561,8 +554,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
                     return;
                 }
-
-
                 var data = {
                     "CustomerName": oModel.CustomerName,
                     "Address": oModel.Address,
@@ -596,9 +587,8 @@ sap.ui.define([
                     "Country": oModel.Country,
                     "City": oModel.City,
                     "CustomerDesignation": oModel.CustomerDesignation,
-
                 };
-                var Items = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").map(function (item, index) {
+                var Items = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").map(function(item, index) {
 
                     var itemObj = {
                         data: {
@@ -609,14 +599,17 @@ sap.ui.define([
                             "Currency": oModel.Currency || "INR",
                             "Period": item.Period || "Per Day",
                             "TotalAmount": item.TotalAmount
-
                         }
                     };
                     if (item.ItemId) {
-                        itemObj.filters = { ItemId: item.ItemId };
-                    }
-                    else {
-                        itemObj.filters = { flag: "create", PoNumber: this.PoNumber };
+                        itemObj.filters = {
+                            ItemId: item.ItemId
+                        };
+                    } else {
+                        itemObj.filters = {
+                            flag: "create",
+                            PoNumber: this.PoNumber
+                        };
                         itemObj.data.PoNumber = this.PoNumber;
 
                     }
@@ -654,9 +647,6 @@ sap.ui.define([
                 this.byId("POO_idPDFButton").setVisible(true)
                 this.byId("POO_idClearButton").setVisible(false)
                 this.byId("FPO_id_PoNumber").setVisible(true)
-
-
-
                 purchaseOrderModel.setProperty("/Editable", false);
             } else {
                 MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
@@ -664,12 +654,11 @@ sap.ui.define([
             }
 
         },
-        onClearNotesPress: function () {
+        onClearNotesPress: function() {
             this.getView().getModel("PurchaseOrderModel").setProperty("/Notes", "")
         },
-        POO_onEditButtonPress: function () {
+        POO_onEditButtonPress: function() {
             const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
-
             this.byId("FPO_id_CustomerName").setEditable(true)
             this.byId("FPO_id_StartDate").setEditable(true)
             this.byId("FPO_id_EndDate").setEditable(true)
@@ -685,24 +674,19 @@ sap.ui.define([
             this.byId("POO_idPDFButton").setVisible(false)
             this.byId("POO_idClearButton").setVisible(true)
             this.byId("FPO_id_PoNumber").setVisible(true)
-
-
-
-
             purchaseOrderModel.setProperty("/Editable", true);
             this.getView().byId("POO_idSaveButton").setVisible(true)
-
         },
-        FPO_onDateChange: function (oEvent) {
+        FPO_onDateChange: function(oEvent) {
             utils._LCvalidateDate(oEvent)
         },
-        PO_onConsultantnameLiveChange: function (oEvent) {
+        PO_onConsultantnameLiveChange: function(oEvent) {
             utils._LCvalidateName(oEvent)
         },
-        POO_onCustDescriptionLiveChange: function (oEvent) {
+        POO_onCustDescriptionLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
-        POO_onPOTableDelete: async function (oEvent) {
+        POO_onPOTableDelete: async function(oEvent) {
             const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
             const oTable = this.byId("idTable");
             oTable.setMode(purchaseOrderModel.getProperty("/Editable") ? "Delete" : "None");
@@ -730,7 +714,7 @@ sap.ui.define([
                         this.ajaxDeleteWithJQuery("PurchaseOrderItems", payload).then(() => {
                             MessageToast.show(this.i18nModel.getText("purchaseOrderDeleted"));
                             oData.splice(iIndex, 1);
-                            oData.forEach(function (item, index) {
+                            oData.forEach(function(item, index) {
                                 item.SerialNo = index + 1;
                             });
                             oModel.setProperty("/PurchaseOrders", oData);
@@ -742,7 +726,7 @@ sap.ui.define([
                                 oModel.setProperty("/GrantTotal", "0.00");
                             } else {
                                 var fSubTotal = 0;
-                                oData.forEach(function (item) {
+                                oData.forEach(function(item) {
                                     var total = parseFloat(item.TotalAmount);
                                     if (!isNaN(total)) fSubTotal += total;
                                 });
@@ -755,7 +739,7 @@ sap.ui.define([
                 );
             } else {
                 oData.splice(iIndex, 1);
-                oData.forEach(function (item, index) {
+                oData.forEach(function(item, index) {
                     item.SerialNo = index + 1;
                 });
                 oModel.setProperty("/PurchaseOrders", oData);
@@ -768,7 +752,7 @@ sap.ui.define([
                     oModel.setProperty("/GrantTotal", "0.00");
                 } else {
                     var fSubTotal = 0;
-                    oData.forEach(function (item) {
+                    oData.forEach(function(item) {
                         var total = parseFloat(item.TotalAmount);
                         if (!isNaN(total)) fSubTotal += total;
                     });
@@ -778,7 +762,7 @@ sap.ui.define([
             }
         },
 
-        POO_onPDFButtonPress: async function () {
+        POO_onPDFButtonPress: async function() {
             var oPDFModel = this.getView().getModel("PDFData");
             var oPOModel = this.getView().getModel("PurchaseOrderModel").getData();
             oPDFModel.setProperty("/ClientCompanyName", oPOModel.CustomerName);
@@ -803,15 +787,25 @@ sap.ui.define([
             var amountInWords = await this.convertNumberToWords(oPOModel.GrantTotal, oPOModel.Currency);
             oPDFModel.setProperty("/POAmountInWords", amountInWords);
             var htmlContent = oPOModel.Notes;
-               this.getBusyDialog();
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oPOModel.BranchCode });
+            this.getBusyDialog();
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                branchCode: oPOModel.BranchCode
+            });
             var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                 try {
-                    const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                    const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                    const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                    const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+                    const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
+                        type: "image/png"
+                    });
+                    const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], {
+                        type: "image/png"
+                    });
+                    const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], {
+                        type: "image/png"
+                    });
+                    const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], {
+                        type: "image/png"
+                    });
 
                     const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                         this._convertBLOBToImage(logoBlob),
@@ -840,7 +834,7 @@ sap.ui.define([
             }
         },
 
-        POO_onmailButtonPress: function () {
+        POO_onmailButtonPress: function() {
             var oEmployeeEmail = this.getView().getModel("PurchaseOrderModel").getData().customerEmail;
             if (!oEmployeeEmail || oEmployeeEmail.length === 0) {
                 sap.m.MessageBox.error("To Email is missing");
@@ -860,12 +854,12 @@ sap.ui.define([
             this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
             this.validateSendButton();
         },
-        EOD_commonOpenDialog: function (fragmentName) {
+        EOD_commonOpenDialog: function(fragmentName) {
             if (!this.EOU_oDialogMail) {
                 sap.ui.core.Fragment.load({
                     name: fragmentName,
                     controller: this,
-                }).then(function (EOU_oDialogMail) {
+                }).then(function(EOU_oDialogMail) {
                     this.EOU_oDialogMail = EOU_oDialogMail;
                     this.getView().addDependent(this.EOU_oDialogMail);
                     this.EOU_oDialogMail.open();
@@ -876,12 +870,12 @@ sap.ui.define([
         },
 
         //close mail dialog
-        Mail_onPressClose: function () {
+        Mail_onPressClose: function() {
             this.EOU_oDialogMail.destroy();
             this.EOU_oDialogMail = null;
         },
         //File upload function calling from base controller
-        Mail_onUpload: function (oEvent) {
+        Mail_onUpload: function(oEvent) {
             this.handleFileUpload(
                 oEvent,
                 this, // context
@@ -897,7 +891,7 @@ sap.ui.define([
             );
         },
         //Mail dialog button visibility
-        validateSendButton: function () {
+        validateSendButton: function() {
             const sendBtn = sap.ui.getCore().byId("SendMail_Button");
             const emailField = sap.ui.getCore().byId("CCMail_TextArea");
             const uploaderModel = this.getView().getModel("UploaderData");
@@ -910,11 +904,11 @@ sap.ui.define([
             sendBtn.setEnabled(isEmailValid && isFileUploaded);
         },
 
-        Mail_onEmailChange: function () {
+        Mail_onEmailChange: function() {
             this.validateSendButton(); // Reuse from BaseController
         },
         //Send mail
-        Mail_onSendEmail: function () {
+        Mail_onSendEmail: function() {
             var oModel = this.getView().getModel("PurchaseOrderModel").getData();
             const uploaderModel = this.getView().getModel("UploaderData").getProperty("/attachments");
             if (uploaderModel == false) {
@@ -941,8 +935,6 @@ sap.ui.define([
                 this.closeBusyDialog();
                 this.EOU_oDialogMail.close()
             })
-
-
         },
     });
 });

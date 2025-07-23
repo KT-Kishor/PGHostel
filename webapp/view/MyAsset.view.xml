@@ -36,28 +36,28 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-            <Column>
+            <Column demandPopin="true">
                     <Text text="Type" />
                 </Column>
-                <Column>
+                <Column demandPopin="true">
                     <Text text="Model" />
                 </Column>
-                <Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
                     <Text text="Description" />
                 </Column>
-                <Column>
+                <Column demandPopin="true">
                     <Text text="Serial Number" />
                 </Column>
-                <Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
                     <Text text="Equipment Number" />
                 </Column>
-                 <Column>
+                 <Column minScreenWidth="Desktop" demandPopin="true">
                     <Text text="Assigned Date" />
                 </Column>
-                <Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
                     <Text text="Asset Value" />
                 </Column>
-                <Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
                     <Text text="Status" />
                 </Column>
             </columns>
@@ -98,7 +98,7 @@
             </items>
         </Table>
         <footer>
-            <Bar id="IA_id_FooterBar">
+            <Bar>
                 <contentLeft>
                     <core:Fragment
                         fragmentName="sap.kt.com.minihrsolution.fragment.Footer"

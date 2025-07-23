@@ -90,7 +90,7 @@
                     <Column hAlign="Left" demandPopin="true">
                         <Text text="{i18n>quotationNo}" />
                     </Column>
-                    <Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true">
+                    <Column hAlign="Left"  demandPopin="true">
                         <Text text="{i18n>quotaiodate}" />
                     </Column>
                     <Column hAlign="Left" minScreenWidth="Desktop" demandPopin="true">

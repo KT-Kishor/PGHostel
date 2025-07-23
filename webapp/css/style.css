@@ -604,6 +604,13 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   width: 100%;
 }
 
+.customComboBox {
+    max-width: 200px;
+    min-width: 120px;
+    width: 100%;
+}
+
+
 .rightAlignLabel {
   text-align: right;
   margin-right: 5px;
