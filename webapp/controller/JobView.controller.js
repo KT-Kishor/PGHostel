@@ -1119,58 +1119,59 @@ sap.ui.define(
 
                     const isExperienced = f("experienceSwitch")?.getState?.();
 
-                    const mandatoryChecks = [{
-                            ctrl: f("fullNameInput"),
-                            fn: utils._LCvalidateMandatoryField
-                        },
-                        {
-                            ctrl: f("genderCombo"),
-                            fn: utils._LCstrictValidationComboBox
-                        },
-                        {
-                            ctrl: f("emailInput"),
-                            fn: utils._LCvalidateEmail
-                        },
-                        {
-                            ctrl: f("countryCombo"),
-                            fn: utils._LCstrictValidationComboBox
-                        },
-                        {
-                            ctrl: f("LocationComboBox"),
-                            fn: utils._LCstrictValidationComboBox,
-                        },
-                        {
-                            ctrl: f("addressInput"),
-                            fn: utils._LCvalidateMandatoryField
-                        },
-                        {
-                            ctrl: f("isd_code"),
-                            fn: utils._LCstrictValidationComboBox
-                        },
-                        {
-                            ctrl: f("mobileInput"),
-                            fn: utils._LCvalidateMobileNumber
-                        },
-                        {
-                            ctrl: f("dobPicker"),
-                            fn: utils._LCvalidateMandatoryField
-                        },
-                        {
-                            ctrl: f("qualificationCombo"),
-                            fn: utils._LCstrictValidationComboBox,
-                        },
-                        {
-                            ctrl: f("universityCombo"),
-                            fn: utils._LCstrictValidationComboBox,
-                        },
-                        {
-                            ctrl: f("PassingYear"),
-                            fn: utils._LCvalidateMandatoryField
-                        },
-                        {
-                            ctrl: f("skillsInput"),
-                            fn: utils._LCvalidateMandatoryField
-                        },
+                    const mandatoryChecks = [
+                      {
+                        ctrl: f("fullNameInput"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
+                      {
+                        ctrl: f("genderCombo"),
+                        fn: utils._LCstrictValidationComboBox,
+                      },
+                      {
+                        ctrl: f("emailInput"),
+                        fn: utils._LCvalidateEmail,
+                      },
+                      {
+                        ctrl: f("countryCombo"),
+                        fn: utils._LCstrictValidationComboBox,
+                      },
+                      {
+                        ctrl: f("LocationComboBox"),
+                        fn: utils._LCstrictValidationComboBox,
+                      },
+                      {
+                        ctrl: f("addressInput"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
+                      {
+                        ctrl: f("isd_code"),
+                        fn: utils._LCstrictValidationComboBox,
+                      },
+                      {
+                        ctrl: f("mobileInput"),
+                        fn: utils._LCvalidateMobileNumber,
+                      },
+                      {
+                        ctrl: f("dobPicker"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
+                      {
+                        ctrl: f("qualificationCombo"),
+                        fn: utils._LCstrictValidationComboBox,
+                      },
+                      {
+                        ctrl: f("universityCombo"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
+                      {
+                        ctrl: f("PassingYear"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
+                      {
+                        ctrl: f("skillsInput"),
+                        fn: utils._LCvalidateMandatoryField,
+                      },
                     ];
 
                     if (isExperienced) {
@@ -1401,14 +1402,14 @@ sap.ui.define(
                                     "mailto:?subject=Check this out&body=" +
                                     encodeURIComponent(window.location.href);
                             }),
-                            createItem("image/Whatsapp.png", "WhatsApp", () => {
+                            createItem("image/whatsapp.png", "WhatsApp", () => {
                                 window.open(
                                     "https://wa.me/?text=" +
                                     encodeURIComponent(window.location.href),
                                     "_blank"
                                 );
                             }),
-                            createItem("image/Link.png", "Copy Link", () => {
+                            createItem("image/link.png", "Copy Link", () => {
                                 navigator.clipboard.writeText(window.location.href);
                                 sap.m.MessageToast.show("Link copied!");
                             }),
