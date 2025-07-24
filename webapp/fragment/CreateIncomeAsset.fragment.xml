@@ -135,16 +135,16 @@
                 />
 
                 <Label text="{i18n>currency}" required="true" />
-                <Select
+               <ComboBox
                     id="FCIA_id_currency"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
-                    items="{CurrencyModel>/}"
+                    items="{CurrencyModel>/}" valueStateText="{i18n>selectCurrency}"
                 >
                     <core:Item
                         text="{CurrencyModel>currency}"
                         key="{CurrencyModel>currency}"
                     />
-                </Select>
+                </ComboBox>
                 <Label text="{i18n>transferby}"/>
                 <Select
                     id="FCIA_id_transferBy"

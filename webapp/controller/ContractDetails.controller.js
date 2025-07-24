@@ -442,6 +442,13 @@ sap.ui.define([
                 }
             },
 
+            CD_onChangeCurrency: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+                 if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
             CD_ValidateConsultantName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
@@ -494,6 +501,7 @@ sap.ui.define([
                 oModel.ContarctEmail = this.byId("CD_id_Email").getValue();
                 oModel.EndClientHirer = this.byId("CD_id_EndClientHirer").getValue();
                 oModel.Amount = this.byId("CD_id_Amount").getValue();
+                oModel.Currency = this.byId("CD_id_Currency").getValue();
                 oModel.ClientReportContact = this.byId("CD_id_HiringContact").getValue();
                 oModel.StartDate = this.byId("CD_id_Datestart").getValue();
                 oModel.EndDate = this.byId("CD_id_DateEnd").getValue();
@@ -504,7 +512,7 @@ sap.ui.define([
 
                 // Include Country and ConLocation in field check
                 const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
-                    oModel.EndClientHirer && oModel.Amount && oModel.ClientReportContact && oModel.StartDate && oModel.EndDate && oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
+                    oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.StartDate && oModel.EndDate && oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
                 if (bAllFieldsFilled) {
                     // Run validations with correct chaining using &&
@@ -516,6 +524,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
@@ -553,6 +562,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
@@ -578,7 +588,7 @@ sap.ui.define([
                         }
 
                         var oModel = this.getView().getModel("ContractModelWizart");
-                        var selectedCurrency = this.byId("CD_id_Currency").getSelectedKey();
+                        var selectedCurrency = this.byId("CD_id_Currency").getValue();
                         var branchCode = this.getView().byId("CD_id_ConLocation").getSelectedItem().getAdditionalText();
 
                         var data = {
@@ -771,6 +781,7 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_CurrencySelect"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_codeModel"), "ID") &&
@@ -807,7 +818,7 @@ sap.ui.define([
 
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
-                const selectedCurrency = this.byId("CU_id_CurrencySelect").getSelectedKey();
+                const selectedCurrency = this.byId("CU_id_CurrencySelect").getValue();
                 const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText}`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
                 const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();

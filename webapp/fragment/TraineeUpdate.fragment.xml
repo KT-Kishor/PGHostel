@@ -111,13 +111,16 @@
 															width="100%" />
 											</m:VBox>
 											<m:VBox width="30%" class="sapUiTinyMarginBegin">
-												<m:Select  editable="{viewModel>/editable}" 
-															id="TU_id_Currency" 
-															items="{CurrencyModel>/}" 
-															selectedKey="{oTraineeDetails>/Currency}" 
-															width="100%">
-													<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-												</m:Select>
+												<m:ComboBox  editable="{viewModel>/editable}" 
+													id="TU_id_Currency" 
+													items="{CurrencyModel>/}" 
+													selectedKey="{oTraineeDetails>/Currency}" 
+													width="100%" valueStateText="{i18n>selectCurrency}" change="TD_onChangeCurrency">
+													
+													<core:Item 
+														key="{CurrencyModel>currency}" 
+														text="{CurrencyModel>currency}" />
+												</m:ComboBox>
 											</m:VBox>
 										</m:HBox>
 										<m:Label text="{i18n>releaseDateT}" required="true" />

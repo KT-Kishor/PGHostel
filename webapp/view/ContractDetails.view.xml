@@ -45,11 +45,10 @@
 							</RadioButtonGroup>
 							<Label text="{i18n>amount}" required="true" />
 							<Input value="{ContractModelWizart>/Amount}"  id="CD_id_Amount"  placeholder="{i18n>placeAmount}"  liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}" />
-							<Select items="{CurrencyModel>/}" 
-									selectedKey="{ContractModelWizart>/Currency}" id="CD_id_Currency" visible="true" class="marginLeft">
-								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-							</Select>
-
+							<ComboBox items="{CurrencyModel>/}" selectedKey="{ContractModelWizart>/Currency}" 
+                            id="CD_id_Currency" visible="true" class="marginLeft" valueStateText="{i18n>selectCurrency}" change="CD_onChangeCurrency">
+							<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+						    </ComboBox>
 							<Label text="{i18n>endClientHirer}" required="true"/>
 							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" showSecondaryValues="true" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
                             <core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>companyName}" additionalText="{CreateCustomerModel>name}" />

@@ -18,9 +18,6 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("PurchaseOrderObject").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function(oEvent) {
-            //   await   this._fetchCommonData("BaseLocation", "BaseLocationModel");
-
-
             var LoginFunction = await this.commonLoginFunction("PurchaseOrder");
             if (!LoginFunction) return;
             this.getBusyDialog()
@@ -314,7 +311,8 @@ sap.ui.define([
             oModel.setProperty("/PurchaseOrders", aData);
         },
 
-        onSelectCurrencyChange: function() {
+        onSelectCurrencyChange: function(oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
             this._calculateGSTandTotal();
         },
 
@@ -359,7 +357,7 @@ sap.ui.define([
 
             var tax = parseFloat(this.getView().byId("FPO_id_tax").getValue()) || 0;
             var GSTtype = this.getView().byId("FPO_id_type").getValue();
-            var Currency = this.getView().byId("FPO_id_Currency").getSelectedKey();
+            var Currency = this.getView().byId("FPO_id_Currency").getValue();
 
             var GST = fSubTotal * tax / 100;
 
@@ -389,6 +387,7 @@ sap.ui.define([
                     utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_Currency"), "ID") &&
                     utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                     this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
                 ) {
@@ -531,7 +530,7 @@ sap.ui.define([
                 utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
-
+                utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_Currency"), "ID") &&
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {

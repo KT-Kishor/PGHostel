@@ -190,17 +190,17 @@
                                     width="30%"
                                     class="sapUiTinyMarginBegin"
                                 >
-                                    <Select
+                                   <ComboBox
                                         id="TD_id_Currency"
-                                        items="{CurrencyModel>/}"
+                                        items="{CurrencyModel>/}" valueStateText="{i18n>selectCurrency}"
                                         selectedKey="{oTraineeDetails>/Currency}"
-                                        width="100%"
+                                        width="100%" change="TD_onChangeCurrency"
                                     >
                                         <core:Item
                                             key="{CurrencyModel>currency}"
                                             text="{CurrencyModel>currency}"
                                         />
-                                    </Select>
+                                    </ComboBox>
                                 </VBox>
                             </HBox>
                             <Label

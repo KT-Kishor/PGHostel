@@ -28,7 +28,7 @@ sap.ui.define([
                     "ReportingManager": "",
                     "Type": "",
                     "Amount": "",
-                    "Currency": "",
+                    "Currency": "INR",
                     "ReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "TraineeEmail": "",
@@ -141,6 +141,10 @@ sap.ui.define([
                 utils._LCvalidateMobileNumber(oEvent);
                 if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
             },
+            TD_onChangeCurrency:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent);
+                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
+            },
             //validate date function
             TD_validateDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent); // Base validation
@@ -166,15 +170,15 @@ sap.ui.define([
             //wizard step validation function
             TD_validateStep: function () {
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
-                oModel.Currency = this.getView().byId("TD_id_Currency").getSelectedKey();
+                oModel.Currency = this.getView().byId("TD_id_Currency").getValue();
                 oModel.Gender = this.getView().byId("TD_id_Gender").getSelectedKey();
                 oModel.BaseLocation = this.getView().byId("TD_id_Location").getSelectedKey();
                 oModel.TrainingDuration = this.getView().byId("TD_id_TDuration").getSelectedKey();
-                const bAllFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getSelectedKey() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_TrainingType").getSelectedKey() && this.getView().byId("TD_id_TrainingAmount").getValue() && this.getView().byId("TD_id_ReleaseDate").getValue() &&
+                const bAllFieldsFilled = this.getView().byId("TD_id_Name").getValue() && this.getView().byId("TD_id_ReportingManager").getSelectedKey() && this.getView().byId("TD_id_EmailID").getValue() && this.getView().byId("TD_id_TrainingType").getSelectedKey() && this.getView().byId("TD_id_TrainingAmount").getValue() && this.getView().byId("TD_id_Currency").getValue() &&  this.getView().byId("TD_id_ReleaseDate").getValue() &&
                     this.getView().byId("TD_id_JoiningDate").getValue() && this.getView().byId("TD_id_TDuration").getSelectedKey() && this.getView().byId("TD_Id_Country").getValue() && this.getView().byId("TD_id_Location").getSelectedKey() && this.getView().byId("TD_id_Mobile").getValue() && this.getView().byId("TD_id_STDCode").getValue();
                 if (bAllFieldsFilled) {
                     let bValid = utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") && utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
-                        utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_Location"), "ID") && utils._LCvalidateMobileNumber(this.getView().byId("TD_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_STDCode"), "ID");
+                        utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") &&  utils._LCstrictValidationComboBox(this.byId("TD_id_Currency"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") && utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_Id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_Location"), "ID") && utils._LCvalidateMobileNumber(this.getView().byId("TD_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("TD_id_STDCode"), "ID");
                     this.getView().byId("TD_id_Wizard").getSteps()[0].setValidated(bValid);
                 } else {
                     this.getView().byId("TD_id_Wizard").getSteps()[0].setValidated(false);
@@ -193,6 +197,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
                         utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("TD_id_Currency"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TD_Id_Country"), "ID") &&
@@ -205,7 +210,7 @@ sap.ui.define([
                     }
                     this.getBusyDialog();
                     // Prepare payload
-                    oModel.Currency = this.byId("TD_id_Currency").getSelectedKey();
+                    oModel.Currency = this.getView().byId("TD_id_Currency").getValue();
                     oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
                     oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
                     oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
@@ -290,6 +295,7 @@ sap.ui.define([
                             utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
                             utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") &&
                             utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("TU_id_Currency"), "ID") &&
                             utils._LCstrictValidationComboBox(this.getView().byId("TU_Id_Country"), "ID") &&
                             utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Location"), "ID") &&
                             utils._LCvalidateMobileNumber(this.getView().byId("TU_id_Mobile"), "ID") &&

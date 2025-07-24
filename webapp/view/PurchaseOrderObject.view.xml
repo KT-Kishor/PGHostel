@@ -422,18 +422,18 @@
                                             class="oSowFragLabel"
                                             required="true"
                                         />
-                                        <m:Select
+                                        <m:ComboBox
                                             id="FPO_id_Currency"
                                             change="onSelectCurrencyChange"
                                             selectedKey="{PurchaseOrderModel>/Currency}"
-                                            items="{CurrencyModel>/}"
-                                            width="100%"
+                                            items="{CurrencyModel>/}" valueStateText="{i18n>selectCurrency}"
+                                            width="100%" 
                                         >
                                             <c:Item
                                                 key="{CurrencyModel>currency}"
                                                 text="{CurrencyModel>currency}"
                                             />
-                                        </m:Select>
+                                        </m:ComboBox>
                                         <m:Label
                                             text="{i18n>description}"
                                             class="oSowFragLabel"

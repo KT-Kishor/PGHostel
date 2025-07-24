@@ -123,9 +123,10 @@
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
 										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/editable}" />
-										<m:Select  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{oFilteredContractModel>/Currency}" visible="true" width="100%" class="marginLeft" editable="{simpleForm>/editable}">
-											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-										</m:Select>
+										<m:ComboBox  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" 
+    									selectedKey="{oFilteredContractModel>/Currency}" visible="true"  valueStateText="{i18n>selectCurrency}" width="100%" class="marginLeft" editable="{simpleForm>/editable}" change="CD_onChangeCurrency">
+										<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+									    </m:ComboBox>
 											<!-- Contract Period -->
 										<m:Label text="{i18n>warrantyDate}"  />
 										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/editable}" >

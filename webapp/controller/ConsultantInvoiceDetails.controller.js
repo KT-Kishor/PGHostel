@@ -778,7 +778,8 @@ sap.ui.define(
                     }
                 },
 
-                CI_onCurrencyChange: function () {
+                CI_onCurrencyChange: function (oEvent) {
+                    utils._LCstrictValidationComboBox(oEvent);
                     var oConsultantModel = this.getView().getModel("ConsultantInvoiceModel");
                     var currency = oConsultantModel.getProperty("/Currency");
 
@@ -1035,6 +1036,7 @@ sap.ui.define(
                             utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
                             utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_Currency"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
                             utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
                             utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&
@@ -1230,6 +1232,7 @@ sap.ui.define(
                         utils._LCstrictValidationComboBox(this.byId("CI_id_codeModel"), "ID") &&
                         utils._LCvalidateMobileNumber(this.byId("CI_id_InputMobile"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CI_id_InputConsultantAddress"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CI_id_Currency"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CI_id_InputBankName"), "ID") &&
                         utils._LCvalidateName(this.byId("CI_id_InputAccountName"), "ID") &&
                         utils._LCvalidateAccountNo(this.byId("CI_id_InputAccountNo"), "ID") &&

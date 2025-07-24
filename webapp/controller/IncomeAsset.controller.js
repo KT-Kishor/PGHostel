@@ -299,9 +299,10 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(true).setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue("").setValueState("None").setEditable(true).setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_currency").setEditable(true).setVisible(true)
-                    sap.ui.getCore().byId("FCIA_id_currency").setValue("INR")
-                    sap.ui.getCore().byId("FCIA_id_currency").setSelectedKey("")
+                    var oComboBox = sap.ui.getCore().byId("FCIA_id_currency");
+                    oComboBox.setEditable(true);
+                    oComboBox.setVisible(true);
+                    oComboBox.setSelectedKey("INR");
                     sap.ui.getCore().byId("FCIA_id_transferBy").setVisible(false)
 
 
@@ -1105,7 +1106,6 @@ sap.ui.define([
                 }
             },
             FTIA_onsavepress: async function () {
-
                 var oModel = this.getView().getModel("CreateIncomeAssetModel").getData()
                 var Date = sap.ui.getCore().byId("FTIA_id_Date").getValue()
                 var table = this.byId("IA_id_OdataTable");

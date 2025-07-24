@@ -150,26 +150,25 @@
 								<m:Table items="{path:'SowReadModel>/',sorter: {path: 'Description',descending: false,group: true}}" busyIndicatorDelay="0" id="Sow_Id_ReadTable" mode="SingleSelectLeft" selectionChange="onPressChangeSow">
 									<m:headerToolbar>
 										<m:OverflowToolbar>
-											<m:Title text="{i18n>sowTitle}" />
+											<m:Title text="{i18n>sowTitle}"></m:Title>
 											<m:ToolbarSpacer />
-											<m:ComboBox
-            id="MsaE_id_SowStatus"
-            items="{SowStatusModel>/SowStatus}"
-            change="MsaE_onChangeSowStatus"
-            class="sapUiTinyMarginEnd customComboBox">
+											<m:ComboBox 
+            id="MsaE_id_SowStatus" 
+            items="{SowStatusModel>/SowStatus}" 
+            width="10%" 
+            change="MsaE_onChangeSowStatus">
 												<core:Item key="{SowStatusModel>ID}" text="{SowStatusModel>Status}" />
 											</m:ComboBox>
-											<m:ToolbarSeparator class="sapUiMediumHide sapUiSmallHide" />
-											<m:Button
-            text="{i18n>addSOW}"
-            type="Accept"
-            press="MsaE_onPressCreateSow"
-            class="sapUiTinyMarginEnd" />
-											<m:ToolbarSeparator class="sapUiMediumHide sapUiSmallHide" />
-											<m:Button
-            icon="sap-icon://action"
-            text="Actions"
-            press="onOpenActionSheet" />
+											<m:ToolbarSeparator />
+											<m:Button 
+            text="{i18n>addSOW}" 
+            type="Accept" 
+            press="MsaE_onPressCreateSow"></m:Button>
+											<m:ToolbarSeparator />
+											<m:Button 
+            icon="sap-icon://action" 
+            text="Actions" 
+            press="onOpenActionSheet"></m:Button>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
 									<m:columns>
