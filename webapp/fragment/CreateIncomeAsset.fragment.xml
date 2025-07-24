@@ -137,6 +137,7 @@
                 <Label text="{i18n>currency}" required="true" />
                <ComboBox
                     id="FCIA_id_currency"
+                    change="FCIA_onbranchchange"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
                     items="{CurrencyModel>/}" valueStateText="{i18n>selectCurrency}"
                 >

@@ -387,7 +387,7 @@ sap.ui.define([
                     utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
-                    utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_Currency"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_Currency"), "ID") &&
                     utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                     this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
                 ) {
@@ -530,7 +530,7 @@ sap.ui.define([
                 utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                 utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
-                utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_Currency"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_Currency"), "ID") &&
                 utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") &&
                 this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0
             ) {

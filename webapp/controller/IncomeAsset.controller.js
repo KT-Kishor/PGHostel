@@ -378,7 +378,9 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FCIA_id_eqno"), "ID") &&
 
                         utils._LCvalidateDate(sap.ui.getCore().byId("FCIA_id_Date"), "ID") &&
-                        utils._LCvalidateAmount(sap.ui.getCore().byId("FCIA_id_assetvalue"), "ID")
+                        utils._LCvalidateAmount(sap.ui.getCore().byId("FCIA_id_assetvalue"), "ID")&&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_currency"), "ID")
+
                     ) {
                         var selectedBranch = sap.ui.getCore().byId("FCIA_id_branch").getSelectedItem();
 
