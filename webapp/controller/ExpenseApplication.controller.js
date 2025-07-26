@@ -99,7 +99,7 @@ sap.ui.define([
                 Country: "",
                 Source: "",
                 Destination: "",
-                CostCenter: "Kalpavriksha Technologies Kalaburagi",
+                CostCenter: "Kvriksha Technologies Private Limited Kalaburagi",
                 TripType: "Customer Facing",
                 Comments: "",
                 Status: "Draft"

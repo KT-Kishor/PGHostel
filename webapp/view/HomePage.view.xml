@@ -11,7 +11,7 @@
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
 			<tnt:ToolHeader>
-				<Avatar src="./image/logo.jpg" displaySize="XS" tooltip="Company Logo"/>
+				<Avatar src="./image/logo.jpeg" displaySize="XS" tooltip="Company Logo"/>
 				<Title level="H1" text="{i18n>companynameKT}" class="custom-text"/>
 				<ToolbarSpacer/>
 				<Button icon="sap-icon://employee-pane" text="" tooltip="{i18n>tooltipLogin}" press="onpressLogin">

@@ -1217,7 +1217,7 @@ sap.ui.define([
                     content: "",
                     isFileUploaded: false,
                     button: true,
-                    Subject: "KALPAVRIKSHA TECHNOLOGIES - INVOICE PAYMENT REMINDER",
+                    Subject: "Kvriksha Technologies Private Limited - INVOICE PAYMENT REMINDER",
                     htmlbody: `<p>Dear Finance Team,</p>
                     <p>I hope you're doing well. This is a friendly reminder that payment for invoice ${modelData.InvNo}, issued on  ${modelData.InvoiceDate}, is still outstanding.</p>
                     <li><b>Invoice No : ${modelData.InvNo}</b></li>
@@ -1617,7 +1617,7 @@ sap.ui.define([
 
                 const paymentDetails = [
                     { label: "Bank Name", value: "Kotak Mahindra Bank Limited" },
-                    { label: "Account Name", value: "Kalpavriksha Technologies" },
+                    { label: "Account Name", value: "Kvriksha Technologies Private Limited" },
                     { label: "Account No", value: "0648506056" },
                     { label: "IFSC Code", value: "KKBK0008249" },
                     { label: "Swift Code", value: "KKBKINBBCPC" },
@@ -1637,7 +1637,7 @@ sap.ui.define([
                 checkPageSpace(35);
                 const forLabelY = currentY + 5;
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX + 2, forLabelY);
+                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX - 15, forLabelY);
 
                 const logoXPosition = rightAlignX + 20;
                 const logoYPosition = forLabelY + 2;
@@ -1645,8 +1645,8 @@ sap.ui.define([
 
                 const partnersYPosition = logoYPosition + 18;
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 30, partnersYPosition);
-                doc.text(oCompanyDetailsModel.designation, rightAlignX + 28, partnersYPosition + 5);
+                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 32, partnersYPosition);
+                doc.text(oCompanyDetailsModel.designation, rightAlignX + 30, partnersYPosition + 5);
 
                 doc.setFont("times", "normal").setFontSize(11);
                 doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);

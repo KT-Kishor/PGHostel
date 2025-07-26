@@ -21,7 +21,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getBusyDialog();
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
-                    this.companyName = "Kalpavriksha Technologies";
+                    this.companyName = "Kvriksha Technologies Private Limited";
                     this._fetchCommonData("EmployeeDetailsData", "empModel");
 
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
@@ -2055,6 +2055,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             CC_onPressIdCardDetails: function () {
                 var oView = this.getView();
+                this.onAfterRendering();
                 var oEmployeeModel = oView.getModel("sEmployeeModel");
                 var employeeData = oEmployeeModel && oEmployeeModel.getData();
                 var employeeDetails = employeeData && employeeData[0];
@@ -2169,7 +2170,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                     // company logo at top-right corner
                     if (compLogoBase64) {
-                        doc.addImage(compLogoBase64, 'JPEG', 40, 2.5, 12, 12);   // logo at top-right
+                        doc.addImage(compLogoBase64, 'JPEG', 40, 2.5, 14, 14);   // logo at top-right
                     }
                     // Define the photo placeholder
                     const imageWidth = 20;
