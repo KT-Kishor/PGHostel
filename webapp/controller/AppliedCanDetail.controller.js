@@ -149,6 +149,7 @@ sap.ui.define([
                 ],
                 beginButton: new sap.m.Button({
                     text: "Close",
+                    type: "Reject",
                     press: function () {
                         this._oResumeDialog.close();
                         this._oResumeDialog.destroy();

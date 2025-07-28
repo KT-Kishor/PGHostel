@@ -7,7 +7,7 @@
 >
 	<Page  title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
 		<headerContent>
-		<Button
+			<Button
                 press="Tile_NotifictionBTN"
                 icon="sap-icon://bell"
                 type="Transparent"
@@ -50,21 +50,18 @@
 					<Button
                         text="{i18n>viewResume}"
                         press="openResumePreview"
-                        icon="sap-icon://display"
                         type="Attention"
                     />
 					<Button
                         text="{i18n>downloadResume}"
                         press="onDownloadResume"
-                        icon="sap-icon://download"
                         type="Ghost"
                     />
 					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard"   press="ACD_onBoardCandidate"   type="Accept"/>
-
 				</Toolbar>
 			</f:toolbar>
 			<f:content>
-                <!-- Bind the 'editable' property to the viewModel -->
+				<!-- Bind the 'editable' property to the viewModel -->
 				<Label text="{i18n>compName}" />
 				<Input value="{setDataToForm>/FullName}" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>gender}" />

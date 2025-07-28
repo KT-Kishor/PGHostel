@@ -428,18 +428,6 @@ sap.ui.define([
                 if (!bIsCreate) {
                     sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Emphasized");
                 }
-                  const oForm = sap.ui.getCore().byId("candidateForm");
-                    if (oForm) {
-                        const oDevice = sap.ui.Device;
-                        if (oDevice.system.phone) {
-                            oForm.setLayout("ResponsiveGridLayout");
-                            oForm.setColumnsM(1);
-                        } else {
-                            oForm.setLayout("GridLayout");
-                            oForm.setColumnsL(2);
-                            oForm.setColumnsXL(2);
-                        }
-                    }
                 oDialog.open();
             });
         },
