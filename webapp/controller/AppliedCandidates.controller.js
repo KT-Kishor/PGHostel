@@ -7,15 +7,15 @@ sap.ui.define([
     "../model/formatter",
     "../utils/validation",
     "sap/ui/export/Spreadsheet"
-], function (BaseController, JSONModel, Filter, FilterOperator, MessageToast, formatter, utils, Spreadsheet) {
+], function(BaseController, JSONModel, Filter, FilterOperator, MessageToast, formatter, utils, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
         formatter: formatter,
-        onInit: function () {
+        onInit: function() {
             const router = this.getOwnerComponent().getRouter();
             router.getRoute("AppliedCandidates").attachPatternMatched(this._onObjectMatched, this);
         },
-        _onObjectMatched: async function () {
+        _onObjectMatched: async function() {
             var LoginFUnction = await this.commonLoginFunction("AppliedCandidates");
             if (!LoginFUnction) return;
             this.i18na = this.getOwnerComponent().getModel("i18n").getResourceBundle();
@@ -24,70 +24,109 @@ sap.ui.define([
                 maxDates: new Date(new Date().setDate(new Date().getDate() + 30))
             }), "myyModel");
             this.getView().setModel(new JSONModel({
-                NameState: "None", ExpectedCTCState: "None", CurrentCTCState: "None",
-                AvailableForInterviewState: "None", NoticePeriodState: "None", MobileNumberState: "None",
-                DateState: "None", EmailIDState: "None", ExperienceState: "None",
-                RemarkState: "None", SkillsState: "None", City: "None"
+                NameState: "None",
+                ExpectedCTCState: "None",
+                CurrentCTCState: "None",
+                AvailableForInterviewState: "None",
+                NoticePeriodState: "None",
+                MobileNumberState: "None",
+                DateState: "None",
+                EmailIDState: "None",
+                ExperienceState: "None",
+                RemarkState: "None",
+                SkillsState: "None",
+                City: "None"
             }), "modelValuStateError");
-            this.getView().setModel(new JSONModel({ Editable: true }), "EditableModeltruefalse");
-            this.getView().setModel(new JSONModel({ results: [{ key: "YES", text: "YES" }, { key: "NO", text: "NO" }] }), "setInterviewYesNo");
+            this.getView().setModel(new JSONModel({
+                Editable: true
+            }), "EditableModeltruefalse");
+            this.getView().setModel(new JSONModel({
+                results: [{
+                    key: "YES",
+                    text: "YES"
+                }, {
+                    key: "NO",
+                    text: "NO"
+                }]
+            }), "setInterviewYesNo");
+            var oUploadModel = new sap.ui.model.json.JSONModel({
+                File: "",
+                FileName: "",
+                FileType: ""
+            });
+            this.getView().setModel(oUploadModel, "UploadModel");
+            var oTokenModel = new JSONModel({
+                tokens: []
+            });
+            this.getView().setModel(oTokenModel, "tokenModel");
             this.AC_ReadCall();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18na.getText("TableHeader"));
             this.onFilterBarClear();
             this.getView().setModel(new JSONModel({
-                isEditMode: false, busy: false
+                isEditMode: false,
+                busy: false
             }), "viewModel");
-            //this._makeDatePickersReadOnly(["filterExperience"]);
             this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
             this.initializeBirthdayCarousel();
         },
-        AC_ReadCall: async function () {
+        AC_ReadCall: async function() {
             this.getBusyDialog();
             try {
-                // the columns you need for the table view.
                 const aSelectFields = [
                     "FullName",
+                    "CurrentSalary",
+                    "ExpectedSalary",
                     "NoticePeriod",
+                    "Mobile",
                     "Email",
-                    "Experience"
+                    "Experience",
+                    "CreatedBy",
+                    "Skills"
                 ];
                 const oQueryParameters = {
                     "$select": aSelectFields.join(",")
                 };
 
-                const response = await this.ajaxReadWithJQuery("JobApplications", { parameters: oQueryParameters });
+                const response = await this.ajaxReadWithJQuery("JobApplications", {
+                    parameters: oQueryParameters
+                });
 
                 const aCandidates = response.data || [];
                 this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
-                this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))), "UniqueNamesModel");
+                this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({
+                    FullName: name
+                }))), "UniqueNamesModel");
             } catch (err) {
                 MessageToast.show("Failed to load candidate data.");
             } finally {
                 this.closeBusyDialog();
             }
         },
-        onPressback: function () {
+
+        onPressback: function() {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
-        onLogout: function () {
+        
+        onLogout: function() {
             this.CommonLogoutFunction();
         },
-        onCandidatePress: function (oEvent) {
+
+        onCandidatePress: function(oEvent) {
             const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
-            this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", { id: id });
+            this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", {
+                id: id
+            });
         },
-        onFilterBarClear: function () {
+
+        onFilterBarClear: function() {
             this.byId("filterEmployeeName").setSelectedKey("");
             this.byId("filterNoticePeriod").setValue("");
             this.byId("filterSkills").setValue("");
             this.byId("filterExperience").setSelectedKey("");
-            // const oBinding = this.byId("appliedCandidatesTable").getBinding("items");
-            // if (oBinding) {
-            //     oBinding.filter([]);
-            // }
         },
-        onFilterBarSearch: function () {
+
+        onFilterBarSearch: function() {
             this.getBusyDialog();
             setTimeout(() => {
                 try {
@@ -103,7 +142,7 @@ sap.ui.define([
                     if (sNoticePeriodInput) {
                         aFilters.push(new Filter({
                             path: "NoticePeriod",
-                            test: function (sDataValue) {
+                            test: function(sDataValue) {
                                 if (!sDataValue || !sNoticePeriodInput) return false;
                                 const data = sDataValue.toString().trim();
                                 const input = sNoticePeriodInput.toString().trim();
@@ -125,7 +164,9 @@ sap.ui.define([
                                             const max = parseInt(rangeParts[1].trim(), 10);
                                             if (isNaN(min) || isNaN(max)) return false;
                                             return numData >= min && numData <= max;
-                                        } catch (e) { return false; }
+                                        } catch (e) {
+                                            return false;
+                                        }
                                     }
                                     return false;
                                 }
@@ -142,7 +183,7 @@ sap.ui.define([
                     if (sExperienceInput) {
                         aFilters.push(new Filter({
                             path: "Experience",
-                            test: function (sDataValue) {
+                            test: function(sDataValue) {
                                 if (!sDataValue || !sExperienceInput) return false;
                                 const data = sDataValue.toString().trim();
                                 const input = sExperienceInput.toString().trim();
@@ -162,7 +203,9 @@ sap.ui.define([
                                             const max = parseFloat(rangeParts[1].trim());
                                             if (isNaN(min) || isNaN(max)) return false;
                                             return numData >= min && numData <= max;
-                                        } catch (e) { return false; }
+                                        } catch (e) {
+                                            return false;
+                                        }
                                     }
                                     return false;
                                 }
@@ -178,7 +221,7 @@ sap.ui.define([
             }, 50);
         },
 
-        onSuggestSkills: function (oEvent) {
+        onSuggestSkills: function(oEvent) {
             let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
             let aTableData = this.getView().getModel("DataTableModel").getData();
             let aMatchingSkillStrings = aTableData
@@ -188,11 +231,15 @@ sap.ui.define([
                     return skillStr.split(",").some(skill => skill.trim().toLowerCase().includes(sValue));
                 });
             let aUniqueSkillStrings = [...new Set(aMatchingSkillStrings)];
-            let aSuggestionItems = aUniqueSkillStrings.map(skill => ({ skill }));
-            this.getView().setModel(new JSONModel({ skills: aSuggestionItems }), "skillModel");
+            let aSuggestionItems = aUniqueSkillStrings.map(skill => ({
+                skill
+            }));
+            this.getView().setModel(new JSONModel({
+                skills: aSuggestionItems
+            }), "skillModel");
         },
 
-        onAddNewCandidate: function () {
+        onAddNewCandidate: function() {
             const oNewCandidate = {
                 FullName: "",
                 ExpectedSalary: "",
@@ -207,28 +254,68 @@ sap.ui.define([
                 Skills: "",
                 ISD: "+91",
                 City: "",
-                Country: "IN"
+                Country: "IN",
+                ResumeFile: "",
+                AttachmentName: "",
+                AttachmentType: ""
             };
             this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");
+            this.getView().getModel("tokenModel").setProperty("/tokens", [])
+            this.getView().setModel(new JSONModel({
+                File: "",
+                FileName: "",
+                FileType: ""
+            }), "UploadModel");
             this._openDialog("Create Candidate", true);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
         },
-        onEditCandidate: function () {
+
+        onEditCandidate: function() {
             const oTable = this.byId("appliedCandidatesTable");
             const oSelectedItem = oTable.getSelectedItem();
             if (!oSelectedItem) {
                 MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
                 return;
             }
+
             const oContext = oSelectedItem.getBindingContext("DataTableModel");
             const oCandidateData = jQuery.extend({}, oContext.getObject());
+
+            // Normalize fields
             if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
             if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
+
             this.getView().setModel(new JSONModel(oCandidateData), "stuDataModel");
+
+            // Tokens
+            this.getView().getModel("tokenModel").setProperty("/tokens", []);
+            const aTokens = oCandidateData.Attachments || [];
+            if (aTokens.length > 0) {
+                const aTokenData = aTokens.map(token => ({
+                    key: token.FileName,
+                    text: token.FileName
+                }));
+                this.getView().getModel("tokenModel").setProperty("/tokens", aTokenData);
+            } else if (oCandidateData.AttachmentName) {
+                // Legacy support: show token from fields
+                this.getView().getModel("tokenModel").setProperty("/tokens", [{
+                    key: oCandidateData.AttachmentName,
+                    text: oCandidateData.AttachmentName
+                }]);
+            }
+
+            // Load UploadModel for editing
+            const oUploadData = {
+                File: oCandidateData.ResumeFile || "",
+                FileName: oCandidateData.AttachmentName || "",
+                FileType: oCandidateData.AttachmentType || ""
+            };
+            this.getView().setModel(new JSONModel(oUploadData), "UploadModel");
             this._openDialog("Edit Candidate", false);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
         },
-        onDeleteCandidate: function () {
+
+        onDeleteCandidate: function() {
             const oTable = this.byId("appliedCandidatesTable");
             const oSelectedItem = oTable.getSelectedItem();
             if (!oSelectedItem) {
@@ -242,7 +329,11 @@ sap.ui.define([
                 async () => {
                     this.getBusyDialog();
                     try {
-                        await this.ajaxDeleteWithJQuery("JobApplications", { filters: { ID: sID } });
+                        await this.ajaxDeleteWithJQuery("JobApplications", {
+                            filters: {
+                                ID: sID
+                            }
+                        });
                         MessageToast.show(this.i18na.getText("dataDelteSucces"));
                         this.AC_ReadCall(); // Refresh the table
                     } catch (error) {
@@ -254,7 +345,8 @@ sap.ui.define([
                 }
             );
         },
-        _preparePayload: function () {
+
+        _preparePayload: function() {
             if (!this._validateAllDialogFields()) {
                 return null;
             }
@@ -265,6 +357,13 @@ sap.ui.define([
             if (dateValue) {
                 oPayload.Date = dateValue.split(".").reverse().join("/");
             }
+            const oUploadModel = this.getView().getModel("UploadModel");
+            if (oUploadModel) {
+                const uploadData = oUploadModel.getData();
+                oPayload.ResumeFile = uploadData.File || ""; // base64 content
+                oPayload.AttachmentName = uploadData.FileName || "";
+                oPayload.AttachmentType = uploadData.FileType || "";
+            }
             if (!oPayload.ID) {
                 const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
                 const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
@@ -273,12 +372,14 @@ sap.ui.define([
             return oPayload;
         },
 
-        onSaveNewCandidate: async function () {
+        onSaveNewCandidate: async function() {
             const oPayload = this._preparePayload();
             if (!oPayload) return;
             this.getBusyDialog();
             try {
-                await this.ajaxCreateWithJQuery("JobApplications", { data: oPayload });
+                await this.ajaxCreateWithJQuery("JobApplications", {
+                    data: oPayload
+                });
                 MessageToast.show(this.i18na.getText("messageTraineeCreated"));
                 this.AC_ReadCall(); // Refresh data
                 this._closeDialog();
@@ -288,12 +389,18 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-        onUpdateCandidate: async function () {
+
+        onUpdateCandidate: async function() {
             const oPayload = this._preparePayload();
             if (!oPayload) return;
             this.getBusyDialog();
             try {
-                await this.ajaxUpdateWithJQuery("JobApplications", { data: oPayload, filters: { ID: oPayload.ID } });
+                await this.ajaxUpdateWithJQuery("JobApplications", {
+                    data: oPayload,
+                    filters: {
+                        ID: oPayload.ID
+                    }
+                });
                 MessageToast.show(this.i18na.getText("dataUpdatedSuccess"));
                 this.AC_ReadCall(); // Refresh data
                 this._closeDialog();
@@ -303,7 +410,8 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-        _openDialog: function (sTitle, bIsCreate) {
+
+        _openDialog: function(sTitle, bIsCreate) {
             if (!this.oDialog) {
                 this.oDialog = sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.AddRecruitment",
@@ -320,10 +428,23 @@ sap.ui.define([
                 if (!bIsCreate) {
                     sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Emphasized");
                 }
+                  const oForm = sap.ui.getCore().byId("candidateForm");
+                    if (oForm) {
+                        const oDevice = sap.ui.Device;
+                        if (oDevice.system.phone) {
+                            oForm.setLayout("ResponsiveGridLayout");
+                            oForm.setColumnsM(1);
+                        } else {
+                            oForm.setLayout("GridLayout");
+                            oForm.setColumnsL(2);
+                            oForm.setColumnsXL(2);
+                        }
+                    }
                 oDialog.open();
             });
         },
-        _closeDialog: function () {
+
+        _closeDialog: function() {
             if (this.oDialog) {
                 this.oDialog.then(oDialog => oDialog.close());
             }
@@ -341,7 +462,7 @@ sap.ui.define([
             this.getView().byId("appliedCandidatesTable").removeSelections();
         },
 
-        onDialogEditToggle: function () {
+        onDialogEditToggle: function() {
             const oEditButton = sap.ui.getCore().byId("FM_Id_EditBTN");
             if (oEditButton.getText() === "Edit") {
                 this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
@@ -350,14 +471,15 @@ sap.ui.define([
                 this.onUpdateCandidate();
             }
         },
-        onDialogCountryChange: function (oEvent) {
+
+        onDialogCountryChange: function(oEvent) {
             const sCountryCode = oEvent.getSource().getSelectedKey();
             const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
             oCityComboBox.getBinding("items").filter(new Filter("CountryCode", FilterOperator.EQ, sCountryCode));
             this.getView().getModel("stuDataModel").setProperty("/City", "");
         },
 
-        _validateAllDialogFields: function () {
+        _validateAllDialogFields: function() {
             try {
                 const isValid =
                     utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
@@ -388,20 +510,46 @@ sap.ui.define([
         onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
         onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
 
-        onExport: function () {
+        onExport: function() {
             const aData = this.getView().getModel("DataTableModel").getData();
-            const aCols = [
-                { label: "Name", property: "FullName" },
-                { label: "Current CTC (LPA)", property: "CurrentSalary" },
-                { label: "Expected CTC (LPA)", property: "ExpectedSalary" },
-                { label: "Notice Period (Days)", property: "NoticePeriod", template: "{0}" }, // Template to handle '0'
-                { label: "Mobile Number", property: "Mobile" },
-                { label: "Email", property: "Email" },
-                { label: "Experience (Years)", property: "Experience" },
-                { label: "Skills", property: "Skills" }
+            const aCols = [{
+                    label: "Name",
+                    property: "FullName"
+                },
+                {
+                    label: "Current CTC (LPA)",
+                    property: "CurrentSalary"
+                },
+                {
+                    label: "Expected CTC (LPA)",
+                    property: "ExpectedSalary"
+                },
+                {
+                    label: "Notice Period (Days)",
+                    property: "NoticePeriod",
+                    template: "{0}"
+                }, // Template to handle '0'
+                {
+                    label: "Mobile Number",
+                    property: "Mobile"
+                },
+                {
+                    label: "Email",
+                    property: "Email"
+                },
+                {
+                    label: "Experience (Years)",
+                    property: "Experience"
+                },
+                {
+                    label: "Skills",
+                    property: "Skills"
+                }
             ];
             const oSettings = {
-                workbook: { columns: aCols },
+                workbook: {
+                    columns: aCols
+                },
                 dataSource: aData,
                 fileName: "Candidate_Data.xlsx"
             };
@@ -409,8 +557,7 @@ sap.ui.define([
             oSheet.build().finally(() => oSheet.destroy());
         },
 
-
-        SalaryInfoPress: function (oEvent) {
+        SalaryInfoPress: function(oEvent) {
             if (!this._oPopover) {
                 this._oPopover = new sap.m.Popover({
                     contentWidth: "300px",
@@ -418,13 +565,83 @@ sap.ui.define([
                     showHeader: false,
                     placement: sap.m.PlacementType.Bottom,
                     content: [new sap.m.VBox({
-                        alignItems: "Center", justifyContent: "Center", width: "100%",
-                        items: [new sap.m.Text({ text: this.i18na.getText("salaryPackageInfo"), wrapping: true })]
+                        alignItems: "Center",
+                        justifyContent: "Center",
+                        width: "100%",
+                        items: [new sap.m.Text({
+                            text: this.i18na.getText("salaryPackageInfo"),
+                            wrapping: true
+                        })]
                     }).addStyleClass("customPopoverContent")]
                 });
                 this.getView().addDependent(this._oPopover);
             }
             this._oPopover.openBy(oEvent.getSource());
+        },
+
+        onFileSizeExceeds: function() {
+            MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+        },
+
+        onBeforeUploadStarts: function(oEvent) {
+            const oFile = oEvent.getParameter("files")[0];
+            if (!oFile) {
+                MessageToast.show("No file selected.");
+                return;
+            }
+            const oModel = this.getView().getModel("tokenModel");
+            let aTokens = oModel.getProperty("/tokens") || [];
+
+            // Restrict to one file
+            if (aTokens.length >= 1) {
+                sap.m.MessageBox.error("Only one file can be uploaded at a time.");
+                return;
+            }
+
+            const reader = new FileReader();
+            const that = this;
+
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                const oUploadModel = that.getView().getModel("UploadModel");
+                if (!oUploadModel) {
+                    that.getView().setModel(new sap.ui.model.json.JSONModel(), "UploadModel");
+                }
+                that.getView().getModel("UploadModel").setData({
+                    File: base64,
+                    FileName: oFile.name,
+                    FileType: oFile.type
+                });
+                aTokens.push({
+                    key: oFile.name,
+                    text: oFile.name
+                });
+                oModel.setProperty("/tokens", aTokens);
+                MessageToast.show("File uploaded successfully: " + oFile.name);
+            };
+            reader.readAsDataURL(oFile);
+        },
+
+        onTokenDelete: function(oEvent) {
+            var oModel = this.getView().getModel("tokenModel"); // Get the model
+            var aTokens = oModel.getProperty("/tokens") || [];
+            var aTokensToDelete = oEvent.getParameter("tokens"); // Get deleted tokens from event
+
+            aTokensToDelete.forEach(function(oDeletedToken) {  // Filter out deleted tokens
+                var sKey = oDeletedToken.getKey();
+                aTokens = aTokens.filter(function(token) {
+                    return token.key !== sKey;
+                });
+            });
+
+            oModel.setProperty("/tokens", aTokens);   // Update model
+
+            if (aTokens.length === 0) { // Clear upload model if all tokens are deleted
+                var oUploadModel = this.getView().getModel("UploadModel");
+                oUploadModel.setProperty("/File", "");
+                oUploadModel.setProperty("/FileName", "");
+                oUploadModel.setProperty("/FileType", "");
+            }
         },
     })
 })

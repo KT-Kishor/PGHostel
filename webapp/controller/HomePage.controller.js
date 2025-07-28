@@ -159,9 +159,9 @@ sap.ui.define(
               {
                 pageId: "companyPageId",
                 header: "Company info",
-                title: "Kvriksha Technologies",
+                title: "Kalpavriksha Technologies",
                 titleUrl: "",
-                icon: "./image/logo.jpeg",
+                icon: "./image/logo.jpg",
                 displayShape: "Circle",
                 description: "Cell Phone : +91 9686145959",
                 groups: [
@@ -180,7 +180,7 @@ sap.ui.define(
                       },
                       {
                         label: "Email",
-                        value: "accounts@kvrikshatechnologies.com",
+                        value: "accounts@kalpavrikshatechnologies.com",
                         emailSubject: "Subject",
                         elementType: "email",
                       },

@@ -42,7 +42,7 @@
                             <m:Avatar
                                 displayShape="Circle"
                                 displaySize="M"
-                                src="../image/logo.jpeg"
+                                src="../image/logo.jpg"
                                 class="sapUiTinyMarginEnd"
                             />
                             <m:Title
@@ -85,7 +85,7 @@
                         class="sapUiLargeMarginEnd"
                         displayShape="Circle"
                         displaySize="XL"
-                        src="../image/logo.jpeg"
+                        src="../image/logo.jpg"
                     />
 
                     <layout:VerticalLayout

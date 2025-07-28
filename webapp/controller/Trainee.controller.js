@@ -18,7 +18,7 @@ sap.ui.define([
                 if (!LoginFunction) return;
 
                 this.getBusyDialog();
-                this.companyName = "Kvriksha Technologies Private Limited"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
+                this.companyName = "Kalpavriksha Technologies"; // TO AVOID ONE MORE AJAX CALL (By Shivang)
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
                 this.byId("T_id_OnboardBtn").setEnabled(false);

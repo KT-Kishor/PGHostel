@@ -71,7 +71,7 @@
                 >
                     <m:Avatar
                         class="sapUiSmallMarginEnd"
-                        src="../image/logo.jpeg"
+                        src="../image/logo.jpg"
                         displaySize="L"
                     />
                     <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">

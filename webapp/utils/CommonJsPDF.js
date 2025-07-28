@@ -125,7 +125,7 @@ sap.ui.define([], function () {
 
                             words.forEach((word, index) => {
                                 // Check if the word should be bold
-                                if (word === "WHEREAS" || word.includes("Kvriksha Technologies Private Limited")) {
+                                if (word === "WHEREAS" || word.includes("Kalpavriksha Technologies")) {
                                     doc.setFont("times", "bold");
                                 } else {
                                     doc.setFont("times", "normal");
@@ -138,7 +138,7 @@ sap.ui.define([], function () {
                         } else {
                             // Left-align the last line of the paragraph
                             words.forEach((word) => {
-                                if (word === "WHEREAS" || word.includes("Kvriksha Technologies Private Limited")) {
+                                if (word === "WHEREAS" || word.includes("Kalpavriksha Technologies")) {
                                     doc.setFont("times", "bold");
                                 } else {
                                     doc.setFont("times", "normal");
