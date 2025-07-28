@@ -1,23 +1,23 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     controllerName="sap.kt.com.minihrsolution.controller.InvoiceDashboard"
-	xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:fb="sap.ui.comp.filterbar"
     displayBlock="true"
-	xmlns:layout="sap.ui.layout"
-	xmlns:viz="sap.viz.ui5.controls"
-	xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
-	xmlns:vizData="sap.viz.ui5.data"
+    xmlns:layout="sap.ui.layout"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:vizData="sap.viz.ui5.data"
     xmlns:f="sap.f">
-	<Page id="invoiceDashboardPage" >
-		<headerContent>
-			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
-		</headerContent>
-		<content>
+    <Page id="invoiceDashboardPage" >
+        <headerContent>
+            <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+        </headerContent>
+        <content>
             <VBox class="sapUiSmallMargin">
-                            <!-- Filter Bar -->
-                <fb:FilterBar id="dashboardFilterBar"  liveMode="false"  useToolbar="false"  clear="onClearFilters" showClearOnFB="true"  search="onFilterChange" >
+                <!-- Filter Bar -->
+                  <fb:FilterBar id="dashboardFilterBar"  liveMode="false"  useToolbar="false"  clear="onClearFilters" showClearOnFB="true"  search="onFilterChange" >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Company" label="Company" groupName="Group1" visibleInFilterBar="true" >
                             <fb:control>
@@ -26,6 +26,16 @@
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
+                         <!-- NEW: Period Filter -->
+                        <!-- <fb:FilterGroupItem name="Period" label="{i18n>paymentDuration}" groupName="Group1" visibleInFilterBar="true">
+                            <fb:control>
+                                <ComboBox id="periodFilter" width="400px" placeholder="{i18n>paymentDuration}" items="{invoicePaymentDuration>/duration}">
+                                    <items>
+                                        <core:Item key="{invoicePaymentDuration>ID}" text="{invoicePaymentDuration>Code}"/>
+                                    </items>
+                                </ComboBox>
+                            </fb:control>
+                        </fb:FilterGroupItem> -->
                         <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
                                 <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>currentYear}" />
@@ -37,10 +47,24 @@
                 <!--  Grid for Charts -->
                 <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiSmallMarginTop">
                     <layout:content>
+                        <!-- Status Distribution Chart -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="{i18n>invoiceStatusDash}" /></f:header>
+                            <f:header>
+                                <Bar>
+                                    <contentMiddle>
+                                        <Title text="{i18n>invoiceStatusDash}" level="H5"/>
+                                    </contentMiddle>
+                                    <contentRight>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar"/>
+                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut"/>
+                                    </contentRight>
+                                </Bar>
+                            </f:header>
                             <f:content>
-                                <viz:VizFrame id="donutChartStatus" vizType="donut" width="100%" height="300px"
+                                <viz:VizFrame id="donutChartStatus"
+                                    vizType="{invoiceChartTypeModel>/statusType}"
+                                    width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, type: 'value' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
@@ -60,11 +84,24 @@
                             </f:content>
                         </f:Card>
 
-                        <!-- (Monthly Trend) -->
+                        <!-- Monthly Trend Chart with Chart Switcher -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="{i18n>invoiceMonthly}" /></f:header>
+                            <f:header>
+                                <Bar>
+                                    <contentMiddle>
+                                        <Title text="{i18n>invoiceMonthly}" level="H5"/>
+                                    </contentMiddle>
+                                    <contentRight>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar"/>
+                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine"/>
+                                    </contentRight>
+                                </Bar>
+                            </f:header>
                             <f:content>
-                                <viz:VizFrame id="lineChartMonthly" vizType="line" width="100%" height="300px"
+                                <viz:VizFrame id="lineChartMonthly"
+                                    vizType="{invoiceChartTypeModel>/monthlyType}"
+                                    width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/monthlyValue}">
@@ -84,11 +121,23 @@
                             </f:content>
                         </f:Card>
                         
-                        <!--  (Value by Company) -->
+                        <!-- Value by Company Chart -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="{i18n>companytotalinvoice}" /></f:header>
+                            <f:header>
+                                <Bar>
+                                    <contentMiddle>
+                                        <Title text="{i18n>companytotalinvoice}" level="H5"/>
+                                    </contentMiddle>
+                                    <contentRight>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar"/>
+                                    </contentRight>
+                                </Bar>
+                            </f:header>
                             <f:content>
-                                <viz:VizFrame id="barChartCompany" vizType="bar" width="100%" height="300px"
+                                <viz:VizFrame id="barChartCompany"
+                                    vizType="{invoiceChartTypeModel>/companyType}"
+                                    width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/companyTotals}">
@@ -108,11 +157,21 @@
                             </f:content>
                         </f:Card>
 
-                        <!--(Yearly Trend) -->
+                        <!-- Yearly Trend Chart -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header><Title text="{i18n>yearlyInvoiceTrend}" /></f:header>
+                            <f:header>
+                                <Bar>
+                                    <contentMiddle>
+                                        <Title text="{i18n>yearlyInvoiceTrend}" level="H5"/>
+                                    </contentMiddle>
+                                    <contentRight>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar"/>
+                                        <Button icon="sap-icon://line-charts" press="IN_onPressYearlyLine"/>
+                                    </contentRight>
+                                </Bar>
+                            </f:header>
                             <f:content>
-                                <viz:VizFrame id="lineChartYearly" vizType="line" width="100%" height="300px"
+                                <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px"
                                     vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, legend: { visible: true } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/yearlyTrend}">
@@ -136,11 +195,11 @@
                     </layout:content>
                 </layout:Grid>
             </VBox>
-		</content>
-		<footer>
-			<Bar>
-				<contentLeft><core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" /></contentLeft>
-			</Bar>
-		</footer>
-	</Page>
+        </content>
+        <footer>
+            <Bar>
+               	<contentLeft><core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" /></contentLeft>
+            </Bar>
+        </footer>
+    </Page>
 </mvc:View>

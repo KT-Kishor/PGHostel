@@ -297,6 +297,11 @@
           "type": "sap.ui.model.json.JSONModel",
           "uri": "model/universities.json",
           "preload": true
+        },
+          "invoicePaymentDuration": {
+          "type": "sap.ui.model.json.JSONModel",
+          "uri": "model/InvoicePaymentDuration.json",
+          "preload": true
         }
         },
         "resources": {

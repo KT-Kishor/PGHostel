@@ -5,10 +5,21 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
+        _getDefaultChartTypes: function () {
+            return { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line" };
+        },
         onInit: function () {
             // Model for all chart data
-            this.getView().setModel(new JSONModel({ statusDistribution: [], monthlyValue: [], companyTotals: [], yearlyTrend: [] }), "chartData");
+            this.getView().setModel(new JSONModel({
+                statusDistribution: [],
+                monthlyValue: [],
+                companyTotals: [],
+                yearlyTrend: []
+            }), "chartData");
             this.getView().setModel(new JSONModel([]), "companies");
+            // Chart type model for each chart block - created once
+            this.getView().setModel(new JSONModel(this._getDefaultChartTypes()), "invoiceChartTypeModel");
+
             this.getOwnerComponent().getRouter().getRoute("RouteInvoiceDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
         _onObjectMatched: async function () {
@@ -16,12 +27,12 @@ sap.ui.define([
             if (!LoginFunction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
-            this.onClearFilters()
+            this.getView().getModel("invoiceChartTypeModel").setData(this._getDefaultChartTypes());
+            this.onClearFilters();
             this.readInvoiceData();
         },
         // --- Data Fetching and Filtering ---
         readInvoiceData: async function () {
-            // this.getBusyDialog();
             try {
                 const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
                 const rawBackendData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -115,6 +126,18 @@ sap.ui.define([
                 yearlyTrend: Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a, b) => a.year - b.year)
             });
         },
+        // --- Chart Type Switchers ---
+        IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
+        IN_onPressStatusBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar"); },
+        IN_onPressStatusDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut"); },
+        IN_onPressMonthlyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "pie"); },
+        IN_onPressMonthlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "bar"); },
+        IN_onPressMonthlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "line"); },
+        IN_onPressCompanyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "pie"); },
+        IN_onPressCompanyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "bar"); },
+        IN_onPressYearlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar"); },
+        IN_onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
+
         // --- Filter Reset ---
         onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);
