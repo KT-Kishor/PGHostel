@@ -605,11 +605,10 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .customComboBox {
-    max-width: 200px;
-    min-width: 120px;
-    width: 100%;
+  max-width: 200px;
+  min-width: 120px;
+  width: 100%;
 }
-
 
 .rightAlignLabel {
   text-align: right;
@@ -795,7 +794,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     rgb(173, 166, 249)
   ) !important;
 }
-.sapMGHLI {
+/* .sapMGHLI {
   background-image: linear-gradient(
     to bottom right,
     rgb(170, 212, 237),
@@ -803,7 +802,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   ) !important;
   font-weight: bold;
   color: #006064;
-}
+} */
 
 .rightMarginCustom {
   margin-right: 40px;
@@ -827,7 +826,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 0;
 }
 .responsiveCard {
-  max-width: 700px;  /* upper limit */
+  max-width: 700px; /* upper limit */
   width: 100%;
   box-sizing: border-box;
 }
@@ -859,42 +858,41 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 /*Share button styles*/
 .myCustomIconBtn {
- height: 60px !important;
- width: 60px !important;
- padding: 0 !important;
- transition: all 0.2s ease-in-out;
+  height: 60px !important;
+  width: 60px !important;
+  padding: 0 !important;
+  transition: all 0.2s ease-in-out;
 }
 
 .myCustomIconBtn .sapMBtnInner {
- background-color: white !important;
- height: 100% !important;
- width: 100% !important;
- border-radius: 8px;
- border: 3px solid #141f7d !important;
- padding: 0 !important;
- display: flex !important;
- justify-content: center !important;
- align-items: center !important;
- transition: background-color 0.2s ease-in-out;
+  background-color: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 8px;
+  border: 3px solid #141f7d !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .myCustomIconBtn .sapMBtnIcon {
- color: #141f7d !important;
- font-size: 30px !important;
- margin-left: -12px !important;
- margin-top: 4px !important;
- transition: color 0.2s ease-in-out;
+  color: #141f7d !important;
+  font-size: 30px !important;
+  margin-left: -12px !important;
+  margin-top: 4px !important;
+  transition: color 0.2s ease-in-out;
 }
 /* Share button hover effect */
 .myCustomIconBtn:hover .sapMBtnInner {
-  background-color: #141f7d !important; 
+  background-color: #141f7d !important;
   box-shadow: 0 0 0.5rem #17191884 !important; /* Yahan dark green shadow */
 }
 
 .myCustomIconBtn:hover .sapMBtnIcon {
- color: #ffffff !important; 
+  color: #ffffff !important;
 }
-
 
 .myFormattedText {
   width: 100% !important;
@@ -920,8 +918,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 }
 
-
-
 /* Paragraphs and lists */
 .myFormattedText p,
 .myFormattedText li {
@@ -938,7 +934,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding-left: 1.5rem !important;
   margin: 0 0 1rem 0;
 }
-
 
 /* List items */
 .myFormattedText li {
@@ -1065,36 +1060,36 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 
 /* Common box */
 .shareItemBox {
- padding: 0.5rem 0.7rem;
- border-bottom: 1px solid #e0e0e0;
- border-radius: 6px;
- transition: background-color 0.2s;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: background-color 0.2s;
 }
 
 .shareItemBox:hover {
- background-color: #f4f4f4;
- cursor: pointer;
+  background-color: #f4f4f4;
+  cursor: pointer;
 }
 
 /* Last item without bottom border */
 .shareItemBoxLast {
- padding: 0.5rem 0.7rem;
- border-radius: 6px;
- transition: background-color 0.2s;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
 }
 
 .shareItemBoxLast:hover {
- background-color: #f4f4f4;
- cursor: pointer;
+  background-color: #f4f4f4;
+  cursor: pointer;
 }
 
 /* Optional spacing between icon and text */
 .shareText {
- margin-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .myAppBackground {
-  background-image: url('../image/background.jpg') !important;
+  background-image: url("../image/background.jpg") !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
@@ -1122,101 +1117,99 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 Apply now button and reference button styles
 */
 .myCustomButton {
-height: 60px !important;
-width: 345px !important;
-font-size: 20px !important; 
-padding: 0 !important;
-transition: all 0.2s ease-in-out;
+  height: 60px !important;
+  width: 345px !important;
+  font-size: 20px !important;
+  padding: 0 !important;
+  transition: all 0.2s ease-in-out;
 }
 
 .myCustomButton .sapMBtnInner {
-background-color: #141f7d !important; 
-height: 100% !important;
-line-height: normal !important;
-padding: 16px !important;
-font-size: 24px !important;
-border-radius: 8px;
-transition: background-color 0.2s ease-in-out;
+  background-color: #141f7d !important;
+  height: 100% !important;
+  line-height: normal !important;
+  padding: 16px !important;
+  font-size: 24px !important;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .myCustomButton .sapMBtnContent {
-color: white !important;
-font-size: 20px !important; 
-transition: font-size 0.2s ease-in-out;
+  color: white !important;
+  font-size: 20px !important;
+  transition: font-size 0.2s ease-in-out;
 }
 /* Apply Now button hover effect */
 .myCustomButton:hover .sapMBtnInner {
- 
- background-color: #182493dc !important; 
- box-shadow: 0 0 0.5rem #17191884 !important; 
+  background-color: #182493dc !important;
+  box-shadow: 0 0 0.5rem #17191884 !important;
 }
 
 .myCustomButton:hover .sapMBtnContent {
   font-size: 20px !important;
-  font-weight: bold !important; 
+  font-weight: bold !important;
   /* color: ##182493d5  !important ; */
   /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif  !important; */
 }
 
-
 /* Main container */
 .mainJobContainer {
-width: 100%;
-display: flex;
-box-sizing: border-box;
-padding: 0.5rem 1rem;
-align-items: flex-start;
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  align-items: flex-start;
 }
 
 /* Left column (main content) */
 .leftColumn {
-flex-grow: 1; 
-box-sizing: border-box;
-margin: 1rem; 
-margin-right: 32.5rem; 
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 1rem;
+  margin-right: 32.5rem;
 }
 
 /* Right column (Fixed position) */
 .rightColumn {
-width: 30rem;
-box-sizing: border-box;
-position: fixed !important;
-top: 3rem !important;
-right: 1.5rem !important;
-margin: 1rem;
+  width: 30rem;
+  box-sizing: border-box;
+  position: fixed !important;
+  top: 3rem !important;
+  right: 1.5rem !important;
+  margin: 1rem;
 }
 
 /* Panel styling - consistent on all devices */
 .contentPanel,
 .actionPanel {
-background: transparent !important;
-padding: 0.5rem !important; 
-width: 100%;
-border-radius: 0.5rem; 
- box-shadow: 0 0 0.5rem #17191884 !important; 
- /* overflow: hidden; -- Yahan se hata diya hai takki content cut off na ho aur ScrollContainer kaam kare */
+  background: transparent !important;
+  padding: 0.5rem !important;
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem #17191884 !important;
+  /* overflow: hidden; -- Yahan se hata diya hai takki content cut off na ho aur ScrollContainer kaam kare */
 }
 
 /* Mobile layout */
 @media (max-width: 1200px) {
-.mainJobContainer {
- flex-wrap: wrap;
-}
+  .mainJobContainer {
+    flex-wrap: wrap;
+  }
 
-.leftColumn {
- width: 100%;
- margin-right: 0;
- margin: 1rem;
-}
+  .leftColumn {
+    width: 100%;
+    margin-right: 0;
+    margin: 1rem;
+  }
 
-.rightColumn {
- width: 100%;
- position: static !important;
- margin-top: 1rem;
- right: auto !important;
- margin: 1rem;
-} 
-}/*#############################################################################*/
+  .rightColumn {
+    width: 100%;
+    position: static !important;
+    margin-top: 1rem;
+    right: auto !important;
+    margin: 1rem;
+  }
+} /*#############################################################################*/
 
 .myCustomFilterBar.sapUiCompFilterBarNonPhone {
   background-image: none !important;
@@ -1224,27 +1217,31 @@ border-radius: 0.5rem;
 }
 
 .myCustomFilterBar.sapUiCompFilterBarNonPhone .sapMInputBaseInner {
-  background-color: transparent !important; 
-  border: none !important; 
-  box-shadow: none !important; 
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* JOB POSTING */
-.rteError .sapUiRteToolbar, 
+.rteError .sapUiRteToolbar,
 .rteError .sapUiRteCnt {
-    border: 1px solid red !important;
+  border: 1px solid red !important;
 }
 
 .rteError .sapUiRteCnt {
-    border-top: none !important;
+  border-top: none !important;
 }
-
 
 .blockInputTyping .sapMInputBaseInner {
-    pointer-events: none !important;
-  }
-
-  .sapUiRTEErrorBorder {
-    border: 2px solid red !important;
-    border-radius: 4px;
+  pointer-events: none !important;
 }
+
+.sapUiRTEErrorBorder {
+  border: 2px solid red !important;
+  border-radius: 4px;
+}
+
+.sapMTableTH {
+    background-color: #f2b15b;
+}
+

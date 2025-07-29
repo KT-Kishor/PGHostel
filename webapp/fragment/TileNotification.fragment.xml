@@ -5,7 +5,8 @@
     xmlns:card="sap.f.cards"
 >
     <Popover
-        contentWidth="750px"
+        contentWidth="65%"
+        contentHeight="auto"
         placement="Bottom"
         verticalScrolling="true"
         showHeader="true"
@@ -29,7 +30,7 @@
                 class="courselclass responsiveCarousel"
                 backgroundDesign="Transparent"
                 height="17.5rem"
-                width="45rem"
+                width="60rem"
                 loop="true"
                 showPageIndicator="false"
                 pages="{path: 'BirthdayModel>/'}"
@@ -82,12 +83,12 @@
             </Carousel>
             <f:Card
                 width="auto"
-                class="sapUiSmallMarginBeginEnd sapUiTinyMarginTop"
+                class="sapUiSmallMarginBeginEnd sapUiTinyMarginTop sapUiSmallMargin"
                 visible="{= ${MSASOWModel>/length} > 0
                         &amp;&amp; (
                             ${LoginModel>/Role} === 'Admin' ||
                             ${LoginModel>/Role} === 'Demo' ||
-                            ${LoginModel>/Role} === 'AccountManage' ||
+                            ${LoginModel>/Role} === 'Account Manager' ||
                             ${LoginModel>/Role} === 'HR Manager'
                         )}"
             >
@@ -95,6 +96,7 @@
                     <Table
                         items="{MSASOWModel>/}"
                         id=""
+                       
                     >
                         <headerToolbar>
                             <OverflowToolbar>
@@ -163,12 +165,11 @@
       &amp;&amp; (
         ${LoginModel>/Role} === 'Admin' ||
         ${LoginModel>/Role} === 'Demo' ||
-        ${LoginModel>/Role} === 'AccountManage' ||
-        ${LoginModel>/Role} === 'HR Manager'
+        ${LoginModel>/Role} === 'Account Manager' 
       )}"
             >
                 <f:content>
-                    <Table items="{CompanyInvoiceModelData>/}">
+                    <Table items="{CompanyInvoiceModelData>/}" >
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title

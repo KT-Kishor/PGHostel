@@ -41,8 +41,8 @@
                     <ToolbarSpacer/>
 
 					<!-- <Button   press="MA_onEmpTask"   id="MA_id_AssignB" visible="false"/> -->
-						<Button    type="Accept" press="MA_onCreateTask"  text="{i18n>createTask}" tooltip="{i18n>assignEmp}"/>
-						<Button    press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" type="Emphasized" />
+						<Button    type="Transparent" press="MA_onCreateTask"  text="{i18n>createTask}" tooltip="{i18n>assignEmp}"/>
+						<Button    press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" type="Transparent" />
 				
                    </OverflowToolbar>
             </headerToolbar>

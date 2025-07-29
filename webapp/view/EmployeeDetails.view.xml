@@ -58,7 +58,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="ED_id_EmpDetailsTable" class="sapUiTinyMargin" items="{
-                path: 'sEmployeeDetails>/', sorter: {path: 'EmployeeStatus',descending: false,group: true}}"  busyIndicatorDelay="0"  width="auto"
+                path: 'sEmployeeDetails>/', sorter: {path: 'EmployeeStatus',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"  busyIndicatorDelay="0"  width="auto"
                    growingScrollToLoad="false" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >

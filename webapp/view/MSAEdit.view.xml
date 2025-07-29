@@ -24,10 +24,10 @@
 			<headerTitle>
 				<ObjectPageDynamicHeaderTitle>
 					<actions>
-						<m:Button text="Edit" type="Emphasized" press="MsaE_onEditOrSavePress" />
+						<m:Button text="Edit" type="Transparent" press="MsaE_onEditOrSavePress" />
 						<!-- <m:Button text="{= ${simpleForm>/editable} ? 'Save' : 'Edit' }" type="{= ${simpleForm>/editable} ? 'Accept' : 'Transparent' }" press="MsaE_onEditOrSavePress" /> -->
-						<m:Button id="MSA" type="Ghost" text="{i18n>msaSendEmail}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
-						<m:Button type="Attention" text="{i18n>GeneratePDF}" enabled="{simpleForm>/isEnabled}" press="MsaE_onPressMerge" />
+						<m:Button id="MSA" type="Transparent" text="{i18n>msaSendEmail}" enabled="{simpleForm>/isEnabled}" press="MsaE_onSendEmailMSA" />
+						<m:Button type="Transparent" text="{i18n>GeneratePDF}" enabled="{simpleForm>/isEnabled}" press="MsaE_onPressMerge" />
 					</actions>
 					<expandedHeading>
 						<m:Title text="{FilteredMsaModel>/0/CompanyName}" wrapping="true" />
@@ -162,7 +162,7 @@
 											<m:ToolbarSeparator />
 											<m:Button 
             text="{i18n>addSOW}" 
-            type="Accept" 
+            type="Transparent" 
             press="MsaE_onPressCreateSow"></m:Button>
 											<m:ToolbarSeparator />
 											<m:Button 

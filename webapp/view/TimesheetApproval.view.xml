@@ -122,8 +122,8 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                   <Button text="Approve" press="TSA_onApprove" type="Accept" enabled="{viewModel>/canApproveReject}"/>
-                   <Button text="Reject" press="TSA_onReject" type="Reject" enabled="{viewModel>/canApproveReject}"/>
+                   <Button text="Approve" press="TSA_onApprove" type="Transparent" enabled="{viewModel>/canApproveReject}"/>
+                   <Button text="Reject" press="TSA_onReject" type="Transparent" enabled="{viewModel>/canApproveReject}"/>
                 </contentRight>
             </Bar>
         </footer>

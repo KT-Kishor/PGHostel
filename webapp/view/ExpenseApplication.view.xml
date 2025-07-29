@@ -74,9 +74,9 @@
                     <!-- <ToolbarSeparator/> -->
                     <ToolbarSpacer/>
                     <ToolbarSpacer/>
-					<Button  type="Ghost" text="{i18n>download}" tooltip="{i18n>downloadPerdiem}" press="Exp_onPressExpenseDownload" />
-					<Button  type="Reject" tooltip="{i18n>deleteExpense}" enabled="false" id="Exp_id_DeleteBtn" text="{i18n>deleteExpense}" press="Exp_onPressDeleteExpense" />
-                   <Button  type="Accept" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
+					<Button  type="Transparent" text="{i18n>download}" tooltip="{i18n>downloadPerdiem}" press="Exp_onPressExpenseDownload" />
+					<Button  type="Transparent" tooltip="{i18n>deleteExpense}" enabled="false" id="Exp_id_DeleteBtn" text="{i18n>deleteExpense}" press="Exp_onPressDeleteExpense" />
+                   <Button  type="Transparent" text="{i18n>expAddBtn}" tooltip="{i18n>expenseAddTooltip}" press="Exp_onPressAddExpense" />
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

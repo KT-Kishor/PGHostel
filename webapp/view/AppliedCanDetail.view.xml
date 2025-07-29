@@ -7,6 +7,7 @@
 >
 	<Page  title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
 		<headerContent>
+			
 			<Button
                 press="Tile_NotifictionBTN"
                 icon="sap-icon://bell"
@@ -39,25 +40,26 @@
 			<!-- form header  -->
 			<f:toolbar>
 				<Toolbar>
+			<Title text="{i18n>TableHeader}"  />
 					<ToolbarSpacer />
 					<Button
                         id="ACD_id_EditButton"
                         text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                         press="ACD_onEditPress"
-                        type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
+                        type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
                         tooltip="{i18n>editDetails}"
                     />
 					<Button
                         text="{i18n>viewResume}"
                         press="openResumePreview"
-                        type="Attention"
+                        type="Transparent"
                     />
 					<Button
                         text="{i18n>downloadResume}"
                         press="onDownloadResume"
-                        type="Ghost"
+                        type="Transparent"
                     />
-					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard"   press="ACD_onBoardCandidate"   type="Accept"/>
+					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard"   press="ACD_onBoardCandidate"   type="Transparent"/>
 				</Toolbar>
 			</f:toolbar>
 			<f:content>

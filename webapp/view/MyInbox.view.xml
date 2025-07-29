@@ -41,7 +41,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin"  items="{path: 'MyInboxModelData>/', sorter: {path: 'EmpID',descending: false,group: true}}"  busyIndicatorDelay="0"  width="auto"
+			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin"  items="{path: 'MyInboxModelData>/', sorter: {path: 'EmpID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"  busyIndicatorDelay="0"  width="auto"
                 inset="false"  mode="SingleSelectLeft" selectionChange="onSelectionChangeStatus"   growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
@@ -94,10 +94,10 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
 				<contentRight>
-					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressButtons" type="Accept" visible="false"/>
-					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressButtons" type="Reject" visible="false"/>
-					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressButtons" type="Emphasized" visible="false"/>
-					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressButtons" type="Accept" visible="false"/>
+					<Button id="MI_id_ButApprove" text="{i18n>approve}" press="MI_onPressButtons" type="Transparent" visible="false"/>
+					<Button id="MI_id_ButReject" text="{i18n>reject}" press="MI_onPressButtons" type="Transparent" visible="false"/>
+					<Button id="MI_id_ButReSend" text="{i18n>resend}" press="MI_onPressButtons" type="Transparent" visible="false"/>
+					<Button id="MI_id_ButPaid" text="{i18n>paid}" press="MI_onPressButtons" type="Transparent" visible="false"/>
 				</contentRight>
 			</Bar>
 		</footer>

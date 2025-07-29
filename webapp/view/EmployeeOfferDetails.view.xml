@@ -244,7 +244,7 @@
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
 				<contentRight>
-					<Button text="{i18n>submit}" press="EOD_onSubmitData" id="EOD_id_Submit" type="Accept"  enabled="false"/>
+					<Button text="{i18n>submit}" press="EOD_onSubmitData" id="EOD_id_Submit" type="Transparent"  enabled="false"/>
 				</contentRight>
 			</Bar>
 		</footer>

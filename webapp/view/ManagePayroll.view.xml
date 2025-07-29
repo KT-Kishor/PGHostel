@@ -29,19 +29,19 @@
                     />
                     <Button
                         id="MP_id_DeleteBtn"
-                        type="Reject"
+                        type="Transparent"
                         text="{i18n>delete}"
                         press=".MP_onPressDelete"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
-                        type="Emphasized"
+                        type="Transparent"
                         text="{i18n>export}"
                         press=".MP_onPressExport"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
-                        type="Neutral"
+                        type="Transparent"
                         text="{i18n>legend}"
                         press=".MP_onOpenMessagePopover"
                         visible="{Payroll>/isSELVisible}"

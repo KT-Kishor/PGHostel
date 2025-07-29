@@ -387,7 +387,7 @@
                                                     visible="{visiablityPlay>/editable}"
                                                     tooltip="{i18n>addItem}"
                                                     press="HQD_onPressAddQuotationItem"
-                                                    type="Accept"
+                                                    type="Transparent"
                                                 />
 											</m:OverflowToolbar>
 										</m:headerToolbar>
@@ -704,7 +704,7 @@
 					<m:Button
         visible="{visiablityPlay>/createVisi}"
         text="{i18n>submit}"
-        type="Accept"
+        type="Transparent"
         press="HQD_onPressSubmit"
         class="sendMail"
     />
@@ -713,7 +713,7 @@
         id="HQD_id_QuotationMail"
         press="HQD_onPressSendEmail"
         visible="{visiablityPlay>/merge}"
-        type="Ghost"
+        type="Transparent"
         class="sendMail"
     />
 					<m:Button
@@ -721,13 +721,13 @@
         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
         press="HQD_onPressEdit"
         class="sendMail"
-        type="{= ${visiablityPlay>/editable} === true ? 'Accept' : 'Emphasized'}"
+        type="{= ${visiablityPlay>/editable} === true ? 'Transparent' : 'Transparent'}"
     />
 					<m:Button
         text="{i18n>jsPdf}"
         press="HQD_onPressMerge"
         visible="{visiablityPlay>/merge}"
-        type="Attention"
+        type="Transparent"
     />
 				</m:contentRight>
 			</m:Bar>

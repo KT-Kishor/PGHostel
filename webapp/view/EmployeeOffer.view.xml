@@ -42,14 +42,15 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table  id="EO_id_TableEOffer" busyIndicatorDelay="0" mode="SingleSelectLeft" selectionChange="EO_onSelectionRadRowE" class="sapUiResponsiveMargin" items="{
-                path: 'EmployeeOfferModel>/', sorter: {path: 'Status',descending: false,group: true}}" growingScrollToLoad="true" width="auto"  growing="true"  growingThreshold="50"  alternateRowColors="true">
+                path: 'EmployeeOfferModel>/', sorter: {path: 'Status',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" growingScrollToLoad="true" width="auto"  growing="true"  growingThreshold="50"  alternateRowColors="true">
 			 <headerToolbar>
                 <OverflowToolbar >
                     <Title text="{i18n>headerEmpDetails} ({= ${EmployeeOfferModel>/}.length})" />
                     <ToolbarSpacer/>
-                    <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="{i18n>onboardEmp}" type="Ghost" press="EO_onOnboardPress"/>
-                    <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Reject" text="{i18n>rejectEmp}" press="EO_onRejectPress"  />
-                    <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Accept"  tooltip="{i18n>generateOffer}"/>
+                    <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="{i18n>onboardEmp}" type="Transparent" press="EO_onOnboardPress"/>
+                    <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Transparent" text="{i18n>rejectEmp}" press="EO_onRejectPress"  />
+                    <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Transparent"  tooltip="{i18n>generateOffer}"/>
+					<Button text="{i18n>download}" type="Transparent"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

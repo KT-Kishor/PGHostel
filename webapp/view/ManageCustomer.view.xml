@@ -29,20 +29,20 @@
 					<OverflowToolbar>
 						<Title id="MC_id_Title" text="{i18n>custDetails} ({= ${CreateCustomerModel>/}.length })"/>
 						<ToolbarSpacer/>
-						<Button  type="Accept" text="{i18n>addCustomerBtn}" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" id="MC_id_AddCustomer" />
+						<Button  type="Transparent" text="{i18n>addCustomerBtn}" tooltip="{i18n>custAddButToolTip}" press="MC_onAddCustomerDetails" id="MC_id_AddCustomer" />
 						<ToolbarSeparator />
-						<Button text="{i18n>custEditButToolTip}" type="Emphasized" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" id="MC_id_EditCustomer"/>
+						<Button text="{i18n>custEditButToolTip}" type="Transparent" tooltip="{i18n>custEditButToolTip}" press="MC_onEditCustomerDetails" id="MC_id_EditCustomer"/>
 						<ToolbarSeparator />
-						<Button type="Reject" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" id="MC_id_DeleteCustomer" />
+						<Button type="Transparent" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" id="MC_id_DeleteCustomer" />
 						<ToolbarSeparator />
-						<Button type="Attention" text="{i18n>msasow}" press="MC_OnPressMSASOW" />
+						<Button type="Transparent" text="{i18n>msasow}" press="MC_OnPressMSASOW" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>companyName}" />
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>customerName}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">

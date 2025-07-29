@@ -118,8 +118,9 @@ sap.ui.define([
                     sPath: EmployeeID,
                     Role: EmployeeRole
                 });
-            }
-
-
+            },
+             getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         });
     });

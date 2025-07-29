@@ -66,10 +66,10 @@
                   <OverflowToolbar>
                     <Title text="{i18n>tileTimesheetFooter}" />
                     <ToolbarSpacer />
-                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Accept" tooltip="{i18n>fillTimesheet}" />
+                    <Button text="{i18n>fillTimesheet}" press="TS_onFillDetails" type="Transparent" tooltip="{i18n>fillTimesheet}" />
                      <Button
                             text="{i18n>export}"
-                            type="Ghost"
+                            type="Transparent"
                             tooltip="{i18n>exportTooltip}"
                             press="TS_onExport"
                             class="sapUiSmallMarginEnd"
@@ -112,8 +112,8 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                    <Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Accept"  id="TS_id_Submited" enabled="{viewModel>/canSubmit}"/>
-                    <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Reject"  id="TS_id_Delete" enabled="{viewModel>/canDelete}"/>
+                    <Button text="{i18n>submit}" press="TS_onSubmitTimesheet" type="Transparent"  id="TS_id_Submited" enabled="{viewModel>/canSubmit}"/>
+                    <Button text="{i18n>delete}" press="TS_onDeleteTimesheet" type="Transparent"  id="TS_id_Delete" enabled="{viewModel>/canDelete}"/>
                 </contentRight>
             </Bar>
         </footer>

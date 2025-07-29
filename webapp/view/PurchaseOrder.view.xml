@@ -70,8 +70,8 @@
 					<OverflowToolbar>
 						<Title    text="Purchase Order List ({=${POModel>/}.length})"/>
 						<ToolbarSpacer />
-						<Button  text="Create Purchase Order" press="PO_onCreatePurchaseOrder" type="Accept"/>
-						<Button  text="Delete" press="PO_onDeleteButtonPress" type="Reject"/>
+						<Button  text="Create Purchase Order" press="PO_onCreatePurchaseOrder" type="Transparent"/>
+						<Button  text="Delete" press="PO_onDeleteButtonPress" type="Transparent"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

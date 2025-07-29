@@ -106,10 +106,12 @@
 
         <Table
             id="appliedCandidatesTable"
-            items="{path:'DataTableModel>/', sorter: {path: 'CreatedBy', descending: false, group: true}}"
+            items="{path: 'DataTableModel>/', sorter: [{path: 'CreatedBy', descending: false, group: true },    
+            {path: 'CreateDate', descending: true }]}"  
             mode="SingleSelectLeft"
             class="sapUiResponsiveMargin"
             width="auto"
+            busyIndicatorDelay="0"
             noDataText="{i18n>noData}"
             growingScrollToLoad="true"
              growingThreshold="50"  alternateRowColors="true">
@@ -124,24 +126,24 @@
                         <Button
                             text="{i18n>create}"
                             press="onAddNewCandidate"
-                            type="Accept"
+                            type="Transparent"
                             tooltip="{i18n>tooltipAdduser}"
                         />
                         <Button
                             text="{i18n>edit}"
-                            type="Emphasized"
+                            type="Transparent"
                             press="onEditCandidate"
                             tooltip="{i18n>tooltipEditUser}"
                         />
                         <Button
                             text="{i18n>delete}"
                             press="onDeleteCandidate"
-                            type="Reject"
+                            type="Transparent"
                             tooltip="{i18n>tooltipDeleteStudent}"
                         />
                         <Button
                             text="{i18n>export}"
-                            type="Ghost"
+                            type="Transparent"
                             press="onExport"
                             class="sapUiSmallMarginEnd"
                         />

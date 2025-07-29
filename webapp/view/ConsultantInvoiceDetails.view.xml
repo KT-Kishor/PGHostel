@@ -35,7 +35,7 @@
 											<m:Button 
 											visible="{visiablityPlay>/copyBtn}" 
 											class="sendMail" 
-											type="Emphasized" 
+											type="Transparent" 
 											icon="sap-icon://copy" 
 											text="{i18n>copy}" press="CI_onPressCopyBtn" />
 											<!-- Paste Button -->
@@ -199,7 +199,7 @@
 									<!-- Toolbar -->
 									<m:OverflowToolbar>
 										<m:ToolbarSpacer />
-										<m:Button visible="{visiablityPlay>/invBtn}"  text="{i18n>addItem}" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Accept" />
+										<m:Button visible="{visiablityPlay>/invBtn}"  text="{i18n>addItem}" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Transparent" />
 									</m:OverflowToolbar>
 									<m:Table id="CI_id_ConsultantInvoiceDeatailTable"  
 									items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}"
@@ -387,11 +387,11 @@
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</m:contentLeft>
 				<m:contentRight>
-					<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CI_onPressSubmit" class="sendMail" />
-				<m:Button text="{i18n>tileFooter}" id="CI_id_ContractMail" press="CI_onSendEmail" visible="{visiablityPlay>/merge}"
-				type="Ghost"/>
-				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CI_onPressEdit" class="sendMail" type="{= ${visiablityPlay>/editable} ? 'Accept' : 'Emphasized' }"/>
-				<m:Button text="{i18n>GeneratePDF}" press="CI_onPressGeneratePdf"  visible="{visiablityPlay>/merge}" type="Attention"/>
+					<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Transparent" press="CI_onPressSubmit" class="sendMail" />
+				<m:Button text="{i18n>tileFooter}"  id="CI_id_ContractMail" press="CI_onSendEmail" visible="{visiablityPlay>/merge}"
+				type="Transparent"/>
+				<m:Button visible="{visiablityPlay>/editVisi}" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}"  press="CI_onPressEdit" class="sendMail" type="{= ${visiablityPlay>/editable} ? 'Transparent' : 'Transparent' }"/>
+				<m:Button text="{i18n>GeneratePDF}" press="CI_onPressGeneratePdf"  visible="{visiablityPlay>/merge}" type="Transparent"/>
 				</m:contentRight>
 			</m:Bar>
 			</m:footer>

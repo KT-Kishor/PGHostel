@@ -117,7 +117,7 @@
                             text="Assign Employee"
                             press="AT_onAssignEmpTask"
                             id="AT_id_Assign"
-                            type="Accept"
+                            type="Transparent"
                             tooltip="{i18n>assigntask}"
                         />
                         <Button
@@ -125,14 +125,14 @@
                             text="{i18n>edit}"
                             id="AT_id_EditTask"
                             tooltip="{i18n>editassigntask}"
-                            type="Emphasized"
+                            type="Transparent"
                         />
                         <Button
                             text="{i18n>delete}"
                             press="AT_onDeleteTask"
                             id="AT_id_DeleteTask"
                             tooltip="{i18n>deleteassigntask}"
-                            type="Reject"
+                            type="Transparent"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

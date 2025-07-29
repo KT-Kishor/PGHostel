@@ -364,6 +364,10 @@ sap.ui.define([
         const btn = this.byId(id);
         if (btn) btn.setVisible(false);
       });
-    }
+    },
+    
+ getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
   });
 });

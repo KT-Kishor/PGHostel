@@ -35,8 +35,8 @@
 						<m:Title text="{sEmployeeModel>/0/Designation}" />
 					</snappedTitleOnMobile>
 					<actions>
-						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Accept" visible="{viewModel>/SelfService}" />
-						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Ghost" />
+						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Transparent" visible="{viewModel>/SelfService}" />
+						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Transparent" />
                         <m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn" id="SS_id_Action"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
@@ -148,7 +148,7 @@
                                                 id="BasicDetailsBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
-                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
+                                                type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
                                                 tooltip="{i18n>editDetails}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 
@@ -695,7 +695,7 @@
                                                 id="DocumentBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
-                                                type="{= ${viewModel>/isEditMode} ? 'Accept' : 'Emphasized' }"
+                                                type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
                                                 tooltip="{i18n>editDetails}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>      
                                     </m:Toolbar>
@@ -892,21 +892,21 @@
                                                 id="EdF_id_EduAdd"
                                                 tooltip="{i18n>toolEAddEdu}"
                                                 press="EdF_AddEdu"
-                                                type="Accept"
+                                                type="Transparent"
                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 											<m:Button
                                                 text="{i18n>edit}"
                                                 id="EdF_id_EduEdit"
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
-                                                type="Emphasized"
+                                                type="Transparent"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 											<m:Button
                                                 text="{i18n>delete}"
                                                 id="EdF_id_EduDelete"
                                                 tooltip="{i18n>toolDeleteEdu}"
                                                 press="EdF_DeletEdu"
-                                                type="Reject"
+                                                type="Transparent"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -990,20 +990,20 @@
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                 tooltip="{i18n>referenceDetails}"
                                                 press="EmpF_onReferenceDetails"
-                                                type="Ghost"
+                                                type="Transparent"
                                                 text="{i18n>referenceDetails}"
                                             />
 											<m:Button
                                                 text="{i18n>add}"
                                                 press="EmpF_onAddEmployment"
-                                                type="Accept"
+                                                type="Transparent"
                                                 tooltip="{i18n>toolAddEmp}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
 											<m:Button
                                                 text="{i18n>edit}"
                                                 press="EmpF_onEditEmployment"
-                                                type="Emphasized"
+                                                type="Transparent"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
@@ -1011,7 +1011,7 @@
 											<m:Button
                                                 text="{i18n>delete}"
                                                 press="EmpF_onDeletEmployment"
-                                                type="Reject"
+                                                type="Transparent"
                                                 tooltip="{i18n>toolDelEmp}"
                                                 id="EmpF_id_EmpDelete"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
@@ -1143,14 +1143,14 @@
                                                     visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     id="downloadSelectedButton"
                                                     text="{i18n>delete}"
-                                                    type="Reject"
+                                                    type="Transparent"
                                                     press="onDeleteFiles"
                                                     enabled="false"
                                                 />
 												<m:Button
                                                     id="DeleteSelectedButton"
                                                     text="{i18n>Download}"
-                                                    type="Ghost"
+                                                    type="Transparent"
                                                     visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                     press="onDownloadFiles"
                                                     enabled="false"

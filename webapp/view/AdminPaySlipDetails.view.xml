@@ -500,7 +500,7 @@
                     />
                     <m:Button
                         text="{i18n>submit}"
-                        type="Accept"
+                        type="Transparent"
                         press="APD_onPressSubmit"
                         class="sendMail"
                         visible="{PaySlip>/isCreate}"
@@ -508,7 +508,7 @@
                     />
                     <m:Button
                         text="{i18n>jsPdf}"
-                        type="Reject"
+                        type="Transparent"
                         press="APD_onPressGeneratePdf"
                         visible="{= !${PaySlip>/isCreate} }"
                     />

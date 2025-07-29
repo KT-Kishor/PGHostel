@@ -191,27 +191,27 @@
                     <ToolbarSpacer />
                     <Button
                         text="{i18n>create}"
-                        type="Accept"
+                        type="Transparent"
                         press="IA_onCreateButtonPress"
                         tooltip="Create"
                     />
                     <Button
                     id="idEditButton"
                         text="{i18n>edit}"
-                        type="Emphasized"
+                        type="Transparent"
                         press="IA_onUpadateButtonPress"
                         tooltip="{i18n>edit}"
                     />
                     <Button
                         text="{i18n>Transferbtn}"
-                        type="Ghost"
+                        type="Transparent"
                         press="IA_onTransferButtonPress"
                         tooltip="Transfer"
                     />
                     <Button
                        id="idTrashButton"
                         text="{i18n>trash}"
-                        type="Ghost"
+                        type="Transparent"
                         press="IA_onTrashButtonPress"
                         tooltip="Trash"
                         visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
@@ -220,7 +220,7 @@
                         id="IA_id_Export"
                         text="{i18n>download}"
                         press="IA_onExport"
-                        type="Ghost"
+                        type="Transparent"
                         tooltip="Download"
                     />
                 </OverflowToolbar>
@@ -457,7 +457,7 @@
                                 text="{i18n>pickedBtn}"
                                 visible="{incomeModel>showPickButton}"            
                                 tooltip="{i18n>pickedBtn}"
-                                type="Ghost"
+                                type="Transparent"
                                 class="sapUiTinyMarginBegin"
                                 press="IA_onPickedButtonPress"
                             />

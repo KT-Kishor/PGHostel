@@ -394,7 +394,7 @@
                         text="{i18n>submit}"
                         press="TD_onSubmitData"
                         id="TD_id_Submit"
-                        type="Accept"
+                        type="Transparent"
                         enabled="false"
                     />
                 </contentRight>

@@ -1,4 +1,4 @@
-sap.ui.define([
+  sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "../utils/TraineeCertificatePDF",
@@ -1287,7 +1287,14 @@ sap.ui.define([
       if (this._autoScrollTimer) {
         clearInterval(this._autoScrollTimer);
       }
-      var filteredModel = this.getView().getModel("EmpDetails").getData().filter(function (item) {
+
+      var oEmpModel = this.getView().getModel("EmpDetails");
+      if (!oEmpModel || !oEmpModel.getData()) {
+        setTimeout(this.initializeBirthdayCarousel.bind(this), 100); // Try again after 500ms
+        return;
+      }
+
+      var filteredModel = oEmpModel.getData().filter(function (item) {
         return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
           new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
       });
@@ -1311,5 +1318,138 @@ sap.ui.define([
         }.bind(this), iInterval);
       }
     },
+    OnPressNavigationMsaDet: function (oEvent) {
+      var MsaID = oEvent
+        .getSource()
+        .getBindingContext("MSASOWModel")
+        .getProperty("MsaID");
+      this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
+    },
+    CI_onPressInvoiceRow: function (oEvent) {
+      var Path = encodeURIComponent(
+        oEvent
+          .getSource()
+          .getBindingContext("CompanyInvoiceModelData")
+          .getObject().InvNo
+      );
+      this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
+    },
+
+     getStyledGroupHeader: function (oGroup) {
+            const statusStyles = {
+                "New": {
+                    background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
+                    textColor: "#000000"
+                },
+                "Offer Sent": {
+                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+                    textColor: "#000000"
+                },
+                "Rejected": {
+                    background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
+                    textColor: "#000000"
+                    // rgb(255 70 70), rgb(250 16 16));
+                },
+                "Saved": {
+                    background: "linear-gradient(to bottom right,rgb(218, 233, 236), rgb(2 94 171))",
+                    textColor: "#000000"
+                },
+                "Onboarded": {
+                    background: "linear-gradient(to bottom right,rgb(231 241 231), rgb(131 230 131))",
+                    textColor: "#000000"
+                },
+                "Training Completed": {
+                    background: "linear-gradient(to bottom right,rgb(190 228 190), rgb(4 154 4))",
+                    textColor: "#000000"
+                },
+                "Draft": {
+                    background: "linear-gradient(to bottom right, #ccc, #eee)",
+                    textColor: "#000000"
+                },
+                "Submitted": {
+                     background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+                    textColor: "#000000"
+                },
+                "Approved": {
+                    background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
+                    textColor: "#000000"
+                },
+                "Revised": {
+                    background: "linear-gradient(to bottom right, #f8e77d, #f5c442)",
+                    textColor: "#000000"
+                },
+                "Send back by manager": {
+                    background: "linear-gradient(to bottom right, #ffb347, #ffcc33)",
+                    textColor: "#000000"
+                },
+                "Send back by account": {
+                    background: "linear-gradient(to bottom right, #ffb347, #ffcc33)",
+                    textColor: "#000000"
+                },
+                "Send to account": {
+                    background: "linear-gradient(to bottom right, #7bdff2, #b2f7ef)",
+                    textColor: "#000000"
+                },
+                "Active": {
+                    background: "linear-gradient(to bottom right, rgb(194 243 194), rgb(37 200 37))",
+                    textColor: "#000000"
+                },
+                "Inactive": {
+                    background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
+                    textColor: "#000000"
+                },
+                "Asset Assigned": {
+                    background: "linear-gradient(to bottom right, #8ed1fc, #3ba0ff)",
+                    textColor: "#000000"
+                },
+                "Returned": {
+                    background: "linear-gradient(to bottom right, #fcb69f, #ffb199)",
+                    textColor: "#000000"
+                },
+                "Transferred": {
+                    background: "linear-gradient(to bottom right, #ffe47a, #f9d423)",
+                    textColor: "#000000"
+                },
+                "Available": {
+                    background: "linear-gradient(to bottom right, #d4fc79, #96e6a1)",
+                    textColor: "#000000"
+                },
+                "Trashed": {
+                    background: "linear-gradient(to bottom right, #ff6a6a, #d32f2f)",
+                    textColor: "#000000"
+                },
+                "Assigned": {
+                    background: "linear-gradient(to bottom right, #93f9b9, #1d976c)",
+                    textColor: "#000000"
+                },
+                "Admin": {
+                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+                    textColor: "#000000"
+                },
+            };
+
+            const defaultStyle = {
+                background: "linear-gradient(to bottom right, rgba(200, 200, 200, 0.4), rgba(220, 220, 220, 0.4))",
+                textColor: "#000000"
+            };
+
+            const currentStyle = statusStyles[oGroup.key] || defaultStyle;
+
+            const oHeader = new sap.m.GroupHeaderListItem({
+                title: oGroup.key
+            });
+
+            oHeader._customBackground = currentStyle.background;
+            oHeader._customTextColor = currentStyle.textColor;
+
+            oHeader.addEventDelegate({
+                onAfterRendering: function () {
+                    this.$().css("background", this._customBackground);
+                    this.$().css("color", this._customTextColor);
+                }
+            }, oHeader);
+
+            return oHeader;
+        }
   })
 });

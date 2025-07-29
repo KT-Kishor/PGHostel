@@ -48,18 +48,18 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="T_id_TraineeTable" class="sapUiResponsiveMargin"    items="{
-                path: 'traineeModel>/', sorter: {path: 'Status',descending: false,group: true}}" busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
+                path: 'traineeModel>/', sorter: {path: 'Status',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="T_id_Title" text="{i18n>traineeDetail} ({= ${traineeModel>/}.length })"/>
                     <ToolbarSpacer/>
-                    <Button  tooltip="{i18n>downloadcCertificate}" text="{i18n>certificate}"  id="T_id_Download"   press="T_onCertDownload"   visible="false" type="Attention"/>
-                    <Button  tooltip="{i18n>sendTrineeCertificate}" text="{i18n>mailCertificate}" id="T_id_Cermail"  type="Ghost" press="T_onCerMail"  visible="false"/>
-                    <Button  text="{i18n>onBoardTrainee}" id="T_id_OnboardBtn"  type="Ghost" press="T_onOnboardPress"  enabled="false" tooltip="{i18n>onboard}"/>
-                    <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Reject"  press="T_onRejectPress"  enabled="false" tooltip="{i18n>rejectTainee}" />
-                    <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Accept"  press="T_onPressAddTrainee"   tooltip="{i18n>addTrainee}"/>
-					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  visible="false" type="Accept"/>
+                    <Button  tooltip="{i18n>downloadcCertificate}" text="{i18n>certificate}"  id="T_id_Download"   press="T_onCertDownload"   visible="false" type="Transparent"/>
+                    <Button  tooltip="{i18n>sendTrineeCertificate}" text="{i18n>mailCertificate}" id="T_id_Cermail"  type="Transparent" press="T_onCerMail"  visible="false"/>
+                    <Button  text="{i18n>onBoardTrainee}" id="T_id_OnboardBtn"  type="Transparent" press="T_onOnboardPress"  enabled="false" tooltip="{i18n>onboard}"/>
+                    <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Transparent"  press="T_onRejectPress"  enabled="false" tooltip="{i18n>rejectTainee}" />
+                    <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Transparent"  press="T_onPressAddTrainee"   tooltip="{i18n>addTrainee}"/>
+					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  visible="false" type="Transparent"/>
 
                 </OverflowToolbar>
             </headerToolbar>

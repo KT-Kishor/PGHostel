@@ -568,6 +568,9 @@ sap.ui.define([
                     this.closeBusyDialog();
                     MessageToast.show(error.responseText);
                 }
-            }
+            },
+            getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         });
     });

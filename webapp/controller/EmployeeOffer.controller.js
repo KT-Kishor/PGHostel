@@ -88,6 +88,10 @@ sap.ui.define([
                     this.closeBusyDialog(); // Close after async call finishes
                 }
             },
+            
+            getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
             _getCurrentYearDates: function() {
                 var year = new Date().getFullYear();

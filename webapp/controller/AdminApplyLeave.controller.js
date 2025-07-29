@@ -260,7 +260,7 @@ sap.ui.define(
                 },
 
                 // Function to fetch employee details
-                 EmployeeDetReadCall: async function (entity, value) {
+                EmployeeDetReadCall: async function (entity, value) {
                     try {
                         let data = await this.ajaxReadWithJQuery(entity, value);
                         if (data && data.data && data.data.length > 0) {
@@ -274,7 +274,7 @@ sap.ui.define(
                             }
                             let yearModel = new JSONModel({ items: addYears });
                             this.getView().setModel(yearModel, "YearModel");
-                            
+
                         } else {
                             MessageToast.show(this.i18nModel.getText("joiningDateMissing"));
                         }
@@ -497,7 +497,7 @@ sap.ui.define(
                     } catch (error) {
                         MessageToast.show(error.message || error.responseText);
                     } finally {
-                       sap.ui.core.BusyIndicator.hide();
+                        sap.ui.core.BusyIndicator.hide();
                     }
                 },
 
@@ -505,7 +505,7 @@ sap.ui.define(
                 AL_onPressApplyLeave: function () {
                     var oView = this.getView();
                     var loginData = this.getOwnerComponent().getModel("LoginModel").getData();
-                    
+
                     if (!this.JoiningDate || this.JoiningDate.length < 3) {
                         sap.m.MessageToast.show("Joining date is not available or invalid.");
                         return;
@@ -549,7 +549,7 @@ sap.ui.define(
                     this.openLeaveDialog(oView);
                 },
 
-               // Update leave button handler
+                // Update leave button handler
                 AL_onPressUpdate: function () {
                     var oView = this.getView();
                     var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
@@ -614,7 +614,7 @@ sap.ui.define(
                     sap.ui.getCore().byId("AL_id_LeaveComments").setValueState("None");
                 },
 
-               // Close the leave dialog fragment
+                // Close the leave dialog fragment
                 AL_onPressClose: function () {
                     this.oLeaveDialog.close();
                     this.byId("AL_id_LeaveTableStandard").removeSelections(true); // Clear table selection
@@ -693,10 +693,10 @@ sap.ui.define(
 
 
                 onHalfDaySelect: function (oEvent) {
-                        var bSelected = oEvent.getParameter("selected"); // Always reliable
-                        var oLeaveModel = this.getView().getModel("LeaveTempModel");
-                        oLeaveModel.setProperty("/halfDay", bSelected); // Set updated value explicitly
-                        this.onLiveChange(); // Recalculate
+                    var bSelected = oEvent.getParameter("selected"); // Always reliable
+                    var oLeaveModel = this.getView().getModel("LeaveTempModel");
+                    oLeaveModel.setProperty("/halfDay", bSelected); // Set updated value explicitly
+                    this.onLiveChange(); // Recalculate
                 },
 
                 // Check if leave is already applied for given dates
@@ -971,8 +971,8 @@ sap.ui.define(
                             }
 
                             if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate, this.previousLeaveDates)) {
-                                    return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
-                                }
+                                return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+                            }
 
 
                             // Leave model filtering
@@ -1066,47 +1066,47 @@ sap.ui.define(
                 },
 
                 AL_onPressDelete: async function () {
-                        try {
-                            var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
-                            if (!oTable) {
-                                MessageToast.show(this.i18nModel.getText("selectLeaveToDelete"));
-                                return;
-                            }
-
-                            var oModelData = oTable.getBindingContext("LeaveModel").getObject();
-                            var requestData = { filters: { ID: oModelData.ID } };
-
-                            // Show confirmation dialog before delete
-                            this.showConfirmationDialog(
-                                this.i18nModel.getText("confirmDeleteTitle"),   
-                                this.i18nModel.getText("confirmDeleteMessage"),
-                                async function () {
-                                    this.getBusyDialog(); // Show busy dialog
-
-                                    try {
-                                        const response = await this.ajaxDeleteWithJQuery("Leaves", requestData);
-                                        this.closeBusyDialog();
-
-                                        if (response.success === true) {
-                                            MessageToast.show(this.i18nModel.getText("leaveDeletedSuccess"));
-                                            this.byId("AL_id_LeaveTableStandard").removeSelections(true);
-                                            this.byId("AL_id_Updatebtn").setVisible(false);
-                                            this.byId("AL_id_Deletebtn").setVisible(false);
-                                            this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
-                                        } else {
-                                            MessageToast.show(response.message || response.responseText);
-                                        }
-                                    } catch (error) {
-                                        this.closeBusyDialog();
-                                        MessageToast.show(error.message || error.responseText);
-                                    }
-                                }.bind(this), // fnOnConfirm
-                            );
-                        } catch (error) {
-                            this.closeBusyDialog();
-                            MessageToast.show(error.message || error.responseText);
+                    try {
+                        var oTable = this.byId("AL_id_LeaveTableStandard").getSelectedItem();
+                        if (!oTable) {
+                            MessageToast.show(this.i18nModel.getText("selectLeaveToDelete"));
+                            return;
                         }
-                    },
+
+                        var oModelData = oTable.getBindingContext("LeaveModel").getObject();
+                        var requestData = { filters: { ID: oModelData.ID } };
+
+                        // Show confirmation dialog before delete
+                        this.showConfirmationDialog(
+                            this.i18nModel.getText("confirmDeleteTitle"),
+                            this.i18nModel.getText("confirmDeleteMessage"),
+                            async function () {
+                                this.getBusyDialog(); // Show busy dialog
+
+                                try {
+                                    const response = await this.ajaxDeleteWithJQuery("Leaves", requestData);
+                                    this.closeBusyDialog();
+
+                                    if (response.success === true) {
+                                        MessageToast.show(this.i18nModel.getText("leaveDeletedSuccess"));
+                                        this.byId("AL_id_LeaveTableStandard").removeSelections(true);
+                                        this.byId("AL_id_Updatebtn").setVisible(false);
+                                        this.byId("AL_id_Deletebtn").setVisible(false);
+                                        this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                                    } else {
+                                        MessageToast.show(response.message || response.responseText);
+                                    }
+                                } catch (error) {
+                                    this.closeBusyDialog();
+                                    MessageToast.show(error.message || error.responseText);
+                                }
+                            }.bind(this), // fnOnConfirm
+                        );
+                    } catch (error) {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    }
+                },
 
                 // Selection change handler for leave table
                 onSelectionChange: function (oEvent) {
@@ -1162,6 +1162,9 @@ sap.ui.define(
 
                 onLogout: function () {
                     this.CommonLogoutFunction(); // Navigate to login page
+                },
+                getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
                 },
             },
         );

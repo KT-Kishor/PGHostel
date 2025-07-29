@@ -475,7 +475,7 @@
                                                 <m:ToolbarSpacer />
                                                 <m:Button
                                                     id="POO_idAddItemButton"
-                                                    type="Accept"
+                                                    type="Transparent"
                                                     text="{i18n>createitem}"
                                                     press="onAddItemButtonPress"
                                                     
@@ -743,32 +743,32 @@
                     <m:Button
                         id="POO_idSubmitButton"
                         text="{i18n>submit}"
-                        type="Accept"
+                        type="Transparent"
                         press="POO_onSubmitButtonPress"
                     />
                     <m:Button
                         id="POO_idmailButton"
                         text="{i18n>tileFooter}"
-                        type="Ghost"
+                        type="Transparent"
                         press="POO_onmailButtonPress"
                     />
                     <m:Button
                         id="POO_ideditButton"
                         visible="{=${PurchaseOrderModel>/Editable}===false}"
                         text="{i18n>edit}"
-                        type="Emphasized"
+                        type="Transparent"
                         press="POO_onEditButtonPress"
                     />
                     <m:Button
                         id="POO_idSaveButton"
                         text="{i18n>save}"
-                        type="Accept"
+                        type="Transparent"
                         press="POO_onSaveButtonPress"
                     />
                     <m:Button
                         id="POO_idPDFButton"
                         text="{i18n>genaratepdf}"
-                        type="Attention"
+                        type="Transparent"
                         press="POO_onPDFButtonPress"
                     />
                 </m:contentRight>

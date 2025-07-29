@@ -18,13 +18,13 @@
                 <contentRight>
                     <Button
                         id="GS_id_BtnSave"
-                        type="Accept"
+                        type="Transparent"
                         text="{i18n>save}"
                         press=".GS_onPressSave"
                         visible="{Payroll>/isSELVisible}"
                     />
                     <Button
-                        type="Neutral"
+                        type="Transparent"
                         text="{i18n>legend}"
                         press=".GS_onOpenMessagePopover"
                         visible="{Payroll>/isSELVisible}"

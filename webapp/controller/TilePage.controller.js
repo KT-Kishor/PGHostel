@@ -437,23 +437,23 @@ sap.ui.define(
           this.getRouter().navTo("RouteHP_View");
         },
 
-        OnPressNavigationMsaDet: function (oEvent) {
-          var MsaID = oEvent
-            .getSource()
-            .getBindingContext("MSASOWModel")
-            .getProperty("MsaID");
-          this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
-        },
+        // OnPressNavigationMsaDet: function (oEvent) {
+        //   var MsaID = oEvent
+        //     .getSource()
+        //     .getBindingContext("MSASOWModel")
+        //     .getProperty("MsaID");
+        //   this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
+        // },
 
-        CI_onPressInvoiceRow: function (oEvent) {
-          var Path = encodeURIComponent(
-            oEvent
-              .getSource()
-              .getBindingContext("CompanyInvoiceModelData")
-              .getObject().InvNo
-          );
-          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
-        },
+        // CI_onPressInvoiceRow: function (oEvent) {
+        //   var Path = encodeURIComponent(
+        //     oEvent
+        //       .getSource()
+        //       .getBindingContext("CompanyInvoiceModelData")
+        //       .getObject().InvNo
+        //   );
+        //   this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
+        // },
 
         TileV_onpressInvoiceDashboard: function () {
           this.getRouter().navTo("RouteInvoiceDashboard");

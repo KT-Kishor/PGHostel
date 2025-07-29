@@ -505,7 +505,10 @@ sap.ui.define(
                         }
                     }
                     this.closeBusyDialog();
-                }
+                },
+                 getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
             }
         );
     }

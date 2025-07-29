@@ -116,8 +116,8 @@
 								</f:SimpleForm>
 							</blocks>
 							<actions>
-								<m:Button type="Accept" visible="{visiablityPlay>/createVisi}" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
-								<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>ActiveSOW}" type="Ghost" press="CID_onPressMSAandSOW" />
+								<m:Button type="Transparent" visible="{visiablityPlay>/createVisi}" text="{i18n>addCustomerBtn}" press="CID_onPressAddCustomer" />
+								<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>ActiveSOW}" type="Transparent" press="CID_onPressMSAandSOW" />
 							</actions>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection>
@@ -128,8 +128,8 @@
 											<m:Toolbar>
 												<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
 												<m:ToolbarSpacer />
-												<m:Button type="Attention" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
-												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Accept" press="CID_onPressAddInvoiceItems" />
+												<m:Button type="Transparent" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
+												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Transparent" press="CID_onPressAddInvoiceItems" />
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>
@@ -273,11 +273,11 @@
 					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</m:contentLeft>
 				<m:contentRight>
-					<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Accept" press="CID_onPressSubmit" class="sendMail" />
-				<m:Button text="{i18n>companyInvoiceSendEmail}" type="Ghost" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
-				<m:Button visible="{visiablityPlay>/Edit}" type="{= ${visiablityPlay>/editable} ? 'Accept' : 'Emphasized' }" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}" press="CID_onPressEdit" class="sendMail" />
-				<m:Button text="{i18n>sendInvoiceText}" type="Ghost" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}" />
-				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf" visible="{visiablityPlay>/merge}" type="Attention" />
+					<m:Button visible="{visiablityPlay>/createVisi}" text="{i18n>submit}" type="Transparent" press="CID_onPressSubmit" class="sendMail" />
+				<m:Button text="{i18n>companyInvoiceSendEmail}" type="Transparent" press="CID_onPressSendEmail" visible="{visiablityPlay>/payByDate}" />
+				<m:Button visible="{visiablityPlay>/Edit}" type="{= ${visiablityPlay>/editable} ? 'Transparent' : 'Transparent' }" text="{= ${visiablityPlay>/editable} === true?'Save':'Edit'}" press="CID_onPressEdit" class="sendMail" />
+				<m:Button text="{i18n>sendInvoiceText}" type="Transparent" press="CID_onPressSendMultipalEmail" visible="{visiablityPlay>/MultiEmail}" />
+				<m:Button text="{i18n>GeneratePDF}" press="CID_onPressGeneratePdf" visible="{visiablityPlay>/merge}" type="Transparent" />
 				</m:contentRight>
 			</m:Bar>
 			</m:footer>

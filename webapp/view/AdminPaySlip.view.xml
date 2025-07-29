@@ -89,7 +89,7 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>paySlipTitle}"
-                            type="Accept"
+                            type="Transparent"
                             press="AP_onPressAddPayslip"
                         />
                     </Toolbar>

@@ -273,10 +273,10 @@
 				</m:contentLeft>
 				<m:contentRight>
 					<!-- Save/Edit and Merge Buttons -->
-					<m:Button text="{i18n>tileFooter}" press="EOUF_onSendEmail"  id="EOUF_id_EmpmailBut" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Ghost"/>
+					<m:Button text="{i18n>tileFooter}" press="EOUF_onSendEmail"  id="EOUF_id_EmpmailBut" visible="{= ${viewModel>/isVisiable} }" enabled="{viewModel>/isEditMode}" type="Transparent"/>
 					<m:Button text="{= ${viewModel>/editable} ? ${i18n>save} : ${i18n>edit} }"
-                              press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/ediBut} }" type="{= ${viewModel>/isEditMode} ? 'Emphasized' : 'Accept' }" />
-					<m:Button text="{i18n>GeneratePDF}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" type="Attention"/>
+                              press="EOUF_onEditOrSavePress"  id="EOUF_id_SaveBut" visible="{= ${viewModel>/ediBut} }" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" />
+					<m:Button text="{i18n>GeneratePDF}" press="EOUF_onPressMerge" visible="{= ${viewModel>/isVisiable} }" id="EOUF_id_EmpmergeButton" enabled="{viewModel>/isEditMode}" type="Transparent"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

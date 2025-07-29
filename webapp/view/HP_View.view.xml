@@ -51,9 +51,9 @@
 					<OverflowToolbar>
 						<Title text="{i18n>HP_Table_TB}" level="H2" />
 						<ToolbarSpacer />
-						<Button id="HP_id_create" text="Create" press="onOpenAddJobDialog" type="Accept" />
-						<Button id="HP_id_edit" text="Edit" press="onOpenEditJobDialog" type="Emphasized" />
-						<Button id="HP_id_delete" text="Delete" press="onDeleteJob" type="Reject" />
+						<Button id="HP_id_create" text="Create" press="onOpenAddJobDialog" type="Transparent" />
+						<Button id="HP_id_edit" text="Edit" press="onOpenEditJobDialog" type="Transparent" />
+						<Button id="HP_id_delete" text="Delete" press="onDeleteJob" type="Transparent" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
