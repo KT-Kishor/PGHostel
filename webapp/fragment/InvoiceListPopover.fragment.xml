@@ -11,8 +11,8 @@
                 noDataText="No invoices found for this status.">
                 <items>
                     <StandardListItem
-                        title="{InvNo}"
-                        description="Amount: {TotalAmount} {Currency}"
+                        title="{popoverData>InvNo}"
+                        description=" {popoverData>CustomerName} Amount: {popoverData>TotalAmount} {popoverData>Currency} "
                         type="Navigation"
                         press="onInvoiceNumberPress" />
                 </items>
