@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <ResponsivePopover
+        id="invoiceListPopover"
+        title="Invoices for '{popoverData>/status}'"
+        placement="Right">
+        <content>
+            <List
+                items="{popoverData>/invoices}"
+                noDataText="No invoices found for this status.">
+                <items>
+                    <StandardListItem
+                        title="{InvNo}"
+                        description="Amount: {TotalAmount} {Currency}"
+                        type="Navigation"
+                        press="onInvoiceNumberPress" />
+                </items>
+            </List>
+        </content>
+    </ResponsivePopover>
+</core:FragmentDefinition>

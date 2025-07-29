@@ -1,15 +1,15 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], function (BaseController, JSONModel, MessageToast) {
+    "sap/m/MessageToast",
+    "sap/ui/core/Fragment"
+], function (BaseController, JSONModel, MessageToast, Fragment) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
-        _getDefaultChartTypes: function () {
-            return { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line" };
-        },
+
+        _oGroupedInvoices: {},
+
         onInit: function () {
-            // Model for all chart data
             this.getView().setModel(new JSONModel({
                 statusDistribution: [],
                 monthlyValue: [],
@@ -17,133 +17,179 @@ sap.ui.define([
                 yearlyTrend: []
             }), "chartData");
             this.getView().setModel(new JSONModel([]), "companies");
-            // Chart type model for each chart block - created once
-            this.getView().setModel(new JSONModel(this._getDefaultChartTypes()), "invoiceChartTypeModel");
-
+            this.getView().setModel(new JSONModel({ statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line" }), "invoiceChartTypeModel");
             this.getOwnerComponent().getRouter().getRoute("RouteInvoiceDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
+
         _onObjectMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("InvoiceDashboard");
             if (!LoginFunction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
-            this.getView().getModel("invoiceChartTypeModel").setData(this._getDefaultChartTypes());
+            this.getView().setModel(new JSONModel({ statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line" }), "invoiceChartTypeModel");
             this.onClearFilters();
             this.readInvoiceData();
         },
-        // --- Data Fetching and Filtering ---
+
         readInvoiceData: async function () {
             try {
                 const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
-                const rawBackendData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                // Map data once on load
-                this.rawInvoiceData = rawBackendData.map(item => ({
-                    CompanyName: item.CustomerName,
-                    Amount: parseFloat(item.TotalAmount || 0),
-                    Status: item.Status || "Unknown",
-                    InvoiceDate: new Date(item.InvoiceDate) // Convert to Date object for easier filtering
-                }));
-                // Populate company filter dropdown
-                const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CompanyName))];
+                this.rawInvoiceData = (Array.isArray(oData.data) ? oData.data : [oData.data]);
+                
+                const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CustomerName))];
                 this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c, text: c })));
-                // Set default year filter to current year
                 this.byId("yearFilter").setValue(new Date().getFullYear().toString());
-                // Perform initial data aggregation
+                
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
-            } finally {
-                // this.closeBusyDialog();
             }
         },
-        // --- Filter and Aggregate Data ---
+
         onFilterChange: function () {
-            if (!this.rawInvoiceData) {
-                return;
-            }
+            if (!this.rawInvoiceData) return;
             this.getBusyDialog();
-            setTimeout(function () {
+            setTimeout(() => {
                 try {
                     const aSelectedCompanies = this.byId("companyFilter").getSelectedKeys();
                     const sSelectedYear = this.byId("yearFilter").getValue();
-                    // --- Filter data for the first 3 charts based on all filters ---
-                    let aFilteredData = this.rawInvoiceData;
-                    if (aSelectedCompanies.length > 0) {
-                        aFilteredData = aFilteredData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
-                    }
-                    if (sSelectedYear) {
-                        aFilteredData = aFilteredData.filter(invoice => invoice.InvoiceDate.getFullYear().toString() === sSelectedYear);
-                    }
-                    // --- Filter data for the Yearly Trend chart (ignores year filter) ---
-                    let aYearlyTrendData = this.rawInvoiceData;
-                    if (aSelectedCompanies.length > 0) {
-                        aYearlyTrendData = aYearlyTrendData.filter(invoice => aSelectedCompanies.includes(invoice.CompanyName));
-                    }
-                    this._aggregateAndSetChartData(aFilteredData, aYearlyTrendData);
+                    const oDateRange = this.byId("DashI_id_Date");
+                    const dFrom = oDateRange.getDateValue();
+                    const dTo = oDateRange.getSecondDateValue();
+
+                    let aFilteredData = this.rawInvoiceData.filter(item => {
+                        const invoiceDate = new Date(item.InvoiceDate);
+                        let bCompanyMatch = aSelectedCompanies.length === 0 || aSelectedCompanies.includes(item.CustomerName);
+                        let bDateMatch = true;
+                        if (dFrom && dTo) {
+                            const dEndDate = new Date(dTo);
+                            dEndDate.setDate(dEndDate.getDate() + 1);
+                            bDateMatch = invoiceDate >= dFrom && invoiceDate < dEndDate;
+                        } else if (sSelectedYear) {
+                            bDateMatch = invoiceDate.getFullYear().toString() === sSelectedYear;
+                        }
+                        return bCompanyMatch && bDateMatch;
+                    });
+                    
+                    let aYearlyTrendData = (aSelectedCompanies.length > 0)
+                        ? this.rawInvoiceData.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName))
+                        : this.rawInvoiceData;
+
+                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData);
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
                     this.closeBusyDialog();
                 }
-            }.bind(this), 500); // The .bind(this) is crucial to maintain the controller's context
+            }, 100);
         },
-        // --- Aggregate and Set Chart Data ---
-        _aggregateAndSetChartData: function (aFilteredData, aYearlyTrendData) {
-            // 1. Status Distribution (Donut Chart)
-            const statusDistribution = aFilteredData.reduce((acc, item) => {
-                acc[item.Status] = (acc[item.Status] || 0) + 1;
-                return acc;
-            }, {});
-            // 2. Monthly Value (Line Chart)
+
+        _aggregateAndSetAllChartData: function(aFilteredData, aYearlyTrendData) {
+            this._oGroupedInvoices = {};
+            const statusCounts = {};
+            aFilteredData.forEach(invoice => {
+                const status = invoice.Status || "Unknown";
+                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
+                this._oGroupedInvoices[status].push(invoice);
+                statusCounts[status] = (statusCounts[status] || 0) + 1;
+            });
+            const aStatusDistribution = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
+
             const monthlyValue = aFilteredData.reduce((acc, item) => {
-                const month = item.InvoiceDate.getMonth(); // 0-11
-                acc[month] = (acc[month] || 0) + item.Amount;
+                const month = new Date(item.InvoiceDate).getMonth();
+                acc[month] = (acc[month] || 0) + parseFloat(item.TotalAmount || 0);
                 return acc;
             }, {});
-            // 3. Company Totals (Bar Chart)
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmount: monthlyValue[i] || 0 }));
+            
             const companyTotals = aFilteredData.reduce((acc, item) => {
-                acc[item.CompanyName] = (acc[item.CompanyName] || 0) + item.Amount;
+                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + parseFloat(item.TotalAmount || 0);
                 return acc;
             }, {});
-            // 4. Yearly Trend (Line Chart)
+            const formattedCompanyTotals = Object.entries(companyTotals)
+                .map(([name, total]) => ({ companyName: name, totalAmount: total }))
+                .sort((a, b) => b.totalAmount - a.totalAmount);
+            
             const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
-                const year = item.InvoiceDate.getFullYear();
+                const year = new Date(item.InvoiceDate).getFullYear();
                 if (!acc[year]) acc[year] = { totalAmount: 0, count: 0 };
-                acc[year].totalAmount += item.Amount;
+                acc[year].totalAmount += parseFloat(item.TotalAmount || 0);
                 acc[year].count++;
                 return acc;
             }, {});
-            // --- Format data for models ---
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const formattedMonthly = Array.from({ length: 12 }, (_, i) => ({
-                month: monthNames[i],
-                totalAmount: monthlyValue[i] || 0
-            }));
+            const formattedYearlyTrend = Object.entries(yearlyTrend)
+                .map(([yr, data]) => ({ year: yr, ...data }))
+                .sort((a, b) => a.year - b.year);
+
             this.getView().getModel("chartData").setData({
-                statusDistribution: Object.entries(statusDistribution).map(([st, co]) => ({ status: st, count: co })),
+                statusDistribution: aStatusDistribution,
                 monthlyValue: formattedMonthly,
-                companyTotals: Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmount: total })).sort((a, b) => b.totalAmount - a.totalAmount),
-                yearlyTrend: Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a, b) => a.year - b.year)
+                companyTotals: formattedCompanyTotals,
+                yearlyTrend: formattedYearlyTrend
             });
         },
-        // --- Chart Type Switchers ---
-        IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
-        IN_onPressStatusBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar"); },
-        IN_onPressStatusDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut"); },
-        IN_onPressMonthlyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "pie"); },
-        IN_onPressMonthlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "bar"); },
-        IN_onPressMonthlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "line"); },
-        IN_onPressCompanyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "pie"); },
-        IN_onPressCompanyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "bar"); },
-        IN_onPressYearlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar"); },
-        IN_onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
 
-        // --- Filter Reset ---
-        onClearFilters: function () {
+        onStatusChartSelect: function (oEvent) {
+            const oSelectedData = oEvent.getParameter("data")[0].data;
+            if (!oSelectedData || !oSelectedData.Status) return;
+            const sStatus = oSelectedData.Status;
+
+            const aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
+            this.getView().setModel(new JSONModel({
+                status: sStatus,
+                invoices: aInvoicesForStatus
+            }), "popoverData");
+
+            const oView = this.getView();
+            if (!this._pPopover) {
+                this._pPopover = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.InvoiceListPopover",
+                    controller: this
+                }).then(oPopover => {
+                    oView.addDependent(oPopover);
+                    return oPopover;
+                });
+            }
+            this._pPopover.then(oPopover => oPopover.openBy(oEvent.getParameter("data")[0].target));
+        },
+        
+        onInvoiceNumberPress: function (oEvent) {
+            const oInvoiceObject = oEvent.getSource().getBindingContext("popoverData").getObject();
+
+            if (!oInvoiceObject || !oInvoiceObject.InvNo) {
+                MessageToast.show("Error: Could not find Invoice Number to navigate.");
+                return;
+            }
+
+            const sInvoiceNo = oInvoiceObject.InvNo;
+
+            this.byId("invoiceListPopover").close();
+            MessageToast.show("Navigating to invoice: " + sInvoiceNo);
+            
+            this.getRouter().navTo("RouteCompanyInvoiceDetails", { 
+                invoiceId: sInvoiceNo 
+            });
+        },
+        
+        // --- Chart Type Switchers and other functions ---
+        IN_onPressStatusPie: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie");},
+        IN_onPressStatusBar: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar");},
+        IN_onPressStatusDonut: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut");},
+        IN_onPressMonthlyPie: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "pie");},
+        IN_onPressMonthlyBar: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "bar");},
+        IN_onPressMonthlyLine: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "line");},
+        IN_onPressCompanyPie: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "pie");},
+        IN_onPressCompanyBar: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "bar");},
+        IN_onPressYearlyBar: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar");},
+        IN_onPressYearlyLine: function(){ this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line");},
+        
+      onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);
+            this.byId("DashI_id_Date").setValue("");
             this.byId("yearFilter").setValue(new Date().getFullYear().toString()); // Reset to current year
         },
-        // --- Navigation back ---
+        
         onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
         onLogout: function () { this.getRouter().navTo("RouteLoginPage"); }
     });

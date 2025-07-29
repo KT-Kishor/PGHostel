@@ -26,16 +26,11 @@
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
-                         <!-- NEW: Period Filter -->
-                        <!-- <fb:FilterGroupItem name="Period" label="{i18n>paymentDuration}" groupName="Group1" visibleInFilterBar="true">
-                            <fb:control>
-                                <ComboBox id="periodFilter" width="400px" placeholder="{i18n>paymentDuration}" items="{invoicePaymentDuration>/duration}">
-                                    <items>
-                                        <core:Item key="{invoicePaymentDuration>ID}" text="{invoicePaymentDuration>Code}"/>
-                                    </items>
-                                </ComboBox>
-                            </fb:control>
-                        </fb:FilterGroupItem> -->
+                         <fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+                    <DateRangeSelection id="DashI_id_Date" valueFormat="MM/dd/yyyy"  displayFormat="MM/dd/yyyy" change="onDateChange" />						
+					</fb:control>
+						</fb:FilterGroupItem>
                         <fb:FilterGroupItem name="Year" label="{i18n>year}" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
                                 <DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>currentYear}" />
@@ -48,7 +43,7 @@
                 <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiSmallMarginTop">
                     <layout:content>
                         <!-- Status Distribution Chart -->
-                        <f:Card class="sapUiTinyMargin">
+                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Bar>
                                     <contentMiddle>
@@ -62,25 +57,27 @@
                                 </Bar>
                             </f:header>
                             <f:content>
-                                <viz:VizFrame id="donutChartStatus"
-                                    vizType="{invoiceChartTypeModel>/statusType}"
-                                    width="100%" height="300px"
-                                    vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, type: 'value' } } }">
-                                    <viz:dataset>
-                                        <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
-                                            <vizData:dimensions>
-                                                <vizData:DimensionDefinition name="Status" value="{chartData>status}" />
-                                            </vizData:dimensions>
-                                            <vizData:measures>
-                                                <vizData:MeasureDefinition name="Count" value="{chartData>count}" />
-                                            </vizData:measures>
-                                        </vizData:FlattenedDataset>
-                                    </viz:dataset>
-                                    <viz:feeds>
-                                        <vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
-                                        <vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
-                                    </viz:feeds>
-                                </viz:VizFrame>
+                                <!-- The vizProperties enable clicking, and selectData triggers our controller function -->
+                               <viz:VizFrame id="donutChartStatus"
+                                vizType="{invoiceChartTypeModel>/statusType}"
+                                  width="100%" height="300px"
+                                   vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }"
+                                  selectData="onStatusChartSelect">
+    <viz:dataset>
+        <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
+            <vizData:dimensions>
+                <vizData:DimensionDefinition name="Status" value="{chartData>status}" />
+            </vizData:dimensions>
+            <vizData:measures>
+                <vizData:MeasureDefinition name="Count" value="{chartData>count}" />
+            </vizData:measures>
+        </vizData:FlattenedDataset>
+    </viz:dataset>
+    <viz:feeds>
+        <vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
+        <vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
+    </viz:feeds>
+</viz:VizFrame>
                             </f:content>
                         </f:Card>
 
