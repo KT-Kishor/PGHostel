@@ -94,13 +94,10 @@ sap.ui.define([], function () {
       var oInput = type === "ID" ? (oInput = oEvent) : (oInput = oEvent.getSource());
       var value = oInput.getValue();
       var cleanedValue = value.replace(/[^0-9.]/g, "");
-      var parts = cleanedValue.split(".");
-      if (parts.length === 2) {
-        cleanedValue = parts[0] + "." + parts[1].slice(0, 2);
-      }
+    
       oInput.setValue(cleanedValue);
 
-      if (!/^\d+(\.\d{1,2})?$/.test(cleanedValue)) {
+      if (!/^\d+(\.\d+)?$/.test(cleanedValue)) {
         oInput.setValueState("Error");
         return false;
       } else {

@@ -33,7 +33,7 @@
 							<DatePicker valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" id="MsaD_id_CreateMSADate" value="{msaModelWizart>/CreateMSADate}" change="MsaD_validateDate" valueStateText="{i18n>dateValueState}" />
 
 							<Label text="{i18n>companyName}" required="true" />
-							<Input value="{msaModelWizart>/CompanyName}" maxLength="50" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
+							<Input value="{msaModelWizart>/CompanyName}" maxLength="200" placeholder="{i18n>placeCompany}" id="MsaD_id_CompanyName" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeCompany}" />
 
 							<Label text="{i18n>companyHeadName}" required="true" />
 							<Select id="MsaD_id_HeadSal" selectedKey="{msaModelWizart>/Salutation}" items="{Salutation>/salutation}" width="100%">
