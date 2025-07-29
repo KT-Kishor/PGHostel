@@ -856,12 +856,14 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     height: auto;
   }
 }
-/*Share button styles*/
+
+
+/* Share button styles - reduced size */
 .myCustomIconBtn {
-  height: 60px !important;
-  width: 60px !important;
-  padding: 0 !important;
-  transition: all 0.2s ease-in-out;
+   height: 50px !important;
+   width: 50px !important;
+   padding: 0 !important;
+   transition: all 0.2s ease-in-out;
 }
 
 .myCustomIconBtn .sapMBtnInner {
@@ -878,12 +880,13 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .myCustomIconBtn .sapMBtnIcon {
-  color: #141f7d !important;
-  font-size: 30px !important;
-  margin-left: -12px !important;
-  margin-top: 4px !important;
-  transition: color 0.2s ease-in-out;
+   color: #141f7d !important;
+   font-size: 25px !important;
+   margin-left: -10px !important; /* adjusted for smaller icon */
+   margin-top: 3px !important;
+   transition: color 0.2s ease-in-out;
 }
+
 /* Share button hover effect */
 .myCustomIconBtn:hover .sapMBtnInner {
   background-color: #141f7d !important;
@@ -891,25 +894,27 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .myCustomIconBtn:hover .sapMBtnIcon {
-  color: #ffffff !important;
+ color: #ffffff !important; 
 }
+
 
 .myFormattedText {
   width: 100% !important;
   max-width: 100%;
   min-width: 280px;
-  font-size: 1rem;
-  line-height: 1.5 !important;
-  font-family: "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 1rem; /* Changed: Reverted to normal base font size (from 1.1rem) */
+  line-height: 1.6 !important;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
   text-align: justify;
-  margin: 0 auto; /* centers it horizontally */
-  padding: 1rem;
+  margin: 0 auto;
+  padding: 1.5rem;
   color: #222 !important;
   display: block;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
-/* 100% width on mobile */
+/* Responsive for mobile */
 @media screen and (max-width: 600px) {
   .myFormattedText {
     width: 100% !important;
@@ -921,18 +926,18 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 /* Paragraphs and lists */
 .myFormattedText p,
 .myFormattedText li {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem !important;
-  line-height: 1.6 !important;
+  margin: 0 0 0.9rem 0;
+  font-size: 1rem !important; /* Changed: Reverted to normal font size (from 1.15rem) */
+  line-height: 1.7 !important; /* Adjusted slightly for normal text line spacing */
   color: inherit !important;
   text-align: justify;
 }
 
-/* Unordered & ordered list */
+/* List padding */
 .myFormattedText ul,
 .myFormattedText ol {
-  padding-left: 1.5rem !important;
-  margin: 0 0 1rem 0;
+  padding-left: 2rem !important;
+  margin: 0 0 1.2rem 0;
 }
 
 /* List items */
@@ -940,31 +945,45 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   list-style-position: outside;
 }
 
-/* Headings */
+/* Headings - toned down font size and boldness, added subtle line */
 .myFormattedText h1,
 .myFormattedText h2,
 .myFormattedText h3,
 .myFormattedText h4,
 .myFormattedText h5,
 .myFormattedText h6 {
-  margin: 1rem 0 0.5rem 0;
-  font-weight: bold;
-  color: inherit !important;
+  margin: 2rem 0 0.8rem 0;
+  font-weight: 600 !important;
+  line-height: 1.35;
+  font-size: 1.2rem !important; /* Changed: Adjusted heading font size (from 1.3rem) */
+  color: #333 !important;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.4rem;
 }
 
-/* Emphasis */
+/* Emphasis and bold */
 .myFormattedText em,
 .myFormattedText i {
   font-style: italic;
 }
 
+/* General strong/bold text - reduced harshness */
 .myFormattedText strong,
 .myFormattedText b {
-  font-weight: bold !important;
-  color: inherit !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important; /* Changed: Reverted to normal font size (from 1.1rem) */
+  color: #111 !important;
 }
 
-/* Underline and strike */
+/* Specific strong for list items - slightly more emphasis than general bold, but not harsh */
+.myFormattedText li strong,
+.myFormattedText li b {
+  font-weight: 750 !important;
+  color: #000 !important;
+  font-size: 1.05rem !important; /* Changed: Adjusted for normal list item text (from 1.18rem) */
+}
+
+/* Underline, strike, highlight */
 .myFormattedText u {
   text-decoration: underline;
 }
@@ -974,10 +993,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   text-decoration: line-through;
 }
 
-/* Highlight (mark) */
-.myFormattedText mark {
-  background-color: yellow;
-  color: black;
+.myFormattedText mark,
+.myFormattedText .highlight {
+  background-color: #A8E6CF !important; /* Light green */
+  color: #000 !important; /* Black text on highlight */
+  font-weight: bold;
 }
 
 /* Span general styling */
@@ -997,30 +1017,33 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-size: smaller;
 }
 
-/* Code and preformatted */
+/* Code blocks */
 .myFormattedText code {
-  font-family: monospace;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
   background-color: #f5f5f5;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.95rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem; /* Slightly smaller than normal text, common for code */
+  color: #333;
 }
 
 .myFormattedText pre {
-  background-color: #f9f9f9;
-  padding: 1rem;
-  border: 1px solid #ccc;
+  background-color: #eeeeee;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
   overflow: auto;
-  font-family: monospace;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  border-radius: 6px;
 }
 
 /* Blockquote */
 .myFormattedText blockquote {
-  margin: 1rem 0;
-  padding-left: 1rem;
-  border-left: 4px solid #ccc;
-  color: #555;
+  margin: 1.8rem 0;
+  padding-left: 1.5rem;
+  border-left: 4px solid #bbb;
+  color: #444;
   font-style: italic;
+  background-color: #fcfcfc;
 }
 
 /* Images */
@@ -1028,31 +1051,60 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 1rem 0;
+  margin: 1.8rem 0;
+  border-radius: 5px;
 }
 
 /* Links */
 .myFormattedText a {
-  color: #007bff;
+  color: #444;
   text-decoration: underline;
+  transition: color 0.3s ease;
 }
 
 .myFormattedText a:hover {
-  color: #0056b3;
+  color: #000;
+  text-decoration: none;
 }
 
 /* Horizontal Rule */
 .myFormattedText hr {
   border: none;
   border-top: 1px solid #ccc;
-  margin: 1rem 0;
+  margin: 2.5rem 0;
 }
 
-.myFormattedText .highlight {
-  background-color: yellow;
-  color: black;
-  font-weight: bold;
+/* Special Note Section */
+.myFormattedText div > p[style*="background: #f5f5f5;"],
+.myFormattedText p.note-box {
+  background: #f5f5f5 !important;
+  padding: 18px 22px !important;
+  border-left: 4px solid #999 !important;
+  border-radius: 8px;
+  margin-top: 2.5rem !important;
+  margin-bottom: 2.5rem !important;
+  font-style: normal;
+  color: #333 !important;
 }
+
+.myFormattedText div > p[style*="background: #f5f5f5;"] strong,
+.myFormattedText p.note-box strong {
+  color: #111 !important;
+  font-weight: 700 !important;
+}
+
+/* Custom Highlight for RTE example (Green background) */
+.myFormattedText .alert-mark {
+  background-color: #66BB6A; /* A slightly darker green for alert */
+  color: #fff !important; /* White text on green background */
+  font-weight: 700;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  border: 1px solid #4CAF50;
+}
+
+
+
 
 .blockInputTyping .sapMInputBaseInner {
   pointer-events: none;
@@ -1087,30 +1139,43 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .shareText {
   margin-left: 0.5rem;
 }
-
+/* 
 .myAppBackground {
-  background-image: url("../image/background.jpg") !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-attachment: fixed !important; /* Optional: Fixed or scroll */
-  opacity: 1 !important; /* Optional: Adjust if needed for readability */
+  background-image: url("../image/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.6rem;
+}
+.myAppBackgroun {
+  position: fixed;
+  height: 100%;
+} */
+ .myAppBackground {
+  position: relative;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  z-index: 0; /* Ensure layering works */
 }
 
-/* Ensures content is readable over the background */
-.sapMShellContent {
-  background-color: transparent !important;
-}
-
+/* Fixed full-page background image behind content */
 .myAppBackground::before {
-  content: "" !important;
-  position: fixed !important;
+  content: "";
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: -1 !important;
+
+  background-image: url("../image/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  z-index: -1;
 }
+
+
 
 /*#############################################################################*/
 /*
@@ -1245,3 +1310,23 @@ Apply now button and reference button styles
     background-color: #f2b15b;
 }
 
+
+
+/* Custom CSS for rounded table corners and box shadow */
+.myRoundedTable {
+    border-radius: 10px; /* Corners ko round karega */
+    overflow: hidden;    /* Important: ensures content inside respects the rounded corners */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.764), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Ye box shadow hai */
+}
+
+/* Optional: To ensure the header also respects rounded corners if it has its own background */
+.myRoundedTable .sapMListTblHeader {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+/* Optional: To ensure the footer also respects rounded corners if it has its own background */
+.myRoundedTable .sapMListTblFooter {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

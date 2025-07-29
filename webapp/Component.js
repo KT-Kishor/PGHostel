@@ -31,6 +31,12 @@ sap.ui.define([
             this._fetchCommonData("AppVisibility", "RoleModel");
             // this._fetchCommonData("PaymentTerms", "ContractpaymentModel");
             this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {});
+           
+           
+            const oAppStateModel = new sap.ui.model.json.JSONModel({
+              previousTab: "idHome", // default value
+            });
+            this.setModel(oAppStateModel, "AppStateModel");
 
 
             // enable routing

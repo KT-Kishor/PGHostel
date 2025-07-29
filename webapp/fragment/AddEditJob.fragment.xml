@@ -1,17 +1,17 @@
-<core:FragmentDefinition id="JobAddFrag" 
-	xmlns:vk="sap.ui.vk" 
-	xmlns="sap.m" 
-	xmlns:l="sap.ui.layout" 
-	xmlns:f="sap.ui.layout.form" 
-	xmlns:core="sap.ui.core" 
-	xmlns:rte="sap.ui.richtexteditor">
+	<core:FragmentDefinition id="JobAddFrag" 
+		xmlns:vk="sap.ui.vk" 
+		xmlns="sap.m" 
+		xmlns:l="sap.ui.layout" 
+		xmlns:f="sap.ui.layout.form" 
+		xmlns:core="sap.ui.core" 
+		xmlns:rte="sap.ui.richtexteditor">
 	<Dialog id="addJobDialog" title="{= ${temporaryModel>/dialogTitle} }" resizable="true" draggable="true" contentHeight="auto" contentWidth="60%" afterClose="onCloseDialog">
 		<content>
 			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Change Job Status" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Status" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="statusCombo" required="true" class="sapUiSmallMarginTop" selectedKey="{temporaryModel>/Status}" items="{BackendStatusModel>/}" change="onStatusChange" >
+					<ComboBox id="statusCombo" required="true" class="sapUiSmallMarginTop" selectedKey="{temporaryModel>/Status}" items="{BackendStatusModel>/}" change="onStatusChange" valueStateText="{i18n>jpStatusValueState}" >
 						<core:Item key="{BackendStatusModel>key}" text="{BackendStatusModel>text}" />
 					</ComboBox>
 				</f:content>
@@ -70,11 +70,12 @@ change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
 					
 					
 					<Label text="Qualification" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox class="sapUiSmallMarginTop" id="qualificationComb" placeholder="Select Qualification" items="{QualificationModel>/qualfication}" selectedKey="{temporaryModel>/SelectedQualificationKey}" change="onQualificationChange" required="true" valueStateText="{i18n>jpQulificationValueState}">
-						<core:Item key="{QualificationModel>}" text="{QualificationModel>}" />
-					</ComboBox>
-					
-					
+					<MultiInput change=".onQualificationsChange" class="sapUiSmallMarginTop" id="multiInputQualifications" 
+placeholder="Select Qualifications" 
+showValueHelp="true" 
+valueHelpRequest=".onOpenQualificationsDialog" 
+tokenUpdate=".onQualificationsTokenUpdate" />
+
 					
 					
 					<Label text="Certifications" class="sapUiSmallMarginTop" />

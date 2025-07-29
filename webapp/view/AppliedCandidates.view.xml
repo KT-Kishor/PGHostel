@@ -158,7 +158,6 @@
                 <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>mobilenumber}" /></Column>
                 <Column minScreenWidth="Tablet" demandPopin="true" width="250px"><Text text="{i18n>emailId}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
-                <Column  demandPopin="true"><Text text="{i18n>createdBy}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>createdDate}" /></Column>
                 <Column demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
@@ -171,8 +170,7 @@
                         <Text text="{= ${DataTableModel>NoticePeriod} === '0' ? 'Immediate' : ${DataTableModel>NoticePeriod} + ' Days'}" />
                         <Text text="{DataTableModel>ISD}-{DataTableModel>Mobile}" />
                         <Text text="{DataTableModel>Email}" />
-                        <Text text="{DataTableModel>Experience} Years" />
-                        <Text text="{DataTableModel>CreatedBy}" />
+                       <Text text="{= ${DataTableModel>Experience} === '0' || !${DataTableModel>Experience} ? 'Fresher' : ${DataTableModel>Experience} + ' Years'}" />
                         <Text text="{path:'DataTableModel>CreateDate' ,formatter:'.Formatter.formatDate'}" />
                         <ExpandableText text="{DataTableModel>Skills}" maxCharacters="20"/>
                     </cells>

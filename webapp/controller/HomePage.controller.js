@@ -57,7 +57,7 @@ sap.ui.define(
           const oExpYears = new JSONModel();
           oExpYears.loadData("model/ExpYears.json", null, false);
           oView.setModel(oExpYears, "ExpYears");
-
+          this.getBusyDialog();
           $.ajax({
             url: "https://rest.kalpavrikshatechnologies.com/JobOpenings",
             type: "GET",
@@ -82,6 +82,7 @@ sap.ui.define(
 
               // 🔄 Populate comboboxes with filtered data
               this._loadComboBoxModels(activeCandidates, oView);
+              this.closeBusyDialog();
             }.bind(this),
 
             error: function (error) {
@@ -93,20 +94,30 @@ sap.ui.define(
                 error?.responseJSON?.message || fallbackMessage;
 
               MessageToast.show("Error: " + errorMessage);
+              this.closeBusyDialog();
             }.bind(this),
           });
         },
 
         _onRouteMatched: function () {
+          const sStoredTab =
+            sessionStorage.getItem("homePageReturnTab") || "idHome";
           const oTabHeader = this.byId("mainTabHeader");
           if (oTabHeader) {
-            oTabHeader.setSelectedKey("idHome");
+            oTabHeader.setSelectedKey(sStoredTab);
           }
-          var oNavContainer = this.byId("pageContainer");
-          this.API = "https://www.rest.kalpavrikshatechnologies.com";
-          oNavContainer.to(this.byId("idHome"));
-          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
+          const oNavContainer = this.byId("pageContainer");
+          if (oNavContainer) {
+            oNavContainer.to(this.byId(sStoredTab));
+          }
+
+          // Clear it so it's not reused accidentally
+          sessionStorage.removeItem("homePageReturnTab");
+          this.API = "https://www.rest.kalpavrikshatechnologies.com";
+          oNavContainer.to(this.byId(selectedTab));
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+ 
           var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
@@ -577,23 +588,26 @@ sap.ui.define(
             },
           });
         },
-
         v1_onViewItem: function (oEvent) {
-          var oSelectedItem = oEvent
+          const oSelectedData = oEvent
             .getSource()
-            .getBindingContext("JobApplicationModel");
-          var oSelectedData = oSelectedItem.getObject();
-          var oSelectedModel = new JSONModel(oSelectedData);
+            .getBindingContext("JobApplicationModel")
+            .getObject();
+          const sJobId = oSelectedData.ID; // Or whatever your unique field is
 
-          this.getOwnerComponent().setModel(
-            oSelectedModel,
-            "SelectedCandidate"
-          );
 
-          setTimeout(() => {
-            this.getOwnerComponent().getRouter().navTo("RouteJobView");
-          }, 100);
+          // 🔁 Set global tab info
+        const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
+        if (oAppStateModel) {
+          oAppStateModel.setProperty("/previousTab", "idCareer");
+        }
+          // Navigate using the jobId
+          this.getRouter().navTo("RouteJobView", {
+            jobId: sJobId,
+          });
         },
+
+
       }
     );
   }

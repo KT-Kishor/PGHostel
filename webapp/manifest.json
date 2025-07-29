@@ -699,18 +699,9 @@
                     ]
                 },
                 {
-                    "name": "RouteJobView",
-                    "pattern": "JobView",
-                    "target": [
-                        "TargetJobView"
-                    ]
-                },
-                {
-                    "name": "AppliedCanDetail",
-                    "pattern": "AppliedCanDetail/{id}",
-                    "target": [
-                        "TargetAppliedCanDetail"
-                    ]
+                   "name": "RouteJobView",
+                  "pattern": "JobView/{jobId}",
+                  "target": ["TargetJobView"]
                 },
                 {
                     "name": "RouteInvoiceDashboard",

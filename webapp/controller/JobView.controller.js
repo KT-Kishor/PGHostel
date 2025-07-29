@@ -1,12 +1,13 @@
 sap.ui.define(
   [
     "./BaseController",
+    "sap/ui/model/json/JSONModel",
     "../utils/validation",
     "sap/m/MessageToast",
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
   ],
-  (BaseController, utils, MessageToast, Fragment, MessageBox) => {
+  (BaseController, JSONModel, utils, MessageToast, Fragment, MessageBox) => {
     ("use strict");
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.JobView",
@@ -14,27 +15,27 @@ sap.ui.define(
         onInit: function () {
           this.getView().addStyleClass("sapUiSizeCompact");
 
-          const oRouter = this.getOwnerComponent().getRouter();
-          oRouter
+          // Attach route match handler
+          this.getOwnerComponent()
+            .getRouter()
             .getRoute("RouteJobView")
             .attachPatternMatched(this._onRouteMatched, this);
 
+          // Load i18n bundle
           const oI18nModel = this.getOwnerComponent().getModel("i18n");
           this.oResourceBundle = oI18nModel.getResourceBundle();
 
-          const oCitiesModel = new sap.ui.model.json.JSONModel({
-            cities: [],
-          });
-          this.getView().setModel(oCitiesModel, "cities");
+          // Init cities model
+          this.getView().setModel(new JSONModel({ cities: [] }), "cities");
 
-          this.tokenModel = new sap.ui.model.json.JSONModel({
-            tokens: [],
-          });
+          // Init token model for file uploads
+          this.tokenModel = new JSONModel({ tokens: [] });
           this.getView().setModel(this.tokenModel, "tokenModel");
 
-          this.getView().setModel(this.oFileModel);
+          // File model (yeh 'this.oFileModel' kahan se aa raha hai? Ensure it's defined or remove if not needed)
+          this.getView().setModel(this.oFileModel); // Is line ko verify karein ya hata dein agar this.oFileModel defined nahi hai.
 
-          // Attach change handler to the native file input
+          // File input change listener (ensure 'hiddenFileInput' ID exists in XML)
           setTimeout(() => {
             const fileInput = document.getElementById("hiddenFileInput");
             if (fileInput) {
@@ -44,6 +45,126 @@ sap.ui.define(
               );
             }
           }, 0);
+        },
+
+        // 🚦 Route handler — when user navigates to /JobView/:jobId
+        // _onRouteMatched: function (oEvent) {
+        //   const sJobId = oEvent.getParameter("arguments").jobId;
+        //   console.log("[Route] Job ID matched:", sJobId);
+
+        //   this.getBusyDialog();
+
+        //   this._fetchJobById(sJobId)
+        //     .then((oJob) => {
+        //       if (oJob) {
+        //         // ✅ JobApplicationModel ko ek baar define aur set karein
+        //         // Yeh model main view pe set hoga aur fragment ise inherit karega.
+        //         // Isme fetched job data hogi.
+        //         const oJobApplicationModel = new JSONModel(oJob);
+        //         this.getView().setModel(
+        //           oJobApplicationModel,
+        //           "JobApplicationModel"
+        //         );
+
+        //         console.log(
+        //           "[Model] JobApplicationModel set with data:",
+        //           oJobApplicationModel.getData()
+        //         );
+        //       } else {
+        //         MessageToast.show("No job found.");
+        //         console.warn("[Warn] No job returned for ID:", sJobId);
+        //       }
+        //     })
+        //     .catch((err) => {
+        //       console.error("[Error] Failed to fetch job:", err);
+        //       MessageToast.show("Failed to fetch job details.");
+        //     })
+        //     .finally(() => {
+        //       this.closeBusyDialog();
+        //     });
+        // },
+        _onRouteMatched: function (oEvent) {
+          const sJobId = oEvent.getParameter("arguments").jobId;
+          console.log("[Route] Job ID matched:", sJobId);
+
+           this.getBusyDialog();
+
+          this._fetchJobById(sJobId)
+            .then((oJob) => {
+              const bIsValidJob = !!oJob;
+              const oJobApplicationModel = new JSONModel({
+                ...oJob,
+                isValidJob: bIsValidJob, // 👈 new flag
+              });
+
+              this.getView().setModel(
+                oJobApplicationModel,
+                "JobApplicationModel"
+              );
+
+              if (!bIsValidJob) {
+                if (!oData || !oData.JobTitle) {
+                  this.getView().byId("jobDetailsContainer").setVisible(false); // hide main content block
+                  // Optionally trigger a toast or log
+                }
+
+                // MessageToast.show("Job not available.");
+                console.warn("[Route] No valid job data for ID:", sJobId);
+              }
+            })
+            .catch((err) => {
+              console.error("[Error] Failed to fetch job:", err);
+              MessageToast.show("Failed to fetch job details.");
+            })
+            .finally(() => {
+              this.closeBusyDialog();
+            });
+        },
+
+        _fetchJobById: function (sJobId) {
+          const sUrl = "https://rest.kalpavrikshatechnologies.com/JobOpenings";
+          console.log(
+            "[API] Fetching job list for filtering by ID and Status:",
+            sJobId
+          );
+
+          return new Promise((resolve, reject) => {
+            $.ajax({
+              url: sUrl,
+              method: "GET",
+              contentType: "application/json",
+              dataType: "json",
+              headers: {
+                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                password:
+                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              },
+              success: function (oData) {
+                const aData = oData?.data || [];
+                console.log("[API] Total jobs fetched:", aData.length);
+
+                const oFilteredJob = aData.find((job) => {
+                  const idMatch = job?.ID === sJobId;
+                  const statusTrue = job?.Status === "true";
+
+                  if (idMatch && statusTrue) {
+                    return true; // ✅ Only show this
+                  }
+                  return false; // ❌ Hide others
+                });
+
+                if (oFilteredJob) {
+                  resolve(oFilteredJob);
+                } else {
+                  resolve(null); // Job doesn't qualify
+                }
+              },
+              error: function (xhr, status, error) {
+                console.error("[API Error]", status, error);
+                reject(error);
+              },
+            });
+          });
         },
 
         onFileChange: function (oEvent) {
@@ -163,7 +284,6 @@ sap.ui.define(
           fileErrorLayout.setVisible(true);
           fileErrorText.setVisible(true);
           fileErrorText.setText("File size must be under 5MB");
-          // MessageToast.show("File size must be under 5MB");
 
           const fileUploader = oEvent.getSource();
 
@@ -196,63 +316,20 @@ sap.ui.define(
           this.oSelectedFile = null;
         },
 
-        _onRouteMatched: function () {
-          const oView = this.getView();
-          const oModel = this.getOwnerComponent().getModel("SelectedCandidate");
-
-          if (!oModel) {
-            const sMessage = this.oResourceBundle.getText("v2_m_notselectGoBk");
-            MessageToast.show(sMessage);
-            return;
-          }
-
-          oView.setModel(oModel, "SelectedCandidate");
-          oView.bindElement({
-            path: "/",
-            model: "SelectedCandidate",
-          });
-
-          try {
-            const fieldsToClean = [
-              "/SecondarySkills",
-              "/SkillRequirements",
-              "/KeyResponsibilities",
-              "/JobDescription",
-            ];
-
-            fieldsToClean.forEach((sPath) => {
-              let sValue = oModel.getProperty(sPath);
-
-              if (sValue && typeof sValue === "string") {
-                if (!sValue.includes("<")) {
-                  const keywords = sValue
-                    .split(",")
-                    .map((s) => `<strong>${s.trim()}</strong>`)
-                    .join(", ");
-                  sValue = `<p>${keywords}</p>`;
-                }
-
-                // Clean unsupported tags (like <mark>)
-                if (this._cleanUnsupportedTags) {
-                  sValue = this._cleanUnsupportedTags(sValue);
-                }
-
-                oModel.setProperty(sPath, sValue);
-              } else {
-                //  console.warn(` Skipped ${sPath} — Empty or invalid format`);
-              }
-            });
-          } catch (e) {
-            // console.warn(" Could not clean one or more fields from SelectedCandidate model.", e);
-          }
-
-          if (this._cleanFormattedTextStyles) {
-            setTimeout(() => this._cleanFormattedTextStyles(), 300);
-          }
-        },
+        // onNavBack: function () {
+        //   this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+        // },
 
         onNavBack: function () {
+          const oAppStateModel =
+            this.getOwnerComponent().getModel("AppStateModel");
+          const sTabKey =
+            oAppStateModel?.getProperty("/previousTab") || "idHome";
+
           this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+
+          // Save tab key temporarily to session
+          sessionStorage.setItem("homePageReturnTab", sTabKey);
         },
 
         anySkillPresent: function (primary, secondary, required) {
@@ -281,11 +358,11 @@ sap.ui.define(
         getWorkModeTooltip: function (sMode) {
           switch ((sMode || "").toUpperCase()) {
             case "REMOTE":
-              return "Remote: Work from home";
+              return "Work from home";
             case "ON-SITE":
-              return "On-site: Work from office";
+              return "Work from office";
             case "HYBRID":
-              return "Hybrid: Combination of remote and on-site work";
+              return "Combination of remote and on-site work";
             default:
               return "Work mode information not available";
           }
@@ -317,7 +394,7 @@ sap.ui.define(
             el.style.color = "#2c3e50";
           });
         },
-        getFormDataAsJSON: function () {
+          getFormDataAsJSON: function () {
           const safeVal = (ctrl) => ctrl?.getValue?.().trim?.() || "";
           const safeKey = (ctrl) => ctrl?.getSelectedKey?.().trim?.() || "";
           // const safeText = (ctrl) => ctrl?.getSelectedItem?.()?.getText?.().trim?.() || "";
@@ -386,11 +463,17 @@ sap.ui.define(
           // Resume
           const uploadModel = view.getModel("UploadModel")?.getData?.() || {};
           const fileBase64 = uploadModel.File || "";
+          const fileName = uploadModel.FileName || "";
+          const fileType = uploadModel.FileType || "";
 
           //  Job Title from external model
+          // const jobTitle =
+          //   view.getModel("SelectedCandidate")?.getProperty("/JobTitle") ||
+          //   "Unknown";
           const jobTitle =
-            view.getModel("SelectedCandidate")?.getProperty("/JobTitle") ||
-            "Unknown";
+            this.getView()
+              .getModel("JobApplicationModel")
+              ?.getProperty("/JobTitle") || "Unknown"; // ✅ Changed from SelectedCandidate
 
           //  Final Payload
           return {
@@ -429,6 +512,9 @@ sap.ui.define(
             JobTitle: jobTitle,
             ResumeFile: fileBase64,
             CreatedBy: "Candidate",
+            AttachmentName: fileName,
+            AttachmentType: fileType,
+            CreateDate: new Date().toISOString().split("T")[0], // → "2025-07-29"
           };
         },
 
@@ -476,7 +562,52 @@ sap.ui.define(
               that._oJobDialog = oDialog; //  Save the actual Dialog after loading
               that.getView().addDependent(oDialog);
               //  Optional: inject into fragment also
-              oDialog.setModel(oJobModel, "JobModel");
+              //              oDialog.setModel(oJobModel, "JobModel");
+              oDialog.setModel(oJobModel, "JobApplicationModel");
+
+              // Get the JobApplicationModel that was already set on the View
+              // (e.g., from _onRouteMatched function)
+              const oJobApplicationModelFromView = that
+                .getView()
+                .getModel("JobApplicationModel");
+
+              // *** FIX 1: Set JobApplicationModel on Dialog ***
+              if (oJobApplicationModelFromView) {
+                oDialog.setModel(
+                  oJobApplicationModelFromView,
+                  "JobApplicationModel"
+                );
+
+                // *** FIX 2: Programmatically set the Dialog Title ***
+                const jobTitle =
+                  oJobApplicationModelFromView.getProperty("/JobTitle");
+                if (jobTitle) {
+                  oDialog.setTitle("Job Application — " + jobTitle);
+                  console.log(
+                    "Dialog title set programmatically:",
+                    oDialog.getTitle()
+                  );
+                } else {
+                  oDialog.setTitle("Job Application"); // Default if title is not found
+                  console.warn(
+                    "JobTitle not found in JobApplicationModel, using default title."
+                  );
+                }
+              } else {
+                // Fallback: Agar kisi wajah se JobApplicationModel view par set nahi hai,
+                // toh ek naya model bana dein. Ideally, this block should not be hit
+                // if _onRouteMatched works correctly.
+                const oFallbackJobModel = new sap.ui.model.json.JSONModel({
+                  JobTitle: "Job Application", // Default title if not found
+                  // ... other properties if needed ...
+                });
+                oDialog.setModel(oFallbackJobModel, "JobApplicationModel");
+                oDialog.setTitle("Job Application"); // Set fallback title
+                console.warn(
+                  "JobApplicationModel not found on View, using fallback for dialog title."
+                );
+              }
+              // *** END FIX ***
 
               //  Inject global models into fragment if not already done
               ["CountryModel", "codeModel", "BaseLocationModel"].forEach(
@@ -631,6 +762,7 @@ sap.ui.define(
                   oExpRange.setMinDate(oMinStart);
                   oExpRange.setMaxDate(oMaxEnd);
                 }
+                oDialog.open();
               }
             });
           } else {
@@ -664,19 +796,55 @@ sap.ui.define(
         },
 
         onAddressChange: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
+          const oInput = oEvent.getSource();
+          const sValue = oInput.getValue().trim();
+
+          if (!sValue) {
+            // Empty is allowed
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+            return;
+          }
+
+          if (sValue.length < 8) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText(
+              "Address must be at least 8 characters long"
+            );
+          } else {
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+          }
         },
+
         onLearningChange: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
+          const oSource = oEvent.getSource();
+          const sValue = oSource.getValue().trim();
+
+          if (!sValue) {
+            oSource.setValueState("None");
+            oSource.setValueStateText("");
+            return;
+          }
+
+          if (sValue.length < 8) {
+            oSource.setValueState("Error");
+            oSource.setValueStateText(
+              "Minimum 8 characters on Learning Journey"
+            );
+          } else {
+            oSource.setValueState("None");
+            oSource.setValueStateText("");
+          }
         },
 
         onExpertiseChange: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onRolesChange: function (oEvent) {
-          utils._LCvalidateMandatoryField(oEvent);
-        },
+        // onRolesChange: function (oEvent) {
+        //   utils._LCvalidateMandatoryField(oEvent);
+        // },
 
         onSkillsChange: function (oEvent) {
           var oInput = oEvent.getSource();
@@ -712,30 +880,39 @@ sap.ui.define(
             oInput.setValueStateText("");
           }
         },
-
         onDOBChange: function (oEvent) {
           var oDatePicker = oEvent.getSource();
-          var oSelectedDate = oDatePicker.getDateValue(); // JS Date object
+          var sId = oDatePicker.getId();
 
-          if (!oSelectedDate) {
+          // Reapply readonly protection after any change (in case of re-render)
+          this._makeDatePickersReadOnly([sId]);
+
+          var oSelectedDate = oDatePicker.getDateValue(); // parsed Date object
+          var sRawValue = oDatePicker.getValue(); // user input (string)
+
+          // 1. If field is empty — valid (optional field)
+          if (!sRawValue) {
+            oDatePicker.setValueState(sap.ui.core.ValueState.None);
+            oDatePicker.setValueStateText("");
+            return;
+          }
+
+          // 2. If input is non-empty, but parsed date is invalid — error
+          if (!oSelectedDate || isNaN(oSelectedDate.getTime())) {
             oDatePicker.setValueState(sap.ui.core.ValueState.Error);
-            const sMessage = this.oResourceBundle.getText("v2_m_errDOB");
-            //    MessageToast.show(sMessage);
-
+            const sMessage = this.oResourceBundle.getText("v2_m_errDOB"); // e.g., "Invalid date format"
             oDatePicker.setValueStateText(sMessage);
             return;
           }
 
+          // 3. Valid date selected — perform age validation
           var oToday = new Date();
 
-          // 1. Must be at least 18 years old
           var oMaxDOB = new Date(
             oToday.getFullYear() - 18,
             oToday.getMonth(),
             oToday.getDate()
           );
-
-          // 2. Must be younger than 65
           var oMinDOB = new Date(
             oToday.getFullYear() - 65,
             oToday.getMonth(),
@@ -744,20 +921,18 @@ sap.ui.define(
 
           if (oSelectedDate > oMaxDOB) {
             oDatePicker.setValueState(sap.ui.core.ValueState.Error);
-
-            const sMessage = this.oResourceBundle.getText("v2_m_err18YO");
-
+            const sMessage = this.oResourceBundle.getText("v2_m_err18YO"); // e.g., "Must be at least 18"
             oDatePicker.setValueStateText(sMessage);
           } else if (oSelectedDate < oMinDOB) {
             oDatePicker.setValueState(sap.ui.core.ValueState.Error);
-            const sMessage = this.oResourceBundle.getText("v2_m_err65YO");
-
+            const sMessage = this.oResourceBundle.getText("v2_m_err65YO"); // e.g., "Must be younger than 65"
             oDatePicker.setValueStateText(sMessage);
           } else {
             oDatePicker.setValueState(sap.ui.core.ValueState.None);
             oDatePicker.setValueStateText("");
           }
         },
+
         onSalaryChange: function (oEvent) {
           var oInput = oEvent.getSource();
           var sValue = oInput.getValue();
@@ -875,75 +1050,80 @@ sap.ui.define(
             oEndDatePicker.setValueState("None");
           }
         },
-        onExperienceDateChange: function (oEvent) {
-          const oRange = oEvent.getSource();
-          const oStart = oRange.getDateValue(); // Start Date
-          const oEnd = oRange.getSecondDateValue(); // End Date
-          const today = new Date();
+        // onExperienceDateChange: function (oEvent) {
+        //   const oRange = oEvent.getSource();
+        //   const oStart = oRange.getDateValue(); // Start Date
+        //   const oEnd = oRange.getSecondDateValue(); // End Date
+        //   const today = new Date();
 
-          const minStartDate = new Date(
-            today.getFullYear() - 30,
-            today.getMonth(),
-            today.getDate()
-          );
+        //   const minStartDate = new Date(
+        //     today.getFullYear() - 30,
+        //     today.getMonth(),
+        //     today.getDate()
+        //   );
 
-          //  Error Messages
-          const sMissing = this.oResourceBundle.getText("v2_m_errDatesreq");
-          const sOrder = this.oResourceBundle.getText("v2_m_errStDatb4endDate");
-          const sRange = this.oResourceBundle.getText("v2_m_errbetLast30Yrs");
+        //   //  Error Messages
+        //   const sMissing = this.oResourceBundle.getText("v2_m_errDatesreq");
+        //   const sOrder = this.oResourceBundle.getText("v2_m_errStDatb4endDate");
+        //   const sRange = this.oResourceBundle.getText("v2_m_errbetLast30Yrs");
 
-          let errorMsg = "";
+        //   let errorMsg = "";
 
-          if (!oStart || !oEnd) {
-            errorMsg = sMissing;
-          } else if (oStart > oEnd) {
-            errorMsg = sOrder;
-          } else if (oStart < minStartDate) {
-            errorMsg = sRange;
-          }
+        //   if (!oStart || !oEnd) {
+        //     errorMsg = sMissing;
+        //   } else if (oStart > oEnd) {
+        //     errorMsg = sOrder;
+        //   } else if (oStart < minStartDate) {
+        //     errorMsg = sRange;
+        //   }
 
-          if (errorMsg) {
-            oRange.setValueState("Error");
-            oRange.setValueStateText(errorMsg);
-          } else {
-            oRange.setValueState("None");
-            oRange.setValueStateText("");
-          }
-        },
+        //   if (errorMsg) {
+        //     oRange.setValueState("Error");
+        //     oRange.setValueStateText(errorMsg);
+        //   } else {
+        //     oRange.setValueState("None");
+        //     oRange.setValueStateText("");
+        //   }
+        // },
 
         // ...existing code...
         onPassingYearChange: function (oEvent) {
           const oDatePicker = oEvent.getSource();
-          const sValue = oDatePicker.getValue(); // What user typed (string)
-          const oDate = oDatePicker.getDateValue(); // Parsed date (null if invalid)
-
+          const sValue = oDatePicker.getValue().trim(); // User input string
           const oToday = new Date();
           const minYear = oToday.getFullYear() - 45;
           const maxYear = oToday.getFullYear();
 
-          // Check for empty or non-numeric input
-          if (!sValue || !/^\d{4}$/.test(sValue)) {
+          // Allow empty input (optional field)
+          if (!sValue) {
+            oDatePicker.setValueState("None");
+            oDatePicker.setValueStateText("");
+            return;
+          }
+
+          // If input is not a 4-digit year
+          if (!/^\d{4}$/.test(sValue)) {
             oDatePicker.setValueState("Error");
             oDatePicker.setValueStateText(
-              `Enter a valid year of passing between ${minYear} and ${maxYear}`
+              `Enter a valid year between ${minYear} and ${maxYear}`
             );
             return;
           }
 
-          // Now check if year is in range
           const year = parseInt(sValue, 10);
           if (year < minYear || year > maxYear) {
             oDatePicker.setValueState("Error");
             oDatePicker.setValueStateText(
-              `Enter a valid year of passsing between ${minYear} and ${maxYear}`
+              `Enter a year between ${minYear} and ${maxYear}`
             );
             return;
           }
 
-          // All good
+          // Valid year
           oDatePicker.setValueState("None");
           oDatePicker.setValueStateText("");
         },
+
         // ...existing code...
         onComboBoxChange: function (oEvent) {
           const combo = oEvent.getSource();
@@ -964,10 +1144,30 @@ sap.ui.define(
         },
 
         onEmpTypeChange: function (oEvent) {
+          const oComboBox = oEvent.getSource();
+          const sValue = oComboBox.getValue().trim();
+
+          if (!sValue) {
+            oComboBox.setValueState("None");
+            oComboBox.setValueStateText("");
+            return;
+          }
+
+          // FIX: Pass the full event
           utils._LCstrictValidationComboBox(oEvent);
         },
 
         onDesignationChange: function (oEvent) {
+          const oComboBox = oEvent.getSource();
+          const sValue = oComboBox.getValue().trim();
+
+          if (!sValue) {
+            oComboBox.setValueState("None");
+            oComboBox.setValueStateText("");
+            return;
+          }
+
+          // FIX: Pass the full event
           utils._LCstrictValidationComboBox(oEvent);
         },
 
@@ -982,17 +1182,18 @@ sap.ui.define(
           const oInput = oEvent.getSource();
           const university = oInput.getValue().trim();
 
+          // Allow empty
+          if (!university) {
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+            return;
+          }
+
           // Basic format rule: only letters, numbers, and certain punctuation
           const isValidFormat = /^[A-Za-z0-9\s\-.,()]+$/.test(university);
 
-          // Must contain at least one alphabet (no purely numeric or symbolic input)
+          // Must contain at least one alphabet
           const hasAlphabet = /[A-Za-z]/.test(university);
-
-          if (!university) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText("University cannot be empty.");
-            return;
-          }
 
           if (university.length < 8) {
             oInput.setValueState("Error");
@@ -1023,56 +1224,117 @@ sap.ui.define(
         },
 
         onGenderChange: function (oEvent) {
+          const oComboBox = oEvent.getSource();
+          const sValue = oComboBox.getValue().trim();
+
+          if (!sValue) {
+            oComboBox.setValueState("None");
+            oComboBox.setValueStateText("");
+            return;
+          } 
           utils._LCstrictValidationComboBox(oEvent, "genderInvalid");
         },
 
         MC_onChangeCountry: function (oEvent) {
           try {
-            // 🔍 Validate
-            utils._LCstrictValidationComboBox(oEvent);
+            const oComboBox = oEvent.getSource();
+            const sInputValue = oComboBox.getValue();
+            const aItems = oComboBox.getItems();
 
-            const selectedKey = oEvent
-              .getSource()
-              .getSelectedKey()
-              .toUpperCase(); // <-- normalize to uppercase
             const oView = this.getView();
             const oModel = oView.getModel("JobModel");
 
-            if (oModel) {
-              oModel.setProperty("/country", selectedKey);
-
-              // 🌐 Filter ISD Code ComboBox
-              const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
-              if (oISDCombo && oISDCombo.getBinding("items")) {
-                const oISDFilter = new sap.ui.model.Filter(
-                  "country_code",
-                  "EQ",
-                  selectedKey
-                );
-                oISDCombo.getBinding("items").filter([oISDFilter]);
-
-                //  Wait for list to update, then act
-                setTimeout(() => {
-                  const aItems = oISDCombo.getItems();
-                  if (aItems.length === 1) {
-                    const sCode = aItems[0]
-                      .getBindingContext("codeModel")
-                      .getObject().calling_code;
-                    const sFinalCode = sCode.split(",")[0].trim(); // Handles cases like "+92, +92-1"
-
-                    oISDCombo.setSelectedKey(sFinalCode);
-                    oISDCombo.setEnabled(false); // ✅ disable for single-entry countries
-                    oModel.setProperty("/stdCode", sFinalCode);
-                  } else {
-                    oISDCombo.setSelectedKey("");
-                    oISDCombo.setEnabled(true); // ✅ enable for multiple or no matches
-                    oModel.setProperty("/stdCode", "");
-                  }
-                }, 0); // micro-delay ensures binding is ready
+            // 1. If blank, clear everything, no filter
+            if (!sInputValue) {
+              oComboBox.setValueState(sap.ui.core.ValueState.None);
+              oComboBox.setValueStateText("");
+              oComboBox.setSelectedKey(""); // Clear key
+              if (oModel) {
+                oModel.setProperty("/country", "");
+                oModel.setProperty("/stdCode", "");
               }
+
+              // Clear ISD combo
+              const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
+              if (oISDCombo) {
+                oISDCombo.setSelectedKey("");
+                oISDCombo.setEnabled(true);
+                if (oISDCombo.getBinding("items")) {
+                  oISDCombo.getBinding("items").filter([]); // Remove filter
+                }
+              }
+
+              // Clear Location combo
+              const oLocationCombo = Fragment.byId(
+                "jobFormFrag",
+                "LocationComboBox"
+              );
+              if (oLocationCombo) {
+                oLocationCombo.setSelectedKey("");
+                if (oLocationCombo.getBinding("items")) {
+                  oLocationCombo.getBinding("items").filter([]); // Remove filter
+                }
+              }
+
+              return;
             }
 
-            // Filter Location ComboBox
+            // 2. Check for valid country
+            const oMatchedItem = aItems.find((item) => {
+              return (
+                item.getText().toLowerCase() === sInputValue.toLowerCase() ||
+                item.getKey().toLowerCase() === sInputValue.toLowerCase()
+              );
+            });
+
+            if (!oMatchedItem) {
+              // ❌ Invalid input
+              oComboBox.setValueState(sap.ui.core.ValueState.Error);
+              oComboBox.setValueStateText(
+                this.oResourceBundle.getText("v2_m_errInvalidComboBox")
+              );
+              return;
+            }
+
+            // ✅ Valid country selected
+            oComboBox.setSelectedKey(oMatchedItem.getKey());
+            oComboBox.setValueState(sap.ui.core.ValueState.None);
+            oComboBox.setValueStateText("");
+
+            const selectedKey = oMatchedItem.getKey().toUpperCase();
+            if (oModel) {
+              oModel.setProperty("/country", selectedKey);
+            }
+
+            // 🌐 ISD Code Filter
+            const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
+            if (oISDCombo && oISDCombo.getBinding("items")) {
+              const oISDFilter = new sap.ui.model.Filter(
+                "country_code",
+                "EQ",
+                selectedKey
+              );
+              oISDCombo.getBinding("items").filter([oISDFilter]);
+
+              setTimeout(() => {
+                const aISDItems = oISDCombo.getItems();
+                if (aISDItems.length === 1) {
+                  const sCode = aISDItems[0]
+                    .getBindingContext("codeModel")
+                    .getObject().calling_code;
+                  const sFinalCode = sCode.split(",")[0].trim();
+                  oISDCombo.setSelectedKey(sFinalCode);
+                  oISDCombo.setEnabled(false);
+                  oModel.setProperty("/stdCode", sFinalCode);
+                } else {
+                  oISDCombo.setSelectedKey("");
+                  oISDCombo.setEnabled(true);
+                  oModel.setProperty("/stdCode", "");
+                }
+              }, 0);
+            }
+
+            // 📍 Location Filter
             const oLocationCombo = Fragment.byId(
               "jobFormFrag",
               "LocationComboBox"
@@ -1092,8 +1354,42 @@ sap.ui.define(
         },
 
         MC_onBaseLocationChange: function (oEvent) {
-          utils._LCstrictValidationComboBox(oEvent);
+          try {
+            const oComboBox = oEvent.getSource();
+            const sEnteredKey = oComboBox.getValue();
+            const sSelectedKey = oComboBox.getSelectedKey();
+
+            if (!sEnteredKey) {
+              // Empty input is allowed
+              oComboBox.setValueState("None");
+              oComboBox.setValueStateText("");
+              return;
+            }
+
+            const aItems = oComboBox.getItems();
+            const bValidMatch = aItems.some(function (oItem) {
+              return (
+                oItem.getText().toLowerCase() === sEnteredKey.toLowerCase() ||
+                oItem.getKey().toLowerCase() === sEnteredKey.toLowerCase()
+              );
+            });
+
+            if (!bValidMatch) {
+              oComboBox.setValueState("Error");
+              oComboBox.setValueStateText(
+                "Please select a valid location from the list"
+              );
+            } else {
+              oComboBox.setValueState("None");
+              oComboBox.setValueStateText("");
+            }
+          } catch (err) {
+            console.error("MC_onBaseLocationChange error:", err);
+          }
         },
+
+        // MC_onBaseLocationChange: function (oEvent) {
+        // },
         ajaxCreateWithJQuery: function (sUrl, oPayLoad) {
           return new Promise((resolve, reject) => {
             $.ajax({
@@ -1143,26 +1439,26 @@ sap.ui.define(
               ctrl: f("fullNameInput"),
               fn: utils._LCvalidateMandatoryField,
             },
-            {
-              ctrl: f("genderCombo"),
-              fn: utils._LCstrictValidationComboBox,
-            },
+            // {
+            //   ctrl: f("genderCombo"),
+            //   fn: utils._LCstrictValidationComboBox,
+            // },
             {
               ctrl: f("emailInput"),
               fn: utils._LCvalidateEmail,
             },
-            {
-              ctrl: f("countryCombo"),
-              fn: utils._LCstrictValidationComboBox,
-            },
-            {
-              ctrl: f("LocationComboBox"),
-              fn: utils._LCstrictValidationComboBox,
-            },
-            {
-              ctrl: f("addressInput"),
-              fn: utils._LCvalidateMandatoryField,
-            },
+            // {
+            //   ctrl: f("countryCombo"),
+            //   fn: utils._LCstrictValidationComboBox,
+            // },
+            // {
+            //   ctrl: f("LocationComboBox"),
+            //   fn: utils._LCstrictValidationComboBox,
+            // },
+            // {
+            //   ctrl: f("addressInput"),
+            //   fn: utils._LCvalidateMandatoryField,
+            // },
             {
               ctrl: f("isd_code"),
               fn: utils._LCstrictValidationComboBox,
@@ -1171,22 +1467,22 @@ sap.ui.define(
               ctrl: f("mobileInput"),
               fn: utils._LCvalidateMobileNumber,
             },
-            {
-              ctrl: f("dobPicker"),
-              fn: utils._LCvalidateMandatoryField,
-            },
+            // {
+            //   ctrl: f("dobPicker"),
+            //   fn: utils._LCvalidateMandatoryField,
+            // },
             {
               ctrl: f("qualificationCombo"),
               fn: utils._LCstrictValidationComboBox,
             },
-            {
-              ctrl: f("universityCombo"),
-              fn: utils._LCvalidateMandatoryField,
-            },
-            {
-              ctrl: f("PassingYear"),
-              fn: utils._LCvalidateMandatoryField,
-            },
+            // {
+            //   ctrl: f("universityCombo"),
+            //   fn: utils._LCvalidateMandatoryField,
+            // },
+            // {
+            //   ctrl: f("PassingYear"),
+            //   fn: utils._LCvalidateMandatoryField,
+            // },
             {
               ctrl: f("skillsInput"),
               fn: utils._LCvalidateMandatoryField,
@@ -1203,45 +1499,45 @@ sap.ui.define(
                 ctrl: f("companyInput"),
                 fn: utils._LCvalidateMandatoryField,
               },
-              {
-                ctrl: f("previousJobTitleCombo"),
-                fn: utils._LCstrictValidationComboBox,
-              },
+              // {
+              //   ctrl: f("previousJobTitleCombo"),
+              //   fn: utils._LCstrictValidationComboBox,
+              // },
               {
                 ctrl: f("salaryInput"),
                 fn: utils._LCvalidateMandatoryField,
               },
+              // {
+              //   ctrl: f("experienceRange"),
+              //   fn: utils._LCvalidateMandatoryField,
+              // },
+              // {
+              //   ctrl: f("rolesInput"),
+              //   fn: utils._LCvalidateMandatoryField,
+              // },
+              // {
+              //   ctrl: f("employmentTypeCombo"),
+              //   fn: utils._LCstrictValidationComboBox,
+              // },
               {
-                ctrl: f("experienceRange"),
+                ctrl: f("expectedSalaryInput"),
                 fn: utils._LCvalidateMandatoryField,
-              },
-              {
-                ctrl: f("rolesInput"),
-                fn: utils._LCvalidateMandatoryField,
-              },
-              {
-                ctrl: f("employmentTypeCombo"),
-                fn: utils._LCstrictValidationComboBox,
               },
               {
                 ctrl: f("noticePeriodCombo"),
                 fn: utils._LCstrictValidationComboBox,
               },
-              {
-                ctrl: f("expectedSalaryInput"),
-                fn: utils._LCvalidateMandatoryField,
-              }
             );
           } else {
             mandatoryChecks.push(
               {
                 ctrl: f("fresherExpertiseInput"),
                 fn: utils._LCvalidateMandatoryField,
-              },
-              {
-                ctrl: f("fresherSelfDesc"),
-                fn: utils._LCvalidateMandatoryField,
               }
+              // {
+              //   ctrl: f("fresherSelfDesc"),
+              //   fn: utils._LCvalidateMandatoryField,
+              // }
             );
           }
 
@@ -1426,28 +1722,53 @@ sap.ui.define(
           }
 
           if (!this._oSharePopover) {
+            const oJobModel = this.getView().getModel("JobApplicationModel");
+            const sJobId = oJobModel?.getProperty("/ID") || "";
+            const sBaseURL = window.location.origin + window.location.pathname;
+            const sHash = "#/JobView/" + encodeURIComponent(sJobId);
+            const sFullShareURL = `${sBaseURL}?sap-ui-xx-viewCache=false${sHash}`;
+            // const sMessage = ""
+            const sMessage = `Explore this exciting opportunity at Kalpavriksha Technologies.\nApply now or share it with someone who might be a great fit\n${sFullShareURL}`;
+            // const sMessage = `📢 Kalpavriksha Technologies is hiring!\nExplore this opportunity and apply now:\n${sFullShareURL}`;
+
             const items = [
               createItem("image/linkedin.png", "LinkedIn", () => {
-                window.open("https://linkedin.com", "_blank");
-              }),
-              createItem("image/Mail.png", "Email", () => {
-                window.location.href =
-                  "mailto:?subject=Check this out&body=" +
-                  encodeURIComponent(window.location.href);
-              }),
-              createItem("image/whatsapp.png", "WhatsApp", () => {
+                this._oSharePopover.close();
                 window.open(
-                  "https://wa.me/?text=" +
-                    encodeURIComponent(window.location.href),
+                  "https://www.linkedin.com/sharing/share-offsite/?url=" +
+                    encodeURIComponent(sFullShareURL),
                   "_blank"
                 );
+                sap.m.MessageToast.show("Opening LinkedIn...");
               }),
-              createItem("image/link.png", "Copy Link", () => {
-                navigator.clipboard.writeText(window.location.href);
-                sap.m.MessageToast.show("Link copied!");
+
+              createItem("image/Mail.png", "Email", () => {
+                this._oSharePopover.close();
+                const sSubject =
+                  "Exciting Job Opportunity at Kalpavriksha Technologies";
+                window.location.href =
+                  "mailto:?subject=" +
+                  encodeURIComponent(sSubject) +
+                  "&body=" +
+                  encodeURIComponent(sMessage);
+              }),
+
+              createItem("image/Whatsapp.png", "WhatsApp", () => {
+                this._oSharePopover.close();
+                window.open(
+                  "https://api.whatsapp.com/send?text=" +
+                    encodeURIComponent(sMessage),
+                  "_blank"
+                );
+                sap.m.MessageToast.show("Opening WhatsApp...");
+              }),
+
+              createItem("image/Link.png", "Copy Link", () => {
+                this._oSharePopover.close();
+                navigator.clipboard.writeText(sMessage);
+                sap.m.MessageToast.show("Link copied");
               }),
             ];
-
             // Style the last item differently
             const lastHBox = items[items.length - 1].getContent()[0];
             lastHBox.removeStyleClass("shareItemBox");
@@ -1456,7 +1777,7 @@ sap.ui.define(
             this._oSharePopover = new sap.m.Popover({
               placement: sap.m.PlacementType.Bottom,
               showHeader: false,
-              contentWidth: "200px",
+              contentWidth: "150px",
               content: [
                 new sap.m.List({
                   items: items,
@@ -1488,39 +1809,39 @@ sap.ui.define(
           navigator.clipboard.writeText(window.location.href);
           sap.m.MessageToast.show("Link copied!");
         },
-        copyDynamicLink: function (oEvent) {
-          var that = this;
+        // copyDynamicLink: function (oEvent) {
+        //   var that = this;
 
-          // Optional: Get Job ID or Applicant ID if needed
-          var jobId = "static123"; // replace with dynamic logic if needed
+        //   // Optional: Get Job ID or Applicant ID if needed
+        //   var jobId = "static123"; // replace with dynamic logic if needed
 
-          $.ajax({
-            url: "/api/getDynamicLink?jobId=" + jobId, // Replace with your real API
-            method: "GET",
-            success: function (response) {
-              // Example response: { token: "abc123" }
-              var token = response.token || "defaultToken";
+        //   $.ajax({
+        //     url: "/api/getDynamicLink?jobId=" + jobId, // Replace with your real API
+        //     method: "GET",
+        //     success: function (response) {
+        //       // Example response: { token: "abc123" }
+        //       var token = response.token || "defaultToken";
 
-              // Build your app link with hash-based routing
-              var link =
-                window.location.origin + "/index.html#/JobView?id=" + token;
+        //       // Build your app link with hash-based routing
+        //       var link =
+        //         window.location.origin + "/index.html#/JobView?id=" + token;
 
-              navigator.clipboard
-                .writeText(link)
-                .then(function () {
-                  sap.m.MessageToast.show("Link copied to clipboard!");
-                })
-                .catch(function (err) {
-                  sap.m.MessageBox.error("Failed to copy: " + err);
-                });
-            },
-            error: function () {
-              sap.m.MessageBox.error(
-                "Could not fetch dynamic link from backend."
-              );
-            },
-          });
-        },
+        //       navigator.clipboard
+        //         .writeText(link)
+        //         .then(function () {
+        //           sap.m.MessageToast.show("Link copied to clipboard!");
+        //         })
+        //         .catch(function (err) {
+        //           sap.m.MessageBox.error("Failed to copy: " + err);
+        //         });
+        //     },
+        //     error: function () {
+        //       sap.m.MessageBox.error(
+        //         "Could not fetch dynamic link from backend."
+        //       );
+        //     },
+        //   });
+        // },
       }
     );
   }
