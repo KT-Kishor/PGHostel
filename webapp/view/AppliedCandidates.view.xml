@@ -75,6 +75,7 @@
                             showSuggestion="true"
                             suggest="onSuggestSkills"
                             suggestionItems="{path: 'skillModel>/skills'}"
+                             showClearIcon="true"
                         >
                             <core:Item text="{skillModel>skill}" />
                         </Input>
@@ -156,6 +157,7 @@
                 <Column minScreenWidth="Tablet" demandPopin="true" width="250px"><Text text="{i18n>emailId}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>TableColExperience}" /></Column>
                 <Column  demandPopin="true"><Text text="{i18n>createdBy}" /></Column>
+                <Column  demandPopin="true"><Text text="{i18n>createdDate}" /></Column>
                 <Column demandPopin="true"><Text text="{i18n>TableColSkills}" /></Column>
             </columns>
             <items>
@@ -169,6 +171,7 @@
                         <Text text="{DataTableModel>Email}" />
                         <Text text="{DataTableModel>Experience} Years" />
                         <Text text="{DataTableModel>CreatedBy}" />
+                        <Text text="{path:'DataTableModel>CreateDate' ,formatter:'.Formatter.formatDate'}" />
                         <ExpandableText text="{DataTableModel>Skills}" maxCharacters="20"/>
                     </cells>
                 </ColumnListItem>

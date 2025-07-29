@@ -373,16 +373,27 @@ sap.ui.define([
                 const oData = oContext.getObject();
                 const sMimeType = oData.AttachmentType || "image/png";
                 const sBase64 = oData.Attachment;
-                const sFileName = oData.FileName || "Document Preview";
+                const sFileName = oData.AttachmentName || "Document Preview";
+
+                // Save for download
+                this.SelectedData = {
+                    Attachment: sBase64,
+                    AttachmentType: sMimeType,
+                    AttachmentName: sFileName
+                };
 
                 if (!this._oPreviewDialog) {
                     this._oPreviewDialog = new sap.m.Dialog({
                         title: sFileName,
-                        contentWidth: "50%",
-                        contentHeight: "50%",
-                        resizable: true,
+                        stretch: true, // Fullscreen on all devices
                         draggable: true,
+                        resizable: true,
                         content: [],
+                        beginButton: new sap.m.Button({
+                            text: "Download",
+                            type: "Ghost",
+                            press: this.Exp_Det_onPressDownloadAttachment.bind(this)
+                        }),
                         endButton: new sap.m.Button({
                             text: "Close",
                             type: "Reject",
@@ -430,35 +441,7 @@ sap.ui.define([
                     }));
                     this._oPreviewDialog.open();
                 } else {
-                    // Unsupported type: Trigger download
-                    try {
-                        const byteCharacters = atob(sBase64);
-                        const byteArrays = [];
-
-                        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                            const slice = byteCharacters.slice(offset, offset + 512);
-                            const byteNumbers = new Array(slice.length);
-                            for (let i = 0; i < slice.length; i++) {
-                                byteNumbers[i] = slice.charCodeAt(i);
-                            }
-                            const byteArray = new Uint8Array(byteNumbers);
-                            byteArrays.push(byteArray);
-                        }
-
-                        const blob = new Blob(byteArrays, { type: sMimeType });
-                        const sBlobUrl = URL.createObjectURL(blob);
-
-                        const link = document.createElement("a");
-                        link.href = sBlobUrl;
-                        link.download = oData.FileName || "attachment";
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
-                        URL.revokeObjectURL(sBlobUrl);
-                    } catch (e) {
-                        MessageToast.show("Attachment could not be downloaded.");
-                    }
+                    this.Exp_Det_onPressDownloadAttachment();
                 }
             },
 

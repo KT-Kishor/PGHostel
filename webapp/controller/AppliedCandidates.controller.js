@@ -2,12 +2,11 @@ sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
     "../model/formatter",
     "../utils/validation",
     "sap/ui/export/Spreadsheet"
-], function(BaseController, JSONModel, Filter, FilterOperator, MessageToast, formatter, utils, Spreadsheet) {
+], function(BaseController, JSONModel, Filter, MessageToast, formatter, utils, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
         formatter: formatter,
@@ -135,7 +134,7 @@ sap.ui.define([
                     // 1. Name Filter
                     const sName = this.byId("filterEmployeeName").getValue().trim();
                     if (sName) {
-                        aFilters.push(new Filter("FullName", FilterOperator.Contains, sName));
+                        aFilters.push(new Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
                     }
                     // 2. Notice Period Filter
                     const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
@@ -176,7 +175,7 @@ sap.ui.define([
                     // 3. Skills Filter
                     const sSkills = this.byId("filterSkills").getValue().trim();
                     if (sSkills) {
-                        aFilters.push(new Filter("Skills", FilterOperator.Contains, sSkills));
+                        aFilters.push(new Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
                     }
                     // 4. Experience Filter
                     const sExperienceInput = this.byId("filterExperience").getValue().trim();
@@ -257,7 +256,8 @@ sap.ui.define([
                 Country: "IN",
                 ResumeFile: "",
                 AttachmentName: "",
-                AttachmentType: ""
+                AttachmentType: "",
+                CreateDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
             };
             this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");
             this.getView().getModel("tokenModel").setProperty("/tokens", [])
@@ -463,7 +463,7 @@ sap.ui.define([
         onDialogCountryChange: function(oEvent) {
             const sCountryCode = oEvent.getSource().getSelectedKey();
             const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
-            oCityComboBox.getBinding("items").filter(new Filter("CountryCode", FilterOperator.EQ, sCountryCode));
+            oCityComboBox.getBinding("items").filter(new Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
             this.getView().getModel("stuDataModel").setProperty("/City", "");
         },
 
