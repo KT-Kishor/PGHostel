@@ -262,9 +262,12 @@ sap.ui.define([
         IN_onPressYearlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar"); },
         onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
         onPressPaymentStacked: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "stacked_bar"); },
+        onPressVerticalStack: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "column"); },
+        onPressPaymentDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "donut"); },
         onPressPaymentGrouped: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "bar"); },
         onPressPendingColumn: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "column"); },
         onPressPendingBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "bar"); },
+        onPressPendingDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "donut"); },
 
         onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);

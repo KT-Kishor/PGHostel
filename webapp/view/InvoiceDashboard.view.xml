@@ -162,6 +162,8 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>paymentBreakdown}" level="H5"/> </contentMiddle>
                                     <contentRight>
+                                        <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPaymentDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressVerticalStack" tooltip="Column Chart"/>
                                         <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStacked" tooltip="Stacked Horizontal"/>
                                         <Button icon="sap-icon://horizontal-bar-chart" press="onPressPaymentGrouped" tooltip="Grouped Horizontal"/>
                                     </contentRight>
@@ -202,6 +204,7 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>pendingPaymentsByCompany}" level="H5"/> </contentMiddle>
                                     <contentRight>
+                                        <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPendingDonut" tooltip="Donut Chart"/>
                                         <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="Column Chart"/>
                                         <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="Bar Chart"/>
                                     </contentRight>
