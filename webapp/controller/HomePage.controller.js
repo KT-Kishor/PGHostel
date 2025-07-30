@@ -99,26 +99,24 @@ sap.ui.define(
           });
         },
 
-        _onRouteMatched: function () {
-          const sStoredTab =
-            sessionStorage.getItem("homePageReturnTab") || "idHome";
-          const oTabHeader = this.byId("mainTabHeader");
-          if (oTabHeader) {
-            oTabHeader.setSelectedKey(sStoredTab);
-          }
+      _onRouteMatched: function () {
+        const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
+        const oTabHeader = this.byId("mainTabHeader");
+        if (oTabHeader) {
+          oTabHeader.setSelectedKey(sStoredTab);
+        }
 
-          const oNavContainer = this.byId("pageContainer");
-          if (oNavContainer) {
-            oNavContainer.to(this.byId(sStoredTab));
-          }
+        const oNavContainer = this.byId("pageContainer");
+        if (oNavContainer) {
+          const oPage = this.byId(sStoredTab);
+          if (oPage) {
+            oNavContainer.to(oPage);
+          } 
+        }
 
-          // Clear it so it's not reused accidentally
-          sessionStorage.removeItem("homePageReturnTab");
-          this.API = "https://www.rest.kalpavrikshatechnologies.com";
-          oNavContainer.to(this.byId(selectedTab));
-          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-          var oCarousel = this.byId("videoCarousel");
+         sessionStorage.removeItem("homePageReturnTab");
+         this.API = "https://www.rest.kalpavrikshatechnologies.com";
+         var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
             "../video/Employee offer.mp4",
@@ -150,17 +148,17 @@ sap.ui.define(
               ],
             });
 
-            oVBox.addStyleClass("sapUiTinyMargin");
+            oVBox.addStyleClass("sapUiTinyMargin"); // Apply transparent background class
             oCarousel.addPage(oVBox);
           });
 
           var iCurrentIndex = 0;
-          var aPages = oCarousel.getPages();
+          var aPages = oCarousel.getPages(); // Get all slides
 
           function autoSlide() {
             if (aPages.length > 1) {
-              iCurrentIndex = (iCurrentIndex + 1) % aPages.length;
-              oCarousel.setActivePage(aPages[iCurrentIndex]);
+              iCurrentIndex = (iCurrentIndex + 1) % aPages.length; // Move to next slide
+              oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
             }
           }
           setInterval(autoSlide, 30000);
