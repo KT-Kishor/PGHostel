@@ -1,0 +1,51 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="paymentDetailsDialog"
+        title="Invoice Breakdown for {dialogData>/companyName}"
+        contentWidth="800px"
+        contentHeight="400px"
+        resizable="true"
+        draggable="true">
+        <content>
+            <Table
+                items="{dialogData>/invoices}"
+                noDataText="No Invoices Found">
+                <columns>
+                    <Column><Text text="Invoice No" /></Column>
+                    <Column hAlign="End"><Text text="Taxable Amount" /></Column>
+                    <Column hAlign="End"><Text text="GST Amount" /></Column>
+                    <Column hAlign="End"><Text text="TDS Amount" /></Column>
+                    <Column hAlign="End"><Text text="Total Amount (INR)" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{dialogData>InvNo}" />
+                            <ObjectNumber number="{
+                                path: 'dialogData>SubTotalInGST',
+                                formatter: '.formatter.currencyValue'
+                            }" unit="INR" />
+                             <ObjectNumber number="{
+                                path: 'dialogData>gstAmount',
+                                formatter: '.formatter.currencyValue'
+                            }" unit="INR" />
+                             <ObjectNumber number="{
+                                path: 'dialogData>IncomeTax',
+                                formatter: '.formatter.currencyValue'
+                            }" unit="INR" />
+                             <ObjectNumber number="{
+                                path: 'dialogData>totalAmountInINR',
+                                formatter: '.formatter.currencyValue'
+                            }" unit="INR" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="Close" press="onCloseDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

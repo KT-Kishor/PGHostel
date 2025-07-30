@@ -48,9 +48,9 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>invoiceStatusDash}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar"/>
-                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart"/>
+                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="Donut Chart"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -76,9 +76,9 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>invoiceMonthly}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar"/>
-                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie" tooltip="Pie Chart"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="Bar Chart"/>
+                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine" tooltip="Line Chart"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -104,8 +104,8 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>companytotalinvoice}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie" tooltip="Pie Chart"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="Bar Chart"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -131,8 +131,8 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>yearlyInvoiceTrend}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar"/>
-                                        <Button icon="sap-icon://line-charts" press="onPressYearlyLine"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart"/>
+                                        <Button icon="sap-icon://line-charts" press="onPressYearlyLine" tooltip="Line Chart"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -168,7 +168,16 @@
                                 </Bar>
                             </f:header>
                             <f:content>
-                                <viz:VizFrame id="stackedChartPayment" vizType="{invoiceChartTypeModel>/paymentBreakdownType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
+                                <viz:VizFrame id="stackedChartPayment"
+                                    vizType="{invoiceChartTypeModel>/paymentBreakdownType}"
+                                    width="100%"
+                                    height="300px"
+                                    vizProperties="{
+                                        title: { visible: false },
+                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
+                                        interaction: { selectability: { mode: 'SINGLE' } }
+                                    }"
+                                    selectData="onPaymentBreakdownSelect">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/paymentBreakdown}">
                                             <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
@@ -199,7 +208,16 @@
                                 </Bar>
                             </f:header>
                             <f:content>
-                                <viz:VizFrame id="barChartPending" vizType="{invoiceChartTypeModel>/pendingByCompanyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
+                                <viz:VizFrame id="barChartPending"
+                                    vizType="{invoiceChartTypeModel>/pendingByCompanyType}"
+                                    width="100%"
+                                    height="300px"
+                                    vizProperties="{
+                                        title: { visible: false },
+                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
+                                        interaction: { selectability: { mode: 'SINGLE' } }
+                                    }"
+                                    selectData="onPendingCompanySelect">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/pendingByCompany}">
                                             <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>

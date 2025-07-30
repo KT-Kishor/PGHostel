@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="pendingInvoicesDialog"
+        title="Pending Invoices for {dialogData>/companyName}"
+        contentWidth="800px"
+        contentHeight="400px"
+        resizable="true"
+        draggable="true">
+        <content>
+            <Table
+                items="{dialogData>/invoices}"
+                noDataText="No Pending Invoices Found">
+                <columns>
+                    <Column><Text text="Invoice No" /></Column>
+                    <Column><Text text="Invoice Date" /></Column>
+                    <Column><Text text="Status" /></Column>
+                    <Column hAlign="End"><Text text="Pending Amount (INR)" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{dialogData>InvNo}" />
+                            <Text text="{
+                                path: 'dialogData>InvoiceDate',
+                             formatter:'.Formatter.formatDate'}" />
+                            <Text text="{dialogData>Status}" />
+                             <ObjectNumber number="{
+                                path: 'dialogData>pendingAmountInINR',
+                                formatter: '.formatter.currencyValue'
+                            }" unit="INR" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="Close" press="onCloseDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
