@@ -11,7 +11,7 @@ sap.ui.define([
 
         onInit: function () {
             const oChartData = { statusDistribution: [], monthlyValue: [], companyTotals: [], yearlyTrend: [], paymentBreakdown: [], pendingByCompany: [] };
-            const oChartTypes = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_column", pendingByCompanyType: "column" };
+            const oChartTypes = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel([]), "companies");
             this.getView().setModel(new JSONModel(oChartTypes), "invoiceChartTypeModel");
@@ -80,67 +80,84 @@ sap.ui.define([
         },
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
-            this._oGroupedInvoices = {};
-            const statusCounts = {};
-            aFilteredData.forEach(invoice => {
-                const status = invoice.Status || "Unknown";
-                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
-                this._oGroupedInvoices[status].push(invoice);
-                statusCounts[status] = (statusCounts[status] || 0) + 1;
-            });
-            const aStatusDistribution = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
+            // Helper function to get the INR value of an invoice
+            const getInrValue = (item) => {
+                const totalAmount = parseFloat(item.TotalAmount || 0);
+                if (item.Currency === "INR") {
+                    return totalAmount;
+                } else {
+                    // Use AmountInINR if available, otherwise calculate it.
+                    const amountInINR = parseFloat(item.AmountInINR || 0);
+                    if (amountInINR > 0) {
+                        return amountInINR;
+                    }
+                    const conversionRate = parseFloat(item.ConversionRate || 1);
+                    return totalAmount * conversionRate;
+                }
+            };
+            // --- Aggregation for charts that need currency conversion ---
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const month = new Date(item.InvoiceDate).getMonth();
-                acc[month] = (acc[month] || 0) + parseFloat(item.TotalAmount || 0);
+                acc[month] = (acc[month] || 0) + getInrValue(item);
                 return acc;
             }, {});
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmount: monthlyValue[i] || 0 }));
             const companyTotals = aFilteredData.reduce((acc, item) => {
-                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + parseFloat(item.TotalAmount || 0);
+                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + getInrValue(item);
                 return acc;
             }, {});
-            const formattedCompanyTotals = Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmount: total })).sort((a, b) => b.totalAmount - a.totalAmount);
             const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
                 const year = new Date(item.InvoiceDate).getFullYear();
-                if (!acc[year]) acc[year] = { totalAmount: 0, count: 0 };
-                acc[year].totalAmount += parseFloat(item.TotalAmount || 0);
+                if (!acc[year]) { acc[year] = { totalAmountInINR: 0, count: 0 }; }
+                acc[year].totalAmountInINR += getInrValue(item);
                 acc[year].count++;
                 return acc;
             }, {});
-            const formattedYearlyTrend = Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a, b) => a.year - b.year);
             const pendingStatuses = ["Submitted", "Payment Partially"];
             const pendingByCompany = aFilteredData.filter(item => pendingStatuses.includes(item.Status)).reduce((acc, item) => {
-                const company = item.CustomerName;
-                acc[company] = (acc[company] || 0) + parseFloat(item.TotalAmount || 0);
+                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + getInrValue(item);
                 return acc;
             }, {});
-            const formattedPendingByCompany = Object.entries(pendingByCompany).map(([name, amount]) => ({ companyName: name, pendingAmount: amount })).sort((a, b) => b.pendingAmount - a.pendingAmount);
+
+            // --- Aggregation for charts that DO NOT need currency conversion ---
+            this._oGroupedInvoices = {};
+            const statusCounts = aFilteredData.reduce((acc, item) => {
+                const status = item.Status || "Unknown";
+                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
+                this._oGroupedInvoices[status].push(item);
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, {});
+            // --- Aggregation for Payment Breakdown (INR only) ---
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
-                const company = item.CustomerName;
-                if (!acc[company]) {
-                    acc[company] = { baseAmount: 0, gst: 0, tds: 0 };
+                if (item.Currency === "INR") {
+                    const company = item.CustomerName;
+                    if (!acc[company]) {
+                        acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0 };
+                    }
+                    const totalGst = parseFloat(item.CGST || 0) + parseFloat(item.SGST || 0) + parseFloat(item.IGST || 0);
+                    acc[company].taxableAmount += parseFloat(item.SubTotalInGST || 0);
+                    acc[company].gstAmount += totalGst;
+                    acc[company].tdsAmount += parseFloat(item.IncomeTax || 0);
                 }
-                const totalAmount = parseFloat(item.TotalAmount || 0);
-                const gstAmount = parseFloat(item.GST || 0);
-                const tdsAmount = parseFloat(item.TDS || 0);
-
-                const baseAmount = totalAmount - gstAmount - tdsAmount;
-                acc[company].baseAmount += (baseAmount > 0 ? baseAmount : 0);
-                acc[company].gst += gstAmount;
-                acc[company].tds += tdsAmount;
                 return acc;
             }, {});
-            const formattedPaymentBreakdown = Object.entries(paymentBreakdown)
-                .map(([name, values]) => ({ companyName: name, ...values }));
 
+            // --- Formatting for UI Models ---
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmountInINR: monthlyValue[i] || 0 }));
+            const formattedCompanyTotals = Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmountInINR: total })).sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
+            const formattedYearlyTrend = Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a, b) => a.year - b.year);
+            const formattedPending = Object.entries(pendingByCompany).map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount })).sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR);
+            const formattedStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
+            const formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => ({ companyName: name, ...values }));
+            // --- Set data to the model ---
             this.getView().getModel("chartData").setData({
-                statusDistribution: aStatusDistribution,
+                statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
                 companyTotals: formattedCompanyTotals,
                 yearlyTrend: formattedYearlyTrend,
-                paymentBreakdown: formattedPaymentBreakdown, // Corrected data
-                pendingByCompany: formattedPendingByCompany
+                paymentBreakdown: formattedPaymentBreakdown,
+                pendingByCompany: formattedPending
             });
         },
 
@@ -148,7 +165,6 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Status) return;
             const sStatus = oSelectedData.Status;
-
             const aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
             const oView = this.getView();
             if (!this._pPopover) {
@@ -162,18 +178,15 @@ sap.ui.define([
                 });
             }
             this._pPopover.then(oPopover => {
-                const oPopoverModel = new JSONModel({
-                    status: sStatus,
-                    invoices: aInvoicesForStatus
-                });
-                oPopover.setModel(oPopoverModel, "popoverData"); // <-- SET MODEL ON POPOVER
+                const oPopoverModel = new JSONModel({ status: sStatus, invoices: aInvoicesForStatus });
+                oPopover.setModel(oPopoverModel, "popoverData");
                 oPopover.openBy(oEvent.getParameter("data")[0].target);
             });
         },
-
-        onInvoiceNumberPress: function (oEvent) {
+         onInvoiceNumberPress: function (oEvent) {
             this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo) });
         },
+
         IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
         IN_onPressStatusBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar"); },
         IN_onPressStatusDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut"); },
@@ -183,12 +196,11 @@ sap.ui.define([
         IN_onPressCompanyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "pie"); },
         IN_onPressCompanyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/companyType", "bar"); },
         IN_onPressYearlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar"); },
-        IN_onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
-        onPressPaymentStacked: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "stacked_column"); },
-        onPressPaymentGrouped: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "column"); },
+        onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
+        onPressPaymentStacked: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "stacked_bar"); },
+        onPressPaymentGrouped: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/paymentBreakdownType", "bar"); },
         onPressPendingColumn: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "column"); },
         onPressPendingBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "bar"); },
-
         onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);
             this.byId("DashI_id_Date").setValue("");
