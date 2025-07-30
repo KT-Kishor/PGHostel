@@ -1,17 +1,17 @@
-	<core:FragmentDefinition id="JobAddFrag" 
-		xmlns:vk="sap.ui.vk" 
-		xmlns="sap.m" 
-		xmlns:l="sap.ui.layout" 
-		xmlns:f="sap.ui.layout.form" 
-		xmlns:core="sap.ui.core" 
-		xmlns:rte="sap.ui.richtexteditor">
+<core:FragmentDefinition id="JobAddFrag" 
+	xmlns:vk="sap.ui.vk" 
+	xmlns="sap.m" 
+	xmlns:l="sap.ui.layout" 
+	xmlns:f="sap.ui.layout.form" 
+	xmlns:core="sap.ui.core" 
+	xmlns:rte="sap.ui.richtexteditor">
 	<Dialog id="addJobDialog" title="{= ${temporaryModel>/dialogTitle} }" resizable="true" draggable="true" contentHeight="auto" contentWidth="60%" afterClose="onCloseDialog">
 		<content>
 			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Change Job Status" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Status" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="statusCombo" required="true" class="sapUiSmallMarginTop" selectedKey="{temporaryModel>/Status}" items="{BackendStatusModel>/}" change="onStatusChange" valueStateText="{i18n>jpStatusValueState}" >
+					<ComboBox id="statusCombo" required="true" class="sapUiSmallMarginTop" selectedKey="{temporaryModel>/Status}" items="{BackendStatusModel>/}" change="onStatusChange" valueStateText="{i18n>jpStatusValueState}">
 						<core:Item key="{BackendStatusModel>key}" text="{BackendStatusModel>text}" />
 					</ComboBox>
 				</f:content>
@@ -20,31 +20,17 @@
 				<f:content>
 					<Title text="Administrative Details" level="H4" class="sapUiSmallMargin" />
 					<Label text="Location" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" 
-					class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" 
-					selectedKey="{temporaryModel>/SelectedLocation}" items="{BaseLocationModel>/}" 
-					change="onLocationChange" valueStateText="{i18n>jpLocationValueState}" >
+					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedLocation}" items="{BaseLocationModel>/}" change="onLocationChange" valueStateText="{i18n>jpLocationValueState}">
 						<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</ComboBox>
-
-
-<Label text="Work Mode" required="true" class="sapUiSmallMarginTop" />
-<ComboBox id="workModeCombo"  placeholder="Select Work Mode" required="true" class="sapUiSmallMarginTop" 
-items="{WorkingMode>/location}" selectedKey="{temporaryModel>/SelectedWorkMode}" showClearIcon="true" 
-change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
-	<core:ListItem key="{WorkingMode>ID}" text="{WorkingMode>Location}" />
-</ComboBox>
-
-
-
-
+					<Label text="Work Mode" required="true" class="sapUiSmallMarginTop" />
+					<ComboBox id="workModeCombo" placeholder="Select Work Mode" required="true" class="sapUiSmallMarginTop" items="{WorkingMode>/location}" selectedKey="{temporaryModel>/SelectedWorkMode}" showClearIcon="true" change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
+						<core:ListItem key="{WorkingMode>ID}" text="{WorkingMode>Location}" />
+					</ComboBox>
 					<Label text="Number of Positions" required="true" class="sapUiSmallMarginTop" />
 					<Input id="positionsInput" value="{temporaryModel>/NoOfPositions}" type="Text" placeholder="e.g., 5" liveChange="onNoOfPositionsChange" class="sapUiSmallMarginTop" maxLength="2" required="true"/>
-
 					<Label text="Post Date" required="true" class="sapUiSmallMarginTop" />
 					<DatePicker id="postDateDP" value="{temporaryModel>/PostDate}" valueFormat="yyyy-MM-dd" displayFormat="dd-MM-yyyy" placeholder="Select Date" change="onPostDateChange" class="sapUiSmallMarginTop" required="true" />
-
-
 				</f:content>
 			</f:SimpleForm>
 			<f:SimpleForm id="addJobForm3" editable="true" layout="ResponsiveGridLayout">
@@ -52,61 +38,31 @@ change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
 					<Title text="Skills &amp; Requirements" level="H4" class="sapUiSmallMargin" />
 					<Label text="Primary Skills" required="true" class="sapUiSmallMarginTop" />
 					<Input id="primarySkillsInput" value="{temporaryModel>/PrimarySkills}" placeholder="e.g., SAPUI5" liveChange="onPrimarySkillsChange" class="sapUiSmallMarginTop" type="Text" maxLength="50" required="true"/>
-
 					<Label text="Secondary Skills" required="true" class="sapUiSmallMarginTop" />
 					<rte:RichTextEditor id="secondarySkillsRTE" value="{temporaryModel>/SecondarySkills}" width="100%" height="150px" class="sapUiSmallMarginTop" required="true" change="onSecondarySkillsChange" />
-					
-					
 					<Label text="Skill Requirements" class="sapUiSmallMarginTop" />
 					<rte:RichTextEditor id="skillReqRTE" value="{temporaryModel>/SkillRequirements}" width="100%" height="150px" class="sapUiSmallMarginTop" change="onSkillRequirementsChange" />
-					
-					
-					
 					<Label text="Experience" required="true" class="sapUiSmallMarginTop" />
-						<ComboBox class="sapUiSmallMarginTop" id="experienceCombo" placeholder="Select Experience" items="{ExperienceModel>/data}" selectedKey="{temporaryModel>/SelectedExperienceKey}" change="onExperienceChange" required="true" valueStateText="{i18n>jpExpValueState}">
-							<core:Item key="{ExperienceModel>value}" text="{ExperienceModel>value} Years" />
-						</ComboBox>
-					
-					
-					
+					<ComboBox class="sapUiSmallMarginTop" id="experienceCombo" placeholder="Select Experience" items="{ExperienceModel>/data}" selectedKey="{temporaryModel>/SelectedExperienceKey}" change="onExperienceChange" required="true" valueStateText="{i18n>jpExpValueState}">
+						<core:Item key="{ExperienceModel>value}" text="{ExperienceModel>value} Years" />
+					</ComboBox>
 					<Label text="Qualification" required="true" class="sapUiSmallMarginTop" />
-					<MultiInput change=".onQualificationsChange" class="sapUiSmallMarginTop" id="multiInputQualifications" 
-placeholder="Select Qualifications" 
-showValueHelp="true" 
-valueHelpRequest=".onOpenQualificationsDialog" 
-tokenUpdate=".onQualificationsTokenUpdate" />
-
-					
-					
+					<MultiInput change=".onQualificationsChange" class="sapUiSmallMarginTop" id="multiInputQualifications" placeholder="Select Qualifications" showValueHelp="true" valueHelpRequest=".onOpenQualificationsDialog" tokenUpdate=".onQualificationsTokenUpdate" />
 					<Label text="Certifications" class="sapUiSmallMarginTop" />
 					<Input id="certificationsInput" value="{temporaryModel>/Certifications}" placeholder="Any relevant certifications" liveChange="onCertificationChange" class="sapUiSmallMarginTop" maxLength="50" type="Text" />
-				
-				
-				
 				</f:content>
 			</f:SimpleForm>
 			<f:SimpleForm id="addJobForm" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
-				
-				
-				
 					<Title text="Job Details" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Job Title" required="true" class="sapUiSmallMarginTop" />
 					<ComboBox class="sapUiSmallMarginTop" id="JobTitleCombo" placeholder="Select Job Title" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedJobTitleKey}" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
 						<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
 					</ComboBox>
-				
-				
-				
 					<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
 					<rte:RichTextEditor id="jobDescRTE" value="{temporaryModel>/JobDescription}" width="100%" height="200px" class="sapUiSmallMarginTop" required="true" change="onJobDescriptionChange"/>
-				
-				
-				
 					<Label text="Key Responsibilities" class="sapUiSmallMarginTop" />
 					<rte:RichTextEditor id="keyRespRTE" value="{temporaryModel>/KeyResponsibilities}" width="100%" height="200px" class="sapUiSmallMarginTop" change="onKeyResponsibilitiesChange"/>
-				
-				
 				</f:content>
 			</f:SimpleForm>
 		</content>

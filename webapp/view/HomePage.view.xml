@@ -1,12 +1,11 @@
-<mvc:View controllerName="sap.kt.com.minihrsolution.controller.HomePage"
-    displayBlock="true"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:l="sap.ui.layout"
-	xmlns:core="sap.ui.core"
-	xmlns:tnt="sap.tnt"
-	xmlns:f="sap.f"
-	xmlns:fb="sap.ui.comp.filterbar"
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.HomePage" displayBlock="true" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:l="sap.ui.layout" 
+	xmlns:core="sap.ui.core" 
+	xmlns:tnt="sap.tnt" 
+	xmlns:f="sap.f" 
+	xmlns:fb="sap.ui.comp.filterbar" 
 	xmlns:svm="sap.ui.comp.smartvariants" height="100%">
 	<tnt:ToolPage id="toolPage">
 		<tnt:header>
@@ -23,7 +22,7 @@
 		</tnt:header>
 		<tnt:subHeader>
 			<tnt:ToolHeader>
-				<IconTabHeader id="mainTabHeader" select="onTabSelect" >
+				<IconTabHeader id="mainTabHeader" select="onTabSelect">
 					<items>
 						<IconTabFilter key="idHome" text="{i18n>toolHome}" />
 						<IconTabFilter key="idAboutUs" text="{i18n>aboutus}"/>
@@ -52,32 +51,20 @@
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>
 					</ScrollContainer>
-					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin" >
+					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
 					</Page>
-					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin" >
+					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin">
 						<l:VerticalLayout width="100%">
 							<l:BlockLayout background="Dashboard">
 								<l:BlockLayoutRow>
-											<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}">
-												<Text text="{i18n>careersDes}" class="carrer-Des" />
-											</l:BlockLayoutCell>
+									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}">
+										<Text text="{i18n>careersDes}" class="carrer-Des" />
+									</l:BlockLayoutCell>
 								</l:BlockLayoutRow>
 							</l:BlockLayout>
 							<VBox height="1rem"/>
-							<fb:FilterBar
-            id="V1_ID_filterbar"
-            class="sapUiSmallMargin myCustomFilterBar myRoundedTable"
-            clear="v1_filClear"
-            search="V1_onSearch"
-            showClearOnFB="true"
-            showAllFilters="true"
-            showFilterConfiguration="false"
-            filtersDialogCancel="false"
-            persistencyKey="myPersKey"
-            useToolbar="false"
-            filterChange=".onFilterChange"
-            afterVariantLoad=".onAfterVariantLoad">
+							<fb:FilterBar id="V1_ID_filterbar" class="sapUiSmallMargin myCustomFilterBar myRoundedTable" clear="v1_filClear" search="V1_onSearch" showClearOnFB="true" showAllFilters="true" showFilterConfiguration="false" filtersDialogCancel="false" persistencyKey="myPersKey" useToolbar="false" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
 								<fb:filterGroupItems>
 									<fb:FilterGroupItem name="Skills" label="{i18n>V1_L_Skills}" groupName="Group1" visibleInFilterBar="true">
 										<fb:control>
@@ -88,7 +75,7 @@
 									</fb:FilterGroupItem>
 									<fb:FilterGroupItem name="Location" label="{i18n>V1_L_Location}" groupName="Group1" visibleInFilterBar="true">
 										<fb:control>
-											<ComboBox id="V1_ID_LocationComboBox" placeholder="Select Location" items="{BaseLocationModel>/}"  showClearIcon="true" showSecondaryValues="true" >
+											<ComboBox id="V1_ID_LocationComboBox" placeholder="Select Location" items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true">
 												<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 											</ComboBox>
 										</fb:control>
@@ -102,13 +89,7 @@
 									</fb:FilterGroupItem>
 								</fb:filterGroupItems>
 							</fb:FilterBar>
-							<Table
-            id="V1_ID_Table"
-            items="{JobApplicationModel>/Candidates}"
-            mode="SingleSelectMaster"
-            alternateRowColors="true"
-            class="sapUiSmallMargin myRoundedTable"
-            width="auto">
+							<Table id="V1_ID_Table" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
 								<columns>
 									<Column demandPopin="true">
 										<Text text="{i18n>v1_jobTitle}" />
@@ -131,7 +112,7 @@
 									<ColumnListItem>
 										<cells>
 											<Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
-										<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
+											<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
 											<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
 											<Text text="{JobApplicationModel>Location}" />
 											<Text text="{JobApplicationModel>Experience}" />
@@ -145,7 +126,7 @@
 					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 					</ScrollContainer>
-					<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin" >
+					<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/>
 					</Page>
 					<ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">

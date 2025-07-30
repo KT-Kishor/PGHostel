@@ -4,7 +4,7 @@ sap.ui.define(
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "../model/formatter", // Custom formatter functions
+    "../model/formatter",
   ],
   function (BaseController, utils, JSONModel, MessageToast, Formatter) {
     "use strict";
@@ -117,7 +117,7 @@ sap.ui.define(
           this.API = "https://www.rest.kalpavrikshatechnologies.com";
           oNavContainer.to(this.byId(selectedTab));
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
- 
+
           var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
@@ -150,17 +150,17 @@ sap.ui.define(
               ],
             });
 
-            oVBox.addStyleClass("sapUiTinyMargin"); // Apply transparent background class
+            oVBox.addStyleClass("sapUiTinyMargin");
             oCarousel.addPage(oVBox);
           });
 
           var iCurrentIndex = 0;
-          var aPages = oCarousel.getPages(); // Get all slides
+          var aPages = oCarousel.getPages();
 
           function autoSlide() {
             if (aPages.length > 1) {
-              iCurrentIndex = (iCurrentIndex + 1) % aPages.length; // Move to next slide
-              oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
+              iCurrentIndex = (iCurrentIndex + 1) % aPages.length;
+              oCarousel.setActivePage(aPages[iCurrentIndex]);
             }
           }
           setInterval(autoSlide, 30000);
@@ -595,19 +595,17 @@ sap.ui.define(
             .getObject();
           const sJobId = oSelectedData.ID; // Or whatever your unique field is
 
-
           // 🔁 Set global tab info
-        const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
-        if (oAppStateModel) {
-          oAppStateModel.setProperty("/previousTab", "idCareer");
-        }
+          const oAppStateModel =
+            this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idCareer");
+          }
           // Navigate using the jobId
           this.getRouter().navTo("RouteJobView", {
             jobId: sJobId,
           });
         },
-
-
       }
     );
   }

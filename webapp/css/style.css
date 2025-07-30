@@ -48,6 +48,13 @@
   }
 }
 
+/* Prevent label clipping */
+.customRow .formBox .sapMLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .TextColor {
   color: darksalmon;
 }
@@ -249,6 +256,7 @@
   background-image: url("../image/career1.jpg");
   background-size: cover;
   background-position: center;
+   background-attachment: fixed; 
   background-repeat: no-repeat;
   border-radius: 0.6rem;
   border-radius: 8px;
@@ -808,12 +816,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   margin-right: 40px;
 }
 
-/* .sapMPopover .sapMPopoverScroll {
-  background-image: url("../image/career1.jpg") !important;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-} */
 .floatingButton {
   position: fixed;
   bottom: 100px;
@@ -912,6 +914,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   display: block;
   box-sizing: border-box;
   background-color: #ffffff;
+  /* text-shadow: 4px 4px 2px #aaa; */
 }
 
 /* Responsive for mobile */
@@ -927,8 +930,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .myFormattedText p,
 .myFormattedText li {
   margin: 0 0 0.9rem 0;
-  font-size: 1rem !important; /* Changed: Reverted to normal font size (from 1.15rem) */
-  line-height: 1.7 !important; /* Adjusted slightly for normal text line spacing */
+  font-size: 1rem !important;
+  line-height: 1.7 !important;
   color: inherit !important;
   text-align: justify;
 }
@@ -945,7 +948,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   list-style-position: outside;
 }
 
-/* Headings - toned down font size and boldness, added subtle line */
+/* Headings -*/
 .myFormattedText h1,
 .myFormattedText h2,
 .myFormattedText h3,
@@ -955,7 +958,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   margin: 2rem 0 0.8rem 0;
   font-weight: 600 !important;
   line-height: 1.35;
-  font-size: 1.2rem !important; /* Changed: Adjusted heading font size (from 1.3rem) */
+  font-size: 1.2rem !important;
   color: #333 !important;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 0.4rem;
@@ -967,20 +970,20 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-style: italic;
 }
 
-/* General strong/bold text - reduced harshness */
+/* General strong/bold */
 .myFormattedText strong,
 .myFormattedText b {
   font-weight: 700 !important;
-  font-size: 1rem !important; /* Changed: Reverted to normal font size (from 1.1rem) */
+  font-size: 1rem !important; /* Changed:(from 1.1rem) */
   color: #111 !important;
 }
 
-/* Specific strong for list items - slightly more emphasis than general bold, but not harsh */
+/* Specific strong for list items, but not harsh */
 .myFormattedText li strong,
 .myFormattedText li b {
   font-weight: 750 !important;
   color: #000 !important;
-  font-size: 1.05rem !important; /* Changed: Adjusted for normal list item text (from 1.18rem) */
+  font-size: 1.05rem !important; /* Changed: (from 1.18rem) */
 }
 
 /* Underline, strike, highlight */
@@ -996,7 +999,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .myFormattedText mark,
 .myFormattedText .highlight {
   background-color: #A8E6CF !important; /* Light green */
-  color: #000 !important; /* Black text on highlight */
+  color: #000 !important; 
   font-weight: bold;
 }
 
@@ -1023,7 +1026,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   background-color: #f5f5f5;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
-  font-size: 0.9rem; /* Slightly smaller than normal text, common for code */
+  font-size: 0.9rem; 
   color: #333;
 }
 
@@ -1093,10 +1096,10 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-weight: 700 !important;
 }
 
-/* Custom Highlight for RTE example (Green background) */
+/* Custom Highlight for RTE example */
 .myFormattedText .alert-mark {
-  background-color: #66BB6A; /* A slightly darker green for alert */
-  color: #fff !important; /* White text on green background */
+  background-color: #66BB6A; 
+  color: #fff !important; 
   font-weight: 700;
   padding: 0.2em 0.4em;
   border-radius: 3px;
@@ -1139,45 +1142,27 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .shareText {
   margin-left: 0.5rem;
 }
-/* 
+
+
+
+
 .myAppBackground {
-  background-image: url("../image/background.jpg");
-  background-size: cover;
+ background-image: url("../image/background.jpg");
+   background-size: cover;
   background-position: center;
+  background-attachment: fixed; 
   background-repeat: no-repeat;
   border-radius: 0.6rem;
+  border-radius: 8px;
 }
-.myAppBackgroun {
-  position: fixed;
-  height: 100%;
-} */
- .myAppBackground {
+
+.myAppBackground {
   position: relative;
-  border-radius: 0.6rem;
-  overflow: hidden;
-  z-index: 0; /* Ensure layering works */
-}
-
-/* Fixed full-page background image behind content */
-.myAppBackground::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  background-image: url("../image/background.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  z-index: -1;
+  height: 100%;
 }
 
 
 
-/*#############################################################################*/
 /*
 Apply now button and reference button styles
 */
@@ -1213,8 +1198,6 @@ Apply now button and reference button styles
 .myCustomButton:hover .sapMBtnContent {
   font-size: 20px !important;
   font-weight: bold !important;
-  /* color: ##182493d5  !important ; */
-  /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif  !important; */
 }
 
 /* Main container */
@@ -1252,7 +1235,6 @@ Apply now button and reference button styles
   width: 100%;
   border-radius: 0.5rem;
   box-shadow: 0 0 0.5rem #17191884 !important;
-  /* overflow: hidden; -- Yahan se hata diya hai takki content cut off na ho aur ScrollContainer kaam kare */
 }
 
 /* Mobile layout */
@@ -1274,7 +1256,7 @@ Apply now button and reference button styles
     right: auto !important;
     margin: 1rem;
   }
-} /*#############################################################################*/
+} /*##*/
 
 .myCustomFilterBar.sapUiCompFilterBarNonPhone {
   background-image: none !important;
@@ -1312,21 +1294,45 @@ Apply now button and reference button styles
 
 
 
-/* Custom CSS for rounded table corners and box shadow */
 .myRoundedTable {
-    border-radius: 10px; /* Corners ko round karega */
-    overflow: hidden;    /* Important: ensures content inside respects the rounded corners */
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.764), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Ye box shadow hai */
+    border-radius: 10px; 
+    overflow: hidden;    
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.764), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
 }
 
-/* Optional: To ensure the header also respects rounded corners if it has its own background */
 .myRoundedTable .sapMListTblHeader {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
 
-/* Optional: To ensure the footer also respects rounded corners if it has its own background */
 .myRoundedTable .sapMListTblFooter {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+
+.noBottomSpace {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+ 
+.fileUploaderHBox {
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+ 
+/* Ensure Tokenizer takes full width on mobile */
+@media (max-width: 600px) {
+  .fileUploaderHBox .sapMTokenizer {
+    width: 100% !important;
+    margin-top: 0.5rem;
+  }
+ 
+  .fileUploaderHBox .sapMLabel {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+ 
+  .fileUploaderHBox .sapMFileUploader {
+    width: 100%;
+  }
 }

@@ -26,7 +26,6 @@ sap.ui.define(
           const aLocations = this.getView()
             .getModel("BaseLocationModel")
             ?.getProperty("/results");
-          console.log("aLocations", aLocations);
 
           const router = this.getOwnerComponent().getRouter();
           router
@@ -36,37 +35,36 @@ sap.ui.define(
 
         _onObjectMatched: async function () {
           try {
-            this.getBusyDialog(); // Show busy dialog at the beginning
+            this.getBusyDialog();
 
-            // 🔐 Login check
+            //  Login check
             const bLoginSuccess = await this.commonLoginFunction("JobPosting");
             if (!bLoginSuccess) {
               this.closeBusyDialog();
               return;
             }
 
-            // 🌐 i18n + validation init
+            //  i18n + validation init
             this.i18na = this.getView().getModel("i18n")?.getResourceBundle();
             this.validation = validation;
 
-            // 🧠 Set Header Name using i18n
+            //  Set Header Name using i18n
             const sHeaderText = this.i18na.getText("JobPosting");
             this.getView()
               .getModel("LoginModel")
               .setProperty("/HeaderName", sHeaderText);
 
-            // 🧹 Reset controller state
+            // Reset controller state
             this._productDialog = null;
             this._isEdit = false;
             this._editIndex = null;
 
-            // 📦 Load backend data
+            // Load backend data
             await this._fetchJobOpenings();
             await this._setBackendStatusModel();
             await this._getUniqueSkillsFromCandidates();
           } catch (error) {
-            // ❌ Proper error capture
-            console.error("Error in _onObjectMatched:", error);
+            // Proper error capture
             MessageToast.show(
               error?.message || error?.responseText || "Unknown error occurred."
             );
@@ -112,7 +110,7 @@ sap.ui.define(
             });
             this.getView().setModel(oModel, "JobApplicationModel");
 
-            // 🔁 Refresh dependent models for filters
+            //  Refresh dependent models for filters
             this._getUniqueSkillsFromCandidates();
           } catch (err) {
             this.closeBusyDialog();
@@ -165,7 +163,7 @@ sap.ui.define(
               .getModel("JobApplicationModel")
               ?.getProperty("/Candidates") || [];
 
-          // 📍 Location
+          // Location
           const aLocations = [
             ...new Set(
               aCandidates.map((o) => o.Location?.trim()).filter(Boolean)
@@ -177,7 +175,7 @@ sap.ui.define(
           });
           this.getView().setModel(oLocModel, "BackendLocationModel");
 
-          // 💼 Experience
+          // Experience
           const aExperience = [
             ...new Set(
               aCandidates.map((o) => o.Experience?.trim()).filter(Boolean)
@@ -187,7 +185,7 @@ sap.ui.define(
           const oExpModel = new JSONModel(aExperience);
           this.getView().setModel(oExpModel, "BackendExperienceModel");
 
-          // ✅ Status
+          //  Status
           const aStatus = [...new Set(aCandidates.map((o) => o.Status))].map(
             (stat) => ({
               key: stat?.toString(),
@@ -198,7 +196,7 @@ sap.ui.define(
           const oStatusModel = new JSONModel(aStatus);
           this.getView().setModel(oStatusModel, "BackendStatusModel");
 
-          // 🧠 Primary Skills
+          //  Primary Skills
           const aSkills = aCandidates
             .map((o) => o.PrimarySkills)
             .filter(Boolean)
@@ -240,10 +238,10 @@ sap.ui.define(
             this._dialogMap[dialogId] = oDialog;
           }
 
-          // 🧠 Bind model before opening
+          //  Bind model before opening
           oDialog.setModel(oTempModel, "temporaryModel");
 
-          // 📆 Set min/max range for DatePickers
+          // Set min/max range for DatePickers
           datePickerIds.forEach((id) => {
             const oDP = this.byId(id);
             if (oDP?.setMinDate && oDP?.setMaxDate) {
@@ -255,7 +253,7 @@ sap.ui.define(
             }
           });
 
-          // 🔁 Attach Rich Text Editor change events
+          // Attach Rich Text Editor change events
           const sFragId = oView.getId();
           ["secondarySkillsRTE", "jobDescRTE"].forEach((rteId) => {
             const oRTE = Fragment.byId(sFragId, rteId);
@@ -265,7 +263,7 @@ sap.ui.define(
             }
           });
 
-          // 🧩 Set DatePickers readonly
+          // Set DatePickers readonly
           datePickerIds.forEach((id) => {
             const oDP = this.byId(id);
             if (oDP) {
@@ -279,104 +277,13 @@ sap.ui.define(
           oDialog.open();
         },
 
-        // onOpenAddJobDialog: function () {
-        //   const oView = this.getView();
-
-        //   this._isEdit = false;
-        //   this._editJobId = null;
-
-        //   // this.getBusyDialog().open();
-
-        //   const oTempModel = new JSONModel({
-        //     dialogTitle: "Create Job Posting",
-        //     SelectedJobTitleKey: "",
-        //     qualifications: [],
-        //     SelectedExperienceKey: "",
-        //     SelectedLocation: "",
-        //     JobDescription: "",
-        //     KeyResponsibilities: "",
-        //     PrimarySkills: "",
-        //     SecondarySkills: "",
-        //     SkillRequirements: "",
-        //     Certifications: "",
-        //     SelectedWorkMode: "",
-        //     NoOfPositions: "",
-        //     PostDate: "", // default to blank or today
-        //     Status: "true",
-        //     isEdit: false,
-        //   });
-
-        //   oView.setModel(oTempModel, "temporaryModel");
-
-        //   // Use shared method to open dialog and render tokens
-        //   this._openJobDialog(oTempModel);
-        //   this.closeBusyDialog(); // Always close
-        // },
-        // onOpenEditJobDialog: function () {
-        //   const oView = this.getView();
-        //   const oTable = this.byId("jobPostingTable");
-        //   const oSelectedItem = oTable.getSelectedItem();
-
-        //   if (!oSelectedItem) {
-        //     MessageToast.show("Please select a row to edit");
-        //     return;
-        //   }
-
-        //   const oContext = oSelectedItem.getBindingContext(
-        //     "JobApplicationModel"
-        //   );
-        //   const oData = oContext.getObject();
-
-        //   this._isEdit = true;
-        //   this._editJobId = oData.ID || "";
-
-        //   const aQualifications = (oData.Qualification || "")
-        //     .split(",")
-        //     .map((s) => s.trim())
-        //     .filter(Boolean);
-
-        //   const aLocations =
-        //     oView.getModel("BaseLocationModel")?.getProperty("/") || [];
-        //   const selectedLocationId =
-        //     aLocations.find((loc) => loc.city === oData.Location)?.id || "";
-
-        //   const workingModes =
-        //     oView.getModel("WorkingMode")?.getProperty("/location") || [];
-        //   const selectedWorkModeId =
-        //     workingModes.find((mode) => mode.Location === oData.LocationService)
-        //       ?.ID || "";
-
-        //   const oTempModel = new JSONModel({
-        //     dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
-        //     SelectedJobTitleKey: oData.JobTitle || "",
-        //     qualifications: aQualifications,
-        //     SelectedExperienceKey: oData.Experience || "",
-        //     SelectedLocation: selectedLocationId,
-        //     JobDescription: oData.JobDescription || "",
-        //     KeyResponsibilities: oData.KeyResponsibilities || "",
-        //     PrimarySkills: oData.PrimarySkills || "",
-        //     SecondarySkills: oData.SecondarySkills || "",
-        //     SkillRequirements: oData.SkillRequirements || "",
-        //     Certifications: oData.Certifications || "",
-        //     SelectedWorkMode: selectedWorkModeId,
-        //     NoOfPositions: oData.NoOfPositions || "",
-        //     PostDate: oData.PostDate?.split("T")[0] || "",
-        //     Status: oData.Status || "false",
-        //     isEdit: true,
-        //   });
-
-        //   oView.setModel(oTempModel, "temporaryModel");
-
-        //   // Use shared method to open dialog and render tokens
-        //   this._openJobDialog(oTempModel);
-        // },
         onOpenAddJobDialog: function () {
           const oView = this.getView();
 
           this._isEdit = false;
           this._editJobId = null;
 
-          this.getBusyDialog(); // ✅ Open Busy Dialog properly
+          this.getBusyDialog(); //
 
           const oTempModel = new JSONModel({
             dialogTitle: "Create Job Posting",
@@ -400,11 +307,9 @@ sap.ui.define(
           oView.setModel(oTempModel, "temporaryModel");
 
           this._openJobDialog(oTempModel)
-            .catch((err) => {
-              console.error("Dialog open error:", err);
-            })
+            .catch((err) => {})
             .finally(() => {
-              this.closeBusyDialog(); // ✅ Always close
+              this.closeBusyDialog();
             });
         },
 
@@ -418,7 +323,7 @@ sap.ui.define(
             return;
           }
 
-          this.getBusyDialog(); // ✅ Open Busy Dialog properly
+          this.getBusyDialog();
 
           const oContext = oSelectedItem.getBindingContext(
             "JobApplicationModel"
@@ -466,11 +371,9 @@ sap.ui.define(
           oView.setModel(oTempModel, "temporaryModel");
 
           this._openJobDialog(oTempModel)
-            .catch((err) => {
-              console.error("Dialog open error:", err);
-            })
+            .catch((err) => {})
             .finally(() => {
-              this.closeBusyDialog(); // ✅ Always close
+              this.closeBusyDialog();
             });
         },
 
@@ -493,24 +396,6 @@ sap.ui.define(
           });
         },
 
-        // _openJobDialog: function (oTempModel) {
-        //   this._commonFragmentOpen(
-        //     oTempModel,
-        //     "sap.kt.com.minihrsolution.fragment.AddEditJob",
-        //     "addJobDialog",
-        //     ["postDateDP"]
-        //   ).then(() => {
-        //     const oMultiInput = this.byId("multiInputQualifications");
-        //     if (oMultiInput) {
-        //       oMultiInput.removeAllTokens();
-        //       const aQualifications =
-        //         oTempModel.getProperty("/qualifications") || [];
-        //       aQualifications.forEach((q) =>
-        //         oMultiInput.addToken(new sap.m.Token({ text: q, key: q }))
-        //       );
-        //     }
-        //   });
-        // },
         onQualificationsTokenUpdate: function (oEvent) {
           const oInput = oEvent.getSource();
           const oModel = this.getView().getModel("temporaryModel");
@@ -533,7 +418,7 @@ sap.ui.define(
             oModel.setProperty("/qualifications", aUpdated);
           }
 
-          // ✅ Always validate after change (whether added or removed)
+          // Always validate after change (whether added or removed)
           setTimeout(() => {
             const aTokens = oInput.getTokens();
             if (aTokens.length === 0) {
@@ -553,7 +438,6 @@ sap.ui.define(
           const oDialog = this.byId("addJobDialog");
 
           if (!oDialog) {
-            console.warn("Dialog not found");
             return;
           }
 
@@ -680,7 +564,7 @@ sap.ui.define(
           const oPayload = this._prepareJobPayload();
           if (!oPayload) return;
 
-          this.getBusyDialog(); // ✅ Show Busy Dialog
+          this.getBusyDialog(); //
 
           try {
             if (this._isEdit && this._editJobId) {
@@ -696,20 +580,19 @@ sap.ui.define(
               MessageToast.show(this.getText("jobCreateSuccess"));
             }
 
-            await this._fetchJobOpenings(); // ✅ Refresh
+            await this._fetchJobOpenings();
 
-            this.onJobSelectionChange(); // ✅ Clear selection
-            this._cleanupDialogAfterSubmit(); // ✅ Reset form
-            this.onCloseDialog(); // ✅ Close dialog
+            this.onJobSelectionChange();
+            this._cleanupDialogAfterSubmit();
+            this.onCloseDialog();
           } catch (error) {
-            console.error("Submit Job Error:", error);
             const errorText =
               error?.responseJSON?.error?.message ||
               error?.message ||
               this.getText("jobSubmitError");
             MessageToast.show(errorText);
           } finally {
-            this.closeBusyDialog(); // ✅ Always close
+            this.closeBusyDialog();
           }
         },
 
@@ -786,7 +669,7 @@ sap.ui.define(
             ...(isEditMode && { statusCombo: "Status" }),
           };
 
-          // ✅ Smooth scroll helper
+          // Smooth scroll helper
           const scrollAndToast = (oCtrl, fieldName) => {
             setTimeout(() => {
               try {
@@ -802,9 +685,7 @@ sap.ui.define(
                   });
                 }
                 oCtrl.focus?.();
-              } catch (e) {
-                console.warn("Scroll failed for", fieldName, e);
-              }
+              } catch (e) {}
               MessageToast.show(
                 that.getText("mandetoryFields") + `: ${fieldName}`
               );
@@ -858,7 +739,6 @@ sap.ui.define(
             if (!validateField(field.id, field.validator)) return false;
           }
 
-          // ✅ SecondarySkills RTE
           const oSecRTE = Fragment.byId(oView.getId(), "secondarySkillsRTE");
           const sSecPlain = oSecRTE
             ?.getValue()
@@ -875,7 +755,7 @@ sap.ui.define(
             oSecDom?.classList.remove("sapUiRTEErrorBorder");
           }
 
-          // ✅ ComboBoxes + MultiInput
+          // ComboBoxes + MultiInput
           const nextFields = [
             {
               id: "experienceCombo",
@@ -898,7 +778,7 @@ sap.ui.define(
             if (!validateField(field.id, field.validator)) return false;
           }
 
-          // ✅ JobDescription RTE
+          // JobDescription RTE
           const oJobDescRTE = Fragment.byId(oView.getId(), "jobDescRTE");
           const sDescPlain = oJobDescRTE
             ?.getValue()
@@ -978,7 +858,6 @@ sap.ui.define(
 
           if (!oJobData.ID) {
             MessageToast.show("Selected item has no valid ID for deletion.");
-            console.error("Missing ID in Job Data:", oJobData);
             return;
           }
 
@@ -990,14 +869,12 @@ sap.ui.define(
             async () => {
               this.getBusyDialog();
               try {
-                console.log("📦 Deletion Payload:", sPayload);
                 await this.ajaxDeleteWithJQuery("JobOpenings", sPayload);
                 MessageToast.show(this.i18na.getText("DeleteJPSucces"));
                 this._fetchJobOpenings();
                 oTable.removeSelections(true);
                 this.onJobSelectionChange();
               } catch (error) {
-                console.error("❌ Deletion failed:", error);
                 MessageToast.show(
                   "Failed to delete job: " +
                     (error?.responseJSON?.message ||
@@ -1009,7 +886,7 @@ sap.ui.define(
             },
             () => {
               oTable.removeSelections(true);
-              this.onJobSelectionChange(); // ⛔ disables Delete button
+              this.onJobSelectionChange();
             }
           );
         },
@@ -1018,18 +895,14 @@ sap.ui.define(
           const oInput = oEvent.getSource();
           let sValue = oInput.getValue();
 
-          // Step 1: Remove non-digit characters
           sValue = sValue.replace(/\D/g, "");
 
-          // Step 2: Remove leading zeros
           sValue = sValue.replace(/^0+/, "");
 
-          // Step 3: Limit to 2 digits
           if (sValue.length > 2) {
             sValue = sValue.substring(0, 2);
           }
 
-          // Step 4: Validate final value
           const iValue = parseInt(sValue, 10);
           if (!iValue || iValue < 1 || iValue > 99) {
             oInput.setValueState("Error");
@@ -1040,7 +913,6 @@ sap.ui.define(
             oInput.setValueState("None");
           }
 
-          // Step 5: Set corrected value
           oInput.setValue(sValue);
         },
 
@@ -1051,25 +923,18 @@ sap.ui.define(
           const oMinDate = new Date();
           oMinDate.setFullYear(oToday.getFullYear() - 20);
 
-          // 🛑 1. Empty or invalid input check (keyboard nonsense, blank)
           if (!oDate || isNaN(oDate.getTime())) {
             oDatePicker.setValueState("Error");
             oDatePicker.setValueStateText("Please select a valid date");
-          }
-          // 🛑 2. Range check
-          else if (oDate < oMinDate || oDate > oToday) {
+          } else if (oDate < oMinDate || oDate > oToday) {
             oDatePicker.setValueState("Error");
             oDatePicker.setValueStateText(
               "Date must be within the last 20 years and not in the future"
             );
-          }
-          // ✅ Valid date
-          else {
+          } else {
             oDatePicker.setValueState("None");
           }
 
-          // 🛡 3. Always block typing manually
-          // (Ensures even after re-binding it's enforced again)
           setTimeout(() => {
             oDatePicker.$().find("input").attr("readonly", true);
           }, 0);
@@ -1092,7 +957,6 @@ sap.ui.define(
 
           const validSkillRegex = /^(?!\d+$)[A-Za-z0-9 +#.\-,]+$/;
 
-          // Split by comma and validate each skill
           const skillsArray = sValue
             .split(",")
             .map((s) => s.trim())
@@ -1196,7 +1060,7 @@ sap.ui.define(
           let sStartDate = "";
           let sEndDate = "";
 
-          // 🔄 Extract filter values
+          // Extract filter values
           aFilterItems.forEach((oItem) => {
             const sFieldName = oItem.getName();
             const oControl = oItem.getControl();
@@ -1286,7 +1150,7 @@ sap.ui.define(
           } catch (err) {
             this.showMessage(
               "fetchError",
-              "❌ " + (err?.responseJSON?.message || err?.message)
+              " " + (err?.responseJSON?.message || err?.message)
             );
           } finally {
             this.closeBusyDialog();
@@ -1302,20 +1166,20 @@ sap.ui.define(
               .getModel("JobApplicationModel")
               ?.getProperty("/Candidates") || [];
 
-          // 🔍 Flatten and extract all skills
+          // Flatten and extract all skills
           const aMatchedSkills = aTableData
             .map((item) => item.PrimarySkills?.split(",") || [])
             .flat()
             .map((skill) => skill.trim())
             .filter((skill) => skill.toLowerCase().includes(sValue));
 
-          // 🧼 Remove duplicates
+          //  Remove duplicates
           const aUniqueSkills = [...new Set(aMatchedSkills)];
 
-          // 📦 Convert to suggestion item format
+          // Convert to suggestion item format
           const aSuggestionItems = aUniqueSkills.map((skill) => ({ skill }));
 
-          // 🔁 Bind to model
+          // Bind to model
           const oSuggestModel = new JSONModel({
             skills: aSuggestionItems,
           });
@@ -1327,7 +1191,7 @@ sap.ui.define(
           this.byId("filterExperienceJP").setSelectedKey("");
           this.byId("filterStatus").setSelectedKey("");
           this.byId("filterPrimarySkills").setValue("");
-          this.byId("filterCreateDate").setValue("");
+          this.byId("filterPostDate").setValue("");
         },
         onJobSelectionChange: function () {
           var aSelectedItems = this.byId("jobPostingTable").getSelectedItems();
@@ -1365,13 +1229,7 @@ sap.ui.define(
           this.validation._LCstrictValidationComboBox(oEvent);
         },
         onOpenQualificationsDialog: function () {
-          console.log("Hello i'm triggered");
-
           const oTempModel = this.getView().getModel("QualificationModel");
-          console.log(
-            "Hello",
-            this.getView().getModel("QualificationModel").getData()
-          );
 
           this._commonFragmentOpen(
             oTempModel,
@@ -1396,11 +1254,6 @@ sap.ui.define(
             oMultiInput.addToken(new sap.m.Token({ text: q, key: q }));
           });
 
-          // ✅ Strict reusable validation
-          // this.utils.validation._strictValidationMultiInput(
-          //   oMultiInput,
-          //   "At least one qualification is required."
-          // );
           this.validation._strictValidationMultiInput(
             oMultiInput,
             aValues,

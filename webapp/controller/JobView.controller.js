@@ -32,10 +32,8 @@ sap.ui.define(
           this.tokenModel = new JSONModel({ tokens: [] });
           this.getView().setModel(this.tokenModel, "tokenModel");
 
-          // File model (yeh 'this.oFileModel' kahan se aa raha hai? Ensure it's defined or remove if not needed)
-          this.getView().setModel(this.oFileModel); // Is line ko verify karein ya hata dein agar this.oFileModel defined nahi hai.
+          this.getView().setModel(this.oFileModel);
 
-          // File input change listener (ensure 'hiddenFileInput' ID exists in XML)
           setTimeout(() => {
             const fileInput = document.getElementById("hiddenFileInput");
             if (fileInput) {
@@ -47,54 +45,17 @@ sap.ui.define(
           }, 0);
         },
 
-        // 🚦 Route handler — when user navigates to /JobView/:jobId
-        // _onRouteMatched: function (oEvent) {
-        //   const sJobId = oEvent.getParameter("arguments").jobId;
-        //   console.log("[Route] Job ID matched:", sJobId);
-
-        //   this.getBusyDialog();
-
-        //   this._fetchJobById(sJobId)
-        //     .then((oJob) => {
-        //       if (oJob) {
-        //         // ✅ JobApplicationModel ko ek baar define aur set karein
-        //         // Yeh model main view pe set hoga aur fragment ise inherit karega.
-        //         // Isme fetched job data hogi.
-        //         const oJobApplicationModel = new JSONModel(oJob);
-        //         this.getView().setModel(
-        //           oJobApplicationModel,
-        //           "JobApplicationModel"
-        //         );
-
-        //         console.log(
-        //           "[Model] JobApplicationModel set with data:",
-        //           oJobApplicationModel.getData()
-        //         );
-        //       } else {
-        //         MessageToast.show("No job found.");
-        //         console.warn("[Warn] No job returned for ID:", sJobId);
-        //       }
-        //     })
-        //     .catch((err) => {
-        //       console.error("[Error] Failed to fetch job:", err);
-        //       MessageToast.show("Failed to fetch job details.");
-        //     })
-        //     .finally(() => {
-        //       this.closeBusyDialog();
-        //     });
-        // },
         _onRouteMatched: function (oEvent) {
           const sJobId = oEvent.getParameter("arguments").jobId;
-          console.log("[Route] Job ID matched:", sJobId);
 
-           this.getBusyDialog();
+          this.getBusyDialog();
 
           this._fetchJobById(sJobId)
             .then((oJob) => {
               const bIsValidJob = !!oJob;
               const oJobApplicationModel = new JSONModel({
                 ...oJob,
-                isValidJob: bIsValidJob, // 👈 new flag
+                isValidJob: bIsValidJob,
               });
 
               this.getView().setModel(
@@ -104,17 +65,14 @@ sap.ui.define(
 
               if (!bIsValidJob) {
                 if (!oData || !oData.JobTitle) {
-                  this.getView().byId("jobDetailsContainer").setVisible(false); // hide main content block
-                  // Optionally trigger a toast or log
+                  this.getView().byId("jobDetailsContainer").setVisible(false);
                 }
 
-                // MessageToast.show("Job not available.");
-                console.warn("[Route] No valid job data for ID:", sJobId);
+                // console.warn("[Route] No valid job data for ID:", sJobId);
               }
             })
             .catch((err) => {
-              console.error("[Error] Failed to fetch job:", err);
-              MessageToast.show("Failed to fetch job details.");
+              // MessageToast.show("Failed to fetch job details");
             })
             .finally(() => {
               this.closeBusyDialog();
@@ -123,10 +81,6 @@ sap.ui.define(
 
         _fetchJobById: function (sJobId) {
           const sUrl = "https://rest.kalpavrikshatechnologies.com/JobOpenings";
-          console.log(
-            "[API] Fetching job list for filtering by ID and Status:",
-            sJobId
-          );
 
           return new Promise((resolve, reject) => {
             $.ajax({
@@ -141,26 +95,24 @@ sap.ui.define(
               },
               success: function (oData) {
                 const aData = oData?.data || [];
-                console.log("[API] Total jobs fetched:", aData.length);
 
                 const oFilteredJob = aData.find((job) => {
                   const idMatch = job?.ID === sJobId;
                   const statusTrue = job?.Status === "true";
 
                   if (idMatch && statusTrue) {
-                    return true; // ✅ Only show this
+                    return true;
                   }
-                  return false; // ❌ Hide others
+                  return false;
                 });
 
                 if (oFilteredJob) {
                   resolve(oFilteredJob);
                 } else {
-                  resolve(null); // Job doesn't qualify
+                  resolve(null);
                 }
               },
               error: function (xhr, status, error) {
-                console.error("[API Error]", status, error);
                 reject(error);
               },
             });
@@ -170,13 +122,12 @@ sap.ui.define(
         onFileChange: function (oEvent) {
           const oFile = oEvent.getParameter("files")[0];
           if (!oFile) {
-            MessageToast.show("No file selected.");
+            MessageToast.show("No file selected");
             return;
           }
           const oModel = this.getView().getModel("tokenModel");
           let aTokens = oModel.getProperty("/tokens") || [];
 
-          // Restrict to one file
           if (aTokens.length >= 1) {
             sap.m.MessageBox.error("Only one file uploaded");
             return;
@@ -224,14 +175,11 @@ sap.ui.define(
         },
 
         onTokenDelete: function (oEvent) {
-          // Get the model
           var oModel = this.getView().getModel("tokenModel");
           var aTokens = oModel.getProperty("/tokens") || [];
 
-          // Get deleted tokens from event
           var aTokensToDelete = oEvent.getParameter("tokens");
 
-          // Filter out deleted tokens
           aTokensToDelete.forEach(function (oDeletedToken) {
             var sKey = oDeletedToken.getKey();
             aTokens = aTokens.filter(function (token) {
@@ -239,10 +187,8 @@ sap.ui.define(
             });
           });
 
-          // Update model
           oModel.setProperty("/tokens", aTokens);
 
-          // Clear upload model if all tokens are deleted
           if (aTokens.length === 0) {
             const uploadModel = this.getView().getModel("UploadModel");
             if (uploadModel) {
@@ -316,10 +262,6 @@ sap.ui.define(
           this.oSelectedFile = null;
         },
 
-        // onNavBack: function () {
-        //   this.getOwnerComponent().getRouter().navTo("RouteHomePage");
-        // },
-
         onNavBack: function () {
           const oAppStateModel =
             this.getOwnerComponent().getModel("AppStateModel");
@@ -328,7 +270,6 @@ sap.ui.define(
 
           this.getOwnerComponent().getRouter().navTo("RouteHomePage");
 
-          // Save tab key temporarily to session
           sessionStorage.setItem("homePageReturnTab", sTabKey);
         },
 
@@ -350,10 +291,10 @@ sap.ui.define(
           }
 
           if (typeof val === "number") {
-            return val !== 0; // e.g., 1 returns true, 0 returns false
+            return val !== 0;
           }
 
-          return !!val; // fallback — converts to boolean
+          return !!val;
         },
         getWorkModeTooltip: function (sMode) {
           switch ((sMode || "").toUpperCase()) {
@@ -394,10 +335,9 @@ sap.ui.define(
             el.style.color = "#2c3e50";
           });
         },
-          getFormDataAsJSON: function () {
+        getFormDataAsJSON: function () {
           const safeVal = (ctrl) => ctrl?.getValue?.().trim?.() || "";
           const safeKey = (ctrl) => ctrl?.getSelectedKey?.().trim?.() || "";
-          // const safeText = (ctrl) => ctrl?.getSelectedItem?.()?.getText?.().trim?.() || "";
           const safeText = (ctrl) =>
             ctrl?.getValue?.().trim?.() ||
             ctrl?.getSelectedItem?.()?.getText?.().trim?.() ||
@@ -426,12 +366,10 @@ sap.ui.define(
             safeText(f("qualificationCombo")) ||
             safeVal(f("qualificationCombo"));
 
-          //  Experience (may be empty if fresher)
           const experience = safeVal(f("experienceInput"));
           const company = safeVal(f("companyInput"));
           const designation = safeText(f("previousJobTitleCombo")) || "";
           const salary = safeVal(f("salaryInput"));
-          // const previousRoles = safeVal(f("rolesInput"));
 
           const workDurationStart = safeDate(
             f("experienceRange")?.getDateValue?.()
@@ -448,16 +386,11 @@ sap.ui.define(
           const describeYourSelf = safeVal(f("fresherSelfDesc"));
           const expertise = safeText(f("fresherExpertiseInput"));
 
-          // const roles = safeText(f("rolesInput"));
           const roles = safeVal(f("rolesInput"));
 
-          // const roles = safeText(f("rolesInput")).trim();
-
-          //  Location
           const country =
             safeText(f("countryCombo")) || safeVal(f("countryCombo"));
           const isd = safeText(f("isd_code")) || safeVal(f("isd_code"));
-          // const city = safeText(f("LocationComboBox")) || safeVal(f("LocationComboBox"));
           const city = f("LocationComboBox").getSelectedKey();
 
           // Resume
@@ -466,14 +399,10 @@ sap.ui.define(
           const fileName = uploadModel.FileName || "";
           const fileType = uploadModel.FileType || "";
 
-          //  Job Title from external model
-          // const jobTitle =
-          //   view.getModel("SelectedCandidate")?.getProperty("/JobTitle") ||
-          //   "Unknown";
           const jobTitle =
             this.getView()
               .getModel("JobApplicationModel")
-              ?.getProperty("/JobTitle") || "Unknown"; // ✅ Changed from SelectedCandidate
+              ?.getProperty("/JobTitle") || "Unknown";
 
           //  Final Payload
           return {
@@ -514,7 +443,7 @@ sap.ui.define(
             CreatedBy: "Candidate",
             AttachmentName: fileName,
             AttachmentType: fileType,
-            CreateDate: new Date().toISOString().split("T")[0], // → "2025-07-29"
+            CreateDate: new Date().toISOString().split("T")[0],
           };
         },
 
@@ -561,55 +490,33 @@ sap.ui.define(
             }).then(function (oDialog) {
               that._oJobDialog = oDialog; //  Save the actual Dialog after loading
               that.getView().addDependent(oDialog);
-              //  Optional: inject into fragment also
-              //              oDialog.setModel(oJobModel, "JobModel");
               oDialog.setModel(oJobModel, "JobApplicationModel");
 
-              // Get the JobApplicationModel that was already set on the View
-              // (e.g., from _onRouteMatched function)
               const oJobApplicationModelFromView = that
                 .getView()
                 .getModel("JobApplicationModel");
 
-              // *** FIX 1: Set JobApplicationModel on Dialog ***
               if (oJobApplicationModelFromView) {
                 oDialog.setModel(
                   oJobApplicationModelFromView,
                   "JobApplicationModel"
                 );
 
-                // *** FIX 2: Programmatically set the Dialog Title ***
                 const jobTitle =
                   oJobApplicationModelFromView.getProperty("/JobTitle");
                 if (jobTitle) {
                   oDialog.setTitle("Job Application — " + jobTitle);
-                  console.log(
-                    "Dialog title set programmatically:",
-                    oDialog.getTitle()
-                  );
                 } else {
-                  oDialog.setTitle("Job Application"); // Default if title is not found
-                  console.warn(
-                    "JobTitle not found in JobApplicationModel, using default title."
-                  );
+                  oDialog.setTitle("Job Application");
                 }
               } else {
-                // Fallback: Agar kisi wajah se JobApplicationModel view par set nahi hai,
-                // toh ek naya model bana dein. Ideally, this block should not be hit
-                // if _onRouteMatched works correctly.
                 const oFallbackJobModel = new sap.ui.model.json.JSONModel({
                   JobTitle: "Job Application", // Default title if not found
-                  // ... other properties if needed ...
                 });
                 oDialog.setModel(oFallbackJobModel, "JobApplicationModel");
                 oDialog.setTitle("Job Application"); // Set fallback title
-                console.warn(
-                  "JobApplicationModel not found on View, using fallback for dialog title."
-                );
               }
-              // *** END FIX ***
 
-              //  Inject global models into fragment if not already done
               ["CountryModel", "codeModel", "BaseLocationModel"].forEach(
                 (sName) => {
                   const oGlobalModel = that.getOwnerComponent().getModel(sName);
@@ -630,7 +537,7 @@ sap.ui.define(
                 "jobFileUploader"
               );
               if (fileUploader) {
-                fileUploader.data("required", true); //  runtime-only
+                fileUploader.data("required", true);
               }
 
               //  Set DOB min/max range
@@ -723,7 +630,6 @@ sap.ui.define(
 
                 oYearPicker.setMinDate(oMinYear);
                 oYearPicker.setMaxDate(oMaxYear);
-                // oYearPicker.setDateValue(oMaxYear); // Optional: pre-fill with current year
 
                 const oToday2 = new Date();
 
@@ -842,25 +748,17 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        // onRolesChange: function (oEvent) {
-        //   utils._LCvalidateMandatoryField(oEvent);
-        // },
-
         onSkillsChange: function (oEvent) {
           var oInput = oEvent.getSource();
           var sValue = oInput.getValue();
 
-          // Trim just for visual cleanup — do not use for length or alpha count
           var sTrimmed = sValue.trim();
 
-          // Rule 1: Must be minimum 8 characters
           var bMinLength = sValue.length >= 8;
 
-          // Rule 2: Must contain at least 10 alphabets (a-z, A-Z)
           var letterMatches = sValue.match(/[a-zA-Z]/g);
           var bHasEnoughLetters = letterMatches && letterMatches.length >= 8;
 
-          // Rule 3: Must not be all spaces or just symbols
           var bNotOnlySpaces = !/^\s*$/.test(sValue); // not just spaces
           var bNotOnlyDots = !/^[.]+$/.test(sValue); // not just dots
 
@@ -872,7 +770,6 @@ sap.ui.define(
           ) {
             oInput.setValueState(sap.ui.core.ValueState.Error);
             const sMessage = this.oResourceBundle.getText("v2_m_errSkills");
-            //  MessageToast.show(sMessage);
 
             oInput.setValueStateText(sMessage);
           } else {
@@ -884,11 +781,10 @@ sap.ui.define(
           var oDatePicker = oEvent.getSource();
           var sId = oDatePicker.getId();
 
-          // Reapply readonly protection after any change (in case of re-render)
           this._makeDatePickersReadOnly([sId]);
 
-          var oSelectedDate = oDatePicker.getDateValue(); // parsed Date object
-          var sRawValue = oDatePicker.getValue(); // user input (string)
+          var oSelectedDate = oDatePicker.getDateValue();
+          var sRawValue = oDatePicker.getValue();
 
           // 1. If field is empty — valid (optional field)
           if (!sRawValue) {
@@ -900,7 +796,7 @@ sap.ui.define(
           // 2. If input is non-empty, but parsed date is invalid — error
           if (!oSelectedDate || isNaN(oSelectedDate.getTime())) {
             oDatePicker.setValueState(sap.ui.core.ValueState.Error);
-            const sMessage = this.oResourceBundle.getText("v2_m_errDOB"); // e.g., "Invalid date format"
+            const sMessage = this.oResourceBundle.getText("v2_m_errDOB");
             oDatePicker.setValueStateText(sMessage);
             return;
           }
@@ -1050,41 +946,6 @@ sap.ui.define(
             oEndDatePicker.setValueState("None");
           }
         },
-        // onExperienceDateChange: function (oEvent) {
-        //   const oRange = oEvent.getSource();
-        //   const oStart = oRange.getDateValue(); // Start Date
-        //   const oEnd = oRange.getSecondDateValue(); // End Date
-        //   const today = new Date();
-
-        //   const minStartDate = new Date(
-        //     today.getFullYear() - 30,
-        //     today.getMonth(),
-        //     today.getDate()
-        //   );
-
-        //   //  Error Messages
-        //   const sMissing = this.oResourceBundle.getText("v2_m_errDatesreq");
-        //   const sOrder = this.oResourceBundle.getText("v2_m_errStDatb4endDate");
-        //   const sRange = this.oResourceBundle.getText("v2_m_errbetLast30Yrs");
-
-        //   let errorMsg = "";
-
-        //   if (!oStart || !oEnd) {
-        //     errorMsg = sMissing;
-        //   } else if (oStart > oEnd) {
-        //     errorMsg = sOrder;
-        //   } else if (oStart < minStartDate) {
-        //     errorMsg = sRange;
-        //   }
-
-        //   if (errorMsg) {
-        //     oRange.setValueState("Error");
-        //     oRange.setValueStateText(errorMsg);
-        //   } else {
-        //     oRange.setValueState("None");
-        //     oRange.setValueStateText("");
-        //   }
-        // },
 
         // ...existing code...
         onPassingYearChange: function (oEvent) {
@@ -1206,7 +1067,7 @@ sap.ui.define(
           if (!isValidFormat) {
             oInput.setValueState("Error");
             oInput.setValueStateText(
-              "Only letters, numbers, spaces, hyphens, commas, periods, and parentheses allowed."
+              "Only letters, numbers, spaces, hyphens, commas, periods, and parentheses allowed"
             );
             return;
           }
@@ -1214,7 +1075,7 @@ sap.ui.define(
           if (!hasAlphabet) {
             oInput.setValueState("Error");
             oInput.setValueStateText(
-              "University name must include at least one letter."
+              "University name must include at least one letter"
             );
             return;
           }
@@ -1231,7 +1092,7 @@ sap.ui.define(
             oComboBox.setValueState("None");
             oComboBox.setValueStateText("");
             return;
-          } 
+          }
           utils._LCstrictValidationComboBox(oEvent, "genderInvalid");
         },
 
@@ -1288,7 +1149,7 @@ sap.ui.define(
             });
 
             if (!oMatchedItem) {
-              // ❌ Invalid input
+              //  Invalid input
               oComboBox.setValueState(sap.ui.core.ValueState.Error);
               oComboBox.setValueStateText(
                 this.oResourceBundle.getText("v2_m_errInvalidComboBox")
@@ -1296,7 +1157,7 @@ sap.ui.define(
               return;
             }
 
-            // ✅ Valid country selected
+            //  Valid country selected
             oComboBox.setSelectedKey(oMatchedItem.getKey());
             oComboBox.setValueState(sap.ui.core.ValueState.None);
             oComboBox.setValueStateText("");
@@ -1306,7 +1167,7 @@ sap.ui.define(
               oModel.setProperty("/country", selectedKey);
             }
 
-            // 🌐 ISD Code Filter
+            //  ISD Code Filter
             const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
             if (oISDCombo && oISDCombo.getBinding("items")) {
               const oISDFilter = new sap.ui.model.Filter(
@@ -1334,7 +1195,7 @@ sap.ui.define(
               }, 0);
             }
 
-            // 📍 Location Filter
+            // Location Filter
             const oLocationCombo = Fragment.byId(
               "jobFormFrag",
               "LocationComboBox"
@@ -1348,9 +1209,7 @@ sap.ui.define(
               oLocationCombo.getBinding("items").filter([oLocationFilter]);
               oLocationCombo.setSelectedKey("");
             }
-          } catch (error) {
-            console.error("MC_onChangeCountry error:", error);
-          }
+          } catch (error) {}
         },
 
         MC_onBaseLocationChange: function (oEvent) {
@@ -1383,13 +1242,9 @@ sap.ui.define(
               oComboBox.setValueState("None");
               oComboBox.setValueStateText("");
             }
-          } catch (err) {
-            console.error("MC_onBaseLocationChange error:", err);
-          }
+          } catch (err) {}
         },
 
-        // MC_onBaseLocationChange: function (oEvent) {
-        // },
         ajaxCreateWithJQuery: function (sUrl, oPayLoad) {
           return new Promise((resolve, reject) => {
             $.ajax({
@@ -1439,26 +1294,10 @@ sap.ui.define(
               ctrl: f("fullNameInput"),
               fn: utils._LCvalidateMandatoryField,
             },
-            // {
-            //   ctrl: f("genderCombo"),
-            //   fn: utils._LCstrictValidationComboBox,
-            // },
             {
               ctrl: f("emailInput"),
               fn: utils._LCvalidateEmail,
             },
-            // {
-            //   ctrl: f("countryCombo"),
-            //   fn: utils._LCstrictValidationComboBox,
-            // },
-            // {
-            //   ctrl: f("LocationComboBox"),
-            //   fn: utils._LCstrictValidationComboBox,
-            // },
-            // {
-            //   ctrl: f("addressInput"),
-            //   fn: utils._LCvalidateMandatoryField,
-            // },
             {
               ctrl: f("isd_code"),
               fn: utils._LCstrictValidationComboBox,
@@ -1467,22 +1306,10 @@ sap.ui.define(
               ctrl: f("mobileInput"),
               fn: utils._LCvalidateMobileNumber,
             },
-            // {
-            //   ctrl: f("dobPicker"),
-            //   fn: utils._LCvalidateMandatoryField,
-            // },
             {
               ctrl: f("qualificationCombo"),
               fn: utils._LCstrictValidationComboBox,
             },
-            // {
-            //   ctrl: f("universityCombo"),
-            //   fn: utils._LCvalidateMandatoryField,
-            // },
-            // {
-            //   ctrl: f("PassingYear"),
-            //   fn: utils._LCvalidateMandatoryField,
-            // },
             {
               ctrl: f("skillsInput"),
               fn: utils._LCvalidateMandatoryField,
@@ -1499,26 +1326,10 @@ sap.ui.define(
                 ctrl: f("companyInput"),
                 fn: utils._LCvalidateMandatoryField,
               },
-              // {
-              //   ctrl: f("previousJobTitleCombo"),
-              //   fn: utils._LCstrictValidationComboBox,
-              // },
               {
                 ctrl: f("salaryInput"),
                 fn: utils._LCvalidateMandatoryField,
               },
-              // {
-              //   ctrl: f("experienceRange"),
-              //   fn: utils._LCvalidateMandatoryField,
-              // },
-              // {
-              //   ctrl: f("rolesInput"),
-              //   fn: utils._LCvalidateMandatoryField,
-              // },
-              // {
-              //   ctrl: f("employmentTypeCombo"),
-              //   fn: utils._LCstrictValidationComboBox,
-              // },
               {
                 ctrl: f("expectedSalaryInput"),
                 fn: utils._LCvalidateMandatoryField,
@@ -1526,19 +1337,13 @@ sap.ui.define(
               {
                 ctrl: f("noticePeriodCombo"),
                 fn: utils._LCstrictValidationComboBox,
-              },
+              }
             );
           } else {
-            mandatoryChecks.push(
-              {
-                ctrl: f("fresherExpertiseInput"),
-                fn: utils._LCvalidateMandatoryField,
-              }
-              // {
-              //   ctrl: f("fresherSelfDesc"),
-              //   fn: utils._LCvalidateMandatoryField,
-              // }
-            );
+            mandatoryChecks.push({
+              ctrl: f("fresherExpertiseInput"),
+              fn: utils._LCvalidateMandatoryField,
+            });
           }
 
           //  Validate sequentially
@@ -1580,7 +1385,7 @@ sap.ui.define(
             });
             MessageBox.success("Your Job Application Submitted Successfully!", {
               onClose: () => {
-                this.onClose(); // Only close after user clicks OK
+                this.onClose();
               },
             });
           } catch (err) {
@@ -1651,7 +1456,7 @@ sap.ui.define(
                 oTitle.setText(jobTitle);
               } else {
               }
-            }, 0); // 0ms ensures it runs after rendering
+            }, 0);
 
             oDialog.open();
           });
@@ -1677,9 +1482,9 @@ sap.ui.define(
             "FileUploader"
           );
 
-          fileUploader.setValue(""); // Clear the file
-          fileUploader.setValueState("Error"); // Set error state after removal
-          fileUploader.setValueStateText("Please upload your resume"); // Optional, user-friendly message
+          fileUploader.setValue("");
+          fileUploader.setValueState("Error");
+          fileUploader.setValueStateText("Please upload your resume");
 
           // Remove any previously selected file reference
           this.oSelectedFile = null;
@@ -1727,9 +1532,7 @@ sap.ui.define(
             const sBaseURL = window.location.origin + window.location.pathname;
             const sHash = "#/JobView/" + encodeURIComponent(sJobId);
             const sFullShareURL = `${sBaseURL}?sap-ui-xx-viewCache=false${sHash}`;
-            // const sMessage = ""
             const sMessage = `Explore this exciting opportunity at Kalpavriksha Technologies.\nApply now or share it with someone who might be a great fit\n${sFullShareURL}`;
-            // const sMessage = `📢 Kalpavriksha Technologies is hiring!\nExplore this opportunity and apply now:\n${sFullShareURL}`;
 
             const items = [
               createItem("image/linkedin.png", "LinkedIn", () => {
@@ -1769,7 +1572,6 @@ sap.ui.define(
                 sap.m.MessageToast.show("Link copied");
               }),
             ];
-            // Style the last item differently
             const lastHBox = items[items.length - 1].getContent()[0];
             lastHBox.removeStyleClass("shareItemBox");
             lastHBox.addStyleClass("shareItemBoxLast");
@@ -1786,7 +1588,6 @@ sap.ui.define(
             });
           }
 
-          // Open popover
           this._oSharePopover.openBy(oSource);
         },
 
@@ -1809,39 +1610,6 @@ sap.ui.define(
           navigator.clipboard.writeText(window.location.href);
           sap.m.MessageToast.show("Link copied!");
         },
-        // copyDynamicLink: function (oEvent) {
-        //   var that = this;
-
-        //   // Optional: Get Job ID or Applicant ID if needed
-        //   var jobId = "static123"; // replace with dynamic logic if needed
-
-        //   $.ajax({
-        //     url: "/api/getDynamicLink?jobId=" + jobId, // Replace with your real API
-        //     method: "GET",
-        //     success: function (response) {
-        //       // Example response: { token: "abc123" }
-        //       var token = response.token || "defaultToken";
-
-        //       // Build your app link with hash-based routing
-        //       var link =
-        //         window.location.origin + "/index.html#/JobView?id=" + token;
-
-        //       navigator.clipboard
-        //         .writeText(link)
-        //         .then(function () {
-        //           sap.m.MessageToast.show("Link copied to clipboard!");
-        //         })
-        //         .catch(function (err) {
-        //           sap.m.MessageBox.error("Failed to copy: " + err);
-        //         });
-        //     },
-        //     error: function () {
-        //       sap.m.MessageBox.error(
-        //         "Could not fetch dynamic link from backend."
-        //       );
-        //     },
-        //   });
-        // },
       }
     );
   }
