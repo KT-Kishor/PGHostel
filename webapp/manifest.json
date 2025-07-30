@@ -704,6 +704,13 @@
                   "target": ["TargetJobView"]
                 },
                 {
+                    "name": "AppliedCanDetail",
+                    "pattern": "AppliedCanDetail/{id}",
+                    "target": [
+                        "TargetAppliedCanDetail"
+                    ]
+                },
+                {
                     "name": "RouteInvoiceDashboard",
                     "pattern": "InvoiceDashboard",
                     "target": [

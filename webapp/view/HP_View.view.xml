@@ -15,8 +15,8 @@
 					<!-- Primary Skills -->
 					<fb:FilterGroupItem name="Skills" label="Primary Skills" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<Input id="filterPrimarySkills" placeholder="Type a skill" showSuggestion="true" suggest="onSuggestSkills" suggestionItems="{    path: 'skillModel>/skills'  }">
-								<core:Item key="{skillModel>skill}" text="{skillModel>skill}" />
+							<Input id="filterPrimarySkills" placeholder="Type a skill" showClearIcon="true"  showSuggestion="true" suggest="onSuggestSkills" suggestionItems="{    path: 'skillModel>/skills'  }">
+								<core:Item key="{skillModel>skill}" text="{skillModel>skill}"  />
 							</Input>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -39,18 +39,23 @@
 					<!-- Status -->
 					<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox showClearIcon="true" placeholder="choose Status" id="filterStatus" items="{BackendStatusModel>/}">
+							<ComboBox showClearIcon="true" placeholder="Choose Status" id="filterStatus" items="{BackendStatusModel>/}">
 								<core:Item key="{BackendStatusModel>key}" text="{BackendStatusModel>text}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<!-- Date Filter -->
+					<fb:FilterGroupItem name="PostDate" label="Post Date" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							 <DateRangeSelection
+								id="filterPostDate"
+								valueFormat="yyyy-MM-dd"
+								displayFormat="dd/MM/yyyy" />
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-
-
-
 			<Table id="jobPostingTable" mode="SingleSelectLeft" 
-			
 			items="{path: 'JobApplicationModel>/Candidates', sorter: [{ path: 'CreatedBy', descending: false, group: true }, { path: 'PostDate', descending: true }]}"  
 			selectionChange="onJobSelectionChange">
 				<headerToolbar>

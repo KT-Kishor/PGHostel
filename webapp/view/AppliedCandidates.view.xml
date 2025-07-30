@@ -101,6 +101,19 @@
                         </ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
+                 <fb:FilterGroupItem
+                    name="createDate"
+                    label="{i18n>createdDate}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                         <DateRangeSelection
+            id="filterCreateDate"
+            valueFormat="yyyy-MM-dd"
+            displayFormat="dd/MM/yyyy" />
+                    </fb:control>
+                </fb:FilterGroupItem>
             </fb:filterGroupItems>
         </fb:FilterBar>
 

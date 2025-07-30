@@ -73,13 +73,9 @@ sap.ui.define([
             try {
                 const aSelectFields = [
                     "FullName",
-                    "CurrentSalary",
-                    "ExpectedSalary",
                     "NoticePeriod",
-                    "Mobile",
                     "Email",
                     "Experience",
-                    "CreatedBy",
                     "Skills"
                 ];
                 const oQueryParameters = {
@@ -123,34 +119,36 @@ sap.ui.define([
             this.byId("filterNoticePeriod").setValue("");
             this.byId("filterSkills").setValue("");
             this.byId("filterExperience").setSelectedKey("");
+            this.byId("filterCreateDate").setValue("");
         },
 
-        onFilterBarSearch: function() {
+        onFilterBarSearch: function () {
             this.getBusyDialog();
             setTimeout(() => {
                 try {
                     const oTableBinding = this.byId("appliedCandidatesTable").getBinding("items");
                     const aFilters = [];
+                    const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+
                     // 1. Name Filter
                     const sName = this.byId("filterEmployeeName").getValue().trim();
                     if (sName) {
-                        aFilters.push(new Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
+                        aFilters.push(new sap.ui.model.Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
                     }
+
                     // 2. Notice Period Filter
                     const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
                     if (sNoticePeriodInput) {
-                        aFilters.push(new Filter({
+                        aFilters.push(new sap.ui.model.Filter({
                             path: "NoticePeriod",
-                            test: function(sDataValue) {
+                            test: function (sDataValue) {
                                 if (!sDataValue || !sNoticePeriodInput) return false;
                                 const data = sDataValue.toString().trim();
                                 const input = sNoticePeriodInput.toString().trim();
-                                // User typed a single number or non-range string
+
                                 if (!input.includes('-')) {
                                     return data.toLowerCase() === input.toLowerCase();
-                                }
-                                // User selected a range (e.g., "0-15")
-                                else {
+                                }else {
                                     if (data.toLowerCase() === input.toLowerCase()) {
                                         return true;
                                     }
@@ -172,26 +170,26 @@ sap.ui.define([
                             }
                         }));
                     }
+
                     // 3. Skills Filter
                     const sSkills = this.byId("filterSkills").getValue().trim();
                     if (sSkills) {
-                        aFilters.push(new Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
+                        aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
                     }
+
                     // 4. Experience Filter
                     const sExperienceInput = this.byId("filterExperience").getValue().trim();
                     if (sExperienceInput) {
-                        aFilters.push(new Filter({
+                        aFilters.push(new sap.ui.model.Filter({
                             path: "Experience",
-                            test: function(sDataValue) {
+                            test: function (sDataValue) {
                                 if (!sDataValue || !sExperienceInput) return false;
                                 const data = sDataValue.toString().trim();
                                 const input = sExperienceInput.toString().trim();
-                                // User typed a single number
+
                                 if (!input.includes('-')) {
                                     return data.toLowerCase() === input.toLowerCase();
-                                }
-                                // User selected a range
-                                else {
+                                } else {
                                     if (data.toLowerCase() === input.toLowerCase()) return true;
                                     if (!data.includes('-')) {
                                         try {
@@ -211,9 +209,30 @@ sap.ui.define([
                             }
                         }));
                     }
+
+                    // 5. CreateDate (DateRangeSelection) Filter
+                    let oStartDate, oEndDate;
+                    let dateProvided = false;
+
+                    const oDateRange = this.byId("filterCreateDate");
+                    if (oDateRange) {
+                        oStartDate = oDateRange.getDateValue();
+                        oEndDate = oDateRange.getSecondDateValue();
+                        if (oStartDate && oEndDate) {
+                            dateProvided = true;
+                        }
+                    }
+
+                    if (oStartDate && oEndDate) {
+                        const sStart = oDateFormat.format(oStartDate); // yyyy-MM-dd
+                        const sEnd = oDateFormat.format(oEndDate);
+                        aFilters.push(new sap.ui.model.Filter("CreateDate", sap.ui.model.FilterOperator.BT, sStart, sEnd));
+                    }
+
+                    // Apply Filters
                     oTableBinding.filter(aFilters);
                 } catch (error) {
-                    MessageToast.show("Error during filtering.");
+                     MessageToast.show("Error during filtering.");
                 } finally {
                     setTimeout(() => this.closeBusyDialog(), 300);
                 }
