@@ -18,7 +18,7 @@
 	<l:VerticalLayout width="100%">
 		<l:BlockLayout background="Dashboard">
 			<l:BlockLayoutRow>
-				<l:BlockLayoutCell width="2" title="{i18n>Jobnotfound}">
+				<l:BlockLayoutCell width="2" title="{i18n>jobNotAvailableMessage}">
 					<VBox class="sapUiSmallMarginBottom">
 						<!-- <Text text="{i18n>jobNotAvailableMessage}" class="carrer-Des" /> -->
 						<Text text="{i18n>jobNotAvailableSubMessage}" class="carrer-Des sapUiTinyMarginTop" />

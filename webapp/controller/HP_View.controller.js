@@ -279,11 +279,104 @@ sap.ui.define(
           oDialog.open();
         },
 
+        // onOpenAddJobDialog: function () {
+        //   const oView = this.getView();
+
+        //   this._isEdit = false;
+        //   this._editJobId = null;
+
+        //   // this.getBusyDialog().open();
+
+        //   const oTempModel = new JSONModel({
+        //     dialogTitle: "Create Job Posting",
+        //     SelectedJobTitleKey: "",
+        //     qualifications: [],
+        //     SelectedExperienceKey: "",
+        //     SelectedLocation: "",
+        //     JobDescription: "",
+        //     KeyResponsibilities: "",
+        //     PrimarySkills: "",
+        //     SecondarySkills: "",
+        //     SkillRequirements: "",
+        //     Certifications: "",
+        //     SelectedWorkMode: "",
+        //     NoOfPositions: "",
+        //     PostDate: "", // default to blank or today
+        //     Status: "true",
+        //     isEdit: false,
+        //   });
+
+        //   oView.setModel(oTempModel, "temporaryModel");
+
+        //   // Use shared method to open dialog and render tokens
+        //   this._openJobDialog(oTempModel);
+        //   this.closeBusyDialog(); // Always close
+        // },
+        // onOpenEditJobDialog: function () {
+        //   const oView = this.getView();
+        //   const oTable = this.byId("jobPostingTable");
+        //   const oSelectedItem = oTable.getSelectedItem();
+
+        //   if (!oSelectedItem) {
+        //     MessageToast.show("Please select a row to edit");
+        //     return;
+        //   }
+
+        //   const oContext = oSelectedItem.getBindingContext(
+        //     "JobApplicationModel"
+        //   );
+        //   const oData = oContext.getObject();
+
+        //   this._isEdit = true;
+        //   this._editJobId = oData.ID || "";
+
+        //   const aQualifications = (oData.Qualification || "")
+        //     .split(",")
+        //     .map((s) => s.trim())
+        //     .filter(Boolean);
+
+        //   const aLocations =
+        //     oView.getModel("BaseLocationModel")?.getProperty("/") || [];
+        //   const selectedLocationId =
+        //     aLocations.find((loc) => loc.city === oData.Location)?.id || "";
+
+        //   const workingModes =
+        //     oView.getModel("WorkingMode")?.getProperty("/location") || [];
+        //   const selectedWorkModeId =
+        //     workingModes.find((mode) => mode.Location === oData.LocationService)
+        //       ?.ID || "";
+
+        //   const oTempModel = new JSONModel({
+        //     dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
+        //     SelectedJobTitleKey: oData.JobTitle || "",
+        //     qualifications: aQualifications,
+        //     SelectedExperienceKey: oData.Experience || "",
+        //     SelectedLocation: selectedLocationId,
+        //     JobDescription: oData.JobDescription || "",
+        //     KeyResponsibilities: oData.KeyResponsibilities || "",
+        //     PrimarySkills: oData.PrimarySkills || "",
+        //     SecondarySkills: oData.SecondarySkills || "",
+        //     SkillRequirements: oData.SkillRequirements || "",
+        //     Certifications: oData.Certifications || "",
+        //     SelectedWorkMode: selectedWorkModeId,
+        //     NoOfPositions: oData.NoOfPositions || "",
+        //     PostDate: oData.PostDate?.split("T")[0] || "",
+        //     Status: oData.Status || "false",
+        //     isEdit: true,
+        //   });
+
+        //   oView.setModel(oTempModel, "temporaryModel");
+
+        //   // Use shared method to open dialog and render tokens
+        //   this._openJobDialog(oTempModel);
+        // },
         onOpenAddJobDialog: function () {
           const oView = this.getView();
 
           this._isEdit = false;
           this._editJobId = null;
+
+          this.getBusyDialog(); // ✅ Open Busy Dialog properly
 
           const oTempModel = new JSONModel({
             dialogTitle: "Create Job Posting",
@@ -299,16 +392,22 @@ sap.ui.define(
             Certifications: "",
             SelectedWorkMode: "",
             NoOfPositions: "",
-            PostDate: "", // default to blank or today
+            PostDate: "",
             Status: "true",
             isEdit: false,
           });
 
           oView.setModel(oTempModel, "temporaryModel");
 
-          // Use shared method to open dialog and render tokens
-          this._openJobDialog(oTempModel);
+          this._openJobDialog(oTempModel)
+            .catch((err) => {
+              console.error("Dialog open error:", err);
+            })
+            .finally(() => {
+              this.closeBusyDialog(); // ✅ Always close
+            });
         },
+
         onOpenEditJobDialog: function () {
           const oView = this.getView();
           const oTable = this.byId("jobPostingTable");
@@ -318,6 +417,8 @@ sap.ui.define(
             MessageToast.show("Please select a row to edit");
             return;
           }
+
+          this.getBusyDialog(); // ✅ Open Busy Dialog properly
 
           const oContext = oSelectedItem.getBindingContext(
             "JobApplicationModel"
@@ -357,19 +458,24 @@ sap.ui.define(
             Certifications: oData.Certifications || "",
             SelectedWorkMode: selectedWorkModeId,
             NoOfPositions: oData.NoOfPositions || "",
-            PostDate: oData.PostDate?.split("T")[0] || "",
+            PostDate: (oData.PostDate || "").split("T")[0] || "",
             Status: oData.Status || "false",
             isEdit: true,
           });
 
           oView.setModel(oTempModel, "temporaryModel");
 
-          // Use shared method to open dialog and render tokens
-          this._openJobDialog(oTempModel);
+          this._openJobDialog(oTempModel)
+            .catch((err) => {
+              console.error("Dialog open error:", err);
+            })
+            .finally(() => {
+              this.closeBusyDialog(); // ✅ Always close
+            });
         },
 
         _openJobDialog: function (oTempModel) {
-          this._commonFragmentOpen(
+          return this._commonFragmentOpen(
             oTempModel,
             "sap.kt.com.minihrsolution.fragment.AddEditJob",
             "addJobDialog",
@@ -386,6 +492,25 @@ sap.ui.define(
             }
           });
         },
+
+        // _openJobDialog: function (oTempModel) {
+        //   this._commonFragmentOpen(
+        //     oTempModel,
+        //     "sap.kt.com.minihrsolution.fragment.AddEditJob",
+        //     "addJobDialog",
+        //     ["postDateDP"]
+        //   ).then(() => {
+        //     const oMultiInput = this.byId("multiInputQualifications");
+        //     if (oMultiInput) {
+        //       oMultiInput.removeAllTokens();
+        //       const aQualifications =
+        //         oTempModel.getProperty("/qualifications") || [];
+        //       aQualifications.forEach((q) =>
+        //         oMultiInput.addToken(new sap.m.Token({ text: q, key: q }))
+        //       );
+        //     }
+        //   });
+        // },
         onQualificationsTokenUpdate: function (oEvent) {
           const oInput = oEvent.getSource();
           const oModel = this.getView().getModel("temporaryModel");
@@ -422,55 +547,6 @@ sap.ui.define(
             }
           }, 0);
         },
-
-        // onCloseDialog: function () {
-        //   const oView = this.getView();
-        //   const oDialog = this.byId("addJobDialog");
-
-        //   if (!oDialog) {
-        //     console.warn("Dialog not found");
-        //     oDialog.destroy();
-        //     return;
-        //   }
-
-        //   const aFieldIds = [
-        //     "JobTitleCombo",
-        //     "primarySkillsInput",
-        //     "qualificationComb",
-        //     "experienceCombo",
-        //     "certificationsInput",
-        //     "idlocationcombo",
-        //     "positionsInput",
-        //     "postDateDP",
-        //     "jobDescRTE",
-        //     "workModeCombo",
-        //     "keyRespRTE",
-        //     "secondarySkillsRTE",
-        //     "skillReqRTE",
-        //   ];
-
-        //   aFieldIds.forEach((sId) => {
-        //     const oControl = oView.byId(sId);
-        //     if (!oControl) return;
-
-        //     if (oControl.setValueState) oControl.setValueState("None");
-        //     if (oControl.removeStyleClass)
-        //       oControl.removeStyleClass("rteError");
-
-        //     if (typeof oControl.setValue === "function") {
-        //       oControl.setValue("");
-        //     } else if (typeof oControl.setSelectedKey === "function") {
-        //       oControl.setSelectedKey("");
-        //     } else if (oControl.removeAllTokens) {
-        //       oControl.removeAllTokens();
-        //     }
-        //   });
-
-        //   oView.setModel(null, "temporaryModel");
-        //   oDialog.close();
-        //   this.byId("jobPostingTable").removeSelections(true);
-        //   this.onJobSelectionChange();
-        // },
 
         onCloseDialog: function () {
           const oView = this.getView();
@@ -600,169 +676,42 @@ sap.ui.define(
             .getText(sKey, aArgs);
         },
 
-        // onSubmitJob: async function () {
-        //   //    const oModel = this.getView()
-        //   //   .getModel("JobApplicationModel")
-        //   //   .getData(); // ← now safe
+        onSubmitJob: async function () {
+          const oPayload = this._prepareJobPayload();
+          if (!oPayload) return;
 
-        //   const oPayload = this._prepareJobPayload();
-        //   if (!oPayload) return;
+          this.getBusyDialog(); // ✅ Show Busy Dialog
 
-        //   this.getBusyDialog();
-
-        //   try {
-        //     // Show busy dialog before operation
-        //     this.getBusyDialog();
-
-        //     // Create or Update logic
-        //     if (this._isEdit && this._editJobId) {
-        //       await this.ajaxUpdateWithJQuery("JobOpenings", {
-        //         data: oPayload,
-        //         filters: { ID: this._editJobId },
-        //       });
-        //       MessageToast.show(this.getText("jobUpdateSuccess"));
-        //     } else {
-        //       await this.ajaxCreateWithJQuery("JobOpenings", {
-        //         data: [oPayload],
-        //       });
-        //       MessageToast.show(this.getText("jobCreateSuccess"));
-        //     }
-
-        //     console.log("// 🔁 Refresh model");
-        //     const oJobModel = this.getView().getModel("JobApplicationModel");
-        //     if (oJobModel) oJobModel.refresh(true);
-
-        //     console.log("// 🧹 Reset selection, cleanup, and close dialog");
-        //     this.onJobSelectionChange();
-        //     console.log("// Refresh or reset table selection if needed");
-        //     this._cleanupDialogAfterSubmit();
-        //     console.log("// Reset form or clear fragment state");
-        //     this.onCloseDialog();
-        //     console.log("// Close the dialog");
-        //   } catch (error) {
-        //     console.error("Submit Job Error:", error);
-
-        //     console.log(
-        //       "// 🔐 Optional: Display backend error text if available"
-        //     );
-        //     const errorText =
-        //       error?.responseJSON?.error?.message ||
-        //       error?.message ||
-        //       this.getText("jobSubmitError");
-
-        //     MessageToast.show(errorText);
-        //   } finally {
-        //     // Always hide BusyDialog
-        //     this.closeBusyDialog();
-        //   }
-        // },
-
-        // _cleanupDialogAfterSubmit: function () {
-        //   const oView = this.getView();
-
-        //   try {
-        //     const oDialog = oView.byId("addJobDialog");
-        //     if (oDialog) {
-        //       oDialog.close();
-        //       console.log("if (oDialog) {oDialog.close()");
-        //     }
-        //   } catch (e) {
-        //     console.warn("Dialog close failed:", e);
-        //     console.log(" catch (e) {");
-        //   }
-
-        //   console.log("// Safely reset temporaryModel BEFORE clearing tokens");
-        //   try {
-        //     const oTempModel = this.getModel("temporaryModel");
-        //     if (oTempModel) {
-        //       oTempModel.setData({});
-        //       console.log("// reset early, before tokens update");
-        //     }
-        //   } catch (e) {}
-
-        //   console.log(
-        //     "// Clear tokens AFTER model reset to avoid duplicated IDs"
-        //   );
-        //   try {
-        //     const oMultiInput = oView.byId("multiInputQualifications");
-        //     if (oMultiInput) {
-        //       oMultiInput.removeAllTokens();
-        //     }
-        //   } catch (e) {}
-
-        //   const aFieldIds = [
-        //     "JobTitleCombo",
-        //     "primarySkillsInput",
-        //     "experienceCombo",
-        //     "certificationsInput",
-        //     "idlocationcombo",
-        //     "positionsInput",
-        //     "postDateDP",
-        //     "workModeCombo",
-        //   ];
-
-        //   aFieldIds.forEach((sId) => {
-        //     try {
-        //       const oControl = oView.byId(sId);
-        //       if (!oControl) return;
-
-        //       if (oControl.setValueState) oControl.setValueState("None");
-        //       if (typeof oControl.setValue === "function") {
-        //         oControl.setValue("");
-        //       } else if (typeof oControl.setSelectedKey === "function") {
-        //         oControl.setSelectedKey("");
-        //       } else if (typeof oControl.removeAllTokens === "function") {
-        //         oControl.removeAllTokens();
-        //       }
-        //     } catch (e) {}
-        //   });
-
-        //   console.log("// Reset internal flags");
-        //   this._isEdit = false;
-        //   this._editJobId = null;
-        // },
-
-          onSubmitJob: async function () {
-            const oPayload = this._prepareJobPayload();
-            if (!oPayload) return;
-
-            this.getBusyDialog();
-
-            try {
-              this.getBusyDialog(); // Show busy
-
-              // === 📝 Save to backend ===
-              if (this._isEdit && this._editJobId) {
-                await this.ajaxUpdateWithJQuery("JobOpenings", {
-                  data: oPayload,
-                  filters: { ID: this._editJobId },
-                });
-                MessageToast.show(this.getText("jobUpdateSuccess"));
-              } else {
-                await this.ajaxCreateWithJQuery("JobOpenings", {
-                  data: [oPayload],
-                });
-                MessageToast.show(this.getText("jobCreateSuccess"));
-              }
-
-              // === 🔁 Refresh JobApplicationModel from backend ===
-              await this._fetchJobOpenings();
-
-              // === 🧹 Cleanup ===
-              this.onJobSelectionChange(); // Reset selection if any
-              this._cleanupDialogAfterSubmit(); // Clear temp model, etc.
-              this.onCloseDialog(); // Close fragment
-            } catch (error) {
-              console.error("Submit Job Error:", error);
-              const errorText =
-                error?.responseJSON?.error?.message ||
-                error?.message ||
-                this.getText("jobSubmitError");
-              MessageToast.show(errorText);
-            } finally {
-              this.closeBusyDialog(); // Always close busy
+          try {
+            if (this._isEdit && this._editJobId) {
+              await this.ajaxUpdateWithJQuery("JobOpenings", {
+                data: oPayload,
+                filters: { ID: this._editJobId },
+              });
+              MessageToast.show(this.getText("jobUpdateSuccess"));
+            } else {
+              await this.ajaxCreateWithJQuery("JobOpenings", {
+                data: [oPayload],
+              });
+              MessageToast.show(this.getText("jobCreateSuccess"));
             }
-          },
+
+            await this._fetchJobOpenings(); // ✅ Refresh
+
+            this.onJobSelectionChange(); // ✅ Clear selection
+            this._cleanupDialogAfterSubmit(); // ✅ Reset form
+            this.onCloseDialog(); // ✅ Close dialog
+          } catch (error) {
+            console.error("Submit Job Error:", error);
+            const errorText =
+              error?.responseJSON?.error?.message ||
+              error?.message ||
+              this.getText("jobSubmitError");
+            MessageToast.show(errorText);
+          } finally {
+            this.closeBusyDialog(); // ✅ Always close
+          }
+        },
 
         _cleanupDialogAfterSubmit: function () {
           const oView = this.getView();
@@ -970,7 +919,6 @@ sap.ui.define(
         },
 
         _prepareJobPayload: function () {
-
           if (!this._validateJobPostingFields()) return null;
 
           const oData = this.getView().getModel("temporaryModel").getData();
@@ -980,7 +928,7 @@ sap.ui.define(
           const sUserID = this.getOwnerComponent()
             .getModel("LoginModel")
             .getProperty("/EmployeeID");
-                
+
           return {
             jobTitle: oData.SelectedJobTitleKey,
             jobDescription: oData.JobDescription,
@@ -1001,141 +949,6 @@ sap.ui.define(
             CreatedBy: `${sUserName} (${sUserID})`,
           };
         },
-
-        // _validateJobPostingFields: function () {
-
-        //   const oView = this.getView();
-        //   const validation = this.validation;
-        //   const fieldLabels = {
-        //     idlocationcombo: "Location",
-        //     workModeCombo: "Work Mode",
-        //     positionsInput: "Number of Positions",
-        //     postDateDP: "Post Date",
-        //     primarySkillsInput: "Primary Skills",
-        //     experienceCombo: "Experience",
-        //     // qualificationComb: "Qualification",
-        //     multiInputQualifications: "Qualification",
-
-        //     JobTitleCombo: "Job Title",
-        //   };
-
-        //   const scrollToControl = (oCtrl) => {
-        //     const oDom = oCtrl?.getDomRef?.() || oCtrl?.getContentDomRef?.();
-        //     if (oDom?.scrollIntoView) {
-        //       oDom.scrollIntoView({ behavior: "smooth", block: "center" });
-        //     }
-        //   };
-
-        //   const validateField = (id, validatorFn) => {
-        //     const oCtrl = oView.byId(id);
-        //     if (!oCtrl) return true;
-
-        //     const isValid = validatorFn(oCtrl, "ID");
-        //     if (!isValid) {
-        //       oCtrl.setValueState("Error");
-        //       oCtrl.setValueStateText(`${fieldLabels[id]} is required`);
-        //       scrollToControl(oCtrl);
-        //       oCtrl.focus?.();
-        //       MessageToast.show(this.getText("mandetoryFields"));
-        //       return false;
-        //     } else {
-        //       oCtrl.setValueState("None");
-        //       return true;
-        //     }
-        //   };
-
-        //   // 1️⃣ First 4 common fields
-        //   const firstFields = [
-        //     {
-        //       id: "statusCombo",
-        //       validator: validation._LCstrictValidationComboBox,
-        //     },
-        //     { id: "idlocationcombo", validator: validation._LCvalidateName },
-        //     {
-        //       id: "workModeCombo",
-        //       validator: validation._LCstrictValidationComboBox,
-        //     },
-        //     {
-        //       id: "positionsInput",
-        //       validator: validation._LCvalidateAmountZeroTaking,
-        //     },
-        //     {
-        //       id: "postDateDP",
-        //       validator: validation._LCvalidateMandatoryField,
-        //     },
-
-        //     {
-        //       id: "primarySkillsInput",
-        //       validator: validation._LCvalidateMandatoryField,
-        //     },
-        //   ];
-        //   for (const field of firstFields) {
-        //     if (!validateField(field.id, field.validator)) return false;
-        //   }
-
-        //   // 2️⃣ Validate SecondarySkills RTE
-        //   const oSecRTE = Fragment.byId(oView.getId(), "secondarySkillsRTE");
-        //   const sSecPlain = oSecRTE
-        //     ?.getValue()
-        //     ?.replace(/<[^>]*>/g, "")
-        //     .replace(/&nbsp;/g, "")
-        //     .trim();
-        //   const oSecDom =
-        //     oSecRTE?.getDomRef?.() || oSecRTE?.getContentDomRef?.();
-        //   if (!sSecPlain) {
-        //     oSecDom?.classList.add("sapUiRTEErrorBorder");
-        //     scrollToControl(oSecRTE);
-        //     oSecRTE?.focus?.();
-        //     //   MessageToast.show(this.getText("mandetoryFields"));
-        //     return false;
-        //   } else {
-        //     oSecDom?.classList.remove("sapUiRTEErrorBorder");
-        //   }
-
-        //   // 3️⃣ Next 3 ComboBoxes
-        //   const nextFields = [
-        //     {
-        //       id: "experienceCombo",
-        //       validator: validation._LCstrictValidationComboBox,
-        //     },
-        //     {
-        //       id: "multiInputQualifications",
-        //       validator: function (oCtrl) {
-        //         const aTokens = oCtrl.getTokens?.() || [];
-        //         return aTokens.length > 0;
-        //       },
-        //     },
-        //     {
-        //       id: "JobTitleCombo",
-        //       validator: validation._LCstrictValidationComboBox,
-        //     },
-        //   ];
-        //   for (const field of nextFields) {
-        //     if (!validateField(field.id, field.validator)) return false;
-        //   }
-
-        //   // 4️⃣ Validate JobDescription RTE
-        //   const oJobDescRTE = Fragment.byId(oView.getId(), "jobDescRTE");
-        //   const sDescPlain = oJobDescRTE
-        //     ?.getValue()
-        //     ?.replace(/<[^>]*>/g, "")
-        //     .replace(/&nbsp;/g, "")
-        //     .trim();
-        //   const oDescDom =
-        //     oJobDescRTE?.getDomRef?.() || oJobDescRTE?.getContentDomRef?.();
-        //   if (!sDescPlain) {
-        //     oDescDom?.classList.add("sapUiRTEErrorBorder");
-        //     scrollToControl(oJobDescRTE);
-        //     oJobDescRTE?.focus?.();
-        //     MessageToast.show(this.getText("mandetoryFields"));
-
-        //     return false;
-        //   } else {
-        //     oDescDom?.classList.remove("sapUiRTEErrorBorder");
-        //   }
-
-        //   return true;
-        // },
 
         _setDatePickerRange: function () {
           const oDatePicker = this.byId("postDateDP");
@@ -1380,9 +1193,12 @@ sap.ui.define(
             Status: "",
           };
 
+          let sStartDate = "";
+          let sEndDate = "";
+
           // 🔄 Extract filter values
           aFilterItems.forEach((oItem) => {
-            const sFieldName = oItem.getName(); // "Skills", "Experience", etc.
+            const sFieldName = oItem.getName();
             const oControl = oItem.getControl();
             if (!oControl) return;
 
@@ -1416,26 +1232,46 @@ sap.ui.define(
               case "Status":
                 oFilterPayload.Status = oControl.getSelectedKey() || "";
                 break;
+
+              case "PostDate": {
+                const oDateRange = oControl.getDateValue(); // Start date
+                const oSecondDate = oControl.getSecondDateValue(); // End date
+
+                if (oDateRange && oSecondDate) {
+                  const oDateFormat =
+                    sap.ui.core.format.DateFormat.getDateInstance({
+                      pattern: "yyyy-MM-dd",
+                    });
+                  sStartDate = oDateFormat.format(oDateRange);
+                  sEndDate = oDateFormat.format(oSecondDate);
+                }
+                break;
+              }
             }
           });
 
-          // ⛔ No filters? Load full data
-          const bEmpty = Object.values(oFilterPayload).every((val) => !val);
+          const bEmpty =
+            Object.values(oFilterPayload).every((val) => !val) &&
+            !sStartDate &&
+            !sEndDate;
+
           if (bEmpty) {
-            this._fetchJobOpenings(); // Load original dataset
-            this._setBackendStatusModel(); // Refresh dropdowns if needed
+            this._fetchJobOpenings();
+            this._setBackendStatusModel();
             return;
           }
 
           try {
             this.getBusyDialog();
 
-            const oResponse = await this.ajaxReadWithJQuery(
-              "JobOpenings",
-              oFilterPayload
-            );
+            const oResponse = await this.ajaxReadWithJQuery("JobOpenings", {
+              ...oFilterPayload,
+              StartDate: sStartDate,
+              EndDate: sEndDate,
+            });
+
             const aData = oResponse?.data || [];
-            // 👇 Add this condition
+
             if (aData.length === 0) {
               MessageToast.show(
                 this.getText("noMatchingResults") ||
@@ -1491,6 +1327,7 @@ sap.ui.define(
           this.byId("filterExperienceJP").setSelectedKey("");
           this.byId("filterStatus").setSelectedKey("");
           this.byId("filterPrimarySkills").setValue("");
+          this.byId("filterCreateDate").setValue("");
         },
         onJobSelectionChange: function () {
           var aSelectedItems = this.byId("jobPostingTable").getSelectedItems();

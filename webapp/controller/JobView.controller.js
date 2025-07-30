@@ -1765,7 +1765,7 @@ sap.ui.define(
 
               createItem("image/Link.png", "Copy Link", () => {
                 this._oSharePopover.close();
-                navigator.clipboard.writeText(sMessage);
+                navigator.clipboard.writeText(sFullShareURL);
                 sap.m.MessageToast.show("Link copied");
               }),
             ];
