@@ -131,35 +131,34 @@
                     maxLength="200" placeholder="{i18n>expValStaEmployeeRemark}" />
 			</layout:content>
 		</layout:SimpleForm>
-		<Label text="{i18n>attachmentLabel} :" class="sapUiTinyMargin"/>
-		<FlexBox
-    direction="Row"
-    justifyContent="Start"
-    alignItems="Center"
-    wrap="Wrap"
-    class="sapUiTinyMarginBottom">
-			<u:FileUploader
-        id="FM_jobFileUploader"
-        fileSizeExceed="onFileSizeExceeds"
-        maximumFileSize="5MB"
-        typeMissmatch="onFileTypeMissmatch"
-        fileType="pdf,doc,docx"
-        change="onBeforeUploadStarts"
-        class="sapUiSmallMargin"
-        buttonOnly="true"
-        sameFilenameAllowed="true"
-        iconFirst="true"
-        buttonText="{i18n>attachmentButtonText}" 
-    />
-			<Tokenizer
-        id="FM_tokenizer"
-        width="auto"
-        tokenDelete="onTokenDelete"
-        editable="{EditableModeltruefalse>/Editable}"
-        tokens="{tokenModel>/tokens}">
-				<Token key="{tokenModel>key}" text="{tokenModel>text}" />
-			</Tokenizer>
-		</FlexBox>
+		<VBox class="uploaderSection noBottomSpace">
+    <HBox alignItems="Center" wrap="Wrap" class="fileUploaderHBox">
+        <Label text="{i18n>attachmentLabel} :" class="sapUiSmallMargin"/>
+        
+        <u:FileUploader
+            id="FM_jobFileUploader"
+            fileSizeExceed="onFileSizeExceeds"
+            maximumFileSize="5MB"
+            typeMissmatch="onFileTypeMissmatch"
+            fileType="pdf,doc,docx"
+            change="onBeforeUploadStarts"
+            buttonOnly="true"
+            sameFilenameAllowed="true"
+            iconFirst="true"
+            buttonText="{i18n>attachmentButtonText}" 
+        />
+
+        <Tokenizer
+            id="FM_tokenizer"
+            width="auto"
+            tokenDelete="onTokenDelete"
+            editable="{EditableModeltruefalse>/Editable}"
+            tokens="{tokenModel>/tokens}">
+            <Token key="{tokenModel>key}" text="{tokenModel>text}" />
+        </Tokenizer>
+    </HBox>
+</VBox>
+
 		<footer>
 			<OverflowToolbar id="otbFooter">
 				<ToolbarSpacer />
