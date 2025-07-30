@@ -101,7 +101,7 @@ sap.ui.define(
                 }
             },
 
-            _createGroupHeader: function (oGroup) {
+           _createGroupHeader: function (oGroup) {
                 let sKey = oGroup.key;
                 const userData = this.getView().getModel("LoginModel").getData();
 
@@ -110,10 +110,22 @@ sap.ui.define(
                     sKey = this.Formatter.formatDate(sKey);
                 }
 
-                return new sap.m.GroupHeaderListItem({
+                const oHeader = new sap.m.GroupHeaderListItem({
                     title: sKey,
                     upperCase: false
                 });
+
+                // Apply custom background and text color
+                oHeader.addEventDelegate({
+                    onAfterRendering: function () {
+                        this.$().css({
+                            "background-color": "rgb(214 230 235)",
+                            "color": "#000000"
+                        });
+                    }
+                }, oHeader);
+
+                return oHeader;
             },
 
             logindata: async function () {

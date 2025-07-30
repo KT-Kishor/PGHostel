@@ -80,9 +80,11 @@
 							<core:ListItem key="{DesignationModel>id}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 						</ComboBox>
 						<Label text="Current Annual Salary (INR)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="salaryInput" maxLength="12" required="true" placeholder="500000" liveChange=".onSalaryChange"/>
+						<Input id="salaryInput" maxLength="12" required="true" placeholder="500000" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
+                    valueHelpIconSrc="sap-icon://message-information"/>
 						<Label text="Expected Salary (Annual INR)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="expectedSalaryInput" maxLength="12" required="true" placeholder="950000" liveChange=".onSalaryChange"/>
+						<Input id="expectedSalaryInput" maxLength="12" required="true" placeholder="950000" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
+                    valueHelpIconSrc="sap-icon://message-information"/>
 						<Label text="Employment Type" required="false" class="sapUiSmallMarginTop"/>
 						<ComboBox id="employmentTypeCombo" width="100%" required="false" change="onEmpTypeChange" valueStateText="{i18n>employmentVal}" placeholder="Select Type">
 							<core:Item key="full" text="Full-Time"/>

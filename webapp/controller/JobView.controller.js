@@ -47,9 +47,11 @@ sap.ui.define(
 
         _onRouteMatched: function (oEvent) {
           const sJobId = oEvent.getParameter("arguments").jobId;
-
+ 
           this.getBusyDialog();
-
+          this.getView().byId("jobDetailsContainer").setVisible(false);
+          this.getView().byId("idJobNotAvailable").setVisible(false);
+ 
           this._fetchJobById(sJobId)
             .then((oJob) => {
               const bIsValidJob = !!oJob;
@@ -57,18 +59,15 @@ sap.ui.define(
                 ...oJob,
                 isValidJob: bIsValidJob,
               });
-
+ 
               this.getView().setModel(
                 oJobApplicationModel,
                 "JobApplicationModel"
               );
-
-              if (!bIsValidJob) {
-                if (!oData || !oData.JobTitle) {
-                  this.getView().byId("jobDetailsContainer").setVisible(false);
-                }
-
-                // console.warn("[Route] No valid job data for ID:", sJobId);
+              if (bIsValidJob) {
+                this.getView().byId("jobDetailsContainer").setVisible(true);
+              } else {
+                this.getView().byId("idJobNotAvailable").setVisible(true);
               }
             })
             .catch((err) => {
@@ -1609,6 +1608,28 @@ sap.ui.define(
         onCopyLinkPress: function () {
           navigator.clipboard.writeText(window.location.href);
           sap.m.MessageToast.show("Link copied!");
+        },
+
+           SalaryInfoPress: function(oEvent) {
+            if (!this._oPopover) {
+                this._oPopover = new sap.m.Popover({
+                    contentWidth: "300px",
+                    contentHeight: "auto",
+                    showHeader: false,
+                    placement: sap.m.PlacementType.Bottom,
+                    content: [new sap.m.VBox({
+                        alignItems: "Center",
+                        justifyContent: "Center",
+                        width: "100%",
+                        items: [new sap.m.Text({
+                            text: this.oResourceBundle.getText("salaryPackageInfo"),
+                            wrapping: true
+                        })]
+                    }).addStyleClass("customPopoverContent")]
+                });
+                this.getView().addDependent(this._oPopover);
+            }
+            this._oPopover.openBy(oEvent.getSource());
         },
       }
     );

@@ -642,9 +642,9 @@ sap.ui.define([
                     AmountInINR: FilterModel.Currency === "INR"
                         ? parseFloat(oModel.subTotal) || 0
                         : parseFloat(oSelectedCustomerModel.AmountInFCurrency) || 0,
-                    CGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oModel.gstAmount) || 0 : 0,
-                    SGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oModel.gstAmount) || 0 : 0,
-                    IGST: oSelectedCustomerModel.Type === "IGST" ? parseFloat(oModel.gstAmount) || 0 : 0,
+                    CGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oSelectedCustomerModel.CGST) || 0 : 0,
+                    SGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oSelectedCustomerModel.SGST) || 0 : 0,
+                    IGST: oSelectedCustomerModel.Type === "IGST" ? parseFloat(oSelectedCustomerModel.IGST) || 0 : 0,
                     TotalAmount: parseFloat(oModel.TotalAmount) || 0,
                     Status: oSelectedCustomerModel.Status,
                     InvoiceDescription: oSelectedCustomerModel.InvoiceDescription || "",

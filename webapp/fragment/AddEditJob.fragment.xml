@@ -7,7 +7,7 @@
 	xmlns:rte="sap.ui.richtexteditor">
 	<Dialog id="addJobDialog" title="{= ${temporaryModel>/dialogTitle} }" resizable="true" draggable="true" contentHeight="auto" contentWidth="60%" afterClose="onCloseDialog">
 		<content>
-			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="true" layout="ResponsiveGridLayout">
+			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="false" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Change Job Status" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Status" required="true" class="sapUiSmallMarginTop" />
