@@ -406,5 +406,6 @@ sap.ui.define([
         onLogout: function () {
             this.getRouter().navTo("RouteLoginPage");
         },
+
     });
 });

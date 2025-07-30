@@ -55,6 +55,10 @@ sap.ui.define(
               "/length",
               this.getView().getModel("MSASOWModel").getData().length
             );
+
+            await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
+           this.getView().getModel("SOWModel").setProperty("/length",this.getView().getModel("SOWModel").getData().length);
+
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");

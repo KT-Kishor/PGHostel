@@ -77,7 +77,7 @@
                         path: 'FinancialYear',
                         descending: false,
                         group: true
-                    }
+                    },groupHeaderFactory: '.getGroupHeader'
                 }"
             >
                 <headerToolbar>

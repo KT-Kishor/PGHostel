@@ -367,7 +367,11 @@ sap.ui.define([
             };
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
-        }
+        },
+        
+ getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
     });
 });

@@ -352,6 +352,9 @@ sap.ui.define([
             }
         },
 
+ getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
     });
 });

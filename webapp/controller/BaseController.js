@@ -1325,6 +1325,13 @@
         .getProperty("MsaID");
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
     },
+    OnPressNavigationSOW:function (oEvent) {
+      var MsaID = oEvent
+        .getSource()
+        .getBindingContext("SOWModel")
+        .getProperty("MsaID");
+      this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
+    }, 
     CI_onPressInvoiceRow: function (oEvent) {
       var Path = encodeURIComponent(
         oEvent
@@ -1335,6 +1342,27 @@
       this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
     },
 
+    getGroupHeader: function (oGroup) {
+                // Same color for ALL group headers
+                const bgColor = "rgb(214 230 235)"; 
+                const textColor = "#000000"; 
+
+                const oHeader = new sap.m.GroupHeaderListItem({
+                    title: oGroup.key,
+                    upperCase: false
+                });
+
+                oHeader.addEventDelegate({
+                    onAfterRendering: function () {
+                        this.$()
+                            .css("background-color", bgColor)
+                            .css("color", textColor)
+                           
+                    }
+                }, oHeader);
+
+                return oHeader;
+            },
      getStyledGroupHeader: function (oGroup) {
             const statusStyles = {
                 "New": {
@@ -1363,7 +1391,7 @@
                     textColor: "#000000"
                 },
                 "Draft": {
-                    background: "linear-gradient(to bottom right, #ccc, #eee)",
+                    background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
                     textColor: "#000000"
                 },
                 "Submitted": {
@@ -1375,19 +1403,19 @@
                     textColor: "#000000"
                 },
                 "Revised": {
-                    background: "linear-gradient(to bottom right, #f8e77d, #f5c442)",
+                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
                     textColor: "#000000"
                 },
                 "Send back by manager": {
-                    background: "linear-gradient(to bottom right, #ffb347, #ffcc33)",
+                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
                     textColor: "#000000"
                 },
                 "Send back by account": {
-                    background: "linear-gradient(to bottom right, #ffb347, #ffcc33)",
+                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
                     textColor: "#000000"
                 },
                 "Send to account": {
-                    background: "linear-gradient(to bottom right, #7bdff2, #b2f7ef)",
+                   background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
                     textColor: "#000000"
                 },
                 "Active": {

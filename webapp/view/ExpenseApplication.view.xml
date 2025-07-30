@@ -59,7 +59,7 @@
 			</fb:FilterBar>
 
 <Table id="exp_Id_Expense"
-       items="{path: 'ExpenseModel>/', sorter: {path: 'Status',descending: false,group: true}}"
+       items="{path: 'ExpenseModel>/', sorter: {path: 'Status',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
        class="sapUiResponsiveMargin"
        growing="true"
        growingThreshold="50"

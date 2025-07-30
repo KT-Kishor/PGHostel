@@ -33,7 +33,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table  class="sapUiResponsiveMargin" items="{path: 'ConsultantModel>/', sorter: {path: 'EmployeeID',descending: false,group: true}}" growingScrollToLoad="true" width="auto" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"  id="CI_id_ConsultantInvoiceTable">
+			<Table  class="sapUiResponsiveMargin" items="{path: 'ConsultantModel>/', sorter: {path: 'EmployeeID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" growingScrollToLoad="true" width="auto" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"  id="CI_id_ConsultantInvoiceTable">
 				<headerToolbar>
 					<Toolbar>
 						<Title id="CI_id_TitleInv" text="{i18n>consultantInvoiceDetails}  ({= ${ConsultantModel>/}.length })"/>

@@ -32,7 +32,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="MSA_id_Table" class="sapUiTinyMargin" items="{
-                path: 'MSADisplayModel>/', sorter: {path: 'CreateMSADate',descending: false,group: true}}" busyIndicatorDelay="0" width="auto" growingScrollToLoad="true" growing="true" growingThreshold="50" alternateRowColors="true">
+                path: 'MSADisplayModel>/', sorter: {path: 'CreateMSADate',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" busyIndicatorDelay="0" width="auto" growingScrollToLoad="true" growing="true" growingThreshold="50" alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >
 						<Title id="MSA_id_Title" text="{i18n>msaDetails} ({= ${MSADisplayModel>/}.length })"/>

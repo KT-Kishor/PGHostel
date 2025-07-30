@@ -68,7 +68,7 @@
             <Table
                 id="TSA_id_Table"
                 mode="MultiSelect"
-                items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeID',descending: false,group: true}}"
+                items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
                 growing="true"
                 selectionChange="TSA_onSelect"
                 growingScrollToLoad="true"

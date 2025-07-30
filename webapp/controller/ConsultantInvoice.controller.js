@@ -4,15 +4,16 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast",
         "../model/formatter",
+
     ],
-    function(
+    function (
         BaseController, JSONModel, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoice", {
-            onInit: function() {
+            onInit: function () {
                 this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function() {
+            _onRouteMatched: async function () {
                 var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                 if (!LoginFUnction) return;
                 // Get i18n resource bundle
@@ -26,7 +27,7 @@ sap.ui.define(
                 this.initializeBirthdayCarousel();
             },
 
-            ContractReadCall: async function() {
+            ContractReadCall: async function () {
                 try {
                     const oView = this.getView();
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -100,7 +101,7 @@ sap.ui.define(
                 }
             },
 
-            _createGroupHeader: function(oGroup) {
+            _createGroupHeader: function (oGroup) {
                 let sKey = oGroup.key;
                 const userData = this.getView().getModel("LoginModel").getData();
 
@@ -115,7 +116,7 @@ sap.ui.define(
                 });
             },
 
-            logindata: async function() {
+            logindata: async function () {
                 try {
                     await this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
@@ -132,14 +133,14 @@ sap.ui.define(
                 }
             },
 
-            CI_onPressAddInvoice: function() {
+            CI_onPressAddInvoice: function () {
                 this.getRouter().navTo("RouteNavConsultantInvoiceApplication", {
                     sPath: "X",
                     oPath: "Y",
                 });
             },
 
-            CI_onPressInvoice: function(oEvent) {
+            CI_onPressInvoice: function (oEvent) {
                 var oBindingContext = oEvent.getSource().getBindingContext("ConsultantModel");
                 var oInvoiceNo = oBindingContext.getProperty("InvoiceNo");
                 var oEmployeeID = oBindingContext.getProperty("EmployeeID");
@@ -149,15 +150,15 @@ sap.ui.define(
                 });
             },
 
-            onPressback: function() {
+            onPressback: function () {
                 this.getRouter().navTo("RouteTilePage");
             },
 
-            onLogout: function() {
+            onLogout: function () {
                 this.getRouter().navTo("RouteLoginPage");
             },
 
-            CI_onClearFilters: function() {
+            CI_onClearFilters: function () {
                 const oFilterBar = this.getView().byId("CI_id_ConsultantInvoiceFilterBar");
                 oFilterBar.getFilterGroupItems().forEach((oItem) => {
                     const oControl = oItem.getControl();
@@ -171,7 +172,7 @@ sap.ui.define(
                 });
             },
 
-            CI_OnSearch: async function() {
+            CI_OnSearch: async function () {
                 try {
                     const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
                     const aFilterItems = oFilterBar.getFilterGroupItems();
@@ -293,7 +294,7 @@ sap.ui.define(
             },
 
             // Helper function to get financial year range
-            _getFinancialYearRange: function() {
+            _getFinancialYearRange: function () {
                 const today = new Date();
                 const currentYear = today.getFullYear();
                 const currentMonth = today.getMonth(); // 0 = Jan, 3 = April
@@ -317,7 +318,7 @@ sap.ui.define(
                 };
             },
 
-            onDateRangeChange: function(oEvent) {
+            onDateRangeChange: function (oEvent) {
                 try {
                     const oDateRange = oEvent.getSource();
                     const value = oDateRange.getValue();
@@ -345,7 +346,7 @@ sap.ui.define(
             },
 
 
-            _filterInvoiceModelByDateRange: function(startDate, endDate) {
+            _filterInvoiceModelByDateRange: function (startDate, endDate) {
                 const oConsultantModel = this.getView().getModel("ConsultantModel");
                 const oInvoiceModel = this.getView().getModel("InvoiceModel");
 
@@ -368,7 +369,7 @@ sap.ui.define(
                 // Update InvoiceModel with filtered data
                 oInvoiceModel.setData(aFilteredData);
                 oInvoiceModel.refresh(true);
-            },
+            },           
         })
     }
 

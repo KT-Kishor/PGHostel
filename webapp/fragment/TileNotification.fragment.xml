@@ -96,7 +96,6 @@
                     <Table
                         items="{MSASOWModel>/}"
                         id=""
-                       
                     >
                         <headerToolbar>
                             <OverflowToolbar>
@@ -169,7 +168,7 @@
       )}"
             >
                 <f:content>
-                    <Table items="{CompanyInvoiceModelData>/}" >
+                    <Table items="{CompanyInvoiceModelData>/}">
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
@@ -224,6 +223,95 @@
                                         text="{path:'CompanyInvoiceModelData>PayByDate',formatter:'.Formatter.formatDate'}"
                                         inverted="false"
                                         state="{ parts: [{path: 'CompanyInvoiceModelData>PayByDate'},{path: 'CompanyInvoiceModelData>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </f:content>
+            </f:Card>
+
+            <f:Card
+                width="auto"
+                class="sapUiSmallMarginBeginEnd sapUiTinyMarginTop sapUiSmallMargin"
+                visible="{= ${SOWModel>/length} > 0
+                        &amp;&amp; (
+                            ${LoginModel>/Role} === 'Admin' ||
+                            ${LoginModel>/Role} === 'Demo' ||
+                            ${LoginModel>/Role} === 'Account Manager' ||
+                            ${LoginModel>/Role} === 'HR Manager'
+                        )}"
+            >
+                <f:content>
+                    <Table
+                        items="{SOWModel>/}"
+                        id=""
+                    >
+                        <headerToolbar>
+                            <OverflowToolbar>
+                                <Title
+                                    text="{i18n>sowTitle}"
+                                    level="H1"
+                                />
+                            </OverflowToolbar>
+                        </headerToolbar>
+                        <columns>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>POConsultantname}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>startDate}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Desktop"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>endDate}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>designation}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>rate}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>status}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem
+                                type="Navigation"
+                                press="OnPressNavigationSOW"
+                            >
+                                <cells>
+                                    <Text text="{SOWModel>ConsultantName}" />
+                                    <Text
+                                        text="{path:'SOWModel>StartDate',formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <Text
+                                        text="{path:'SOWModel>EndDate',formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <Text text="{SOWModel>Designation}" />
+                                    <Text text="{SOWModel>Rate}" />
+                                    <ObjectStatus
+                                        text="{SOWModel>Status}"
+                                        inverted="false"
+                                        state="{path: 'SOWModel>Status', formatter: '.Formatter.formatObjectStatus'}"
                                     />
                                 </cells>
                             </ColumnListItem>

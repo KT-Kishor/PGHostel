@@ -175,7 +175,7 @@
                 sorter: [{
                     path: 'Type',
                     group: true
-                }]
+                }],groupHeaderFactory: '.getGroupHeader'
             }"
             mode="SingleSelectLeft"
             updateFinished="onTableColorFormatting"

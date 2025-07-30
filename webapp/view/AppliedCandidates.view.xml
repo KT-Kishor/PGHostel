@@ -119,16 +119,16 @@
 
         <Table
             id="appliedCandidatesTable"
-            items="{path: 'DataTableModel>/', sorter: [{path: 'CreatedBy', descending: false, group: true },    
-            {path: 'CreateDate', descending: true }]}"  
+            items="{path: 'DataTableModel>/',sorter: [{path: 'CreatedBy', descending: false, group: true },    
+            {path: 'CreateDate', descending: true }],groupHeaderFactory: '.getGroupHeader'}"
             mode="SingleSelectLeft"
             class="sapUiResponsiveMargin"
             width="auto"
             busyIndicatorDelay="0"
             noDataText="{i18n>noData}"
             growingScrollToLoad="true"
-             growingThreshold="50"  alternateRowColors="true">
-			 <headerToolbar>
+            growingThreshold="50"  alternateRowColors="true">
+					 <headerToolbar>
                 <OverflowToolbar>
                     <content>
                         <Title

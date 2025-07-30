@@ -141,7 +141,7 @@
 						path: 'Type',
 						descending: false,
 						group: true
-					}
+					},groupHeaderFactory: '.getGroupHeader'
             }"
             class="sapUiResponsiveMargin"
             width="auto"
