@@ -19,7 +19,7 @@
                 <!-- Filter Bar -->
                 <fb:FilterBar id="dashboardFilterBar" liveMode="false" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" >
                     <fb:filterGroupItems>
-                        <fb:FilterGroupItem name="Company" label="Company" groupName="Group1" visibleInFilterBar="true">
+                        <fb:FilterGroupItem name="Company" label="{i18n>company}" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
                                 <MultiComboBox id="companyFilter" width="400px" placeholder="{i18n>companyName}" items="{path: 'companies>/'}" >
                                     <items><core:Item key="{companies>key}" text="{companies>text}"/></items>
@@ -48,9 +48,9 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>invoiceStatusDash}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart"/>
-                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="Donut Chart"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChartTooltip}"/>
+                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChartTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -76,9 +76,9 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>invoiceMonthly}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie" tooltip="Pie Chart"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="Bar Chart"/>
-                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine" tooltip="Line Chart"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
+                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChartTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -86,8 +86,8 @@
                                 <viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/monthlyValue}">
-                                            <vizData:dimensions> <vizData:DimensionDefinition name="Month" value="{chartData>month}" /> </vizData:dimensions>
-                                            <vizData:measures> <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" /> </vizData:measures>
+                                            <vizData:dimensions> <vizData:DimensionDefinition name="{i18n>month}" value="{chartData>month}" /> </vizData:dimensions>
+                                            <vizData:measures> <vizData:MeasureDefinition name="{i18n>totalValueInr}" value="{chartData>totalAmountInINR}" /> </vizData:measures>
                                         </vizData:FlattenedDataset>
                                     </viz:dataset>
                                     <viz:feeds>
@@ -104,8 +104,8 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>companytotalinvoice}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie" tooltip="Pie Chart"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="Bar Chart"/>
+                                        <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -113,8 +113,8 @@
                                 <viz:VizFrame id="barChartCompany" vizType="{invoiceChartTypeModel>/companyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/companyTotals}">
-                                            <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
-                                            <vizData:measures> <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" /> </vizData:measures>
+                                            <vizData:dimensions> <vizData:DimensionDefinition name="{i18n>chartCompany}" value="{chartData>companyName}" /> </vizData:dimensions>
+                                            <vizData:measures> <vizData:MeasureDefinition name="{i18n>totalValueInr}" value="{chartData>totalAmountInINR}" /> </vizData:measures>
                                         </vizData:FlattenedDataset>
                                     </viz:dataset>
                                     <viz:feeds>
@@ -131,8 +131,8 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>yearlyInvoiceTrend}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart"/>
-                                        <Button icon="sap-icon://line-charts" press="onPressYearlyLine" tooltip="Line Chart"/>
+                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChartTooltip}"/>
+                                        <Button icon="sap-icon://line-charts" press="onPressYearlyLine" tooltip="{i18n>lineChartTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
@@ -140,10 +140,10 @@
                                 <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, legend: { visible: true } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/yearlyTrend}">
-                                            <vizData:dimensions> <vizData:DimensionDefinition name="Year" value="{chartData>year}" /> </vizData:dimensions>
+                                            <vizData:dimensions> <vizData:DimensionDefinition name="{i18n>chartYear}" value="{chartData>year}" /> </vizData:dimensions>
                                             <vizData:measures>
-                                                <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
-                                                <vizData:MeasureDefinition name="Invoice Count" value="{chartData>count}" />
+                                                <vizData:MeasureDefinition name="{i18n>totalValueInr}" value="{chartData>totalAmountInINR}" />
+                                                <vizData:MeasureDefinition name="{i18n>invoiceCount}" value="{chartData>count}" />
                                             </vizData:measures>
                                         </vizData:FlattenedDataset>
                                     </viz:dataset>
@@ -163,30 +163,25 @@
                                     <contentMiddle> <Title text="{i18n>paymentBreakdown}" level="H5"/> </contentMiddle>
                                     <contentRight>
                                         <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPaymentDonut" tooltip="{i18n>donutChartTooltip}"/>
-                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressVerticalStack" tooltip="Column Chart"/>
-                                        <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStacked" tooltip="Stacked Horizontal"/>
-                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPaymentGrouped" tooltip="Grouped Horizontal"/>
+                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressVerticalStack" tooltip="{i18n>columnChartTooltip}"/>
+                                        <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStacked" tooltip="{i18n>stackedHorizontalTooltip}"/>
+                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPaymentGrouped" tooltip="{i18n>groupedHorizontalTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="stackedChartPayment"
                                     vizType="{invoiceChartTypeModel>/paymentBreakdownType}"
-                                    width="100%"
-                                    height="300px"
-                                    vizProperties="{
-                                        title: { visible: false },
-                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
-                                        interaction: { selectability: { mode: 'SINGLE' } }
-                                    }"
+                                    width="100%" height="300px"
+                                    vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, interaction: { selectability: { mode: 'SINGLE' } } }"
                                     selectData="onPaymentBreakdownSelect">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/paymentBreakdown}">
-                                            <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
+                                            <vizData:dimensions> <vizData:DimensionDefinition name="{i18n>chartCompany}" value="{chartData>companyName}" /> </vizData:dimensions>
                                             <vizData:measures>
-                                                <vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
-                                                <vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
-                                                <vizData:MeasureDefinition name="TDS Amount" value="{chartData>tdsAmount}" />
+                                                <vizData:MeasureDefinition name="{i18n>taxableAmount}" value="{chartData>taxableAmount}" />
+                                                <vizData:MeasureDefinition name="{i18n>gstAmount}" value="{chartData>gstAmount}" />
+                                                <vizData:MeasureDefinition name="{i18n>tdsAmount}" value="{chartData>tdsAmount}" />
                                             </vizData:measures>
                                         </vizData:FlattenedDataset>
                                     </viz:dataset>
@@ -204,27 +199,22 @@
                                 <Bar>
                                     <contentMiddle> <Title text="{i18n>pendingPaymentsByCompany}" level="H5"/> </contentMiddle>
                                     <contentRight>
-                                        <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPendingDonut" tooltip="Donut Chart"/>
-                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="Column Chart"/>
-                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="Bar Chart"/>
+                                        <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPendingDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="{i18n>columnChartTooltip}"/>
+                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="{i18n>barChartTooltip}"/>
                                     </contentRight>
                                 </Bar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="barChartPending"
                                     vizType="{invoiceChartTypeModel>/pendingByCompanyType}"
-                                    width="100%"
-                                    height="300px"
-                                    vizProperties="{
-                                        title: { visible: false },
-                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
-                                        interaction: { selectability: { mode: 'SINGLE' } }
-                                    }"
+                                    width="100%" height="300px"
+                                    vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, interaction: { selectability: { mode: 'SINGLE' } } }"
                                     selectData="onPendingCompanySelect">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/pendingByCompany}">
-                                            <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
-                                            <vizData:measures> <vizData:MeasureDefinition name="Pending Amount (INR)" value="{chartData>pendingAmountInINR}" /> </vizData:measures>
+                                            <vizData:dimensions> <vizData:DimensionDefinition name="{i18n>chartCompany}" value="{chartData>companyName}" /> </vizData:dimensions>
+                                            <vizData:measures> <vizData:MeasureDefinition name="{i18n>pendingAmountInr}" value="{chartData>pendingAmountInINR}" /> </vizData:measures>
                                         </vizData:FlattenedDataset>
                                     </viz:dataset>
                                     <viz:feeds>
