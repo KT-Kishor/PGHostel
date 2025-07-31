@@ -45,14 +45,14 @@
                         <!-- 1. Status Distribution Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>invoiceStatusDash}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                         <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChartTooltip}"/>
-                                        <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChartTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <!-- CORRECTED: wrapping="true" added -->
+                                    <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChartTooltip}"/>
+                                    <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }" selectData="onStatusChartSelect">
@@ -73,14 +73,13 @@
                         <!-- 2. Monthly Trend Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>invoiceMonthly}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                         <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>pieChartTooltip}"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
-                                        <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChartTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://pie-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
+                                    <Button icon="sap-icon://line-charts" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChartTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
@@ -101,13 +100,12 @@
                         <!-- 3. Value by Company Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>companytotalinvoice}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                       <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie" tooltip="{i18n>pieChartTooltip}"/>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://pie-chart" press="IN_onPressCompanyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="barChartCompany" vizType="{invoiceChartTypeModel>/companyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
@@ -128,13 +126,12 @@
                         <!-- 4. Yearly Trend Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>yearlyInvoiceTrend}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                        <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChartTooltip}"/>
-                                        <Button icon="sap-icon://line-charts" press="onPressYearlyLine" tooltip="{i18n>lineChartTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <Title text="{i18n>yearlyInvoiceTrend}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChartTooltip}"/>
+                                    <Button icon="sap-icon://line-charts" press="onPressYearlyLine" tooltip="{i18n>lineChartTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, legend: { visible: true } }">
@@ -159,15 +156,14 @@
                         <!-- 5. Payment Breakdown (Stacked Bar Chart) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>paymentBreakdown}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                        <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPaymentDonut" tooltip="{i18n>donutChartTooltip}"/>
-                                       <Button icon="sap-icon://vertical-bar-chart" press="onPressVerticalStack" tooltip="{i18n>columnChartTooltip}"/>
-                                        <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStacked" tooltip="{i18n>stackedHorizontalTooltip}"/>
-                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPaymentGrouped" tooltip="{i18n>groupedHorizontalTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPaymentDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                    <Button icon="sap-icon://vertical-bar-chart" press="onPressVerticalStack" tooltip="{i18n>columnChartTooltip}"/>
+                                    <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStacked" tooltip="{i18n>stackedHorizontalTooltip}"/>
+                                    <Button icon="sap-icon://horizontal-bar-chart" press="onPressPaymentGrouped" tooltip="{i18n>groupedHorizontalTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="stackedChartPayment"
@@ -201,14 +197,13 @@
                         <!-- 6. Pending/Partial Payments by Company -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Bar>
-                                    <contentMiddle> <Title text="{i18n>pendingPaymentsByCompany}" level="H5"/> </contentMiddle>
-                                    <contentRight>
-                                         <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPendingDonut" tooltip="{i18n>donutChartTooltip}"/>
-                                        <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="{i18n>columnChartTooltip}"/>
-                                        <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="{i18n>barChartTooltip}"/>
-                                    </contentRight>
-                                </Bar>
+                                <Toolbar>
+                                    <Title text="{i18n>pendingPaymentsByCompany}" level="H5" wrapping="true"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://donut-chart" type="Transparent" press="onPressPendingDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                    <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="{i18n>columnChartTooltip}"/>
+                                    <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="{i18n>barChartTooltip}"/>
+                                </Toolbar>
                             </f:header>
                             <f:content>
                                 <viz:VizFrame id="barChartPending"
