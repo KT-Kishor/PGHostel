@@ -46,7 +46,6 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar>
-                                    <!-- CORRECTED: wrapping="true" added -->
                                     <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
