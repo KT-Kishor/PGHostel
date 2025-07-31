@@ -1269,23 +1269,31 @@ Apply now button and reference button styles
   box-shadow: none !important;
 }
 
-/* JOB POSTING */
-.rteError .sapUiRteToolbar,
-.rteError .sapUiRteCnt {
-  border: 1px solid red !important;
-}
+  /* JOB POSTING */
+  .rteError .sapUiRteToolbar,
+  .rteError .sapUiRteCnt {
+    border: 1px solid red !important;
+  }
 
-.rteError .sapUiRteCnt {
-  border-top: none !important;
-}
+  .rteError .sapUiRteCnt {
+    border-top: none !important;
+  }
 
-.blockInputTyping .sapMInputBaseInner {
-  pointer-events: none !important;
-}
+  .blockInputTyping .sapMInputBaseInner {
+    pointer-events: none !important;
+  }
 
-.sapUiRTEErrorBorder {
-  border: 2px solid red !important;
-  border-radius: 4px;
+  .sapUiRTEErrorBorder {
+    border: 2px solid red !important;
+    border-radius: 4px;
+  }
+
+
+
+  .myRTEBorderVBox {
+    border: 1px solid #0064D9; 
+    border-radius: 5px; 
+    padding: 5px; 
 }
 
 .sapMTableTH {

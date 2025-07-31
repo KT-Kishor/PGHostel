@@ -7,7 +7,7 @@
 	xmlns:rte="sap.ui.richtexteditor">
 	<Dialog id="addJobDialog" title="{= ${temporaryModel>/dialogTitle} }" resizable="true" draggable="true" contentHeight="auto" contentWidth="60%" afterClose="onCloseDialog">
 		<content>
-			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="false" layout="ResponsiveGridLayout">
+			<f:SimpleForm id="addJobForm2" visible="{= ${temporaryModel>/isEdit} === true }" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Change Job Status" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Status" required="true" class="sapUiSmallMarginTop" />
@@ -39,9 +39,9 @@
 					<Label text="Primary Skills" required="true" class="sapUiSmallMarginTop" />
 					<Input id="primarySkillsInput" value="{temporaryModel>/PrimarySkills}" placeholder="e.g., SAPUI5" liveChange="onPrimarySkillsChange" class="sapUiSmallMarginTop" type="Text" maxLength="50" required="true"/>
 					<Label text="Secondary Skills" required="true" class="sapUiSmallMarginTop" />
-					<rte:RichTextEditor id="secondarySkillsRTE" value="{temporaryModel>/SecondarySkills}" width="100%" height="150px" class="sapUiSmallMarginTop" required="true" change="onSecondarySkillsChange" />
+					<VBox id="secondarySkillsRTE" class="sapUiSmallMarginTop" />
 					<Label text="Skill Requirements" class="sapUiSmallMarginTop" />
-					<rte:RichTextEditor id="skillReqRTE" value="{temporaryModel>/SkillRequirements}" width="100%" height="150px" class="sapUiSmallMarginTop" change="onSkillRequirementsChange" />
+					<VBox id="skillReqRTE" class="sapUiSmallMarginTop"/>
 					<Label text="Experience" required="true" class="sapUiSmallMarginTop" />
 					<ComboBox class="sapUiSmallMarginTop" id="experienceCombo" placeholder="Select Experience" items="{ExperienceModel>/data}" selectedKey="{temporaryModel>/SelectedExperienceKey}" change="onExperienceChange" required="true" valueStateText="{i18n>jpExpValueState}">
 						<core:Item key="{ExperienceModel>value}" text="{ExperienceModel>value} Years" />
@@ -60,9 +60,9 @@
 						<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
 					</ComboBox>
 					<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
-					<rte:RichTextEditor id="jobDescRTE" value="{temporaryModel>/JobDescription}" width="100%" height="200px" class="sapUiSmallMarginTop" required="true" change="onJobDescriptionChange"/>
+					<VBox id="jobDescRTE" class="sapUiSmallMarginTop"/>
 					<Label text="Key Responsibilities" class="sapUiSmallMarginTop" />
-					<rte:RichTextEditor id="keyRespRTE" value="{temporaryModel>/KeyResponsibilities}" width="100%" height="200px" class="sapUiSmallMarginTop" change="onKeyResponsibilitiesChange"/>
+					<VBox id="keyRespRTE" class="sapUiSmallMarginTop"/>
 				</f:content>
 			</f:SimpleForm>
 		</content>

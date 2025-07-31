@@ -6,6 +6,7 @@ sap.ui.define(
     "sap/ui/core/Fragment",
     "../model/formatter",
     "../utils/validation",
+    "sap/ui/richtexteditor/RichTextEditor",
   ],
   (
     BaseController,
@@ -13,7 +14,8 @@ sap.ui.define(
     MessageToast,
     Fragment,
     formatter,
-    validation
+    validation,
+    RichTextEditor
   ) => {
     "use strict";
 
@@ -35,15 +37,11 @@ sap.ui.define(
 
         _onObjectMatched: async function () {
           try {
-            this.getBusyDialog();
-
             //  Login check
-            const bLoginSuccess = await this.commonLoginFunction("JobPosting");
-            if (!bLoginSuccess) {
-              this.closeBusyDialog();
+            var LoginFUnction = await this.commonLoginFunction("JobPosting");
+            if (!LoginFUnction) {
               return;
             }
-
             //  i18n + validation init
             this.i18na = this.getView().getModel("i18n")?.getResourceBundle();
             this.validation = validation;
@@ -69,16 +67,16 @@ sap.ui.define(
               error?.message || error?.responseText || "Unknown error occurred."
             );
           } finally {
-            this.closeBusyDialog(); // Ensure dialog is closed in all cases
+            this.closeBusyDialog();
           }
         },
 
         onPressback: function () {
-          this.getRouter().navTo("RouteTilePage"); // Navigate to tile page
+          this.getRouter().navTo("RouteTilePage");
         },
 
         onLogout: function () {
-          this.CommonLogoutFunction(); // Navigate to login page
+          this.CommonLogoutFunction();
         },
 
         _updateDynamicFilters: function (aData) {
@@ -110,7 +108,6 @@ sap.ui.define(
             });
             this.getView().setModel(oModel, "JobApplicationModel");
 
-            //  Refresh dependent models for filters
             this._getUniqueSkillsFromCandidates();
           } catch (err) {
             this.closeBusyDialog();
@@ -240,6 +237,7 @@ sap.ui.define(
 
           //  Bind model before opening
           oDialog.setModel(oTempModel, "temporaryModel");
+          oView.setModel(oTempModel, "temporaryModel");
 
           // Set min/max range for DatePickers
           datePickerIds.forEach((id) => {
@@ -250,16 +248,6 @@ sap.ui.define(
               oMinDate.setFullYear(oToday.getFullYear() - 20);
               oDP.setMinDate(oMinDate);
               oDP.setMaxDate(oToday);
-            }
-          });
-
-          // Attach Rich Text Editor change events
-          const sFragId = oView.getId();
-          ["secondarySkillsRTE", "jobDescRTE"].forEach((rteId) => {
-            const oRTE = Fragment.byId(sFragId, rteId);
-            if (oRTE) {
-              oRTE.detachChange(this.onRichTextChange, this);
-              oRTE.attachChange(this.onRichTextChange, this);
             }
           });
 
@@ -276,14 +264,190 @@ sap.ui.define(
 
           oDialog.open();
         },
+        _openJobDialog: function (oTempModel) {
+          return this._commonFragmentOpen(
+            oTempModel,
+            "sap.kt.com.minihrsolution.fragment.AddEditJob",
+            "addJobDialog",
+            ["postDateDP"]
+          ).then(() => {
+            const oMultiInput = this.byId("multiInputQualifications");
+            if (oMultiInput) {
+              oMultiInput.removeAllTokens();
+              const aQualifications =
+                oTempModel.getProperty("/qualifications") || [];
+              aQualifications.forEach((q) => {
+                oMultiInput.addToken(new sap.m.Token({ text: q, key: q }));
+              });
+            }
+
+            this._initRichTextEditors();
+
+            this._initializeDefaultDropdownValues();
+          });
+        },
+
+        _initRichTextEditors: function () {
+          const oView = this.getView();
+          const oModel = oView.getModel("temporaryModel");
+
+          if (!oModel) {
+            return;
+          }
+
+          const aRTEs = [
+            { vboxId: "jobDescRTE", prop: "JobDescription", mandatory: true },
+            {
+              vboxId: "keyRespRTE",
+              prop: "KeyResponsibilities",
+              mandatory: false,
+            },
+            {
+              vboxId: "secondarySkillsRTE",
+              prop: "SecondarySkills",
+              mandatory: true,
+            },
+            {
+              vboxId: "skillReqRTE",
+              prop: "SkillRequirements",
+              mandatory: false,
+            },
+          ];
+
+          setTimeout(() => {
+            aRTEs.forEach(({ vboxId, prop, mandatory }) => {
+              const oVBox = oView.byId(vboxId);
+              if (!oVBox) {
+                return;
+              }
+
+              oVBox.addStyleClass("myRTEBorderVBox");
+
+              oVBox.destroyItems();
+              const sValue = oModel.getProperty("/" + prop) || "";
+
+              const oRTE = new RichTextEditor({
+                width: "100%",
+                height: "350px",
+                editorType: sap.ui.richtexteditor.EditorType.TinyMCE,
+                showGroupFont: true,
+                showGroupTextAlign: true,
+                showGroupStructure: true,
+                customToolbar: true,
+                value: sValue,
+                ready: (oEvent) => {
+                  const editor = oEvent.getSource();
+                  if (editor.getValue() !== sValue) {
+                    editor.setValue(sValue);
+                  }
+                },
+              });
+
+              oRTE.attachChange(() => {
+                const sVal = oRTE.getValue();
+                oModel.setProperty("/" + prop, sVal);
+
+                // 🔍 Validate on change
+                const sPlainText = sVal
+                  .replace(/<[^>]*>/g, "")
+                  .replace(/&nbsp;/g, "")
+                  .trim();
+                const isEmpty = sPlainText === "";
+                const isShort = sPlainText.length < 8;
+
+                if (mandatory && (isEmpty || isShort)) {
+                  oVBox.addStyleClass("sapUiRTEErrorBorder");
+                } else if (!mandatory && !isEmpty && isShort) {
+                  oVBox.addStyleClass("sapUiRTEErrorBorder");
+                } else {
+                  oVBox.removeStyleClass("sapUiRTEErrorBorder");
+                }
+              });
+
+              oVBox.addItem(oRTE);
+            });
+          }, 100);
+        },
+        _validateRTEContent: function (oRTE, oVBox, rteId) {
+          const sHTML = oRTE.getValue?.() || "";
+          const sPlainText = sHTML
+            .replace(/<[^>]*>/g, "")
+            .replace(/&nbsp;/g, "")
+            .replace(/\s+/g, "")
+            .trim();
+
+          const isEmpty = sPlainText === "";
+          const isShort = sPlainText.length < 8;
+
+          const mandatoryRTEs = ["jobDescEditor", "secondarySkillsEditor"];
+          const optionalMin8RTEs = [
+            "skillRequirementsEditor",
+            "keyResponsibilitiesEditor",
+          ];
+
+          if (mandatoryRTEs.includes(rteId)) {
+            if (isEmpty || isShort) {
+              oVBox?.addStyleClass("sapUiRTEErrorBorder");
+            } else {
+              oVBox?.removeStyleClass("sapUiRTEErrorBorder");
+            }
+          } else if (optionalMin8RTEs.includes(rteId)) {
+            if (!isEmpty && isShort) {
+              oVBox?.addStyleClass("sapUiRTEErrorBorder");
+            } else {
+              oVBox?.removeStyleClass("sapUiRTEErrorBorder");
+            }
+          }
+        },
+
+        _initializeDefaultDropdownValues: function () {
+          const oView = this.getView();
+          const oModel = oView.getModel("temporaryModel");
+
+          const oJobTitleCombo = oView.byId("JobTitleCombo");
+          const oExperienceCombo = oView.byId("experienceCombo");
+          const oStatusCombo = oView.byId("statusCombo");
+
+          if (oJobTitleCombo?.getSelectedKey()) {
+            oModel.setProperty(
+              "/SelectedJobTitleKey",
+              oJobTitleCombo.getSelectedKey()
+            );
+          }
+
+          if (oExperienceCombo?.getSelectedKey()) {
+            oModel.setProperty(
+              "/SelectedExperienceKey",
+              oExperienceCombo.getSelectedKey()
+            );
+          }
+
+          if (this._isEdit && oStatusCombo?.getSelectedKey()) {
+            oModel.setProperty("/Status", oStatusCombo.getSelectedKey());
+          }
+
+          const oCertifications = oView.byId("certificationsInput");
+          if (oCertifications?.getValue()) {
+            oModel.setProperty("/Certifications", oCertifications.getValue());
+          }
+
+          const oPrimarySkills = oView.byId("primarySkillsInput");
+          if (oPrimarySkills?.getValue()) {
+            oModel.setProperty("/PrimarySkills", oPrimarySkills.getValue());
+          }
+
+          const oNoOfPositions = oView.byId("positionsInput");
+          if (oNoOfPositions?.getValue()) {
+            oModel.setProperty("/NoOfPositions", oNoOfPositions.getValue());
+          }
+        },
 
         onOpenAddJobDialog: function () {
           const oView = this.getView();
-
           this._isEdit = false;
           this._editJobId = null;
 
-          this.getBusyDialog(); //
+          this.getBusyDialog();
 
           const oTempModel = new JSONModel({
             dialogTitle: "Create Job Posting",
@@ -307,7 +471,9 @@ sap.ui.define(
           oView.setModel(oTempModel, "temporaryModel");
 
           this._openJobDialog(oTempModel)
-            .catch((err) => {})
+            .catch((err) => {
+              this.errorMessage("Failed to open dialog.");
+            })
             .finally(() => {
               this.closeBusyDialog();
             });
@@ -368,32 +534,15 @@ sap.ui.define(
             isEdit: true,
           });
 
+          // Set model BEFORE dialog opens
           oView.setModel(oTempModel, "temporaryModel");
 
+          // Now open dialog
           this._openJobDialog(oTempModel)
-            .catch((err) => {})
+            .catch(() => {})
             .finally(() => {
               this.closeBusyDialog();
             });
-        },
-
-        _openJobDialog: function (oTempModel) {
-          return this._commonFragmentOpen(
-            oTempModel,
-            "sap.kt.com.minihrsolution.fragment.AddEditJob",
-            "addJobDialog",
-            ["postDateDP"]
-          ).then(() => {
-            const oMultiInput = this.byId("multiInputQualifications");
-            if (oMultiInput) {
-              oMultiInput.removeAllTokens();
-              const aQualifications =
-                oTempModel.getProperty("/qualifications") || [];
-              aQualifications.forEach((q) =>
-                oMultiInput.addToken(new sap.m.Token({ text: q, key: q }))
-              );
-            }
-          });
         },
 
         onQualificationsTokenUpdate: function (oEvent) {
@@ -437,51 +586,68 @@ sap.ui.define(
           const oView = this.getView();
           const oDialog = this.byId("addJobDialog");
 
-          if (!oDialog) {
-            return;
-          }
+          if (!oDialog) return;
 
+          //  Fields to reset
           const aFieldIds = [
             "JobTitleCombo",
             "primarySkillsInput",
-            "qualificationComb",
             "experienceCombo",
             "certificationsInput",
             "idlocationcombo",
             "positionsInput",
             "postDateDP",
-            "jobDescRTE",
             "workModeCombo",
-            "keyRespRTE",
-            "secondarySkillsRTE",
-            "skillReqRTE",
+            // DO NOT include 'qualificationComb' – it's not used anywhere
           ];
 
+          //  Reset all inputs/selects
           aFieldIds.forEach((sId) => {
             const oControl = oView.byId(sId);
             if (!oControl) return;
 
-            if (oControl.setValueState) oControl.setValueState("None");
-            if (oControl.removeStyleClass)
+            if (typeof oControl.setValueState === "function") {
+              oControl.setValueState("None");
+            }
+
+            if (typeof oControl.removeStyleClass === "function") {
               oControl.removeStyleClass("rteError");
+            }
 
             if (typeof oControl.setValue === "function") {
               oControl.setValue("");
             } else if (typeof oControl.setSelectedKey === "function") {
               oControl.setSelectedKey("");
-            } else if (oControl.removeAllTokens) {
+            } else if (typeof oControl.removeAllTokens === "function") {
               oControl.removeAllTokens();
             }
           });
 
-          // Specific fix for qualifications MultiInput error state
+          // Reset MultiInput (Qualifications)
           const oQualMultiInput = this.byId("multiInputQualifications");
           if (oQualMultiInput) {
             oQualMultiInput.setValueState("None");
             oQualMultiInput.setValueStateText("");
+            oQualMultiInput.removeAllTokens();
           }
 
-          // Reset model data instead of nullifying the model
+          //  Destroy RTEs inside VBoxes (since we're injecting them fresh on open)
+          const aRTEBoxIds = [
+            "jobDescRTE",
+            "keyRespRTE",
+            "secondarySkillsRTE",
+            "skillReqRTE",
+          ];
+
+          aRTEBoxIds.forEach((id) => {
+            const oVBox = oView.byId(id);
+            if (oVBox) {
+              oVBox.destroyItems(); // Clears RTEs
+              oVBox.removeStyleClass("sapUiRTEErrorBorder"); // Optional: remove error styles
+            }
+          });
+
+          // Reset temporary model
           const oTempModel = oView.getModel("temporaryModel");
           if (oTempModel) {
             oTempModel.setData({
@@ -498,58 +664,50 @@ sap.ui.define(
               keyResponsibilities: "",
               secondarySkills: "",
               skillRequirements: "",
+              Status: "true",
+              SelectedJobTitleKey: "",
+              SelectedExperienceKey: "",
+              SelectedLocation: "",
+              SelectedWorkMode: "",
               dialogTitle: "Create Job Posting",
+              isEdit: false,
             });
           }
 
+          // Close dialog and reset selection
           oDialog.close();
           this.byId("jobPostingTable").removeSelections(true);
           this.onJobSelectionChange();
         },
 
-        onQualificationsChange: function (oEvent) {
-          const oInput = oEvent.getSource();
-          const sValue = oInput.getValue();
-
-          if (sValue && sValue.trim() !== "") {
-            // Clear manual typing instantly
-            oInput.setValue("");
-            this.utils.validation.setError(oInput, "Select from dialog only.");
-          } else {
-            // Re-validate via strict token check
-            this.utils.validation._strictValidationMultiInput(
-              oInput,
-              "At least one qualification is required."
-            );
-          }
-        },
-
         onRichTextChange: function (oEvent) {
           const oRTE = oEvent.getSource();
-          const sLabel = this._getRTELabel(oRTE.getId());
-          const sValue = oRTE.getValue();
-          const sPlain = sValue
-            ?.replace(/<[^>]*>/g, "")
-            .replace(/&nbsp;/g, "")
+          const sId = oRTE.getId();
+          const sValue = oRTE.getValue() || "";
+
+          // Remove tags, nbsp, etc.
+          const sPlainText = sValue
+            .replace(/<[^>]*>/g, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, "")
             .trim();
 
-          const oDomRef = oRTE.getDomRef?.() || oRTE.getContentDomRef?.();
-
-          if (!sPlain) {
-            if (oDomRef && !oDomRef.classList.contains("sapUiRTEErrorBorder")) {
-              oDomRef.classList.add("sapUiRTEErrorBorder");
-              MessageToast.show(`${sLabel} is required.`);
-            }
-          } else {
-            if (oDomRef?.classList.contains("sapUiRTEErrorBorder")) {
-              oDomRef.classList.remove("sapUiRTEErrorBorder");
-            }
+          const oDom = document.getElementById(sId);
+          if (
+            sPlainText.length > 0 &&
+            oDom?.classList.contains("sapUiRTEErrorBorder")
+          ) {
+            oDom.classList.remove("sapUiRTEErrorBorder");
           }
         },
 
         _getRTELabel: function (rteId) {
-          if (rteId.includes("secondarySkillsRTE")) return "Secondary Skills";
           if (rteId.includes("jobDescRTE")) return "Job Description";
+          if (rteId.includes("secondarySkillsRTE")) return "Secondary Skills";
+          if (rteId.includes("keyResponsibilitiesRTE"))
+            return "Key Responsibilities";
+          if (rteId.includes("skillRequirementsRTE"))
+            return "Skill Requirements";
           return "This field";
         },
 
@@ -564,7 +722,7 @@ sap.ui.define(
           const oPayload = this._prepareJobPayload();
           if (!oPayload) return;
 
-          this.getBusyDialog(); //
+          this.getBusyDialog();
 
           try {
             if (this._isEdit && this._editJobId) {
@@ -650,26 +808,30 @@ sap.ui.define(
           this._isEdit = false;
           this._editJobId = null;
         },
+
         _validateJobPostingFields: function () {
           const oView = this.getView();
           const validation = this.validation;
           const that = this;
-
           const isEditMode = this._isEdit;
 
           const fieldLabels = {
+            statusCombo: "Status",
             idlocationcombo: "Location",
             workModeCombo: "Work Mode",
             positionsInput: "Number of Positions",
             postDateDP: "Post Date",
             primarySkillsInput: "Primary Skills",
+            secondarySkillsRTE: "Secondary Skills",
             experienceCombo: "Experience",
             multiInputQualifications: "Qualification",
             JobTitleCombo: "Job Title",
-            ...(isEditMode && { statusCombo: "Status" }),
+            certificationsInput: "Certifications",
+            jobDescRTE: "Job Description",
+            keyResponsibilitiesRTE: "Key Responsibilities",
+            skillRequirementsRTE: "Skill Requirements",
           };
 
-          // Smooth scroll helper
           const scrollAndToast = (oCtrl, fieldName) => {
             setTimeout(() => {
               try {
@@ -677,122 +839,259 @@ sap.ui.define(
                   oCtrl?.getFocusDomRef?.() ||
                   oCtrl?.getDomRef?.() ||
                   oCtrl?.getContentDomRef?.();
-                if (oDom?.scrollIntoView) {
-                  oDom.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                    inline: "nearest",
-                  });
-                }
-                oCtrl.focus?.();
+                oDom?.scrollIntoView({ behavior: "smooth", block: "center" });
+                oCtrl?.focus?.();
               } catch (e) {}
+
               MessageToast.show(
-                that.getText("mandetoryFields") + `: ${fieldName}`
+                fieldName
+                  ? that.getText("mandetoryFields") + `: ${fieldName}`
+                  : that.getText("mandetoryFields")
               );
-            }, 50);
+            }, 80);
           };
 
-          const validateField = (id, validatorFn) => {
-            const oCtrl = oView.byId(id);
-            if (!oCtrl) return true;
+          const validateField = (field) => {
+            const oCtrl = oView.byId(field.id);
+            if (!oCtrl || !field.validator) return true;
 
-            const isValid = validatorFn(oCtrl, "ID");
+            let isValid = true;
+
+            if (field.type === "multiinput") {
+              const aTokens = oCtrl.getTokens?.() || [];
+              isValid = field.validator(oCtrl, aTokens);
+            } else {
+              isValid = field.validator(oCtrl, "ID");
+            }
+
             if (!isValid) {
               oCtrl.setValueState("Error");
-              oCtrl.setValueStateText(`${fieldLabels[id]} is required`);
-              scrollAndToast(oCtrl, fieldLabels[id]);
+              oCtrl.setValueStateText(
+                `${fieldLabels[field.id] || "This field"} is required`
+              );
+              scrollAndToast(oCtrl, fieldLabels[field.id] || "Field");
               return false;
             }
+
             oCtrl.setValueState("None");
             return true;
           };
 
-          const fieldsToValidate = [
+          const validateRTE = (rteId, isMandatory) => {
+            const oVBox = Fragment.byId(oView.getId(), rteId);
+            const oRTE = oVBox?.getItems?.()[0];
+            if (!oRTE) return true;
+
+            const sHTML = oRTE.getValue?.() || "";
+            const sPlainText = sHTML
+              .replace(/<[^>]*>/g, "")
+              .replace(/&nbsp;/g, "")
+              .replace(/\s+/g, "")
+              .trim();
+            const isEmpty = sPlainText === "";
+            const isTooShort = sPlainText.length < 8;
+
+            const isInvalid =
+              (isMandatory && isEmpty) || (!isEmpty && isTooShort);
+
+            if (isInvalid) {
+              oVBox?.addStyleClass("sapUiRTEErrorBorder");
+              scrollAndToast(oVBox, fieldLabels[rteId] || "Rich Text Field");
+              return false;
+            }
+
+            oVBox?.removeStyleClass("sapUiRTEErrorBorder");
+            return true;
+          };
+
+          // (a) Validate First 6 mandatory fields
+          const firstFields = [
             ...(isEditMode
               ? [
                   {
                     id: "statusCombo",
+                    type: "combo",
                     validator: validation._LCstrictValidationComboBox,
                   },
                 ]
               : []),
-            { id: "idlocationcombo", validator: validation._LCvalidateName },
+            {
+              id: "idlocationcombo",
+              type: "input",
+              validator: validation._LCvalidateName,
+            },
             {
               id: "workModeCombo",
+              type: "combo",
               validator: validation._LCstrictValidationComboBox,
             },
             {
               id: "positionsInput",
+              type: "input",
               validator: validation._LCvalidateAmountZeroTaking,
             },
             {
               id: "postDateDP",
+              type: "date",
               validator: validation._LCvalidateMandatoryField,
             },
             {
               id: "primarySkillsInput",
-              validator: validation._LCvalidateMandatoryField,
+              type: "input",
+              validator: function (oCtrl) {
+                const sValue = oCtrl.getValue()?.trim() || "";
+
+                if (!sValue) return false;
+
+                if (sValue.length > 50) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText("Maximum 50 characters allowed.");
+                  return false;
+                }
+
+                const skillRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
+                const skillsArray = sValue
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter((s) => s.length > 0);
+
+                const allValid = skillsArray.every((skill) =>
+                  skillRegex.test(skill)
+                );
+
+                if (!allValid) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText(
+                    "Only letters, digits, and + - . / # ( ) symbols allowed. Each entry min 2 chars."
+                  );
+                  return false;
+                }
+
+                return true;
+              },
             },
           ];
 
-          for (const field of fieldsToValidate) {
-            if (!validateField(field.id, field.validator)) return false;
+          for (const field of firstFields) {
+            if (!validateField(field)) return false;
           }
 
-          const oSecRTE = Fragment.byId(oView.getId(), "secondarySkillsRTE");
-          const sSecPlain = oSecRTE
-            ?.getValue()
-            ?.replace(/<[^>]*>/g, "")
-            .replace(/&nbsp;/g, "")
-            .trim();
-          const oSecDom =
-            oSecRTE?.getDomRef?.() || oSecRTE?.getContentDomRef?.();
-          if (!sSecPlain) {
-            oSecDom?.classList.add("sapUiRTEErrorBorder");
-            scrollAndToast(oSecRTE, "Secondary Skills");
-            return false;
-          } else {
-            oSecDom?.classList.remove("sapUiRTEErrorBorder");
-          }
+          // (b) Secondary Skills RTE (mandatory)
+          if (!validateRTE("secondarySkillsRTE", true)) return false;
 
-          // ComboBoxes + MultiInput
-          const nextFields = [
+          // (c) Experience, Qualification, Job Title
+          const secondFields = [
             {
               id: "experienceCombo",
+              type: "combo",
               validator: validation._LCstrictValidationComboBox,
             },
             {
               id: "multiInputQualifications",
-              validator: function (oCtrl) {
-                const aTokens = oCtrl.getTokens?.() || [];
-                return aTokens.length > 0;
-              },
+              type: "multiinput",
+              validator: (oCtrl) => oCtrl.getTokens?.().length > 0,
             },
             {
               id: "JobTitleCombo",
+              type: "combo",
               validator: validation._LCstrictValidationComboBox,
             },
           ];
 
-          for (const field of nextFields) {
-            if (!validateField(field.id, field.validator)) return false;
+          for (const field of secondFields) {
+            if (!validateField(field)) return false;
           }
 
-          // JobDescription RTE
-          const oJobDescRTE = Fragment.byId(oView.getId(), "jobDescRTE");
-          const sDescPlain = oJobDescRTE
-            ?.getValue()
-            ?.replace(/<[^>]*>/g, "")
-            .replace(/&nbsp;/g, "")
-            .trim();
-          const oDescDom =
-            oJobDescRTE?.getDomRef?.() || oJobDescRTE?.getContentDomRef?.();
-          if (!sDescPlain) {
-            oDescDom?.classList.add("sapUiRTEErrorBorder");
-            scrollAndToast(oJobDescRTE, "Job Description");
-            return false;
-          } else {
-            oDescDom?.classList.remove("sapUiRTEErrorBorder");
+          // (d) Optional: Validate Certifications field format
+          const certInput = oView.byId("certificationsInput");
+          if (certInput) {
+            const sValue = certInput.getValue().trim();
+
+            if (sValue) {
+              if (sValue.length > 50) {
+                certInput.setValueState("Error");
+                certInput.setValueStateText("Maximum 50 characters allowed.");
+                scrollAndToast(certInput, fieldLabels["certificationsInput"]);
+                return false;
+              }
+
+              const certRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
+              const certArray = sValue
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0);
+
+              const allValid = certArray.every((cert) => certRegex.test(cert));
+
+              if (!allValid) {
+                certInput.setValueState("Error");
+                certInput.setValueStateText(
+                  "Only letters, digits, and + - . / # ( ) symbols allowed. Each entry min 2 chars."
+                );
+                scrollAndToast(certInput, fieldLabels["certificationsInput"]);
+                return false;
+              }
+            }
+
+            certInput.setValueState("None");
+          }
+
+          // (e) Job Description (mandatory)
+          if (!validateRTE("jobDescRTE", true)) return false;
+
+          // (e.1) Optional RTEs must be blank or >=8 chars
+          const optionalRTEs = ["keyRespRTE", "skillReqRTE"];
+
+          for (const rteId of optionalRTEs) {
+            const oVBox = Fragment.byId(oView.getId(), rteId);
+            const oRTE = oVBox?.getItems?.()[0];
+            if (!oVBox || !oRTE) continue;
+
+            const html = oRTE.getValue?.() || "";
+            const plain = html
+              .replace(/<[^>]*>/g, "")
+              .replace(/&nbsp;/g, "")
+              .replace(/\s+/g, "")
+              .trim();
+
+            const isFilled = plain.length > 0;
+            const isTooShort = plain.length < 8;
+
+            if (isFilled && isTooShort) {
+              oVBox.addStyleClass("sapUiRTEErrorBorder");
+              scrollAndToast(oVBox);
+              MessageToast.show(that.getText("mandetoryFields"));
+
+              return false;
+            }
+
+            // only remove error border if valid
+            if (!isFilled || !isTooShort) {
+              oVBox.removeStyleClass("sapUiRTEErrorBorder");
+            }
+          }
+
+          // FINAL FAILSAFE: if *any* optional RTE still has red border, block submission
+          for (const rteId of optionalRTEs) {
+            const oVBox = Fragment.byId(oView.getId(), rteId);
+            if (oVBox?.hasStyleClass("sapUiRTEErrorBorder")) {
+              scrollAndToast(oVBox);
+              MessageToast.show(that.getText("mandetoryFields"));
+
+              return false;
+            }
+          }
+
+          // (f) Final rejection check for red-border RTEs
+          for (const rteId of optionalRTEs) {
+            const oVBox = Fragment.byId(oView.getId(), rteId);
+            const oDom = oVBox?.getDomRef?.();
+            if (oDom?.classList.contains("sapUiRTEErrorBorder")) {
+              scrollAndToast(oVBox);
+              MessageToast.show(that.getText("mandetoryFields"));
+
+              return false;
+            }
           }
 
           return true;
@@ -801,7 +1100,56 @@ sap.ui.define(
         _prepareJobPayload: function () {
           if (!this._validateJobPostingFields()) return null;
 
-          const oData = this.getView().getModel("temporaryModel").getData();
+          const oView = this.getView();
+          const oModel =
+            oView.getModel("temporaryModel") ||
+            sap.ui.core.Fragment.byId(oView.getId(), "addJobDialog")?.getModel(
+              "temporaryModel"
+            );
+
+          if (!oModel) {
+            MessageToast.show("Unexpected error. Please reopen the dialog.");
+            return null;
+          }
+
+          //  Sync RTEs
+          const aRTEs = [
+            { vboxId: "jobDescRTE", prop: "JobDescription" },
+            { vboxId: "keyRespRTE", prop: "KeyResponsibilities" },
+            { vboxId: "secondarySkillsRTE", prop: "SecondarySkills" },
+            { vboxId: "skillReqRTE", prop: "SkillRequirements" },
+          ];
+
+          aRTEs.forEach(({ vboxId, prop }) => {
+            const oVBox = oView.byId(vboxId);
+            const oRTE = oVBox?.getItems?.()[0];
+            if (oRTE && typeof oRTE.getValue === "function") {
+              oModel.setProperty("/" + prop, oRTE.getValue());
+            }
+          });
+
+          //  Sync fallback ComboBox/Input values
+          const fallbackFields = {
+            SelectedJobTitleKey:
+              oView.byId("JobTitleCombo")?.getSelectedKey() || "",
+            SelectedExperienceKey:
+              oView.byId("experienceCombo")?.getSelectedKey() || "",
+            Status: oView.byId("statusCombo")?.getSelectedKey() || "",
+            NoOfPositions:
+              oView.byId("positionsInput")?.getValue()?.trim() || "",
+            PrimarySkills:
+              oView.byId("primarySkillsInput")?.getValue()?.trim() || "",
+            Certifications:
+              oView.byId("certificationsInput")?.getValue()?.trim() || "",
+          };
+
+          Object.entries(fallbackFields).forEach(([path, value]) => {
+            if (!oModel.getProperty("/" + path)) {
+              oModel.setProperty("/" + path, value);
+            }
+          });
+
+          const oData = oModel.getData();
           const sUserName = this.getOwnerComponent()
             .getModel("LoginModel")
             .getProperty("/EmployeeName");
@@ -816,13 +1164,15 @@ sap.ui.define(
             primarySkills: oData.PrimarySkills,
             secondarySkills: oData.SecondarySkills,
             skillRequirements: oData.SkillRequirements || "",
-            // qualification: oData.SelectedQualificationKey,
             qualification: (oData.qualifications || []).join(", "),
             experience: oData.SelectedExperienceKey,
             certifications: oData.Certifications || "",
-            location: this.byId("idlocationcombo")?.getValue()?.trim(),
+            location: this.byId("idlocationcombo")?.getValue()?.trim() || "",
             LocationService:
-              this.byId("workModeCombo")?.getSelectedItem()?.getText() || "",
+              this.byId("workModeCombo")
+                ?.getSelectedItem()
+                ?.getText()
+                ?.trim() || "",
             NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
             postDate: oData.PostDate,
             Status: oData.Status,
@@ -890,161 +1240,6 @@ sap.ui.define(
             }
           );
         },
-
-        onNoOfPositionsChange: function (oEvent) {
-          const oInput = oEvent.getSource();
-          let sValue = oInput.getValue();
-
-          sValue = sValue.replace(/\D/g, "");
-
-          sValue = sValue.replace(/^0+/, "");
-
-          if (sValue.length > 2) {
-            sValue = sValue.substring(0, 2);
-          }
-
-          const iValue = parseInt(sValue, 10);
-          if (!iValue || iValue < 1 || iValue > 99) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText(
-              "Number of Positions Required\nEnter a number between 1 and 99 (no leading zero)."
-            );
-          } else {
-            oInput.setValueState("None");
-          }
-
-          oInput.setValue(sValue);
-        },
-
-        onPostDateChange: function (oEvent) {
-          const oDatePicker = oEvent.getSource();
-          const oDate = oDatePicker.getDateValue();
-          const oToday = new Date();
-          const oMinDate = new Date();
-          oMinDate.setFullYear(oToday.getFullYear() - 20);
-
-          if (!oDate || isNaN(oDate.getTime())) {
-            oDatePicker.setValueState("Error");
-            oDatePicker.setValueStateText("Please select a valid date");
-          } else if (oDate < oMinDate || oDate > oToday) {
-            oDatePicker.setValueState("Error");
-            oDatePicker.setValueStateText(
-              "Date must be within the last 20 years and not in the future"
-            );
-          } else {
-            oDatePicker.setValueState("None");
-          }
-
-          setTimeout(() => {
-            oDatePicker.$().find("input").attr("readonly", true);
-          }, 0);
-        },
-        onPrimarySkillsChange: function (oEvent) {
-          const oInput = oEvent.getSource();
-          const sValue = oEvent.getParameter("value")?.trim();
-
-          if (!sValue) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText("Primary Skills are required.");
-            return;
-          }
-
-          if (sValue.length > 50) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText("Maximum 50 characters allowed.");
-            return;
-          }
-
-          const validSkillRegex = /^(?!\d+$)[A-Za-z0-9 +#.\-,]+$/;
-
-          const skillsArray = sValue
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          const bAllValid = skillsArray.every((skill) =>
-            validSkillRegex.test(skill)
-          );
-
-          if (!bAllValid) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText(
-              "Only letters, alphanumerics, spaces and + # . - , are allowed."
-            );
-          } else {
-            oInput.setValueState("None");
-          }
-        },
-
-        onCertificationChange: function (oEvent) {
-          const oInput = oEvent.getSource();
-          const sValue = oEvent.getParameter("value")?.trim();
-
-          if (sValue.length > 50) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText("Maximum 50 characters allowed.");
-            return;
-          }
-
-          const validSkillRegex = /^(?!\d+$)[A-Za-z0-9 +#.\-,]+$/;
-
-          // Split by comma and validate each skill
-          const skillsArray = sValue
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          const bAllValid = skillsArray.every((skill) =>
-            validSkillRegex.test(skill)
-          );
-
-          if (!bAllValid) {
-            oInput.setValueState("Error");
-            oInput.setValueStateText(
-              "Only letters, alphanumerics, spaces and + # . - , are allowed."
-            );
-          } else {
-            oInput.setValueState("None");
-          }
-        },
-
-        _isValidCertificationsInput: function (sValue) {
-          if (!sValue || sValue.trim() === "") {
-            return true; // Certifications are optional
-          }
-
-          const skillsArray = sValue
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          const hasDuplicates =
-            new Set(skillsArray).size !== skillsArray.length;
-
-          const validSkillRegex = /^(?!\d+$)[A-Za-z0-9 +#.\-]+$/;
-          const allSkillsValid = skillsArray.every((skill) =>
-            validSkillRegex.test(skill)
-          );
-
-          return !hasDuplicates && allSkillsValid && sValue.length <= 50;
-        },
-        onRTESecSkillChange: function (oEvent) {
-          const oEditor = oEvent.getSource();
-          const sHTML = oEditor.getValue();
-
-          const sText = sHTML
-            .replace(/<[^>]*>/g, "") // Remove HTML tags
-            .replace(/&nbsp;/g, "") // Remove non-breaking spaces
-            .replace(/\s+/g, ""); // Remove all whitespace
-
-          if (!sText) {
-            oEditor.setValueState("Error");
-            oEditor.setValueStateText("This field is required");
-          } else {
-            oEditor.setValueState("None");
-          }
-        },
-
         onFilterSearch: async function () {
           const oView = this.getView();
           const aFilterItems =
@@ -1060,7 +1255,6 @@ sap.ui.define(
           let sStartDate = "";
           let sEndDate = "";
 
-          // Extract filter values
           aFilterItems.forEach((oItem) => {
             const sFieldName = oItem.getName();
             const oControl = oItem.getControl();
@@ -1193,6 +1387,154 @@ sap.ui.define(
           this.byId("filterPrimarySkills").setValue("");
           this.byId("filterPostDate").setValue("");
         },
+
+        onNoOfPositionsChange: function (oEvent) {
+          const oInput = oEvent.getSource();
+          let sValue = oInput.getValue();
+
+          sValue = sValue.replace(/\D/g, "").replace(/^0+/, "");
+
+          if (sValue.length > 2) {
+            sValue = sValue.substring(0, 2);
+          }
+
+          const iValue = parseInt(sValue, 10);
+          if (!iValue || iValue < 1 || iValue > 99) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText(
+              "Number of Positions Required\nEnter a number between 1 and 99 (no leading zero)."
+            );
+          } else {
+            oInput.setValueState("None");
+          }
+
+          oInput.setValue(sValue);
+
+          //  Update model
+          this.getView()
+            .getModel("temporaryModel")
+            .setProperty("/NoOfPositions", sValue);
+        },
+
+        onPostDateChange: function (oEvent) {
+          const oDatePicker = oEvent.getSource();
+          const oDate = oDatePicker.getDateValue();
+          const oToday = new Date();
+          const oMinDate = new Date();
+          oMinDate.setFullYear(oToday.getFullYear() - 20);
+
+          if (!oDate || isNaN(oDate.getTime())) {
+            oDatePicker.setValueState("Error");
+            oDatePicker.setValueStateText("Please select a valid date");
+          } else if (oDate < oMinDate || oDate > oToday) {
+            oDatePicker.setValueState("Error");
+            oDatePicker.setValueStateText(
+              "Date must be within the last 20 years and not in the future"
+            );
+          } else {
+            oDatePicker.setValueState("None");
+          }
+
+          setTimeout(() => {
+            oDatePicker.$().find("input").attr("readonly", true);
+          }, 0);
+        },
+        onPrimarySkillsChange: function (oEvent) {
+          const oInput = oEvent.getSource();
+          const sValue = oEvent.getParameter("value")?.trim() || "";
+
+          const oModel = oInput.getModel("temporaryModel");
+
+          // Mandatory check
+          if (!sValue) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText("Primary Skills are required.");
+            oModel?.setProperty("/PrimarySkills", "");
+            return;
+          }
+
+          // Max length
+          if (sValue.length > 50) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText("Maximum 50 characters allowed.");
+            oModel?.setProperty("/PrimarySkills", sValue);
+            return;
+          }
+
+          // Per skill check
+          const validSkillRegex = /^[a-zA-Z0-9\s+#().\/-]{2,}$/;
+          const skillsArray = sValue
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+
+          const allValid = skillsArray.every((skill) =>
+            validSkillRegex.test(skill)
+          );
+
+          if (!allValid) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText(
+              "Each skill must be 2+ characters. Only letters, numbers, spaces, and + - . / # ( ) are allowed."
+            );
+          } else {
+            oInput.setValueState("None");
+          }
+
+          // Sync to model even if invalid
+          oModel?.setProperty("/PrimarySkills", sValue);
+        },
+
+        onCertificationChange: function (oEvent) {
+          const oInput = oEvent.getSource();
+          const sValue = oEvent.getParameter("value")?.trim() || "";
+
+          // Allow empty (optional field)
+          if (!sValue) {
+            oInput.setValueState("None");
+            this._updateCertModel(oInput, "");
+            return;
+          }
+
+          // Max length check
+          if (sValue.length > 50) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText("Maximum 50 characters allowed.");
+            return;
+          }
+
+          // Regex: allow a wide range of tech cert symbols
+          const certRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
+          const certArray = sValue
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+
+          const allValid = certArray.every((cert) => certRegex.test(cert));
+
+          if (!allValid) {
+            oInput.setValueState("Error");
+            oInput.setValueStateText(
+              "Use letters, digits, and tech symbols (# - + . / ( )). Min 2 chars per entry."
+            );
+            return;
+          }
+
+          // Set success state and update model
+          oInput.setValueState("None");
+          this._updateCertModel(oInput, sValue);
+        },
+
+        // Helper for safe model update
+        _updateCertModel: function (oInput, value) {
+          const oModel = oInput.getModel("temporaryModel");
+          if (oModel) {
+            oModel.setProperty("/Certifications", value);
+          } else {
+            MessageToast.show("Form not initialized properly.");
+          }
+        },
+
         onJobSelectionChange: function () {
           var aSelectedItems = this.byId("jobPostingTable").getSelectedItems();
           if (aSelectedItems.length > 0) {
@@ -1208,6 +1550,11 @@ sap.ui.define(
 
         onStatusChange: function (oEvent) {
           this.validation._LCstrictValidationComboBox(oEvent);
+
+          const sKey = oEvent.getSource().getSelectedKey();
+          this.getView()
+            .getModel("temporaryModel")
+            .setProperty("/Status", sKey);
         },
 
         onLocationChange: function (oEvent) {
@@ -1219,46 +1566,110 @@ sap.ui.define(
 
         onExperienceChange: function (oEvent) {
           this.validation._LCstrictValidationComboBox(oEvent);
+
+          const sKey = oEvent.getSource().getSelectedKey();
+          this.getView()
+            .getModel("temporaryModel")
+            .setProperty("/SelectedExperienceKey", sKey);
         },
 
-        onQualificationChange: function (oEvent) {
+        onQualificationsChange: function (oEvent) {
           this.validation._LCstrictValidationComboBox(oEvent);
         },
 
         onJobTitleChange: function (oEvent) {
+          // Step 1: Validation
           this.validation._LCstrictValidationComboBox(oEvent);
-        },
-        onOpenQualificationsDialog: function () {
-          const oTempModel = this.getView().getModel("QualificationModel");
 
-          this._commonFragmentOpen(
-            oTempModel,
-            "sap.kt.com.minihrsolution.fragment.SelectQualificationsDialog",
-            "SelectQualificationsDialog"
-          );
+          // Step 2: Set selected key to model (only if model is available)
+          const oComboBox = oEvent.getSource();
+          const sKey = oComboBox.getSelectedKey();
+          const oModel = this.getView().getModel("temporaryModel");
+
+          if (!oModel) {
+            MessageToast.show("Form model not initialized.");
+            return;
+          }
+
+          oModel.setProperty("/SelectedJobTitleKey", sKey);
+        },
+
+        _LCvalidateMultiInput: function (oMultiInput, aTokens) {
+          if (!oMultiInput || !aTokens) return false;
+
+          if (aTokens.length === 0) {
+            oMultiInput.setValueState("Error");
+            oMultiInput.setValueStateText(
+              "At least one selection is required."
+            );
+            oMultiInput
+              .getDomRef()
+              ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return false;
+          } else {
+            oMultiInput.setValueState("None");
+            oMultiInput.setValueStateText("");
+            return true;
+          }
+        },
+
+        onOpenQualificationsDialog: function () {
+          const oView = this.getView();
+          const oModel = oView.getModel("temporaryModel");
+
+          if (!oModel) {
+            MessageToast.show(
+              "Form model not initialized. Please reopen the dialog."
+            );
+            return;
+          }
+
+          if (!this._oQualificationDialog) {
+            Fragment.load({
+              name: "sap.kt.com.minihrsolution.fragment.SelectQualificationsDialog",
+              id: oView.getId(),
+              controller: this,
+            }).then((oDialog) => {
+              this._oQualificationDialog = oDialog;
+              oView.addDependent(oDialog);
+
+              // Set the model here explicitly
+              oDialog.setModel(oModel, "temporaryModel");
+
+              oDialog.open();
+            });
+          } else {
+            // Re-attach model in case it's refreshed
+            this._oQualificationDialog.setModel(oModel, "temporaryModel");
+            this._oQualificationDialog.open();
+          }
         },
         onConfirmQualifications: function (oEvent) {
+          const oInput = this.byId("multiInputQualifications");
+          const oModel = this.getView().getModel("temporaryModel");
+
           const aSelectedItems = oEvent.getParameter("selectedItems") || [];
           const aValues = aSelectedItems.map((item) => item.getTitle());
 
-          // Update model
-          const oTempModel = this.getView().getModel("temporaryModel");
-          if (oTempModel) {
-            oTempModel.setProperty("/qualifications", aValues);
-          }
-
-          // Update UI tokens
-          const oMultiInput = this.byId("multiInputQualifications");
-          oMultiInput.destroyTokens();
-          aValues.forEach((q) => {
-            oMultiInput.addToken(new sap.m.Token({ text: q, key: q }));
+          // Inject tokens manually
+          oInput.removeAllTokens();
+          aValues.forEach((text) => {
+            oInput.addToken(new sap.m.Token({ text }));
           });
 
-          this.validation._strictValidationMultiInput(
-            oMultiInput,
-            aValues,
-            "At least one qualification is required."
+          // Validate tokens now
+          const isValid = this._LCvalidateMultiInput(
+            oInput,
+            oInput.getTokens()
           );
+          if (!isValid) return;
+
+          //  Update model
+          if (oModel) {
+            oModel.setProperty("/qualifications", aValues);
+          } else {
+            MessageToast.show("Form model not initialized.");
+          }
         },
 
         onSearchQualifications: function (oEvent) {
@@ -1269,6 +1680,40 @@ sap.ui.define(
             sQuery
           );
           oEvent.getSource().getBinding("items").filter([oFilter]);
+        },
+
+        _mapRTEFieldIdToModelProp: function (id) {
+          const map = {
+            jobDescRTE: "JobDescription",
+            keyRespRTE: "KeyResponsibilities",
+            secondarySkillsRTE: "SecondarySkills",
+            skillReqRTE: "SkillRequirements",
+          };
+          return map[id] || id;
+        },
+        _attachRTEListeners: function (sRTEId, bMandatory) {
+          const oRTE = this.byId(sRTEId);
+          if (!oRTE || !bMandatory) {
+            return;
+          }
+
+          oRTE.attachChange(() => {
+            const sValue = oRTE.getValue() || "";
+
+            // Strip HTML, &nbsp;, and whitespace
+            const sPlainText = sValue
+              .replace(/<[^>]*>/g, "")
+              .replace(/&nbsp;/g, " ")
+              .replace(/\s+/g, "")
+              .trim();
+
+            if (sPlainText.length > 0) {
+              const oDomRef = oRTE.getDomRef();
+              if (oDomRef?.classList.contains("sapUiRTEErrorBorder")) {
+                oDomRef.classList.remove("sapUiRTEErrorBorder");
+              }
+            }
+          });
         },
       }
     );
