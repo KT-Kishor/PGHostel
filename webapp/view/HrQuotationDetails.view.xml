@@ -279,14 +279,11 @@
                                             text="{i18n>customerName}"
                                             required="true"
                                         />
-										<m:Input
-                                            value="{SingleCompanyModel>/CustomerName}"
-                                            id="HQD_id_CustomerName"
-                                            liveChange="HQD_onCustomerNameLiveChange"
-                                            valueStateText="{i18n>placeName}"
-                                            editable="{visiablityPlay>/editable}"
-                                            maxLength="100"
-                                        />
+                                         <m:ComboBox items="{path:'CreateCustomerModel>/'}" value="{SingleCompanyModel>/CustomerName}"  id="HQD_id_CustomerName"  change="HQD_onCustomerNameLiveChange"
+                                           valueStateText="{i18n>placeName}"
+                                            editable="{visiablityPlay>/editable}">
+                                            <core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>name}"/>
+                                            </m:ComboBox>
 										<m:Label    
                                             text="{i18n>emailID}"
                                             required="true"

@@ -27,6 +27,7 @@ sap.ui.define(
         await this._fetchCommonData("Quotation", "QuotationPDFModel", {});
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
+        this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
 
         if (sQuotationNo === "new") {
           // Create new mode

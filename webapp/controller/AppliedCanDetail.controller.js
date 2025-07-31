@@ -12,19 +12,27 @@ sap.ui.define([
             const oViewModel = new JSONModel({ isEditMode: false });
             this.getView().setModel(oViewModel, "viewModel");
             const router = this.getOwnerComponent().getRouter();
-            router
-                .getRoute("AppliedCanDetail")
-                .attachPatternMatched(this._onObjectMatched, this);
+            router.getRoute("AppliedCanDetail").attachPatternMatched(this._onObjectMatched, this);
         },
-        _onObjectMatched: async function (oEvent) {
+       _onObjectMatched: async function (oEvent) {
             this.getView().getModel("viewModel").setProperty("/isEditMode", false);
             var LoginFUnction = await this.commonLoginFunction("Recruitment");
             if (!LoginFUnction) return;
             this.sUserId = oEvent.getParameter("arguments").id;
-            let data = this.getView().getModel("DataTableModel").getData();
-            let filterData = data.find((Element) => Element.ID === this.sUserId);
-            let formModel = new JSONModel(filterData);
-            this.getView().setModel(formModel, "setDataToForm");
+             this.getBusyDialog(); 
+            try {
+                let filter = { ID: this.sUserId }; 
+                let result = await this.ajaxReadWithJQuery("JobApplications", filter);
+                if (result?.data?.length > 0) {
+                    let formModel = new JSONModel(result.data[0]);
+                    this.getView().setModel(formModel, "setDataToForm");
+                }
+                this.closeBusyDialog();
+            } catch (err) {
+                this.closeBusyDialog();
+                console.error("Read failed:", err);
+                MessageToast.show("Failed to load application details.");
+            }
         },
         ACD_onEditPress: async function () {
             const oViewModel = this.getView().getModel("viewModel");

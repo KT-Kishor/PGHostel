@@ -68,32 +68,27 @@ sap.ui.define([
             this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
             this.initializeBirthdayCarousel();
         },
-        AC_ReadCall: async function() {
+        AC_ReadCall: async function () {
             this.getBusyDialog();
             try {
-                const aSelectFields = [
-                    "FullName",
-                    "NoticePeriod",
-                    "Email",
-                    "Experience",
-                    "Skills"
-                ];
+                const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD","Mobile", "Date", "Email","Experience","Skills", "Remark",
+                "CreateDate","CreatedBy", "ID"];
+
                 const oQueryParameters = {
-                    "$select": aSelectFields.join(",")
+                    fields: aSelectFields.join(",")
                 };
 
-                const response = await this.ajaxReadWithJQuery("JobApplications", {
-                    parameters: oQueryParameters
-                });
-
+                const response = await this.ajaxReadWithJQuery("customReadCall", oQueryParameters);
                 const aCandidates = response.data || [];
-                this.getOwnerComponent().setModel(new JSONModel(aCandidates), "DataTableModel");
+                this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aCandidates), "DataTableModel");
+
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
-                this.getView().setModel(new JSONModel(Array.from(nameSet).map(name => ({
-                    FullName: name
-                }))), "UniqueNamesModel");
+                this.getView().setModel(
+                    new sap.ui.model.json.JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))),
+                    "UniqueNamesModel"
+                );
             } catch (err) {
-                MessageToast.show("Failed to load candidate data.");
+                sap.m.MessageToast.show("Failed to load candidate data.");
             } finally {
                 this.closeBusyDialog();
             }
@@ -177,33 +172,33 @@ sap.ui.define([
                         aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
                     }
 
-                    // 4. Experience Filter
-                    const sExperienceInput = this.byId("filterExperience").getValue().trim();
+                   const sExperienceInput = this.byId("filterExperience").getValue().trim();
                     if (sExperienceInput) {
                         aFilters.push(new sap.ui.model.Filter({
                             path: "Experience",
                             test: function (sDataValue) {
-                                if (!sDataValue || !sExperienceInput) return false;
-                                const data = sDataValue.toString().trim();
                                 const input = sExperienceInput.toString().trim();
 
+                                // If input is a single value (not a range)
                                 if (!input.includes('-')) {
+                                    const data = sDataValue ? sDataValue.toString().trim() : "";
                                     return data.toLowerCase() === input.toLowerCase();
-                                } else {
-                                    if (data.toLowerCase() === input.toLowerCase()) return true;
-                                    if (!data.includes('-')) {
-                                        try {
-                                            const numData = parseFloat(data);
-                                            if (isNaN(numData)) return false;
-                                            const rangeParts = input.split('-');
-                                            const min = parseFloat(rangeParts[0].trim());
-                                            const max = parseFloat(rangeParts[1].trim());
-                                            if (isNaN(min) || isNaN(max)) return false;
-                                            return numData >= min && numData <= max;
-                                        } catch (e) {
-                                            return false;
-                                        }
-                                    }
+                                }
+
+                                // If input is a range like "0-2"
+                                try {
+                                    const rangeParts = input.split('-');
+                                    const min = parseFloat(rangeParts[0].trim());
+                                    const max = parseFloat(rangeParts[1].trim());
+                                    if (isNaN(min) || isNaN(max)) return false;
+
+                                    // If data is empty or null, treat as 0 experience
+                                    const data = sDataValue ? sDataValue.toString().trim() : "0";
+                                    const numData = parseFloat(data);
+                                    if (isNaN(numData)) return false;
+
+                                    return numData >= min && numData <= max;
+                                } catch (e) {
                                     return false;
                                 }
                             }
