@@ -3,7 +3,7 @@
     xmlns:core="sap.ui.core">
     <Dialog
         id="paymentDetailsDialog"
-        title="Invoice Breakdown for {dialogData>/companyName}"
+        title="{i18n>brktitle} {dialogData>/companyName}"
         contentWidth="800px"
         contentHeight="400px"
         resizable="true"
@@ -11,16 +11,16 @@
         <content>
             <Table
                 items="{dialogData>/invoices}"
-                noDataText="No Invoices Found">
+                noDataText="{i18n>noBData}">
                 <columns>
-                    <Column><Text text="Invoice No" /></Column>
-                    <Column hAlign="End"><Text text="Taxable Amount" /></Column>
-                    <Column hAlign="End"><Text text="GST Amount" /></Column>
-                    <Column hAlign="End"><Text text="TDS Amount" /></Column>
-                    <Column hAlign="End"><Text text="Total Amount (INR)" /></Column>
+                    <Column><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>taxableAmount}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>gstAmount}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>tdsAmount}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>colTotalAmount}" /></Column>
                 </columns>
                 <items>
-                    <ColumnListItem>
+                    <ColumnListItem type="Navigation" press="onPaymentBreakdownPress">
                         <cells>
                             <Text text="{dialogData>InvNo}" />
                             <ObjectNumber number="{
@@ -45,7 +45,7 @@
             </Table>
         </content>
         <endButton>
-            <Button text="Close" press="onCloseDialog" />
+            <Button text="{i18n>close}" press="onCloseDialog" type="Reject" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

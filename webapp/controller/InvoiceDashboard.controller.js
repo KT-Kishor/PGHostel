@@ -258,6 +258,12 @@ sap.ui.define([
         onInvoiceNumberPress: function (oEvent) {
             this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo) });
         },
+        onPaymentBreakdownPress: function (oEvent) {
+            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) });
+        },
+        onPendingInvoicePress: function (oEvent) {
+            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) });
+        },
 
                 // --- CHART TYPE SWITCHERS ---
         IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
