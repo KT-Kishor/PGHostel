@@ -40,10 +40,10 @@
                 </fb:FilterBar>
 
                 <!-- Grid for Charts -->
-                <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiSmallMarginTop">
+                <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiResponsiveMargin">
                     <layout:content>
                         <!-- 1. Status Distribution Chart -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card >
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true"/>
@@ -70,7 +70,7 @@
                         </f:Card>
 
                         <!-- 2. Monthly Trend Chart -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card >
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true"/>
@@ -97,7 +97,7 @@
                         </f:Card>
                         
                         <!-- 3. Value by Company Chart -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card >
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
@@ -123,7 +123,7 @@
                         </f:Card>
 
                         <!-- 4. Yearly Trend Chart -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card >
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>yearlyInvoiceTrend}" level="H5" wrapping="true"/>
@@ -153,7 +153,7 @@
                         </f:Card>
                         
                         <!-- 5. Payment Breakdown (Stacked Bar Chart) -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card>
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true"/>
@@ -194,7 +194,7 @@
                         </f:Card>
 
                         <!-- 6. Pending/Partial Payments by Company -->
-                        <f:Card class="sapUiTinyMargin">
+                        <f:Card >
                             <f:header>
                                 <Toolbar>
                                     <Title text="{i18n>pendingPaymentsByCompany}" level="H5" wrapping="true"/>
