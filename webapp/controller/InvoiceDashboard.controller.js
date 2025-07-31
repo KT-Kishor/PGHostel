@@ -6,6 +6,8 @@ sap.ui.define([
     "../model/formatter"
 ], function (BaseController, JSONModel, MessageToast, Fragment, Formatter) {
     "use strict";
+    // Define the initial default chart types as a constant for clarity and easy maintenance.
+    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
         Formatter: Formatter,
 
@@ -14,16 +16,17 @@ sap.ui.define([
 
         onInit: function () {
             const oChartData = { statusDistribution: [], monthlyValue: [], companyTotals: [], yearlyTrend: [], paymentBreakdown: [], pendingByCompany: [] };
-            const oChartTypes = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel([]), "companies");
-            this.getView().setModel(new JSONModel(oChartTypes), "invoiceChartTypeModel");
+            // Initialize the chart type model with the default values.
+            this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "invoiceChartTypeModel");
             this.getOwnerComponent().getRouter().getRoute("RouteInvoiceDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
 
         _onObjectMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("InvoiceDashboard");
             if (!LoginFunction) return;
+            this.getView().getModel("invoiceChartTypeModel").setData(JSON.parse(JSON.stringify(INITIAL_CHART_TYPES)));
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
             this.byId("donutChartStatus").vizSelection([], { clearSelection: true });
@@ -34,6 +37,7 @@ sap.ui.define([
 
         readInvoiceData: async function () {
             try {
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
                 this.rawInvoiceData = (Array.isArray(oData.data) ? oData.data : [oData.data]);
                 const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CustomerName))];
@@ -42,6 +46,7 @@ sap.ui.define([
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
+                this.closeBusyDialog();
             }
         },
 
@@ -83,8 +88,8 @@ sap.ui.define([
             }, 100);
         },
 
-        // --- HELPER to get INR value. Refactored to be reusable ---
-        _getInrValue: function(item) {
+        // --- HELPER to get INR value. Refactored to be reusable --
+        _getInrValue: function (item) {
             const totalAmount = parseFloat(item.TotalAmount || 0);
             if (item.Currency === "INR") {
                 return totalAmount;
@@ -144,18 +149,13 @@ sap.ui.define([
                 if (!acc[company]) {
                     acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0 };
                 }
-                const totalGst = this._convertToInr(item.CGST, item) +
-                    this._convertToInr(item.SGST, item) +
-                    this._convertToInr(item.IGST, item);
-
+                const totalGst = this._convertToInr(item.CGST, item) + this._convertToInr(item.SGST, item) + this._convertToInr(item.IGST, item);
                 acc[company].taxableAmount += this._convertToInr(item.SubTotalInGST, item);
                 acc[company].gstAmount += totalGst;
                 acc[company].tdsAmount += this._convertToInr(item.IncomeTax, item);
-
                 return acc;
             }, {});
 
-            // --- Formatting for UI Models ---
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmountInINR: monthlyValue[i] || 0 }));
             const formattedCompanyTotals = Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmountInINR: total })).sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
@@ -163,9 +163,8 @@ sap.ui.define([
             const formattedPending = Object.entries(pendingByCompany).map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount })).sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR).slice(0, 5);
             const formattedStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
             let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => ({ companyName: name, ...values }));
-            //to remove companies with no breakdown data ---
             formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company => company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0);
-            // --- Set data to the model ---
+
             this.getView().getModel("chartData").setData({
                 statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
@@ -177,7 +176,6 @@ sap.ui.define([
         },
 
         // --- EVENT HANDLERS FOR CHART SELECTIONS ---
-
         onStatusChartSelect: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Status) return;
@@ -185,18 +183,11 @@ sap.ui.define([
             const aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
             const oView = this.getView();
             if (!this._pPopover) {
-                this._pPopover = Fragment.load({
-                    id: oView.getId(),
-                    name: "sap.kt.com.minihrsolution.fragment.InvoiceListPopover",
-                    controller: this
-                }).then(oPopover => {
-                    oView.addDependent(oPopover);
-                    return oPopover;
-                });
+                this._pPopover = Fragment.load({ id: oView.getId(), name: "sap.kt.com.minihrsolution.fragment.InvoiceListPopover", controller: this })
+                    .then(oPopover => { oView.addDependent(oPopover); return oPopover; });
             }
             this._pPopover.then(oPopover => {
-                const oPopoverModel = new JSONModel({ status: sStatus, invoices: aInvoicesForStatus });
-                oPopover.setModel(oPopoverModel, "popoverData");
+                oPopover.setModel(new JSONModel({ status: sStatus, invoices: aInvoicesForStatus }), "popoverData");
                 oPopover.openBy(oEvent.getParameter("data")[0].target);
             });
         },
@@ -206,17 +197,12 @@ sap.ui.define([
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && inv.Currency === "INR");
-            // Add calculated values needed for the dialog table
             aInvoices.forEach(inv => {
                 inv.gstAmount = parseFloat(inv.CGST || 0) + parseFloat(inv.SGST || 0) + parseFloat(inv.IGST || 0);
-                inv.totalAmountInINR = this._getInrValue(inv); 
+                inv.totalAmountInINR = this._getInrValue(inv);
             });
             if (!this.pPaymentDetailsDialog) {
-                this.pPaymentDetailsDialog = Fragment.load({
-                    id: this.getView().getId(),
-                    name: "sap.kt.com.minihrsolution.fragment.PaymentBreakdownDetails",
-                    controller: this
-                });
+                this.pPaymentDetailsDialog = Fragment.load({ id: this.getView().getId(), name: "sap.kt.com.minihrsolution.fragment.PaymentBreakdownDetails", controller: this });
             }
             this.pPaymentDetailsDialog.then(oDialog => {
                 oDialog.setModel(new JSONModel({ companyName: sCompanyName, invoices: aInvoices }), "dialogData");
@@ -230,19 +216,10 @@ sap.ui.define([
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
             const aPendingStatuses = ["Submitted", "Payment Partially"];
-            const aInvoices = this._aCurrentFilteredData.filter(inv =>
-                inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status)
-            );
-            // Add calculated values needed for the dialog table
-            aInvoices.forEach(inv => {
-                inv.pendingAmountInINR = this._getInrValue(inv);
-            });
+            const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
+            aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
             if (!this.pPendingInvoicesDialog) {
-                this.pPendingInvoicesDialog = Fragment.load({
-                    id: this.getView().getId(),
-                    name: "sap.kt.com.minihrsolution.fragment.PendingInvoicesDialog",
-                    controller: this
-                });
+                this.pPendingInvoicesDialog = Fragment.load({ id: this.getView().getId(), name: "sap.kt.com.minihrsolution.fragment.PendingInvoicesDialog", controller: this });
             }
             this.pPendingInvoicesDialog.then(oDialog => {
                 oDialog.setModel(new JSONModel({ companyName: sCompanyName, invoices: aInvoices }), "dialogData");
@@ -250,22 +227,16 @@ sap.ui.define([
                 oDialog.open();
             });
         },
-        
+
         onCloseDialog: function (oEvent) {
             oEvent.getSource().getParent().close();
         },
-        
-        onInvoiceNumberPress: function (oEvent) {
-            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo) });
-        },
-        onPaymentBreakdownPress: function (oEvent) {
-            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) });
-        },
-        onPendingInvoicePress: function (oEvent) {
-            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) });
-        },
 
-                // --- CHART TYPE SWITCHERS ---
+        onInvoiceNumberPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo) }); },
+        onPaymentBreakdownPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) }); },
+        onPendingInvoicePress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo) }); },
+
+        // --- CHART TYPE SWITCHERS ---
         IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
         IN_onPressStatusBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar"); },
         IN_onPressStatusDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut"); },
@@ -283,11 +254,13 @@ sap.ui.define([
         onPressPendingColumn: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "column"); },
         onPressPendingBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "bar"); },
         onPressPendingDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/pendingByCompanyType", "donut"); },
+
         onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);
             this.byId("DashI_id_Date").setValue("");
             this.byId("yearFilter").setValue(new Date().getFullYear().toString());
         },
+
         onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
         onLogout: function () { this.getRouter().navTo("RouteLoginPage"); }
     });
