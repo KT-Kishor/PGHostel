@@ -47,11 +47,11 @@ sap.ui.define(
 
         _onRouteMatched: function (oEvent) {
           const sJobId = oEvent.getParameter("arguments").jobId;
- 
+
           this.getBusyDialog();
           this.getView().byId("jobDetailsContainer").setVisible(false);
           this.getView().byId("idJobNotAvailable").setVisible(false);
- 
+
           this._fetchJobById(sJobId)
             .then((oJob) => {
               const bIsValidJob = !!oJob;
@@ -59,7 +59,7 @@ sap.ui.define(
                 ...oJob,
                 isValidJob: bIsValidJob,
               });
- 
+
               this.getView().setModel(
                 oJobApplicationModel,
                 "JobApplicationModel"
@@ -829,47 +829,48 @@ sap.ui.define(
         },
 
         onSalaryChange: function (oEvent) {
-          var oInput = oEvent.getSource();
-          var sValue = oInput.getValue();
+          const oInput = oEvent.getSource();
+          let sValue = oInput.getValue();
 
-          // Block invalid characters instantly (remove alphabets, symbols except '.')
+          // Remove invalid characters (allow only digits and dot)
           sValue = sValue.replace(/[^0-9.]/g, "");
 
-          // Allow only one decimal point
-          var parts = sValue.split(".");
+          // Only allow one dot
+          const parts = sValue.split(".");
           if (parts.length > 2) {
-            parts = [parts[0], parts[1]]; // remove extra dots
+            parts.splice(2); // Keep only first two parts
           }
 
-          // Limit to 2 decimal digits
+          // Limit decimal digits to 2
           if (parts[1]) {
             parts[1] = parts[1].substring(0, 2);
           }
 
-          // Rebuild clean value
-          var cleanValue = parts.join(".");
+          let cleanValue = parts.join(".");
 
-          // Block starting with 0 unless followed by '.'
+          // If value starts with multiple 0s before a digit (like 007), strip leading 0s
           if (/^0\d/.test(cleanValue)) {
-            cleanValue = cleanValue.replace(/^0+/, ""); // Remove leading zero(s)
+            cleanValue = cleanValue.replace(/^0+/, "");
           }
 
-          // Update input value immediately (blocks typing junk)
+          // Edge case: if user types only ".", prepend 0
+          if (cleanValue === ".") {
+            cleanValue = "0.";
+          }
+
           oInput.setValue(cleanValue);
 
-          // Final validation: format + length + minimum amount
-          var regex = /^(?!0\d)\d{1,9}(\.\d{0,2})?$/;
-          var isFormatValid = regex.test(cleanValue);
-          var isMinValid = parseFloat(cleanValue) >= 50000;
+          // Validate final value
+          const floatVal = parseFloat(cleanValue);
+          const isValidFormat = /^\d{1,2}(\.\d{1,2})?$/.test(cleanValue); 
+          const isWithinRange = floatVal >= 0.5 && floatVal <= 99.0;
 
-          if (isFormatValid && isMinValid && cleanValue.length <= 12) {
+          if (isValidFormat && isWithinRange) {
             oInput.setValueState(sap.ui.core.ValueState.None);
             oInput.setValueStateText("");
           } else {
             oInput.setValueState(sap.ui.core.ValueState.Error);
-
-            const sMessage = this.oResourceBundle.getText("v2_m_errSal");
-
+            const sMessage = this.oResourceBundle.getText("v2_m_errSal"); 
             oInput.setValueStateText(sMessage);
           }
         },
@@ -1028,7 +1029,7 @@ sap.ui.define(
           }
 
           // FIX: Pass the full event
-          utils._LCstrictValidationComboBox(oEvent);
+          utils._LCvalidateMandatoryField(oEvent);
         },
 
         MC_ValidateComboBox: function (oEvent) {
@@ -1327,12 +1328,47 @@ sap.ui.define(
               },
               {
                 ctrl: f("salaryInput"),
-                fn: utils._LCvalidateMandatoryField,
+                fn: function (oCtrl) {
+                  const val = oCtrl.getValue().trim();
+                  const num = parseFloat(val);
+                  const isValid =
+                    /^\d{1,2}(\.\d{1,2})?$/.test(val) &&
+                    num >= 0.5 &&
+                    num <= 99;
+
+                  if (!isValid) {
+                    oCtrl.setValueState("Error");
+                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal")); 
+                    return false;
+                  } else {
+                    oCtrl.setValueState("None");
+                    oCtrl.setValueStateText("");
+                    return true;
+                  }
+                },
               },
               {
                 ctrl: f("expectedSalaryInput"),
-                fn: utils._LCvalidateMandatoryField,
+                fn: function (oCtrl) {
+                  const val = oCtrl.getValue().trim();
+                  const num = parseFloat(val);
+                  const isValid =
+                    /^\d{1,2}(\.\d{1,2})?$/.test(val) &&
+                    num >= 0.5 &&
+                    num <= 99;
+
+                  if (!isValid) {
+                    oCtrl.setValueState("Error");
+                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal")); 
+                    return false;
+                  } else {
+                    oCtrl.setValueState("None");
+                    oCtrl.setValueStateText("");
+                    return true;
+                  }
+                },
               },
+
               {
                 ctrl: f("noticePeriodCombo"),
                 fn: utils._LCstrictValidationComboBox,
@@ -1610,26 +1646,30 @@ sap.ui.define(
           sap.m.MessageToast.show("Link copied!");
         },
 
-           SalaryInfoPress: function(oEvent) {
-            if (!this._oPopover) {
-                this._oPopover = new sap.m.Popover({
-                    contentWidth: "300px",
-                    contentHeight: "auto",
-                    showHeader: false,
-                    placement: sap.m.PlacementType.Bottom,
-                    content: [new sap.m.VBox({
-                        alignItems: "Center",
-                        justifyContent: "Center",
-                        width: "100%",
-                        items: [new sap.m.Text({
-                            text: this.oResourceBundle.getText("salaryPackageInfo"),
-                            wrapping: true
-                        })]
-                    }).addStyleClass("customPopoverContent")]
-                });
-                this.getView().addDependent(this._oPopover);
-            }
-            this._oPopover.openBy(oEvent.getSource());
+        SalaryInfoPress: function (oEvent) {
+          if (!this._oPopover) {
+            this._oPopover = new sap.m.Popover({
+              contentWidth: "300px",
+              contentHeight: "auto",
+              showHeader: false,
+              placement: sap.m.PlacementType.Bottom,
+              content: [
+                new sap.m.VBox({
+                  alignItems: "Center",
+                  justifyContent: "Center",
+                  width: "100%",
+                  items: [
+                    new sap.m.Text({
+                      text: this.oResourceBundle.getText("salaryPackageInfo"),
+                      wrapping: true,
+                    }),
+                  ],
+                }).addStyleClass("customPopoverContent"),
+              ],
+            });
+            this.getView().addDependent(this._oPopover);
+          }
+          this._oPopover.openBy(oEvent.getSource());
         },
       }
     );

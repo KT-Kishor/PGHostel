@@ -516,7 +516,10 @@ sap.ui.define(
               ?.ID || "";
 
           const oTempModel = new JSONModel({
-            dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
+          //  dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
+            // When populating temp model in edit mode
+            SelectedJobTitleValue: oData.JobTitle || "",
+
             SelectedJobTitleKey: oData.JobTitle || "",
             qualifications: aQualifications,
             SelectedExperienceKey: oData.Experience || "",
@@ -993,8 +996,45 @@ sap.ui.define(
             },
             {
               id: "JobTitleCombo",
-              type: "combo",
-              validator: validation._LCstrictValidationComboBox,
+              type: "input", // no need for custom 'typed'
+              validator: function (oCtrl) {
+                const sValue = oCtrl?.getValue()?.trim() || "";
+
+                if (!sValue) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText("Job Title is required.");
+                  return false;
+                }
+
+                if (sValue.length < 2) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText(
+                    "Job Title must be at least 2 characters."
+                  );
+                  return false;
+                }
+
+                // Optional format validation (can skip if free text is allowed)
+                const jobTitleRegex = /^[a-zA-Z0-9\s\-+()./#]{2,}$/;
+                if (!jobTitleRegex.test(sValue)) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText(
+                    "Only letters, digits, and + - . / # ( ) symbols allowed."
+                  );
+                  return false;
+                }
+
+                // Valid
+                oCtrl.setValueState("None");
+
+                // Update model
+                const oModel = oCtrl.getModel("temporaryModel");
+                if (oModel) {
+                  oModel.setProperty("/SelectedJobTitleValue", sValue);
+                }
+
+                return true;
+              },
             },
           ];
 
@@ -1097,88 +1137,90 @@ sap.ui.define(
           return true;
         },
 
-        _prepareJobPayload: function () {
-          if (!this._validateJobPostingFields()) return null;
+          _prepareJobPayload: function () {
+            if (!this._validateJobPostingFields()) return null;
 
-          const oView = this.getView();
-          const oModel =
-            oView.getModel("temporaryModel") ||
-            sap.ui.core.Fragment.byId(oView.getId(), "addJobDialog")?.getModel(
-              "temporaryModel"
-            );
+            const oView = this.getView();
+            const oModel =
+              oView.getModel("temporaryModel") ||
+              sap.ui.core.Fragment.byId(oView.getId(), "addJobDialog")?.getModel(
+                "temporaryModel"
+              );
 
-          if (!oModel) {
-            MessageToast.show("Unexpected error. Please reopen the dialog.");
-            return null;
-          }
-
-          //  Sync RTEs
-          const aRTEs = [
-            { vboxId: "jobDescRTE", prop: "JobDescription" },
-            { vboxId: "keyRespRTE", prop: "KeyResponsibilities" },
-            { vboxId: "secondarySkillsRTE", prop: "SecondarySkills" },
-            { vboxId: "skillReqRTE", prop: "SkillRequirements" },
-          ];
-
-          aRTEs.forEach(({ vboxId, prop }) => {
-            const oVBox = oView.byId(vboxId);
-            const oRTE = oVBox?.getItems?.()[0];
-            if (oRTE && typeof oRTE.getValue === "function") {
-              oModel.setProperty("/" + prop, oRTE.getValue());
+            if (!oModel) {
+              MessageToast.show("Unexpected error. Please reopen the dialog.");
+              return null;
             }
-          });
 
-          //  Sync fallback ComboBox/Input values
-          const fallbackFields = {
-            SelectedJobTitleKey:
-              oView.byId("JobTitleCombo")?.getSelectedKey() || "",
-            SelectedExperienceKey:
-              oView.byId("experienceCombo")?.getSelectedKey() || "",
-            Status: oView.byId("statusCombo")?.getSelectedKey() || "",
-            NoOfPositions:
-              oView.byId("positionsInput")?.getValue()?.trim() || "",
-            PrimarySkills:
-              oView.byId("primarySkillsInput")?.getValue()?.trim() || "",
-            Certifications:
-              oView.byId("certificationsInput")?.getValue()?.trim() || "",
-          };
+            //  Sync RTEs
+            const aRTEs = [
+              { vboxId: "jobDescRTE", prop: "JobDescription" },
+              { vboxId: "keyRespRTE", prop: "KeyResponsibilities" },
+              { vboxId: "secondarySkillsRTE", prop: "SecondarySkills" },
+              { vboxId: "skillReqRTE", prop: "SkillRequirements" },
+            ];
 
-          Object.entries(fallbackFields).forEach(([path, value]) => {
-            if (!oModel.getProperty("/" + path)) {
-              oModel.setProperty("/" + path, value);
-            }
-          });
+            aRTEs.forEach(({ vboxId, prop }) => {
+              const oVBox = oView.byId(vboxId);
+              const oRTE = oVBox?.getItems?.()[0];
+              if (oRTE && typeof oRTE.getValue === "function") {
+                oModel.setProperty("/" + prop, oRTE.getValue());
+              }
+            });
 
-          const oData = oModel.getData();
-          const sUserName = this.getOwnerComponent()
-            .getModel("LoginModel")
-            .getProperty("/EmployeeName");
-          const sUserID = this.getOwnerComponent()
-            .getModel("LoginModel")
-            .getProperty("/EmployeeID");
+            //  Sync fallback ComboBox/Input values
+            const fallbackFields = {
+              SelectedJobTitleKey:
+                oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
+              SelectedExperienceKey:
+                oView.byId("experienceCombo")?.getSelectedKey() || "",
+              Status: oView.byId("statusCombo")?.getSelectedKey() || "",
+              NoOfPositions:
+                oView.byId("positionsInput")?.getValue()?.trim() || "",
+              PrimarySkills:
+                oView.byId("primarySkillsInput")?.getValue()?.trim() || "",
+              Certifications:
+                oView.byId("certificationsInput")?.getValue()?.trim() || "",
+            };
 
-          return {
-            jobTitle: oData.SelectedJobTitleKey,
-            jobDescription: oData.JobDescription,
-            keyResponsibilities: oData.KeyResponsibilities || "",
-            primarySkills: oData.PrimarySkills,
-            secondarySkills: oData.SecondarySkills,
-            skillRequirements: oData.SkillRequirements || "",
-            qualification: (oData.qualifications || []).join(", "),
-            experience: oData.SelectedExperienceKey,
-            certifications: oData.Certifications || "",
-            location: this.byId("idlocationcombo")?.getValue()?.trim() || "",
-            LocationService:
-              this.byId("workModeCombo")
-                ?.getSelectedItem()
-                ?.getText()
-                ?.trim() || "",
-            NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
-            postDate: oData.PostDate,
-            Status: oData.Status,
-            CreatedBy: `${sUserName} (${sUserID})`,
-          };
-        },
+            Object.entries(fallbackFields).forEach(([path, value]) => {
+              if (!oModel.getProperty("/" + path)) {
+                oModel.setProperty("/" + path, value);
+              }
+            });
+
+            const oData = oModel.getData();
+            const sUserName = this.getOwnerComponent()
+              .getModel("LoginModel")
+              .getProperty("/EmployeeName");
+            const sUserID = this.getOwnerComponent()
+              .getModel("LoginModel")
+              .getProperty("/EmployeeID");
+
+            return {
+             // jobTitle: oData.SelectedJobTitleKey,
+              JobTitle: oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
+
+              jobDescription: oData.JobDescription,
+              keyResponsibilities: oData.KeyResponsibilities || "",
+              primarySkills: oData.PrimarySkills,
+              secondarySkills: oData.SecondarySkills,
+              skillRequirements: oData.SkillRequirements || "",
+              qualification: (oData.qualifications || []).join(", "),
+              experience: oData.SelectedExperienceKey,
+              certifications: oData.Certifications || "",
+              location: this.byId("idlocationcombo")?.getValue()?.trim() || "",
+              LocationService:
+                this.byId("workModeCombo")
+                  ?.getSelectedItem()
+                  ?.getText()
+                  ?.trim() || "",
+              NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
+              postDate: oData.PostDate,
+              Status: oData.Status,
+              CreatedBy: `${sUserName} (${sUserID})`,
+            };
+          },
 
         _setDatePickerRange: function () {
           const oDatePicker = this.byId("postDateDP");
@@ -1577,22 +1619,40 @@ sap.ui.define(
           this.validation._LCstrictValidationComboBox(oEvent);
         },
 
-        onJobTitleChange: function (oEvent) {
-          // Step 1: Validation
-          this.validation._LCstrictValidationComboBox(oEvent);
+        // onJobTitleChange: function (oEvent) {
+        //   // Step 1: Validation
+        //   this.validation._LCvalidationComboBox(oEvent);
 
-          // Step 2: Set selected key to model (only if model is available)
-          const oComboBox = oEvent.getSource();
-          const sKey = oComboBox.getSelectedKey();
-          const oModel = this.getView().getModel("temporaryModel");
+        //   // Step 2: Set selected key to model (only if model is available)
+        //   const oComboBox = oEvent.getSource();
+        //   const sKey = oComboBox.getSelectedKey();
+        //   const oModel = this.getView().getModel("temporaryModel");
 
-          if (!oModel) {
-            MessageToast.show("Form model not initialized.");
-            return;
-          }
+        //   if (!oModel) {
+        //     MessageToast.show("Form model not initialized.");
+        //     return;
+        //   }
 
-          oModel.setProperty("/SelectedJobTitleKey", sKey);
-        },
+        //   oModel.setProperty("/SelectedJobTitleKey", sKey);
+        // },
+onJobTitleChange: function (oEvent) {
+  const oComboBox = oEvent.getSource();
+  const sValue = oComboBox.getValue()?.trim();
+  const oModel = this.getView().getModel("temporaryModel");
+
+  if (!sValue) {
+    oComboBox.setValueState("Error");
+    oComboBox.setValueStateText("Job Title is required.");
+    return;
+  }
+
+  oComboBox.setValueState("None");
+
+  // Save typed value directly
+  if (oModel) {
+    oModel.setProperty("/SelectedJobTitleValue", sValue); // Store value
+  }
+},
 
         _LCvalidateMultiInput: function (oMultiInput, aTokens) {
           if (!oMultiInput || !aTokens) return false;

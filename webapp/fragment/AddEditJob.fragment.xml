@@ -56,10 +56,17 @@
 				<f:content>
 					<Title text="Job Details" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Job Title" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox class="sapUiSmallMarginTop" id="JobTitleCombo" placeholder="Select Job Title" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedJobTitleKey}" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
-						<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
-					</ComboBox>
-					<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
+						<!-- <ComboBox class="sapUiSmallMarginTop" id="JobTitleCombo" value="{temporaryModel>/SelectedJobTitleValue}"   placeholder="Select Job Title" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedJobTitleKey}" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
+							<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
+						</ComboBox> -->
+
+						<ComboBox id="JobTitleCombo" class="sapUiSmallMarginTop" value="{temporaryModel>/SelectedJobTitleValue}"     
+	 placeholder="Select or enter Job Title" items="{    path: 'jobTitleModel>/',    sorter: { path: 'department', descending: false, group: true }  }" showSecondaryValues="true" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}" showSuggestion="true" filterSuggests="true" suggest="onSuggestJobTitle"                          
+
+>
+	<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
+</ComboBox>
+						<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
 					<VBox id="jobDescRTE" class="sapUiSmallMarginTop"/>
 					<Label text="Key Responsibilities" class="sapUiSmallMarginTop" />
 					<VBox id="keyRespRTE" class="sapUiSmallMarginTop"/>

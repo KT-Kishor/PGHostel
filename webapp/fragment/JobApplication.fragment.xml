@@ -79,11 +79,11 @@
 						<ComboBox id="previousJobTitleCombo" width="100%" required="false" placeholder="Select / Enter title" items="{ path: 'DesignationModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{DesignationModel>/PreviousJobTitle}" change=".onDesignationChange" showSecondaryValues="true" valueStateText="{i18n>designationVal}">
 							<core:ListItem key="{DesignationModel>id}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 						</ComboBox>
-						<Label text="Current Annual Salary (INR)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="salaryInput" maxLength="12" required="true" placeholder="500000" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
+						<Label text="Current Annual Salary (LPA)" required="true" class="sapUiSmallMarginTop"/>
+						<Input id="salaryInput" maxLength="5" required="true" placeholder="e.g. 4.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
                     valueHelpIconSrc="sap-icon://message-information"/>
-						<Label text="Expected Salary (Annual INR)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="expectedSalaryInput" maxLength="12" required="true" placeholder="950000" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
+						<Label text="Expected Annual Salary (LPA)" required="true" class="sapUiSmallMarginTop"/>
+						<Input id="expectedSalaryInput" maxLength="5" required="true" placeholder="e.g. 5 or 5.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
                     valueHelpIconSrc="sap-icon://message-information"/>
 						<Label text="Employment Type" required="false" class="sapUiSmallMarginTop"/>
 						<ComboBox id="employmentTypeCombo" width="100%" required="false" change="onEmpTypeChange" valueStateText="{i18n>employmentVal}" placeholder="Select Type">
