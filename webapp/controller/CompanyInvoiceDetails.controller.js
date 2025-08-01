@@ -188,7 +188,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/Name", SelectedData.name);
                 this.SelectedCustomerModel.setProperty("/PAN", SelectedData.PAN);
                 this.SelectedCustomerModel.setProperty("/GST", SelectedData.GST);
-                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address + " ," + SelectedData.baseLocation + " ," + SelectedData.country);
+                this.SelectedCustomerModel.setProperty("/Address", SelectedData.address + ", " + SelectedData.baseLocation + ", " + SelectedData.country);
                 this.SelectedCustomerModel.setProperty("/MailID", SelectedData.mailID);
                 this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
                 this.SelectedCustomerModel.setProperty("/Type", SelectedData.type);
@@ -652,7 +652,7 @@ sap.ui.define([
                     MailID: oSelectedCustomerModel.MailID,
                     Type: oSelectedCustomerModel.Type || "",
                     Value: (!oSelectedCustomerModel.Value || isNaN(oSelectedCustomerModel.Value)) ? "0" : oSelectedCustomerModel.Value,
-                    PayByDate: (sMode === 'update') ? oSelectedCustomerModel.PayByDate.split('/').reverse().join('-') : oSelectedCustomerModel.PayByDate?.toISOString().split('T')[0] || "",
+                    PayByDate: (sMode === 'update') ? oSelectedCustomerModel.PayByDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.PayByDate).split('/').reverse().join('-') || "",
                     POSOW: oSelectedCustomerModel.POSOW,
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
@@ -1621,7 +1621,7 @@ sap.ui.define([
                     { label: "Account No", value: "0648506056" },
                     { label: "IFSC Code", value: "KKBK0008249" },
                     { label: "Swift Code", value: "KKBKINBBCPC" },
-                    { label: "Pay By ", value: Formatter.formatDate(oModel.PayByDate) }
+                    { label: 'Pay By', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.PayByDate : Formatter.formatDate(oModel.PayByDate) },
                 ];
 
                 paymentDetails.forEach(detail => {

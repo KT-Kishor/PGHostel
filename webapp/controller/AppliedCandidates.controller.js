@@ -48,16 +48,6 @@ sap.ui.define([
                     text: "NO"
                 }]
             }), "setInterviewYesNo");
-            var oUploadModel = new sap.ui.model.json.JSONModel({
-                File: "",
-                FileName: "",
-                FileType: ""
-            });
-            this.getView().setModel(oUploadModel, "UploadModel");
-            var oTokenModel = new JSONModel({
-                tokens: []
-            });
-            this.getView().setModel(oTokenModel, "tokenModel");
             this.AC_ReadCall();
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18na.getText("TableHeader"));
             this.onFilterBarClear();
@@ -68,11 +58,12 @@ sap.ui.define([
             this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
             this.initializeBirthdayCarousel();
         },
-        AC_ReadCall: async function () {
+        AC_ReadCall: async function() {
             this.getBusyDialog();
             try {
-                const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD","Mobile", "Date", "Email","Experience","Skills", "Remark",
-                "CreateDate","CreatedBy", "ID"];
+                const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD", "Mobile", "Date", "Email", "Experience", "Skills", "Remark",
+                    "CreateDate", "CreatedBy", "ID"
+                ];
 
                 const oQueryParameters = {
                     fields: aSelectFields.join(",")
@@ -84,7 +75,9 @@ sap.ui.define([
 
                 const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
                 this.getView().setModel(
-                    new sap.ui.model.json.JSONModel(Array.from(nameSet).map(name => ({ FullName: name }))),
+                    new sap.ui.model.json.JSONModel(Array.from(nameSet).map(name => ({
+                        FullName: name
+                    }))),
                     "UniqueNamesModel"
                 );
             } catch (err) {
@@ -97,7 +90,7 @@ sap.ui.define([
         onPressback: function() {
             this.getOwnerComponent().getRouter().navTo("RouteTilePage");
         },
-        
+
         onLogout: function() {
             this.CommonLogoutFunction();
         },
@@ -117,13 +110,15 @@ sap.ui.define([
             this.byId("filterCreateDate").setValue("");
         },
 
-        onFilterBarSearch: function () {
+        onFilterBarSearch: function() {
             this.getBusyDialog();
             setTimeout(() => {
                 try {
                     const oTableBinding = this.byId("appliedCandidatesTable").getBinding("items");
                     const aFilters = [];
-                    const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                    const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                        pattern: "yyyy-MM-dd"
+                    });
 
                     // 1. Name Filter
                     const sName = this.byId("filterEmployeeName").getValue().trim();
@@ -136,14 +131,14 @@ sap.ui.define([
                     if (sNoticePeriodInput) {
                         aFilters.push(new sap.ui.model.Filter({
                             path: "NoticePeriod",
-                            test: function (sDataValue) {
+                            test: function(sDataValue) {
                                 if (!sDataValue || !sNoticePeriodInput) return false;
                                 const data = sDataValue.toString().trim();
                                 const input = sNoticePeriodInput.toString().trim();
 
                                 if (!input.includes('-')) {
                                     return data.toLowerCase() === input.toLowerCase();
-                                }else {
+                                } else {
                                     if (data.toLowerCase() === input.toLowerCase()) {
                                         return true;
                                     }
@@ -172,11 +167,11 @@ sap.ui.define([
                         aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
                     }
 
-                   const sExperienceInput = this.byId("filterExperience").getValue().trim();
+                    const sExperienceInput = this.byId("filterExperience").getValue().trim();
                     if (sExperienceInput) {
                         aFilters.push(new sap.ui.model.Filter({
                             path: "Experience",
-                            test: function (sDataValue) {
+                            test: function(sDataValue) {
                                 const input = sExperienceInput.toString().trim();
 
                                 // If input is a single value (not a range)
@@ -227,7 +222,7 @@ sap.ui.define([
                     // Apply Filters
                     oTableBinding.filter(aFilters);
                 } catch (error) {
-                     MessageToast.show("Error during filtering.");
+                    MessageToast.show("Error during filtering.");
                 } finally {
                     setTimeout(() => this.closeBusyDialog(), 300);
                 }
@@ -268,18 +263,9 @@ sap.ui.define([
                 ISD: "+91",
                 City: "",
                 Country: "IN",
-                ResumeFile: "",
-                AttachmentName: "",
-                AttachmentType: "",
                 CreateDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
             };
             this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");
-            this.getView().getModel("tokenModel").setProperty("/tokens", [])
-            this.getView().setModel(new JSONModel({
-                File: "",
-                FileName: "",
-                FileType: ""
-            }), "UploadModel");
             this._openDialog("Create Candidate", true);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
         },
@@ -298,33 +284,7 @@ sap.ui.define([
             // Normalize fields
             if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
             if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
-
             this.getView().setModel(new JSONModel(oCandidateData), "stuDataModel");
-
-            // Tokens
-            this.getView().getModel("tokenModel").setProperty("/tokens", []);
-            const aTokens = oCandidateData.Attachments || [];
-            if (aTokens.length > 0) {
-                const aTokenData = aTokens.map(token => ({
-                    key: token.FileName,
-                    text: token.FileName
-                }));
-                this.getView().getModel("tokenModel").setProperty("/tokens", aTokenData);
-            } else if (oCandidateData.AttachmentName) {
-                // Legacy support: show token from fields
-                this.getView().getModel("tokenModel").setProperty("/tokens", [{
-                    key: oCandidateData.AttachmentName,
-                    text: oCandidateData.AttachmentName
-                }]);
-            }
-
-            // Load UploadModel for editing
-            const oUploadData = {
-                File: oCandidateData.ResumeFile || "",
-                FileName: oCandidateData.AttachmentName || "",
-                FileType: oCandidateData.AttachmentType || ""
-            };
-            this.getView().setModel(new JSONModel(oUploadData), "UploadModel");
             this._openDialog("Edit Candidate", false);
             this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
         },
@@ -370,13 +330,6 @@ sap.ui.define([
             let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
             if (dateValue) {
                 oPayload.Date = dateValue.split(".").reverse().join("/");
-            }
-            const oUploadModel = this.getView().getModel("UploadModel");
-            if (oUploadModel) {
-                const uploadData = oUploadModel.getData();
-                oPayload.ResumeFile = uploadData.File || ""; // base64 content
-                oPayload.AttachmentName = uploadData.FileName || "";
-                oPayload.AttachmentType = uploadData.FileType || "";
             }
             if (!oPayload.ID) {
                 const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
@@ -579,71 +532,6 @@ sap.ui.define([
                 this.getView().addDependent(this._oPopover);
             }
             this._oPopover.openBy(oEvent.getSource());
-        },
-
-        onFileSizeExceeds: function() {
-            MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
-        },
-
-        onBeforeUploadStarts: function(oEvent) {
-            const oFile = oEvent.getParameter("files")[0];
-            if (!oFile) {
-                MessageToast.show("No file selected.");
-                return;
-            }
-            const oModel = this.getView().getModel("tokenModel");
-            let aTokens = oModel.getProperty("/tokens") || [];
-
-            // Restrict to one file
-            if (aTokens.length >= 1) {
-                sap.m.MessageBox.error("Only one file can be uploaded at a time.");
-                return;
-            }
-
-            const reader = new FileReader();
-            const that = this;
-
-            reader.onload = function(e) {
-                const base64 = e.target.result.split(',')[1];
-                const oUploadModel = that.getView().getModel("UploadModel");
-                if (!oUploadModel) {
-                    that.getView().setModel(new sap.ui.model.json.JSONModel(), "UploadModel");
-                }
-                that.getView().getModel("UploadModel").setData({
-                    File: base64,
-                    FileName: oFile.name,
-                    FileType: oFile.type
-                });
-                aTokens.push({
-                    key: oFile.name,
-                    text: oFile.name
-                });
-                oModel.setProperty("/tokens", aTokens);
-                MessageToast.show("File uploaded successfully: " + oFile.name);
-            };
-            reader.readAsDataURL(oFile);
-        },
-
-        onTokenDelete: function(oEvent) {
-            var oModel = this.getView().getModel("tokenModel"); // Get the model
-            var aTokens = oModel.getProperty("/tokens") || [];
-            var aTokensToDelete = oEvent.getParameter("tokens"); // Get deleted tokens from event
-
-            aTokensToDelete.forEach(function(oDeletedToken) {  // Filter out deleted tokens
-                var sKey = oDeletedToken.getKey();
-                aTokens = aTokens.filter(function(token) {
-                    return token.key !== sKey;
-                });
-            });
-
-            oModel.setProperty("/tokens", aTokens);   // Update model
-
-            if (aTokens.length === 0) { // Clear upload model if all tokens are deleted
-                var oUploadModel = this.getView().getModel("UploadModel");
-                oUploadModel.setProperty("/File", "");
-                oUploadModel.setProperty("/FileName", "");
-                oUploadModel.setProperty("/FileType", "");
-            }
         },
     })
 })
