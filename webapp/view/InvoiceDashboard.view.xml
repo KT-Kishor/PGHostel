@@ -107,7 +107,7 @@
                                 </Toolbar>
                             </f:header>
                             <f:content>
-                                <viz:VizFrame id="barChartCompany" vizType="{invoiceChartTypeModel>/companyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } } }">
+                                <viz:VizFrame id="barChartCompany" vizType="{invoiceChartTypeModel>/companyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#' } } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/companyTotals}">
                                             <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
@@ -133,7 +133,7 @@
                                 </Toolbar>
                             </f:header>
                             <f:content>
-                                <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#,##0' } }, legend: { visible: true } }">
+                                <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: true, formatString: '#' } }, legend: { visible: true } }">
                                     <viz:dataset>
                                         <vizData:FlattenedDataset data="{chartData>/yearlyTrend}">
                                             <vizData:dimensions> <vizData:DimensionDefinition name="Year" value="{chartData>year}" /> </vizData:dimensions>
@@ -171,7 +171,7 @@
                                     height="300px"
                                     vizProperties="{
                                         title: { visible: false },
-                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
+                                        plotArea: { dataLabel: { visible: true, formatString: '#' } },
                                         interaction: { selectability: { mode: 'SINGLE' } }
                                     }"
                                     selectData="onPaymentBreakdownSelect">
@@ -211,7 +211,7 @@
                                     height="300px"
                                     vizProperties="{
                                         title: { visible: false },
-                                        plotArea: { dataLabel: { visible: true, formatString: '#,##0' } },
+                                        plotArea: { dataLabel: { visible: true, formatString: '#' } },
                                         interaction: { selectability: { mode: 'SINGLE' } }
                                     }"
                                     selectData="onPendingCompanySelect">
