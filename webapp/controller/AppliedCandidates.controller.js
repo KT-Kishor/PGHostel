@@ -102,6 +102,17 @@ sap.ui.define([
             });
         },
 
+         EOD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None")
+                }
+                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
+                sap.ui.getCore().byId("FM_Id_City").setValue("");
+            },
+
         onFilterBarClear: function() {
             this.byId("filterEmployeeName").setSelectedKey("");
             this.byId("filterNoticePeriod").setValue("");
@@ -262,7 +273,7 @@ sap.ui.define([
                 Skills: "",
                 ISD: "+91",
                 City: "",
-                Country: "IN",
+                Country: "India",
                 CreateDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
             };
             this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");

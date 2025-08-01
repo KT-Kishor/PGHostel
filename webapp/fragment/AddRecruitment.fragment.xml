@@ -1,4 +1,4 @@
-<core:FragmentDefinition
+<core:FragmentDefinition 
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:layout="sap.ui.layout.form"
@@ -69,16 +69,12 @@
 					<core:Item key="{NoticePeriod>key}" text="{NoticePeriod>text}" />
 				</ComboBox>
 				<Label text="{i18n>expCountry}" required="true" />
-				<Select items="{CountryModel>/}" id="FM_Id_Country" selectedKey="{stuDataModel>/Country}"
-                    editable="{EditableModeltruefalse>/Editable}" change="onDialogCountryChange">
-					<core:Item key="{CountryModel>code}" text="{CountryModel>countryName}" />
-				</Select>
+                    <ComboBox change="EOD_onChangeCountry"  editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaCountry}" id="FM_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{stuDataModel>/Country}" showSecondaryValues="true"  >
+				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				</ComboBox>
 				<Label text="{i18n>city}" required="true" />
-				<ComboBox items="{BaseLocationModel>/}" id="FM_Id_City" value="{stuDataModel>/City}"
-                    valueState="{modelValuStateError>/City}" valueStateText="{i18n>cityVAlueState}"
-                    editable="{EditableModeltruefalse>/Editable}" change="onDropdownChange"
-                    placeholder="{i18n>cityVAlueState}">
-					<core:Item key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" />
+                    <ComboBox items="{BaseLocationModel>/}" editable="{simpleForm>/editable}" id="FM_Id_City"  showSecondaryValues="true" selectedKey="{stuDataModel>/City}" valueStateText="{i18n>combovalueState}">  
+				<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 				<Label text="{i18n>mobilenumber}" required="true" />
 				<Select

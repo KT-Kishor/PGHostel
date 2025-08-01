@@ -1258,7 +1258,7 @@ sap.ui.define([
                     button: false,
                     Subject: `${modelData.CustomerName} - ${modelData.InvoiceDescription}`,
                     htmlbody: `<p>Dear Finance Team,</p>
-                    <p>Please find the following invoice detail below:</p>
+                    <p>Please find the following invoice details below:</p>
                     <li><b>Invoice No : ${modelData.InvNo}</b></li>
                     <li><b>Invoice Date : ${modelData.InvoiceDate}</b></li>
                     <li><b>Total Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>

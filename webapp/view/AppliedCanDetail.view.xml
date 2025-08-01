@@ -66,17 +66,14 @@
 				<DatePicker id="CD_id_DOB" value="{path: 'setDataToForm>/DOB'}"	editable="{viewModel>/isEditMode}" change=".onDOBChange" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy"/>
 				<Label text="{i18n>email}" />
 				<Input value="{setDataToForm>/Email}" maxLength="50" editable="{viewModel>/isEditMode}"/>
-				<Label text="{i18n>expCountry}" />
-				<Select items="{CountryModel>/}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}"
-                    editable="{viewModel>/isEditMode}" change="onDialogCountryChange">
-					<core:Item key="{CountryModel>code}" text="{CountryModel>countryName}" />
-				</Select>
+				<Label text="{i18n>expCountry}"  />
+				<ComboBox items="{path:'CountryModel>/',length:1000}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}"
+                value="{setDataToForm>/Country}" editable="{viewModel>/isEditMode}" change="onDialogCountryChange">
+				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				</ComboBox>
 				<Label text="{i18n>city}" />
-				<ComboBox items="{BaseLocationModel>/}" id="AN_Id_City" value="{setDataToForm>/City}"
-                    valueState="{modelValuStateError>/City}" valueStateText="{i18n>cityVAlueState}"
-                    editable="{viewModel>/isEditMode}" change="onDropdownChange"
-                    placeholder="{i18n>cityVAlueState}">
-					<core:Item key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" />
+				<ComboBox items="{BaseLocationModel>/}" editable="{viewModel>/isEditMode}" id="AN_Id_City"  showSecondaryValues="true" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}">  
+				<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 				<Label text="{i18n>address}" />
 				<TextArea rows="3" value="{setDataToForm>/Address}" maxLength="200" editable="{viewModel>/isEditMode}"/>
@@ -92,15 +89,9 @@
 				<Label text="{i18n>TableColExperience}" />
 				<Input value="{setDataToForm>/Experience}" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>TableColNoticePeriod}" />
-				<ComboBox
-    id="AN_RE_NoticePeriod"
-    items="{NoticePeriod>/}"
-	value="{setDataToForm>/NoticePeriod}"
-    selectedKey="{setDataToForm>/NoticePeriod}"
-    valueState="{modelValuStateError>/NoticePeriodState}"
-    editable="{viewModel>/isEditMode}"
-    valueStateText="{i18n>NoticePeriod}"
-    change="onValidateMandatoryField">
+				<ComboBox id="AN_RE_NoticePeriod" items="{NoticePeriod>/}" value="{setDataToForm>/NoticePeriod}"
+                valueState="{modelValuStateError>/NoticePeriodState}" editable="{viewModel>/isEditMode}"
+   				valueStateText="{i18n>NoticePeriod}" change="onValidateMandatoryField">
 					<core:Item key="{NoticePeriod>key}" text="{NoticePeriod>text}" />
 				</ComboBox>
 				<Label text="{i18n>CurrentSalaryField}" />
@@ -111,7 +102,7 @@
 				<Input value="{setDataToForm>/ExpectedSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}"
                 maxLength="10"/>
 				<Label text="{i18n>Jobtitle}" />
-				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true" selectedKey="{setDataToForm>/JobTitle}" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
+				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true"  change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
 					<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}"/>
 				</ComboBox>
 				<Label text="{i18n>RolesFields}" />

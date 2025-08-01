@@ -114,12 +114,12 @@ sap.ui.define([
             oViewModel.setProperty("/isEditMode", !bIsEditMode);
         },
 
-        onDialogCountryChange: function(oEvent) {
-            const sCountryCode = oEvent.getSource().getSelectedKey();
-            const oCityComboBox = sap.ui.getCore().byId("AN_Id_City");
-            oCityComboBox.getBinding("items").filter(new Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
-            this.getView().getModel("setDataToForm").setProperty("/City", "");
-        },
+        onDialogCountryChange: function (oEvent) {
+             var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+                this.getView().byId("AN_Id_City").getBinding("items").filter(oFilter);
+                this.byId("AN_Id_City").setValue("");
+            },
 
         onPageNavButtonPress: function() {
             this.getOwnerComponent().getRouter().navTo("AppliedCandidates"); // Navigate to tile page

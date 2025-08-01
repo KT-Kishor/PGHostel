@@ -142,12 +142,12 @@
                             type="Transparent"
                             tooltip="{i18n>tooltipAdduser}"
                         />
-                        <Button
+                        <!-- <Button
                             text="{i18n>edit}"
                             type="Transparent"
                             press="onEditCandidate"
                             tooltip="{i18n>tooltipEditUser}"
-                        />
+                        /> -->
                         <Button
                             text="{i18n>delete}"
                             press="onDeleteCandidate"
