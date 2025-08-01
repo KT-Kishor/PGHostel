@@ -62,13 +62,13 @@
 										<m:Text visible="{visiablityPlay>/GST}" text="{ parts: [{path: 'SelectedCustomerModel>/Type'}, {path: 'SelectedCustomerModel>/Value'}], formatter: '.Formatter.formatCustomerTypeValue' }" id="CID_id_Type"/>
 
 										<m:Label visible="{visiablityPlay>/gstVisiable}" text="{i18n>cgs}" required="true"/>
-										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/CGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15"/>
+										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/CGST',formatter: '.Formatter.fromatNumber'}" editable="false" maxLength="15"/>
 
 										<m:Label visible="{visiablityPlay>/igstVisi}" text="{i18n>igst}" required="true"/>
-										<m:Input visible="{visiablityPlay>/igstVisi}" value="{path:'SelectedCustomerModel>/IGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15" />
+										<m:Input visible="{visiablityPlay>/igstVisi}" value="{path:'SelectedCustomerModel>/IGST',formatter: '.Formatter.fromatNumber'}" editable="false" maxLength="15" />
 
 										<m:Label visible="{visiablityPlay>/gstVisiable}" text="{i18n>sgst}" required="true"/>
-										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/SGST',formatter: '.Formatter.fromatNumber'}" editable="{visiablityPlay>/editable}" maxLength="15"/>
+										<m:Input visible="{visiablityPlay>/gstVisiable}" value="{path:'SelectedCustomerModel>/SGST',formatter: '.Formatter.fromatNumber'}" editable="false" maxLength="15"/>
 
 										<m:Label visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" text="{i18n>expConversionRate}" required="true" />
 										<m:Input id="CID_id_ConversionRate" visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}" placeholder="{i18n>companyInvoiceConversionRatePlace}" value="{SelectedCustomerModel>/ConversionRate}" change="onChangeConversionRate" valueStateText="{i18n>convValueStateText}" maxLength="15" editable="{visiablityPlay>/editable}" liveChange="onChnageConvertion"/>

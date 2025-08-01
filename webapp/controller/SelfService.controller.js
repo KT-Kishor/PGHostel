@@ -1951,102 +1951,113 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-            FSA_onPressSubmit: async function () {
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
-                var oComapnyModel = this.getView().getModel("CompanyCodeDetailsModel").getData()[0];
-                var coImg = await this._convertBLOBToImage(new Blob([new Uint8Array(oComapnyModel.companylogo?.data)], { type: "image/png" }));
-                const oEmpModel = this.getView().getModel("sEmployeeModel").getData();
-                const oName = oEmpModel[0].EmployeeName;
-                const oNominee = sap.ui.getCore().byId("FSA_id_nominatedName").getValue();
-                const oDate = sap.ui.getCore().byId("FSA_id_Date").getValue();
-                if (!oNominee || !oDate) {
-                    sap.m.MessageToast.show("Please fill all required fields.");
-                    return;
+           FSA_onPressSubmit: async function () {
+                try {
+                    await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                        branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode
+                    });
+
+                    var oComapnyModel = this.getView().getModel("CompanyCodeDetailsModel").getData()[0];
+                    var coImg = await this._convertBLOBToImage(new Blob([new Uint8Array(oComapnyModel.companylogo?.data)], { type: "image/png" }));
+
+                    const oEmpModel = this.getView().getModel("sEmployeeModel").getData();
+                    const oName = oEmpModel[0].EmployeeName;
+                    const oNominee = sap.ui.getCore().byId("FSA_id_nominatedName").getValue();
+                    const oDate = sap.ui.getCore().byId("FSA_id_Date").getValue();
+
+                    if (!oNominee || !oDate) {
+                        sap.m.MessageToast.show("Please fill all required fields.");
+                        return;
+                    }
+
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: "landscape",
+                        unit: "cm",
+                        format: "a4"
+                    });
+
+                    // Load fonts
+                    doc.addFileToVFS(EBGaramond.filename, EBGaramond.base64);
+                    doc.addFont(EBGaramond.filename, EBGaramond.name, EBGaramond.style);
+
+                    doc.addFileToVFS(Allura.filename, Allura.base64);
+                    doc.addFont(Allura.filename, Allura.name, Allura.style);
+
+                    doc.addFileToVFS(Poppins.filename, Poppins.base64);
+                    doc.addFont(Poppins.filename, Poppins.name, Poppins.style);
+
+                    doc.addFileToVFS(Plight.filename, Plight.base64);
+                    doc.addFont(Plight.filename, Plight.name, Plight.style);
+
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageMiddle = pageWidth / 2;
+
+                    const imgData = this.getView().getModel("PDFData").getProperty("/DemoBase64");
+                    doc.addImage(imgData, 0, 0, pageWidth, pageHeight);
+
+                    doc.setFont(EBGaramond.name, EBGaramond.style);
+                    doc.setFontSize(37);
+                    doc.text("SPOT AWARD", pageMiddle, 4, { align: "center" });
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(20);
+                    doc.text("This certificate is proudly presented to", pageMiddle, 5.5, { align: "center" });
+
+                    doc.setFont(Allura.name, Allura.style);
+                    doc.setFontSize(45);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(oName, pageMiddle, 8.5, { align: "center" });
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(15);
+                    doc.text(".............................................................................................................................................", pageMiddle, 9.5, { align: "center" });
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(15);
+                    doc.text("Excellence in overcoming challenges and timely delivery of solution", pageMiddle, 10.5, { align: "center" });
+                    doc.text("in new technology areas.", pageMiddle, 11.5, { align: "center" });
+
+                    doc.setFont(Poppins.name, Poppins.style);
+                    doc.setFontSize(16);
+                    doc.text(oNominee, 7, 15, { align: "center" });
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(15);
+                    doc.text("...............................", 7, 15.5, { align: "center" });
+
+                    doc.setFont(Poppins.name, Poppins.style);
+                    doc.setFontSize(16);
+                    const formattedDate = sap.ui.core.format.DateFormat.getInstance({ pattern: "dd MMMM yyyy" })
+                        .format(sap.ui.core.format.DateFormat.getInstance({ pattern: "dd/MM/yyyy" }).parse(oDate));
+                    doc.text(formattedDate, pageMiddle, 15, { align: "center" });
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(15);
+                    doc.text("...............................", pageMiddle, 15.5, { align: "center" });
+
+                    doc.setFont(Poppins.name, Poppins.style);
+                    doc.setFontSize(16);
+                    doc.text(oComapnyModel.headOfCompany, pageWidth - 7, 15, { align: "center" });
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(15);
+                    doc.text("...............................", pageWidth - 7, 15.5, { align: "center" });
+
+                    // Labels
+                    doc.setFont(Plight.name, Plight.style);
+                    doc.setFontSize(12);
+                    doc.text("Nominated by", 7, 16, { align: "center" });
+                    doc.text("Date", pageMiddle, 16, { align: "center" });
+                    doc.text(oComapnyModel.designation, pageWidth - 7, 16, { align: "center" });
+
+                    doc.addImage(coImg, pageWidth - 5, 0.1, 4, 4);
+                    this.closeBusyDialog(); 
+                   doc.save("SpotAward_Certificate.pdf");
+                    this.oDialog.close();   
+                } catch (error) {
+                     sap.m.MessageToast.show("An error occurred while generating the certificate. Please try again.");
+                } finally {
+                    this.closeBusyDialog();
                 }
-                this.getBusyDialog();
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: "landscape",
-                    unit: "cm",
-                    format: "a4"
-                });
-
-                doc.addFileToVFS(EBGaramond.filename, EBGaramond.base64);
-                doc.addFont(EBGaramond.filename, EBGaramond.name, EBGaramond.style);
-
-                doc.addFileToVFS(Allura.filename, Allura.base64);
-                doc.addFont(Allura.filename, Allura.name, Allura.style);
-
-                doc.addFileToVFS(Poppins.filename, Poppins.base64);
-                doc.addFont(Poppins.filename, Poppins.name, Poppins.style);
-
-                doc.addFileToVFS(Plight.filename, Plight.base64);
-                doc.addFont(Plight.filename, Plight.name, Plight.style);
-
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageMiddle = pageWidth / 2;
-
-                // Add background image (base64)
-                const imgData = this.getView().getModel("PDFData").getProperty("/DemoBase64");
-                doc.addImage(imgData, 0, 0, pageWidth, pageHeight);
-
-                doc.setFont(EBGaramond.name, EBGaramond.style);
-                doc.setFontSize(37);
-                doc.text("SPOT AWARD", pageMiddle, 4, { align: "center" });
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(20);
-                doc.text("This certificate is proudly presented to", pageMiddle, 5.5, { align: "center" });
-
-                doc.setFont(Allura.name, Allura.style);
-                doc.setFontSize(45);
-                doc.setTextColor(0, 0, 0);
-                doc.text(oName, pageMiddle, 8.5, { align: "center" });
-                // drawDottedLine(doc, 5.5, 9, pageWidth - 4);
-
-                doc.setFont("times", "normal");
-                doc.setFontSize(15);
-                doc.text(".............................................................................................................................................", pageMiddle, 9.5, { align: "center" });
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(15);
-                doc.text("Excellence in overcoming challenges and timely delivery of solution", pageMiddle, 10.5, { align: "center" });
-                doc.text("in new technology areas.", pageMiddle, 11.5, { align: "center" });
-
-                doc.setFont(Poppins.name, Poppins.style);
-                doc.setFontSize(16);
-                doc.text(oNominee, 7, 15, { align: "center" }); // left
-                doc.setFont("times", "normal");
-                doc.setFontSize(15);
-                doc.text("...............................", 7, 15.5, { align: "center" });
-
-                doc.setFont(Poppins.name, Poppins.style);
-                doc.setFontSize(16);
-                const formattedDate = sap.ui.core.format.DateFormat.getInstance({ pattern: "dd MMMM yyyy" }).format(sap.ui.core.format.DateFormat.getInstance({ pattern: "dd/MM/yyyy" }).parse(sap.ui.getCore().byId("FSA_id_Date").getValue()));
-                doc.text(formattedDate, pageMiddle, 15, { align: "center" });
-                doc.setFont("times", "normal");
-                doc.setFontSize(15);
-                doc.text("...............................", pageMiddle, 15.5, { align: "center" });
-
-                doc.setFont(Poppins.name, Poppins.style);
-                doc.setFontSize(16);
-                doc.text(oComapnyModel.headOfCompany, pageWidth - 7, 15, { align: "center" }); // right
-                doc.setFont("times", "normal");
-                doc.setFontSize(15);
-                doc.text("...............................", pageWidth - 7, 15.5, { align: "center" });
-                // Labels
-                doc.setFont(Plight.name, Plight.style);
-                doc.setFontSize(12);
-                doc.text("Nominated by", 7, 16, { align: "center" });
-                // drawDottedLine(doc, 2, 15, 4);
-                doc.text("Date", pageMiddle, 16, { align: "center" });
-                // drawDottedLine(doc, pageMiddle - 1.2, 18.0, pageMiddle + 1.2);
-                doc.text(oComapnyModel.designation, pageWidth - 7, 16, { align: "center" });
-                // drawDottedLine(doc, pageWidth - 4, 18.0, pageWidth - 3.2);
-
-                doc.addImage(coImg, pageWidth - 5, 0.1, 4, 4);
-                doc.save("SpotAward_Certificate.pdf");
-                this.closeBusyDialog();
             },
 
             FSA_onPressClose: function () {

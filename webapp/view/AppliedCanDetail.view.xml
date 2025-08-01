@@ -102,7 +102,7 @@
 				<Input value="{setDataToForm>/ExpectedSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}"
                 maxLength="10"/>
 				<Label text="{i18n>Jobtitle}" />
-				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true"  change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
+				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{setDataToForm>/JobTitle}"  showSecondaryValues="true"  change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
 					<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}"/>
 				</ComboBox>
 				<Label text="{i18n>RolesFields}" />
