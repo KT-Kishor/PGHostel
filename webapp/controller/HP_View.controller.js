@@ -516,7 +516,7 @@ sap.ui.define(
               ?.ID || "";
 
           const oTempModel = new JSONModel({
-          //  dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
+          dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
             // When populating temp model in edit mode
             SelectedJobTitleValue: oData.JobTitle || "",
 
