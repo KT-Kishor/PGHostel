@@ -627,9 +627,8 @@ sap.ui.define([
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var FilterModel = this.getView().getModel("FilteredExpenseModel").getData()[0];
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (
-                    utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") &&
-                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") &&
+                var NotUpdatedAttachment = this.getView().getModel("ItemExpenseModel").getData().filter(item => item.ItemID === this.SelectedData.ItemID)[0];
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") &&
                     (
                         oModel.ItemType === "Perdiem Declaration"
                             ? true
@@ -660,9 +659,9 @@ sap.ui.define([
                             ForeignAmount: oModel.ExpenseAmount,
                             ItemType: oModel.ItemType,
                             ModeOfPayment: oModel.ModeOfPayment,
-                            Attachment: oUploadModel.File,
-                            AttachmentType: oUploadModel.FileType,
-                            AttachmentName: oUploadModel.FileName
+                            Attachment: (oUploadModel.File) ? oUploadModel.File : NotUpdatedAttachment.File,
+                            AttachmentType: (oUploadModel.FileType) ? oUploadModel.FileType : NotUpdatedAttachment.FileType,
+                            AttachmentName: (oUploadModel.FileName) ? oUploadModel.FileName : NotUpdatedAttachment.FileName
                         },
                         filters: {
                             ItemID: this.SelectedData.ItemID,
