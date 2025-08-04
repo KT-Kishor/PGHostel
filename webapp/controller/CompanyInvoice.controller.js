@@ -20,11 +20,28 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+         _onRouteMatched: async function () {
           var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
           if (!LoginFUnction) return;
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceapp"));
+          this._isClearPressed = false; // ensure full data is not requested'
+          const currentYear = new Date().getFullYear();
+          let fyStart, fyEnd;
+
+          if (new Date().getMonth() >= 3) {
+              fyStart = new Date(currentYear, 3, 1);  // April 1
+              fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+            } else {
+                  fyStart = new Date(currentYear - 1, 3, 1);  // April 1 last year
+                  fyEnd = new Date(currentYear, 2, 31); // March 31 this year
+          }
+            // Set the date range UI (override user-selected values)
+            const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
+            if (dateRangeControl) {
+                  dateRangeControl.setDateValue(fyStart);
+                  dateRangeControl.setSecondDateValue(fyEnd);
+            }
           await this.CompanyInvoice_onSearch();
           this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
           this.getView().getModel("LoginModel").setProperty("/RichText", false);
@@ -60,11 +77,8 @@ sap.ui.define(
               }
             });
 
-            // Prepare financial year date range
-            // const today = new Date();
             const currentYear = new Date().getFullYear();
-            // const currentMonth = new Date().getMonth(); // 0 = Jan, 3 = April
-
+          
             let fyStart, fyEnd, financialYearLabel;
             if (new Date().getMonth() >= 3) { // April or later
               fyStart = new Date(currentYear, 3, 1); // April 1st
@@ -78,30 +92,32 @@ sap.ui.define(
 
             const formatDate = (date) => date.toISOString().split("T")[0];
 
-            // Set default date if none provided
-            if (!params.InvoiceStartDate && !params.InvoiceEndDate) {
-              params.InvoiceStartDate = formatDate(fyStart);
-              params.InvoiceEndDate = formatDate(fyEnd);
-              params.FinancialYear = financialYearLabel;
+            // Check if clear button was pressed
+                    if (this._isClearPressed) {
+                        // fetch all data, no filters
+                        delete params.StartDate;
+                        delete params.EndDate;
+                        delete params.FinancialYear;
+                        this._isClearPressed = false; // reset flag
+                    } else if (!invoiceDateProvided) {
+                        // No date selected by user → apply financial year filter
+                        params.StartDate = formatDate(fyStart);
+                        params.EndDate = formatDate(fyEnd);
+                        params.FinancialYear = financialYearLabel;
 
-              // Also set in DateRangeSelection control
-              const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
-              if (dateRangeControl) {
-                dateRangeControl.setDateValue(fyStart);
-                dateRangeControl.setSecondDateValue(fyEnd);
-              }
-            } else {
-              // If dates match financial year, add FinancialYear param
-              const startDate = new Date(params.InvoiceStartDate);
-              const endDate = new Date(params.InvoiceEndDate);
-
-              if (
-                startDate.getTime() === fyStart.getTime() &&
-                endDate.getTime() === fyEnd.getTime()
-              ) {
-                params.FinancialYear = financialYearLabel;
-              }
-            }
+                        const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
+                        if (dateRangeControl) {
+                            dateRangeControl.setDateValue(fyStart);
+                            dateRangeControl.setSecondDateValue(fyEnd);
+                        }
+                    } else {
+                        // Date was selected by user → check if it's financial year
+                        const startDate = new Date(params.StartDate);
+                        const endDate = new Date(params.EndDate);
+                        if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                            params.FinancialYear = financialYearLabel;
+                        }
+                    }
             // Fetch data
             this._fetchCommonData("CompanyInvoice", "CompanyInvoiceFilterModel", { InvoiceStartDate: params.InvoiceStartDate, InvoiceEndDate: params.InvoiceEndDate });
             await this._fetchCommonData("CompanyInvoice", "CompanyInvoiceModel", params);
@@ -118,6 +134,7 @@ sap.ui.define(
           this.byId("CI_id_InvoiceDatePicker").setValue("");
           this.byId("CI_id_CustomerNameComboBox").setValue("");
           this.byId("CI_id_StatusComboBox").setValue("");
+          this._isClearPressed = true;
         },
 
         onSelectionChange: function (oEvent) {
