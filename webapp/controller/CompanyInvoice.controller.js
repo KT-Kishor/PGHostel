@@ -150,11 +150,11 @@ sap.ui.define(
         },
 
         CI_onPressAddInvoice: function () {
-          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: "X" });
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: "X" ,dash:"CompanyInvoice"});
         },
 
         CI_onPressInvoiceRow: function (oEvent) {
-          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().InvNo) });
+          this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().InvNo) ,dash:"CompanyInvoice" });
         },
 
         onPressback: function () {

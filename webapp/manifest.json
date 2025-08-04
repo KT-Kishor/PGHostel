@@ -480,7 +480,7 @@
                 },
                 {
                     "name": "RouteCompanyInvoiceDetails",
-                    "pattern": "InvoiceDetails/{sPath}",
+                    "pattern": "InvoiceDetails/{sPath}/{dash}",
                     "target": [
                         "TargetCompanyInvoiceDetails"
                     ]

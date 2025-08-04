@@ -18,6 +18,9 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
                 if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
+                var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
+                this.sourceView = sSource || "CompanyInvoice";
+
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice", Action: "CC" });
@@ -596,7 +599,11 @@ sap.ui.define([
 
             CID_onPressback: function () {
                 this.getView().getModel("LoginModel").setProperty("/RichText", false);
-                this.getRouter().navTo("RouteCompanyInvoice")
+                if (this.sourceView === "InvoiceDashboard") {
+                    this.getRouter().navTo("RouteInvoiceDashboard");
+                } else {
+                    this.getRouter().navTo("RouteCompanyInvoice");
+                }
             },
 
             CID_ValidateDate: function (oEvent) { utils._LCvalidateDate(oEvent) },
@@ -1066,7 +1073,7 @@ sap.ui.define([
 
                 const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount && this.ResivedTDSFlag;
                 if (!this.ResivedAmount) {
-                   sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
                 }
 
                 if (!isValid) {
@@ -1535,7 +1542,7 @@ sap.ui.define([
 
                 if (parseFloat(oModel.SubTotalNotGST) > 0) {
                     summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
+                    Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
                     ]);
                 }
 
@@ -1559,8 +1566,8 @@ sap.ui.define([
                     if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
                         summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") && 
-                    igstValue > 0) {
+                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") &&
+                        igstValue > 0) {
                         summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }

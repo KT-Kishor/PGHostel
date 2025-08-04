@@ -1339,7 +1339,8 @@
           .getBindingContext("CompanyInvoiceModelData")
           .getObject().InvNo
       );
-      this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
+      var navigate = encodeURIComponent( oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
+      this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path ,dash: navigate});
     },
 
     getGroupHeader: function (oGroup) {
