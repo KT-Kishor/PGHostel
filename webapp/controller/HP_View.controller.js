@@ -516,14 +516,14 @@ sap.ui.define(
               ?.ID || "";
 
           const oTempModel = new JSONModel({
-          dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
-            // When populating temp model in edit mode
+            dialogTitle: `Edit Post — ${oData.JobTitle || ""}`,
             SelectedJobTitleValue: oData.JobTitle || "",
-
-            SelectedJobTitleKey: oData.JobTitle || "",
+            // SelectedJobTitleKey: oData.JobTitle || "",
             qualifications: aQualifications,
             SelectedExperienceKey: oData.Experience || "",
-            SelectedLocation: selectedLocationId,
+            // SelectedLocation: selectedLocationId,
+            SelectedJobLocation: oData.Location || "",
+
             JobDescription: oData.JobDescription || "",
             KeyResponsibilities: oData.KeyResponsibilities || "",
             PrimarySkills: oData.PrimarySkills || "",
@@ -921,7 +921,7 @@ sap.ui.define(
             {
               id: "idlocationcombo",
               type: "input",
-              validator: validation._LCvalidateName,
+              validator: validation._LCvalidateMandatoryField,
             },
             {
               id: "workModeCombo",
@@ -942,31 +942,23 @@ sap.ui.define(
               id: "primarySkillsInput",
               type: "input",
               validator: function (oCtrl) {
-                const sValue = oCtrl.getValue()?.trim() || "";
+                const sValue = oCtrl.getValue().trim();
 
-                if (!sValue) return false;
-
-                if (sValue.length > 50) {
+                if (!sValue) {
                   oCtrl.setValueState("Error");
-                  oCtrl.setValueStateText("Maximum 50 characters allowed.");
+                  oCtrl.setValueStateText("Primary Skills are required.");
                   return false;
                 }
 
-                const skillRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
-                const skillsArray = sValue
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter((s) => s.length > 0);
-
-                const allValid = skillsArray.every((skill) =>
-                  skillRegex.test(skill)
-                );
-
-                if (!allValid) {
+                if (sValue.length < 2) {
                   oCtrl.setValueState("Error");
-                  oCtrl.setValueStateText(
-                    "Only letters, digits, and + - . / # ( ) symbols allowed. Each entry min 2 chars."
-                  );
+                  oCtrl.setValueStateText("Minimum 2 characters are required.");
+                  return false;
+                }
+
+                if (sValue.length > 100) {
+                  oCtrl.setValueState("Error");
+                  oCtrl.setValueStateText("Maximum 100 characters allowed.");
                   return false;
                 }
 
@@ -1013,17 +1005,6 @@ sap.ui.define(
                   );
                   return false;
                 }
-
-                // Optional format validation (can skip if free text is allowed)
-                const jobTitleRegex = /^[a-zA-Z0-9\s\-+()./#]{2,}$/;
-                if (!jobTitleRegex.test(sValue)) {
-                  oCtrl.setValueState("Error");
-                  oCtrl.setValueStateText(
-                    "Only letters, digits, and + - . / # ( ) symbols allowed."
-                  );
-                  return false;
-                }
-
                 // Valid
                 oCtrl.setValueState("None");
 
@@ -1045,35 +1026,34 @@ sap.ui.define(
           // (d) Optional: Validate Certifications field format
           const certInput = oView.byId("certificationsInput");
           if (certInput) {
-            const sValue = certInput.getValue().trim();
+            const sValue = certInput.getValue(); // Raw value
+            const trimmedValue = sValue.trim();
 
-            if (sValue) {
-              if (sValue.length > 50) {
-                certInput.setValueState("Error");
-                certInput.setValueStateText("Maximum 50 characters allowed.");
-                scrollAndToast(certInput, fieldLabels["certificationsInput"]);
-                return false;
-              }
+            // Allow empty string, but not just whitespace
+            if (sValue.length === 0) {
+              certInput.setValueState("None");
+            } else {
+              const isOnlySpacesOrDots = /^[.\s]+$/.test(sValue);
 
-              const certRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
-              const certArray = sValue
-                .split(",")
-                .map((s) => s.trim())
-                .filter((s) => s.length > 0);
-
-              const allValid = certArray.every((cert) => certRegex.test(cert));
-
-              if (!allValid) {
+              if (trimmedValue.length < 2 || isOnlySpacesOrDots) {
                 certInput.setValueState("Error");
                 certInput.setValueStateText(
-                  "Only letters, digits, and + - . / # ( ) symbols allowed. Each entry min 2 chars."
+                  "Minimum 2 characters, and cannot be just spaces or dots."
                 );
                 scrollAndToast(certInput, fieldLabels["certificationsInput"]);
                 return false;
               }
-            }
 
-            certInput.setValueState("None");
+              if (trimmedValue.length > 100) {
+                certInput.setValueState("Error");
+                certInput.setValueStateText("Maximum 100 characters allowed.");
+                scrollAndToast(certInput, fieldLabels["certificationsInput"]);
+                return false;
+              }
+
+              // All good
+              certInput.setValueState("None");
+            }
           }
 
           // (e) Job Description (mandatory)
@@ -1137,90 +1117,90 @@ sap.ui.define(
           return true;
         },
 
-          _prepareJobPayload: function () {
-            if (!this._validateJobPostingFields()) return null;
+        _prepareJobPayload: function () {
+          if (!this._validateJobPostingFields()) return null;
 
-            const oView = this.getView();
-            const oModel =
-              oView.getModel("temporaryModel") ||
-              sap.ui.core.Fragment.byId(oView.getId(), "addJobDialog")?.getModel(
-                "temporaryModel"
-              );
+          const oView = this.getView();
+          const oModel =
+            oView.getModel("temporaryModel") ||
+            sap.ui.core.Fragment.byId(oView.getId(), "addJobDialog")?.getModel(
+              "temporaryModel"
+            );
 
-            if (!oModel) {
-              MessageToast.show("Unexpected error. Please reopen the dialog.");
-              return null;
+          if (!oModel) {
+            MessageToast.show("Unexpected error. Please reopen the dialog.");
+            return null;
+          }
+
+          //  Sync RTEs
+          const aRTEs = [
+            { vboxId: "jobDescRTE", prop: "JobDescription" },
+            { vboxId: "keyRespRTE", prop: "KeyResponsibilities" },
+            { vboxId: "secondarySkillsRTE", prop: "SecondarySkills" },
+            { vboxId: "skillReqRTE", prop: "SkillRequirements" },
+          ];
+
+          aRTEs.forEach(({ vboxId, prop }) => {
+            const oVBox = oView.byId(vboxId);
+            const oRTE = oVBox?.getItems?.()[0];
+            if (oRTE && typeof oRTE.getValue === "function") {
+              oModel.setProperty("/" + prop, oRTE.getValue());
             }
+          });
 
-            //  Sync RTEs
-            const aRTEs = [
-              { vboxId: "jobDescRTE", prop: "JobDescription" },
-              { vboxId: "keyRespRTE", prop: "KeyResponsibilities" },
-              { vboxId: "secondarySkillsRTE", prop: "SecondarySkills" },
-              { vboxId: "skillReqRTE", prop: "SkillRequirements" },
-            ];
+          //  Sync fallback ComboBox/Input values
+          const fallbackFields = {
+            SelectedJobTitleKey:
+              oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
+            SelectedExperienceKey:
+              oView.byId("experienceCombo")?.getSelectedKey() || "",
+            Status: oView.byId("statusCombo")?.getSelectedKey() || "",
+            NoOfPositions:
+              oView.byId("positionsInput")?.getValue()?.trim() || "",
+            PrimarySkills:
+              oView.byId("primarySkillsInput")?.getValue()?.trim() || "",
+            Certifications:
+              oView.byId("certificationsInput")?.getValue()?.trim() || "",
+          };
 
-            aRTEs.forEach(({ vboxId, prop }) => {
-              const oVBox = oView.byId(vboxId);
-              const oRTE = oVBox?.getItems?.()[0];
-              if (oRTE && typeof oRTE.getValue === "function") {
-                oModel.setProperty("/" + prop, oRTE.getValue());
-              }
-            });
+          Object.entries(fallbackFields).forEach(([path, value]) => {
+            if (!oModel.getProperty("/" + path)) {
+              oModel.setProperty("/" + path, value);
+            }
+          });
 
-            //  Sync fallback ComboBox/Input values
-            const fallbackFields = {
-              SelectedJobTitleKey:
-                oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
-              SelectedExperienceKey:
-                oView.byId("experienceCombo")?.getSelectedKey() || "",
-              Status: oView.byId("statusCombo")?.getSelectedKey() || "",
-              NoOfPositions:
-                oView.byId("positionsInput")?.getValue()?.trim() || "",
-              PrimarySkills:
-                oView.byId("primarySkillsInput")?.getValue()?.trim() || "",
-              Certifications:
-                oView.byId("certificationsInput")?.getValue()?.trim() || "",
-            };
+          const oData = oModel.getData();
+          const sUserName = this.getOwnerComponent()
+            .getModel("LoginModel")
+            .getProperty("/EmployeeName");
+          const sUserID = this.getOwnerComponent()
+            .getModel("LoginModel")
+            .getProperty("/EmployeeID");
 
-            Object.entries(fallbackFields).forEach(([path, value]) => {
-              if (!oModel.getProperty("/" + path)) {
-                oModel.setProperty("/" + path, value);
-              }
-            });
+          return {
+            // jobTitle: oData.SelectedJobTitleKey,
+            JobTitle: oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
 
-            const oData = oModel.getData();
-            const sUserName = this.getOwnerComponent()
-              .getModel("LoginModel")
-              .getProperty("/EmployeeName");
-            const sUserID = this.getOwnerComponent()
-              .getModel("LoginModel")
-              .getProperty("/EmployeeID");
-
-            return {
-             // jobTitle: oData.SelectedJobTitleKey,
-              JobTitle: oView.byId("JobTitleCombo")?.getValue()?.trim() || "",
-
-              jobDescription: oData.JobDescription,
-              keyResponsibilities: oData.KeyResponsibilities || "",
-              primarySkills: oData.PrimarySkills,
-              secondarySkills: oData.SecondarySkills,
-              skillRequirements: oData.SkillRequirements || "",
-              qualification: (oData.qualifications || []).join(", "),
-              experience: oData.SelectedExperienceKey,
-              certifications: oData.Certifications || "",
-              location: this.byId("idlocationcombo")?.getValue()?.trim() || "",
-              LocationService:
-                this.byId("workModeCombo")
-                  ?.getSelectedItem()
-                  ?.getText()
-                  ?.trim() || "",
-              NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
-              postDate: oData.PostDate,
-              Status: oData.Status,
-              CreatedBy: `${sUserName} (${sUserID})`,
-            };
-          },
+            jobDescription: oData.JobDescription,
+            keyResponsibilities: oData.KeyResponsibilities || "",
+            primarySkills: oData.PrimarySkills,
+            secondarySkills: oData.SecondarySkills,
+            skillRequirements: oData.SkillRequirements || "",
+            qualification: (oData.qualifications || []).join(", "),
+            experience: oData.SelectedExperienceKey,
+            certifications: oData.Certifications || "",
+            location: this.byId("idlocationcombo")?.getValue()?.trim() || "",
+            LocationService:
+              this.byId("workModeCombo")
+                ?.getSelectedItem()
+                ?.getText()
+                ?.trim() || "",
+            NoOfPositions: parseInt(oData.NoOfPositions, 10) || 0,
+            postDate: oData.PostDate,
+            Status: oData.Status,
+            CreatedBy: `${sUserName} (${sUserID})`,
+          };
+        },
 
         _setDatePickerRange: function () {
           const oDatePicker = this.byId("postDateDP");
@@ -1483,88 +1463,73 @@ sap.ui.define(
         },
         onPrimarySkillsChange: function (oEvent) {
           const oInput = oEvent.getSource();
-          const sValue = oEvent.getParameter("value")?.trim() || "";
-
+          const sValue = oEvent.getParameter("value") || "";
           const oModel = oInput.getModel("temporaryModel");
 
           // Mandatory check
-          if (!sValue) {
+          if (!sValue.trim()) {
             oInput.setValueState("Error");
             oInput.setValueStateText("Primary Skills are required.");
             oModel?.setProperty("/PrimarySkills", "");
             return;
           }
 
-          // Max length
-          if (sValue.length > 50) {
+          // Min length check
+          if (sValue.trim().length < 2) {
             oInput.setValueState("Error");
-            oInput.setValueStateText("Maximum 50 characters allowed.");
+            oInput.setValueStateText("Minimum 2 characters are required.");
             oModel?.setProperty("/PrimarySkills", sValue);
             return;
           }
 
-          // Per skill check
-          const validSkillRegex = /^[a-zA-Z0-9\s+#().\/-]{2,}$/;
-          const skillsArray = sValue
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          const allValid = skillsArray.every((skill) =>
-            validSkillRegex.test(skill)
-          );
-
-          if (!allValid) {
+          // Max length
+          if (sValue.length > 100) {
             oInput.setValueState("Error");
-            oInput.setValueStateText(
-              "Each skill must be 2+ characters. Only letters, numbers, spaces, and + - . / # ( ) are allowed."
-            );
-          } else {
-            oInput.setValueState("None");
+            oInput.setValueStateText("Maximum 100 characters allowed.");
+            oModel?.setProperty("/PrimarySkills", sValue);
+            return;
           }
 
-          // Sync to model even if invalid
+          oInput.setValueState("None");
           oModel?.setProperty("/PrimarySkills", sValue);
         },
 
         onCertificationChange: function (oEvent) {
+          // Value ko trim mat karo abhi, pehle validation karo
           const oInput = oEvent.getSource();
-          const sValue = oEvent.getParameter("value")?.trim() || "";
+          const sValue = oEvent.getParameter("value") || "";
 
           // Allow empty (optional field)
-          if (!sValue) {
+          if (sValue.trim() === "" && sValue.length === 0) {
             oInput.setValueState("None");
             this._updateCertModel(oInput, "");
             return;
           }
 
-          // Max length check
-          if (sValue.length > 50) {
+          // Ab trim ki hui value use karo
+          const trimmedValue = sValue.trim();
+
+          // New check for only spaces or dots
+          const isOnlySpacesOrDots = /^[.\s]+$/.test(sValue);
+
+          if (trimmedValue.length < 2 || isOnlySpacesOrDots) {
             oInput.setValueState("Error");
-            oInput.setValueStateText("Maximum 50 characters allowed.");
+            oInput.setValueStateText(
+              "Minimum 2 characters, and cannot be just spaces or dots."
+            );
             return;
           }
 
-          // Regex: allow a wide range of tech cert symbols
-          const certRegex = /^[a-zA-Z0-9\s#\-+()./]{2,}$/;
-          const certArray = sValue
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          const allValid = certArray.every((cert) => certRegex.test(cert));
-
-          if (!allValid) {
+          // Max length check
+          if (trimmedValue.length > 100) {
             oInput.setValueState("Error");
-            oInput.setValueStateText(
-              "Use letters, digits, and tech symbols (# - + . / ( )). Min 2 chars per entry."
-            );
+            oInput.setValueStateText("Maximum 100 characters allowed.");
             return;
           }
 
           // Set success state and update model
           oInput.setValueState("None");
-          this._updateCertModel(oInput, sValue);
+          this._updateCertModel(oInput, trimmedValue);
         },
 
         // Helper for safe model update
@@ -1576,7 +1541,6 @@ sap.ui.define(
             MessageToast.show("Form not initialized properly.");
           }
         },
-
         onJobSelectionChange: function () {
           var aSelectedItems = this.byId("jobPostingTable").getSelectedItems();
           if (aSelectedItems.length > 0) {
@@ -1600,8 +1564,20 @@ sap.ui.define(
         },
 
         onLocationChange: function (oEvent) {
-          this.validation._LCstrictValidationComboBox(oEvent);
+          const oComboBox = oEvent.getSource();
+          const sValue = oComboBox.getValue().trim();
+          if (!sValue) {
+            oComboBox.setValueState("Error");
+            oComboBox.setValueStateText("Location is required");
+            return;
+          }
+          // FIX: Pass the full event
+          this.validation._LCvalidateMandatoryField(oEvent);
+          if (oModel) {
+            oModel.setProperty("/SelectedJobLocation", sValue); // Store value
+          }
         },
+
         onWorkModeChange: function (oEvent) {
           this.validation._LCstrictValidationComboBox(oEvent);
         },
@@ -1619,40 +1595,30 @@ sap.ui.define(
           this.validation._LCstrictValidationComboBox(oEvent);
         },
 
-        // onJobTitleChange: function (oEvent) {
-        //   // Step 1: Validation
-        //   this.validation._LCvalidationComboBox(oEvent);
+        onJobTitleChange: function (oEvent) {
+          const oComboBox = oEvent.getSource();
+          const sValue = oComboBox.getValue()?.trim();
+          const oModel = this.getView().getModel("temporaryModel");
 
-        //   // Step 2: Set selected key to model (only if model is available)
-        //   const oComboBox = oEvent.getSource();
-        //   const sKey = oComboBox.getSelectedKey();
-        //   const oModel = this.getView().getModel("temporaryModel");
+          if (!sValue) {
+            oComboBox.setValueState("Error");
+            oComboBox.setValueStateText("Job Title is required.");
+            return;
+          }
+          if (sValue.length < 2) {
+            oComboBox.setValueState("Error");
+            oComboBox.setValueStateText(
+              "Job Title must be at least 2 characters."
+            );
+            return false;
+          }
+          oComboBox.setValueState("None");
 
-        //   if (!oModel) {
-        //     MessageToast.show("Form model not initialized.");
-        //     return;
-        //   }
-
-        //   oModel.setProperty("/SelectedJobTitleKey", sKey);
-        // },
-onJobTitleChange: function (oEvent) {
-  const oComboBox = oEvent.getSource();
-  const sValue = oComboBox.getValue()?.trim();
-  const oModel = this.getView().getModel("temporaryModel");
-
-  if (!sValue) {
-    oComboBox.setValueState("Error");
-    oComboBox.setValueStateText("Job Title is required.");
-    return;
-  }
-
-  oComboBox.setValueState("None");
-
-  // Save typed value directly
-  if (oModel) {
-    oModel.setProperty("/SelectedJobTitleValue", sValue); // Store value
-  }
-},
+          // Save typed value directly
+          if (oModel) {
+            oModel.setProperty("/SelectedJobTitleValue", sValue); // Store value
+          }
+        },
 
         _LCvalidateMultiInput: function (oMultiInput, aTokens) {
           if (!oMultiInput || !aTokens) return false;

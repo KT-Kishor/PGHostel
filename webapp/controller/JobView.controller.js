@@ -862,7 +862,7 @@ sap.ui.define(
 
           // Validate final value
           const floatVal = parseFloat(cleanValue);
-          const isValidFormat = /^\d{1,2}(\.\d{1,2})?$/.test(cleanValue); 
+          const isValidFormat = /^\d{1,2}(\.\d{1,2})?$/.test(cleanValue);
           const isWithinRange = floatVal >= 0.5 && floatVal <= 99.0;
 
           if (isValidFormat && isWithinRange) {
@@ -870,7 +870,7 @@ sap.ui.define(
             oInput.setValueStateText("");
           } else {
             oInput.setValueState(sap.ui.core.ValueState.Error);
-            const sMessage = this.oResourceBundle.getText("v2_m_errSal"); 
+            const sMessage = this.oResourceBundle.getText("v2_m_errSal");
             oInput.setValueStateText(sMessage);
           }
         },
@@ -1338,7 +1338,7 @@ sap.ui.define(
 
                   if (!isValid) {
                     oCtrl.setValueState("Error");
-                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal")); 
+                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal"));
                     return false;
                   } else {
                     oCtrl.setValueState("None");
@@ -1359,7 +1359,7 @@ sap.ui.define(
 
                   if (!isValid) {
                     oCtrl.setValueState("Error");
-                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal")); 
+                    oCtrl.setValueStateText(i18n.getText("v2_m_errSal"));
                     return false;
                   } else {
                     oCtrl.setValueState("None");

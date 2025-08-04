@@ -844,9 +844,46 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .blockInputTyping .sapMInputBaseInner {
   pointer-events: none;
 }
+@media (max-width: 1200px) and (min-width: 768px) {
+  .myAppBackground {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background-clip: padding-box !important;
+  }
 
-/*333333333333333333333333332222222222222222222211111111111111111*/
+  .sapUiTinyMargin,
+  .sapUiContentPadding,
+  .sapUiSmallMargin,
+  .sapUiLargeMarginBegin,
+  .sapUiLargeMarginEnd {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
+  .mainJobContainer {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .leftColumn,
+  .rightColumn {
+    margin: 0 !important;
+    padding: 1rem !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .actionPanel,
+  .contentPanel {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+    background: transparent !important;
+  }
+}
 /*
  * Main container for all content
  */
@@ -1241,9 +1278,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .myCustomIconBtn:hover .sapMBtnIcon {
   color: #ffffff !important;
 }
-/*333333333333333333333333332222222222222222222211111111111111111*/
-
-/*MObile111MObile111MObile111MObile111MObile111MObile111MObile111MObile111*/
 /*
  * MOBILE VIEW: Styles for screens up to 1200px (desktop view ke liye koi change nahi)
  */
@@ -1375,6 +1409,27 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   .myCustomIconBtn:hover .sapMBtnIcon {
     color: #ffffff !important;
   }
+  @media (max-width: 1200px) {
+  .myAppBackground {
+    background-image: url("../image/background.jpg");
+    border-radius: 12px !important;
+    overflow: visible !important; /* 🔁 CHANGE THIS from 'hidden' */
+    background-clip: padding-box !important;
+    box-sizing: border-box !important;
+
+    /* ✅ Add these */
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  html,
+  body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important; /* ✅ ensure scrolling works vertically */
+    min-height: 100vh !important;
+  }
+}
+
 }
 
 /* 📱 Additional tweaks for ultra-small screens (phones) */
@@ -1450,16 +1505,12 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     overflow-x: hidden !important;
   }
 
-  /* Optional: Fix panel or container background for dark/light themes */
   .sapMPanel,
   .sapMScrollCont,
   .mainJobContainer {
     background-color: #fff !important; /* or transparent/dark based on theme */
   }
 }
-
-
-/*MObile111MObile111MObile111MObile111MObile111MObile111MObile111MObile111*/
 
 /* Common box */
 .shareItemBox {

@@ -20,7 +20,7 @@
 				<f:content>
 					<Title text="Administrative Details" level="H4" class="sapUiSmallMargin" />
 					<Label text="Location" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedLocation}" items="{BaseLocationModel>/}" change="onLocationChange" valueStateText="{i18n>jpLocationValueState}">
+					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" items="{BaseLocationModel>/}" change="onLocationChange" valueStateText="{i18n>jpLocationValueState}" value="{temporaryModel>/SelectedJobLocation}">
 						<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</ComboBox>
 					<Label text="Work Mode" required="true" class="sapUiSmallMarginTop" />
@@ -37,7 +37,7 @@
 				<f:content>
 					<Title text="Skills &amp; Requirements" level="H4" class="sapUiSmallMargin" />
 					<Label text="Primary Skills" required="true" class="sapUiSmallMarginTop" />
-					<Input id="primarySkillsInput" value="{temporaryModel>/PrimarySkills}" placeholder="e.g., SAPUI5" liveChange="onPrimarySkillsChange" class="sapUiSmallMarginTop" type="Text" maxLength="50" required="true"/>
+					<Input id="primarySkillsInput" value="{temporaryModel>/PrimarySkills}" placeholder="e.g., SAPUI5" liveChange="onPrimarySkillsChange" class="sapUiSmallMarginTop" type="Text" maxLength="100" required="true"/>
 					<Label text="Secondary Skills" required="true" class="sapUiSmallMarginTop" />
 					<VBox id="secondarySkillsRTE" class="sapUiSmallMarginTop" />
 					<Label text="Skill Requirements" class="sapUiSmallMarginTop" />
@@ -49,24 +49,17 @@
 					<Label text="Qualification" required="true" class="sapUiSmallMarginTop" />
 					<MultiInput change=".onQualificationsChange" class="sapUiSmallMarginTop" id="multiInputQualifications" placeholder="Select Qualifications" showValueHelp="true" valueHelpRequest=".onOpenQualificationsDialog" tokenUpdate=".onQualificationsTokenUpdate" />
 					<Label text="Certifications" class="sapUiSmallMarginTop" />
-					<Input id="certificationsInput" value="{temporaryModel>/Certifications}" placeholder="Any relevant certifications" liveChange="onCertificationChange" class="sapUiSmallMarginTop" maxLength="50" type="Text" />
+					<Input id="certificationsInput" value="{temporaryModel>/Certifications}" placeholder="Any relevant certifications" liveChange="onCertificationChange" class="sapUiSmallMarginTop" maxLength="100" type="Text" />
 				</f:content>
 			</f:SimpleForm>
 			<f:SimpleForm id="addJobForm" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Job Details" level="H4" class="sapUiSmallMargin"/>
 					<Label text="Job Title" required="true" class="sapUiSmallMarginTop" />
-						<!-- <ComboBox class="sapUiSmallMarginTop" id="JobTitleCombo" value="{temporaryModel>/SelectedJobTitleValue}"   placeholder="Select Job Title" items="{ path: 'jobTitleModel>/', sorter: { path: 'department', descending: false, group: true } }" showSecondaryValues="true" selectedKey="{temporaryModel>/SelectedJobTitleKey}" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
-							<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
-						</ComboBox> -->
-
-						<ComboBox id="JobTitleCombo" class="sapUiSmallMarginTop" value="{temporaryModel>/SelectedJobTitleValue}"     
-	 placeholder="Select or enter Job Title" items="{    path: 'jobTitleModel>/',    sorter: { path: 'department', descending: false, group: true }  }" showSecondaryValues="true" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}" showSuggestion="true" filterSuggests="true" suggest="onSuggestJobTitle"                          
-
->
-	<core:ListItem key="{jobTitleModel>designationName}" text="{jobTitleModel>designationName}" additionalText="{jobTitleModel>department}" />
-</ComboBox>
-						<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
+					<ComboBox value="{temporaryModel>/SelectedJobTitleValue}" items="{path:'DesignationModel>/', 										sorter:{ path:'department',descending:false, group:true}}" showSecondaryValues="true" id="JobTitleCombo" valueStateText="{i18n>jpJobTitlevaluestate}" change="onJobTitleChange" required="true" placeholder="Select or enter Job Title" class="sapUiSmallMarginTop">
+						<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
+					</ComboBox>
+					<Label text="Job Description" required="true" class="sapUiSmallMarginTop" />
 					<VBox id="jobDescRTE" class="sapUiSmallMarginTop"/>
 					<Label text="Key Responsibilities" class="sapUiSmallMarginTop" />
 					<VBox id="keyRespRTE" class="sapUiSmallMarginTop"/>

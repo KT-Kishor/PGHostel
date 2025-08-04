@@ -80,11 +80,9 @@
 							<core:ListItem key="{DesignationModel>id}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />
 						</ComboBox>
 						<Label text="Current Annual Salary (LPA)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="salaryInput" maxLength="5" required="true" placeholder="e.g. 4.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
-                    valueHelpIconSrc="sap-icon://message-information"/>
+						<Input id="salaryInput" maxLength="5" required="true" placeholder="e.g. 4.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information"/>
 						<Label text="Expected Annual Salary (LPA)" required="true" class="sapUiSmallMarginTop"/>
-						<Input id="expectedSalaryInput" maxLength="5" required="true" placeholder="e.g. 5 or 5.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress"
-                    valueHelpIconSrc="sap-icon://message-information"/>
+						<Input id="expectedSalaryInput" maxLength="5" required="true" placeholder="e.g. 5 or 5.5" liveChange=".onSalaryChange" showValueHelp="true" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information"/>
 						<Label text="Employment Type" required="false" class="sapUiSmallMarginTop"/>
 						<ComboBox id="employmentTypeCombo" width="100%" required="false" change="onEmpTypeChange" valueStateText="{i18n>employmentVal}" placeholder="Select Type">
 							<core:Item key="full" text="Full-Time"/>
