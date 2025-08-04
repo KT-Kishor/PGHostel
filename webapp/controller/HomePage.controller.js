@@ -14,9 +14,9 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-          this.getRouter()
-            .getRoute("RouteHomePage")
-            .attachMatched(this._onRouteMatched, this);
+          this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
+
+          // Form Data
           var oFormData = new JSONModel({
             CustomerName: "",
             CompanyName: "",
@@ -26,80 +26,13 @@ sap.ui.define(
             MobileNo: "",
             Comments: "",
           });
-
           this.getView().setModel(oFormData, "formData");
 
-          const oAppConfigModel = new JSONModel({
-            url: "https://rest.kalpavrikshatechnologies.com/",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-          });
-
-          // Set globally — like LoginModel
-          this.getOwnerComponent().setModel(oAppConfigModel, "AppConfigModel");
-
-          var oTData = new JSONModel({
-            Name: "",
-            CollegeName: "",
-            EmailID: "",
-            Course: "",
-            MobileNo: "",
-            Comments: "",
-          });
-
-          this.getView().setModel(oTData, "TraineeData");
-
-          var oView = this.getView();
-
-          const oExpYears = new JSONModel();
-          oExpYears.loadData("model/ExpYears.json", null, false);
-          oView.setModel(oExpYears, "ExpYears");
-          this.getBusyDialog();
-          $.ajax({
-            url: "https://rest.kalpavrikshatechnologies.com/JobOpenings",
-            type: "GET",
-            contentType: "application/json",
-            dataType: "json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (response) {
-              const allCandidates = response?.data || [];
-
-              // 🔍 Filter only those with Status === "true"
-              const activeCandidates = allCandidates.filter(
-                (candidate) => candidate.Status === "true"
-              );
-
-              // 📦 Set filtered model
-              const oModel = new JSONModel({ Candidates: activeCandidates });
-              oView.setModel(oModel, "JobApplicationModel");
-
-              // 🔄 Populate comboboxes with filtered data
-              this._loadComboBoxModels(activeCandidates, oView);
-              this.closeBusyDialog();
-            }.bind(this),
-
-            error: function (error) {
-              const oResourceBundle = this.getView()
-                .getModel("i18n")
-                .getResourceBundle();
-              const fallbackMessage = oResourceBundle.getText("V1_m_errFetchD");
-              const errorMessage =
-                error?.responseJSON?.message || fallbackMessage;
-
-              MessageToast.show("Error: " + errorMessage);
-              this.closeBusyDialog();
-            }.bind(this),
-          });
+          // Load carousel videos etc. when route matches
+          this._careerDataLoaded = false; // flag to avoid repeated fetch
         },
 
-      _onRouteMatched: function () {
+       _onRouteMatched: function () {
         const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
         const oTabHeader = this.byId("mainTabHeader");
         if (oTabHeader) {
@@ -126,7 +59,7 @@ sap.ui.define(
             "../video/Scheme upload.mp4",
           ];
 
-          // Add videos dynamically to the carousel
+           // Add videos dynamically to the carousel
           videoUrls.forEach(function (url, index) {
             var oHtmlControl = new sap.ui.core.HTML({
               content:
@@ -217,14 +150,73 @@ sap.ui.define(
               },
             ],
           };
-
           var oModel = new JSONModel(oData);
           this.getView().setModel(oModel);
         },
 
         onTabSelect: function (oEvent) {
           var oItem = oEvent.getParameter("item");
-          this.byId("pageContainer").to(this.byId(oItem.getKey()));
+          const sKey = oItem.getKey();
+
+          this.byId("pageContainer").to(this.byId(sKey));
+          if (sKey === "idCareer" && !this._careerDataLoaded) {
+            this._careerDataLoaded = true;
+            this._loadCareerSectionData();
+          }
+        },
+
+        _loadCareerSectionData: function () {
+          const oAppConfigModel = new sap.ui.model.json.JSONModel({
+            url: "https://rest.kalpavrikshatechnologies.com/",
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            },
+          });
+          this.getOwnerComponent().setModel(oAppConfigModel, "AppConfigModel");
+
+          const oTData = new sap.ui.model.json.JSONModel({
+            Name: "",
+            CollegeName: "",
+            EmailID: "",
+            Course: "",
+            MobileNo: "",
+            Comments: "",
+          });
+          this.getView().setModel(oTData, "TraineeData");
+
+          const oExpYears = new sap.ui.model.json.JSONModel();
+          oExpYears.loadData("model/ExpYears.json", null, false);
+          this.getView().setModel(oExpYears, "ExpYears");
+
+          const oView = this.getView();
+          this.getBusyDialog();
+
+          $.ajax({
+            url: "https://rest.kalpavrikshatechnologies.com/JobOpenings",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            },
+            success: function (response) {
+              const allCandidates = response?.data || [];
+              const activeCandidates = allCandidates.filter((candidate) => candidate.Status === "true");
+              const oModel = new sap.ui.model.json.JSONModel({ Candidates: activeCandidates });
+              oView.setModel(oModel, "JobApplicationModel");
+              this._loadComboBoxModels(activeCandidates, oView);
+              this.closeBusyDialog();
+            }.bind(this),
+            error: function (error) {
+              const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+              const fallbackMessage = oResourceBundle.getText("V1_m_errFetchD");
+              const errorMessage = error?.responseJSON?.message || fallbackMessage;
+              MessageToast.show("Error: " + errorMessage);
+              this.closeBusyDialog();
+            }.bind(this),
+          });
         },
         onpressLogin: function () {
           //sap.m.URLHelper.redirect("https://www.kalpavrikshatechnologies.com/EmployeeLogin", true);

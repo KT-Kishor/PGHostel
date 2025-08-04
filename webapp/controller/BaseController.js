@@ -1363,7 +1363,8 @@
 
                 return oHeader;
             },
-     getStyledGroupHeader: function (oGroup) {
+            
+            getStyledGroupHeader: function (oGroup) {
             const statusStyles = {
                 "New": {
                     background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
@@ -1452,6 +1453,10 @@
                 },
                 "Admin": {
                     background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+                    textColor: "#000000"
+                },
+                 "Paid": {
+                    background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
                     textColor: "#000000"
                 },
             };
