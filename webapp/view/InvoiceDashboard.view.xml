@@ -84,7 +84,7 @@
                                 <Toolbar>
                                     <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
-                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalchartTooltip}"/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
                                     <Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChartTooltip}"/>
                                 </Toolbar>
@@ -119,7 +119,7 @@
                                 <Toolbar>
                                     <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
-                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>verticalchartTooltip}"/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
                                 </Toolbar>
                             </f:header>
@@ -193,9 +193,9 @@
                                 <Toolbar>
                                     <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
-                                    <Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedColumnTooltip}"/>
-                                    <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="{i18n>stackedBarTooltip}"/>
-                                    <Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>groupedBarTooltip}"/>
+                                    <Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedHorizontalTooltip}"/>
+                                    <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="{i18n>groupedHorizontalTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>barChartTooltip}"/>
                                 </Toolbar>
                             </f:header>
                             <f:content>
