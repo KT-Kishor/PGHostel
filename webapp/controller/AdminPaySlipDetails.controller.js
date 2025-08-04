@@ -174,7 +174,6 @@ sap.ui.define([
                 var dedData = data.DeductionData;
                 try {
                     this.checkEmpty(earnData);
-                    this.checkEmpty(dedData);
                 } catch (err) {
                     MessageBox.error(err.message);
                     return;
