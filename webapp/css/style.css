@@ -25,7 +25,11 @@
   margin: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
+@media (min-width: 1024px) {
+  .myHeaderContentFlexBox {
+    flex-wrap: nowrap !important;
+  }
+}
 .chatBubbleMe {
   background-color: #bcedea; /* Light green background */
 }

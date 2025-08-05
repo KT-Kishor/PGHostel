@@ -42,65 +42,65 @@
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<headerContent>
-	<m:FlexBox wrap="NoWrap" fitContainer="true" alignItems="Start" >
-		<!--  Avatar -->
-		<m:VBox class="sapUiSmallMarginEnd">
-			<m:layoutData>
-				<m:FlexItemData growFactor="0" />
-			</m:layoutData>
-			<m:Avatar
-                src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}"
-                displaySize="L"
-            />
-		</m:VBox>
-		<!--  Contact Info -->
-		<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-			<layout:layoutData>
-				<m:FlexItemData growFactor="1" minWidth="220px"/>
-			</layout:layoutData>
-			<m:Text
-                text="{sEmployeeModel>/0/STDCode} {sEmployeeModel>/0/MobileNo}"
-                wrapping="true"
-            />
-			<m:Text
-                text="{sEmployeeModel>/0/CompanyEmailID}"
-                wrapping="true"
-            />
-		</layout:VerticalLayout>
-		
-		<!--Permanent Address -->
-		<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-			<layout:layoutData>
-				<m:FlexItemData growFactor="2" minWidth="300px"/>
-			</layout:layoutData>
-			<m:Label
-                text="{i18n>permanentAddress}"
-                class="TextColor"
-                wrapping="true"
-            />
-			<m:ExpandableText id="permAddressText"
-                text="{sEmployeeModel>/0/PermanentAddress}"
-                width="100%"
-                maxLines="60"/>
-		</layout:VerticalLayout>
-		
-		<!--  Correspondence Address -->
-		<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-			<layout:layoutData>
-				<m:FlexItemData growFactor="2" minWidth="300px"/>
-			</layout:layoutData>
-			<m:Label
-                text="{i18n>correspondenceAddress}"
-                class="TextColor"
-                wrapping="true"
-            />
-			<m:ExpandableText
-                text="{sEmployeeModel>/0/CorrespondenceAddress}"
-                width="100%"
-                maxLines="60"/>
-		</layout:VerticalLayout>
-	</m:FlexBox>
-</headerContent>
+				<m:FlexBox wrap="Wrap" class="myHeaderContentFlexBox" fitContainer="true" alignItems="Start" >	
+					<!--  Avatar -->
+					<m:VBox class="sapUiSmallMarginEnd">
+						<m:layoutData>
+							<m:FlexItemData growFactor="0" />
+						</m:layoutData>
+						<m:Avatar
+							src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}"
+							displaySize="L"
+						/>
+					</m:VBox>	
+					<!--  Contact Info -->
+					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+						<layout:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</layout:layoutData>
+						<m:Text
+							text="{sEmployeeModel>/0/STDCode} {sEmployeeModel>/0/MobileNo}"
+							wrapping="true"
+						/>
+						<m:Text
+							text="{sEmployeeModel>/0/CompanyEmailID}"
+							wrapping="true"
+						/>
+					</layout:VerticalLayout>
+					
+					<!--Permanent Address -->
+					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+						<layout:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</layout:layoutData>
+						<m:Label
+							text="{i18n>permanentAddress}"
+							class="TextColor"
+							wrapping="true"
+						/>
+						<m:ExpandableText id="permAddressText"
+							text="{sEmployeeModel>/0/PermanentAddress}"
+							width="100%"
+							maxLines="60"/>
+					</layout:VerticalLayout>
+					
+					<!--  Correspondence Address -->
+					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+						<layout:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</layout:layoutData>
+						<m:Label
+							text="{i18n>correspondenceAddress}"
+							class="TextColor"
+							wrapping="true"
+						/>
+						<m:ExpandableText
+							text="{sEmployeeModel>/0/CorrespondenceAddress}"
+							width="100%"
+							maxLines="60"/>
+					</layout:VerticalLayout>		
+				</m:FlexBox>
+			</headerContent>
 			<sections>
 				<ObjectPageSection 
                     titleUppercase="false"
