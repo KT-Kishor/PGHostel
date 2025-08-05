@@ -1,3 +1,5 @@
+/*Frist Part*/
+
 /* captcha text style */
 .sapMInputBaseError {
   border: 1px solid red !important;
@@ -956,6 +958,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .shareText {
   margin-left: 0.5rem;
 }
+/*/////////////////////////////////////////////////////////////////////////////*/
+/*/////////////////////////////////////////////////////////////////////////////*/
+/*/////////////////////////////////////////////////////////////////////////////*/
+/*/////////////////////////////////////////////////////////////////////////////*/
+/*Second part*/
 
 .rightMarginCustom {
   margin-right: 40px;
@@ -1517,8 +1524,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   .sapUiSmallMargin,
   .sapUiSmallMarginLeft,
   .sapUiSmallMarginRight {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   #mainContainer,
@@ -1544,9 +1551,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     overflow-x: hidden !important;
   }
 
-  .sapMPanel,
+  /*.sapMPanel,
   .sapMScrollCont,
   .mainJobContainer {
-    background-color: #fff !important; /* or transparent/dark based on theme */
-  }
+    background-color: #fff !important; 
+      } */
 }
