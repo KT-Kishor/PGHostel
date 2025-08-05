@@ -72,7 +72,7 @@ sap.ui.define(["../model/formatter",], function (formatter) {
                 { label: "Location", value: oModel.BaseLocation },
                 { label: "Department", value: oModel.Department },
                 { label: "Bank Name", value: oModel.BankName },
-                { label: "Role", value: oModel.Role },
+                { label: "Designation", value: oModel.Role },
                 { label: "Bank A/C No.", value: oModel.BankAccountNo },
                 { label: "Date of Joining", value: formatter.formatDate(oModel.JoiningDate) },
             ];

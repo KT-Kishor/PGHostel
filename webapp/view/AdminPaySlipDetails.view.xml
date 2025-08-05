@@ -88,7 +88,7 @@
                         <layout:HorizontalLayout
                             class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
                         >
-                            <m:Label text="{i18n>role}:" />
+                            <m:Label text="{i18n>designation}:" />
                             <m:Text
                                 class="sapUiTinyMarginBegin"
                                 text="{PaySlip>/EmpData/Role}"
