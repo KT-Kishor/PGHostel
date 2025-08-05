@@ -51,7 +51,7 @@
 					<ScrollContainer id="idAboutUs" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding home-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Aboutus" type="XML"/>
 					</ScrollContainer>
-					<Page id="idProducts" showHeader="false" class=" Products_list sapUiTinyMargin">
+					<Page id="idProducts" showHeader="false" class="Products_list sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
 					</Page>
 					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin">
@@ -59,7 +59,7 @@
 							<l:BlockLayout background="Dashboard">
 								<l:BlockLayoutRow>
 									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}">
-										<Text text="{i18n>careersDes}" class="carrer-Des" />
+										<Text text="{i18n>careersDes}"/>
 									</l:BlockLayoutCell>
 								</l:BlockLayoutRow>
 							</l:BlockLayout>

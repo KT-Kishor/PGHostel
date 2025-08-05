@@ -13,7 +13,7 @@
 			<ToolbarSpacer />
 		</headerContent>
 		<content>
-			<ScrollContainer id="idJobNotAvailable" visible="{= !${JobApplicationModel>/JobTitle} }" horizontal="false" vertical="true" height="97.6%" class="sapUiContentPadding career-background sapUiTinyMargin">
+			<ScrollContainer id="idJobNotAvailable" visible="{= !${JobApplicationModel>/JobTitle} }" horizontal="false" vertical="true" height="97.6%" class="sapUiContentPadding care-background sapUiTinyMargin">
 				<l:VerticalLayout width="100%">
 					<l:BlockLayout background="Dashboard">
 						<l:BlockLayoutRow>
