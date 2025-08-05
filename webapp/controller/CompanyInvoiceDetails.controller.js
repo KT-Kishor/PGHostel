@@ -1036,6 +1036,7 @@ sap.ui.define([
             },
             onLiveTransactionID: function (oEvent) { utils._LCvalidateMandatoryField(oEvent) },
             onReceivedDateDatePickerChange: function (oEvent) { utils._LCvalidateDate(oEvent); },
+            
             onChangePaymentRecived: async function () {
                 var paymentModel = this.getView().getModel("PaymentModel").getData();
                 const isMandatoryValid =
@@ -1052,18 +1053,19 @@ sap.ui.define([
                 var receivedAmount = parseFloat((paymentModel.ReceivedAmount || "0").replaceAll(',', ''));
                 var receivedTDS = parseFloat((paymentModel.ReceivedTDS).replaceAll(',', ''));
                 var isReceivedAmountInvalid = isNaN(receivedAmount) || receivedAmount <= 0;
-                var isReceivedTDSInvalid = isNaN(receivedTDS) || receivedTDS <= 0;
+                var isReceivedTDSInvalid = isNaN(receivedTDS) || receivedTDS < 0;
 
                 if (isReceivedAmountInvalid) {
                     sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
                 } else {
                     sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 }
-
-                if (isReceivedTDSInvalid) {
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("Error").setValueStateText(this.i18nModel.getText("tdsAmountError"));
-                } else {
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                if (paymentModel.Currency === "INR") {
+                    if (isReceivedTDSInvalid) {
+                        sap.ui.getCore().byId("idReceivedTDS").setValueState("Error").setValueStateText(this.i18nModel.getText("tdsAmountError"));
+                    } else {
+                        sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                    }
                 }
 
                 if (isReceivedAmountInvalid || isReceivedTDSInvalid) {
