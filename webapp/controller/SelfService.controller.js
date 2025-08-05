@@ -406,9 +406,49 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     }
                 }
             },
+            _validateAllRequiredFieldsForSubmit: function () {
+                const oView = this.getView();
+                const bIsValid =
+                    // --- Basic Details Section ---
+                    utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                    utils._LCstrictValidationComboBox(oView.byId("SS_id_BloodGroup"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
+                    utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
 
+                    // --- Emergency Contact 1 ---
+                    utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
+                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
+
+                    // --- Emergency Contact 2 ---
+                    utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
+                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
+
+                    // --- Bank Details Section ---
+                    utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
+                    utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
+                    utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
+                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
+
+                    // --- Personal IDs Section ---
+                    utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
+                    utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
+
+                return bIsValid;
+            },
             onPressSubmit: async function (oEvent) {
                 const that = this;
+                if (!this._validateAllRequiredFieldsForSubmit()) {
+                    MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
+                    return;
+                }
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
                 if (!oModel || oModel.items.length === 0) {
@@ -768,12 +808,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.ViewModel.setProperty("/fragmentSave", false);
                 this.SS_commonEmpFunction();
                 this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
-            },
-            EmpF_onAddEmployment: function () {
-                this.ViewModel.setProperty("/fragmentSubmit", true);
-                this.ViewModel.setProperty("/fragmentSave", false);
-                this.SS_commonEmpFunction();
-                this.SS_commonOpenDialog("SEmp_oDialog", "sap.kt.com.minihrsolution.fragment.AddEmployment", ["AddEmp_id_StartDate", "AddEmp_id_EndDate"]);
+                setTimeout(() => {
+                    sap.ui.getCore().byId("AddEmp_id_ExpTypeRadioGroup").setSelectedIndex(1);
+                }, 0);
             },
 
             EmpF_onEditEmployment: function () {
@@ -1949,7 +1986,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-           FSA_onPressSubmit: async function () {
+            FSA_onPressSubmit: async function () {
                 try {
                     await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
                         branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode
@@ -2048,11 +2085,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     doc.text(oComapnyModel.designation, pageWidth - 7, 16, { align: "center" });
 
                     doc.addImage(coImg, pageWidth - 5, 0.1, 4, 4);
-                    this.closeBusyDialog(); 
-                   doc.save("SpotAward_Certificate.pdf");
-                    this.oDialog.close();   
+                    this.closeBusyDialog();
+                    doc.save("SpotAward_Certificate.pdf");
+                    this.oDialog.close();
                 } catch (error) {
-                     sap.m.MessageToast.show("An error occurred while generating the certificate. Please try again.");
+                    sap.m.MessageToast.show("An error occurred while generating the certificate. Please try again.");
                 } finally {
                     this.closeBusyDialog();
                 }
@@ -2268,11 +2305,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", false)
-                   // this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                    // this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this._onPressPreview("Initial");
                 } else {
                     this.getView().getModel("viewModel").setProperty("/backButtonVisible", false)
-                  //  this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
+                    //  this.getView().getModel("viewModel").setProperty("/closeButtonVisible", true)
                     this.getView().getModel("viewModel").setProperty("/BtnVisible", true);
                     this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     this.getView().getModel("viewModel").setProperty("/editableResignatin", true)
@@ -2341,15 +2378,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         ${designation}<br/>
         ${this.companyName}</p>
     </div>
-`;                 
+`;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
                 if(flag !== "Preview"){
                     if(new Date(oEmployeeModel.ResignationEndDate) < new Date()){
-                    this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
-                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+                        this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
                     }else{
-                    this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
+                        this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                     }
                 }
             },
@@ -2495,6 +2532,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             SS_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+            },
+            onExperienceTypeChange: function (oEvent) {
+                const iSelectedIndex = oEvent.getParameter("selectedIndex");
+                // If "Fresher" (index 0) is selected
+                if (iSelectedIndex === 0) {
+                    // Show a message and close the dialog
+                    MessageToast.show(this.i18nModel.getText("fresherNoDetailsNeeded"));
+                    this.AddEmp_onClose(); 
+                }
             },
         });
     });
