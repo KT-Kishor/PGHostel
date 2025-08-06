@@ -254,28 +254,43 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
                 this._oActionBtn.openBy(oBtn);
             },
-            SS_readEducationalDetails: async function (filter) {
+            SS_readEducationalDetails: async function (filter, showBusy = true) {
                 try {
-                    this.getBusyDialog();
+                    if (showBusy) {
+                        this.getBusyDialog();
+                    }
                     const oData = await this.ajaxReadWithJQuery("EducationalDetails", { EmployeeID: filter },);
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "sEducationModel");
-                    this.closeBusyDialog();
+                    const oModel = new JSONModel(offerData);
+                    this.getOwnerComponent().setModel(oModel, "sEducationModel");
+                    return oModel; // Return the model
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
-                    this.closeBusyDialog();
+                    return null; // Return null in case of error
+                } finally {
+                    if (showBusy) {
+                        this.closeBusyDialog();
+                    }
                 }
             },
-            SS_readEmploymentDetails: async function (filter) {
+
+            SS_readEmploymentDetails: async function (filter, showBusy = true) {
                 try {
-                    this.getBusyDialog();
+                    if (showBusy) {
+                        this.getBusyDialog();
+                    }
                     const oData = await this.ajaxReadWithJQuery("EmploymentDetails", { EmployeeID: filter },);
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    this.getOwnerComponent().setModel(new JSONModel(offerData), "sEmploymentModel");
-                    this.closeBusyDialog();
+                    const oModel = new JSONModel(offerData);
+                    this.getOwnerComponent().setModel(oModel, "sEmploymentModel");
+                    return oModel; // Return the model
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
-                    this.closeBusyDialog();
+                    return null; // Return null in case of error
+                } finally {
+                    if (showBusy) {
+                        this.closeBusyDialog();
+                    }
                 }
             },
             SS_commonEduFunction() {
@@ -445,24 +460,30 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
             onPressSubmit: async function (oEvent) {
                 const that = this;
-                if (!this._validateAllRequiredFieldsForSubmit()) {
-                    MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
-                    return;
-                }
-                // this.getBusyDialog(); 
+                this.getBusyDialog();
                 try {
+                    if (!this._validateAllRequiredFieldsForSubmit()) {
+                        MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
+                        return;
+                    }
+
                     const oViewModel = this.getView().getModel("viewModel");
                     const bIsExperienced = oViewModel.getProperty("/isExperienced");
                     // --- Proactively load and then validate Education Data ---
-                    await this.SS_readEducationalDetails(this.EmployeeID);
-                    let oEducationModel = this.getView().getModel("sEducationModel");
-                    let aEducationData = oEducationModel ? oEducationModel.getData() : [];
+                    let aEducationData = [];
+                    try {
+                        const oEducationModel = await this.SS_readEducationalDetails(this.EmployeeID, false); // Suppress busy indicator
+                        aEducationData = oEducationModel ? oEducationModel.getData() : [];
+                    } catch (error) {
+                        MessageToast.show("Error loading education details.");
+                        return;
+                    }
                     // Check for a minimum of two educational records.
                     if (aEducationData.length < 2) {
                         MessageBox.error(this.i18nModel.getText("minEducationRecordsError"), {
                             title: this.i18nModel.getText("educationErrorTitle")
                         });
-                        return; // Stop 
+                        return; // Stop
                     }
                     // Check that one of the records is "School/10th".
                     const aProvidedDegrees = aEducationData.map(edu => edu.DegreeName);
@@ -473,17 +494,29 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         return;
                     }
                     // --- Proactively load and then validate Employment Data ---
-                    await this.SS_readEmploymentDetails(this.EmployeeID);
-                    const oEmploymentModel = this.getView().getModel("sEmploymentModel");
-                    const aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
-                    if (bIsExperienced && aEmploymentData.length < 1) {
-                        MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
-                            title: this.i18nModel.getText("educationErrorTitle")
-                        });
-                        return;
+                    let aEmploymentData = [];
+                    if (bIsExperienced) {
+                        try {
+                            const oEmploymentModel = await this.SS_readEmploymentDetails(this.EmployeeID, false); // Suppress busy indicator
+                            aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
+                        } catch (error) {
+                            MessageToast.show("Error loading employment details.");
+                            return;
+                        }
+                        if (aEmploymentData.length < 1) {
+                            MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
+                                title: this.i18nModel.getText("educationErrorTitle")
+                            });
+                            return;
+                        }
                     }
                     // --- Proactively load and then validate Document Data ---
-                    await this.ReadEmployeeDocument();
+                    try {
+                        await this.ReadEmployeeDocument(false); // Pass false to suppress busy indicator
+                    } catch (error) {
+                        MessageToast.show("Error loading document details.");
+                        return;
+                    }
                     let aRequiredDocNames = ["Pan Card", "Aadhar Card"];
                     const aEducationDocRequirements = aEducationData.map(edu => edu.DegreeName);
                     aRequiredDocNames = aRequiredDocNames.concat(aEducationDocRequirements);
@@ -509,7 +542,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } catch (error) {
                     MessageToast.show("An error occurred during validation. Please try again.");
                 } finally {
-                    // this.closeBusyDialog(); // Always close the busy indicator
+                    this.closeBusyDialog(); // Always close the busy indicator
                 }
             },
 
@@ -989,19 +1022,23 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
             },
 
-            ReadEmployeeDocument: async function () {
+            ReadEmployeeDocument: async function (showBusy = true) {
                 try {
-                    this.getBusyDialog();
+                    if (showBusy) {
+                        this.getBusyDialog();
+                    }
                     const oData = await this.ajaxReadWithJQuery("EmployeeDocument", { EmployeeID: this.EmployeeID });
                     const offerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     const wrappedData = {
                         items: offerData
                     };
                     this.getOwnerComponent().setModel(new JSONModel(wrappedData), "DocumentModel");
-                    this.closeBusyDialog();
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
-                    this.closeBusyDialog();
+                } finally {
+                    if (showBusy) {
+                        this.closeBusyDialog();
+                    }
                 }
             },
 
