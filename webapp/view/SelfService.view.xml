@@ -138,6 +138,15 @@
                                                 text="{i18n>basicDetails}"
                                             />
 											<m:ToolbarSpacer />
+                                              <m:Label  text="{i18n>expProf}"/>
+                                            <m:Switch
+                                                   id="SS_experienceSwitch"
+                                                   state="{viewModel>/isExperienced}"
+                                                   customTextOn="{i18n>experienced}"
+                                                   customTextOff="{i18n>fresher}"
+                                                   enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"                                                   class="sapUiSmallMarginEnd"
+                                                   change="SS_onExperienceSwitchChange">
+                                             </m:Switch>
 											<m:Button
                                                 id="BasicDetailsBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
@@ -958,6 +967,7 @@
                             id="employmentSS1"
                             title="{i18n>employmentDetails}"
                             titleUppercase="false"
+                            visible="{viewModel>/isExperienced}"
                         >
 							<blocks>
 								<m:Table sticky="ColumnHeaders,HeaderToolbar"

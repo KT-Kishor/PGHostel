@@ -6,15 +6,6 @@
 
 	<Dialog showHeader="true" title="{i18n>employmentDetails}" id="AddEmp_id_Dialog">
 		<content>
-			<VBox class="sapUiSmallMargin">
-				<Label text="{i18n>employmentType}" class="sapUiTinyMarginBottom" />
-				<RadioButtonGroup id="AddEmp_id_ExpTypeRadioGroup" selectedIndex="1" select="onExperienceTypeChange">
-					<buttons>
-						<RadioButton id="fresherRadio" text="{i18n>fresher}" />
-						<RadioButton id="experiencedRadio" text="{i18n>experienced}" />
-					</buttons>
-				</RadioButtonGroup>
-			</VBox>
 			<ScrollContainer horizontal="true" vertical="true">
 				<l:BlockLayout background="Dashboard">
 					<l:BlockLayoutRow>

@@ -26,7 +26,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: true, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -448,6 +448,26 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 if (!this._validateAllRequiredFieldsForSubmit()) {
                     MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
                     return;
+                }
+                const oViewModel = this.getView().getModel("viewModel");
+                const bIsExperienced = oViewModel.getProperty("/isExperienced");
+                const oEducationModel = this.getView().getModel("sEducationModel");
+                const aEducationData = oEducationModel ? oEducationModel.getData() : [];
+                const oEmploymentModel = this.getView().getModel("sEmploymentModel");
+                const aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
+                // ---  Check for at least 2 educational records (always required) ---
+                if (aEducationData.length < 2) {
+                    MessageBox.error(this.i18nModel.getText("minEducationRecordsError"), {
+                        title: this.i18nModel.getText("educationErrorTitle")
+                    });
+                    return; // Stop submission
+                }
+                // - If experienced, check for at least 1 employment record ---
+                if (bIsExperienced && aEmploymentData.length < 1) {
+                    MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
+                        title: this.i18nModel.getText("educationErrorTitle") // Reusing the same title for consistency
+                    });
+                    return; // Stop submisssion
                 }
                 await this.ReadEmployeeDocument();
                 var oModel = this.getView().getModel("DocumentModel").getData();
@@ -1035,7 +1055,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         content: [],
                         endButton: new sap.m.Button({
                             text: "Close",
-                            type :"Reject",
+                            type: "Reject",
                             press: function () {
                                 if (this._pdfBlobUrl) {
                                     URL.revokeObjectURL(this._pdfBlobUrl);
@@ -2381,11 +2401,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 `;
                 this.getView().getModel("PDFData").setProperty("/RTEText", data);
                 this.getView().getModel("PDFData").setProperty("/PreviewFlag", true);
-                if(flag !== "Preview"){
-                    if(new Date(oEmployeeModel.ResignationEndDate) < new Date()){
+                if (flag !== "Preview") {
+                    if (new Date(oEmployeeModel.ResignationEndDate) < new Date()) {
                         this.getView().getModel("viewModel").setProperty("/BtnVisible", false);
                         this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
-                    }else{
+                    } else {
                         this.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", true);
                     }
                 }
@@ -2533,14 +2553,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
             },
-            onExperienceTypeChange: function (oEvent) {
-                const iSelectedIndex = oEvent.getParameter("selectedIndex");
-                // If "Fresher" (index 0) is selected
-                if (iSelectedIndex === 0) {
-                    // Show a message and close the dialog
-                    MessageToast.show(this.i18nModel.getText("fresherNoDetailsNeeded"));
-                    this.AddEmp_onClose(); 
+            SS_onExperienceSwitchChange: function (oEvent) {
+                const bIsExperienced = oEvent.getParameter("state");
+                const oEmploymentSection = this.byId("employmentSS1");
+                if (oEmploymentSection) {
+                    oEmploymentSection.setVisible(bIsExperienced);
                 }
-            },
+                if (!bIsExperienced) {
+                    // MessageToast.show(this.i18nModel.getText("employmentDetailsHidden"));
+                }
+            }
         });
     });
