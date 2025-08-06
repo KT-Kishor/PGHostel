@@ -1,5 +1,3 @@
-/*Frist Part*/
-
 /* captcha text style */
 .sapMInputBaseError {
   border: 1px solid red !important;
@@ -27,11 +25,7 @@
   margin: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-@media (min-width: 1024px) {
-  .myHeaderContentFlexBox {
-    flex-wrap: nowrap !important;
-  }
-}
+
 .chatBubbleMe {
   background-color: #bcedea; /* Light green background */
 }
@@ -255,18 +249,6 @@
   align-items: center;
 }
 
-.career-background{
-  background-image: url('../image/career1.jpg');
-  background-size: cover; 
-  background-position: center; 
-  background-repeat: no-repeat; 
-}
-
-.career-background {
-  position: relative; 
-  height: 100%; 
-}
-
 .service-background {
   background-image: url("../image/custom-software-banner.jpg");
   background-size: cover;
@@ -330,6 +312,7 @@
 .contact-touch {
   background-color: white;
   border-radius: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .expert-background {
@@ -492,6 +475,7 @@
 
 .service-section-text {
   line-height: 1.8;
+  font-family: sans-serif;
   font-size: 16px;
 }
 
@@ -810,6 +794,21 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   color: #006064;
 } */
 
+.rightMarginCustom {
+  margin-right: 40px;
+}
+
+.floatingButton {
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+  cursor: pointer;
+  z-index: 1000;
+  border-radius: 50%;
+  height: 80px;
+  width: 110px;
+  padding: 0;
+}
 .responsiveCard {
   max-width: 700px; /* upper limit */
   width: 100%;
@@ -846,6 +845,26 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   pointer-events: none;
 }
 
+.sapMTableTH {
+  background-color: #f2b15b;
+}
+
+.myRoundedTable {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.764), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.myRoundedTable .sapMListTblHeader {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.myRoundedTable .sapMListTblFooter {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
 .noBottomSpace {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
@@ -873,6 +892,38 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 }
 
+/*33333333333333333333333333222222222222222222221111111111133333333333333333333333322222222222222222222111111111113333333333333333333333332222222222222222222211111111111111111*/
+
+/* Common box */
+.shareItemBox {
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBox:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* Last item without bottom border */
+.shareItemBoxLast {
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBoxLast:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* Optional spacing between icon and text */
+.shareText {
+  margin-left: 0.5rem;
+}
+
 .myCustomFilterBar.sapUiCompFilterBarNonPhone {
   background-image: none !important;
   background-color: white !important;
@@ -882,27 +933,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
-}
-
-.myRoundedTable {
-  margin: 1rem;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.myRoundedTable .sapMListTblHeader {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.myRoundedTable .sapMListTblFooter {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
-.sapMTableTH {
-  background-color: #f2b15b;
 }
 
 /* JOB POSTING */
@@ -930,179 +960,58 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 5px;
 }
 
-/* Common box */
-.shareItemBox {
-  padding: 0.5rem 0.7rem;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+.myTinyMargin {
+  margin: 0.25rem !important;
 }
 
-.shareItemBox:hover {
-  background-color: #f4f4f4;
-  cursor: pointer;
+.myTinyMarginTop {
+  margin-top: 0.25rem !important;
 }
 
-/* Last item without bottom border */
-.shareItemBoxLast {
-  padding: 0.5rem 0.7rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+.mySmallMargin {
+  margin: 0.5rem !important;
 }
 
-.shareItemBoxLast:hover {
-  background-color: #f4f4f4;
-  cursor: pointer;
+.mySmallMarginTop {
+  margin-top: 0.5rem !important;
 }
 
-.shareText {
-  margin-left: 0.5rem;
+.mySmallMarginBottom {
+  margin-bottom: 0.5rem !important;
+}
+
+.mySmallMarginEnd {
+  margin-inline-end: 0.5rem !important; /* For RTL support */
+}
+
+.myLargeMarginBegin {
+  margin-inline-start: 2rem !important; /* For RTL support */
+}
+
+.myLargeMarginEnd {
+  margin-inline-end: 2rem !important; /* For RTL support */
+}
+
+.myLargeMarginBottom {
+  margin-bottom: 2rem !important;
+}
+
+.myContentPadding {
+  padding: 1rem !important;
 }
 
 
-.rightMarginCustom {
-  margin-right: 40px;
-}
-
-.floatingButton {
-  position: fixed;
-  bottom: 100px;
-  right: 100px;
-  cursor: pointer;
-  z-index: 1000;
-  border-radius: 50%;
-  height: 80px;
-  width: 110px;
-  padding: 0;
-}
-
-.myCustomViewWrapper {
-  box-sizing: border-box;
-}
-
-/* Scoped reset for SAPUI5 spacing */
-.myCustomViewWrapper .sapUiTinyMargin,
-.myCustomViewWrapper .sapUiContentPadding,
-.myCustomViewWrapper .sapUiSmallMargin,
-.myCustomViewWrapper .sapUiLargeMarginBegin,
-.myCustomViewWrapper .sapUiLargeMarginEnd,
-.myCustomViewWrapper .sapUiSmallMarginLeft,
-.myCustomViewWrapper .sapUiSmallMarginRight {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Main job layout */
-.myCustomViewWrapper .mainJobContainer {
-  width: 100%;
-  display: flex;
-  box-sizing: border-box;
-  padding: 0.5rem 1rem;
-  align-items: flex-start;
-}
-
-.myCustomViewWrapper .leftColumn {
-  flex-grow: 1;
-  margin: 1rem;
-  margin-right: 32.5rem;
-  box-sizing: border-box;
-}
-
-.myCustomViewWrapper .rightColumn {
-  width: 30rem;
-  position: fixed !important;
-  top: 3.4rem !important;
-  right: 1.5rem !important;
-  margin: 1rem;
-  box-sizing: border-box;
-}
-
-/* Panels */
-.myCustomViewWrapper .contentPanel,
-.myCustomViewWrapper .actionPanel {
-  background: transparent !important;
-  padding: 0.5rem !important;
-  width: 100%;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem #17191884 !important;
-}
-
-.myCustomViewWrapper .contentPanelLimitedWidth {
-  max-width: 100% !important;
+.jobViewRoot .myScrollContainer .sapMScrollCont {
   overflow-x: hidden !important;
-  box-sizing: border-box;
 }
 
-/* Button Styles */
-.myCustomViewWrapper .myCustomButton {
-  height: 60px !important;
-  width: 345px !important;
-  font-size: 20px !important;
-  padding: 0 !important;
-  transition: all 0.2s ease-in-out;
-}
 
-.myCustomViewWrapper .myCustomButton .sapMBtnInner {
-   background-color: #141f7d !important;
-  height: 100% !important;
-  line-height: normal !important;
-  padding: 16px !important;
-  font-size: 24px !important;
-  border-radius: 8px;
-  transition: background-color 0.2s ease-in-out;
-
-}
-
-.myCustomViewWrapper .myCustomButton .sapMBtnContent {
- color: white !important;
-  font-size: 20px !important;
-  transition: font-size 0.2s ease-in-out;
-}
-
-.myCustomViewWrapper .myCustomButton:hover .sapMBtnInner {
-  background-color: #182493dc !important;
-  box-shadow: 0 0 0.5rem #17191884 !important;
-}
-
-.myCustomViewWrapper .myCustomIconBtn {
-  height: 50px !important;
-  width: 50px !important;
-  padding: 0 !important;
-}
-
- .myCustomViewWrapper .myCustomButton {
-    width: 250px !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-
-.myCustomViewWrapper .myCustomIconBtn .sapMBtnInner {
-  background-color: white !important;
-  border: 3px solid #141f7d !important;
-  border-radius: 8px;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
-.myCustomViewWrapper .myCustomIconBtn .sapMBtnIcon {
-  color: #141f7d !important;
-  font-size: 25px !important;
-  margin-left: -10px !important;
-  margin-top: 3px !important;
-}
-
-.myCustomViewWrapper .myCustomIconBtn:hover .sapMBtnInner {
-  background-color: #141f7d !important;
-}
-
-.myCustomViewWrapper .myCustomIconBtn:hover .sapMBtnIcon {
-  color: white !important;
-}
-
-/* FormattedText Styling */
-.myCustomViewWrapper .myFormattedText {
-  width: 100%;
+/*
+    * Main container for all content
+    */
+.myFormattedText {
+  width: 100% !important;
+  max-width: 100%;
   min-width: 280px;
   font-size: 1rem;
   line-height: 1.7 !important;
@@ -1112,93 +1021,237 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 0.1rem;
   color: #222 !important;
   display: block;
-  background-color: #ffffff;
   box-sizing: border-box;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  background-color: #ffffff;
 }
 
-.myCustomViewWrapper .myFormattedText p,
-.myCustomViewWrapper .myFormattedText li {
-  margin-bottom: 0.54rem;
+/*
+    * Paragraphs and lists
+    */
+.myFormattedText p,
+.myFormattedText li {
+  margin: 0 0 0.54rem 0;
+  font-size: 1rem !important;
+  line-height: 1.7 !important;
+  color: inherit !important;
+  text-align: justify;
 }
 
-.myCustomViewWrapper .myFormattedText ul,
-.myCustomViewWrapper .myFormattedText ol {
-  padding-left: 2rem;
-  margin-bottom: 0.71rem;
+/*
+    * List padding
+    */
+.myFormattedText ul,
+.myFormattedText ol {
+  padding-left: 2rem !important;
+  margin: 0 0 0.71rem 0;
 }
 
-.myCustomViewWrapper .myFormattedText h1,
-.myCustomViewWrapper .myFormattedText h2,
-.myCustomViewWrapper .myFormattedText h3,
-.myCustomViewWrapper .myFormattedText h4,
-.myCustomViewWrapper .myFormattedText h5,
-.myCustomViewWrapper .myFormattedText h6 {
-  margin: 1.19rem 0 0.8rem;
-  font-weight: 600;
+/*
+    * List items
+    */
+.myFormattedText li {
+  list-style-position: outside;
+}
+
+/*
+    * Headings
+    */
+.myFormattedText h1,
+.myFormattedText h2,
+.myFormattedText h3,
+.myFormattedText h4,
+.myFormattedText h5,
+.myFormattedText h6 {
+  margin: 1.19rem 0 0.8rem 0;
+  font-weight: 600 !important;
   line-height: 1.35;
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
+  color: #333 !important;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 0.4rem;
-  color: #333;
 }
 
-/* Text emphasis */
-.myCustomViewWrapper .myFormattedText b,
-.myCustomViewWrapper .myFormattedText strong {
-  font-weight: 700;
-  color: #111;
-}
-
-.myCustomViewWrapper .myFormattedText li strong,
-.myCustomViewWrapper .myFormattedText li b {
-  font-weight: 750;
-  font-size: 1.05rem;
-  color: #000;
-}
-
-.myCustomViewWrapper .myFormattedText blockquote {
-  padding-left: 1.5rem;
-  border-left: 4px solid #bbb;
-  background-color: #fcfcfc;
-  margin: 1.07rem 0;
+/*
+    * Emphasis and bold
+    */
+.myFormattedText em,
+.myFormattedText i {
   font-style: italic;
 }
 
-.myCustomViewWrapper .myFormattedText a {
-  color: #444;
+/*
+    * General strong/bold
+    */
+.myFormattedText strong,
+.myFormattedText b {
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  color: #111 !important;
+}
+
+/*
+    * Specific strong for list items
+    */
+.myFormattedText li strong,
+.myFormattedText li b {
+  font-weight: 750 !important;
+  color: #000 !important;
+  font-size: 1.05rem !important;
+}
+
+/*
+    * Underline, strike, highlight
+    */
+.myFormattedText u {
   text-decoration: underline;
 }
 
-.myCustomViewWrapper .myFormattedText a:hover {
-  color: #000;
-  text-decoration: none;
+.myFormattedText s,
+.myFormattedText strike {
+  text-decoration: line-through;
 }
 
-.carrer-Des {
-  font-family: sans-serif;
-  line-height: 1.5;
+.myFormattedText mark,
+.myFormattedText .highlight {
+  background-color: #a8e6cf !important;
+  color: #000 !important;
+  font-weight: bold;
 }
 
-.myCustomViewWrapper .myFormattedText code {
+/*
+    * Span general styling
+    */
+.myFormattedText span {
+  color: inherit;
+  font-family: inherit;
+}
+
+/*
+    * Superscript and subscript
+    */
+.myFormattedText sup {
+  vertical-align: super !important;
+  font-size: smaller !important;
+  line-height: 1 !important;
+}
+
+.myFormattedText sub {
+  vertical-align: sub !important;
+  font-size: smaller !important;
+  line-height: 1 !important;
+}
+
+/*
+    * Code blocks
+    */
+.myFormattedText code {
   font-family: "Fira Code", "Cascadia Code", monospace;
   background-color: #f5f5f5;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
   font-size: 0.9rem;
+  color: #333;
   white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
 }
 
-.myCustomViewWrapper .care-background, .myAppBackground {
-    background-image: url("../image/background.jpg");
-    border-radius: 12px !important;         
-    background-clip: padding-box !important;
-    box-sizing: border-box !important;
-  }
+.myFormattedText pre {
+  background-color: #eeeeee;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  overflow: auto;
+  font-family: "Fira Code", "Cascadia Code", monospace;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
+}
 
-.myCustomViewWrapper .care-background {
- background-image: url("../image/career1.jpg");
+/*
+    * Blockquote
+    */
+.myFormattedText blockquote {
+  margin: 1.07rem 0;
+  padding-left: 1.5rem;
+  border-left: 4px solid #bbb;
+  color: #444;
+  font-style: italic;
+  background-color: #fcfcfc;
+}
+
+/*
+    * Images
+    */
+.myFormattedText img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.07rem 0;
+  border-radius: 5px;
+}
+
+/*
+    * Links
+    */
+.myFormattedText a {
+  color: #444;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.myFormattedText a:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+/*
+    * Horizontal Rule
+    */
+.myFormattedText hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1.48rem 0;
+}
+
+/*
+    * Special Note Section
+    */
+.myFormattedText div > p[style*="background: #f5f5f5;"],
+.myFormattedText p.note-box {
+  background: #f5f5f5 !important;
+  padding: 18px 22px !important;
+  border-left: 4px solid #999 !important;
+  border-radius: 8px;
+  margin-top: 1.48rem !important;
+  margin-bottom: 1.48rem !important;
+  font-style: normal;
+  color: #333 !important;
+}
+
+.myFormattedText div > p[style*="background: #f5f5f5;"] strong,
+.myFormattedText p.note-box strong {
+  color: #111 !important;
+  font-weight: 700 !important;
+}
+
+/*
+    * Custom Highlight for RTE example
+    */
+.myFormattedText .alert-mark {
+  background-color: #66bb6a !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 3px !important;
+  border: 1px solid #4caf50 !important;
+}
+
+/*
+    * Background and header styles
+    */
+.career-background {
+  background-image: url("../image/career1.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -1209,8 +1262,50 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   height: 100%;
 }
 
-/* Backgrounds */
-.myCustomViewWrapper .myAppBackground {
+.carrer-Des {
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+/*
+    * Apply now button and reference button styles
+    */
+.myCustomButton {
+  height: 60px !important;
+  width: 345px !important;
+  font-size: 20px !important;
+  padding: 0 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.myCustomButton .sapMBtnInner {
+  background-color: #141f7d !important;
+  height: 100% !important;
+  line-height: normal !important;
+  padding: 16px !important;
+  font-size: 24px !important;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.myCustomButton .sapMBtnContent {
+  color: white !important;
+  font-size: 20px !important;
+  transition: font-size 0.2s ease-in-out;
+}
+
+/* Apply Now button hover effect */
+.myCustomButton:hover .sapMBtnInner {
+  background-color: #182493dc !important;
+  box-shadow: 0 0 0.5rem #17191884 !important;
+}
+
+.myCustomButton:hover .sapMBtnContent {
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+.myAppBackground {
   background-image: url("../image/background.jpg");
   background-size: cover;
   background-position: center;
@@ -1222,66 +1317,338 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   height: 100%;
 }
 
-/* Responsive - Tablet & Below */
+/*
+    * Main container for job content
+    */
+.mainJobContainer {
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  align-items: flex-start;
+}
+
+/*
+    * Desktop/Tablet layout
+    */
+.leftColumn {
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 1rem;
+  top: -1.1rem !important;
+  margin-right: 32.5rem;
+}
+
+.rightColumn {
+  width: 30rem;
+  box-sizing: border-box;
+  position: fixed !important;
+  top: 3.4rem !important;
+  right: 1.5rem !important;
+  margin: 1rem;
+}
+
+/*
+    * Panel styling
+    */
+.contentPanel,
+.actionPanel {
+  background: transparent !important;
+  padding: 0.5rem !important;
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem #17191884 !important;
+}
+
+/*
+    * Share button styles
+    */
+.myCustomIconBtn {
+  height: 50px !important;
+  width: 50px !important;
+  padding: 0 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.myCustomIconBtn .sapMBtnInner {
+  background-color: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 8px;
+  border: 3px solid #141f7d !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.myCustomIconBtn .sapMBtnIcon {
+  color: #141f7d !important;
+  font-size: 25px !important;
+  margin-left: -10px !important;
+  margin-top: 3px !important;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Share button hover effect */
+.myCustomIconBtn:hover .sapMBtnInner {
+  background-color: #141f7d !important;
+  box-shadow: 0 0 0.5rem #17191884 !important;
+}
+
+.myCustomIconBtn:hover .sapMBtnIcon {
+  color: #ffffff !important;
+}
+
+/* Global fix for FormattedText overflows */
+.contentPanelLimitedWidth {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
+}
+
+.jobViewRoot .myScrollContainer,
+.jobViewRoot .sapMScrollContScroll {
+  overflow-x: hidden !important;
+}
+.myFormattedText {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/*
+
+ */
 @media (max-width: 1200px) {
-  .myCustomViewWrapper .mainJobContainer,
-  .myCustomViewWrapper .leftColumn,
-  .myCustomViewWrapper .rightColumn {
+  .jobViewRoot #mainContainer,
+  .jobViewRoot .mainJobContainer {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 0 !important;
+    flex-wrap: wrap !important;
+  }
+
+  .jobViewRoot .leftColumn,
+  .jobViewRoot .rightColumn {
+    width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow-x: hidden !important;
   }
 
-  .myCustomViewWrapper .rightColumn {
+  .jobViewRoot .leftColumn {
+    top: 0 !important;
+  }
+
+  .jobViewRoot .rightColumn {
     position: static !important;
-    margin-top: 1rem;
+    right: auto !important;
+    margin-top: 1rem !important;
   }
 
-  .myCustomViewWrapper .myFormattedText {
-    padding: 0.5rem !important;
-    white-space: normal;
+  .jobViewRoot .myScrollContainer,
+  .jobViewRoot .sapMScrollContScroll {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
-  .myCustomViewWrapper .myCustomButton {
+  .jobViewRoot .myFormattedText {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /*
+   * Background classes bhi ab scoped hain.
+   */
+  .jobViewRoot .career-background,
+  .jobViewRoot .myAppBackground {
+    background-image: url("../image/background.jpg");
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background-clip: padding-box !important;
+    box-sizing: border-box !important;
+  }
+
+  /* `myAppBackground` ke liye specific tweaks */
+  .jobViewRoot .myAppBackground {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  /*
+   * Button styles bhi specific ho gaye hain.
+   */
+  .jobViewRoot .myCustomButton {
     width: 250px !important;
+    display: block !important;
+    margin: 0 !important;
   }
 
-  .myCustomViewWrapper .myAppBackground {
-    min-height: 100vh;
-    overflow: visible;
-  }
-}
-
-/* Responsive - Mobile */
-@media (max-width: 768px) {
-  .myCustomViewWrapper .myCustomIconBtn {
-    transform: scale(0.7);
-    transform-origin: top right;
-  }
-}
-
-/* Responsive - Extra Small Devices */
-@media (max-width: 600px) {
-  .myCustomViewWrapper .myFormattedText p,
-  .myCustomViewWrapper .myFormattedText li,
-  .myCustomViewWrapper .myFormattedText b,
-  .myCustomViewWrapper .myFormattedText strong {
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-
-  .myCustomViewWrapper .myFormattedText h1,
-  .myCustomViewWrapper .myFormattedText h2,
-  .myCustomViewWrapper .myFormattedText h3 {
-    font-size: 1rem;
-  }
-
-  .myCustomViewWrapper .contentPanel,
-  .myCustomViewWrapper .actionPanel {
+  .jobViewRoot .myCustomIconBtn {
+    height: 50px !important;
+    width: 50px !important;
     padding: 0 !important;
-    box-shadow: none !important;
+    transition: all 0.2s ease-in-out;
+    transform: scale(0.9);
+  }
+
+  .jobViewRoot .myCustomIconBtn .sapMBtnInner {
+    background-color: white !important;
+    height: 100% !important;
+    width: 100% !important;
+    border-radius: 8px;
+    border: 3px solid #141f7d !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .jobViewRoot .myCustomIconBtn .sapMBtnIcon {
+    color: #141f7d !important;
+    font-size: 25px !important;
+    margin-left: -10px !important;
+    margin-top: 3px !important;
+    transition: color 0.2s ease-in-out;
+  } 
+
+  .jobViewRoot .myCustomIconBtn:hover .sapMBtnInner {
+    background-color: #141f7d !important;
+    box-shadow: 0 0 0.5rem #17191884 !important;
+  }
+
+  .jobViewRoot .myCustomIconBtn:hover .sapMBtnIcon {
+    color: #ffffff !important;
   }
 }
 
+/*
+ * Additional tweaks for ultra-small screens (phones)
+ *  */
+@media (max-width: 600px) {
+    .jobViewRoot {
+        padding: 0 !important;
+    }
+
+    .jobViewRoot .sapMTitle.sapMTitleStyleH1,
+    .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        line-height: 1.2 !important;
+        margin: 0.5rem 0 0.5rem 0.8rem !important;
+    }
+
+     .jobViewRoot {
+        padding: 0 !important;
+    }
+
+    .jobViewRoot .sapMTitle.sapMTitleStyleH1,
+    .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        line-height: 1.2 !important;
+        margin: 0.5rem 0 0.5rem 0.8rem !important;
+    }
+    
+    .jobViewRoot .mySmallMargin.myLargeMarginBegin.sapMTitle.sapMTitleStyleH5 {
+        font-size: 0.85rem !important;
+        line-height: 1 !important;
+        margin-top: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
+        margin-inline-start: 2rem !important;
+    }
+
+    .jobViewRoot .sapMHBox {
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .jobViewRoot .sapMHBox .sapMTitle:first-child {
+        flex-shrink: 0;
+        flex-basis: 150px;
+        margin-inline-end: 0.5rem !important;
+    }
+    
+    .jobViewRoot .sapMHBox .sapMTitle:last-child {
+        flex-grow: 1;
+        text-align: left;
+        margin: 0 !important;
+    } 
+    
+      /* ========================================================= */
+      /* === Formatted Text (RTE) Section === */
+      /* ========================================================= */
+
+      .jobViewRoot .myFormattedText {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+      }
+
+      .jobViewRoot .myFormattedText p,
+      .jobViewRoot .myFormattedText li {
+            font-size: 0.75rem !important;
+            line-height: 1.3 !important;
+            margin: 0 0 0.5rem 0;
+      }
+
+      /* Normal bold text */
+      .jobViewRoot .myFormattedText strong,
+      .jobViewRoot .myFormattedText b {
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            color: #111 !important;
+      }
+      .jobViewRoot .myFormattedText li strong,
+      .jobViewRoot .myFormattedText li b {
+            font-weight: 750 !important;
+            color: #000 !important;
+            font-size: 0.85rem !important;
+      }
+
+      /* Bullet points (ul, ol) */
+      .jobViewRoot .myFormattedText ul,
+      .jobViewRoot .myFormattedText ol {
+            padding-left: 0.8rem !important;
+            margin-bottom: 0.35rem !important;
+      }
+
+      /* FormattedText headings */
+      .jobViewRoot .myFormattedText h1,
+      .jobViewRoot .myFormattedText h2,
+      .jobViewRoot .myFormattedText h3,
+      .jobViewRoot .myFormattedText h4,
+      .jobViewRoot .myFormattedText h5,
+      .jobViewRoot .myFormattedText h6 {
+            font-size: 1.1rem !important;
+            margin: 0.8rem 0 0.6rem 0;
+      }
+    .jobViewRoot .myFormattedText h6 + ul,
+    .jobViewRoot .myFormattedText h5 + ul,
+    .jobViewRoot .myFormattedText h4 + ul {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .jobViewRoot .contentPanel,
+    .jobViewRoot .actionPanel {
+        padding: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    .jobViewRoot .myCustomIconBtn {
+        transform: scale(0.7);
+    }
+}
 
