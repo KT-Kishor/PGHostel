@@ -449,34 +449,68 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
                     return;
                 }
-                const oViewModel = this.getView().getModel("viewModel");
-                const bIsExperienced = oViewModel.getProperty("/isExperienced");
-                const oEducationModel = this.getView().getModel("sEducationModel");
-                const aEducationData = oEducationModel ? oEducationModel.getData() : [];
-                const oEmploymentModel = this.getView().getModel("sEmploymentModel");
-                const aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
-                // ---  Check for at least 2 educational records (always required) ---
-                if (aEducationData.length < 2) {
-                    MessageBox.error(this.i18nModel.getText("minEducationRecordsError"), {
-                        title: this.i18nModel.getText("educationErrorTitle")
-                    });
-                    return; // Stop submission
+                // this.getBusyDialog(); 
+                try {
+                    const oViewModel = this.getView().getModel("viewModel");
+                    const bIsExperienced = oViewModel.getProperty("/isExperienced");
+                    // --- Proactively load and then validate Education Data ---
+                    await this.SS_readEducationalDetails(this.EmployeeID);
+                    let oEducationModel = this.getView().getModel("sEducationModel");
+                    let aEducationData = oEducationModel ? oEducationModel.getData() : [];
+                    // Check for a minimum of two educational records.
+                    if (aEducationData.length < 2) {
+                        MessageBox.error(this.i18nModel.getText("minEducationRecordsError"), {
+                            title: this.i18nModel.getText("educationErrorTitle")
+                        });
+                        return; // Stop 
+                    }
+                    // Check that one of the records is "School/10th".
+                    const aProvidedDegrees = aEducationData.map(edu => edu.DegreeName);
+                    if (!aProvidedDegrees.includes("School/10th")) {
+                        MessageBox.error(this.i18nModel.getText("mandatory10thDegreeError"), {
+                            title: this.i18nModel.getText("educationErrorTitle")
+                        });
+                        return;
+                    }
+                    // --- Proactively load and then validate Employment Data ---
+                    await this.SS_readEmploymentDetails(this.EmployeeID);
+                    const oEmploymentModel = this.getView().getModel("sEmploymentModel");
+                    const aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
+                    if (bIsExperienced && aEmploymentData.length < 1) {
+                        MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
+                            title: this.i18nModel.getText("educationErrorTitle")
+                        });
+                        return;
+                    }
+                    // --- Proactively load and then validate Document Data ---
+                    await this.ReadEmployeeDocument();
+                    let aRequiredDocNames = ["Pan Card", "Aadhar Card"];
+                    const aEducationDocRequirements = aEducationData.map(edu => edu.DegreeName);
+                    aRequiredDocNames = aRequiredDocNames.concat(aEducationDocRequirements);
+                    if (bIsExperienced) {
+                        aRequiredDocNames.push("Previous Company Relieving Letter", "Previous Company 3 Months Payslip");
+                    }
+                    const aUniqueRequiredDocs = [...new Set(aRequiredDocNames)];
+                    const oUploadedDocsModel = this.getView().getModel("DocumentModel");
+                    const aUploadedItems = oUploadedDocsModel ? oUploadedDocsModel.getProperty("/items") : [];
+                    const aUploadedDocTypes = aUploadedItems.map(doc => doc.DocumentType);
+                    const aMissingDocs = aUniqueRequiredDocs.filter(requiredDoc => !aUploadedDocTypes.includes(requiredDoc));
+
+                    if (aMissingDocs.length > 0) {
+                        const sMissingDocsList = aMissingDocs.join(", ");
+                        const sErrorMessage = jQuery.sap.formatMessage(this.i18nModel.getText("mandatoryDocumentsErrorText"), [sMissingDocsList]);
+                        MessageBox.error(sErrorMessage, { title: this.i18nModel.getText("mandatoryDocumentsErrorTitle") });
+                        return;
+                    }
+                    // If all validations pass, proceed to save.
+                    const ID = oEvent.getSource().getId().split("--").pop();
+                    that.SS_onSavePress(ID);
+
+                } catch (error) {
+                    MessageToast.show("An error occurred during validation. Please try again.");
+                } finally {
+                    // this.closeBusyDialog(); // Always close the busy indicator
                 }
-                // - If experienced, check for at least 1 employment record ---
-                if (bIsExperienced && aEmploymentData.length < 1) {
-                    MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
-                        title: this.i18nModel.getText("educationErrorTitle") // Reusing the same title for consistency
-                    });
-                    return; // Stop submisssion
-                }
-                await this.ReadEmployeeDocument();
-                var oModel = this.getView().getModel("DocumentModel").getData();
-                if (!oModel || oModel.items.length === 0) {
-                    sap.m.MessageBox.error(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"),
-                        { title: this.i18nModel.getText("selfsubmitErr") }); return;
-                }
-                const ID = oEvent.getSource().getId().split("--").pop();
-                that.SS_onSavePress(ID);
             },
 
             onChangeResigEndDate: function (oEvent) {

@@ -138,15 +138,6 @@
                                                 text="{i18n>basicDetails}"
                                             />
 											<m:ToolbarSpacer />
-                                              <m:Label  text="{i18n>expProf}"/>
-                                            <m:Switch
-                                                   id="SS_experienceSwitch"
-                                                   state="{viewModel>/isExperienced}"
-                                                   customTextOn="{i18n>experienced}"
-                                                   customTextOff="{i18n>fresher}"
-                                                   enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"                                                   class="sapUiSmallMarginEnd"
-                                                   change="SS_onExperienceSwitchChange">
-                                             </m:Switch>
 											<m:Button
                                                 id="BasicDetailsBtn"
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
@@ -158,6 +149,15 @@
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
+                                      <m:Label  text="{i18n>expProf}"/>
+                                            <m:Switch
+                                                   id="SS_experienceSwitch"
+                                                   state="{viewModel>/isExperienced}"
+                                                   customTextOn="{i18n>experienced}"
+                                                   customTextOff="{i18n>fresher}"
+                                                   enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"                                                   class="sapUiSmallMarginEnd"
+                                                   change="SS_onExperienceSwitchChange">
+                                             </m:Switch>
 										<m:Label text="{i18n>employeeID}" />
 										<m:Input
                                             value="{sEmployeeModel>/0/EmployeeID}"

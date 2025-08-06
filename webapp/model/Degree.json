@@ -1,7 +1,7 @@
 {
   "degree": [
     { "ID": 1, "DegreeName": "School/10th" },
-    { "ID": 2, "DegreeName": "PUC/12TH" },
+    { "ID": 2, "DegreeName": "PUC/12th" },
     
     { "ID": 3, "DegreeName": "BTech/BE" },
     { "ID": 4, "DegreeName": "MTech/ME" },
