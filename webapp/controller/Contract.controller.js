@@ -5,10 +5,10 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel", //json model
         "../utils/validation", // Import validation functions
         "sap/m/MessageToast", // Import MessageToast for displaying messages
-         "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+        "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
         "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
     ],
-    function(BaseController, Formatter, JSONModel, utils, MessageToast,Timeline, TimelineItem) {
+    function(BaseController, Formatter, JSONModel, utils, MessageToast, Timeline, TimelineItem) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.Contract", {
@@ -27,89 +27,149 @@ sap.ui.define(
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("contractDetails"));
                     try {
-                    this.C_onSearch();
+                        this._isClearPressed = false;
+                        this.C_onSearch();
                     } catch (error) {
                         sap.m.MessageToast.show(error.message || error.responseText);
                     } finally {
                         this.closeBusyDialog(); // Close after async call finishes
                     }
-                     this.initializeBirthdayCarousel();
+                    this.initializeBirthdayCarousel();
                 },
 
-                C_onSearch: async function () {
-                    this.getBusyDialog();
-                    var aFilterItems = this.byId("C_id_FilterBar").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-                    var params = {};
-                    var oStartDate, oEndDate;
-                    var dateProvided = false;
-                    aFilterItems.forEach((oItem) => {
-                        var oControl = oItem.getControl();
-                        var sValue = oItem.getName();
-                        if (oControl) {
-                            if (sValue === "Year") {
-                                oStartDate = oControl.getDateValue();
-                                oEndDate = oControl.getSecondDateValue();
-                                if (oStartDate && oEndDate) {
-                                    dateProvided = true;
+                C_onSearch: async function() {
+                    try {
+                        this.getBusyDialog();
+                        const aFilterItems = this.byId("C_id_FilterBar").getFilterGroupItems();
+                        var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                            pattern: "yyyy-MM-dd"
+                        });
+                        const params = {};
+                        let dateProvided = false;
+
+                        aFilterItems.forEach((oItem) => { // Extract filter values
+                            const oControl = oItem.getControl();
+                            const sKey = oItem.getName();
+
+                            if (oControl) {
+                                if (sKey === "Year" && oControl instanceof sap.m.DateRangeSelection) {
+                                    const oStartDate = oControl.getDateValue();
+                                    const oEndDate = oControl.getSecondDateValue();
+                                    if (oStartDate && oEndDate) {
+                                        params.AssignmentStartDate = oDateFormat.format(oStartDate);
+                                        params.AssignmentEndDate = oDateFormat.format(oEndDate);
+                                        dateProvided = true;
+                                    }
+                                } else if (oControl instanceof sap.m.ComboBox || oControl instanceof sap.m.Select) {
+                                    const sSelectedKey = oControl.getSelectedKey();
+                                    if (sSelectedKey) {
+                                        params[sKey] = sSelectedKey;
+                                    }
+                                } else if (typeof oControl.getValue === "function") {
+                                    const sValue = oControl.getValue().trim();
+                                    if (sValue) {
+                                        params[sKey] = sValue;
+                                    }
                                 }
-                            } else if (oControl.isA("sap.m.ComboBox")) {
-                                var sControlId = oControl.getId();
-                                if (sControlId.includes("idContractNoCombo")) {
-                                    var selectedKey = oControl.getSelectedKey();
-                                    if (selectedKey) params[sValue] = selectedKey;
-                                } else {
-                                    var sValueText = oControl.getValue();
-                                    if (sValueText) params[sValue] = sValueText;
-                                }
-                            } else if (oControl.getValue && oControl.getValue()) {
-                                params[sValue] = oControl.getValue();
+                            }
+                        });
+
+                        // Financial Year Logic
+                        const today = new Date();
+                        const currentYear = today.getFullYear();
+                        let fyStart, fyEnd, financialYearLabel;
+
+                        if (today.getMonth() >= 3) {
+                            fyStart = new Date(currentYear, 3, 1); // April 1
+                            fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+                            financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                        } else {
+                            fyStart = new Date(currentYear - 1, 3, 1); // April 1 last year
+                            fyEnd = new Date(currentYear, 2, 31); // March 31 this year
+                            financialYearLabel = `${currentYear - 1}-${currentYear}`;
+                        }
+
+                        if (this._isClearPressed) { // User clicked Clear
+                            delete params.AssignmentStartDate;
+                            delete params.AssignmentEndDate;
+                            delete params.FinancialYear;
+                            this._isClearPressed = false;
+                        } else if (!dateProvided) { // Apply financial year if no date selected
+                            params.AssignmentStartDate = oDateFormat.format(fyStart);
+                            params.AssignmentEndDate = oDateFormat.format(fyEnd);
+                            params.FinancialYear = financialYearLabel;
+
+                            const oDateRange = this.byId("C_id_Year");
+                            if (oDateRange) {
+                                oDateRange.setDateValue(fyStart);
+                                oDateRange.setSecondDateValue(fyEnd);
+                            }
+                        } else {
+                            // User-selected date → check if matches FY range
+                            const startDate = new Date(params.AssignmentStartDate);
+                            const endDate = new Date(params.AssignmentEndDate);
+                            if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                                params.FinancialYear = financialYearLabel;
                             }
                         }
-                    });
 
-                    // Set default financial year dates if not provided
-                    if (!dateProvided) {
-                        var fyDates = this._getFinancialYearDates();
-                        oStartDate = fyDates.start;
-                        oEndDate = fyDates.end;
-
-                        // Set back to the DateRangeSelection control
-                        var oDateRange = this.byId("C_id_Year");
-                        if (oDateRange) {
-                            oDateRange.setDateValue(oStartDate);
-                            oDateRange.setSecondDateValue(oEndDate);
-                        }
-                    }
-
-                    // Add formatted dates to params
-                    if (oStartDate && oEndDate) {
-                        params["AssignmentStartDate"] = oDateFormat.format(oStartDate);
-                        params["AssignmentEndDate"] = oDateFormat.format(oEndDate);
-                    }
-
-                    try {
-                       await this._fetchCommonData("Contract", "ContractModelInitial", {
+                        // Fetch data
+                        await this._fetchCommonData("Contract", "ContractModelInitial", {
                             AssignmentStartDate: params.AssignmentStartDate,
                             AssignmentEndDate: params.AssignmentEndDate,
                         });
 
+                        // Deduplicate EndClient values
+                        const oModel = this.getView().getModel("ContractModelInitial");
+                        const aData = oModel.getData();
+                        const uniqueEndClients = [];
+                        const seen = new Set();
+                        aData.forEach(item => {
+                            if (item.EndClient && !seen.has(item.EndClient)) {
+                                seen.add(item.EndClient);
+                                uniqueEndClients.push({
+                                    EndClient: item.EndClient
+                                });
+                            }
+                        });
+                        const oEndClientModel = new sap.ui.model.json.JSONModel(uniqueEndClients);
+                        this.getView().setModel(oEndClientModel, "EndClientModel");
+
                         await this._fetchCommonData("Contract", "ContractModel", params);
-                    } catch (error) {
-                        sap.m.MessageToast.show(error.message || error.responseText);
-                    } finally {
                         this.closeBusyDialog();
+                    } catch (error) {
+                        this.closeBusyDialog();
+                        sap.m.MessageToast.show(error.message || error.responseText || "Error during search");
                     }
                 },
 
-                _getFinancialYearDates: function () {
+                _getFinancialYearDates: function() {
                     var today = new Date();
                     var currentYear = today.getFullYear();
 
                     var fyStart = new Date(currentYear, 0, 1); // January 1st
                     var fyEnd = new Date(currentYear, 11, 31); // December 31st
 
-                    return { start: fyStart, end: fyEnd };
+                    return {
+                        start: fyStart,
+                        end: fyEnd
+                    };
+                },
+
+                C_onClearFilters: function() {
+                    const oFilterBar = this.byId("C_id_FilterBar");
+                    oFilterBar.getFilterGroupItems().forEach((item) => {
+                        const oControl = item.getControl();
+                        if (oControl instanceof sap.m.ComboBox || oControl instanceof sap.m.Select) {
+                            oControl.setSelectedKey("");
+                        } else if (oControl instanceof sap.m.Input) {
+                            oControl.setValue("");
+                        } else if (oControl instanceof sap.m.DateRangeSelection) {
+                            oControl.setDateValue(null);
+                            oControl.setSecondDateValue(null);
+                        }
+                    });
+                    this._isClearPressed = true;
                 },
 
                 onPressback: function() {
@@ -142,22 +202,6 @@ sap.ui.define(
                             sID: sAgreementNo
                         });
                     }
-                },
-                
-                C_onClearFilters: function() {
-                    const oView = this.getView();
-                    const oFilterBar = oView.byId("C_id_FilterBar");
-                    oFilterBar.getFilterGroupItems().forEach((item) => {
-                        const oControl = item.getControl();
-                        if (oControl instanceof sap.m.ComboBox || oControl instanceof sap.m.Select) {
-                            oControl.setSelectedKey(""); // Clear selected key
-                        } else if (oControl instanceof sap.m.Input) {
-                            oControl.setValue(""); // Clear input value
-                        } else if (oControl instanceof sap.m.DateRangeSelection) {
-                            oControl.setDateValue(null); // Clear date value
-                            oControl.setSecondDateValue(null); // Clear second date value
-                        }
-                    });
                 },
 
                 CD_ValidateComboBox: function(oEvent) {
@@ -200,44 +244,44 @@ sap.ui.define(
                     return `${year}-${month}-${day}`; // YYYY-MM-DD
                 },
 
-                onShowMore: function (oEvent) {
+                onShowMore: function(oEvent) {
                     var oContext = oEvent.getSource().getBindingContext("ContractModel");
                     var oData = oContext.getObject();
-                    var oComment = oData.Comments || {}; 
+                    var oComment = oData.Comments || {};
 
-                var oTimelineItem = new sap.suite.ui.commons.TimelineItem({
-                    dateTime: this.Formatter.formatDate(oData.AssignmentStartDate),
-                    text: oComment || "No comment provided",
-                    userNameClickable: false,
-                    icon: "sap-icon://comment"
-                });
+                    var oTimelineItem = new sap.suite.ui.commons.TimelineItem({
+                        dateTime: this.Formatter.formatDate(oData.AssignmentStartDate),
+                        text: oComment || "No comment provided",
+                        userNameClickable: false,
+                        icon: "sap-icon://comment"
+                    });
 
-                var oTimeline = new sap.suite.ui.commons.Timeline({
-                    showHeader: false,
-                    enableBusyIndicator: false,
-                    width: "100%",
-                    sortOldestFirst: true,
-                    enableDoubleSided: false,
-                    content: [oTimelineItem],
-                    showHeaderBar: false
-                });
+                    var oTimeline = new sap.suite.ui.commons.Timeline({
+                        showHeader: false,
+                        enableBusyIndicator: false,
+                        width: "100%",
+                        sortOldestFirst: true,
+                        enableDoubleSided: false,
+                        content: [oTimelineItem],
+                        showHeaderBar: false
+                    });
 
-                var oDialog = new sap.m.Dialog({
-                    title: this.getView().getModel("i18n").getProperty("comments"),
-                    contentWidth: "15rem",
-                    contentHeight: "5rem",
-                    draggable: true,
-                    resizable: true,
-                    content: [oTimeline],
-                    endButton: new sap.m.Button({
-                        text: "Close",
-                        type: "Reject",
-                        press: function () {
-                            oDialog.close();
-                            oDialog.destroy();
-                        }
-                    })
-                });
+                    var oDialog = new sap.m.Dialog({
+                        title: this.getView().getModel("i18n").getProperty("comments"),
+                        contentWidth: "15rem",
+                        contentHeight: "5rem",
+                        draggable: true,
+                        resizable: true,
+                        content: [oTimeline],
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            type: "Reject",
+                            press: function() {
+                                oDialog.close();
+                                oDialog.destroy();
+                            }
+                        })
+                    });
 
                     oDialog.open();
                 },
@@ -347,23 +391,23 @@ sap.ui.define(
                             this.CU_onChangeAggrementDate();
                             this.oContractDialog.open();
                             this.oContractDialog.open();
-                        this.oContractDialog.attachAfterOpen(function() {
-                            document.activeElement.blur();
-                        });
+                            this.oContractDialog.attachAfterOpen(function() {
+                                document.activeElement.blur();
+                            });
                         }.bind(this));
                     } else {
-                         this._resetDialogFields(); // Reset fields to original data
+                        this._resetDialogFields(); // Reset fields to original data
                         this.CU_onChangeAggrementDate();
-                       this.oContractDialog.open();
+                        this.oContractDialog.open();
                         this.oContractDialog.attachAfterOpen(function() {
                             document.activeElement.blur();
                         });
                     }
                 },
 
-                 _resetDialogFields: function () {
+                _resetDialogFields: function() {
                     sap.ui.getCore().byId("CR_id_AssignmentStartDate").setValueState("None")
-                      sap.ui.getCore().byId("CR_id_AssignmentEndDate").setValueState("None")
+                    sap.ui.getCore().byId("CR_id_AssignmentEndDate").setValueState("None")
                     sap.ui.getCore().byId("CR_id_EditAmountInput").setValueState("None")
                     sap.ui.getCore().byId("CR_id_Mobile").setValueState("None")
                     sap.ui.getCore().byId("CR_id_codeModel").setValueState("None")
@@ -376,66 +420,65 @@ sap.ui.define(
                     this.byId("C_id_Salary").removeSelections(true);
                 },
 
-
                 CR_onPressSubmit: async function() {
                     var oView = this.getView();
                     var oContractFormVisible = oView.getModel("ContractFormVisibleModel").getData();
                     var oModel = oView.getModel("ContractActiveModel").getData();
                     if (oModel.ContractStatus === "Renewed") {
-                            // Validate required fields for Renewed status
-                            const isMandatoryValid = (
-                                utils._LCvalidateDate(sap.ui.getCore().byId("CR_id_AssignmentStartDate"), "ID") &&
-                                utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID") 
-                            );
+                        // Validate required fields for Renewed status
+                        const isMandatoryValid = (
+                            utils._LCvalidateDate(sap.ui.getCore().byId("CR_id_AssignmentStartDate"), "ID") &&
+                            utils._LCvalidateAmount(sap.ui.getCore().byId("CR_id_EditAmountInput"), "ID")
+                        );
 
-                            if (!isMandatoryValid) {
-                                this.closeBusyDialog();
-                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                                return;
-                            }
-
-                            const rateType = oModel.HrDaliyMonth;
-                            const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
-                            const selectedCurrency = sap.ui.getCore().byId("CR_id_CurrencySelect").getSelectedKey();
-                            const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
-                            const startDate = sap.ui.getCore().byId("CR_id_AssignmentStartDate").getDateValue();
-                            const endDate = sap.ui.getCore().byId("CR_id_AssignmentEndDate").getDateValue();
-
-                            try {
-                                let jsonData = {
-                                    ContractNo: oModel.ContractNo,
-                                    AgreementNo: oModel.AgreementNo,
-                                    StartDate: this.formatDateToISO(startDate),
-                                    EndDate: this.formatDateToISO(endDate),
-                                    ContractPeriod: oModel.ContractPeriod,
-                                    ConsultantRate: ConsultantRate,
-                                    Comments: oModel.Comments,
-                                };
-
-                                this.getBusyDialog();
-                                var updateContract = await this.ajaxCreateWithJQuery("ContractStatusUpdate", jsonData);
-                                if (updateContract.success) {
-                                    MessageToast.show(this.i18nModel.getText("agreementRenewSuccess"));
-                                    this.oContractDialog.close();
-                                    this.byId("C_id_ActivateBtn").setEnabled(false);
-                                    this.byId("C_id_Renewbtn").setEnabled(false);
-                                    this.byId("C_id_Salary").removeSelections(true);
-                                    return this.C_onSearch();
-                                }
-                            } catch (error) {
-                                this.oContractDialog.close();
-                                sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
-                                this.closeBusyDialog();
-                                return;
-                            }
+                        if (!isMandatoryValid) {
+                            this.closeBusyDialog();
+                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                            return;
                         }
+
+                        const rateType = oModel.HrDaliyMonth;
+                        const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
+                        const selectedCurrency = sap.ui.getCore().byId("CR_id_CurrencySelect").getSelectedKey();
+                        const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText} Including all tax`;
+                        const startDate = sap.ui.getCore().byId("CR_id_AssignmentStartDate").getDateValue();
+                        const endDate = sap.ui.getCore().byId("CR_id_AssignmentEndDate").getDateValue();
+
+                        try {
+                            let jsonData = {
+                                ContractNo: oModel.ContractNo,
+                                AgreementNo: oModel.AgreementNo,
+                                StartDate: this.formatDateToISO(startDate),
+                                EndDate: this.formatDateToISO(endDate),
+                                ContractPeriod: oModel.ContractPeriod,
+                                ConsultantRate: ConsultantRate,
+                                Comments: oModel.Comments,
+                            };
+
+                            this.getBusyDialog();
+                            var updateContract = await this.ajaxCreateWithJQuery("ContractStatusUpdate", jsonData);
+                            if (updateContract.success) {
+                                MessageToast.show(this.i18nModel.getText("agreementRenewSuccess"));
+                                this.oContractDialog.close();
+                                this.byId("C_id_ActivateBtn").setEnabled(false);
+                                this.byId("C_id_Renewbtn").setEnabled(false);
+                                this.byId("C_id_Salary").removeSelections(true);
+                                return this.C_onSearch();
+                            }
+                        } catch (error) {
+                            this.oContractDialog.close();
+                            sap.m.MessageBox.error(this.i18nModel.getText("createNewContractFailed"));
+                            this.closeBusyDialog();
+                            return;
+                        }
+                    }
 
                     // Activation flow
                     if (oModel.ContractStatus === "New") {
                         if (oContractFormVisible.showMobileFields) {
                             const isValid = (
                                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId("CR_id_codeModel"), "ID") &&
-                                utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CR_id_Mobile"), "ID") 
+                                utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CR_id_Mobile"), "ID")
                             );
 
                             if (!isValid) {
@@ -506,7 +549,8 @@ sap.ui.define(
                     }
                     this.closeBusyDialog();
                 },
-                 getGroupHeader: function (oGroup) {
+
+                getGroupHeader: function(oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
             }

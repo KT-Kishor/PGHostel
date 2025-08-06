@@ -30,11 +30,8 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="EndClient" label="{i18n>endClient}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox
-							id="C_id_EndClient"
-							showClearIcon="true"
-							items="{path:'ContractModelInitial>/', sorter: {path:'EndClient', descending:false }}" >
-							<core:Item key="{ContractModelInitial>EndClient}" text="{ContractModelInitial>EndClient}" />
+						<ComboBox id="C_id_EndClient" showClearIcon="true" items="{path:'EndClientModel>/', sorter: {path:'EndClient', descending:false}}">
+							<core:Item key="{EndClientModel>EndClient}" text="{EndClientModel>EndClient}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>

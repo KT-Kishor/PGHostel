@@ -45,11 +45,23 @@ sap.ui.define([
                     oDateControl.setSecondDateValue(endDate);
                 }
                 try {
+                     this._isClearPressed = false;
                     if (this.oValue === "Trainee") {
                     await this._fetchCommonData("Trainee", "traineeNameModel", {
                         startDate: params.startDate,
                         endDate: params.endDate
                     });
+                     const oInitialModel = this.getView().getModel("traineeNameModel");
+                    const aInitialData = oInitialModel.getData();
+                    const uniqueTrainees = [];
+                    const seenNames = new Set();
+                    aInitialData.forEach(item => {
+                        if (item.TraineeName && !seenNames.has(item.TraineeName)) {
+                            seenNames.add(item.TraineeName);
+                            uniqueTrainees.push(item);
+                        }
+                    });
+                    oInitialModel.setData(uniqueTrainees);
                     await this._fetchCommonData("Trainee", "traineeModel", params);
                 } else {
                     this.T_onSearch(); // triggers date fallback logic inside
@@ -385,60 +397,97 @@ sap.ui.define([
                     sParEmployee: oTraineeModel.NameSalutation
                 });
             },
-            T_onSearch: async function() {
+            T_onSearch: async function () {
                 try {
                     this.getBusyDialog();
 
-                    var aFilterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                        pattern: "yyyy-MM-dd"
-                    });
-                    var params = {};
+                    const filterItems = this.byId("T_id_Filterbar").getFilterGroupItems();
+                    const params = {};
+                    let joiningDateProvided = false;
 
-                    var oStartDate, oEndDate;
-                    var dateProvided = false;
+                    // Extract values from filter items
+                    filterItems.forEach((item) => {
+                        const control = item.getControl();
+                        const key = item.getName();
 
-                    aFilterItems.forEach(function(oItem) {
-                        var oControl = oItem.getControl();
-                        var sValue = oItem.getName();
-
-                        if (sValue === "JoiningDate" && oControl) {
-                            oStartDate = oControl.getDateValue();
-                            oEndDate = oControl.getSecondDateValue();
-
-                            if (oStartDate && oEndDate) {
-                                dateProvided = true;
+                        if (control && typeof control.getValue === "function") {
+                            const value = control.getValue().trim();
+                            if (value) {
+                                params[key] = value;
                             }
-                        } else if (oControl && oControl.getValue) {
-                            var val = oControl.getValue();
-                            if (val) params[sValue] = val;
+                        }
+
+                        if (key === "JoiningDate" && control?.getDateValue() && control?.getSecondDateValue()) {
+                            const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                                pattern: "yyyy-MM-dd"
+                            });
+                            const start = oDateFormat.format(control.getDateValue());
+                            const end = oDateFormat.format(control.getSecondDateValue());
+                            params.startDate = start;
+                            params.endDate = end;
+                            joiningDateProvided = true;
                         }
                     });
 
-                    // If no date selected, apply default year
-                    if (!dateProvided) {
-                        const { startDate, endDate} = this._getCurrentYearDates();
-                        oStartDate = startDate;
-                        oEndDate = endDate;
+                    // Financial year logic
+                    const currentYear = new Date().getFullYear();
+                    let fyStart, fyEnd, financialYearLabel;
 
-                        const oDateControl = this.byId("T_id_JoiningDate");
-                        if (oDateControl) {
-                            oDateControl.setDateValue(startDate);
-                            oDateControl.setSecondDateValue(endDate);
+                    if (new Date().getMonth() >= 3) {
+                        fyStart = new Date(currentYear, 3, 1);
+                        fyEnd = new Date(currentYear + 1, 2, 31);
+                        financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                    } else {
+                        fyStart = new Date(currentYear - 1, 3, 1);
+                        fyEnd = new Date(currentYear, 2, 31);
+                        financialYearLabel = `${currentYear - 1}-${currentYear}`;
+                    }
+
+                    const formatDate = (date) => date.toISOString().split("T")[0];
+                    if (this._isClearPressed) {
+                        delete params.startDate;
+                        delete params.endDate;
+                        delete params.FinancialYear;
+                        this._isClearPressed = false;
+                    } else if (!joiningDateProvided) {
+                        params.startDate = formatDate(fyStart);
+                        params.endDate = formatDate(fyEnd);
+                        params.FinancialYear = financialYearLabel;
+                        const dateRangeControl = this.byId("T_id_JoiningDate");
+                        if (dateRangeControl) {
+                            dateRangeControl.setDateValue(fyStart);
+                            dateRangeControl.setSecondDateValue(fyEnd);
+                        }
+                    } else {
+                        const startDate = new Date(params.startDate);
+                        const endDate = new Date(params.endDate);
+                        if (
+                            startDate.getTime() === fyStart.getTime() &&
+                            endDate.getTime() === fyEnd.getTime()
+                        ) {
+                            params.FinancialYear = financialYearLabel;
                         }
                     }
 
-                    if (oStartDate && oEndDate) {
-                        params["startDate"] = oDateFormat.format(oStartDate);
-                        params["endDate"] = oDateFormat.format(oEndDate);
-                    }
-
-                    if (params && Object.keys(params).length > 0) {
-                        this.Filter = false;
-                    }
-
+                    // Fetch initial data to get unique trainee names
                     await this._fetchCommonData("Trainee", "traineeNameModel", {
-                    startDate: params.startDate, endDate: params.endDate});
+                        startDate: params.startDate,
+                        endDate: params.endDate
+                    });
+
+                    const oInitialModel = this.getView().getModel("traineeNameModel");
+                    const aInitialData = oInitialModel.getData();
+                    const uniqueTrainees = [];
+                    const seenNames = new Set();
+                    aInitialData.forEach(item => {
+                        if (item.TraineeName && !seenNames.has(item.TraineeName)) {
+                            seenNames.add(item.TraineeName);
+                            uniqueTrainees.push(item);
+                        }
+                    });
+                    oInitialModel.setData(uniqueTrainees);
+
+                    // Fetch filtered data
                     await this._fetchCommonData("Trainee", "traineeModel", params);
                     this.T_ButtonVisibility();
                     this.T_Button();
@@ -465,6 +514,7 @@ sap.ui.define([
                         }
                     }
                 });
+                 this._isClearPressed = true;
             },
             //Traniee certificate mail function
             T_onCerMail: async function() {

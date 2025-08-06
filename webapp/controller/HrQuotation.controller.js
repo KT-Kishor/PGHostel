@@ -4,18 +4,19 @@ sap.ui.define(
         "../model/formatter",
         "sap/ui/model/json/JSONModel",
     ],
-    function (BaseController, Formatter, JSONModel) {
+    function(BaseController, Formatter, JSONModel) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.HrQuotation", {
             Formatter: Formatter,
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteHrQuotation").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function() {
                 var LoginFunction = await this.commonLoginFunction("HrQuotation");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
+                this._isClearPressed = false;
                 // Initialize filters model if it doesn't exist
                 if (!this.getView().getModel("/filters")) {
                     this.getView().setModel(new JSONModel({
@@ -51,16 +52,16 @@ sap.ui.define(
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
 
                 if (this.oValue === "HrQuotation") {
-                     this.HQ_onSearch();
+                    this.HQ_onSearch();
                 } else {
                     // Ensure search is called even if not HrQuotation
-                     this.HQ_onSearch();
+                    this.HQ_onSearch();
                 }
                 this.closeBusyDialog();
                 this.initializeBirthdayCarousel();
             },
 
-            onTableUpdateFinished: function (oEvent) {
+            onTableUpdateFinished: function(oEvent) {
                 // Update the count in the header when table updates
                 var oTable = this.byId("HQ_id_QuotationItemTable");
                 var oTitle = oTable.getHeaderToolbar().getContent()[0];
@@ -68,7 +69,7 @@ sap.ui.define(
                 oTitle.setText(this.getView().getModel("i18n").getResourceBundle().getText("quotaionDetails") + " (" + iLength + ")");
             },
 
-            _getFinancialYearDates: function () {
+            _getFinancialYearDates: function() {
                 var today = new Date();
                 var currentMonth = today.getMonth() + 1;
                 var currentYear = today.getFullYear();
@@ -90,7 +91,7 @@ sap.ui.define(
             },
 
             // Helper function to format date for backend
-            _formatDateForBackend: function (date) {
+            _formatDateForBackend: function(date) {
                 if (!date) return null;
                 var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
                     pattern: "yyyy-MM-dd"
@@ -98,73 +99,83 @@ sap.ui.define(
                 return oDateFormat.format(date);
             },
 
-            HQ_onSearch: async function () {
-                this.getBusyDialog();
+            HQ_onSearch: async function() {
+                try {
+                    this.getBusyDialog();
+                    const aFilterItems = this.byId("HQ_id_QuotationFilterBar").getFilterGroupItems();
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                        pattern: "yyyy-MM-dd"
+                    });
+                    const params = {};
+                    let dateProvided = false;
 
-                var aFilterItems = this.byId("HQ_id_QuotationFilterBar").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                    pattern: "yyyy-MM-dd"
-                });
-                var params = {};
-                var oStartDate, oEndDate;
-                var dateProvided = false;
+                    // Read filters
+                    aFilterItems.forEach((oItem) => {
+                        const oControl = oItem.getControl();
+                        const sName = oItem.getName();
 
-                // Loop through filter group items and extract values
-                aFilterItems.forEach((oItem) => {
-                    var oControl = oItem.getControl();
-                    var sName = oItem.getName();
-
-                    if (oControl) {
-                        if (sName === "Date") {
-                            oStartDate = oControl.getDateValue();
-                            oEndDate = oControl.getSecondDateValue();
-                            if (oStartDate && oEndDate) {
-                                dateProvided = true;
+                        if (oControl) {
+                            if (sName === "Date") {
+                                const oStartDate = oControl.getDateValue();
+                                const oEndDate = oControl.getSecondDateValue();
+                                if (oStartDate && oEndDate) {
+                                    params["DateFrom"] = oDateFormat.format(oStartDate);
+                                    params["DateTo"] = oDateFormat.format(oEndDate);
+                                    dateProvided = true;
+                                }
+                            } else if (oControl.isA("sap.m.ComboBox")) {
+                                const selectedKey = oControl.getSelectedKey();
+                                if (selectedKey) {
+                                    params[sName] = selectedKey;
+                                }
+                            } else if (typeof oControl.getValue === "function" && oControl.getValue()) {
+                                params[sName] = oControl.getValue();
                             }
-                        } else if (oControl.isA("sap.m.ComboBox")) {
-                            var selectedKey = oControl.getSelectedKey();
-                            if (selectedKey) {
-                                params[sName] = selectedKey;
-                            }
-                        } else if (oControl.getValue && oControl.getValue()) {
-                            params[sName] = oControl.getValue();
+                        }
+                    });
+
+                    // Financial Year fallback
+                    const fy = this._getFinancialYearDates();
+                    const financialYearLabel = fy.start.getFullYear() + "-" + fy.end.getFullYear();
+
+                    if (this._isClearPressed) {
+                        // Skip filters
+                        delete params.DateFrom;
+                        delete params.DateTo;
+                        delete params.FinancialYear;
+                    } else if (!dateProvided) {
+                        // No user date selection → use FY
+                        params["DateFrom"] = oDateFormat.format(fy.start);
+                        params["DateTo"] = oDateFormat.format(fy.end)
+                        params["FinancialYear"] = financialYearLabel;
+
+                        const oDateControl = this.byId("HQ_id_Quotaiondate");
+                        if (oDateControl) {
+                            oDateControl.setDateValue(fy.start);
+                            oDateControl.setSecondDateValue(fy.end);
+                        }
+                    } else {
+                        // Check if selected dates match FY
+                        const selectedStart = new Date(params["DateFrom"]);
+                        const selectedEnd = new Date(params["DateTo"]);
+                        if (
+                            selectedStart.getTime() === fy.start.getTime() &&
+                            selectedEnd.getTime() === fy.end.getTime()
+                        ) {
+                            params["FinancialYear"] = financialYearLabel;
                         }
                     }
-                });
 
-                // Set default financial year dates if not provided
-                if (!dateProvided) {
-                    var fyDates = this._getFinancialYearDates();
-                    oStartDate = fyDates.start;
-                    oEndDate = fyDates.end;
+                    // Set filters to model
+                    this.getView().getModel("filters")?.setData(params);
 
-                    // Set back to DateRangeSelection control
-                    var oDateRange = this.byId("HQ_id_Quotaiondate");
-                    if (oDateRange) {
-                        oDateRange.setDateValue(oStartDate);
-                        oDateRange.setSecondDateValue(oEndDate);
-                    }
-                }
-
-                // Add formatted dates to params
-                if (oStartDate && oEndDate) {
-                    params["DateFrom"] = oDateFormat.format(oStartDate);
-                    params["DateTo"] = oDateFormat.format(oEndDate);
-                }
-
-                // Update filters model
-                var oFiltersModel = this.getView().getModel("filters");
-                if (oFiltersModel) {
-                    oFiltersModel.setData(params);
-                }
-
-                try {
+                    // Fetch all data
                     await this._fetchCommonData("Quotation", "AllQuotationsModel", {
                         DateFrom: params.DateFrom,
                         DateTo: params.DateTo
                     });
 
-                    // Fetch filtered data
+                    // Fetch filtered view data
                     await this._fetchCommonData("Quotation", "CompanyQuotationModel", {
                         QuotationNo: params.QuotationNo || null,
                         CustomerName: params.CustomerName || null,
@@ -172,12 +183,12 @@ sap.ui.define(
                         DateTo: params.DateTo
                     });
 
-                    // Apply client-side table filtering
-                    var oTable = this.byId("HQ_id_QuotationItemTable");
-                    var oBinding = oTable.getBinding("items");
+                    // Filter table
+                    const oTable = this.byId("HQ_id_QuotationItemTable");
+                    const oBinding = oTable.getBinding("items");
 
                     if (oBinding) {
-                        var aFilters = [];
+                        const aFilters = [];
 
                         if (params.DateFrom && params.DateTo) {
                             aFilters.push(new sap.ui.model.Filter("Date", "BT", params.DateFrom, params.DateTo));
@@ -189,61 +200,68 @@ sap.ui.define(
                             aFilters.push(new sap.ui.model.Filter("CustomerName", "Contains", params.CustomerName));
                         }
 
-                        var oCombinedFilter = aFilters.length > 0 ? new sap.ui.model.Filter(aFilters, true) : null;
-                        oBinding.filter(oCombinedFilter);
+                        const oFilter = aFilters.length ? new sap.ui.model.Filter(aFilters, true) : null;
+                        oBinding.filter(oFilter);
 
                         this.onTableUpdateFinished();
 
                         await new Promise(resolve => {
-                            oTable.attachEventOnce("updateFinished", function () {
+                            oTable.attachEventOnce("updateFinished", () => {
                                 setTimeout(() => {
                                     this._refreshFilterBarDropdowns();
                                     resolve();
                                 }, 200);
-                            }.bind(this));
+                            });
                         });
                     }
+
                 } catch (error) {
                     console.error("Search error:", error);
-                    sap.m.MessageToast.show("An error occurred during search");
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage") || "Error during search.");
                 } finally {
                     this.closeBusyDialog();
                 }
             },
 
-           _refreshFilterBarDropdowns: function () {
-                var oAllQuotationsModel = this.getView().getModel("AllQuotationsModel");
+            _refreshFilterBarDropdowns: function() {
+                const oAllQuotationsModel = this.getView().getModel("AllQuotationsModel");
                 if (!oAllQuotationsModel) return;
 
-                var aAllData = oAllQuotationsModel.getData() || [];
+                const aAllData = oAllQuotationsModel.getData() || [];
+                let aFilteredData = [];
 
-                //  Get date range selected from filter bar (fallback to FY dates)
-                var oDateRange = this.byId("HQ_id_Quotaiondate");
-                var oStartDate = oDateRange?.getDateValue();
-                var oEndDate = oDateRange?.getSecondDateValue();
+                if (this._isClearPressed) {
+                    aFilteredData = aAllData; // No filtering — use all data
+                    this._isClearPressed = false;
+                } else {
+                    let oStartDate, oEndDate; // Filter by selected date range or fallback to FY
+                    const oDateRange = this.byId("HQ_id_Quotaiondate");
 
-                if (!oStartDate || !oEndDate) {
-                    var fyDates = this._getFinancialYearDates();
-                    oStartDate = fyDates.start;
-                    oEndDate = fyDates.end;
+                    if (oDateRange?.getDateValue() && oDateRange?.getSecondDateValue()) {
+                        oStartDate = oDateRange.getDateValue();
+                        oEndDate = oDateRange.getSecondDateValue();
+                    } else {
+                        const fyDates = this._getFinancialYearDates();
+                        oStartDate = fyDates.start;
+                        oEndDate = fyDates.end;
+                    }
+
+                    aFilteredData = aAllData.filter(oItem => {
+                        const sItemDate = oItem.Date;
+                        if (!sItemDate) return false;
+
+                        const oItemDate = new Date(sItemDate);
+                        return oItemDate >= oStartDate && oItemDate <= oEndDate;
+                    });
                 }
 
-                // Filter AllQuotationsModel data by selected range
-                var aFilteredFYData = aAllData.filter(oItem => {
-                    var sItemDate = oItem.Date;
-                    if (!sItemDate) return false;
+                // Build unique dropdown lists
+                const aUniqueQuotations = [];
+                const aUniqueCustomers = [];
+                const mSeenQuotations = {};
+                const mSeenCustomers = {};
 
-                    var oItemDate = new Date(sItemDate);
-                    return oItemDate >= oStartDate && oItemDate <= oEndDate;
-                });
-
-                // Get unique quotations and customers
-                var aUniqueQuotations = [];
-                var aUniqueCustomers = [];
-                var mSeenQuotations = {};
-                var mSeenCustomers = {};
-
-                aFilteredFYData.forEach(oItem => {
+                aFilteredData.forEach(oItem => {
                     if (oItem?.QuotationNo && !mSeenQuotations[oItem.QuotationNo]) {
                         aUniqueQuotations.push({
                             QuotationNo: oItem.QuotationNo,
@@ -261,21 +279,22 @@ sap.ui.define(
                     }
                 });
 
+                // Set models and refresh dropdowns
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aUniqueQuotations), "FilteredQuotations");
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aUniqueCustomers), "FilteredCustomers");
 
-                //  Refresh dropdowns
                 this.byId("HQ_id_quotationNo")?.getBinding("items")?.refresh(true);
                 this.byId("HQ_id_CustomerName")?.getBinding("items")?.refresh(true);
-            },
-
-            HQ_onClearFilters: function () {
-                this.byId("HQ_id_quotationNo").setSelectedKey(""); // Clear QuotationNo filter
-                this.byId("HQ_id_CustomerName").setSelectedKey(""); // Clear CustomerName filter
-                this.byId("HQ_id_Quotaiondate").setValue(""); // Clear Date filter
             },
 
-            onDateRangeChange: function (oEvent) {
+            HQ_onClearFilters: function() {
+                this.byId("HQ_id_quotationNo").setSelectedKey("");
+                this.byId("HQ_id_CustomerName").setSelectedKey("");
+                this.byId("HQ_id_Quotaiondate").setValue("");
+                this._isClearPressed = true;
+            },
+
+            onDateRangeChange: function(oEvent) {
                 var oDateRange = oEvent.getSource();
                 var dateFrom = oDateRange.getDateValue();
                 var dateTo = oDateRange.getSecondDateValue();
@@ -286,26 +305,25 @@ sap.ui.define(
                 }
             },
 
-            HQ_onPressAddQuotation: function () {
+            HQ_onPressAddQuotation: function() {
                 this.getRouter().navTo("RouteHrQuotationDetails", {
                     sQuotationNo: "new"
                 })
             },
 
-            // Function to navigate back to the TileAdminView route
-            onPressback: function () {
-                this.getRouter().navTo("RouteTilePage");
+            onPressback: function() {
+                this.getRouter().navTo("RouteTilePage"); // Function to navigate back to the TileAdminView route
             },
 
-            onLogout: function () {
+            onLogout: function() {
                 this.CommonLogoutFunction();
             },
 
-            HQ_onPressBack: function () {
+            HQ_onPressBack: function() {
                 this.navigateToRouteView1();
             },
 
-            HQ_onPressQuotation: function (oEvent) {
+            HQ_onPressQuotation: function(oEvent) {
                 var oContext = oEvent.getSource().getBindingContext("CompanyQuotationModel");
                 var oData = oContext.getObject(); // get full object
                 var sQuotationNo = oData.QuotationNo; // extract actual QuotationNo
@@ -314,5 +332,5 @@ sap.ui.define(
                     sQuotationNo: encodeURIComponent(sQuotationNo)
                 });
             }
-        });
-    });
+        });
+    });

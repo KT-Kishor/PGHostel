@@ -1,12 +1,10 @@
 sap.ui.define([
         "./BaseController",
         "../utils/validation",
-        "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast",
-        "sap/m/MessageBox",
         "../model/formatter"
     ],
-    function(BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    function(BaseController, utils, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
@@ -26,7 +24,6 @@ sap.ui.define([
             _onRouteMatched: async function(oEvent) {
                 var LoginFunction = await this.commonLoginFunction("EmployeeOffer");
                 if (!LoginFunction) return;
-
                 this.getBusyDialog();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.byId("EO_id_OnboardBtn").setEnabled(false);
@@ -35,6 +32,7 @@ sap.ui.define([
                 this.oValue = oEvent.getParameter("arguments").valueEmp;
                 this.Filter = true;
                 try {
+                    this._isClearPressed = false;
                     if (this.oValue === "EmployeeOffer") {
                         const {
                             startDate,
@@ -61,12 +59,21 @@ sap.ui.define([
                             startDate: params.startDate,
                             endDate: params.endDate
                         });
-
+                           const oInitialModel = this.getView().getModel("EmployeeOfferModelInitial");
+                            const aInitialData = oInitialModel.getData();
+                            const uniqueConsultants = [];    // Filter unique consultant names
+                            const seenNames = new Set();
+                            aInitialData.forEach(item => {
+                                if (item.ConsultantName && !seenNames.has(item.ConsultantName)) {
+                                    seenNames.add(item.ConsultantName);
+                                    uniqueConsultants.push(item);
+                                }
+                            });
+                            oInitialModel.setData(uniqueConsultants);
                         await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModel", params);
                     } else {
                         this.EO_onSearch();
                     }
-
                     // Role Model filter
                     const oRoleModel = this.getView().getModel("RoleModel");
                     if (oRoleModel) {
@@ -79,30 +86,20 @@ sap.ui.define([
                         }
                         oRoleModel.setData(aRoles);
                     }
-
                     this.initializeBirthdayCarousel();
                     this.closeBusyDialog(); // Close busy dialog after data fetch
                 } catch (error) {
-                  this.closeBusyDialog();
+                    this.closeBusyDialog();
                 } finally {
                     this.closeBusyDialog(); // Close after async call finishes
                 }
             },
-            
-            getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
-
             _getCurrentYearDates: function() {
                 var year = new Date().getFullYear();
                 var startDate = new Date(year, 0, 1); // Jan 1
                 var endDate = new Date(year, 11, 31); // Dec 31
-                return {
-                    startDate,
-                    endDate
-                };
+                return {startDate, endDate};
             },
-
             //Back to tile page
             onPressback: function() {
                 this.getRouter().navTo("RouteTilePage");
@@ -137,68 +134,99 @@ sap.ui.define([
             EO_onRejectPress: function() {
                 this.onHandleEmployeeAction("Rejected", "onRejectEmployee");
             },
-            //Search call for filtering
             EO_onSearch: async function() {
-                this.getBusyDialog();
+                try {
+                    this.getBusyDialog();
+                    const filterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
+                    const params = {};
+                    let joiningDateProvided = false;
 
-                var aFilterItems = this.byId("EO_id_FilterBar").getFilterGroupItems();
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                    pattern: "yyyy-MM-dd"
-                });
-                var params = {};
+                    // Extract values from filter items
+                    filterItems.forEach((item) => {
+                        const control = item.getControl();
+                        const key = item.getName();
 
-                var oStartDate, oEndDate;
-                var dateProvided = false;
-
-                aFilterItems.forEach((oItem) => {
-                    var oControl = oItem.getControl();
-                    var sValue = oItem.getName();
-
-                    if (sValue === "JoiningDate") {
-                        oStartDate = oControl.getDateValue();
-                        oEndDate = oControl.getSecondDateValue();
-
-                        if (oStartDate && oEndDate) {
-                            dateProvided = true;
+                        if (control && typeof control.getValue === "function") {
+                            const value = control.getValue().trim();
+                            params[key] = value;
                         }
-                    } else if (oControl && oControl.getValue && oControl.getValue()) {
-                        params[sValue] = oControl.getValue();
+
+                        if (key === "JoiningDate" && control.getDateValue() && control.getSecondDateValue()) {
+                            const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                                pattern: "yyyy-MM-dd"
+                            });
+                            const start = oDateFormat.format(control.getDateValue());
+                            const end = oDateFormat.format(control.getSecondDateValue());
+                            params.startDate = start;
+                            params.endDate = end;
+                            joiningDateProvided = true;
+                        }
+                    });
+
+                    // Financial year logic
+                    const currentYear = new Date().getFullYear();
+                    let fyStart, fyEnd, financialYearLabel;
+
+                    if (new Date().getMonth() >= 3) {
+                        fyStart = new Date(currentYear, 3, 1);
+                        fyEnd = new Date(currentYear + 1, 2, 31);
+                        financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                    } else {
+                        fyStart = new Date(currentYear - 1, 3, 1);
+                        fyEnd = new Date(currentYear, 2, 31);
+                        financialYearLabel = `${currentYear - 1}-${currentYear}`;
                     }
-                });
 
-                // Set default year if no date is provided
-                if (!dateProvided) {
-                    const {
-                        startDate,
-                        endDate
-                    } = this._getCurrentYearDates();
-                    oStartDate = startDate;
-                    oEndDate = endDate;
-
-                    var oDateControl = this.byId("EO_id_JoiningDate");
-                    if (oDateControl) {
-                        oDateControl.setDateValue(startDate);
-                        oDateControl.setSecondDateValue(endDate);
+                    const formatDate = (date) => date.toISOString().split("T")[0];
+                    if (this._isClearPressed) { // Clear all filters
+                        delete params.startDate;
+                        delete params.endDate;
+                        delete params.FinancialYear;
+                        this._isClearPressed = false;
+                    } else if (!joiningDateProvided) {
+                        // Apply default financial year
+                        params.startDate = formatDate(fyStart);
+                        params.endDate = formatDate(fyEnd);
+                        params.FinancialYear = financialYearLabel;
+                        const dateRangeControl = this.byId("EO_id_JoiningDate");
+                        if (dateRangeControl) {
+                            dateRangeControl.setDateValue(fyStart);
+                            dateRangeControl.setSecondDateValue(fyEnd);
+                        }
+                    } else {
+                        // Check if selected dates match financial year
+                        const startDate = new Date(params.startDate);
+                        const endDate = new Date(params.endDate);
+                        if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                            params.FinancialYear = financialYearLabel;
+                        }
                     }
-                }
 
-                // Add formatted date range to params
-                if (oStartDate && oEndDate) {
-                    params["startDate"] = oDateFormat.format(oStartDate);
-                    params["endDate"] = oDateFormat.format(oEndDate);
-                }
+                    await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModelInitial", {
+                        startDate: params.startDate,
+                        endDate: params.endDate
+                    });
 
-                if (params && Object.keys(params).length > 0) {
-                    this.Filter = false;
-                }
+                    const oInitialModel = this.getView().getModel("EmployeeOfferModelInitial");
+                    const aInitialData = oInitialModel.getData();
+                    const uniqueConsultants = [];    // Filter unique consultant names
+                    const seenNames = new Set();
+                    aInitialData.forEach(item => {
+                        if (item.ConsultantName && !seenNames.has(item.ConsultantName)) {
+                            seenNames.add(item.ConsultantName);
+                            uniqueConsultants.push(item);
+                        }
+                    });
+                    oInitialModel.setData(uniqueConsultants);
 
-                await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModelInitial", {
-                    startDate: params.startDate,
-                    endDate: params.endDate
-                });
-                await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModel", params);
-                this.EO_ButtonVisibility();
-                this.closeBusyDialog();
+                    // Fetch data
+                    await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModel", params);
+                    this.EO_ButtonVisibility();
+                    this.closeBusyDialog();
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+                }
             },
             // Update the status to 'Rejected' after confirmation
             onRejectEmployee: async function() {
@@ -230,6 +258,7 @@ sap.ui.define([
                         }
                     }
                 });
+                this._isClearPressed = true;
             },
             //Common  reject or onboard action handling
             onHandleEmployeeAction: function(status, actionMethod) {
@@ -451,6 +480,9 @@ sap.ui.define([
                     branchInput: "OE_id_BranchInput",
                     mobileInput: "OEF_id_Mobile"
                 });
-            }
+            },
+            getGroupHeader: function(oGroup) {
+                return this.getStyledGroupHeader(oGroup);
+            },
         });
     });
