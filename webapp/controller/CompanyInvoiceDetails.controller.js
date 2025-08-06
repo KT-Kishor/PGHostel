@@ -1672,13 +1672,17 @@ sap.ui.define([
 
                 // Draw wrapped "For: Company Name" right-aligned
                 doc.setFont("helvetica", "bold").setFontSize(11);
-
                 let forLabelY = currentY;
                 for (let i = 0; i < forTextLines.length; i++) {
                     const line = forTextLines[i];
                     const lineWidth = doc.getTextWidth(line);
                     doc.text(line, rightEdgeX - lineWidth, forLabelY);
-                    forLabelY += lineSpacing;
+                    const isLastLine = i === forTextLines.length - 1;
+                    const isWrapped = forText.length > maxLineLength;
+
+                    if (!isLastLine || isWrapped) {
+                        forLabelY += lineSpacing;
+                    }
                 }
 
                 // Signature (Right-aligned under company name)

@@ -1541,36 +1541,10 @@ sap.ui.define([
 
                 const summaryBody = [];
 
-                if (parseFloat(oModel.SubTotalNotGST) > 0) {
-                    summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                    Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
-                    ]);
-                }
-
                 if (parseFloat(oModel.SubTotalInGST) > 0) {
-                    summaryBody.push([
-                        `Sub-Total ( Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
+                    summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
+                    Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
                     ]);
-                }
-
-                const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
-                const cgstPercentage = percentageText;
-                const sgstPercentage = percentageText;
-                const igstPercentage = percentageText;
-
-                if (data.Currency !== "USD") {
-                    const cgstValue = parseFloat(oModel.CGST) || 0;
-                    const sgstValue = parseFloat(oModel.SGST) || 0;
-                    const igstValue = parseFloat(oModel.IGST) || 0;
-
-                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
-                        summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-                        summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST") &&
-                        igstValue > 0) {
-                        summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
-                    }
                 }
 
                 if (data.RoundOf && data.RoundOf !== "0") {
@@ -1629,7 +1603,7 @@ sap.ui.define([
                     { label: "Account No", value: "0648506056" },
                     { label: "IFSC Code", value: "KKBK0008249" },
                     { label: "Swift Code", value: "KKBKINBBCPC" },
-                    { label: "Pay By ", value: Formatter.formatDate(oModel.PayByDate) }
+                    { label: 'Pay By', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.PayByDate : Formatter.formatDate(oModel.PayByDate) },
                 ];
 
                 paymentDetails.forEach(detail => {
@@ -1643,18 +1617,66 @@ sap.ui.define([
                 });
 
                 checkPageSpace(35);
-                const forLabelY = currentY + 5;
-                doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text("For: " + oCompanyDetailsModel.companyName, rightAlignX + 2, forLabelY);
+                const rightEdgeX = pageWidth - margin;
+                const lineSpacing = 5;
+                const maxLineLength = 45;
+                const forText = "For: " + oCompanyDetailsModel.companyName;
 
-                const logoXPosition = rightAlignX + 20;
+                // Split text if more than 45 characters
+                let forTextLines = [];
+                if (forText.length > maxLineLength) {
+                    const words = forText.split(" ");
+                    let currentLine = "";
+                    for (const word of words) {
+                        if ((currentLine + " " + word).trim().length <= maxLineLength) {
+                            currentLine += " " + word;
+                        } else {
+                            forTextLines.push(currentLine.trim());
+                            currentLine = word;
+                        }
+                    }
+                    if (currentLine) {
+                        forTextLines.push(currentLine.trim());
+                    }
+                } else {
+                    forTextLines = [forText];
+                }
+
+                // Draw wrapped "For: Company Name" right-aligned
+                doc.setFont("helvetica", "bold").setFontSize(11);
+                let forLabelY = currentY;
+                for (let i = 0; i < forTextLines.length; i++) {
+                    const line = forTextLines[i];
+                    const lineWidth = doc.getTextWidth(line);
+                    doc.text(line, rightEdgeX - lineWidth, forLabelY);
+                    const isLastLine = i === forTextLines.length - 1;
+                    const isWrapped = forText.length > maxLineLength;
+
+                    if (!isLastLine || isWrapped) {
+                        forLabelY += lineSpacing;
+                    }
+                }
+
+                // Signature (Right-aligned under company name)
+                const signatureWidth = 57;
+                const signatureHeight = 13;
+                const logoXPosition = rightEdgeX - signatureWidth + 16; // align to rightEdge
                 const logoYPosition = forLabelY + 2;
-                doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, 57, 13);
 
-                const partnersYPosition = logoYPosition + 18;
+                doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, signatureWidth, signatureHeight);
+
+                // Head of Company (Right-aligned)
+                const headName = oCompanyDetailsModel.headOfCompany || "";
+                const headWidth = doc.getTextWidth(headName);
+                const partnersYPosition = logoYPosition + signatureHeight + 2;
+
                 doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text(oCompanyDetailsModel.headOfCompany, rightAlignX + 30, partnersYPosition);
-                doc.text(oCompanyDetailsModel.designation, rightAlignX + 28, partnersYPosition + 5);
+                doc.text(headName, rightEdgeX - headWidth, partnersYPosition);
+
+                // Designation (Right-aligned)
+                const designation = oCompanyDetailsModel.designation || "";
+                const designationWidth = doc.getTextWidth(designation);
+                doc.text(designation, rightEdgeX - designationWidth, partnersYPosition + lineSpacing);
 
                 doc.setFont("times", "normal").setFontSize(11);
                 doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);
