@@ -24,7 +24,7 @@ sap.ui.define([
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice", Action: "CC" });
-                this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_CurrencySelect"]);
+                this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status",]);
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.loginModel = this.getView().getModel("LoginModel");
@@ -243,7 +243,7 @@ sap.ui.define([
                     utils._LCvalidationComboBox(oEvent);
                 }
                 this.byId("CID_id_SowPO").setValueState("None");
-                const sSelectedKey = oEvent.getSource().getSelectedKey();
+               const sSelectedKey = oEvent.getSource().getSelectedKey();
                 if (!sSelectedKey) {
                     this.byId("CID_id_CurrencySelect").setEditable(true);
                 }

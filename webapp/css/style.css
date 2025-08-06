@@ -958,11 +958,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .shareText {
   margin-left: 0.5rem;
 }
-/*/////////////////////////////////////////////////////////////////////////////*/
-/*/////////////////////////////////////////////////////////////////////////////*/
-/*/////////////////////////////////////////////////////////////////////////////*/
-/*/////////////////////////////////////////////////////////////////////////////*/
-/*Second part*/
 
 .rightMarginCustom {
   margin-right: 40px;
@@ -980,48 +975,60 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 0;
 }
 
-@media (max-width: 1200px) and (min-width: 768px) {
-  .myAppBackground {
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    background-clip: padding-box !important;
-  }
-
-  .sapUiTinyMargin,
-  .sapUiContentPadding,
-  .sapUiSmallMargin,
-  .sapUiLargeMarginBegin,
-  .sapUiLargeMarginEnd {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .mainJobContainer {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-  }
-
-  .leftColumn,
-  .rightColumn {
-    margin: 0 !important;
-    padding: 1rem !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  .actionPanel,
-  .contentPanel {
-    box-shadow: none !important;
-    margin: 0 !important;
-    padding: 1rem !important;
-    background: transparent !important;
-  }
+.myCustomViewWrapper {
+  box-sizing: border-box;
 }
 
-.myFormattedText {
+/* Scoped reset of default SAPUI5 margins/paddings only for this view */
+.myCustomViewWrapper .sapUiTinyMargin,
+.myCustomViewWrapper .sapUiContentPadding,
+.myCustomViewWrapper .sapUiSmallMargin,
+.myCustomViewWrapper .sapUiLargeMarginBegin,
+.myCustomViewWrapper .sapUiLargeMarginEnd,
+.myCustomViewWrapper .sapUiSmallMarginLeft,
+.myCustomViewWrapper .sapUiSmallMarginRight {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Main container and layout styles */
+.myCustomViewWrapper .mainJobContainer {
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  align-items: flex-start;
+}
+
+.myCustomViewWrapper .leftColumn {
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 1rem;
+  top: -1.1rem !important;
+  margin-right: 32.5rem;
+}
+
+.myCustomViewWrapper .rightColumn {
+  width: 30rem;
+  box-sizing: border-box;
+  position: fixed !important;
+  top: 3.4rem !important;
+  right: 1.5rem !important;
+  margin: 1rem;
+}
+
+/* Panels */
+.myCustomViewWrapper .contentPanel,
+.myCustomViewWrapper .actionPanel {
+  background: transparent !important;
+  padding: 0.5rem !important;
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem #17191884 !important;
+}
+
+/* Formatted Text Styling */
+.myCustomViewWrapper .myFormattedText {
   width: 100% !important;
   max-width: 100%;
   min-width: 280px;
@@ -1035,33 +1042,29 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   display: block;
   box-sizing: border-box;
   background-color: #ffffff;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
-.myFormattedText p,
-.myFormattedText li {
+.myCustomViewWrapper .myFormattedText p,
+.myCustomViewWrapper .myFormattedText li {
   margin: 0 0 0.54rem 0;
   font-size: 1rem !important;
   line-height: 1.7 !important;
-  color: inherit !important;
-  text-align: justify;
 }
 
-.myFormattedText ul,
-.myFormattedText ol {
+.myCustomViewWrapper .myFormattedText ul,
+.myCustomViewWrapper .myFormattedText ol {
   padding-left: 2rem !important;
   margin: 0 0 0.71rem 0;
 }
 
-.myFormattedText li {
-  list-style-position: outside;
-}
-
-.myFormattedText h1,
-.myFormattedText h2,
-.myFormattedText h3,
-.myFormattedText h4,
-.myFormattedText h5,
-.myFormattedText h6 {
+.myCustomViewWrapper .myFormattedText h1,
+.myCustomViewWrapper .myFormattedText h2,
+.myCustomViewWrapper .myFormattedText h3,
+.myCustomViewWrapper .myFormattedText h4,
+.myCustomViewWrapper .myFormattedText h5,
+.myCustomViewWrapper .myFormattedText h6 {
   margin: 1.19rem 0 0.8rem 0;
   font-weight: 600 !important;
   line-height: 1.35;
@@ -1071,144 +1074,55 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding-bottom: 0.4rem;
 }
 
-.myFormattedText em,
-.myFormattedText i {
+/* Text emphasis */
+.myCustomViewWrapper .myFormattedText em,
+.myCustomViewWrapper .myFormattedText i {
   font-style: italic;
 }
 
-.myFormattedText strong,
-.myFormattedText b {
+.myCustomViewWrapper .myFormattedText strong,
+.myCustomViewWrapper .myFormattedText b {
   font-weight: 700 !important;
-  font-size: 1rem !important;
   color: #111 !important;
 }
 
-.myFormattedText li strong,
-.myFormattedText li b {
+.myCustomViewWrapper .myFormattedText li strong,
+.myCustomViewWrapper .myFormattedText li b {
   font-weight: 750 !important;
   color: #000 !important;
   font-size: 1.05rem !important;
 }
 
-.myFormattedText u {
-  text-decoration: underline;
-}
-
-.myFormattedText s,
-.myFormattedText strike {
-  text-decoration: line-through;
-}
-
-.myFormattedText mark,
-.myFormattedText .highlight {
-  background-color: #a8e6cf !important;
-  color: #000 !important;
-  font-weight: bold;
-}
-
-.myFormattedText span {
-  color: inherit;
-  font-family: inherit;
-}
-
-.myFormattedText sup {
-  vertical-align: super !important;
-  font-size: smaller !important;
-  line-height: 1 !important;
-}
-
-.myFormattedText sub {
-  vertical-align: sub !important;
-  font-size: smaller !important;
-  line-height: 1 !important;
-}
-
-.myFormattedText code {
+.myCustomViewWrapper .myFormattedText code {
   font-family: "Fira Code", "Cascadia Code", monospace;
   background-color: #f5f5f5;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #333;
   white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.5;
 }
 
-.myFormattedText pre {
-  background-color: #eeeeee;
-  padding: 1.5rem;
-  border: 1px solid #ddd;
-  overflow: auto;
-  font-family: "Fira Code", "Cascadia Code", monospace;
-  border-radius: 6px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.5;
-}
-
-.myFormattedText blockquote {
+.myCustomViewWrapper .myFormattedText blockquote {
   margin: 1.07rem 0;
   padding-left: 1.5rem;
   border-left: 4px solid #bbb;
-  color: #444;
   font-style: italic;
   background-color: #fcfcfc;
 }
 
-.myFormattedText img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 1.07rem 0;
-  border-radius: 5px;
-}
-
-.myFormattedText a {
+.myCustomViewWrapper .myFormattedText a {
   color: #444;
   text-decoration: underline;
   transition: color 0.3s ease;
 }
 
-.myFormattedText a:hover {
+.myCustomViewWrapper .myFormattedText a:hover {
   color: #000;
   text-decoration: none;
 }
 
-.myFormattedText hr {
-  border: none;
-  border-top: 1px solid #ccc;
-  margin: 1.48rem 0;
-}
-
-.myFormattedText div > p[style*="background: #f5f5f5;"],
-.myFormattedText p.note-box {
-  background: #f5f5f5 !important;
-  padding: 18px 22px !important;
-  border-left: 4px solid #999 !important;
-  border-radius: 8px;
-  margin-top: 1.48rem !important;
-  margin-bottom: 1.48rem !important;
-  font-style: normal;
-  color: #333 !important;
-}
-
-.myFormattedText div > p[style*="background: #f5f5f5;"] strong,
-.myFormattedText p.note-box strong {
-  color: #111 !important;
-  font-weight: 700 !important;
-}
-
-.myFormattedText .alert-mark {
-  background-color: #66bb6a !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-  padding: 0.2em 0.4em !important;
-  border-radius: 3px !important;
-  border: 1px solid #4caf50 !important;
-}
-
-.myCustomButton {
+/* Buttons */
+.myCustomViewWrapper .myCustomButton {
   height: 60px !important;
   width: 345px !important;
   font-size: 20px !important;
@@ -1216,344 +1130,136 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   transition: all 0.2s ease-in-out;
 }
 
-.myCustomButton .sapMBtnInner {
+.myCustomViewWrapper .myCustomButton .sapMBtnInner {
   background-color: #141f7d !important;
   height: 100% !important;
-  line-height: normal !important;
   padding: 16px !important;
   font-size: 24px !important;
   border-radius: 8px;
-  transition: background-color 0.2s ease-in-out;
 }
 
-.myCustomButton .sapMBtnContent {
+.myCustomViewWrapper .myCustomButton .sapMBtnContent {
   color: white !important;
   font-size: 20px !important;
-  transition: font-size 0.2s ease-in-out;
 }
 
-.myCustomButton:hover .sapMBtnInner {
+.myCustomViewWrapper .myCustomButton:hover .sapMBtnInner {
   background-color: #182493dc !important;
   box-shadow: 0 0 0.5rem #17191884 !important;
 }
 
-.myCustomButton:hover .sapMBtnContent {
-  font-size: 20px !important;
-  font-weight: bold !important;
-}
-
-.myCustomIconBtn {
+.myCustomViewWrapper .myCustomIconBtn {
   height: 50px !important;
   width: 50px !important;
   padding: 0 !important;
-  transition: all 0.2s ease-in-out;
 }
 
-.myCustomIconBtn .sapMBtnInner {
+.myCustomViewWrapper .myCustomIconBtn .sapMBtnInner {
   background-color: white !important;
-  height: 100% !important;
-  width: 100% !important;
-  border-radius: 8px;
   border: 3px solid #141f7d !important;
-  padding: 0 !important;
+  border-radius: 8px;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  transition: background-color 0.2s ease-in-out;
 }
 
-.myCustomIconBtn .sapMBtnIcon {
+.myCustomViewWrapper .myCustomIconBtn .sapMBtnIcon {
   color: #141f7d !important;
   font-size: 25px !important;
   margin-left: -10px !important;
   margin-top: 3px !important;
-  transition: color 0.2s ease-in-out;
 }
 
-.myCustomIconBtn:hover .sapMBtnInner {
+.myCustomViewWrapper .myCustomIconBtn:hover .sapMBtnInner {
   background-color: #141f7d !important;
-  box-shadow: 0 0 0.5rem #17191884 !important;
 }
 
-.myCustomIconBtn:hover .sapMBtnIcon {
-  color: #ffffff !important;
+.myCustomViewWrapper .myCustomIconBtn:hover .sapMBtnIcon {
+  color: white !important;
 }
 
-.care-background, .myAppBackground {
-    background-image: url("../image/background.jpg");
-    border-radius: 12px !important;         
-    background-clip: padding-box !important;
-    box-sizing: border-box !important;
-  }
-
-.care-background {
-  background-image: url("../image/career1.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  border-radius: 0.6rem;
-  border-radius: 8px;
-  position: relative;
-  height: 100%;
-}
-
-.carrer-Des {
-  font-family: sans-serif;
-  line-height: 1.5;
-}
-
-.myAppBackground {
+/* Backgrounds */
+.myCustomViewWrapper .myAppBackground {
   background-image: url("../image/background.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  border-radius: 0.6rem;
   border-radius: 8px;
-  position: relative;
   height: 100%;
 }
 
+.myCustomViewWrapper .care-background {
+  background-image: url("../image/career1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  border-radius: 8px;
+  height: 100%;
+}
+
+/* Responsive Styles */
 @media (max-width: 1200px) {
-  .myAppBackground {
-    background-image: url("../image/background.jpg");
-    border-radius: 12px !important;
-    overflow: visible !important; 
-    background-clip: padding-box !important;
-    box-sizing: border-box !important;
-    height: auto !important;
-    min-height: 100vh !important;
-  }
-
-  html,
-  body {
-    overflow-x: hidden !important;
-    overflow-y: auto !important; 
-    min-height: 100vh !important;
-  }
-}
-
-.mainJobContainer {
-  width: 100%;
-  display: flex;
-  box-sizing: border-box;
-  padding: 0.5rem 1rem;
-  align-items: flex-start;
-}
-
-.leftColumn {
-  flex-grow: 1;
-  box-sizing: border-box;
-  margin: 1rem;
-  top: -1.1rem !important;
-  margin-right: 32.5rem;
-}
-
-.rightColumn {
-  width: 30rem;
-  box-sizing: border-box;
-  position: fixed !important;
-  top: 3.4rem !important;
-  right: 1.5rem !important;
-  margin: 1rem;
-}
-
-.contentPanel,
-.actionPanel {
-  background: transparent !important;
-  padding: 0.5rem !important;
-  width: 100%;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem #17191884 !important;
-}
-
-.contentPanelLimitedWidth {
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box;
-}
-.sapMScrollCont,
-.sapMScrollContScroll {
-  overflow-x: hidden !important;
-}
-
-.myFormattedText {
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-/* 📱 For all screens up to 1200px */
-@media (max-width: 1200px) {
-  html,
-  body {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
-  }
-
-  #mainContainer,
-  .mainJobContainer {
+  .myCustomViewWrapper .mainJobContainer,
+  .myCustomViewWrapper .leftColumn,
+  .myCustomViewWrapper .rightColumn {
     display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    padding: 0 !important;
-    flex-wrap: wrap !important;
-  }
-
-  .leftColumn,
-  .rightColumn {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: hidden !important;
   }
 
-  .leftColumn {
-    top: 0 !important;
-  }
-
-  .rightColumn {
+  .myCustomViewWrapper .rightColumn {
     position: static !important;
-    right: auto !important;
     margin-top: 1rem !important;
   }
 
-  .sapMScrollCont,
-  .sapMScrollContScroll {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  .myFormattedText {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
+  .myCustomViewWrapper .myFormattedText {
+    padding: 0.5rem !important;
     white-space: normal !important;
-    word-break: break-word !important;
   }
 
-  .myCustomButton {
+  .myCustomViewWrapper .myCustomButton {
     width: 250px !important;
-
     display: block !important;
     margin: 0 !important;
   }
 
-  .myCustomIconBtn {
-    height: 50px !important;
-    width: 50px !important;
-    padding: 0 !important;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .myCustomIconBtn .sapMBtnInner {
-    background-color: white !important;
-    height: 100% !important;
-    width: 100% !important;
-    border-radius: 8px;
-    border: 3px solid #141f7d !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    transition: background-color 0.2s ease-in-out;
-  }
-
-  .myCustomIconBtn .sapMBtnIcon {
-    color: #141f7d !important;
-    font-size: 25px !important;
-    margin-left: -10px !important;
-    margin-top: 3px !important;
-    transition: color 0.2s ease-in-out;
-  }
-
-  .myCustomIconBtn:hover .sapMBtnInner {
-    background-color: #141f7d !important;
-    box-shadow: 0 0 0.5rem #17191884 !important;
-  }
-
-  .myCustomIconBtn:hover .sapMBtnIcon {
-    color: #ffffff !important;
+  .myCustomViewWrapper .myAppBackground {
+    min-height: 100vh !important;
+    overflow: visible !important;
   }
 }
 
-/* 📱 Additional tweaks for ultra-small screens (phones) */
-@media (max-width: 600px) {
-  .myFormattedText {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+@media (max-width: 768px) {
+  .myCustomViewWrapper .myCustomIconBtn {
+    transform: scale(0.7);
+    transform-origin: top right;
   }
+}
 
-  .myFormattedText p,
-  .myFormattedText li,
-  .myFormattedText strong,
-  .myFormattedText b {
+@media (max-width: 600px) {
+  .myCustomViewWrapper .myFormattedText p,
+  .myCustomViewWrapper .myFormattedText li,
+  .myCustomViewWrapper .myFormattedText strong,
+  .myCustomViewWrapper .myFormattedText b {
     font-size: 0.9rem !important;
     line-height: 1.5 !important;
   }
 
-  .myFormattedText h1,
-  .myFormattedText h2,
-  .myFormattedText h3,
-  .myFormattedText h4,
-  .myFormattedText h5,
-  .myFormattedText h6 {
+  .myCustomViewWrapper .myFormattedText h1,
+  .myCustomViewWrapper .myFormattedText h2,
+  .myCustomViewWrapper .myFormattedText h3 {
     font-size: 1rem !important;
   }
 
-  .contentPanel,
-  .actionPanel {
+  .myCustomViewWrapper .contentPanel,
+  .myCustomViewWrapper .actionPanel {
     padding: 0 !important;
     box-shadow: none !important;
   }
 }
-/* Applies to mobile only */
-@media (max-width: 768px) {
-  /* Shrink icon buttons */
-  .myCustomIconBtn {
-    transform: scale(0.7);
-    transform-origin: top right;
-  }
 
-  /* Remove unnecessary margins */
-  .sapUiLargeMarginBegin,
-  .sapUiSmallMargin,
-  .sapUiSmallMarginLeft,
-  .sapUiSmallMarginRight {
-    margin-left: 0;
-    margin-right: 0;
-  }
 
-  #mainContainer,
-  .mainJobContainer,
-  .leftColumn,
-  .rightColumn,
-  .mobileSafeWrapper,
-  .sapMScrollCont,
-  .sapMScrollContScroll {
-    width: 100% !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background-color: transparent !important; 
-  }
-
-.myFormattedText {
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    white-space: normal !important;
-    overflow-x: hidden !important;
-  }
-
-  /*.sapMPanel,
-  .sapMScrollCont,
-  .mainJobContainer {
-    background-color: #fff !important; 
-      } */
-}
