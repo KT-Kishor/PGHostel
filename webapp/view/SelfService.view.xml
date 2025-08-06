@@ -156,7 +156,8 @@
                                                    customTextOn="{i18n>experienced}"
                                                    customTextOff="{i18n>fresher}"
                                                    enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"                                                   class="sapUiSmallMarginEnd"
-                                                   change="SS_onExperienceSwitchChange">
+                                                   change="SS_onExperienceSwitchChange" 
+                                                   visible="{= !${viewModel>/TraineeRole} }"> 
                                              </m:Switch>
 										<m:Label text="{i18n>employeeID}" />
 										<m:Input
@@ -967,7 +968,7 @@
                             id="employmentSS1"
                             title="{i18n>employmentDetails}"
                             titleUppercase="false"
-                            visible="{viewModel>/isExperienced}"
+                            visible="{= !${viewModel>/TraineeRole} &amp;&amp; ${viewModel>/isExperienced} }"
                         >
 							<blocks>
 								<m:Table sticky="ColumnHeaders,HeaderToolbar"
