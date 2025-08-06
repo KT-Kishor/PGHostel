@@ -22,8 +22,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const oView = this.getView();
                     this.i18nModel = oView.getModel("i18n").getResourceBundle();
                     this.companyName = "Kalpavriksha Technologies";
-                    this._fetchCommonData("EmployeeDetailsData", "empModel");
-
+                    // --- Initialization ---
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
                         fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: true, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
@@ -31,16 +30,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     });
                     oView.setModel(viewModel, "viewModel");
                     this.ViewModel = this.getView().getModel("viewModel");
+                    await this._fetchCommonData("EmployeeDetailsData", "empModel");
+                    // --- Role and Path Determination ---
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
                     var sLoggedInRole = loginModel.getProperty("/Role");
-                    if (["Admin", "HR Manager", "HR"].includes(sLoggedInRole)) {
-                        this.ViewModel.setProperty("/ShowStatusControl", true);
-                    } else {
-                        this.ViewModel.setProperty("/ShowStatusControl", false);
-                    }
-                    this.sNavigatedRole = oEvent.getParameter("arguments").Role; // Role from navigation
+                    this.ViewModel.setProperty("/ShowStatusControl", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole));
+                    this.sNavigatedRole = oEvent.getParameter("arguments").Role;
                     this.sPath = oEvent.getParameter('arguments').sPath;
-                    // sections if role is "Trainee" from either login or navigation
                     var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
                     this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
 
@@ -51,80 +47,70 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("tileSelfSerciceFooter"));
                         this.ViewModel.setProperty("/SetProfile", true);
                         if (loginModel) this.EmployeeID = loginModel.getProperty("/EmployeeID");
-                        aIds.forEach(function (sId) {
-                            this.getView().byId(sId).setRequired(true);
-                        }.bind(this));
-                        this.byId("SS_id_lc").setRequired(false)
-                        this.byId("SS_id_lbase").setRequired(false)
-                        this.byId("SS_id_lds").setRequired(false)
-                        this.byId("SS_id_Lmg").setRequired(false)
-                    }
-                    else {
+                        aIds.forEach(function (sId) { this.byId(sId).setRequired(true); }.bind(this));
+                        this.byId("SS_id_lc").setRequired(false);
+                        this.byId("SS_id_lbase").setRequired(false);
+                        this.byId("SS_id_lds").setRequired(false);
+                        this.byId("SS_id_Lmg").setRequired(false);
+                    } else {
                         this.ViewModel.setProperty("/SelfServiceBtn", false);
                         this.EmployeeID = this.sPath;
-                        this.byId("SS_id_lc").setRequired(true)
-                        this.byId("SS_id_lbase").setRequired(true)
-                        this.byId("SS_id_Lmg").setRequired(true)
-
+                        this.byId("SS_id_lc").setRequired(true);
+                        this.byId("SS_id_lbase").setRequired(true);
+                        this.byId("SS_id_Lmg").setRequired(true);
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
-                            this.ViewModel.setProperty("/Letter", true);
-                        } else {
-                            this.ViewModel.setProperty("/Letter", false);
-                        }
-                        if (["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role"))) {
-                            this.ViewModel.setProperty("/RelievingLetter", true);
-                        }
-                        aIds.forEach(function (sId) {
-                            this.getView().byId(sId).setRequired(false);
-                        }.bind(this));
+                        this.ViewModel.setProperty("/Letter", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee");
+                        this.ViewModel.setProperty("/RelievingLetter", ["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role")));
+                        aIds.forEach(function (sId) { this.byId(sId).setRequired(false); }.bind(this));
                     }
-                    if (this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee") {
-                        this.ViewModel.setProperty("/ResignationVisible", true);
-                    } else {
-                        this.ViewModel.setProperty("/ResignationVisible", false);
-                    }
+                    this.ViewModel.setProperty("/ResignationVisible", this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee");
                     var employeeModel = new JSONModel();
                     this.getOwnerComponent().setModel(employeeModel, "employeeModel");
+                    // --- Data Loading and UI Updates based on Data ---
                     if (this.EmployeeID) {
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
                             EmployeeID: this.EmployeeID
                         });
                         oView.getModel("sEmployeeModel").refresh(true);
                         var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
-                        if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") this.ViewModel.setProperty("/SelfService", true);
 
-                        if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
-                        if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
+                        if (oModelAllData) {
+                            const isExperienced = oModelAllData.EmployeeType !== "Fresher";
+                            this.ViewModel.setProperty("/isExperienced", isExperienced);
+                            if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") {
+                                this.ViewModel.setProperty("/SelfService", true);
+                            }
+                            if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
+                            if (!oModelAllData.EContactIIStdCode) oModelAllAta.EContactIIStdCode = "+91";
 
-                        // --- Releving letter Button Visibility Logic ---
-                        if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
-                            this.byId("SS_id_Action").setVisible(true);
-                            this.ViewModel.setProperty("/TraineeRole", false);
-
-                            if (oModelAllData.EmployeeStatus === "Inactive") {
-                                this.ViewModel.setProperty("/WorkCompletedVisible", true);
-                                this.ViewModel.setProperty("/Letter", false);
-                                this.ViewModel.setProperty("/isVisitMode", false);
-                                this.ViewModel.setProperty("/RelievingLetter", false);
-                            } else if (oModelAllData.EmployeeStatus === "Active") {
+                            // --- Releving letter Button Visibility Logic ---
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
+                                this.byId("SS_id_Action").setVisible(true);
+                                this.ViewModel.setProperty("/TraineeRole", false);
+                                if (oModelAllData.EmployeeStatus === "Inactive") {
+                                    this.ViewModel.setProperty("/WorkCompletedVisible", true);
+                                    this.ViewModel.setProperty("/Letter", false);
+                                    this.ViewModel.setProperty("/isVisitMode", false);
+                                    this.ViewModel.setProperty("/RelievingLetter", false);
+                                } else if (oModelAllData.EmployeeStatus === "Active") {
+                                    this.ViewModel.setProperty("/WorkCompletedVisible", false);
+                                    this.ViewModel.setProperty("/isVisitMode", true);
+                                    this.ViewModel.setProperty("/Letter", true);
+                                }
+                            } else {
                                 this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                                this.ViewModel.setProperty("/isVisitMode", true);
-                                this.ViewModel.setProperty("/Letter", true);
+                                if (oModelAllData.EmployeeStatus === "Inactive") {
+                                    this.byId("SS_id_Action").setVisible(false);
+                                }
                             }
-                        } else {
-                            this.ViewModel.setProperty("/WorkCompletedVisible", false);
-                            if (oModelAllData.EmployeeStatus === "Inactive") {
-                                this.byId("SS_id_Action").setVisible(false);
+                            const oObjectPage = this.byId("ObjectPageLayout");
+                            const oSection = this.byId("basicDetailsSection");
+                            if (oObjectPage && oSection) {
+                                oObjectPage.setSelectedSection(oSection.getId());
                             }
-                        }
-                        const oObjectPage = this.byId("ObjectPageLayout");
-                        const oSection = this.byId("basicDetailsSection");
-                        if (oObjectPage && oSection) {
-                            oObjectPage.setSelectedSection(oSection);
+                            this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
                         }
                     }
-                    this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
                     var oTextModel = new JSONModel({ name: "" });
                     this.getView().setModel(oTextModel, "TextDisplay");
                     var oIdCardModel = this.getView().getModel("IdCardModel");
@@ -149,7 +135,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_id_STDCodeRII").setValueState("None");
                     this.byId("SS_id_FatherName").setValueState("None");
                     this.byId("SS_id_Compmail").setValueState("None");
-
                 } catch (error) { } finally {
                     this.closeBusyDialog();
                 }
@@ -460,79 +445,52 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
             onPressSubmit: async function (oEvent) {
                 const that = this;
-                this.getBusyDialog();
-                try {
-                    if (!this._validateAllRequiredFieldsForSubmit()) {
-                        MessageToast.show(this.i18nModel.getText("uploadAtLeastOneDocumentMessage"));
-                        return;
-                    }
+                if (!this._validateAllRequiredFieldsForSubmit()) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
 
+                this.getBusyDialog(); 
+                try {
                     const oViewModel = this.getView().getModel("viewModel");
                     const bIsExperienced = oViewModel.getProperty("/isExperienced");
                     // --- Proactively load and then validate Education Data ---
-                    let aEducationData = [];
-                    try {
-                        const oEducationModel = await this.SS_readEducationalDetails(this.EmployeeID, false); // Suppress busy indicator
-                        aEducationData = oEducationModel ? oEducationModel.getData() : [];
-                    } catch (error) {
-                        MessageToast.show("Error loading education details.");
+                    const oEducationModel = await this.SS_readEducationalDetails(this.EmployeeID, false);
+                    const aEducationData = oEducationModel ? oEducationModel.getData() : [];
+                    if (aEducationData.length < 2) {
+                        MessageBox.error(this.i18nModel.getText("minEducationRecordsError"));
+                        this.closeBusyDialog(); 
                         return;
                     }
-                    // Check for a minimum of two educational records.
-                    if (aEducationData.length < 2) {
-                        MessageBox.error(this.i18nModel.getText("minEducationRecordsError"), {
-                            title: this.i18nModel.getText("educationErrorTitle")
-                        });
-                        return; // Stop
-                    }
-                    // Check that one of the records is "School/10th".
-                    const aProvidedDegrees = aEducationData.map(edu => edu.DegreeName);
-                    if (!aProvidedDegrees.includes("School/10th")) {
-                        MessageBox.error(this.i18nModel.getText("mandatory10thDegreeError"), {
-                            title: this.i18nModel.getText("educationErrorTitle")
-                        });
+                    if (!aEducationData.some(edu => edu.DegreeName === "School/10th")) {
+                        MessageBox.error(this.i18nModel.getText("mandatory10thDegreeError"));
+                        this.closeBusyDialog();
                         return;
                     }
                     // --- Proactively load and then validate Employment Data ---
-                    let aEmploymentData = [];
                     if (bIsExperienced) {
-                        try {
-                            const oEmploymentModel = await this.SS_readEmploymentDetails(this.EmployeeID, false); // Suppress busy indicator
-                            aEmploymentData = oEmploymentModel ? oEmploymentModel.getData() : [];
-                        } catch (error) {
-                            MessageToast.show("Error loading employment details.");
-                            return;
-                        }
-                        if (aEmploymentData.length < 1) {
-                            MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"), {
-                                title: this.i18nModel.getText("educationErrorTitle")
-                            });
+                        const oEmploymentModel = await this.SS_readEmploymentDetails(this.EmployeeID, false);
+                        if (!oEmploymentModel || oEmploymentModel.getData().length < 1) {
+                            MessageBox.error(this.i18nModel.getText("minEmploymentRecordError"));
+                            this.closeBusyDialog();
                             return;
                         }
                     }
+
                     // --- Proactively load and then validate Document Data ---
-                    try {
-                        await this.ReadEmployeeDocument(false); // Pass false to suppress busy indicator
-                    } catch (error) {
-                        MessageToast.show("Error loading document details.");
-                        return;
-                    }
-                    let aRequiredDocNames = ["Pan Card", "Aadhar Card"];
-                    const aEducationDocRequirements = aEducationData.map(edu => edu.DegreeName);
-                    aRequiredDocNames = aRequiredDocNames.concat(aEducationDocRequirements);
+                    await this.ReadEmployeeDocument(false);
+                    let aRequiredDocNames = ["Pan Card", "Aadhar Card", ...aEducationData.map(edu => edu.DegreeName)];
                     if (bIsExperienced) {
                         aRequiredDocNames.push("Previous Company Relieving Letter", "Previous Company 3 Months Payslip");
                     }
-                    const aUniqueRequiredDocs = [...new Set(aRequiredDocNames)];
-                    const oUploadedDocsModel = this.getView().getModel("DocumentModel");
-                    const aUploadedItems = oUploadedDocsModel ? oUploadedDocsModel.getProperty("/items") : [];
-                    const aUploadedDocTypes = aUploadedItems.map(doc => doc.DocumentType);
-                    const aMissingDocs = aUniqueRequiredDocs.filter(requiredDoc => !aUploadedDocTypes.includes(requiredDoc));
+                    const aUploadedDocs = this.getView().getModel("DocumentModel").getProperty("/items") || [];
+                    const aUploadedDocTypes = aUploadedDocs.map(doc => doc.DocumentType);
+                    const aMissingDocs = [...new Set(aRequiredDocNames)].filter(doc => !aUploadedDocTypes.includes(doc));
 
                     if (aMissingDocs.length > 0) {
                         const sMissingDocsList = aMissingDocs.join(", ");
-                        const sErrorMessage = jQuery.sap.formatMessage(this.i18nModel.getText("mandatoryDocumentsErrorText"), [sMissingDocsList]);
-                        MessageBox.error(sErrorMessage, { title: this.i18nModel.getText("mandatoryDocumentsErrorTitle") });
+                        MessageBox.error(this.i18nModel.getText("mandatoryDocumentsErrorText", [sMissingDocsList]));
+                        this.closeBusyDialog(); // Manually close before returning
                         return;
                     }
                     // If all validations pass, proceed to save.
@@ -542,7 +500,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 } catch (error) {
                     MessageToast.show("An error occurred during validation. Please try again.");
                 } finally {
-                    this.closeBusyDialog(); // Always close the busy indicator
+                    this.closeBusyDialog();
                 }
             },
 
@@ -550,117 +508,100 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCvalidateDate(oEvent);
             },
 
-            SS_onSavePress: function (ID) {
-                var oView = this.getView();
-                var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
+            SS_onSavePress: function (sButtonId) {
+                const oView = this.getView();
+                const oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                 let isValid = true;
-                let optionalValid = true;
-                var Message = this.i18nModel.getText("selfServiceUpdateAdmin");
-                if (this.sNavigatedRole !== "Trainee") {
-                    if (ID !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
-                        MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
-                        return;
-                    }
+                let sMessage = this.i18nModel.getText("selfServiceUpdateAdmin");
+                if (this.sNavigatedRole !== "Trainee" && sButtonId !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
+                    MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
+                    return false;
                 }
-                try {
-                    if (ID !== "Submit") {
-                        if (this.sPath === 'SelfService') {
-                            var Message = this.i18nModel.getText("selfServiceUpdateEmployee");
-                            if (ID === "BasicDetailsBtn") {
-                                isValid =
-                                    utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
-                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_BloodGroup"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
-                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
-                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
-                                    utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
-                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
-                                    utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
-                                    utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-                                    utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
-                                    utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID");
-                            } else if (ID === "DocumentBtn") {
-                                isValid =
-                                    utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
-                                    utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
-                                    utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
-                                    utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
-                                    utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
-                                    utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
-                            }
-                            if (!isValid) {
-                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                                return;
-                            }
-                        }
-                        // Validate company mail, Manager, Country, and Base Location fields
-                        if (
-                            !utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") ||
-                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") ||
-                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") ||
-                            !utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID")
-                        ) {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                            return;
-                        }
-                        // Optional field validation
-                        const passport = oView.byId("SS_id_Passport").getValue().trim();
-                        const voterId = oView.byId("SS_id_Voterid").getValue().trim();
-                        const optionalValid =
-                            (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
-                            (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
-                            (oDataModel.MobileNo == null || oDataModel.MobileNo.trim() === "" || utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID")) &&
-                            (oDataModel.AccountNo == null || oDataModel.AccountNo.trim() === "" || utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID")) &&
-                            (oDataModel.IFSCCode == null || oDataModel.IFSCCode.trim() === "" || utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID")) &&
-                            (oDataModel.PANCard == null || oDataModel.PANCard.trim() === "" || utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID")) &&
-                            (oDataModel.AdharCard == null || oDataModel.AdharCard.trim() === "" || utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID")) &&
-                            (oDataModel.EmployeeStatus === 'Inactive' && this.sNavigatedRole !== "Trainee" ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
+                // --- Section 1: All Validation Logic ---
+                if (this.sPath === 'SelfService') {
+                    sMessage = this.i18nModel.getText("selfServiceUpdateEmployee");
+                    if (sButtonId === "BasicDetailsBtn") {
+                        // Basic Details & Emergency Contacts Validation
+                        isValid =
+                            utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
+                            utils._LCstrictValidationComboBox(oView.byId("SS_id_BloodGroup"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+                            utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
+                            utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+                            utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") &&
+                            utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+                            utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
+                            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
+                            utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+                            utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
+                            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID");
 
-                        if (!optionalValid) {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                            return;
-                        }
-
-                        // Update some fields before sending
-                        oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
-                        oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
-                        oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
-                        oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
-                        oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
-                    } else {
-                        oDataModel.Type = "Submit";
-                        var Message = this.i18nModel.getText("confirmSubmitMessage");
+                    } else if (sButtonId === "DocumentBtn") {
+                        // Bank Details & Personal IDs Validation
+                        isValid =
+                            utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
+                            utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") &&
+                            utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") &&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") &&
+                            utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") &&
+                            utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
                     }
+                } else {
+                    // Admin/HR Edit Validation
+                    const isRequiredValid =
+                        utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") &&
+                        utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") &&
+                        utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID");
 
-                    const oPayload = {
-                        data: oDataModel,
-                        filters: {
-                            EmployeeID: this.EmployeeID
-                        }
-                    };
+                    const passport = oView.byId("SS_id_Passport").getValue().trim();
+                    const voterId = oView.byId("SS_id_Voterid").getValue().trim();
+                    const isOptionalValid =
+                        (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
+                        (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
+                        (oDataModel.EmployeeStatus === 'Inactive' && this.sNavigatedRole !== "Trainee" ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
 
-                    if (optionalValid) {
-                        this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), Message,
-                            function () {
-                                this.getBusyDialog();
-                                this.updateFunctionForSelf(oPayload, ID);
-                            }.bind(this),
-                            function () {
-                                this.closeBusyDialog();
-                            }.bind(this)
-                        );
-                    }
-
-                } catch (error) {
-                    this.closeBusyDialog();
-                    MessageToast.show(error.message || "Unexpected error");
+                    isValid = isRequiredValid && isOptionalValid;
                 }
+                // --- Section 2: Check Validation Result ---
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return false; // Stop if validation failed
+                }
+
+                // --- Section 3: Prepare Data for Payload ---
+                // Get the switch state and set the EmployeeType field for saving.
+                const bIsExperienced = this.ViewModel.getProperty("/isExperienced");
+                oDataModel.EmployeeType = bIsExperienced ? "Experienced" : "Fresher";
+                if (sButtonId === "Submit") {
+                    oDataModel.Type = "Submit";
+                    sMessage = this.i18nModel.getText("confirmSubmitMessage");
+                } else {
+                    oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
+                    oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
+                    oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
+                    oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
+                    oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
+                }
+
+                const oPayload = {
+                    data: oDataModel,
+                    filters: { EmployeeID: this.EmployeeID }
+                };
+
+                // --- Section 4: Show Confirmation and Execute Save ---
+                this.showConfirmationDialog(this.i18nModel.getText("confirmTitle"), sMessage,
+                    function () {
+                        this.getBusyDialog();
+                        this.updateFunctionForSelf(oPayload, sButtonId);
+                    }.bind(this)
+                );
+                return true;
             },
             updateFunctionForSelf: function (oPayload, ID) {
                 var oView = this.getView();
