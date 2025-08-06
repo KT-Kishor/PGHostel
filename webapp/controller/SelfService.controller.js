@@ -450,7 +450,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     return;
                 }
 
-                this.getBusyDialog(); 
+                this.getBusyDialog();
                 try {
                     const oViewModel = this.getView().getModel("viewModel");
                     const bIsExperienced = oViewModel.getProperty("/isExperienced");
@@ -459,7 +459,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const aEducationData = oEducationModel ? oEducationModel.getData() : [];
                     if (aEducationData.length < 2) {
                         MessageBox.error(this.i18nModel.getText("minEducationRecordsError"));
-                        this.closeBusyDialog(); 
+                        this.closeBusyDialog();
                         return;
                     }
                     if (!aEducationData.some(edu => edu.DegreeName === "School/10th")) {
@@ -1305,35 +1305,47 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
             saveEducationDetails: async function (bIsCreate) {
                 try {
-                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
+                    // ---  field validation ---
+                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") &&
+                        utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") &&
+                        utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
                     if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
+                    let oModelData = this.getView().getModel("educationModel").getData();
+                    const sNewDegree = (sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "").trim().toLowerCase();
+                    const aExistingEducation = this.getOwnerComponent().getModel("sEducationModel").getData() || [];
+                    const isDuplicate = aExistingEducation.some(edu => {
+                        const isSameDegree = edu.DegreeName.trim().toLowerCase() === sNewDegree;
+                        return isSameDegree && (bIsCreate || edu.ID !== oModelData.ID);
+                    });
+
+                    if (isDuplicate) {
+                        MessageBox.error(this.i18nModel.getText("duplicateDegreeError", [sap.ui.getCore().byId("AddEd_id_Degree").getSelectedItem().getText()]));
+                        return;
+                    }
                     this.getBusyDialog();
-                    // Prepare model data
-                    let oModel = this.getView().getModel("educationModel").getData();
-                    oModel.EmployeeID = this.EmployeeID;
-                    oModel.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
-                    oModel.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
+                    // Prepare model data for payload
+                    oModelData.EmployeeID = this.EmployeeID;
+                    oModelData.DegreeName = sap.ui.getCore().byId("AddEd_id_Degree").getSelectedKey() || "";
+                    oModelData.GradeType = sap.ui.getCore().byId("AddEd_id_GradeType").getSelectedKey() || "";
 
                     let startDate = sap.ui.getCore().byId("AddEd_id_StartEdu").getValue();
                     let endDate = sap.ui.getCore().byId("AddEd_id_EndEdu").getValue();
-                    oModel.EducationStartDate = startDate ? startDate.split("/").reverse().join('-') : "";
-                    oModel.EducationEndDate = endDate ? endDate.split("/").reverse().join('-') : "";
+                    oModelData.EducationStartDate = startDate ? startDate.split("/").reverse().join('-') : "";
+                    oModelData.EducationEndDate = endDate ? endDate.split("/").reverse().join('-') : "";
 
                     let oPayload, sSuccessMessage, oResponse;
                     if (bIsCreate) {
-                        oPayload = {
-                            tableName: "EducationalDetails",
-                            data: oModel
-                        };
+                        oPayload = { data: oModelData };
                         sSuccessMessage = this.i18nModel.getText("eduDataSaved");
                         oResponse = await this.ajaxCreateWithJQuery("EducationalDetails", oPayload);
                     } else {
                         oPayload = {
-                            data: oModel,
-                            filters: { ID: oModel.ID }
+                            data: oModelData,
+                            filters: { ID: oModelData.ID }
                         };
                         sSuccessMessage = this.i18nModel.getText("eduDataupdate");
                         oResponse = await this.ajaxUpdateWithJQuery("EducationalDetails", oPayload);
@@ -1346,15 +1358,14 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         await this._fetchCommonData("EducationalDetails", "sEducationModel", {
                             EmployeeID: this.EmployeeID
                         });
-                        this.closeBusyDialog();
                     } else {
-                        this.closeBusyDialog();
                         MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                     }
                 } catch (error) {
-                    this.closeBusyDialog();
                     const errorMessage = error?.responseText || error.message || "Unexpected error";
                     MessageToast.show(errorMessage);
+                } finally {
+                    this.closeBusyDialog();
                 }
             },
             AddEd_onSubmitEdDetails: function () {
