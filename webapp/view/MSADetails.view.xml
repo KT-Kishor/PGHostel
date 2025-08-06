@@ -71,6 +71,18 @@
 							<TextArea value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 							<Label text="{i18n>GSTNO}"/>
 							<Input value="{msaModelWizart>/GST}" placeholder="{i18n>placeholderGST}" id="MsaD_id_GST" maxLength="15" liveChange="MsaD_validateGST" valueStateText="{i18n>gstNoValueState}" />
+<Label text="{i18n>status}"/>
+<Select
+    id="MsaD_id12"
+    items="{
+        path: 'AssignmentStatus>/assignmentStatus'
+    }"
+    selectedKey="{msaModelWizart>/Status}"
+    liveChange="MsaD_validateGST"
+    
+>
+    <core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}" />
+</Select>
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}"></Label>
 							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="5" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 							<!-- Payment Section -->
@@ -119,6 +131,9 @@
 							<Text text="{msaModelWizart>/MsaEmail}" />
 							<Label text="{i18n>GSTNO}"/>
 							<Text text="{msaModelWizart>/GST}"/>
+
+							<Label text="{i18n>status}"/>
+							<Text text="{msaModelWizart>/Status}" />	
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/RateCharge} %" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="{i18n>paymentLabel}" visible="{VisibleModel>/Recruitment}"/>
@@ -128,7 +143,8 @@
 							<Label text="{i18n>ReplacementGratuityMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Text text="{msaModelWizart>/ReplacementMonth}" visible="{VisibleModel>/Recruitment}"/>
 							<Label text="{i18n>ReplacementGratuityRefund}" visible="{VisibleModel>/Recruitment}"/>
-							<Text text="{msaModelWizart>/ReplacementRefund} %" visible="{VisibleModel>/Recruitment}"/>							
+							<Text text="{msaModelWizart>/ReplacementRefund} %" visible="{VisibleModel>/Recruitment}"/>	
+													
 						</f:content>
 					</f:SimpleForm>
 				</WizardStep>

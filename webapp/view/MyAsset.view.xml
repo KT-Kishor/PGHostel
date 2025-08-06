@@ -16,6 +16,7 @@
             />
         </headerContent>
         <Table
+        sticky="ColumnHeaders,HeaderToolbar"
             class="sapUiResponsiveMargin"
             alternateRowColors="true"
             width="auto"

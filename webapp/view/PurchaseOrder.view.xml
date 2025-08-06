@@ -64,7 +64,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="idPOTable" mode="SingleSelectLeft" width="auto" class="sapUiResponsiveMargin"
+			<Table id="idPOTable" sticky="ColumnHeaders,HeaderToolbar" mode="SingleSelectLeft" width="auto" class="sapUiResponsiveMargin"
            items="{path: 'POModel>/', sorter: {path: 'PoNumber', descending: true}}">
 				<headerToolbar>
 					<OverflowToolbar>

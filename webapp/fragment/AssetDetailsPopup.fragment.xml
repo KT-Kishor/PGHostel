@@ -9,6 +9,7 @@
     >
         <content>
             <Table
+            sticky="ColumnHeaders"
                 id="FDP_id_VHDTable"
                 items="{filteredAssetDetails>/}"
             >

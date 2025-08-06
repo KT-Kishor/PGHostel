@@ -89,7 +89,7 @@
 									</fb:FilterGroupItem>
 								</fb:filterGroupItems>
 							</fb:FilterBar>
-							<Table id="V1_ID_Table" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
+							<Table id="V1_ID_Table" sticky="ColumnHeaders" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
 								<columns>
 									<Column demandPopin="true">
 										<Text text="{i18n>v1_jobTitle}" />

@@ -41,7 +41,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MI_id_MyInboxTable" class="sapUiTinyMargin"  items="{path: 'MyInboxModelData>/', sorter: {path: 'EmpID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"  busyIndicatorDelay="0"  width="auto"
+			<Table id="MI_id_MyInboxTable" sticky="ColumnHeaders,HeaderToolbar" class="sapUiTinyMargin"  items="{path: 'MyInboxModelData>/', sorter: {path: 'EmpID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"  busyIndicatorDelay="0"  width="auto"
                 inset="false"  mode="SingleSelectLeft" selectionChange="onSelectionChangeStatus"   growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				<headerToolbar>
 					<OverflowToolbar >

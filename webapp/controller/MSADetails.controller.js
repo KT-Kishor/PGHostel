@@ -46,7 +46,8 @@ sap.ui.define([
                     ReplacementRefund: "",
                     Country: "",
                     City: "",
-                    GST: ""
+                    GST: "",
+                    Status:"New"
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 

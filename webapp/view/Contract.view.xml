@@ -55,7 +55,7 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table  class="sapUiResponsiveMargin" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
+			<Table  class="sapUiResponsiveMargin" sticky="ColumnHeaders,HeaderToolbar" growingScrollToLoad="true" width="auto" id="C_id_Salary"  items="{
                 path: 'ContractModel>/', sorter: {path: 'ContractStatus',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0" mode="SingleSelectLeft"
 			    selectionChange="onSelectionChange">
 			 <headerToolbar>

@@ -20,7 +20,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<!-- Table -->
-			<Table id="IC_id_CardTable" mode="SingleSelectLeft" selectionChange="onSelectionChange">
+			<Table id="IC_id_CardTable" mode="SingleSelectLeft" sticky="ColumnHeaders,HeaderToolbar" selectionChange="onSelectionChange">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title id="IC_id_Title" text="{i18n>idCardDetails}"/>

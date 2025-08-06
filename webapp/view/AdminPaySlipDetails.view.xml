@@ -236,7 +236,7 @@
                                         <g:Card>
                                             <g:content>
                                                 <m:VBox>
-                                                    <m:Table
+                                                    <m:Table sticky="ColumnHeaders,HeaderToolbar"
                                                         id="APD_id_SalaryTable"
                                                         items="{PaySlip>/EmpData/EarningData}"
                                                     >
@@ -350,7 +350,7 @@
                                         <g:Card>
                                             <g:content>
                                                 <m:VBox>
-                                                    <m:Table
+                                                    <m:Table sticky="ColumnHeaders,HeaderToolbar"
                                                         items="{PaySlip>/EmpData/DeductionData}"
                                                     >
                                                         <m:headerToolbar>

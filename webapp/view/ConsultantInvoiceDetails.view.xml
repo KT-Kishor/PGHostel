@@ -201,7 +201,7 @@
 										<m:ToolbarSpacer />
 										<m:Button visible="{visiablityPlay>/invBtn}"  text="{i18n>addItem}" tooltip="{i18n>addItem}" press="CI_onPressAddInvoiceDetails" type="Transparent" />
 									</m:OverflowToolbar>
-									<m:Table id="CI_id_ConsultantInvoiceDeatailTable"  
+									<m:Table id="CI_id_ConsultantInvoiceDeatailTable"  sticky="ColumnHeaders"
 									items="{ConsultantInvoiceModel>/ConsultantInvoiceItem}"
 											mode="Delete" 
 											delete="CI_onPressDelete" 

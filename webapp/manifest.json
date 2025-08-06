@@ -721,7 +721,17 @@
                     "name": "RouteHP_View",
                     "pattern": "HP_View",
                     "target": ["TargetHP_View"]
-                  }
+                  },
+                  {
+                   "name": "ExpenseInvoice",
+                   "pattern": "ExpenseInvoice",
+                   "target": ["TargetExpenseInvoice"]
+               },
+                 {
+                   "name": "ExpenseInvoiceDetail",
+                   "pattern": "ExpenseInvoiceDetail/{sPath}",
+                   "target": ["TargetExpenseInvoiceDetails"]
+                 }
             ],
             "targets": {
               "TargetView1": {
@@ -1102,7 +1112,22 @@
                 "clearControlAggregation": false,
                 "viewId": "HP_View",
                 "viewName": "HP_View"
-              }
+              },
+              "TargetExpenseInvoice": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ExpenseInvoice",
+          "viewName": "ExpenseInvoice"
+        },
+         "TargetExpenseInvoiceDetails":{
+           "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ExpenseInvoiceDetail",
+          "viewName": "ExpenseInvoiceDetail"
+        }
+
             }
         },
         "rootView": {

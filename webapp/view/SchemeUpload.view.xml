@@ -104,6 +104,7 @@
                 growing="true"
                 growingThreshold="50"
                 alternateRowColors="false"
+                sticky="ColumnHeaders,HeaderToolbar"
             >
                 <headerToolbar>
                     <OverflowToolbar>

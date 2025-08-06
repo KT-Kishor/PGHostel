@@ -106,6 +106,7 @@
         focusable="true"
     >
         <Table
+        sticky="ColumnHeaders,HeaderToolbar"
             class="sapUiTinyMargin"
             alternateRowColors="true"
             busyIndicatorDelay="0"

@@ -8,7 +8,7 @@
 			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey" useToolbar="false" clear="MC_onClear" showClearOnFB="true" search="MC_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
+			<fb:FilterBar id="MC_id_CompanyFilter" persistencyKey="myPersKey"  useToolbar="false" clear="MC_onClear" showClearOnFB="true" search="MC_onSearch" filterChange=".onFilterChange" showFilterConfiguration="false">
 				<fb:filterGroupItems>
 				<fb:FilterGroupItem name="companyName" label="{i18n>companyName}" groupName="ManageCustomerGroup" visibleInFilterBar="true">
 					<fb:control>
@@ -19,7 +19,7 @@
 				</fb:FilterGroupItem>
 			</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="MC_id_CustTable" mode="SingleSelectLeft" 
+			<Table id="MC_id_CustTable" mode="SingleSelectLeft" sticky="ColumnHeaders,HeaderToolbar"
 			 items="{CreateCustomerModel>/}"
 			 growing="true"
              growingThreshold="100"

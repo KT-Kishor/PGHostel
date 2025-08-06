@@ -372,6 +372,7 @@
                                         delete="HQD_onPressDelete"
                                         mode="{= ${visiablityPlay>/editable} === true ? 'Delete' : 'None'}"
                                         items="{QuotationModel>/QuotationItemModel}"
+                                        sticky="ColumnHeaders,HeaderToolbar"
                                     >
 										<m:headerToolbar>
 											<m:OverflowToolbar>

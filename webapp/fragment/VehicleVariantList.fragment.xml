@@ -25,6 +25,7 @@
 
             <Table
                 id="VVF_id_Table"
+                sticky="ColumnHeaders"
                 growing="true"
                 growingThreshold="50"
                 growingScrollToLoad="true"

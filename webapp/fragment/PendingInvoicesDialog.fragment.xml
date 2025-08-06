@@ -10,6 +10,7 @@
         draggable="true">
         <content>
             <Table
+            sticky="ColumnHeaders"
                 items="{dialogData>/invoices}"
                 noDataText="{i18n>noPendingData}">
                 <columns>

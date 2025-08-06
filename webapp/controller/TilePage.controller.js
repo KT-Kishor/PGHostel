@@ -462,6 +462,9 @@ sap.ui.define(
         TileV_onpressInvoiceDashboard: function () {
           this.getRouter().navTo("RouteInvoiceDashboard");
         },
+        TileV_onpressExpenseInvoiceDashboard:function(){
+          this.getRouter().navTo("ExpenseInvoice");
+        }
       }
     );
   }

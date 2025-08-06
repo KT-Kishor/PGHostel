@@ -131,6 +131,7 @@
             </fb:filterGroupItems>
         </fb:FilterBar>
         <Table
+        sticky="ColumnHeaders,HeaderToolbar"
             alternateRowColors="true"
             id="AA_id_AssestTable"
             fixedLayout="false"

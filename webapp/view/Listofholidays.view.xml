@@ -33,6 +33,7 @@
 			<Table
                  growingScrollToLoad="true"
                      id="LOH_id_HolidayTable"
+					 sticky="ColumnHeaders,HeaderToolbar"
                      width="auto"
                      items="{path: 'HolidayModel>/'}"
 					 busyIndicatorDelay="0"

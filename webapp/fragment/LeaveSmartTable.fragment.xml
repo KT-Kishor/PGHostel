@@ -1,6 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
 
 		<Table id="AL_id_LeaveTableStandard"
+		sticky="ColumnHeaders,HeaderToolbar"
 			mode="SingleSelectLeft"
 			selectionChange="onSelectionChange"
 			 busyIndicatorDelay="0"

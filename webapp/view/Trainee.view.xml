@@ -47,7 +47,7 @@
 				</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="T_id_TraineeTable" class="sapUiResponsiveMargin"    items="{
+			<Table id="T_id_TraineeTable" class="sapUiResponsiveMargin" sticky="ColumnHeaders,HeaderToolbar" items="{
                 path: 'traineeModel>/', sorter: {path: 'Status',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}" busyIndicatorDelay="0"  width="auto" mode="SingleSelectLeft" selectionChange="T_onTableSelectionChange"
                     growingScrollToLoad="true" growing="true"  growingThreshold="50"  alternateRowColors="true">
 				 <headerToolbar>

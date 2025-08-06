@@ -68,6 +68,7 @@
             <Table
                 id="TSA_id_Table"
                 mode="MultiSelect"
+                sticky="ColumnHeaders"
                 items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
                 growing="true"
                 selectionChange="TSA_onSelect"

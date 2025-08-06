@@ -76,7 +76,7 @@
                 alternateRowColors="true"
                 busyIndicatorDelay="0"
                 id="HQ_id_QuotationItemTable"
-                class="sapUiResponsiveMargin"
+                class="sapUiResponsiveMargin" sticky="ColumnHeaders,HeaderToolbar"
                 width="auto">
                 <headerToolbar>
                     <OverflowToolbar>

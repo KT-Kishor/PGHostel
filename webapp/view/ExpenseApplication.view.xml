@@ -68,6 +68,7 @@
        width="auto"
 	   mode="SingleSelectLeft"
 	   selectionChange="onTableSelectionChange"
+	   sticky="ColumnHeaders,HeaderToolbar"
        busyIndicatorDelay="0">			 <headerToolbar>
                 <OverflowToolbar >
                     <Title id="title" text="{i18n>expDetails} ({= ${ExpenseModel>/}.length })"/>

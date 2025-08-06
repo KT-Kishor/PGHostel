@@ -73,7 +73,7 @@
 			</f:SimpleForm>
 		</VBox>
 		<VBox visible="{visiablityPlay>/Table}">
-			<Table items="{PaymentDetailModel>/InvoicePaymentDetail}">
+			<Table items="{PaymentDetailModel>/InvoicePaymentDetail}" sticky="ColumnHeaders">
 				<columns>
 					<Column minScreenWidth="Tablet">
 						<Text text="{i18n>invoiceTransactionID}" />

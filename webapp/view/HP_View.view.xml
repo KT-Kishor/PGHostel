@@ -52,7 +52,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="jobPostingTable" mode="SingleSelectLeft" items="{path: 'JobApplicationModel>/Candidates', sorter: [{ path: 'CreatedBy', descending: false, group: true }, { path: 'PostDate', descending: true }]}" selectionChange="onJobSelectionChange">
+			<Table id="jobPostingTable" mode="SingleSelectLeft" sticky="ColumnHeaders,HeaderToolbar" items="{path: 'JobApplicationModel>/Candidates', sorter: [{ path: 'CreatedBy', descending: false, group: true }, { path: 'PostDate', descending: true }]}" selectionChange="onJobSelectionChange">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>HP_Table_TB}" level="H2" />

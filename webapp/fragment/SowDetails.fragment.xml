@@ -43,7 +43,7 @@
         </f:content>
     </f:SimpleForm>
         <VBox class="sapUiSmallMargin sapUiSmallPadding">
-       <Table busyIndicatorDelay="0" id="SOW_id_oTableCreateSow" items="{path:'oModelDataPro>/'}"  mode="{simpleForm>/Mode}" delete="onPressDeleteModeCreateSow" selectionChange="SOW_onSelectionChange">
+       <Table busyIndicatorDelay="0" sticky="ColumnHeaders,HeaderToolbar" id="SOW_id_oTableCreateSow" items="{path:'oModelDataPro>/'}"  mode="{simpleForm>/Mode}" delete="onPressDeleteModeCreateSow" selectionChange="SOW_onSelectionChange">
     <headerToolbar>
         <Toolbar>
             <Title text="{i18n>ConsultantHeaderDetails}" id="SOW_id_SowDetails" />

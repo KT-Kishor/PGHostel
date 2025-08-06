@@ -51,6 +51,7 @@
                 class="sapUiResponsiveLayout"/>
                 <Table
                 class="sapUiTinyMargin"
+                sticky="ColumnHeaders,HeaderToolbar"
                 growing="true"
                 growingScrollToLoad="true"
                 width="auto"

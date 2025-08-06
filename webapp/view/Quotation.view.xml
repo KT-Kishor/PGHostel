@@ -140,6 +140,7 @@
             </filterbar:FilterBar>
             <Table
                 id="Q_id_Table"
+                sticky="ColumnHeaders,HeaderToolbar"
                 busyIndicatorDelay="0"
                 class="sapUiTinyMargin"
                 width="auto"

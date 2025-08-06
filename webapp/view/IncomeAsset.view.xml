@@ -167,6 +167,7 @@
             </fb:filterGroupItems>
         </fb:FilterBar>
         <Table
+        sticky="ColumnHeaders,HeaderToolbar"
             class="sapUiResponsiveMargin"
             width="auto"
             alternateRowColors="true"

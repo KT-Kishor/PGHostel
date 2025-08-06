@@ -292,6 +292,7 @@
                                     id="Sow_Id_ReadTable"
                                     mode="SingleSelectLeft"
                                     selectionChange="onPressChangeSow"
+                                    sticky="ColumnHeaders,HeaderToolbar"
                                 >
                                     <m:headerToolbar>
                                         <m:OverflowToolbar>

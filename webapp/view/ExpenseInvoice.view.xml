@@ -1,18 +1,18 @@
-<mvc:View controllerName="sap.kt.com.minihrsolution.controller.CompanyInvoice"
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.ExpenseInvoice"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:core="sap.ui.core">
-	<Page id="CI_id_CompanyInvoice">
+	<Page id="EI_id_CompanyInvoice">
 		<headerContent>
         <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
         </headerContent>
 		<content>
-			<fb:FilterBar id="CI_id_InvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" clear="onPressClear" showClearOnFB="true" search="CompanyInvoice_onSearch" >
+			<fb:FilterBar id="EI_id_InvoiceFilterBar" showFilterConfiguration="false" useToolbar="false" clear="onPressClear" showClearOnFB="true" search="CompanyInvoice_onSearch" >
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="InvNo" label="{i18n>invoiceNo}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_InvNo"
+							<ComboBox id="EI_id_InvNo"
                     items="{path:'CompanyInvoiceFilterModel>/', length:1000}" filterSecondaryValues="true"
                     showSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{CompanyInvoiceFilterModel>InvNo}" text="{CompanyInvoiceFilterModel>InvNo}" additionalText="{CompanyInvoiceFilterModel>CustomerName}"/>
@@ -21,35 +21,35 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<DateRangeSelection id="CI_id_InvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
+							<DateRangeSelection id="EI_id_InvoiceDatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CustomerNameComboBox" items="{ManageCustomerModel>/}" showSecondaryValues="true" showClearIcon="true">
+							<ComboBox id="EI_id_CustomerNameComboBox" items="{ManageCustomerModel>/}" showSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_StatusComboBox" items="{CompanyInvoiceStatus>/}" showClearIcon="true">
+							<ComboBox id="EI_id_StatusComboBox" items="{CompanyInvoiceStatus>/}" showClearIcon="true">
 								<core:ListItem key="{CompanyInvoiceStatus>ID}" text="{CompanyInvoiceStatus>InvoiceStatus}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="CI_id_InvoiceTable" sticky="ColumnHeaders,HeaderToolbar" items="{CompanyInvoiceModel>/}">
+			<Table id="EI_id_InvoiceTable" sticky="ColumnHeaders,HeaderToolbar" items="{CompanyInvoiceModel>/}">
 				<headerToolbar>
 					  <OverflowToolbar >
-						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${CompanyInvoiceModel>/}.length})"/>
+						<Title id="EI_id_Title" text="{i18n>expenseInvoice} ({= ${CompanyInvoiceModel>/}.length})"/>
 						 <ToolbarSpacer/>
 						<Button text="{i18n>download}" type="Transparent" tooltip="{i18n>invoicedownload}" press="CI_onPressDownload" />
 
 						<Button text="{i18n>InvoiceAddBtn}" type="Transparent" tooltip="{i18n>addInvoice}" press="CI_onPressAddInvoice" />
 						<ToolbarSeparator />
-						<Button text="{i18n>InvoiceDeleteBtn}" id="CI_InvoiceDelete" visible="false" type="Transparent" press="CI_OnPressDeleteInvoice" enabled="false" />
+						<Button text="{i18n>InvoiceDeleteBtn}" id="EI_InvoiceDelete" visible="false" type="Transparent" press="CI_OnPressDeleteInvoice" enabled="false" />
 						<Button text="{i18n>msasow}" type="Transparent" press="CI_onPressMSASOW"/>
 					  </OverflowToolbar >
 				</headerToolbar>
@@ -82,7 +82,7 @@
 							<Text text="{CompanyInvoiceModel>InvNo}" />
 							<Text text="{CompanyInvoiceModel>CustomerName}" />
 							<Text text="{path:'CompanyInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}" />
-							<ExpandableText text="{CompanyInvoiceModel>InvoiceDescription}" maxCharacters="20"/>
+							<Text text="{CompanyInvoiceModel>InvoiceDescription}" />
 							<Text text="{path: 'CompanyInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {CompanyInvoiceModel>Currency}" textAlign="End" />
 							<ObjectStatus class="PayByDateClass" text="{path:'CompanyInvoiceModel>PayByDate',formatter:'.Formatter.formatDate'}" inverted="false" state="{ parts: [{path: 'CompanyInvoiceModel>PayByDate'},{path: 'CompanyInvoiceModel>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}" />
 							<ObjectStatus text="{CompanyInvoiceModel>Status}" inverted="false" state="{path: 'CompanyInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass" />

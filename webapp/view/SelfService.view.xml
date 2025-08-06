@@ -863,7 +863,7 @@
                             titleUppercase="false"
                         >
 							<blocks>
-								<m:Table
+								<m:Table sticky="ColumnHeaders,HeaderToolbar"
                                     class="sapUiTinyMargin"
                                     growingScrollToLoad="true"
                                     busyIndicatorDelay="0"
@@ -960,7 +960,7 @@
                             titleUppercase="false"
                         >
 							<blocks>
-								<m:Table
+								<m:Table sticky="ColumnHeaders,HeaderToolbar"
                                     class="sapUiTinyMargin"
                                     busyIndicatorDelay="0"
                                     id="EmpF_id_EmpTable"
@@ -1085,7 +1085,8 @@
                                         showIcon="true"
                                         class="sapUiTinyMarginBottom"
                                     />
-									<m:Table
+									<m:Table 
+                                    sticky="ColumnHeaders,HeaderToolbar"
                                         id="table-uploadSet"
                                         mode="SingleSelectLeft"
                                         items="{DocumentModel>/items}"
@@ -1231,7 +1232,7 @@
                             id="connectionsSS"
                             titleUppercase="false"
                         >
-							<m:Table
+							<m:Table sticky="ColumnHeaders"
                                 id="SS_id_PaySlipTable"
                                 busyIndicatorDelay="0"
                                 growing="true"

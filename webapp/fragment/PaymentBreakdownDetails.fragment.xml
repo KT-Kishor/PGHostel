@@ -11,6 +11,7 @@
         <content>
             <Table
                 items="{dialogData>/invoices}"
+                sticky="ColumnHeaders"
                 noDataText="{i18n>noBData}">
                 <columns>
                     <Column><Text text="{i18n>invoiceNo}" /></Column>

@@ -189,6 +189,7 @@
                                     items="{
                                         path: 'objectModel>/'
                                     }"
+                                    sticky="ColumnHeaders"
                                 >
                                     <m:columns>
                                         <m:Column

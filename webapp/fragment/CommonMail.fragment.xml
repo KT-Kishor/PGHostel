@@ -8,7 +8,7 @@
 
         <MessageStrip visible="{LoginModel>/SimpleForm}" class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop" text="{i18n>sendMailFragMsg}" type="Information" showIcon="true" />
         <VBox class="sapUiResponsiveMargin">
-            <Table items="{UploaderData>/attachments}" inset="false" mode="Delete" delete="onAttachmentsTableDelete" popinLayout="Block" busyIndicatorDelay="0" width="100%">
+            <Table  sticky="ColumnHeaders,HeaderToolbar" items="{UploaderData>/attachments}" inset="false" mode="Delete" delete="onAttachmentsTableDelete" popinLayout="Block" busyIndicatorDelay="0" width="100%">
 
                 <headerToolbar>
                     <OverflowToolbar>

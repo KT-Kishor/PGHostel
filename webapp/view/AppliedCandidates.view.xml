@@ -119,6 +119,7 @@
 
         <Table
             id="appliedCandidatesTable"
+            sticky="ColumnHeaders,HeaderToolbar"
             items="{path: 'DataTableModel>/',sorter: [{path: 'CreatedBy', descending: false, group: true },    
             {path: 'CreateDate', descending: true }],groupHeaderFactory: '.getGroupHeader'}"
             mode="SingleSelectLeft"

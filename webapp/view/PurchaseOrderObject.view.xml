@@ -465,7 +465,7 @@
                             <blocks>
                                 <m:VBox class="sapUiSmallMargin">
                                     <m:Table
-                                        id="idTable"
+                                        id="idTable" sticky="ColumnHeaders,HeaderToolbar"
                                         items="{PurchaseOrderModel>/PurchaseOrders}"
                                         mode="{= ${PurchaseOrderModel>/Editable} === true ? 'Delete' : 'None'}"
                                         delete="POO_onPOTableDelete"
