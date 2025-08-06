@@ -247,19 +247,19 @@
 												<m:Text class="amountText" text="{path:'InvoicePayment>/AllReceivedAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- Received TDS -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= 
+											<!-- <m:HBox justifyContent="SpaceBetween" visible="{= 
         (${SelectedCustomerModel>/Status} === 'Payment Received' || 
          ${SelectedCustomerModel>/Status} === 'Payment Partially') &amp;&amp;
          ${FilteredSOWModel>/Currency} === 'INR'
-    }">
-												<m:Label text="{i18n>invoiceReceivedIncomeTax} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+    }"> -->
+												<!-- <m:Label text="{i18n>invoiceReceivedIncomeTax} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path:'InvoicePayment>/AllReceivedTDS',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
-											</m:HBox>
+											</m:HBox> -->
 											<!-- Due Amount -->
-											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }">
+											<!-- <m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }">
 												<m:Label text="{i18n>invoiceDueAmount} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path:'InvoicePayment>/AllDueAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
-											</m:HBox>
+											</m:HBox> -->
 										</m:VBox>
 									</m:FlexBox>
 								</m:VBox>

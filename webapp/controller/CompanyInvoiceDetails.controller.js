@@ -913,7 +913,8 @@ sap.ui.define([
                     Currency: oNavigationModel.Currency,
                     ReceivedTDS: ResivedTDSData,
                     ConversionRate: "",
-                    AmountInINR: ""
+                    AmountInINR: "",
+                    FlagVisCompany : "Company Invoice"
                 });
 
                 this.getView().setModel(oModel, "PaymentModel")

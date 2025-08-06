@@ -35,8 +35,8 @@
 					<Label text="{i18n>invoiceReceivedAmount}" required="true"/>
 					<Input value="{PaymentModel>/ReceivedAmount}" id="idReceivedAmount" change="onChangeReceivedAmount" valueStateText="{i18n>invoiceRecievedAmountMessage}" placeholder="Enter received amount" maxLength="15"/>
 
-					<Label text="{i18n>invoiceReceivedTDS}" required="true" visible="{= ${PaymentModel>/Currency} === 'INR'}" />
-					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="15" visible="{= ${PaymentModel>/Currency} === 'INR'}" valueStateText="Received TDS is required" />
+					<Label text="{i18n>invoiceReceivedTDS}" required="true" />
+					<Input value="{PaymentModel>/ReceivedTDS}" id="idReceivedTDS" change="onChangeReceivedTDS" placeholder="Enter received TDS" maxLength="15" visible="{= ${PaymentModel>/Currency} === 'INR' &amp;&amp;  ${PaymentModel>/FlagVisCompany} === 'Company Invoice' }" valueStateText="Received TDS is required" />
 
 					<Label text=""/>
 					<HBox width="100%" justifyContent="SpaceBetween" visible="{= ${PaymentModel>/Currency} !== 'INR'}">
@@ -62,7 +62,7 @@
 					<Label text="{i18n>invoiceDueAmount}" required="true"/>
 					<HBox width="100%" justifyContent="SpaceBetween">
 						<VBox width="calc(50% - 10px)">
-							<Input value="{path:'PaymentModel>/DueAmount', formatter:'.Formatter.numberFormater'}" editable="false" />
+							<Input value="{path:'PaymentModel>/DueAmount' , formatter:'.Formatter.numberFormater'}" editable="false" />
 						</VBox>
 						<VBox width="calc(50% - 10px)">
 							<Input value="{PaymentModel>/Currency}" editable="false" />
@@ -87,7 +87,7 @@
                     <Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceReceivedAmount}" />
 					</Column>
-					<Column visible="{= ${PaymentModel>/Currency} === 'INR'}" minScreenWidth="Tablet" demandPopin="true">
+					<Column visible="{= ${PaymentModel>/Currency} === 'INR' &amp;&amp;  ${PaymentModel>/FlagVisCompany} === 'Company Invoice'}" minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceReceivedTDS}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">

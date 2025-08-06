@@ -157,12 +157,14 @@ sap.ui.define([
                     }
                     this.Status = Status;
                     this.totalAmountCalculation();
-                    this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath })
+                    this.Readcall("ExpenseInvoicePaymentDetail", { InvNo: this.decodedPath })
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to load invoice data.");
                 } finally {
                     this.closeBusyDialog();
                 }
+
+
             },
 
             onLogout: function () {
@@ -811,8 +813,8 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("EID_id_InvoiceDesc"), "ID") && this.mobileNo &&
                         utils._LCvalidateMandatoryField(this.byId("EID_id_SowPO"), "ID") &&
                         utils._LCvalidateEmail(this.byId("EID_id_InputMailID"), "ID") &&
-                        ( !!this.RateUnit && !!this.Particulars) 
-                        // (oModel.Currency === "INR" ? utils._LCvalidateAmount(this.byId("EID_id_ConversionRate"), "ID") : utils._LCvalidateAmount(this.byId("EID_id_ConversionRate"), "ID"));
+                        (!!this.RateUnit && !!this.Particulars)
+                    // (oModel.Currency === "INR" ? utils._LCvalidateAmount(this.byId("EID_id_ConversionRate"), "ID") : utils._LCvalidateAmount(this.byId("EID_id_ConversionRate"), "ID"));
 
                     if (!bIsValid) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
@@ -852,6 +854,7 @@ sap.ui.define([
             },
 
             onChangeInvoiceStatus: function (oEventOrStatus) {
+                
                 var that = this;
                 var status = "";
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
@@ -877,10 +880,13 @@ sap.ui.define([
                         }).then(function (oDialog) {
                             that.oDialog = oDialog;
                             oView.addDependent(that.oDialog);
+                            
                             that.oDialog.open();
+                            
                             that.modelFunction();
                         }.bind(that));
                     } else {
+                       
                         that.oDialog.open();
                         that.modelFunction();
                     }
@@ -900,17 +906,19 @@ sap.ui.define([
                     TotalAmount: parseFloat(oNavigationModel.TotalAmount).toFixed(2),
                     DueAmount: (
                         this.getView().getModel("InvoicePayment").getData().length !== 0
-                            ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) - parseFloat(ResivedTDSData || 0)
-                            : parseFloat(oNavigationModel.TotalAmount || 0) - parseFloat(oNavigationModel.IncomeTax || 0)
+                            ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) //- parseFloat(ResivedTDSData || 0)
+                            : parseFloat(oNavigationModel.TotalAmount || 0) //- parseFloat(oNavigationModel.IncomeTax || 0)
                     ).toFixed(2),
                     Currency: oNavigationModel.Currency,
                     ReceivedTDS: ResivedTDSData,
                     ConversionRate: "",
-                    AmountInINR: ""
+                    AmountInINR: "",
+                    FlagVisCompany : "Expense Invoice"
+                    
                 });
 
                 this.getView().setModel(oModel, "PaymentModel")
-                this.DueAmount = (this.getView().getModel("InvoicePayment").getData().length !== 0) ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) : parseFloat(oNavigationModel.TotalAmount) - parseFloat(oNavigationModel.IncomeTax);
+                this.DueAmount = (this.getView().getModel("InvoicePayment").getData().length !== 0) ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) : parseFloat(oNavigationModel.TotalAmount) //- parseFloat(oNavigationModel.IncomeTax);
                 this.ResivedTDS = (oNavigationModel.Currency === "INR") ? parseFloat(oNavigationModel.IncomeTax) - parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedTDS") || 0) : '0';
             },
 
@@ -938,7 +946,7 @@ sap.ui.define([
                 var receivedTDS = parseFloat((paymentModel.getProperty("/ReceivedTDS") || "").replaceAll(',', '')) || 0;
                 var AllreceivedTDS = parseFloat(allPaymentData.getProperty("/AllReceivedTDS")) || 0;
 
-                var dueAmount = totalAmount - totalReceivedAmount - receivedAmount - receivedTDS - AllreceivedTDS;
+                var dueAmount = totalAmount - totalReceivedAmount - receivedAmount;
                 paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
                 this.onChangePaymentConvertionRate();
 
@@ -1006,7 +1014,7 @@ sap.ui.define([
                 const totalReceivedAmount = items.reduce((sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0), 0);
                 const totalReceivedTDS = items.reduce((sum, item) => sum + (parseFloat(item.ReceivedTDS) || 0), 0);
                 const totalAmount = parseFloat(items[0]?.TotalAmount || 0);
-                const totalDueAmount = totalAmount - (totalReceivedAmount + totalReceivedTDS);
+                const totalDueAmount = totalAmount - (totalReceivedAmount );
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
                 invoiceModel.setProperty("/AllReceivedTDS", totalReceivedTDS.toFixed(2));
@@ -1045,7 +1053,7 @@ sap.ui.define([
                 var receivedAmount = parseFloat((paymentModel.ReceivedAmount || "0").replaceAll(',', ''));
                 var receivedTDS = parseFloat((paymentModel.ReceivedTDS).replaceAll(',', ''));
                 var isReceivedAmountInvalid = isNaN(receivedAmount) || receivedAmount <= 0;
-                var isReceivedTDSInvalid = isNaN(receivedTDS) || receivedTDS <= 0;
+                // var isReceivedTDSInvalid = isNaN(receivedTDS) || receivedTDS <= 0;
 
                 if (isReceivedAmountInvalid) {
                     sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
@@ -1053,20 +1061,20 @@ sap.ui.define([
                     sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 }
 
-                if (isReceivedTDSInvalid) {
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("Error").setValueStateText(this.i18nModel.getText("tdsAmountError"));
-                } else {
-                    sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
-                }
+                // if (isReceivedTDSInvalid) {
+                //     sap.ui.getCore().byId("idReceivedTDS").setValueState("Error").setValueStateText(this.i18nModel.getText("tdsAmountError"));
+                // } else {
+                //     sap.ui.getCore().byId("idReceivedTDS").setValueState("None");
+                // }
 
-                if (isReceivedAmountInvalid || isReceivedTDSInvalid) {
+                if (isReceivedAmountInvalid ) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
 
                 const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount && this.ResivedTDSFlag;
                 if (!this.ResivedAmount) {
-                   sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("Error").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
                 }
 
                 if (!isValid) {
@@ -1088,17 +1096,17 @@ sap.ui.define([
                     TotalAmount: String(paymentModel.TotalAmount),
                     DueAmount: String(paymentModel.DueAmount),
                     Currency: String(paymentModel.Currency),
-                    ReceivedTDS: String(paymentModel.ReceivedTDS),
+                    // ReceivedTDS: String(paymentModel.ReceivedTDS),
                     ConversionRate: paymentModel.Currency !== "INR" ? String(paymentModel.ConversionRate) : "",
                     AmountInINR: paymentModel.Currency !== "INR" ? String(paymentModel.AmountInINR) : ""
                 };
 
                 try {
-                    const oData = await this.ajaxCreateWithJQuery("InvoicePaymentDetail", { data: jsonData });
+                    const oData = await this.ajaxCreateWithJQuery("ExpenseInvoicePaymentDetail", { data: jsonData });
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this.Readcall("InvoicePaymentDetail", { InvNo: this.decodedPath });
+                        this.Readcall("ExpenseInvoicePaymentDetail", { InvNo: this.decodedPath });
                         this.Readcall("ExpenseInvoice", { InvNo: this.decodedPath });//CompanyInvoice
 
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
@@ -1535,7 +1543,7 @@ sap.ui.define([
 
                 if (parseFloat(oModel.SubTotalNotGST) > 0) {
                     summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
+                    Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
                     ]);
                 }
 
@@ -1559,8 +1567,8 @@ sap.ui.define([
                     if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
                         summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                         summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST") && 
-                    igstValue > 0) {
+                    } else if (data.Currency === "INR" && (oModel.Type === "IGST") &&
+                        igstValue > 0) {
                         summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                     }
                 }
