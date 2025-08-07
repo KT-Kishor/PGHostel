@@ -93,6 +93,7 @@
                             type="Transparent"
                             press="AP_onPressAddPayslip"
                         />
+                        <Button text="{i18n>download}" press="AP_TableDataDownload"/>
                     </Toolbar>
                 </headerToolbar>
                 <columns>

@@ -8,8 +8,9 @@ sap.ui.define(
         "sap/m/MessageBox", //Import MessageBox for alerts/confirmations
         "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
         "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+        'sap/ui/export/Spreadsheet'
     ],
-    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem) {
+    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem,Spreadsheet) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.AdminApplyLeave",
@@ -1166,6 +1167,46 @@ sap.ui.define(
                 getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
+                     AL_DownalodTableData:function(){
+        var table = this.byId("AL_id_LeaveTableStandard");
+          const oModelData = table.getModel("LeaveModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,      
+              fromDate: Formatter.formatDate(item.fromDate),
+              toDate: Formatter.formatDate(item.toDate),
+            //   comments:item.comments.map((elem)=>{
+            //     return elem.Comment
+            //   }),
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("fromDate"), property: "fromDate", type: "string" },
+            { label: this.i18nModel.getText("toDate"), property: "toDate", type: "string" },
+            { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
+            { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
+            { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
+            // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("enboxDetails")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "LeaveDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+    
+                }
             },
         );
     }

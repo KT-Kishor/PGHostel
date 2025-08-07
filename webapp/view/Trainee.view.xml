@@ -60,6 +60,7 @@
                     <Button text="{i18n>rejectTainee}" id="T_id_RejectBtn" type="Transparent"  press="T_onRejectPress"  enabled="false" tooltip="{i18n>rejectTainee}" />
                     <Button text="{i18n>addTrainee}" id="T_id_AddBtn" type="Transparent"  press="T_onPressAddTrainee"   tooltip="{i18n>addTrainee}"/>
 					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="T_id_EmpOnBoard"   press="T_onBoardTrainee"  visible="false" type="Transparent"/>
+					<Button text="{i18n>download}" press="T_DownloadTableData"/>
 
                 </OverflowToolbar>
             </headerToolbar>

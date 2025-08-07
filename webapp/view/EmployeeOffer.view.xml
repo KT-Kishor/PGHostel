@@ -50,7 +50,7 @@
                     <Button tooltip="{i18n>onboardEmp}" id="EO_id_OnboardBtn" text="{i18n>onboardEmp}" type="Transparent" press="EO_onOnboardPress"/>
                     <Button tooltip="{i18n>rejectEmp}" id="EO_id_RejectBtn" type="Transparent" text="{i18n>rejectEmp}" press="EO_onRejectPress"  />
                     <Button text="{i18n>generateOffer}" id="EO_id_AddEOffBut" press="EO_onPressEmployee" type="Transparent"  tooltip="{i18n>generateOffer}"/>
-					<Button text="{i18n>download}" type="Transparent"/>
+					<Button text="{i18n>download}" press="EO_DownloadTableData" type="Transparent"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

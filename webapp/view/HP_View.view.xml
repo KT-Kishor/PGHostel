@@ -60,6 +60,7 @@
 						<Button id="HP_id_create" text="Create" press="onOpenAddJobDialog" type="Transparent" />
 						<Button id="HP_id_edit" text="Edit" press="onOpenEditJobDialog" type="Transparent" />
 						<Button id="HP_id_delete" text="Delete" press="onDeleteJob" type="Transparent" />
+						<Button text="{i18n>download}" press="HP_DownloadTableData"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

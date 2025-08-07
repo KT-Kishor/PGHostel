@@ -82,8 +82,8 @@
                     <OverflowToolbar>
                         <Title text="{i18n>quotaionDetails} ({= ${CompanyQuotationModel>/}.length })" />
                         <ToolbarSpacer/>
-                        <Button text="{i18n>headerQuotation}" tooltip="{i18n>addQuotation}" press="HQ_onPressAddQuotation"
-                        type="Transparent"/>
+                        <Button text="{i18n>headerQuotation}" tooltip="{i18n>addQuotation}" press="HQ_onPressAddQuotation" type="Transparent"/>
+                        <Button text="{i18n>download}" press="HQ_DownloadTableData"/>
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

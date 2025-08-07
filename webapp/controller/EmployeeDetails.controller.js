@@ -1,6 +1,6 @@
 sap.ui.define([
-    "./BaseController", "sap/m/MessageToast", "../model/formatter"],
-    function (BaseController, MessageToast, Formatter) {
+    "./BaseController", "sap/m/MessageToast", "../model/formatter", "sap/ui/export/Spreadsheet"],
+    function (BaseController, MessageToast, Formatter,Spreadsheet) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeDetails", {
             Formatter: Formatter,
@@ -122,5 +122,44 @@ sap.ui.define([
              getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
+
+               ED_onDownloaData:function(){
+        var table = this.byId("ED_id_EmpDetailsTable");
+          const oModelData = table.getModel("sEmployeeDetails").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+            //   EndDate: Formatter.formatDate(item.EndDate),
+            //   StartDate: Formatter.formatDate(item.StartDate),
+            //   SubmittedDate: Formatter.formatDate(item.SubmittedDate),
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("employeeID"), property: "EmployeeID", type: "string" },
+            { label: this.i18nModel.getText("employeeName"), property: "EmployeeName", type: "string" },
+            { label: this.i18nModel.getText("role"), property: "Role", type: "string" },
+            { label: this.i18nModel.getText("designation"), property: "Designation", type: "string" },
+            { label: this.i18nModel.getText("email"), property: "EmployeeEmail", type: "string" },
+            { label: this.i18nModel.getText("manager"), property: "ManagerName", type: "string " },
+            { label: this.i18nModel.getText("baseLocation"), property: "BaseLocation", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("enboxDetails")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "EpmloyeeDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+    }
         });
     });

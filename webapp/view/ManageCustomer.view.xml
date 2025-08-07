@@ -36,6 +36,7 @@
 						<Button type="Transparent" text="{i18n>custDeleteToolTip}" tooltip="{i18n>custDeleteToolTip}" press="MC_onDeleteAddCustomer" id="MC_id_DeleteCustomer" />
 						<ToolbarSeparator />
 						<Button type="Transparent" text="{i18n>msasow}" press="MC_OnPressMSASOW" />
+						<Button text="{i18n>download}" press="MC_DownloadTableData"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

@@ -1,6 +1,7 @@
 sap.ui.define(
-    ["./BaseController", "../model/formatter"],
-    function(BaseController, Formatter) {
+    ["./BaseController", "../model/formatter",
+    "sap/ui/export/Spreadsheet"],
+    function(BaseController, Formatter,Spreadsheet     ) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.AdminPaySlip", {
@@ -184,7 +185,47 @@ sap.ui.define(
                     this.oModel.setProperty("/SelectedFilters", filters);
                     this.getRouter().navTo("RouteNavAdminPaySlipApp");
                 },
-            }
+            },
+             AP_TableDataDownload:function(){
+        var table = this.byId("AP_id_AdminPaySlipTable");
+          const oModelData = table.getModel("PaySlip").getData().EmpTable;
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,      
+              YearMonth: Formatter.formatMonthYear(item.YearMonth), 
+            //   toDate: Formatter.formatDate(item.toDate),
+            //   comments:item.comments.map((elem)=>{
+            //     return elem.Comment
+            //   }),
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("employeeID"), property: "EmployeeID", type: "string" },
+            { label: this.i18nModel.getText("monthAndYear"), property: "YearMonth", type: "string" },
+            { label: this.i18nModel.getText("payableDays"), property: "PayableDays", type: "string" },
+            { label: this.i18nModel.getText("totalEarningAmount"), property: "EarningsTotalMonthly", type: "string" },
+            { label: this.i18nModel.getText("totalDeductionAmount"), property: "DeductionsTotalMonthly", type: "string " },
+            { label: this.i18nModel.getText("netPay"), property: "NetPay", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("enboxDetails")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "PayslipDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+    
+            },
         );
     }
 );

@@ -1,13 +1,19 @@
 sap.ui.define([
         "./BaseController",
+         'sap/ui/export/Spreadsheet',
+         "../model/formatter"
     ],
-    function(BaseController, ) {
+    function(BaseController,Spreadsheet,Formatter ) {
+       
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
+             Formatter:Formatter,
             onInit: function() {
                 this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
+
             },
             _onRouteMatched: async function() {
+                this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle()
                 try {
                     const LoginFunction = await this.commonLoginFunction("MSA&SOW");
                     if (!LoginFunction) return;
@@ -143,6 +149,46 @@ sap.ui.define([
                     this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 }
-            }
+                
+            },
+            MSA_DownloadTableData:function(){
+                      var table = this.byId("MSA_id_Table");
+          const oModelData = table.getModel("MSADisplayModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              MsaContractPeriodEndDate:Formatter.formatDate(item.MsaContractPeriodEndDate),
+            //   PayByDate: Formatter.formatDate(item.PayByDate),
+            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("companyName"), property: "CompanyName", type: "string" },
+            { label: this.i18nModel.getText("companyHeadName"), property: "CompanyHeadName", type: "string" },
+            { label: this.i18nModel.getText("companyHeadPosition"), property: "CompanyHeadPosition", type: "string" },
+            { label: this.i18nModel.getText("paymentterms"), property: "PaymentTerms", type: "string" },
+            { label: this.i18nModel.getText("msaEndDate"), property: "MsaContractPeriodEndDate", type: "string" },
+            { label: this.i18nModel.getText("PayByDate"), property: "PayByDate", type: "string " },
+            { label: this.i18nModel.getText("type"), property: "Type", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "MSADetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+                }
         });
     });

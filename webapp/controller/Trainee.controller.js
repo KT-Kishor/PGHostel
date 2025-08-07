@@ -4,9 +4,10 @@ sap.ui.define([
         "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast",
         "sap/m/MessageBox",
-        "../model/formatter"
+        "../model/formatter",
+        "sap/ui/export/Spreadsheet"
     ],
-    function(BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter) {
+    function(BaseController, utils, JSONModel, MessageToast, MessageBox, Formatter,Spreadsheet) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.Trainee", {
             Formatter: Formatter,
@@ -622,5 +623,46 @@ sap.ui.define([
             getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
+                T_DownloadTableData:function(){
+                      var table = this.byId("T_id_TraineeTable");
+          const oModelData = table.getModel("traineeModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,      
+              JoiningDate: Formatter.formatDate(item.JoiningDate), 
+            //   toDate: Formatter.formatDate(item.toDate),
+            //   comments:item.comments.map((elem)=>{
+            //     return elem.Comment
+            //   }),
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("traineeName"), property: "TraineeName", type: "string" },
+            { label: this.i18nModel.getText("reportingManager"), property: "ReportingManager", type: "string" },
+            { label: this.i18nModel.getText("joiningDate"), property: "JoiningDate", type: "string" },
+            { label: this.i18nModel.getText("durationT"), property: "TrainingDuration", type: "string" },
+            { label: this.i18nModel.getText("type"), property: "Type", type: "string " },
+            { label: this.i18nModel.getText("amount"), property: "Amount", type: "string" },
+            { label: this.i18nModel.getText("baseLocation"), property: "BaseLocation", type: "string" },
+            { label: this.i18nModel.getText("emailId"), property: "TraineeEmail", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("enboxDetails")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "TraineeDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+                }
         });
     });

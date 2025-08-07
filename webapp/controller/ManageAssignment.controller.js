@@ -5,8 +5,9 @@ sap.ui.define(
     "sap/m/MessageToast",
     "../utils/validation",
     "../model/formatter",
+    'sap/ui/export/Spreadsheet',
   ],
-  function (BaseController, JSONModel, MessageToast, utils, Formatter) {
+  function (BaseController, JSONModel, MessageToast, utils, Formatter,Spreadsheet) {
     "use strict";
     return BaseController.extend(
       "sap.kt.com.minihrsolution.controller.ManageAssignment",
@@ -303,10 +304,46 @@ sap.ui.define(
               oEndDatePicker.setValueState("None"); //  Reset EndDate state if valid
             }
           }
-        }
-
-
+        },
+        MA_DownloadTableData:function(){
+         var table = this.byId("MA_id_TaskTable");
+          const oModelData = table.getModel("TaskModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              StartDate: Formatter.formatDate(item.StartDate),
+              EndDate: Formatter.formatDate(item.EndDate),
+              TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("assignmentName"), property: "TaskName", type: "string" },
+            { label: this.i18nModel.getText("assignmentType"), property: "TaskType", type: "string" },
+            { label: this.i18nModel.getText("assignmentDes"), property: "TaskTypeDescription", type: "string" },
+            { label: this.i18nModel.getText("startDate"), property: "StartDate", type: "string" },
+            { label: this.i18nModel.getText("endDate"), property: "EndDate", type: "string" }
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "AssignmentDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
       }
+      },
+      
     );
   }
 );

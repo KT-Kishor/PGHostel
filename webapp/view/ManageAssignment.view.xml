@@ -43,6 +43,7 @@
 					<!-- <Button   press="MA_onEmpTask"   id="MA_id_AssignB" visible="false"/> -->
 						<Button    type="Transparent" press="MA_onCreateTask"  text="{i18n>createTask}" tooltip="{i18n>assignEmp}"/>
 						<Button    press="MA_onEditTask" tooltip="{i18n>editTaskTitle}" id="MA_id_EditTaskB" text="{i18n>edit}" visible="true" type="Transparent" />
+						<Button text="{i18n>download}" press="MA_DownloadTableData"/>
 				
                    </OverflowToolbar>
             </headerToolbar>

@@ -2,8 +2,9 @@ sap.ui.define([
   "./BaseController",
   "sap/ui/model/json/JSONModel",
   "../utils/validation",
-  "../model/formatter"
-], (BaseController, JSONModel, utils, Formatter) => {
+  "../model/formatter",
+   'sap/ui/export/Spreadsheet',
+], (BaseController, JSONModel, utils, Formatter,Spreadsheet) => {
   "use strict";
 
   return BaseController.extend("sap.kt.com.minihrsolution.controller.MyInbox", {
@@ -365,5 +366,44 @@ sap.ui.define([
         if (btn) btn.setVisible(false);
       });
     },
+    MI_DownloadTableData:function(){
+        var table = this.byId("MI_id_MyInboxTable");
+          const oModelData = table.getModel("MyInboxModelData").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              EndDate: Formatter.formatDate(item.EndDate),
+              StartDate: Formatter.formatDate(item.StartDate),
+              SubmittedDate: Formatter.formatDate(item.SubmittedDate),
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("employeeName"), property: "EmpName", type: "string" },
+            { label: this.i18nModel.getText("startDate"), property: "StartDate", type: "string" },
+            { label: this.i18nModel.getText("endDate"), property: "EndDate", type: "string" },
+            { label: this.i18nModel.getText("type"), property: "Type", type: "string" },
+            { label: this.i18nModel.getText("subType"), property: "SubType", type: "string" },
+            { label: this.i18nModel.getText("submittedDate"), property: "SubmittedDate", type: "string " },
+            { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("enboxDetails")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "Inbox_EpmloyeeDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+    }
   });
 });

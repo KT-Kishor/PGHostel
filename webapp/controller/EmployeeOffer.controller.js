@@ -2,9 +2,10 @@ sap.ui.define([
         "./BaseController",
         "../utils/validation",
         "sap/m/MessageToast",
-        "../model/formatter"
+        "../model/formatter",
+         "sap/ui/export/Spreadsheet",
     ],
-    function(BaseController, utils, MessageToast, Formatter) {
+    function(BaseController, utils, MessageToast, Formatter,Spreadsheet) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.EmployeeOffer", {
             Formatter: Formatter,
@@ -480,6 +481,44 @@ sap.ui.define([
                     branchInput: "OE_id_BranchInput",
                     mobileInput: "OEF_id_Mobile"
                 });
+            },
+            EO_DownloadTableData:function(){
+                  var table = this.byId("EO_id_TableEOffer");
+          const oModelData = table.getModel("EmployeeOfferModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              JoiningDate: Formatter.formatDate(item.JoiningDate),
+            //   PayByDate: Formatter.formatDate(item.PayByDate),
+            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("employeeName"), property: "ConsultantName", type: "string" },
+            { label: this.i18nModel.getText("designation"), property: "Designation", type: "string" },
+            { label: this.i18nModel.getText("baseLocation"), property: "BaseLocation", type: "string" },
+            { label: this.i18nModel.getText("joiningDate"), property: "JoiningDate", type: "string" },
+            { label: this.i18nModel.getText("emailId"), property: "EmployeeEmail", type: "string" },
+            { label: this.i18nModel.getText("ctc"), property: "CTC", type: "string " }
+                  ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "EmployeeOferDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
             },
             getGroupHeader: function(oGroup) {
                 return this.getStyledGroupHeader(oGroup);

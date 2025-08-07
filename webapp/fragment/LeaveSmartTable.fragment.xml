@@ -22,6 +22,7 @@
 					<Button press="AL_onPressApplyLeave" text="{i18n>applyLeave}"  type="Transparent"/>
 					<Button id="AL_id_Updatebtn" text="{i18n>editDetails}" press="AL_onPressUpdate" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Emphasized"/>
 					<Button id="AL_id_Deletebtn" text="{i18n>deleteLeave}" press="AL_onPressDelete" visible="{= ${LeaveModel>status} === 'Submitted' }" type="Reject"/>
+					<Button text="{i18n>download}" press="AL_DownalodTableData"></Button>
 					 </OverflowToolbar>
             </headerToolbar>
 			<columns>

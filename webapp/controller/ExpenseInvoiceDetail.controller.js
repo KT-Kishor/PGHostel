@@ -907,7 +907,7 @@ sap.ui.define([
                     DueAmount: (
                         this.getView().getModel("InvoicePayment").getData().length !== 0
                             ? parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) //- parseFloat(ResivedTDSData || 0)
-                            : parseFloat(oNavigationModel.TotalAmount || 0) //- parseFloat(oNavigationModel.IncomeTax || 0)
+                            : parseFloat(oNavigationModel.TotalAmount || 0) //                  - parseFloat(oNavigationModel.IncomeTax || 0)
                     ).toFixed(2),
                     Currency: oNavigationModel.Currency,
                     ReceivedTDS: ResivedTDSData,

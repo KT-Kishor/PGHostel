@@ -63,6 +63,7 @@
 					<Button text="{i18n>activeContract}"  tooltip="{i18n>active}" id="C_id_ActivateBtn" press="C_id_ActivatePress" type="Transparent"/>
 					<Button text="{i18n>renew}" tooltip="{i18n>renew}" id="C_id_Renewbtn" press="C_id_RenewPress" type="Transparent"/>
 					<Button text="{i18n>headerContractDetails}" tooltip="{i18n>headerContractDetails}" id="C_id_AddBtn" press="C_onPressAddContract" type="Transparent"/>
+					<Button text="{i18n>download}" press="C_DownloadTableData"/>
                 </OverflowToolbar>
             </headerToolbar>
 				<columns>

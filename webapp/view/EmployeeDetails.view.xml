@@ -63,6 +63,8 @@
 				<headerToolbar>
 					<OverflowToolbar >
 						<Title id="ED_id_TitleTable" text="{i18n>headerEmpDetails} ({= ${sEmployeeDetails>/}.length})"/>
+						<ToolbarSpacer ></ToolbarSpacer>
+						<Button text="{i18n>download}" press="ED_onDownloaData"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

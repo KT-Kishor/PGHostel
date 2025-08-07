@@ -4,8 +4,9 @@ sap.ui.define([
   "sap/m/MessageToast", // Import MessageToast for notifications
   "../utils/validation", //  Import formatter utility
   "sap/m/MessageBox", // Import MessageBox for alerts/confirmations
+      "sap/ui/export/Spreadsheet",
 ],
-  function (BaseController, JSONModel, MessageToast, utils, MessageBox) {
+  function (BaseController, JSONModel, MessageToast, utils, MessageBox,Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.ManageCustomer", {
       onInit: function () {
@@ -516,6 +517,45 @@ sap.ui.define([
 
       onLogout: function () {
         this.CommonLogoutFunction(); // Navigate to Login Page
+      },
+      MC_DownloadTableData:function(){
+          var table = this.byId("MC_id_CustTable");
+          const oModelData = table.getModel("CreateCustomerModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              // InvoiceDate: Formatter.formatDate(item.InvoiceDate),
+              // PayByDate: Formatter.formatDate(item.PayByDate),
+              // TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("companyname"), property: "companyName", type: "string" },
+            { label: this.i18nModel.getText("customerName"), property: "name", type: "string" },
+            { label: this.i18nModel.getText("gstNo"), property: "GST", type: "string" },
+            { label: this.i18nModel.getText("type"), property: "type", type: "string" },
+            { label: this.i18nModel.getText("percentage"), property: "value", type: "string" },
+            { label: this.i18nModel.getText("email"), property: "customerEmail", type: "string " },
+            { label: this.i18nModel.getText("mobileNo"), property: "mobileNo", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "CompanyInvoice.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
       }
     }
     );

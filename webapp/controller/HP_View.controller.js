@@ -7,6 +7,7 @@ sap.ui.define(
     "../model/formatter",
     "../utils/validation",
     "sap/ui/richtexteditor/RichTextEditor",
+    'sap/ui/export/Spreadsheet',
   ],
   (
     BaseController,
@@ -15,7 +16,8 @@ sap.ui.define(
     Fragment,
     formatter,
     validation,
-    RichTextEditor
+    RichTextEditor,
+    Spreadsheet
   ) => {
     "use strict";
 
@@ -36,6 +38,8 @@ sap.ui.define(
         },
 
         _onObjectMatched: async function () {
+
+          this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle()
           try {
             //  Login check
             var LoginFUnction = await this.commonLoginFunction("JobPosting");
@@ -1740,7 +1744,48 @@ sap.ui.define(
               }
             }
           });
+          
         },
+        HP_DownloadTableData:function(){
+               var table = this.byId("jobPostingTable");
+          const oModelData = table.getModel("JobApplicationModel").getData().Candidates;
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              PostDate: formatter.formatDate(item.PostDate),
+              // PayByDate: Formatter.formatDate(item.PayByDate),
+              // TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("Jobtitle"), property: "JobTitle", type: "string" },
+            { label: this.i18nModel.getText("v1_PriSkills"), property: "PrimarySkills", type: "string" },
+            { label: this.i18nModel.getText("HP_t_Workmode"), property: "LocationService", type: "string" },
+            { label: this.i18nModel.getText("TableColExperience"), property: "Experience", type: "string" },
+            { label: this.i18nModel.getText("V1_L_Location"), property: "Location", type: "string" },
+            { label: this.i18nModel.getText("HP_t_NoOfPos"), property: "NoOfPositions", type: "string " },
+            { label: this.i18nModel.getText("v1_s_postDate"), property: "PostDate", type: "string" },
+            { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
+          ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "JobPostedDetail.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+          }
       }
     );
   }

@@ -194,7 +194,7 @@ sap.ui.define(
             };
           });
           const aCols = [
-            { label: this.i18nModel.getText("invoiceNo"), property: "InvNo", type: "string" },
+            { label: this.i18nModel.getText("invoiceNo"), property: "JobTitle", type: "string" },
             { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
             { label: this.i18nModel.getText("invoiceDate"), property: "InvoiceDate", type: "string" },
             { label: this.i18nModel.getText("invoiceDescription"), property: "InvoiceDescription", type: "string" },

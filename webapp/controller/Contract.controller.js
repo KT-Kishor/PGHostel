@@ -7,8 +7,9 @@ sap.ui.define(
         "sap/m/MessageToast", // Import MessageToast for displaying messages
         "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
         "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+         "sap/ui/export/Spreadsheet"
     ],
-    function(BaseController, Formatter, JSONModel, utils, MessageToast, Timeline, TimelineItem) {
+    function(BaseController, Formatter, JSONModel, utils, MessageToast, Timeline, TimelineItem,Spreadsheet) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.Contract", {
@@ -553,6 +554,46 @@ sap.ui.define(
                 getGroupHeader: function(oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
+                 C_DownloadTableData:function(){
+                  var table = this.byId("C_id_Salary");
+          const oModelData = table.getModel("ContractModel").getData();
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              AssignmentStartDate: Formatter.formatDate(item.AssignmentStartDate),
+              AssignmentEndDate: Formatter.formatDate(item.AssignmentEndDate),
+            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+            };
+          });
+          const aCols = [
+            { label: this.i18nModel.getText("contractNo "), property: "ContractNo", type: "string" },
+            { label: this.i18nModel.getText("consultantName"), property: "ConsultantName", type: "string" },
+            { label: this.i18nModel.getText("locationswhereServices"), property: "ContractLocation", type: "string" },
+            { label: this.i18nModel.getText("endClient"), property: "EndClient", type: "string" },
+            { label: this.i18nModel.getText("startDate"), property: "AssignmentStartDate", type: "string" },
+            { label: this.i18nModel.getText("endDate"), property: "AssignmentEndDate", type: "string" },
+            { label: this.i18nModel.getText("amount"), property: "ConsultantRate", type: "string " },
+            { label: this.i18nModel.getText("paymentterms"), property: "PaymentTerms", type: "string " },
+            { label: this.i18nModel.getText("comments"), property: "Comments", type: "string " }
+                  ];
+          const oSettings = {
+            workbook: {
+              columns: aCols,
+              context: {
+                sheetName: this.i18nModel.getText("invoiceapp")
+              }
+            },
+            dataSource: aFormattedData,
+            fileName: "ContractorDetails.xlsx"
+          };
+          const oSheet = new Spreadsheet(oSettings);
+          oSheet.build().then(function () {
+            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+          }.bind(this))
+            .finally(function () {
+              oSheet.destroy();
+            });
+            }
             }
         );
     }

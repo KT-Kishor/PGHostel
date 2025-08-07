@@ -47,6 +47,7 @@
 					<OverflowToolbar >
 						<Title id="MI_id_TitleTable" text="{i18n>headerEmpDetails}"/>
 						<ToolbarSpacer />
+						<Button text="{i18n>download}"	press="MI_DownloadTableData"/>					
 						<Button icon="sap-icon://detail-view" id="MI_id_LOPDetBut" press="MI_onPressLOPData" tooltip="LOP Leave Details" />
 					</OverflowToolbar>
 				</headerToolbar>
