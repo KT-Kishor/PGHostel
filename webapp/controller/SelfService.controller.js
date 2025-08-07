@@ -84,17 +84,18 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
 
                         if (oModelAllData) {
-                            // Set SegmentedButton state from backend data
-                            if (oModelAllData.EmployeeType) {
-                                const bIsExperienced = oModelAllData.EmployeeType === "Experienced";
-                                this.ViewModel.setProperty("/employeeType", oModelAllData.EmployeeType);
-                                this.ViewModel.setProperty("/isExperienced", bIsExperienced); // For visibility binding
-                                this.byId("SS_experienceSegmentedButton").setSelectedKey(oModelAllData.EmployeeType);
+                            const oRadioGroup = this.byId("SS_experienceRadioGroup");
+                            const bIsFresher = oModelAllData.EmployeeType === "Fresher";
+                            this.ViewModel.setProperty("/employmentSectionVisible", !bIsFresher);
+                            if (bIsFresher) {
+                                oRadioGroup.setSelectedIndex(0); // Select "Fresher"
+                                this.ViewModel.setProperty("/employeeType", "Fresher");
+                            } else if (oModelAllData.EmployeeType === "Experienced") {
+                                oRadioGroup.setSelectedIndex(1); // Select "Experienced"
+                                this.ViewModel.setProperty("/employeeType", "Experienced");
                             } else {
-                                // For new or incomplete records, ensure everything is reset to unselected
+                                oRadioGroup.setSelectedIndex(-1); // No selection
                                 this.ViewModel.setProperty("/employeeType", null);
-                                this.ViewModel.setProperty("/isExperienced", false);
-                                this.byId("SS_experienceSegmentedButton").setSelectedKey(null);
                             }
                             if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") {
                                 this.ViewModel.setProperty("/SelfService", true);
@@ -2628,14 +2629,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
             },
             onExperienceSelect: function (oEvent) {
-                const oSelectedItem = oEvent.getParameter("item");
-                const sSelectedKey = oSelectedItem.getKey(); // This will correctly return "Fresher" or "Experienced"
-                this.ViewModel.setProperty("/employeeType", sSelectedKey);
-                const bIsExperienced = (sSelectedKey === "Experienced");
-                this.ViewModel.setProperty("/isExperienced", bIsExperienced);
-                const oEmploymentSection = this.byId("employmentSS1");
-                if (oEmploymentSection) {
-                    oEmploymentSection.setVisible(bIsExperienced);
+                const iSelectedIndex = oEvent.getParameter("selectedIndex");
+                const bIsExperiencedSelected = (iSelectedIndex === 1);
+                this.ViewModel.setProperty("/employmentSectionVisible", bIsExperiencedSelected);
+                if (iSelectedIndex === 0) {
+                    this.ViewModel.setProperty("/employeeType", "Fresher");
+                } else if (iSelectedIndex === 1) {
+                    this.ViewModel.setProperty("/employeeType", "Experienced");
                 }
             },
         });
