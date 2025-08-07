@@ -21,7 +21,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem id="CI_filterItem_EmployeeID" name="EmployeeID" label="{i18n>employeeID}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_EmployeeID" items="{path:'EmpModel>/', length:1000}" showSecondaryValues="true" showClearIcon="true">
+							<ComboBox id="CI_id_EmployeeID" items="{path:'EmpModel>/', length:1000}" showSecondaryValues="true" showClearIcon="true"  selectionChange="onComboBoxChange">
 								<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 							</ComboBox>
 						</fb:control>
@@ -39,6 +39,7 @@
 						<Title id="CI_id_TitleInv" text="{i18n>consultantInvoiceDetails}  ({= ${ConsultantModel>/}.length })"/>
 						<ToolbarSpacer />
 						<Button text="{i18n>addInvoice}" tooltip="{i18n>addInvoice}" type="Transparent" press="CI_onPressAddInvoice" />
+						<Button text="Download" press="CI_onInvoiceDownloadPress" type="Transparent" tooltip="Download"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>

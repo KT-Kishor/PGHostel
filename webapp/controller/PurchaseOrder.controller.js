@@ -4,8 +4,9 @@ sap.ui.define([
     "../utils/validation",
     "../model/formatter",
     "sap/m/MessageToast",
+     "sap/ui/export/Spreadsheet", // Import Spreadsheet for Excel export functionality
 ], function(
-    BaseController,JSONModel,utils,formatter,MessageToast) {
+    BaseController,JSONModel,utils,formatter,MessageToast,Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.PurchaseOrder", {
         formatter: formatter,
@@ -203,6 +204,49 @@ sap.ui.define([
         },
         onClearNotesPress: function() {
             this.getView().getModel("PurchaseOrderModel").setProperty("/Notes", "")
-        }
+        },
+        PO_onDownloadButtonPress: function () {
+               const oTable = this.getView().byId("idPOTable");
+                const oModelData = oTable.getModel("POModel").getData().map(item => {
+                    return {
+                        ...item,
+                       StartDate:formatter.formatDate(item.StartDate),
+                        EndDate: formatter.formatDate(item.EndDate),
+                        CurrentDate: formatter.formatDate(item.CurrentDate),
+                    };
+                });
+                if (!oModelData || oModelData.length === 0) {
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("noData"));
+                    return;
+                }
+                const that = this;
+                const aCols = [
+                    { label: that.i18nModel.getText("ponumber"), property: "PoNumber", type: "number" },
+                    { label: that.i18nModel.getText("companyName"), property: "CustomerName", type: "string" },
+                    { label: that.i18nModel.getText("customerAddress"), property: "Address", type: "string" },
+                    { label: that.i18nModel.getText("type"), property: "Type", type: "string" },
+                    { label: that.i18nModel.getText("pan"), property: "PAN", type: "string" },
+                    { label: that.i18nModel.getText("sdate"), property: "StartDate", type: "string" },
+                    { label:that.i18nModel.getText("edate"), property: "EndDate", type: "string" },
+                    { label: that.i18nModel.getText("podate"), property: "CurrentDate", type: "string" },
+                ];
+                const oSettings = {
+                    workbook: {
+                        columns: aCols,
+                        context: {
+                            sheetName: that.i18nModel.getText("purchaseOrder")
+                        }
+                    },
+                    dataSource: oModelData,
+                    fileName: "Purchase_Order.xlsx"
+                };
+ 
+                const oSheet = new Spreadsheet(oSettings);
+                oSheet.build().then(function () {
+                        MessageToast.show(that.i18nModel.getText("exportSuccessful"));
+                    }).finally(function () {
+                        oSheet.destroy();
+                    });
+            }
     });
 });

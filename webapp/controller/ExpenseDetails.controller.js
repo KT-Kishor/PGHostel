@@ -126,6 +126,43 @@ sap.ui.define([
                         that.closeBusyDialog();
                     });
             },
+            Exp_Det_onPressDownloadZipFile: async function () {
+                try {
+                    const aTableData = this.getView().getModel("ItemExpenseModel").getProperty("/");
+                    if (!aTableData || aTableData.length === 0) {
+                        sap.m.MessageToast.show("No data in table.");
+                        return;
+                    }
+            
+                    const zip = new JSZip();
+                    let hasAttachment = false;
+                    aTableData.forEach((item, index) => {
+                        if (item.Attachment) {
+                            const sBase64 = item.Attachment;
+                            const sFileName = item.AttachmentName || `attachment_${index + 1}`;
+                            zip.file(sFileName, sBase64, { base64: true });
+                            hasAttachment = true;
+                        }
+                    });
+                    if (!hasAttachment) {
+                        sap.m.MessageToast.show("No attachments found in any row.");
+                        return;
+                    }
+                    const zipBlob = await zip.generateAsync({ type: "blob" });
+                    // Trigger file download
+                    const sBlobUrl = URL.createObjectURL(zipBlob);
+                    const link = document.createElement("a");
+                    link.href = sBlobUrl;
+                    link.download = "All_Expense_Attachments.zip";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(sBlobUrl);
+                } catch (e) {
+                    console.error("Download ZIP failed:", e);
+                    sap.m.MessageToast.show("Download ZIP failed.");
+                }
+            },
             //Download Perdiem Declaration
             Exp_Det_onPressExpenseDownload: function () {
                 let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
@@ -244,7 +281,6 @@ sap.ui.define([
                 this.ViewModel.setProperty("/enable", true);
                 this.ExpenseItem.close();
             },
-
             Exp_Det_onPressBackBtn: function () {
                 if (this.MyInBox) {
                     this.getRouter().navTo("RouteMyInbox", { sMyInBox: "ExpenseDetail" });

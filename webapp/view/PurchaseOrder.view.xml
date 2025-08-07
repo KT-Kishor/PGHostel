@@ -72,6 +72,8 @@
 						<ToolbarSpacer />
 						<Button  text="Create Purchase Order" press="PO_onCreatePurchaseOrder" type="Transparent"/>
 						<Button  text="Delete" press="PO_onDeleteButtonPress" type="Transparent"/>
+						<Button text="Download" press="PO_onDownloadButtonPress" type="Transparent" tooltip="Download"
+                    />
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>

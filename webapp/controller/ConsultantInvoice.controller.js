@@ -4,16 +4,17 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel",
         "sap/m/MessageToast",
         "../model/formatter",
-
+        "sap/ui/export/Spreadsheet", // Import Spreadsheet for Excel export functionality
     ],
-    function (
-        BaseController, JSONModel, MessageToast, Formatter) {
+    function(
+        BaseController, JSONModel, MessageToast, Formatter, Spreadsheet) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.ConsultantInvoice", {
-            onInit: function () {
+            Formatter: Formatter,
+            onInit: function() {
                 this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function() {
                 var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                 if (!LoginFUnction) return;
                 // Get i18n resource bundle
@@ -22,12 +23,13 @@ sap.ui.define(
                 this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("consultantInvoice"));
                 this._makeDatePickersReadOnly(["CI_id_DatePicker"]);
                 this.onClearAndSearch("CI_id_ConsultantInvoiceFilterBar"); // Clear and search function
+                this._isClearPressed = false;
                 this.ContractReadCall();
                 this.bDateRangeTriggered = false;
                 this.initializeBirthdayCarousel();
             },
 
-            ContractReadCall: async function () {
+            ContractReadCall: async function() {
                 try {
                     const oView = this.getView();
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -65,19 +67,22 @@ sap.ui.define(
                     this.getBusyDialog();
 
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", filterObj);
+                    // Update ConsultantModel
                     const oConsultantModel = new JSONModel(oData.data);
                     this.getView().setModel(oConsultantModel, "ConsultantModel");
 
-                    const oInvoiceModel = new JSONModel(oData.data);
+                    // Set InvoiceModel (used in ComboBox)
+                     const oInvoiceModel = new JSONModel(oData.data);
                     this.getView().setModel(oInvoiceModel, "InvoiceModel");
 
-                    // Set default range in date picker control
+                    // Set default date range in DateRangeSelection control
                     const dateControl = this.byId("CI_id_DatePicker");
                     if (dateControl) {
                         dateControl.setDateValue(fyStart);
                         dateControl.setSecondDateValue(fyEnd);
                     }
 
+                    // Table binding
                     const oTable = this.getView().byId("CI_id_ConsultantInvoiceTable");
                     const oSorter = [];
 
@@ -128,7 +133,7 @@ sap.ui.define(
                 return oHeader;
             },
 
-            logindata: function () {
+            logindata: function() {
                 try {
                     this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
@@ -145,14 +150,14 @@ sap.ui.define(
                 }
             },
 
-            CI_onPressAddInvoice: function () {
+            CI_onPressAddInvoice: function() {
                 this.getRouter().navTo("RouteNavConsultantInvoiceApplication", {
                     sPath: "X",
                     oPath: "Y",
                 });
             },
 
-            CI_onPressInvoice: function (oEvent) {
+            CI_onPressInvoice: function(oEvent) {
                 var oBindingContext = oEvent.getSource().getBindingContext("ConsultantModel");
                 var oInvoiceNo = oBindingContext.getProperty("InvoiceNo");
                 var oEmployeeID = oBindingContext.getProperty("EmployeeID");
@@ -162,15 +167,15 @@ sap.ui.define(
                 });
             },
 
-            onPressback: function () {
+            onPressback: function() {
                 this.getRouter().navTo("RouteTilePage");
             },
 
-            onLogout: function () {
+            onLogout: function() {
                 this.getRouter().navTo("RouteLoginPage");
             },
 
-            CI_onClearFilters: function () {
+            CI_onClearFilters: function() {
                 const oFilterBar = this.getView().byId("CI_id_ConsultantInvoiceFilterBar");
                 oFilterBar.getFilterGroupItems().forEach((oItem) => {
                     const oControl = oItem.getControl();
@@ -182,6 +187,8 @@ sap.ui.define(
                         }
                     }
                 });
+                this._isClearPressed = true;
+                this.bDateRangeTriggered = true;
             },
 
             CI_OnSearch: async function () {
@@ -190,24 +197,16 @@ sap.ui.define(
                     const aFilterItems = oFilterBar.getFilterGroupItems();
                     const params = {};
 
-                    if (params.InvoiceStartDate && params.InvoiceEndDate) {
-                        this._filterInvoiceModelByDateRange(params.InvoiceStartDate, params.InvoiceEndDate);
-                    }
-
                     // Get user data
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
 
-                    // Get current financial year range
-                    const {
-                        fyStart,
-                        fyEnd,
-                        financialYearLabel
-                    } = this._getFinancialYearRange();
+                    // Financial year logic
+                    const { fyStart, fyEnd, financialYearLabel } = this._getFinancialYearRange();
                     const formatDate = (date) => date.toISOString().split("T")[0];
 
                     let invoiceDateProvided = false;
 
-                    // Process filter items
+                    // Collect user-entered filter values
                     aFilterItems.forEach((oItem) => {
                         const oControl = oItem.getControl();
                         const sParamKey = oItem.getName();
@@ -215,7 +214,7 @@ sap.ui.define(
                         if (oControl) {
                             if (oControl.isA("sap.m.ComboBox")) {
                                 const selectedKey = oControl.getSelectedKey();
-                                const inputValue = oControl.getValue(); // Get the manually entered value
+                                const inputValue = oControl.getValue();
 
                                 if (sParamKey === "InvoiceNo") {
                                     if (selectedKey) {
@@ -223,11 +222,9 @@ sap.ui.define(
                                         if (invoiceNo) params["InvoiceNo"] = invoiceNo;
                                         if (employeeId) params["EmployeeID"] = employeeId;
                                     } else if (inputValue) {
-                                        // Use the manually entered value
                                         params["InvoiceNo"] = inputValue;
                                     }
                                 } else {
-                                    // For other comboboxes (like EmployeeID)
                                     if (selectedKey) {
                                         params[sParamKey] = selectedKey;
                                     } else if (inputValue) {
@@ -240,9 +237,13 @@ sap.ui.define(
                                     const [start, end] = value.split("-").map(date =>
                                         date.trim().split("/").reverse().join("-")
                                     );
-                                    params["InvoiceStartDate"] = start;
-                                    params["InvoiceEndDate"] = end;
+                                    params.InvoiceStartDate = start;
+                                    params.InvoiceEndDate = end;
                                     invoiceDateProvided = true;
+
+                                    // Set dateRange for ComboBox filtering
+                                    this.dateRangeStart = start;
+                                    this.dateRangeEnd = end;
                                 }
                             } else if (oControl.getValue && oControl.getValue()) {
                                 params[sParamKey] = oControl.getValue();
@@ -250,29 +251,38 @@ sap.ui.define(
                         }
                     });
 
+                    // Role-based filter
                     if (userData.Role === "Contractor") {
                         params.EmployeeID = userData.EmployeeID;
                     }
 
-                    // Set default financial year dates if none provided
-                    if (!invoiceDateProvided) {
+                    // Handle Clear Press
+                    if (this._isClearPressed) {
+                        delete params.InvoiceStartDate;
+                        delete params.InvoiceEndDate;
+                        delete params.FinancialYear;
+                        this._isClearPressed = false;  // Reset range variables
+                        this.dateRangeStart = null;
+                        this.dateRangeEnd = null;
+                    } else if (!invoiceDateProvided) {
+                        // Default to financial year if no date provided
                         params.InvoiceStartDate = formatDate(fyStart);
                         params.InvoiceEndDate = formatDate(fyEnd);
                         params.FinancialYear = financialYearLabel;
-
-                        // Update the DateRangeSelection control to show financial year range
+                        this.bDateRangeTriggered = true;
+                        this.dateRangeStart = formatDate(fyStart);
+                        this.dateRangeEnd = formatDate(fyEnd);
                         const dateRangeControl = this.byId("CI_id_DatePicker");
                         if (dateRangeControl) {
                             dateRangeControl.setDateValue(fyStart);
                             dateRangeControl.setSecondDateValue(fyEnd);
                         }
                     } else {
-                        // If selected dates exactly match financial year
+                        // Check if selected date matches financial year
                         const startDate = new Date(params.InvoiceStartDate);
                         const endDate = new Date(params.InvoiceEndDate);
-
-                        if (startDate.getTime() === fyStart.getTime() &&
-                            endDate.getTime() === fyEnd.getTime()) {
+                        this.bDateRangeTriggered = true;
+                        if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
                             params.FinancialYear = financialYearLabel;
                         }
                     }
@@ -283,7 +293,8 @@ sap.ui.define(
                     if (oData && Array.isArray(oData.data)) {
                         const oModel = new JSONModel(oData.data);
                         this.getView().setModel(oModel, "ConsultantModel");
-                        if (this.bDateRangeTriggered) {
+                        this.bDateRangeTriggered = false;
+                        if (this.bDateRangeTriggered && this.dateRangeStart && this.dateRangeEnd) {
                             const filteredData = oData.data.filter(item => {
                                 const itemDate = new Date(item.InvoiceDate);
                                 const start = new Date(this.dateRangeStart);
@@ -294,7 +305,12 @@ sap.ui.define(
                             const oInvoiceModel = new JSONModel(filteredData);
                             this.getView().setModel(oInvoiceModel, "InvoiceModel");
                             oInvoiceModel.refresh(true);
-                            this.bDateRangeTriggered = false; // reset flag
+                            this.bDateRangeTriggered = false;
+                        } else {
+                            // If no date range triggered, show all data
+                            const oInvoiceModel = new JSONModel(oData.data);
+                            this.getView().setModel(oInvoiceModel, "InvoiceModel");
+                            oInvoiceModel.refresh(true);
                         }
                     }
                     this.closeBusyDialog();
@@ -306,13 +322,11 @@ sap.ui.define(
             },
 
             // Helper function to get financial year range
-            _getFinancialYearRange: function () {
+            _getFinancialYearRange: function() {
                 const today = new Date();
                 const currentYear = today.getFullYear();
                 const currentMonth = today.getMonth(); // 0 = Jan, 3 = April
-
                 let fyStart, fyEnd, financialYearLabel;
-
                 if (currentMonth >= 3) { // April or later
                     fyStart = new Date(currentYear, 3, 1); // April 1st
                     fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
@@ -322,7 +336,6 @@ sap.ui.define(
                     fyEnd = new Date(currentYear, 2, 31); // March 31st this year
                     financialYearLabel = `${currentYear - 1}-${currentYear}`;
                 }
-
                 return {
                     fyStart,
                     fyEnd,
@@ -330,59 +343,92 @@ sap.ui.define(
                 };
             },
 
-            onDateRangeChange: function (oEvent) {
+            onDateRangeChange: function(oEvent) {
                 try {
                     const oDateRange = oEvent.getSource();
                     const value = oDateRange.getValue();
-
                     if (value && value.includes("-")) {
                         const [start, end] = value.split("-").map(date =>
                             date.trim().split("/").reverse().join("-")
                         );
-
                         this.dateRangeStart = start;
                         this.dateRangeEnd = end;
                         this.bDateRangeTriggered = true;
-
                         const oComboBox = this.byId("CI_id_InvoiceNo");
                         if (oComboBox) {
                             oComboBox.setSelectedKey("");
                             oComboBox.setValue("");
                         }
-
-                        this.CI_OnSearch();
                     }
                 } catch (error) {
                     MessageToast.show(error.message || error.responseText);
                 }
             },
 
-
-            _filterInvoiceModelByDateRange: function (startDate, endDate) {
+            _filterInvoiceModelByDateRange: function(startDate, endDate) {
                 const oConsultantModel = this.getView().getModel("ConsultantModel");
                 const oInvoiceModel = this.getView().getModel("InvoiceModel");
-
                 if (!oConsultantModel || !oInvoiceModel) return;
-
-                // Get all data from ConsultantModel
-                const aAllData = oConsultantModel.getData();
-
+                const aAllData = oConsultantModel.getData(); // Get all data from ConsultantModel
                 if (!Array.isArray(aAllData)) return;
-
-                // Filter data by date range
-                const aFilteredData = aAllData.filter(item => {
+                const aFilteredData = aAllData.filter(item => {   // Filter data by date range
                     const itemDate = new Date(item.InvoiceDate);
                     const start = new Date(startDate);
                     const end = new Date(endDate);
-
                     return itemDate >= start && itemDate <= end;
                 });
-
-                // Update InvoiceModel with filtered data
-                oInvoiceModel.setData(aFilteredData);
+                oInvoiceModel.setData(aFilteredData);  // Update InvoiceModel with filtered data
                 oInvoiceModel.refresh(true);
-            },           
+            },
+
+            CI_onInvoiceDownloadPress: function () {
+               const oTable = this.getView().byId("CI_id_ConsultantInvoiceTable");
+                const oModelData = oTable.getModel("ConsultantModel").getData().map(item => {
+                 
+                    return {
+                        ...item,
+                      InvoiceDate: Formatter.formatDate(item.InvoiceDate),
+                        PayBy: Formatter.formatDate(item.PayBy)
+ 
+                    };
+                });
+ 
+                if (!oModelData || oModelData.length === 0) {
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("noData"));
+                    return;
+                }
+                const that = this;
+                const aCols = [
+                    { label: that.i18nModel.getText("consultantName"), property: "ConsultantName", type: "string" },
+                    { label: that.i18nModel.getText("invoiceNo"), property: "InvoiceNo", type: "string" },
+                    { label: that.i18nModel.getText("invoiceTo"), property: "InvoiceTo", type: "string" },
+                    { label: that.i18nModel.getText("invoiceTo"), property: "InvoiceDate", type: "string" },
+                    { label:that.i18nModel.getText("payBy"), property: "PayBy", type: "string" },
+                    { label:that.i18nModel.getText("GSTNO"), property: "GSTNO", type: "string" },
+                    { label:that.i18nModel.getText("currency"), property: "Currency", type: "string" }
+                ];
+ 
+                const oSettings = {
+                    workbook: {
+                        columns: aCols,
+                        context: {
+                            sheetName: that.i18nModel.getText("consultantName")
+                        }
+                    },
+                    dataSource: oModelData,
+                    fileName: "Contractor_Invoice.xlsx"
+                };
+ 
+                const oSheet = new Spreadsheet(oSettings);
+                oSheet.build()
+                    .then(function () {
+                        MessageToast.show(that.i18nModel.getText("exportSuccessful"));
+                    })
+ 
+                    .finally(function () {
+                        oSheet.destroy();
+                    });
+            }
         })
     }
-
 )
