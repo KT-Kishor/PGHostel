@@ -196,8 +196,6 @@ sap.ui.define(
                     const oFilterBar = this.byId("CI_id_ConsultantInvoiceFilterBar");
                     const aFilterItems = oFilterBar.getFilterGroupItems();
                     const params = {};
-
-                    // Get user data
                     const userData = this.getOwnerComponent().getModel("LoginModel").getData();
 
                     // Financial year logic
@@ -205,8 +203,6 @@ sap.ui.define(
                     const formatDate = (date) => date.toISOString().split("T")[0];
 
                     let invoiceDateProvided = false;
-
-                    // Collect user-entered filter values
                     aFilterItems.forEach((oItem) => {
                         const oControl = oItem.getControl();
                         const sParamKey = oItem.getName();
@@ -239,11 +235,10 @@ sap.ui.define(
                                     );
                                     params.InvoiceStartDate = start;
                                     params.InvoiceEndDate = end;
-                                    invoiceDateProvided = true;
-
-                                    // Set dateRange for ComboBox filtering
+                                    invoiceDateProvided = true; // Set dateRange for ComboBox filtering
                                     this.dateRangeStart = start;
                                     this.dateRangeEnd = end;
+                                    this.bDateRangeTriggered = true;
                                 }
                             } else if (oControl.getValue && oControl.getValue()) {
                                 params[sParamKey] = oControl.getValue();
@@ -261,15 +256,15 @@ sap.ui.define(
                         delete params.InvoiceStartDate;
                         delete params.InvoiceEndDate;
                         delete params.FinancialYear;
-                        this._isClearPressed = false;  // Reset range variables
+                        this._isClearPressed = false;
                         this.dateRangeStart = null;
                         this.dateRangeEnd = null;
+                        this.bDateRangeTriggered = false;
                     } else if (!invoiceDateProvided) {
-                        // Default to financial year if no date provided
-                        params.InvoiceStartDate = formatDate(fyStart);
+                        params.InvoiceStartDate = formatDate(fyStart); // Default to financial year if no date provided
                         params.InvoiceEndDate = formatDate(fyEnd);
                         params.FinancialYear = financialYearLabel;
-                        this.bDateRangeTriggered = true;
+                        this.bDateRangeTriggered = false;
                         this.dateRangeStart = formatDate(fyStart);
                         this.dateRangeEnd = formatDate(fyEnd);
                         const dateRangeControl = this.byId("CI_id_DatePicker");
@@ -278,37 +273,39 @@ sap.ui.define(
                             dateRangeControl.setSecondDateValue(fyEnd);
                         }
                     } else {
-                        // Check if selected date matches financial year
-                        const startDate = new Date(params.InvoiceStartDate);
+                        const startDate = new Date(params.InvoiceStartDate); // If user selected full financial year range manually
                         const endDate = new Date(params.InvoiceEndDate);
-                        this.bDateRangeTriggered = true;
                         if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
                             params.FinancialYear = financialYearLabel;
+                            this.bDateRangeTriggered = false; // Reset since filtering not needed
                         }
                     }
-
-                    // Fetch data
                     this.getBusyDialog();
                     const oData = await this.ajaxReadWithJQuery("ConsultantInvoice", params);
                     if (oData && Array.isArray(oData.data)) {
                         const oModel = new JSONModel(oData.data);
                         this.getView().setModel(oModel, "ConsultantModel");
-                        this.bDateRangeTriggered = false;
+                        let invoiceData = oData.data;
+                        let shouldBindInvoiceModel = true;
                         if (this.bDateRangeTriggered && this.dateRangeStart && this.dateRangeEnd) {
-                            const filteredData = oData.data.filter(item => {
-                                const itemDate = new Date(item.InvoiceDate);
-                                const start = new Date(this.dateRangeStart);
-                                const end = new Date(this.dateRangeEnd);
-                                return itemDate >= start && itemDate <= end;
-                            });
-
-                            const oInvoiceModel = new JSONModel(filteredData);
-                            this.getView().setModel(oInvoiceModel, "InvoiceModel");
-                            oInvoiceModel.refresh(true);
+                            const start = new Date(this.dateRangeStart);
+                            const end = new Date(this.dateRangeEnd);
+                            const startDate = new Date(params.InvoiceStartDate);
+                            const endDate = new Date(params.InvoiceEndDate);
+                            if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                                params.FinancialYear = financialYearLabel;
+                                shouldBindInvoiceModel = false;
+                            } else {
+                                shouldBindInvoiceModel = false;
+                                invoiceData = oData.data.filter(item => {
+                                    const itemDate = new Date(item.InvoiceDate);
+                                    return itemDate >= start && itemDate <= end;
+                                });
+                            }
                             this.bDateRangeTriggered = false;
-                        } else {
-                            // If no date range triggered, show all data
-                            const oInvoiceModel = new JSONModel(oData.data);
+                        }
+                        if (shouldBindInvoiceModel) {
+                            const oInvoiceModel = new JSONModel(invoiceData);
                             this.getView().setModel(oInvoiceModel, "InvoiceModel");
                             oInvoiceModel.refresh(true);
                         }
