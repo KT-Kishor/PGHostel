@@ -149,16 +149,17 @@
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
-                                      <m:Label  text="{i18n>expProf}"/>
-                                            <m:Switch
-                                                   id="SS_experienceSwitch"
-                                                   state="{viewModel>/isExperienced}"
-                                                   customTextOn="{i18n>experienced}"
-                                                   customTextOff="{i18n>fresher}"
-                                                   enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"                                                   class="sapUiSmallMarginEnd"
-                                                   change="SS_onExperienceSwitchChange" 
-                                                   visible="{= !${viewModel>/TraineeRole} }"> 
-                                             </m:Switch>
+                                      <m:Label  text="{i18n>experienceSelectionRequired}"/>
+                                     <m:SegmentedButton
+                                       id="SS_experienceSegmentedButton"
+                                        selectionChange="onExperienceSelect"
+                                       enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"
+                                       visible="{= !${viewModel>/TraineeRole} }">
+                                       <m:items>
+                                           <m:SegmentedButtonItem text="{i18n>fresher}" key="Fresher" />
+                                           <m:SegmentedButtonItem text="{i18n>experienced}" key="Experienced" />
+                                       </m:items>
+                                   </m:SegmentedButton>
 										<m:Label text="{i18n>employeeID}" />
 										<m:Input
                                             value="{sEmployeeModel>/0/EmployeeID}"

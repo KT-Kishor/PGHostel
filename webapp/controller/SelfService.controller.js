@@ -34,7 +34,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     // --- Initialization ---
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: true, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: false, employeeType: null, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -84,13 +84,23 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
 
                         if (oModelAllData) {
-                            const isExperienced = oModelAllData.EmployeeType !== "Fresher";
-                            this.ViewModel.setProperty("/isExperienced", isExperienced);
+                            // Set SegmentedButton state from backend data
+                            if (oModelAllData.EmployeeType) {
+                                const bIsExperienced = oModelAllData.EmployeeType === "Experienced";
+                                this.ViewModel.setProperty("/employeeType", oModelAllData.EmployeeType);
+                                this.ViewModel.setProperty("/isExperienced", bIsExperienced); // For visibility binding
+                                this.byId("SS_experienceSegmentedButton").setSelectedKey(oModelAllData.EmployeeType);
+                            } else {
+                                // For new or incomplete records, ensure everything is reset to unselected
+                                this.ViewModel.setProperty("/employeeType", null);
+                                this.ViewModel.setProperty("/isExperienced", false);
+                                this.byId("SS_experienceSegmentedButton").setSelectedKey(null);
+                            }
                             if (this.sPath === "SelfService" && oModelAllData.Type !== "Submit") {
                                 this.ViewModel.setProperty("/SelfService", true);
                             }
                             if (!oModelAllData.EContactIStdCode) oModelAllData.EContactIStdCode = "+91";
-                            if (!oModelAllData.EContactIIStdCode) oModelAllAta.EContactIIStdCode = "+91";
+                            if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                             // --- Releving letter Button Visibility Logic ---
                             if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
@@ -144,7 +154,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.byId("SS_id_STDCodeRII").setValueState("None");
                     this.byId("SS_id_FatherName").setValueState("None");
                     this.byId("SS_id_Compmail").setValueState("None");
-                } catch (error) { } finally {
+                } catch (error) {
+                    MessageBox.error("An error occurred while loading the page. Please try again.");
+                } finally {
                     this.closeBusyDialog();
                 }
                 this.oModel = this.getView().getModel("PaySlip");
@@ -476,8 +488,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                 this.getBusyDialog();
                 try {
-                    const oViewModel = this.getView().getModel("viewModel");
-                    const bIsExperienced = oViewModel.getProperty("/isExperienced");
+                    const sEmployeeType = this.ViewModel.getProperty("/employeeType");
+                    if (!sEmployeeType) {
+                        MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
+                        this.closeBusyDialog();
+                        return;
+                    }
+                    const bIsExperienced = sEmployeeType === "Experienced";
                     // --- 1. Validate Education Data ---
                     const oEducationModel = await this.SS_readEducationalDetails(this.EmployeeID, false);
                     const aEducationData = oEducationModel ? oEducationModel.getData() : [];
@@ -524,7 +541,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.closeBusyDialog();
                         return;
                     }
-                   // --- 4. If all validations pass, proceed to save ---
+                    // --- 4. If all validations pass, proceed to save ---
                     const ID = oEvent.getSource().getId().split("--").pop();
                     that.SS_onSavePress(ID);
 
@@ -552,6 +569,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 if (this.sPath === 'SelfService') {
                     sMessage = this.i18nModel.getText("selfServiceUpdateEmployee");
                     if (sButtonId === "BasicDetailsBtn") {
+                        const sEmployeeType = this.ViewModel.getProperty("/employeeType");
+                        if (!sEmployeeType) {
+                            MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
+                            return false; // Stop the save process
+                        }
                         // Basic Details & Emergency Contacts Validation
                         isValid =
                             utils._LCvalidateDate(oView.byId("SS_id_Dob"), "ID") &&
@@ -606,9 +628,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 }
 
                 // --- Section 3: Prepare Data for Payload ---
-                // Get the switch state and set the EmployeeType field for saving.
-                const bIsExperienced = this.ViewModel.getProperty("/isExperienced");
-                oDataModel.EmployeeType = bIsExperienced ? "Experienced" : "Fresher";
+                oDataModel.EmployeeType = this.ViewModel.getProperty("/employeeType");
                 if (sButtonId === "Submit") {
                     oDataModel.Type = "Submit";
                     sMessage = this.i18nModel.getText("confirmSubmitMessage");
@@ -2607,15 +2627,16 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
             },
-            SS_onExperienceSwitchChange: function (oEvent) {
-                const bIsExperienced = oEvent.getParameter("state");
+            onExperienceSelect: function (oEvent) {
+                const oSelectedItem = oEvent.getParameter("item");
+                const sSelectedKey = oSelectedItem.getKey(); // This will correctly return "Fresher" or "Experienced"
+                this.ViewModel.setProperty("/employeeType", sSelectedKey);
+                const bIsExperienced = (sSelectedKey === "Experienced");
+                this.ViewModel.setProperty("/isExperienced", bIsExperienced);
                 const oEmploymentSection = this.byId("employmentSS1");
                 if (oEmploymentSection) {
                     oEmploymentSection.setVisible(bIsExperienced);
                 }
-                if (!bIsExperienced) {
-                    // MessageToast.show(this.i18nModel.getText("employmentDetailsHidden"));
-                }
-            }
+            },
         });
     });
