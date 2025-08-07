@@ -1546,27 +1546,20 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     .jobViewRoot {
         padding: 0 !important;
     }
-
-    .jobViewRoot .sapMTitle.sapMTitleStyleH1,
+ 
+    .jobViewRoot .sapMTitle.sapMTitleStyleH1 {
+        font-weight: bold !important;
+        font-size: 1.4rem !important;
+        line-height: 1.2 !important;
+    }
+   
     .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
         font-size: 1.2rem !important;
         font-weight: bold !important;
         line-height: 1.2 !important;
         margin: 0.5rem 0 0.5rem 0.8rem !important;
     }
-
-     .jobViewRoot {
-        padding: 0 !important;
-    }
-
-    .jobViewRoot .sapMTitle.sapMTitleStyleH1,
-    .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
-        font-size: 1.2rem !important;
-        font-weight: bold !important;
-        line-height: 1.2 !important;
-        margin: 0.5rem 0 0.5rem 0.8rem !important;
-    }
-    
+   
     .jobViewRoot .mySmallMargin.myLargeMarginBegin.sapMTitle.sapMTitleStyleH5 {
         font-size: 0.85rem !important;
         line-height: 1 !important;

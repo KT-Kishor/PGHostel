@@ -128,9 +128,9 @@ sap.ui.define(
                 return oHeader;
             },
 
-            logindata: async function () {
+            logindata: function () {
                 try {
-                    await this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
+                    this.ajaxReadWithJQuery("AllLoginDetails", "EmpModel").then((data) => {
                         if (data.success) {
                             const filteredData = data.data.filter(emp => emp.Role !== 'Trainee');
                             var oModel = new JSONModel();
