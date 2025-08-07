@@ -4,11 +4,11 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/ui/model/json/JSONModel",
-], function (Controller, utils, MessageToast, Formatter, JSONModel) {
+], function(Controller, utils, MessageToast, Formatter, JSONModel) {
     "use strict";
     return Controller.extend("sap.kt.com.minihrsolution.controller.ExpenseApplication", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             this.getRouter().getRoute("RouteExpensePage").attachMatched(this._onRouteMatched, this);
         },
 
@@ -25,13 +25,17 @@ sap.ui.define([
                 let today = new Date();
                 let year = today.getFullYear();
                 let startDate, endDate;
-
                 if (today.getMonth() + 1 < 4) {
                     startDate = new Date(year - 1, 3, 1);
                     endDate = new Date(year, 2, 31);
                 } else {
                     startDate = new Date(year, 3, 1);
                     endDate = new Date(year + 1, 2, 31);
+                }
+                const dateRangeControl = this.byId("Exp_id_InvoiceDatePicker");
+                if (dateRangeControl) {
+                    dateRangeControl.setDateValue(startDate);
+                    dateRangeControl.setSecondDateValue(endDate);
                 }
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var View = new JSONModel({
@@ -58,26 +62,35 @@ sap.ui.define([
             this.initializeBirthdayCarousel();
         },
 
-        onTableSelectionChange: function (oEvent) {
+        onTableSelectionChange: function(oEvent) {
             var Status = oEvent.getSource().getSelectedItem().getBindingContext("ExpenseModel").getObject().Status;
             this.DeleteExpID = oEvent.getSource().getSelectedItem().getBindingContext("ExpenseModel").getObject().ExpenseID;
             if (Status === "Draft") {
                 this.byId("Exp_id_DeleteBtn").setEnabled(true);
-            }else{
+            } else {
                 this.byId("Exp_id_DeleteBtn").setEnabled(false);
             }
         },
 
-        onChangeEmployeeID: async function () {
+        onChangeEmployeeID: async function(params) {
             var selectedItem = this.byId("Exp_id_EmployeeName").getSelectedItem();
-            var EmployeeID = selectedItem
-                ? selectedItem.getText()
-                : this.LoginModel.getProperty("/EmployeeID");
+            var EmployeeID = selectedItem ? selectedItem.getText() : this.LoginModel.getProperty("/EmployeeID");
 
-            await this._fetchCommonData("Expense", "FilterExpenseModel", { "EmployeeID": EmployeeID });
+            if (params && params.EmployeeID) { // Override EmployeeID if params are passed
+                EmployeeID = params.EmployeeID;
+            }
 
-            var FilterModel = this.getView().getModel("FilterExpenseModel");
+            const fetchParams = {
+                EmployeeID: EmployeeID
+            };
 
+            if (params?.startDate && params?.endDate) { // Add date range if provided
+                fetchParams.startDate = params.startDate;
+                fetchParams.endDate = params.endDate;
+            }
+
+            await this._fetchCommonData("Expense", "FilterExpenseModel", fetchParams);
+            var FilterModel = this.getView().getModel("FilterExpenseModel"); // Remove duplicate ExpenseName entries
             if (FilterModel) {
                 var uniqueData = [
                     ...new Map(
@@ -87,8 +100,9 @@ sap.ui.define([
                 FilterModel.setData(uniqueData);
             }
         },
+
         // Function to initialize the common model for expense creation
-        CommonModel: function () {
+        CommonModel: function() {
             var oModel = new JSONModel({
                 EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
                 EmployeeName: this.LoginModel.getProperty("/EmployeeName"),
@@ -106,22 +120,25 @@ sap.ui.define([
             });
             this.getOwnerComponent().setModel(oModel, "CreateExpenseModel");
         },
+
         // Navigate back to the tile page
-        onPressback: function () {
+        onPressback: function() {
             this.getRouter().navTo("RouteTilePage");
         },
-        onLogout: function () {
+
+        onLogout: function() {
             this.CommonLogoutFunction();
         },
+
         // Open the "Add Expense" fragment
-        Exp_onPressAddExpense: function () {
+        Exp_onPressAddExpense: function() {
             this.CommonModel();
             var oView = this.getView();
             if (!this.Expense) {
                 this.Expense = sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.AddExpense",
                     controller: this
-                }).then(function (Expense) {
+                }).then(function(Expense) {
                     this.Expense = Expense;
                     oView.addDependent(this.Expense);
                     this.Expense.open();
@@ -132,8 +149,9 @@ sap.ui.define([
                 this._FragmentDatePickersReadOnly(["exp-Id-StartDate", "exp-Id-EndDate"])
             }
         },
+
         // Close the "Add Expense" fragment and reset validation states
-        Exp_Frg_onPressClose: function () {
+        Exp_Frg_onPressClose: function() {
             this.Expense.close();
             var core = sap.ui.getCore();
             core.byId("exp-Id-ExpenseName").setValueState("None");
@@ -144,8 +162,9 @@ sap.ui.define([
             core.byId("exp-Id-Destination").setValueState("None");
             core.byId("exp-Id-EmployeeRemark").setValueState("None");
         },
+
         // Submit the expense after validation
-        Exp_Frg_onPressSubmit: async function () {
+        Exp_Frg_onPressSubmit: async function() {
             var that = this;
             try {
                 const isValid =
@@ -166,11 +185,15 @@ sap.ui.define([
                 oModel.ExpStartDate = oModel.ExpStartDate.split("/").reverse().join("-");
                 oModel.ExpEndDate = oModel.ExpEndDate.split("/").reverse().join("-");
                 this.getBusyDialog();
-                const oResponse = await that.ajaxCreateWithJQuery("Expense", { data: oModel });
+                const oResponse = await that.ajaxCreateWithJQuery("Expense", {
+                    data: oModel
+                });
                 if (oResponse) {
                     that.Expense.close();
                     await that.Exp_onPressClear();
-                    await that._fetchCommonData("ExpenseTotalCalculation", "", { ExpenseID: oResponse.ExpenseID });
+                    await that._fetchCommonData("ExpenseTotalCalculation", "", {
+                        ExpenseID: oResponse.ExpenseID
+                    });
                     this.closeBusyDialog();
                     that.onChangeEmployeeID();
                     await that.Exp_onSearch();
@@ -185,166 +208,181 @@ sap.ui.define([
             }
         },
 
-        Exp_onCheckExpenseDetails: function (oEvent) {
+        Exp_onCheckExpenseDetails: function(oEvent) {
             var ExpenseID = oEvent.getSource().getBindingContext("ExpenseModel").getObject().ExpenseID;
             this.getRouter().navTo("RouteExpensDetails", {
                 sPath: ExpenseID.replaceAll("/", "")
             });
         },
 
-        Exp_onLiveExpenseName: function (oEvent) {
+        Exp_onLiveExpenseName: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
         },
 
-        Exp_onDatePickerChange: function (oEvent) {
+        Exp_onDatePickerChange: function(oEvent) {
             utils._LCvalidateDate(oEvent, "oEvent");
             sap.ui.getCore().byId("exp-Id-EndDate").setMinDate(new Date(oEvent.getSource().getValue().split("/").reverse().join('-')));
         },
 
-        Exp_onEndDateChange: function (oEvent) {
+        Exp_onEndDateChange: function(oEvent) {
             utils._LCvalidateDate(oEvent, "oEvent");
             // sap.ui.getCore().byId("exp-Id-EndDate").setMinDate(new Date(oEvent.getSource().getValue().split("/").reverse().join('-')));
         },
 
-        Exp_onChangeCountry: function (oEvent) {
+        Exp_onChangeCountry: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent, "oEvent");
             if (oEvent.getSource().getValue() === '') {
                 oEvent.getSource().setValueState("None")
             }
             var oModel = this.getView().getModel("CreateExpenseModel");
-            oModel.setProperty("/Destination","");
-            oModel.setProperty("/Source","");
+            oModel.setProperty("/Destination", "");
+            oModel.setProperty("/Source", "");
             var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
             var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
             sap.ui.getCore().byId("exp-Id-Source").getBinding("items").filter(oFilter);
             sap.ui.getCore().byId("exp-Id-Destination").getBinding("items").filter(oFilter);
         },
 
-        Exp_onChangeSource: function (oEvent) {
+        Exp_onChangeSource: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if (oEvent.getSource().getValue() === '') {
                 oEvent.getSource().setValueState("None")
             }
         },
 
-        Exp_onChangeDestination: function (oEvent) {
+        Exp_onChangeDestination: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if (oEvent.getSource().getValue() === '') {
                 oEvent.getSource().setValueState("None")
             }
         },
 
-        Exp_onChangeEmployeeRemark: function (oEvent) {
+        Exp_onChangeEmployeeRemark: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
         },
 
-        Exp_onPressExpenseDownload: function () {
+        Exp_onPressExpenseDownload: function() {
             let fileUrl = window.location.origin.split("index")[0] + "/Perdiem_DeclarationForm.doc";
             sap.m.URLHelper.redirect(fileUrl, true)
         },
 
         // Delete the Expenase and Expense Item
-        Exp_onPressDeleteExpense: async function (oEvent) {
+        Exp_onPressDeleteExpense: async function(oEvent) {
             var that = this;
             this.showConfirmationDialog(
                 this.i18nModel.getText("msgBoxConfirm"),
                 this.i18nModel.getText("commonMesBoxConfirmDelete"),
-                async function () {
-                   that.getBusyDialog();
-                    try {
-                        await that.ajaxDeleteWithJQuery("/Expense", { filters: { ExpenseID: that.DeleteExpID } });
-                        MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
-                        that.onChangeEmployeeID();
-                        that.Exp_onSearch();
-                        that.byId("Exp_id_DeleteBtn").setEnabled(false);
-                    } catch (error) {
-                        MessageToast.show(error.responseText || "Error deleting expense");
-                    } finally {
+                async function() {
+                        that.getBusyDialog();
+                        try {
+                            await that.ajaxDeleteWithJQuery("/Expense", {
+                                filters: {
+                                    ExpenseID: that.DeleteExpID
+                                }
+                            });
+                            MessageToast.show(that.i18nModel.getText("expenseDeleteMess")); // <== use 'that' instead of 'this'
+                            that.onChangeEmployeeID();
+                            that.Exp_onSearch();
+                            that.byId("Exp_id_DeleteBtn").setEnabled(false);
+                        } catch (error) {
+                            MessageToast.show(error.responseText || "Error deleting expense");
+                        } finally {
+                            that.closeBusyDialog();
+                        }
+                    },
+                    function() {
                         that.closeBusyDialog();
-                    }
-                },
-                function () { that.closeBusyDialog(); })
+                    })
         },
-        
+
         //Filter Function
-       Exp_onSearch: async function () {
-        try {
-            this.getBusyDialog();
-            var oTable = this.getView().byId("exp_Id_Expense");
-            oTable.setEnableBusyIndicator(true);
+        Exp_onSearch: async function() {
+            try {
+                this.getBusyDialog();
+                var oTable = this.getView().byId("exp_Id_Expense");
+                oTable.setEnableBusyIndicator(true);
 
-            const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
-            const params = {
-            "EmployeeID": this.LoginModel.getProperty("/EmployeeID")
-            };
+                const aFilterItems = this.byId("Exp-id-FilterBar").getFilterGroupItems();
+                const params = {
+                    "EmployeeID": this.LoginModel.getProperty("/EmployeeID")
+                };
 
-            let dateRangeProvided = false;
+                let dateRangeProvided = false;
+                aFilterItems.forEach((oItem) => { // Parse filter values
+                    const oControl = oItem.getControl();
+                    const sKey = oItem.getName();
 
-            // Loop through filter items
-            aFilterItems.forEach((oItem) => {
-            const oControl = oItem.getControl();
-            const sKey = oItem.getName();
+                    if (oControl && typeof oControl.getValue === "function") {
+                        const sValue = oControl.getValue().trim();
 
-            if (oControl && typeof oControl.getValue === "function") {
-                const sValue = oControl.getValue().trim();
+                        if (sKey === "ExpenseDate" && sValue.includes("-")) {
+                            const [start, end] = sValue.split("-").map(date =>
+                                date.trim().split("/").reverse().join("-")
+                            );
+                            params.startDate = start;
+                            params.endDate = end;
+                            dateRangeProvided = true;
+                        } else if (sValue) {
+                            params[sKey] = sValue;
+                        }
+                    }
+                });
 
-                if (sKey === "ExpenseDate" && sValue.includes("-")) {
-                const [start, end] = sValue.split("-").map(date =>
-                    date.trim().split("/").reverse().join("-")
-                );
-                params.startDate = start;
-                params.endDate = end;
-                dateRangeProvided = true;
-                } else if (sValue) {
-                params[sKey] = sValue;
+                // Get Financial Year Start & End
+                const currentYear = new Date().getFullYear();
+                let fyStart, fyEnd, financialYearLabel;
+                if (new Date().getMonth() >= 3) {
+                    fyStart = new Date(currentYear, 3, 1); // April 1
+                    fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+                    financialYearLabel = `${currentYear}-${currentYear + 1}`;
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1);
+                    fyEnd = new Date(currentYear, 2, 31);
+                    financialYearLabel = `${currentYear - 1}-${currentYear}`;
                 }
+
+                const formatDate = (date) => date.toISOString().split("T")[0];
+                if (this._isClearPressed) { // Handle clear button pressed
+                    delete params.startDate;
+                    delete params.endDate;
+                    delete params.FinancialYear;
+                    this._isClearPressed = false;
+                } else if (!dateRangeProvided) { // Apply financial year filter
+                    params.startDate = formatDate(fyStart);
+                    params.endDate = formatDate(fyEnd);
+                    params.FinancialYear = financialYearLabel;
+                    const dateRangeControl = this.byId("Exp_id_InvoiceDatePicker");
+                    if (dateRangeControl) {
+                        dateRangeControl.setDateValue(fyStart);
+                        dateRangeControl.setSecondDateValue(fyEnd);
+                    }
+                } else {
+                    const startDate = new Date(params.startDate); // If user selected date matches FY, attach FinancialYear
+                    const endDate = new Date(params.endDate);
+                    if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                        params.FinancialYear = financialYearLabel;
+                    }
+                }
+                await this._fetchCommonData("Expense", "ExpenseModel", params, ["exp_Id_Expense"]); // Fetch Data
+                this.onChangeEmployeeID(params);
+                this.closeBusyDialog();
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
             }
-            });
-
-            // Set default date range if not provided (financial year)
-            const currentYear = new Date().getFullYear();
-            let fyStart, fyEnd;
-            if (new Date().getMonth() >= 3) {
-            fyStart = new Date(currentYear, 3, 1);  // April 1st
-            fyEnd = new Date(currentYear + 1, 2, 31); // March 31st next year
-            } else {
-            fyStart = new Date(currentYear - 1, 3, 1);
-            fyEnd = new Date(currentYear, 2, 31);
-            }
-
-            const formatDate = (date) => date.toISOString().split("T")[0];
-
-            if (!dateRangeProvided) {
-            params.startDate = formatDate(fyStart);
-            params.endDate = formatDate(fyEnd);
-
-            // Set default value in UI
-            const dateRangeControl = this.byId("Exp_id_InvoiceDatePicker");
-            if (dateRangeControl) {
-                dateRangeControl.setDateValue(fyStart);
-                dateRangeControl.setSecondDateValue(fyEnd);
-            }
-            }
-
-            // Fetch data from backend
-            await this._fetchCommonData("Expense", "ExpenseModel", params, ["exp_Id_Expense"]);
-            this.closeBusyDialog();
-        } catch (error) {
-            this.closeBusyDialog();
-            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-        }
         },
 
-        Exp_onPressClear: async function () {
+        Exp_onPressClear: async function() {
             this.byId("Exp_id_EmployeeName").setSelectedKey("");
             this.byId("Exp_id_ConsFilterBar").setSelectedKey("");
             this.byId("Exp_id_SourceFilter").setSelectedKey("");
             this.byId("Exp_id_DestinationFilter").setSelectedKey("");
             this.byId("Exp_id_StatusFilter").setSelectedKey("");
             this.byId("Exp_id_InvoiceDatePicker").setValue("");
+            this._isClearPressed = true;
         },
 
-        Exp_onChangeExpenseType: function (oEvent) {
+        Exp_onChangeExpenseType: function(oEvent) {
             if (oEvent.getSource()._getSelectedItemText() !== 'Customer Facing') {
                 this.ViewModel.setProperty("/required", false);
             } else {
@@ -352,9 +390,8 @@ sap.ui.define([
             }
         },
 
- getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
-
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
     });
 });
