@@ -3,6 +3,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
             Formatter: Formatter,
+            UG_DEGREES: [
+                "BTech/BE", "BSc", "BCom", "BA", "BBA", "BCA", "LLB", "MBBS",
+                "BDS", "BHMS", "BAMS", "BUMS", "BPT", "Diploma"
+            ],
+            PG_DEGREES: [
+                "MTech/ME", "MSc", "MCom", "MA", "MBA", "MCA", "LLM", "MD", "MS",
+                "Pharma D", "MPT", "PG Diploma", "PhD", "MPhil"
+            ],
+
             onInit: function () {
                 const today = new Date();
                 const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
@@ -231,6 +240,21 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         break;
                 }
             },
+            _getRequiredDocumentTypeForDegree: function (sDegreeName) {
+                if (sDegreeName === "School/10th") {
+                    return "School/10th";
+                }
+                if (sDegreeName === "PUC/12th") {
+                    return "PUC/12th";
+                }
+                if (this.UG_DEGREES.includes(sDegreeName)) {
+                    return "UG Degree Certificate";
+                }
+                if (this.PG_DEGREES.includes(sDegreeName)) {
+                    return "PG Degree Certificate";
+                }
+                return sDegreeName;
+            },
             onOpenActionBtn: function (oEvent) {
                 var oBtn = oEvent.getSource();
                 if (!this._oActionBtn) {
@@ -454,7 +478,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 try {
                     const oViewModel = this.getView().getModel("viewModel");
                     const bIsExperienced = oViewModel.getProperty("/isExperienced");
-                    // --- Proactively load and then validate Education Data ---
+                    // --- 1. Validate Education Data ---
                     const oEducationModel = await this.SS_readEducationalDetails(this.EmployeeID, false);
                     const aEducationData = oEducationModel ? oEducationModel.getData() : [];
                     if (aEducationData.length < 2) {
@@ -467,7 +491,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.closeBusyDialog();
                         return;
                     }
-                    // --- Proactively load and then validate Employment Data ---
+                    // --- 2. Validate Employment Data (if experienced) ---
                     if (bIsExperienced) {
                         const oEmploymentModel = await this.SS_readEmploymentDetails(this.EmployeeID, false);
                         if (!oEmploymentModel || oEmploymentModel.getData().length < 1) {
@@ -476,24 +500,31 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             return;
                         }
                     }
-
-                    // --- Proactively load and then validate Document Data ---
-                    await this.ReadEmployeeDocument(false);
-                    let aRequiredDocNames = ["Pan Card", "Aadhar Card", ...aEducationData.map(edu => edu.DegreeName)];
+                    // Base documents that are always required
+                    let aRequiredDocNames = ["Pan Card", "Aadhar Card"];
+                    // Determine required documents from the education records entered
+                    const aEducationDocRequirements = aEducationData.map(edu => {
+                        return this._getRequiredDocumentTypeForDegree(edu.DegreeName);
+                    });
+                    // Add the unique education document requirements to our list
+                    aRequiredDocNames = [...new Set([...aRequiredDocNames, ...aEducationDocRequirements])];
+                    // Add experience-based documents if needed
                     if (bIsExperienced) {
                         aRequiredDocNames.push("Previous Company Relieving Letter", "Previous Company 3 Months Payslip");
                     }
+                    // Get the list of currently uploaded documents
+                    await this.ReadEmployeeDocument(false);
                     const aUploadedDocs = this.getView().getModel("DocumentModel").getProperty("/items") || [];
                     const aUploadedDocTypes = aUploadedDocs.map(doc => doc.DocumentType);
+                    // Find which required documents are missing
                     const aMissingDocs = [...new Set(aRequiredDocNames)].filter(doc => !aUploadedDocTypes.includes(doc));
-
                     if (aMissingDocs.length > 0) {
                         const sMissingDocsList = aMissingDocs.join(", ");
                         MessageBox.error(this.i18nModel.getText("mandatoryDocumentsErrorText", [sMissingDocsList]));
-                        this.closeBusyDialog(); // Manually close before returning
+                        this.closeBusyDialog();
                         return;
                     }
-                    // If all validations pass, proceed to save.
+                   // --- 4. If all validations pass, proceed to save ---
                     const ID = oEvent.getSource().getId().split("--").pop();
                     that.SS_onSavePress(ID);
 
