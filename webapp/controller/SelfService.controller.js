@@ -181,8 +181,25 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
                             switch (sectionTitle) {
                                 case "Basic Details":
+                                    this.getBusyDialog();
                                     await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                                     this.getView().getModel("sEmployeeModel").refresh(true);
+                                    // Reset the radio button state to match the loaded data
+                                    const oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
+                                    if (oModelAllData) {
+                                        this.ViewModel.setProperty("/employeeType", oModelAllData.EmployeeType);
+                                        const oRadioGroup = this.byId("SS_experienceRadioGroup");
+                                        if (oRadioGroup) {
+                                            if (oModelAllData.EmployeeType === "Fresher") {
+                                                oRadioGroup.setSelectedIndex(0);
+                                            } else if (oModelAllData.EmployeeType === "Experienced") {
+                                                oRadioGroup.setSelectedIndex(1);
+                                            } else {
+                                                oRadioGroup.setSelectedIndex(-1);
+                                            }
+                                        }
+                                    }
+                                    this.closeBusyDialog();
                                     break;
 
                                 case "Salary Details":
@@ -190,7 +207,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                                     break;
 
                                 case "Payslip":
+                                    this.getBusyDialog();
                                     await this._commonGETCall("AdminPaySlip", "EmpTable", { EmployeeID: this.EmployeeID });
+                                    this.closeBusyDialog();
                                     break;
 
                                 case "Document":
@@ -221,8 +240,25 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 const sectionTitle = oNewSection.getTitle();
                 switch (sectionTitle) {
                     case "Basic Details":
+                        this.getBusyDialog();
                         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: this.EmployeeID });
                         this.getView().getModel("sEmployeeModel").refresh(true);
+                        // Reset the radio button state to match the loaded data
+                        const oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
+                        if (oModelAllData) {
+                            this.ViewModel.setProperty("/employeeType", oModelAllData.EmployeeType);
+                            const oRadioGroup = this.byId("SS_experienceRadioGroup");
+                            if (oRadioGroup) {
+                                if (oModelAllData.EmployeeType === "Fresher") {
+                                    oRadioGroup.setSelectedIndex(0);
+                                } else if (oModelAllData.EmployeeType === "Experienced") {
+                                    oRadioGroup.setSelectedIndex(1);
+                                } else {
+                                    oRadioGroup.setSelectedIndex(-1);
+                                }
+                            }
+                        }
+                        this.closeBusyDialog();
                         break;
                     case "Salary Details":
                         this.SS_readSalaryDetails(this.EmployeeID);
@@ -233,7 +269,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.closeBusyDialog();
                         break;
                     case "Document":
-                        this.byId("SS_id_AcName").setValueState("None");
+                         this.byId("SS_id_AcName").setValueState("None");
                         this.byId("SS_id_Acno").setValueState("None");
                         this.byId("SS_id_BankName").setValueState("None");
                         this.byId("SS_id_Branch").setValueState("None");
