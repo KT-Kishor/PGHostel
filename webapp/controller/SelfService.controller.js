@@ -269,7 +269,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.closeBusyDialog();
                         break;
                     case "Document":
-                         this.byId("SS_id_AcName").setValueState("None");
+                        this.byId("SS_id_AcName").setValueState("None");
                         this.byId("SS_id_Acno").setValueState("None");
                         this.byId("SS_id_BankName").setValueState("None");
                         this.byId("SS_id_Branch").setValueState("None");
@@ -1012,43 +1012,82 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             },
 
             onBeforeUploadStarts: function (oEvent) {
-                var Selected = this.byId("SS_id_DocType").getSelectedItem();
-                if (!utils._LCvalidateMandatoryField(this.byId("SS_id_DocType"), "ID") && !Selected) {
-                    return MessageToast.show(this.i18nModel.getText("decumentType"));
+                var oDocType = this.byId("SS_id_DocType");
+                if (!utils._LCvalidateMandatoryField(oDocType, "ID") || !oDocType.getSelectedItem()) {
+                    MessageToast.show(this.i18nModel.getText("decumentType"));
+                    return;
                 }
-                this.getBusyDialog();
+                var docTypeText = oDocType.getSelectedItem().getText();
                 var oModel = this.getView().getModel("sEmployeeModel");
-                // var oUploadItem = oEvent.getParameter("item");
                 var oFile = oEvent.getParameter("files")[0];
-                if (oFile) {
-                    var reader = new FileReader();
-                    var that = this;
-                    reader.onload = function (e) {
-                        var base64 = e.target.result.split(',')[1];
-                        var oPayload = {
-                            "data": {
-                                DocumentType: Selected.getText(),
-                                EmployeeID: oModel.getData()[0].EmployeeID,
-                                CreatedBy: that.getView().getModel("LoginModel").getData().EmployeeName,
-                                CreatedOn: new Date().toISOString(),
-                                File: base64,
-                                FileName: oFile.name,
-                                FileType: oFile.type,
-                            }
-                        };
-                        that.ajaxCreateWithJQuery("EmployeeDocument", oPayload)
-                            .then(function () {
-                                MessageToast.show("File upload sucessfully");
-                                that.ReadEmployeeDocument();
-                                that.byId("SS_id_DocType").setSelectedKey("");
-                            })
-                            .catch(function (err) {
-                                MessageToast.show("File upload failed");
-                                this.closeBusyDialog();
-                            });
-                    };
-                    reader.readAsDataURL(oFile);
+                var that = this;
+                var aUploadedDocs = (this.getView().getModel("DocumentModel")?.getProperty("/items")) || [];
+                var isAlreadyUploaded = aUploadedDocs.some(function (doc) {
+                    return doc.DocumentType === docTypeText;
+                });
+                if (isAlreadyUploaded) {
+                    MessageToast.show(this.i18nModel.getText("documentAlreadyUploaded"));
+                    return;
                 }
+                function uploadFile() {
+                    that.getBusyDialog();
+                    if (oFile) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            var base64 = e.target.result.split(',')[1];
+                            var oPayload = {
+                                "data": {
+                                    DocumentType: docTypeText,
+                                    EmployeeID: oModel.getData()[0].EmployeeID,
+                                    CreatedBy: that.getView().getModel("LoginModel").getData().EmployeeName,
+                                    CreatedOn: new Date().toISOString(),
+                                    File: base64,
+                                    FileName: oFile.name,
+                                    FileType: oFile.type,
+                                }
+                            };
+                            that.ajaxCreateWithJQuery("EmployeeDocument", oPayload)
+                                .then(function () {
+                                    MessageToast.show("File upload sucessfully");
+                                    that.ReadEmployeeDocument();
+                                    that.byId("SS_id_DocType").setSelectedKey("");
+                                })
+                                .catch(function (err) {
+                                    MessageToast.show("File upload failed");
+                                    that.closeBusyDialog();
+                                });
+                        };
+                        reader.readAsDataURL(oFile);
+                    }
+                }
+                // Show warning dialog for specific document types
+                if (
+                    docTypeText === "Previous Company 3 Months Payslip" ||
+                    docTypeText === "UG Degree Certificate" ||
+                    docTypeText === "PG Degree Certificate"
+                ) {
+                    var sWarningMsg = "";
+                    if (docTypeText === "Previous Company 3 Months Payslip") {
+                        sWarningMsg = this.i18nModel.getText("mergeSalarySlipWarning");
+                    } else {
+                        sWarningMsg = this.i18nModel.getText("mergeSemesterDocWarning");
+                    }
+                    MessageBox.warning(
+                        sWarningMsg,
+                        {
+                            actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                            onClose: function (sAction) {
+                                if (sAction === MessageBox.Action.OK) {
+                                    uploadFile();
+                                } else if (sAction === MessageBox.Action.CANCEL) {
+                                    that.byId("SS_id_DocType").setSelectedKey("");
+                                }
+                            }
+                        }
+                    );
+                    return;
+                }
+                uploadFile();
             },
 
             ReadEmployeeDocument: async function (showBusy = true) {
