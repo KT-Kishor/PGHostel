@@ -335,8 +335,12 @@ sap.ui.define(
             },
             HQ_DownloadTableData:function(){
                  var table = this.byId("HQ_id_QuotationItemTable");
-          const oModelData = table.getModel("CompanyQuotationModel").getData();
-          const aFormattedData = oModelData.map(item => {
+                 var oBinding = table.getBinding("items");
+       var aFilteredData = oBinding.getCurrentContexts().map(function (oContext) {
+        return oContext.getObject();
+    });
+
+          const aFormattedData = aFilteredData.map(item => {
             return {
               ...item,
               Date: Formatter.formatDate(item.Date),
