@@ -1659,7 +1659,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     word-break: break-word !important;
   }
 
-  /* `myAppBackground` ke styles, 1200px aur 600px dono se merged */
   .jobViewRoot .career-background,
   .jobViewRoot .myAppBackground {
     background-image: url("../image/background.jpg") !important;
@@ -1675,9 +1674,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     min-height: 100vh !important; /* 1200px se copy kiya gaya */
   }
 
-  /*
-   * Button styles 1200px se copy kiye gaye hain.
-   */
   .jobViewRoot .myCustomButton {
     width: 250px !important;
     display: block !important;
@@ -1689,7 +1685,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     width: 50px !important;
     padding: 0 !important;
     transition: all 0.2s ease-in-out;
-    transform: scale(0.7); /* 600px ka style override hoga */
+    transform: scale(0.7); 
   }
 
   .jobViewRoot .myCustomIconBtn .sapMBtnInner {
@@ -1722,10 +1718,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     color: #ffffff !important;
   }
 
-  /*
-   * Yeh specific styles 600px query ke hain.
-   */
-  .jobViewRoot {
+ .jobViewRoot {
     padding: 0 !important;
   }
 
