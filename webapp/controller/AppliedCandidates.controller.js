@@ -476,50 +476,37 @@ sap.ui.define([
         onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
         onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
 
-        onExport: function() {
+       onExport: function() {
             const aData = this.getView().getModel("DataTableModel").getData();
-            const aCols = [{
-                    label: "Name",
-                    property: "FullName"
-                },
-                {
-                    label: "Current CTC (LPA)",
-                    property: "CurrentSalary"
-                },
-                {
-                    label: "Expected CTC (LPA)",
-                    property: "ExpectedSalary"
-                },
-                {
-                    label: "Notice Period (Days)",
-                    property: "NoticePeriod",
-                    template: "{0}"
-                }, // Template to handle '0'
-                {
-                    label: "Mobile Number",
-                    property: "Mobile"
-                },
-                {
-                    label: "Email",
-                    property: "Email"
-                },
-                {
-                    label: "Experience (Years)",
-                    property: "Experience"
-                },
-                {
-                    label: "Skills",
-                    property: "Skills"
-                }
+            const aFormattedData = aData.map(item => {
+            return {
+              ...item,
+              CurrentSalary: formatter.LPAattach(item.CurrentSalary),
+              ExpectedSalary: formatter.LPAattach(item.ExpectedSalary), 
+              Experience: formatter.ExperienceFormat(item.Experience), 
+            };
+          });
+            const aCols = [
+                { label: "Name", property: "FullName", type: "string"},
+                { label: "Current CTC (LPA)", property: "CurrentSalary", type: "string"},
+                { label: "Expected CTC (LPA)", property: "ExpectedSalary", type: "string"},
+                { label: "Notice Period (Days)", property: "NoticePeriod", type: "string"},
+                { label: "Mobile Number", property: "Mobile", type: "string"},  
+                { label: "Email", property: "Email", type: "string"},
+                { label: "Notice Period (Days)", property: "NoticePeriod", type: "string"},
+                { label: "Experience (Years)", property: "Experience", type: "string"},
+                { label: "Skills", property: "Skills", type: "string"},
             ];
+
             const oSettings = {
                 workbook: {
                     columns: aCols
                 },
-                dataSource: aData,
+                dataSource: aFormattedData,
                 fileName: "Candidate_Data.xlsx"
             };
-            const oSheet = new Spreadsheet(oSettings);
+
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
         },
 

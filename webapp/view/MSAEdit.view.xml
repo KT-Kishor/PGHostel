@@ -296,7 +296,7 @@
                                 >
                                     <m:headerToolbar>
                                         <m:OverflowToolbar>
-                                            <m:Title text="{i18n>sowTitle}" />
+                                            <m:Title text="{i18n>sowTitle} ({= ${SowReadModel>/}.length })" />
                                             <m:ToolbarSpacer />
                                             <m:ComboBox
                                                 id="MsaE_id_SowStatus"

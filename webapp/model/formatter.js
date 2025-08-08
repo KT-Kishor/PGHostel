@@ -328,6 +328,20 @@ sap.ui.define([
                 return assigneName;
 
             }
-        }
+        },
+
+       LPAattach: function (sValue) {
+            if (!sValue && sValue !== 0) { 
+                return "";
+            }
+            return sValue + " LPA";
+        },
+
+        ExperienceFormat: function (sValue) {
+            if (!sValue || sValue === "0") {
+                return "Fresher";
+            }
+            return sValue;
+        },
     }
 });
