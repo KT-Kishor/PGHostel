@@ -45,14 +45,14 @@ sap.ui.define([
 
         TSD_ReadTimesheetEntries: async function () {
             try {
-                this.getBusyDialog();
+              //  this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("Timesheet", { EmployeeID: this.EmployeeID });
                 this.timesheetData = Array.isArray(oData.data) ? oData.data : [oData.data];
             } catch (error) {
                 this.timesheetData = [];
                 MessageToast.show(error.message || error.responseText);
             } finally {
-                this.closeBusyDialog();
+               // this.closeBusyDialog();
             }
         },
 
@@ -150,12 +150,12 @@ sap.ui.define([
         },
 
         TS_onClear: function () {
-            this.getBusyDialog();
+           // this.getBusyDialog();
             this.byId("TS_monthComboBox").setSelectedKey("");
             this.byId("TS_id_Year").setValue("");
             setTimeout(() => {
                 this._applyAllFilters();
-                this.closeBusyDialog();
+               // this.closeBusyDialog();
             }, 500);
         },
 

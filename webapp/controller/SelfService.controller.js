@@ -555,7 +555,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         }
                     }
                     // Base documents that are always required
-                    let aRequiredDocNames = ["Pan Card", "Aadhar Card"];
+                    let aRequiredDocNames = ["Pan Card", "Aadhar Card","Bank details"];
                     // Determine required documents from the education records entered
                     const aEducationDocRequirements = aEducationData.map(edu => {
                         return this._getRequiredDocumentTypeForDegree(edu.DegreeName);
