@@ -1206,7 +1206,7 @@ sap.ui.define(
               oSheet.destroy();
             });
     
-                }
+              }
             },
         );
     }
