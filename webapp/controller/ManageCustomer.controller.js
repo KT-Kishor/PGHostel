@@ -547,7 +547,7 @@ sap.ui.define([
               }
             },
             dataSource: aFormattedData,
-            fileName: "CompanyInvoice.xlsx"
+            fileName: "ManageCustomerDetails.xlsx"
           };
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {

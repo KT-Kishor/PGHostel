@@ -546,7 +546,7 @@ sap.ui.define(
 
           // Now open dialog
           this._openJobDialog(oTempModel)
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => {
               this.closeBusyDialog();
             });
@@ -848,7 +848,7 @@ sap.ui.define(
                   oCtrl?.getContentDomRef?.();
                 oDom?.scrollIntoView({ behavior: "smooth", block: "center" });
                 oCtrl?.focus?.();
-              } catch (e) {}
+              } catch (e) { }
 
               MessageToast.show(
                 fieldName
@@ -915,12 +915,12 @@ sap.ui.define(
           const firstFields = [
             ...(isEditMode
               ? [
-                  {
-                    id: "statusCombo",
-                    type: "combo",
-                    validator: validation._LCstrictValidationComboBox,
-                  },
-                ]
+                {
+                  id: "statusCombo",
+                  type: "combo",
+                  validator: validation._LCstrictValidationComboBox,
+                },
+              ]
               : []),
             {
               id: "idlocationcombo",
@@ -1253,8 +1253,8 @@ sap.ui.define(
               } catch (error) {
                 MessageToast.show(
                   "Failed to delete job: " +
-                    (error?.responseJSON?.message ||
-                      "Please check backend logs")
+                  (error?.responseJSON?.message ||
+                    "Please check backend logs")
                 );
               } finally {
                 this.closeBusyDialog();
@@ -1359,7 +1359,7 @@ sap.ui.define(
             if (aData.length === 0) {
               MessageToast.show(
                 this.getText("noMatchingResults") ||
-                  "No matching records found."
+                "No matching records found."
               );
             }
 
@@ -1744,17 +1744,20 @@ sap.ui.define(
               }
             }
           });
-          
+
         },
-        HP_DownloadTableData:function(){
-               var table = this.byId("jobPostingTable");
+        HP_DownloadTableData: function () {
+          var table = this.byId("jobPostingTable");
           const oModelData = table.getModel("JobApplicationModel").getData().Candidates;
-          const aFormattedData = oModelData.map(item => {
-            return {
+          var exportPayload = [];
+          oModelData.map(item => {
+            exportPayload.push({
               ...item,
               PostDate: formatter.formatDate(item.PostDate),
-            };
+              StatusExport: item.Status === "true" ? "Active" : "Inactive" 
+            });
           });
+
           const aCols = [
             { label: this.i18nModel.getText("Jobtitle"), property: "JobTitle", type: "string" },
             { label: this.i18nModel.getText("v1_PriSkills"), property: "PrimarySkills", type: "string" },
@@ -1763,7 +1766,7 @@ sap.ui.define(
             { label: this.i18nModel.getText("V1_L_Location"), property: "Location", type: "string" },
             { label: this.i18nModel.getText("HP_t_NoOfPos"), property: "NoOfPositions", type: "string " },
             { label: this.i18nModel.getText("v1_s_postDate"), property: "PostDate", type: "string" },
-            { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
+            { label: this.i18nModel.getText("status"), property: "StatusExport", type: "string" },
           ];
           const oSettings = {
             workbook: {
@@ -1772,7 +1775,7 @@ sap.ui.define(
                 sheetName: this.i18nModel.getText("invoiceapp")
               }
             },
-            dataSource: aFormattedData,
+            dataSource: exportPayload,
             fileName: "Job_Detail.xlsx"
           };
           const oSheet = new Spreadsheet(oSettings);
@@ -1782,7 +1785,7 @@ sap.ui.define(
             .finally(function () {
               oSheet.destroy();
             });
-          }
+        }
       }
     );
   }

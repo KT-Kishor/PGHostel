@@ -332,7 +332,7 @@ sap.ui.define(
               }
             },
             dataSource: aFormattedData,
-            fileName: "AssignmentDetails.xlsx"
+            fileName: "ManageAssignmentDetails.xlsx"
           };
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {
