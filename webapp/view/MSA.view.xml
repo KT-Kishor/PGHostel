@@ -37,6 +37,7 @@
 					<OverflowToolbar >
 						<Title id="MSA_id_Title" text="{i18n>msaDetails} ({= ${MSADisplayModel>/}.length })"/>
 						<ToolbarSpacer/>
+						<Button text="{i18n>mailMSA}" id="MSA_id_Mail" type="Transparent" press="MSA_Email" />		
 						<Button text="{i18n>addMSA}" id="MSA_id_Add" type="Transparent" press="MSA_AddmsaDetails" />
 						<Button text="{i18n>headerCustomer}" id="MSA_id_Customer" type="Transparent" press="MSA_onAddCustomer"/>
 						<Button text="{i18n>download}" press="MSA_DownloadTableData"/>

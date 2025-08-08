@@ -190,5 +190,177 @@ sap.ui.define([
               oSheet.destroy();
             });
                 }
+
+                MSA_Email: function () {
+        const oView = this.getView();
+        if (!this._oMailDialog) {
+          this._oMailDialog = sap.ui.xmlfragment(
+            oView.getId(),
+            "sap.kt.com.minihrsolution.fragment.emailMSA",
+            this
+          );
+          oView.addDependent(this._oMailDialog);
+        }
+
+        const sCustomerName = this.byId("MSA_id_CompanyName").getValue();
+        const sMailBodyTemplate = this.getI18nText("mailBodyTemplate"); // Use a combination of replaces to format the text
+
+        const sFormattedBody = sMailBodyTemplate
+          .replace(/{Customer Name}/g, sCustomerName)
+          .replace(/\n\n/g, "</p><p>")
+          .replace(/\n/g, "<br/>")
+          .replace(/Dear/g, "<strong>Dear</strong>")
+          .replace(
+            /Master Services Agreement \(MSA\)/g,
+            "<strong>Master Services Agreement (MSA)</strong>"
+          )
+          .replace(/PAN No/g, "<strong>PAN No</strong>")
+          .replace(/Email address/g, "<strong>Email address</strong>"); // Wrap the whole thing in a paragraph tag
+
+        const sFinalHtml = `<p>${sFormattedBody}</p>`;
+
+        const oMailModel = new JSONModel({
+          to: "",
+          body: sFinalHtml,
         });
+        oView.setModel(oMailModel, "MSAEmailModel");
+
+        this._oMailDialog.open();
+      },
+
+      // New function for liveChange event on email inputs
+
+      // MSA_Email function ka updated code
+      // MSA_Email: async function () {
+      //   const oView = this.getView();
+
+      //   this.getBusyDialog();
+
+      //   const oData = await this.ajaxReadWithJQuery("MSADetails", {
+      //     MsaID: this.byId("MSA_id_CompanyName").getValue(), // Example: MsaID ko company name se fetch kar rahe hain
+      //   });
+
+      //   console.log("Data from Backend:", oData);
+
+      //   // Busy indicator ko band karein
+      //   this.closeBusyDialog();
+
+      // },
+
+      onLiveChangeEmail: function (oEvent) {
+        validation._LCvalidateEmail(oEvent.getSource(), "ID");
+      },
+
+      _validateMandatoryField: function (oControl) {
+        const sValue = oControl.getValue()?.trim();
+        if (!sValue) {
+          oControl.setValueState("Error");
+          return false;
+        } else {
+          oControl.setValueState("None");
+          return true;
+        }
+      },
+
+      // You can create a reusable validation loop function
+
+      _validateInOrder: function (aChecks) {
+        for (const { ctrl, fn } of aChecks) {
+          const bIsValid = fn(ctrl, "ID");
+          if (!bIsValid) {
+            if (typeof ctrl.focus === "function") {
+              ctrl.focus();
+            }
+            return false;
+          }
+        }
+        return true;
+      },
+      // The main `onSendMail` function is now much cleaner
+      // onSendMail function ka updated code
+      onSendMail: async function () {
+        const oView = this.getView();
+        this.i18n = this.getOwnerComponent()
+          .getModel("i18n")
+          .getResourceBundle();
+        const mandatoryText = this.i18n.getText("mandetoryFields");
+        const emailSuccess = this.i18n.getText("emailSuccess");
+
+        const aValidationChecks = [
+          { ctrl: oView.byId("idEmailTo"), fn: validation._LCvalidateEmail },
+          { ctrl: oView.byId("idEmailBody"), fn: this._validateRTE.bind(this) },
+        ];
+
+        const bFormIsValid = this._validateInOrder(aValidationChecks);
+
+        if (!bFormIsValid) {
+          MessageToast.show(mandatoryText);
+          return;
+        }
+
+        this.getBusyDialog();
+
+        const oMailModel = oView.getModel("MSAEmailModel");
+        const oPayload = {
+          Type: "MSADetails",
+          toEmailID: oMailModel.getProperty("/to"),
+          body: oMailModel.getProperty("/body"),
+        };
+        console.log(oPayload);
+        try {
+          await this.ajaxCreateWithJQuery("MSAEmail", oPayload);
+
+          // Success hone par MessageBox dikhayein
+          MessageBox.success(emailSuccess, {
+            onClose: () => {
+              // OK button par click karne par dialog close karein
+              this._oMailDialog.close();
+            },
+          });
+        } catch (oError) {
+          MessageToast.show("Error sending email: " + oError.responseText);
+        } finally {
+          this.closeBusyDialog();
+        }
+      },
+      // Helper function for RTE validation
+
+      onCancelMail: function () {
+        if (this._oMailDialog) {
+          // Close the dialog first
+          this._oMailDialog.close();
+
+          // After the dialog is closed, destroy it to remove it and its contents from the DOM
+          this._oMailDialog.destroy();
+
+          // Clear the reference to the dialog instance
+          this._oMailDialog = null;
+        }
+      },
+
+      onRTEChange: function (oEvent) {
+        // Pass the Rich Text Editor control directly to the validation function
+        const oRTE = oEvent.getSource();
+        this._validateRTE(oRTE);
+      },
+
+      _validateRTE: function (oRTE) {
+        // The control is now passed directly as a parameter
+        const sRTEValue = oRTE.getValue();
+
+        // Strip HTML tags to count only visible text characters
+        const iRTELength = sRTEValue.replace(/<[^>]*>/g, "").trim().length;
+
+        if (iRTELength < 8) {
+          // Add the error class from your CSS
+          oRTE.addStyleClass("sapUiRTEErrorBorder");
+          return false;
+        } else {
+          // Remove the error class if valid
+          oRTE.removeStyleClass("sapUiRTEErrorBorder");
+          return true;
+        }
+      },
     });
+  }
+);
