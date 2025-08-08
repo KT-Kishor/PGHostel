@@ -1753,9 +1753,6 @@ sap.ui.define(
             return {
               ...item,
               PostDate: formatter.formatDate(item.PostDate),
-              // PayByDate: Formatter.formatDate(item.PayByDate),
-              // TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
-              
             };
           });
           const aCols = [
@@ -1776,7 +1773,7 @@ sap.ui.define(
               }
             },
             dataSource: aFormattedData,
-            fileName: "JobPostedDetail.xlsx"
+            fileName: "Job_Detail.xlsx"
           };
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {

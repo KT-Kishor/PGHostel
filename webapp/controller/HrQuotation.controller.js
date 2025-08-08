@@ -362,7 +362,7 @@ sap.ui.define(
               }
             },
             dataSource: aFormattedData,
-            fileName: "CompanyInvoice.xlsx"
+            fileName: "Quatation.xlsx"
           };
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {

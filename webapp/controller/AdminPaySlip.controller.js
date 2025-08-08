@@ -193,10 +193,9 @@ sap.ui.define(
                     return {
                         ...item,
                         YearMonth: Formatter.formatMonthYear(item.YearMonth),
-                        //   toDate: Formatter.formatDate(item.toDate),
-                        //   comments:item.comments.map((elem)=>{
-                        //     return elem.Comment
-                        //   }),
+                        DeductionsTotalMonthly:Formatter.CurrencyInINRText(item.DeductionsTotalMonthly),
+                        EarningsTotalMonthly:Formatter.CurrencyInINRText(item.EarningsTotalMonthly),
+                        NetPay:Formatter.CurrencyInINRText(item.NetPay),
                     };
                 });
                 const aCols = [
