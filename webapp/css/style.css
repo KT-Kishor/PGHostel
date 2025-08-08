@@ -898,7 +898,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 }
 
-/*33333333333333333333333333222222222222222222221111111111133333333333333333333333322222222222222222222111111111113333333333333333333333332222222222222222222211111111111111111*/
+/* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*//* JOb View: Starts HERE*/
 
 /* Common box */
 .shareItemBox {
@@ -987,15 +987,15 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .mySmallMarginEnd {
-  margin-inline-end: 0.5rem !important; /* For RTL support */
+  margin-inline-end: 0.5rem !important;
 }
 
 .myLargeMarginBegin {
-  margin-inline-start: 2rem !important; /* For RTL support */
+  margin-inline-start: 2rem !important; 
 }
 
 .myLargeMarginEnd {
-  margin-inline-end: 2rem !important; /* For RTL support */
+  margin-inline-end: 2rem !important;
 }
 
 .myLargeMarginBottom {
@@ -1006,11 +1006,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   padding: 1rem !important;
 }
 
-
 .jobViewRoot .myScrollContainer .sapMScrollCont {
   overflow-x: hidden !important;
 }
-
 
 /*
     * Main container for all content
@@ -1030,28 +1028,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   box-sizing: border-box;
   background-color: #ffffff;
 }
-
-@media (min-width: 1201px) {
-  .myFormattedText {
-    width: calc(100% - 6rem) !important;
-    margin: 0 3rem !important;
-  }
-    .myFormattedText h1,
-  .myFormattedText h2,
-  .myFormattedText h5 {
-    margin: 1rem; /* Apply similar margin to headings within myFormattedText */
-  }
-  .jobViewRoot .sapMTitle.sapMTitleStyleH1 {
-    margin: 1rem 3rem !important;
-  }
-  .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
-    margin: 0 3rem !important;
-  }
-  .jobViewRoot .mySmallMargin.myLargeMarginBegin.sapMTitle.sapMTitleStyleH5 {
-    margin: 0.8rem 5rem !important;
-  }
-}
-
 /*
     * Paragraphs and lists
     */
@@ -1444,14 +1420,33 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   word-break: break-word;
 }
 
-/*
 
- */
+@media (min-width: 1201px) {
+  .myFormattedText {
+    width: calc(100% - 6rem) !important;
+    margin: 0 3rem !important;
+  }
+  .myFormattedText h1,
+  .myFormattedText h2,
+  .myFormattedText h5 {
+    margin: 1rem;
+  }
+  .jobViewRoot .sapMTitle.sapMTitleStyleH1 {
+    margin: 1rem 3rem !important;
+  }
+  .jobViewRoot .sapMTitle.sapMTitleStyleH2 {
+    margin: 0 3rem !important;
+  }
+  .jobViewRoot .mySmallMargin.myLargeMarginBegin.sapMTitle.sapMTitleStyleH5 {
+    margin: 0.8rem 5rem !important;
+  }
+}
+
 @media (min-width: 601px) and (max-width: 1200px) {
   .jobViewRoot .myFormattedText h1,
   .jobViewRoot .myFormattedText h2,
   .jobViewRoot .myFormattedText h5 {
-      font-size: 1.3rem !important; /* (1.1 + 1.5) / 2 */
+    font-size: 1.3rem !important; /* (1.1 + 1.5) / 2 */
     margin: 1rem;
   }
   .jobViewRoot .sapMTitle.sapMTitleStyleH1 {
@@ -1468,8 +1463,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
   .jobViewRoot .mySmallMargin.myLargeMarginBegin.sapMTitle.sapMTitleStyleH5 {
     margin: 0.8rem 5rem !important;
-   font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
-  line-height: 1 !important;
+    font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
+    line-height: 1 !important;
   }
 
   .jobViewRoot #mainContainer,
@@ -1509,31 +1504,29 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 
   .jobViewRoot .myFormattedText p,
-.jobViewRoot .myFormattedText li {
-  font-size: 0.875rem !important; /* (0.75 + 1.0) / 2 */
-  line-height: 1.3 !important;
+  .jobViewRoot .myFormattedText li {
+    font-size: 0.875rem !important; /* (0.75 + 1.0) / 2 */
+    line-height: 1.3 !important;
+  }
 
-}
+  .jobViewRoot .myFormattedText strong,
+  .jobViewRoot .myFormattedText b {
+    font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
+    font-weight: 700 !important;
+    color: #111 !important;
+  }
 
-.jobViewRoot .myFormattedText strong,
-.jobViewRoot .myFormattedText b {
-  font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
-  font-weight: 700 !important;
-  color: #111 !important;
-}
-
-.jobViewRoot .myFormattedText li strong,
-.jobViewRoot .myFormattedText li b {
-  font-weight: 750 !important;
-  color: #000 !important;
-  font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
-}
+  .jobViewRoot .myFormattedText li strong,
+  .jobViewRoot .myFormattedText li b {
+    font-weight: 750 !important;
+    color: #000 !important;
+    font-size: 0.925rem !important; /* (0.85 + 1.0) / 2 */
+  }
 
   .jobViewRoot .myFormattedText {
     display: block !important;
     width: calc(100% - 6rem) !important;
     margin: 0 3rem !important;
-    /* width: 100% !important; */
     max-width: 100% !important;
     overflow-x: hidden !important;
     white-space: normal !important;
@@ -1541,7 +1534,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 
   /*
-   * Background classes bhi ab scoped hain.
+   * Background classes
    */
   .jobViewRoot .career-background,
   .jobViewRoot .myAppBackground {
@@ -1550,9 +1543,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     overflow: hidden !important;
     background-clip: padding-box !important;
     box-sizing: border-box !important;
+    margin: 0.5rem !important;
+    width: calc(100% - 1rem) !important;
   }
 
-  /* `myAppBackground` ke liye specific tweaks */
+  /* `myAppBackground` tweaks*/
   .jobViewRoot .myAppBackground {
     overflow: visible !important;
     height: auto !important;
@@ -1560,7 +1555,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 
   /*
-   * Button styles bhi specific ho gaye hain.
+   * Button classes
    */
   .jobViewRoot .myCustomButton {
     width: 250px !important;
@@ -1607,13 +1602,11 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 }
 
-
 /*
  * Additional tweaks for ultra-small screens (phones)
  *  */
 @media (max-width: 600px) {
-
-  /* Yeh 1200px se inherit kiye gaye styles hain */
+  /* these are inherited from 1200px */
   .jobViewRoot #mainContainer,
   .jobViewRoot .mainJobContainer {
     display: block !important;
@@ -1665,13 +1658,13 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     background-size: cover !important;
     background-position: center !important;
     border-radius: 12px !important;
-    overflow: hidden !important; /* 600px ka style override hoga */
+    overflow: hidden !important; 
     background-clip: border-box !important;
     box-sizing: border-box !important;
     margin: 0.4rem !important;
     width: calc(100% - 0.8rem) !important;
-    height: auto !important; /* 1200px se copy kiya gaya */
-    min-height: 100vh !important; /* 1200px se copy kiya gaya */
+    height: auto !important; 
+    min-height: 100vh !important; 
   }
 
   .jobViewRoot .myCustomButton {
@@ -1685,7 +1678,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     width: 50px !important;
     padding: 0 !important;
     transition: all 0.2s ease-in-out;
-    transform: scale(0.7); 
+    transform: scale(0.7);
   }
 
   .jobViewRoot .myCustomIconBtn .sapMBtnInner {
@@ -1718,7 +1711,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     color: #ffffff !important;
   }
 
- .jobViewRoot {
+  .jobViewRoot {
     padding: 0 !important;
   }
 
@@ -1814,3 +1807,4 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     margin: 0 !important;
   }
 }
+/* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*/
