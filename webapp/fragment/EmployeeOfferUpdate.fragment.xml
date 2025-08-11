@@ -192,7 +192,7 @@
 														<m:Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 														<m:Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 														<m:Label text="{i18n>variablePayTotal}" class="boldBlackText" />
-														<m:Text visible="{= ${employeeModel>/VariablePay} !== 0 }" text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+														<m:Text visible="{= Number(${employeeModel>/VariablePay}) !== 0 }" text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														<m:Label text="{i18n>grossPayTotal}" class="boldBlackText" />
 														<m:Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 													</f:content>
@@ -226,7 +226,7 @@
 														<m:Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 														<m:Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
 														<m:Label text="{i18n>variablePayTotal}" class="boldBlackText" />
-														<m:Text visible="{= ${employeeModel>/VariablePay} !== 0 }" text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
+														<m:Text visible="{= Number(${employeeModel>/VariablePay}) !== 0 }" text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
 														<m:Label text="{i18n>grossPayTotal}" class="boldBlackText"/>
 														<m:Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
 													</f:content>
@@ -245,11 +245,11 @@
 														<m:Label text="{i18n>yearlyDeduction}" class="boldBlackText"/>
 														<m:Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}" />
 													</m:VBox>
-													<m:VBox class="summaryBox" visible="{= ${employeeModel>/VariablePay} !== 0 }">
+													<m:VBox class="summaryBox" visible="{= Number(${employeeModel>/VariablePay}) !== 0 }">
 														<m:Label  text="{i18n>EmpOfferVariablePay}" class="boldBlackText"/>
 														<m:Text  text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}" />
 													</m:VBox>
-													<m:VBox class="summaryBox" visible="{= ${employeeModel>/JoiningBonus}*1 !==0}">
+													<m:VBox class="summaryBox" visible="{= Number(${employeeModel>/JoiningBonus})*1 !==0}">
 														<m:Label  text="{i18n>joiningBonus}" class="boldBlackText"/>
 														<m:Text  text="INR {path:'employeeModel>/JoiningBonus',formatter: '.Formatter.fromatNumber'}" />
 													</m:VBox>
