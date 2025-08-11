@@ -48,6 +48,10 @@
         {
             "Title": "Gratuity",
             "Text": "Amount Value"
+        },
+        {
+            "Title": "Special Allowance",
+            "Text": "Amount Value"
         }
     ],
     "Deductions": [

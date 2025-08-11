@@ -580,8 +580,16 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
             //pdf generate function
-            async offerGeneratingPdfFunction(oModel) {
+           async offerGeneratingPdfFunction(oModel) {
                 this.getBusyDialog();
+                const _setIfNotZero = (model, path, value, currency) => {
+                    if (value && Number(value) !== 0) {
+                        model.setProperty(path, currency + " " + Formatter.fromatNumber(value));
+                    } else {
+                        model.setProperty(path, "");
+                    }
+                };
+
                 var oEmpModel = oModel.getData();
                 await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
@@ -593,29 +601,38 @@ sap.ui.define([
                 oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
                 oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
                 oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
-                if (oEmpModel.EmploymentBond == "0" || oEmpModel.EmploymentBond == "" || oEmpModel.EmploymentBond == null) {
+
+
+                // Bond Condition
+                if (oEmpModel.EmploymentBond == "0" || !oEmpModel.EmploymentBond) {
                     oPDFModel.setProperty("/BondCondition", "18 employment months");
                     oPDFModel.setProperty("/BondCondition2", "");
-                }
-                else {
+                } else {
                     oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond year(s)");
-                    if(oEmpModel.EmploymentBond == "1") oPDFModel.setProperty("/BondCondition2", "any training costs and during 18 employment months, ");
-                    else oPDFModel.setProperty("/BondCondition2", "any training costs and ");
+                    if (oEmpModel.EmploymentBond == "1") {
+                        oPDFModel.setProperty("/BondCondition2", "any training costs and during 18 employment months, ");
+                    } else {
+                        oPDFModel.setProperty("/BondCondition2", "any training costs and ");
+                    }
                 }
-                oPDFModel.setProperty("/YearlyComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Total));
-                oPDFModel.setProperty("/YearlyComponents/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.BasicSalary));
-                oPDFModel.setProperty("/YearlyComponents/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.HRA));
-                oPDFModel.setProperty("/YearlyComponents/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EmployerPF));
-                oPDFModel.setProperty("/YearlyComponents/4/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.MedicalInsurance));
-                oPDFModel.setProperty("/YearlyComponents/5/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Gratuity));
-                oPDFModel.setProperty("/Deductions/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.TotalDeduction));
-                oPDFModel.setProperty("/Deductions/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.IncomeTax));
-                oPDFModel.setProperty("/Deductions/2/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.EmployeePF));
-                oPDFModel.setProperty("/Deductions/3/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.PT));
-                oPDFModel.setProperty("/VariableComponents/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.VariablePay));
-                oPDFModel.setProperty("/GrossPay/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.GrossPay));
-                oPDFModel.setProperty("/GrossPay/1/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.GrossPayMontly));
-                if (oEmpModel.JoiningBonus == "0") {
+
+                // Yearly Components
+                _setIfNotZero(oPDFModel, "/YearlyComponents/0/Text", oEmpModel.Total, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/YearlyComponents/1/Text", oEmpModel.BasicSalary, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/YearlyComponents/2/Text", oEmpModel.HRA, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/YearlyComponents/3/Text", oEmpModel.EmployerPF, oEmpModel.Currency); // Provident Fund (Employer)
+                _setIfNotZero(oPDFModel, "/YearlyComponents/4/Text", oEmpModel.MedicalInsurance, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/YearlyComponents/5/Text", oEmpModel.Gratuity, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/YearlyComponents/6/Text", oEmpModel.SpecailAllowance, oEmpModel.Currency);
+                // Deductions
+                _setIfNotZero(oPDFModel, "/Deductions/0/Text", oEmpModel.TotalDeduction, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/Deductions/1/Text", oEmpModel.IncomeTax, oEmpModel.Currency); // Income Tax (TDS)
+                _setIfNotZero(oPDFModel, "/Deductions/2/Text", oEmpModel.EmployeePF, oEmpModel.Currency); // Provident Fund (Employee)
+                _setIfNotZero(oPDFModel, "/Deductions/3/Text", oEmpModel.PT, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/VariableComponents/0/Text", oEmpModel.VariablePay, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/GrossPay/0/Text", oEmpModel.GrossPay, oEmpModel.Currency);
+                _setIfNotZero(oPDFModel, "/GrossPay/1/Text", oEmpModel.GrossPayMontly, oEmpModel.Currency);
+                 if (oEmpModel.JoiningBonus == "0") {
                     oPDFModel.setProperty("/Notes/0/Text", "0");
                 }
                 else {

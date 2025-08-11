@@ -144,7 +144,7 @@
 															<Label text="{i18n>hra}" />
 															<Text text="{path:'employeeModel>/HRA',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>eplyrPF}" />
-															<Text text="{path:'employeeModel>/EmployerPF',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<Text text="{path: 'employeeModel>/EmployerPF', formatter: '.Formatter.YearlyToMontlyConv'}" visible="{= ${employeeModel>/EmployerPF} !== 0}" />
 															<Label text="{i18n>medicalInsurance}" />
 															<Text text="{path:'employeeModel>/MedicalInsurance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>gratuity}" />
@@ -155,11 +155,11 @@
 															<Text text="{path:'employeeModel>/Total',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<core:Title text="{i18n>deduction}" />
 															<Label text="{i18n>providentFund}" />
-															<Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<Text text="{path:'employeeModel>/EmployeePF',formatter:'.Formatter.YearlyToMontlyConv'}" visible="{= ${employeeModel>/EmployeePF} !== 0}" />
 															<Label text="{i18n>performanceTax}" />
-															<Text text="{path:'employeeModel>/PT',formatter:'.Formatter.YearlyToMontlyConv'}"  />
+															<Text text="{path:'employeeModel>/PT',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>incomeTax}" />
-															<Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<Text text="{path:'employeeModel>/IncomeTax',formatter:'.Formatter.YearlyToMontlyConv'}" visible="{= ${employeeModel>/IncomeTax} !==0}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
@@ -178,7 +178,7 @@
 															<Label text="{i18n>hra}" />
 															<Text text="INR {path:'employeeModel>/HRA',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>eplyrPF}" />
-															<Text text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
+															<Text text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}" visible="{= ${employeeModel>/EmployerPF}!== 0}"/>
 															<Label text="{i18n>medicalInsurance}" />
 															<Text text="INR {path:'employeeModel>/MedicalInsurance',formatter: '.Formatter.fromatNumber'}"  />
 															<Label text="{i18n>gratuity}" />
@@ -189,11 +189,11 @@
 															<Text text="INR {path:'employeeModel>/Total',formatter: '.Formatter.fromatNumber'}"  />
 															<core:Title text="{i18n>deduction}"/>
 															<Label text="{i18n>providentFund}" />
-															<Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}"/>
+															<Text text="INR {path:'employeeModel>/EmployeePF',formatter: '.Formatter.fromatNumber'}" visible="{= ${employeeModel>/EmployeePF}!== 0}"/>
 															<Label text="{i18n>performanceTax}" />
-															<Text text="INR {path:'employeeModel>/PT',formatter: '.Formatter.fromatNumber'}"/>
+															<Text text="INR {path:'employeeModel>/PT',formatter: '.Formatter.fromatNumber'}" />
 															<Label text="{i18n>incomeTax}" />
-															<Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}"/>
+															<Text text="INR {path:'employeeModel>/IncomeTax',formatter: '.Formatter.fromatNumber'}" visible="{= ${employeeModel>/IncomeTax}!== 0}"/>
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
@@ -216,11 +216,11 @@
 															<Label text="{i18n>yearlyDeduction}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
-														<VBox class="summaryBox">
+														<VBox class="summaryBox" visible="{= ${employeeModel>/VariablePay}!== 0}"> 
 															<Label text="{i18n>EmpOfferVariablePay}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>
-														<VBox class="summaryBox">
+														<VBox class="summaryBox" visible="{= ${employeeModel>/JoiningBonus} * 1 !== 0 }">
 															<Label text="{i18n>joiningBonus}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/JoiningBonus',formatter: '.Formatter.fromatNumber'}" />
 														</VBox>

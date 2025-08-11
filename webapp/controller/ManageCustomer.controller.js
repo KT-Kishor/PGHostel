@@ -518,16 +518,13 @@ sap.ui.define([
       onLogout: function () {
         this.CommonLogoutFunction(); // Navigate to Login Page
       },
+      
       MC_DownloadTableData:function(){
           var table = this.byId("MC_id_CustTable");
           const oModelData = table.getModel("CreateCustomerModel").getData();
           const aFormattedData = oModelData.map(item => {
             return {
-              ...item,
-              // InvoiceDate: Formatter.formatDate(item.InvoiceDate),
-              // PayByDate: Formatter.formatDate(item.PayByDate),
-              // TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
-              
+              ...item,     
             };
           });
           const aCols = [
@@ -552,12 +549,11 @@ sap.ui.define([
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {
             MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-          }.bind(this))
-            .finally(function () {
+          }.bind(this)).finally(function () {
               oSheet.destroy();
-            });
+          });
       }
-    }
+     }
     );
   }
 );

@@ -350,21 +350,18 @@ sap.ui.define([], function () {
                     let monCurrentY = yearlyCompTitleBotLineY + 5;  // Initial Y position
 
                     for (let i = 1; i <= yearlyComponents.length - 1; i++) {
+                        if (!yearlyComponents[i].Text) continue; // Skip if no value
 
-                        // Draw Title on the left
                         doc.text(yearlyComponents[i].Title, margin + 3, monCurrentY);
 
-                        // Draw Text on the right, aligned to the right side
                         let compText = yearlyComponents[i].Text;
                         let compTextWidth = doc.getTextWidth(compText);
                         let compTextX = pageWidth - compTextWidth - margin - 3;
                         doc.text(compText, compTextX, monCurrentY);
 
-                        // Draw a line under each item
                         let botLineY = monCurrentY + 2;
                         doc.line(margin, botLineY, pageWidth - margin, botLineY);
 
-                        // Increment Y position for the next item
                         monCurrentY = botLineY + 5;
                     }
 
@@ -395,21 +392,18 @@ sap.ui.define([], function () {
                     let dedCurrentY = deductionsTitleBotLineY + 5;  // Initial Y position
 
                     for (let i = 1; i <= deductions.length - 1; i++) {
+                        if (!deductions[i].Text) continue; // Skip if no value
 
-                        // Draw Title on the left
                         doc.text(deductions[i].Title, margin + 3, dedCurrentY);
 
-                        // Draw Text on the right, aligned to the right side
                         let compText = deductions[i].Text;
                         let compTextWidth = doc.getTextWidth(compText);
                         let compTextX = pageWidth - compTextWidth - margin - 3;
                         doc.text(compText, compTextX, dedCurrentY);
 
-                        // Draw a line under each item
                         let botLineY = dedCurrentY + 2;
                         doc.line(margin, botLineY, pageWidth - margin, botLineY);
 
-                        // Increment Y position for the next item
                         dedCurrentY = botLineY + 5;
                     }
 
@@ -424,60 +418,80 @@ sap.ui.define([], function () {
                     doc.setLineWidth(1);
                     doc.line(margin, deductions0BotLineY, pageWidth - margin, deductions0BotLineY);
 
-                    let varCompTitleY = deductions0BotLineY + 5;
-                    let varCompTitle = "Variable Component";
-                    let varCompTitleWidth = doc.getTextWidth(varCompTitle);
-                    let varCompTitleX = (pageWidth - varCompTitleWidth) / 2;
-                    let varCompTitleBotLineY = varCompTitleY + 2;
-                    doc.line(margin, varCompTitleBotLineY, pageWidth - margin, varCompTitleBotLineY);
-                    doc.setLineWidth(0.5);
-                    doc.setFillColor(191, 191, 191);
-                    doc.rect(margin, deductions0BotLineY, maxWidth, varCompTitleBotLineY - deductions0BotLineY, 'F');
-                    doc.text(varCompTitle, varCompTitleX, varCompTitleY);
+                    let nextSectionStartY = deductions0BotLineY + 5;
+                    let varComp = oModel.VariableComponents || [];
+                    let hasVariable = varComp.some((item, idx) => idx > 0 && item.Text && item.Text !== "0")
+                                || (varComp[0] && varComp[0].Text && varComp[0].Text !== "0");
 
-                    doc.setFont("helvetica", "normal");
-                    var varComp = oModel.VariableComponents;
-                    let varCompCurrentY = varCompTitleBotLineY + 5;  // Initial Y position
+                    if (hasVariable) {
+                        // Header Y
+                        let varCompTitleY = deductions0BotLineY + 5;
+                        let varCompTitle = "Variable Component";
+                        let varCompTitleWidth = doc.getTextWidth(varCompTitle);
+                        let varCompTitleX = (pageWidth - varCompTitleWidth) / 2;
+                        let varCompTitleBotLineY = varCompTitleY + 2;
 
-                    for (let i = 1; i <= varComp.length - 1; i++) {
+                        doc.setLineWidth(0.5);
+                        doc.line(margin, varCompTitleBotLineY, pageWidth - margin, varCompTitleBotLineY);
+                        doc.setFillColor(191, 191, 191);
+                        doc.rect(margin, deductions0BotLineY, maxWidth, varCompTitleBotLineY - deductions0BotLineY, 'F');
+                        doc.text(varCompTitle, varCompTitleX, varCompTitleY);
 
-                        // Draw Title on the left
-                        doc.text(varComp[i].Title, margin + 3, varCompCurrentY);
+                        let centerX = (typeof pageMiddle !== 'undefined') ? (pageMiddle + 10) : (pageWidth / 2);
+                        let lastBotY = varCompTitleBotLineY;
+                        doc.setFont("helvetica", "normal");
+                        let varCompCurrentY = varCompTitleBotLineY + 5;
 
-                        // Draw Text on the right, aligned to the right side
-                        let compText = varComp[i].Text;
-                        let compTextWidth = doc.getTextWidth(compText);
-                        let compTextX = pageWidth - compTextWidth - margin - 3;
-                        doc.text(compText, compTextX, varCompCurrentY);
+                        for (let i = 1; i <= varComp.length - 1; i++) {
+                            if (!varComp[i] || !varComp[i].Text || varComp[i].Text === "0") continue;
 
-                        // Draw a line under each item
-                        let botLineY = varCompCurrentY + 2;
-                        doc.line(margin, botLineY, pageWidth - margin, botLineY);
+                            // Left column - Title
+                            doc.text(varComp[i].Title, margin + 3, varCompCurrentY);
 
-                        // Increment Y position for the next item
-                        varCompCurrentY = botLineY + 5;
+                            // Right column - Value (right-aligned)
+                            let compText = varComp[i].Text;
+                            let compTextWidth = doc.getTextWidth(compText);
+                            let compTextX = pageWidth - compTextWidth - margin - 3;
+                            doc.text(compText, compTextX, varCompCurrentY);
+
+                            // Horizontal line under this row
+                            let botLineY = varCompCurrentY + 2;
+                            doc.setLineWidth(0.4);
+                            doc.line(margin, botLineY, pageWidth - margin, botLineY);
+                            lastBotY = botLineY;
+                            varCompCurrentY = botLineY + 5;
+                        }
+
+                        doc.setFont("helvetica", "bold");
+                        let varComp0Y = varCompCurrentY;
+                        let totalTitle = (varComp[0] && varComp[0].Title) ? varComp[0].Title : "TOTAL";
+                        let totalText = (varComp[0] && varComp[0].Text) ? varComp[0].Text : "";
+
+                        doc.text(totalTitle, margin + 3, varComp0Y);
+
+                        let totalTextWidth = doc.getTextWidth(totalText);
+                        let totalTextX = pageWidth - totalTextWidth - margin - 3;
+                        doc.text(totalText, totalTextX, varComp0Y);
+
+                        let varComp0BotLineY = varComp0Y + 2;
+                        doc.setLineWidth(1);
+                        doc.line(margin, varComp0BotLineY, pageWidth - margin, varComp0BotLineY); 
+                        lastBotY = varComp0BotLineY;
+                        doc.setLineWidth(0.5);
+                        doc.line(centerX, varCompTitleBotLineY, centerX, lastBotY);
+                        nextSectionStartY = lastBotY + 5;
                     }
 
-                    doc.setFont("helvetica", "bold");
-                    let varComp0Y = varCompCurrentY;
-                    doc.text(varComp[0].Title, margin + 3, varComp0Y);
-                    let varComp0Text = varComp[0].Text;
-                    let varComp0TextWidth = doc.getTextWidth(varComp0Text);
-                    let varComp0TextX = pageWidth - varComp0TextWidth - margin - 3;
-                    doc.text(varComp0Text, varComp0TextX, varComp0Y);
-                    let varComp0BotLineY = varComp0Y + 2;
-                    doc.setLineWidth(1);
-                    doc.line(margin, varComp0BotLineY, pageWidth - margin, varComp0BotLineY);
-
-                    let grossTitleY = varComp0BotLineY + 5;
+                    let grossTitleY = nextSectionStartY;
                     let grossTitle = "Gross Pay";
                     let grossTitleWidth = doc.getTextWidth(grossTitle);
                     let grossTitleX = (pageWidth - grossTitleWidth) / 2;
                     let grossTitleBotLineY = grossTitleY + 2;
+
                     doc.line(margin, grossTitleBotLineY, pageWidth - margin, grossTitleBotLineY);
                     doc.setLineWidth(0.5);
                     doc.setFillColor(191, 191, 191);
-                    doc.rect(margin, varComp0BotLineY, maxWidth, grossTitleBotLineY - varComp0BotLineY, 'F');
+                    doc.rect(margin, grossTitleY - 5, maxWidth, grossTitleBotLineY - (grossTitleY - 5), 'F');
                     doc.text(grossTitle, grossTitleX, grossTitleY);
 
                     var gross = oModel.GrossPay;
@@ -532,7 +546,7 @@ sap.ui.define([], function () {
 
                     doc.line(pageMiddle + 10, yearlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
                     doc.line(pageMiddle + 10, deductionsTitleBotLineY, pageMiddle + 10, deductions0BotLineY);
-                    doc.line(pageMiddle + 10, varCompTitleBotLineY, pageMiddle + 10, varComp0BotLineY);
+                    doc.line(pageMiddle + 10, nextSectionStartY, pageMiddle + 10, nextSectionStartY);
                     doc.line(pageMiddle + 10, grossTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
                     doc.line(margin, topLineY, margin, grossPayBotLineY);
                     doc.line(pageWidth - margin, topLineY, pageWidth - margin, grossPayBotLineY);

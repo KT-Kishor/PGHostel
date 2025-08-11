@@ -115,22 +115,39 @@ sap.ui.define(
                         const oControl = oItem.getControl();
                         const sName = oItem.getName();
 
-                        if (oControl) {
-                            if (sName === "Date") {
-                                const oStartDate = oControl.getDateValue();
-                                const oEndDate = oControl.getSecondDateValue();
-                                if (oStartDate && oEndDate) {
-                                    params["DateFrom"] = oDateFormat.format(oStartDate);
-                                    params["DateTo"] = oDateFormat.format(oEndDate);
-                                    dateProvided = true;
+                        if (!oControl) return;
+
+                        // Date range
+                        if (sName === "Date" && oControl.isA("sap.m.DateRangeSelection")) {
+                            const oStartDate = oControl.getDateValue();
+                            const oEndDate = oControl.getSecondDateValue();
+                            if (oStartDate && oEndDate) {
+                                params.DateFrom = oDateFormat.format(oStartDate);
+                                params.DateTo = oDateFormat.format(oEndDate);
+                                dateProvided = true;
+                            }
+                            return;
+                        }
+
+                        // ComboBox (supports manual entry)
+                        if (oControl.isA("sap.m.ComboBox")) {
+                            const selectedKey = oControl.getSelectedKey();
+                            if (selectedKey) {
+                                params[sName] = selectedKey;
+                            } else {
+                                const typedValue = oControl.getValue().trim();
+                                if (typedValue) {
+                                    params[sName] = typedValue;
                                 }
-                            } else if (oControl.isA("sap.m.ComboBox")) {
-                                const selectedKey = oControl.getSelectedKey();
-                                if (selectedKey) {
-                                    params[sName] = selectedKey;
-                                }
-                            } else if (typeof oControl.getValue === "function" && oControl.getValue()) {
-                                params[sName] = oControl.getValue();
+                            }
+                            return;
+                        }
+
+                        // Generic value-based controls
+                        if (typeof oControl.getValue === "function") {
+                            const sValue = oControl.getValue().trim();
+                            if (sValue) {
+                                params[sName] = sValue;
                             }
                         }
                     });
@@ -333,20 +350,18 @@ sap.ui.define(
                     sQuotationNo: encodeURIComponent(sQuotationNo)
                 });
             },
+
             HQ_DownloadTableData:function(){
                  var table = this.byId("HQ_id_QuotationItemTable");
-                 var oBinding = table.getBinding("items");
-       var aFilteredData = oBinding.getCurrentContexts().map(function (oContext) {
-        return oContext.getObject();
-    });
+                        var oBinding = table.getBinding("items");
+            var aFilteredData = oBinding.getCurrentContexts().map(function (oContext) {
+                return oContext.getObject();
+            });
 
-          const aFormattedData = aFilteredData.map(item => {
+             const aFormattedData = aFilteredData.map(item => {
             return {
               ...item,
-              Date: Formatter.formatDate(item.Date),
-            //   PayByDate: Formatter.formatDate(item.PayByDate),
-            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
-              
+              Date: Formatter.formatDate(item.Date),   
             };
           });
           const aCols = [

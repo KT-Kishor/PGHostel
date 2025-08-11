@@ -8,27 +8,15 @@ sap.ui.define(
     "sap/m/MessageBox",
     "../utils/validation",
   ],
-  function (
-    BaseController,
-    Spreadsheet,
-    Formatter,
-    JSONModel,
-    MessageToast,
-    MessageBox,
-    validation
-  ) {
+  function (BaseController,Spreadsheet,Formatter,JSONModel,MessageToast,MessageBox,validation) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.MSA", {
       Formatter: Formatter,
       onInit: function () {
-        this.getRouter()
-          .getRoute("RouteMSA")
-          .attachMatched(this._onRouteMatched, this);
+        this.getRouter().getRoute("RouteMSA").attachMatched(this._onRouteMatched, this);
       },
       _onRouteMatched: async function () {
-        this.i18nModel = this.getOwnerComponent()
-          .getModel("i18n")
-          .getResourceBundle();
+        this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle();
         try {
           const LoginFunction = await this.commonLoginFunction("MSA&SOW");
           if (!LoginFunction) return;
@@ -50,9 +38,7 @@ sap.ui.define(
             dateRangeControl.setSecondDateValue(fyEnd);
           }
           await this.MSA_onSearch();
-          this.getView()
-            .getModel("LoginModel")
-            .setProperty("/HeaderName", "MSA Details");
+          this.getView().getModel("LoginModel").setProperty("/HeaderName", "MSA Details");
         } catch (error) {
           sap.m.MessageToast.show(error.message || error.responseText);
         } finally {
@@ -104,9 +90,7 @@ sap.ui.define(
             if (control && typeof control.getValue === "function") {
               const value = control.getValue().trim();
               if (key === "CreateMSADate" && value.includes("-")) {
-                const [start, end] = value
-                  .split("-")
-                  .map((date) => date.trim().split("/").reverse().join("-"));
+                const [start, end] = value.split("-").map((date) => date.trim().split("/").reverse().join("-"));
                 params.StartDate = start;
                 params.EndDate = end;
                 msaDateProvided = true;
@@ -185,8 +169,6 @@ sap.ui.define(
             MsaContractPeriodEndDate: Formatter.formatDate(
               item.MsaContractPeriodEndDate
             ),
-            //   PayByDate: Formatter.formatDate(item.PayByDate),
-            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency
           };
         });
         const aCols = [
@@ -315,9 +297,7 @@ sap.ui.define(
 
       onSendMail: async function () {
         const oView = this.getView();
-        this.i18n = this.getOwnerComponent()
-          .getModel("i18n")
-          .getResourceBundle();
+        this.i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
         const mandatoryText = this.i18n.getText("mandetoryFields");
         const emailSuccess = this.i18n.getText("emailSuccess");
 
@@ -334,24 +314,21 @@ sap.ui.define(
         }
 
         this.getBusyDialog();
-
         const oMailModel = oView.getModel("MSAEmailModel");
         const oPayload = {
           Type: "MSADetails",
           toEmailID: oMailModel.getProperty("/to"),
           body: oMailModel.getProperty("/body"),
         };
-        console.log(oPayload);
         try {
-          await this.ajaxCreateWithJQuery("MSAEmail", oPayload);
-
-          MessageBox.success(emailSuccess, {
-            onClose: () => {
-              this._oMailDialog.close();
-            },
+         this.ajaxCreateWithJQuery("MSAEmail", oPayload).then((oData) => {
+          MessageToast.show(this.i18nModel.getText("emailSuccess"));
+           this._oMailDialog.close();
+           this.closeBusyDialog();
           });
         } catch (oError) {
-          MessageToast.show("Error sending email: " + oError.responseText);
+            MessageToast.show(oError.responseText);
+            this.closeBusyDialog();
         } finally {
           this.closeBusyDialog();
         }

@@ -75,8 +75,12 @@ sap.ui.define(
                                 params.PaySlipEndMonth = `${endYear}-${endMonth}-02`; // yyyy-MM-02
                                 paySlipDateProvided = true;
                             } else if (typeof oControl.getSelectedKey === "function") {
+                            if (oControl.getValue && oControl.getValue().trim() !== "") {
+                                params[sKey] = oControl.getValue();
+                            } else {
                                 params[sKey] = oControl.getSelectedKey();
                             }
+                        }
                         }
                     });
 
@@ -219,8 +223,7 @@ sap.ui.define(
                 const oSheet = new Spreadsheet(oSettings);
                 oSheet.build().then(function () {
                     MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-                }.bind(this))
-                    .finally(function () {
+                }.bind(this)).finally(function () {
                         oSheet.destroy();
                     });
                 }

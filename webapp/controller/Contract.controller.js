@@ -48,30 +48,44 @@ sap.ui.define(
                         const params = {};
                         let dateProvided = false;
 
-                        aFilterItems.forEach((oItem) => { // Extract filter values
+                        aFilterItems.forEach((oItem) => {
                             const oControl = oItem.getControl();
                             const sKey = oItem.getName();
 
-                            if (oControl) {
-                                if (sKey === "Year" && oControl instanceof sap.m.DateRangeSelection) {
-                                    const oStartDate = oControl.getDateValue();
-                                    const oEndDate = oControl.getSecondDateValue();
-                                    if (oStartDate && oEndDate) {
-                                        params.AssignmentStartDate = oDateFormat.format(oStartDate);
-                                        params.AssignmentEndDate = oDateFormat.format(oEndDate);
-                                        dateProvided = true;
-                                    }
-                                } else if (oControl instanceof sap.m.ComboBox || oControl instanceof sap.m.Select) {
-                                    const sSelectedKey = oControl.getSelectedKey();
-                                    if (sSelectedKey) {
-                                        params[sKey] = sSelectedKey;
-                                    }
-                                } else if (typeof oControl.getValue === "function") {
-                                    const sValue = oControl.getValue().trim();
-                                    if (sValue) {
-                                        params[sKey] = sValue;
-                                    }
+                            if (!oControl) return;
+
+                            // Date range
+                            if (sKey === "Year" && oControl instanceof sap.m.DateRangeSelection) {
+                                const oStartDate = oControl.getDateValue();
+                                const oEndDate = oControl.getSecondDateValue();
+                                if (oStartDate && oEndDate) {
+                                    params.AssignmentStartDate = oDateFormat.format(oStartDate);
+                                    params.AssignmentEndDate = oDateFormat.format(oEndDate);
+                                    dateProvided = true;
                                 }
+                                return;
+                            }
+
+                            // Select
+                            if (oControl instanceof sap.m.Select) {
+                                const sSelectedKey = oControl.getSelectedKey();
+                                if (sSelectedKey) params[sKey] = sSelectedKey;
+                                return;
+                            }
+
+                            // ComboBox
+                            if (oControl instanceof sap.m.ComboBox) {
+                                const sSelectedKey = oControl.getValue();
+                                const sValue = oControl.getValue().trim();
+                                if (sSelectedKey) params[sKey] = sSelectedKey;
+                                else if (sValue) params[sKey] = sValue;
+                                return;
+                            }
+
+                            // Generic input
+                            if (typeof oControl.getValue === "function") {
+                                const sValue = oControl.getValue().trim();
+                                if (sValue) params[sKey] = sValue;
                             }
                         });
 
@@ -554,47 +568,44 @@ sap.ui.define(
                 getGroupHeader: function(oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
-                 C_DownloadTableData:function(){
-                  var table = this.byId("C_id_Salary");
-          const oModelData = table.getModel("ContractModel").getData();
-          const aFormattedData = oModelData.map(item => {
-            return {
-              ...item,
-              AssignmentStartDate: Formatter.formatDate(item.AssignmentStartDate),
-              AssignmentEndDate: Formatter.formatDate(item.AssignmentEndDate),
-            //   TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
-            };
-          });
-          const aCols = [
-            { label: this.i18nModel.getText("contractNo "), property: "ContractNo", type: "string" },
-            { label: this.i18nModel.getText("consultantName"), property: "ConsultantName", type: "string" },
-            { label: this.i18nModel.getText("locationswhereServices"), property: "ContractLocation", type: "string" },
-            { label: this.i18nModel.getText("endClient"), property: "EndClient", type: "string" },
-            { label: this.i18nModel.getText("startDate"), property: "AssignmentStartDate", type: "string" },
-            { label: this.i18nModel.getText("endDate"), property: "AssignmentEndDate", type: "string" },
-            { label: this.i18nModel.getText("amount"), property: "ConsultantRate", type: "string " },
-            { label: this.i18nModel.getText("paymentterms"), property: "PaymentTerms", type: "string " },
-            { label: this.i18nModel.getText("comments"), property: "Comments", type: "string " }
-                  ];
-          const oSettings = {
-            workbook: {
-              columns: aCols,
-              context: {
-                sheetName: this.i18nModel.getText("invoiceapp")
-              }
-            },
-            dataSource: aFormattedData,
-            fileName: "ContractorDetails.xlsx"
-          };
-          const oSheet = new Spreadsheet(oSettings);
-          oSheet.build().then(function () {
-            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-          }.bind(this))
-            .finally(function () {
-              oSheet.destroy();
-            });
+
+                C_DownloadTableData:function(){
+                var table = this.byId("C_id_Salary");
+                const oModelData = table.getModel("ContractModel").getData();
+                const aFormattedData = oModelData.map(item => {
+                    return {
+                    ...item,
+                    AssignmentStartDate: Formatter.formatDate(item.AssignmentStartDate),
+                    AssignmentEndDate: Formatter.formatDate(item.AssignmentEndDate),
+                    };
+                });
+                const aCols = [
+                    { label: this.i18nModel.getText("contractNo "), property: "ContractNo", type: "string" },
+                    { label: this.i18nModel.getText("consultantName"), property: "ConsultantName", type: "string" },
+                    { label: this.i18nModel.getText("locationswhereServices"), property: "ContractLocation", type: "string" },
+                    { label: this.i18nModel.getText("endClient"), property: "EndClient", type: "string" },
+                    { label: this.i18nModel.getText("startDate"), property: "AssignmentStartDate", type: "string" },
+                    { label: this.i18nModel.getText("endDate"), property: "AssignmentEndDate", type: "string" },
+                    { label: this.i18nModel.getText("amount"), property: "ConsultantRate", type: "string " },
+                    { label: this.i18nModel.getText("paymentterms"), property: "PaymentTerms", type: "string " },
+                    { label: this.i18nModel.getText("comments"), property: "Comments", type: "string " }
+                        ];
+                const oSettings = {
+                    workbook: {
+                    columns: aCols,
+                    context: {sheetName: this.i18nModel.getText("invoiceapp")}
+                    },
+                    dataSource: aFormattedData,
+                    fileName: "ContractorDetails.xlsx"
+                };
+                const oSheet = new Spreadsheet(oSettings);
+                oSheet.build().then(function () {
+                    MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+                }.bind(this)).finally(function () {
+                oSheet.destroy();
+             });
             }
-            }
+         }
         );
     }
 );
