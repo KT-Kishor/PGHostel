@@ -72,7 +72,7 @@ sap.ui.define([
                     this.getView().byId(ids).setValueState("None");
                 }.bind(this));
                 //create case
-                if (this.sArgPara === "CreateOfferFlag" || this.sSalutationArg !== "UpdateOffer") {
+                if ((this.sArgPara === "CreateOfferFlag" && this.sArgPara !== "Recruitment") || (this.sSalutationArg !== "UpdateOffer" && this.sArgPara !== "Recruitment")) {
                     this._TDSslabCall("IN");
                     var createPage = true, updatePage = false;
                     if (this.sArgPara !== "CreateOfferFlag") {
@@ -82,6 +82,24 @@ sap.ui.define([
                     }
                     this.EOD_onResetWizard(); // reset wizard 
                     //update case
+                } else if (this.sArgPara === "Recruitment" && this.sSalutationArg) {
+                    // Fetch all JobApplications
+                    await this._fetchCommonData("JobApplications", "recuritModel", {});
+                    var allData = this.getView().getModel("recuritModel").getData() || [];
+                    // Find the candidate by ID
+                    var recruitmentData = allData.find(item => item.ID == this.sSalutationArg) || {};
+                    // Map fields as needed
+                    var mappedData = {
+                        ConsultantName: recruitmentData.FullName || "",
+                        ConsultantAddress: recruitmentData.Address || "",
+                        Gender: recruitmentData.Gender || "",
+                        Country: recruitmentData.Country || "India",
+                        CountryCode: recruitmentData.CountryCode || "IN",
+                        BaseLocation: recruitmentData.City || "Kalaburagi",
+                        EmployeeEmail: recruitmentData.Email || "",
+                        ConsultantAddress: recruitmentData.Address || "",
+                    };
+                    this.getView().getModel("employeeModel").setData(mappedData);
                 } else {
                     var createPage = false, updatePage = true;
                     var oBasicDetailsSection = this.getView().byId("EODF_id_BasicDetailsSection");
@@ -580,7 +598,7 @@ sap.ui.define([
                 this.offerGeneratingPdfFunction(oModel);
             },
             //pdf generate function
-           async offerGeneratingPdfFunction(oModel) {
+            async offerGeneratingPdfFunction(oModel) {
                 this.getBusyDialog();
                 const _setIfNotZero = (model, path, value, currency) => {
                     if (value && Number(value) !== 0) {
@@ -632,7 +650,7 @@ sap.ui.define([
                 _setIfNotZero(oPDFModel, "/VariableComponents/0/Text", oEmpModel.VariablePay, oEmpModel.Currency);
                 _setIfNotZero(oPDFModel, "/GrossPay/0/Text", oEmpModel.GrossPay, oEmpModel.Currency);
                 _setIfNotZero(oPDFModel, "/GrossPay/1/Text", oEmpModel.GrossPayMontly, oEmpModel.Currency);
-                 if (oEmpModel.JoiningBonus == "0") {
+                if (oEmpModel.JoiningBonus == "0") {
                     oPDFModel.setProperty("/Notes/0/Text", "0");
                 }
                 else {

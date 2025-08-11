@@ -261,10 +261,8 @@ sap.ui.define([
         ACD_onBoardCandidate: function() {
             var oCandidate = this.getView().getModel("setDataToForm").getData();
             this.getOwnerComponent().getRouter().navTo("RouteEmployeeOfferDetails", {
-                sParOffer: oCandidate.FullName,
-                sParEmployee: oCandidate.Gender,
-                sParMail: oCandidate.Email,
-                sParAddress: oCandidate.Address
+               sParOffer: "Recruitment",
+               sParEmployee:oCandidate.ID
             });
         },
 
