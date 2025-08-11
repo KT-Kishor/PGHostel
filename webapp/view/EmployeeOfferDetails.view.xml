@@ -163,7 +163,7 @@
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/TotalDeduction',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
-															<Text text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+															<Text visible="{= ${employeeModel>/IncomeTax} !== 0 }" text="{path:'employeeModel>/VariablePay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 															<Label text="{i18n>grossPayTotal}" class="boldBlackText" />
 															<Text text="{path:'employeeModel>/GrossPay',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														</f:content>
@@ -197,7 +197,7 @@
 															<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
 															<Text text="INR {path:'employeeModel>/TotalDeduction',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
-															<Text text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
+															<Text visible="{= ${employeeModel>/IncomeTax} !== 0 }" text="INR {path:'employeeModel>/VariablePay',formatter: '.Formatter.fromatNumber'}"/>
 															<Label text="{i18n>grossPayTotal}" class="boldBlackText"/>
 															<Text text="INR {path:'employeeModel>/GrossPay',formatter: '.Formatter.fromatNumber'}"/>
 														</f:content>

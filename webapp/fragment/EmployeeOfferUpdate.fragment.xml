@@ -172,7 +172,7 @@
 														<m:Label text="{i18n>hra}" />
 														<m:Text text="{path:'employeeModel>/HRA',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 														<m:Label text="{i18n>eplyrPF}" />
-														<m:Text visible="{= ${employeeModel>/EmployerPF} !== 0 }" text="{path:'employeeModel>/EmployerPF',formatter:'.Formatter.YearlyToMontlyConv'}"/>
+														<m:Text visible="{= Number(${employeeModel>/EmployerPF}) !== 0 }" text="{path:'employeeModel>/EmployerPF',formatter:'.Formatter.YearlyToMontlyConv'}"/>
 														<m:Label text="{i18n>medicalInsurance}" />
 														<m:Text text="{path:'employeeModel>/MedicalInsurance',formatter:'.Formatter.YearlyToMontlyConv'}"  />
 														<m:Label text="{i18n>gratuity}" />
@@ -207,7 +207,7 @@
 														<m:Label text="{i18n>hra}" />
 														<m:Text text="INR {path:'employeeModel>/HRA',formatter: '.Formatter.fromatNumber'}"  />
 														<m:Label text="{i18n>eplyrPF}" />
-														<m:Text visible="{= ${employeeModel>/EmployerPF} !== 0 }" text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
+														<m:Text visible="{= Number(${employeeModel>/EmployerPF}) !== 0 }" text="INR {path:'employeeModel>/EmployerPF',formatter: '.Formatter.fromatNumber'}"/>
 														<m:Label text="{i18n>medicalInsurance}" />
 														<m:Text text="INR {path:'employeeModel>/MedicalInsurance',formatter: '.Formatter.fromatNumber'}"  />
 														<m:Label text="{i18n>gratuity}" />
