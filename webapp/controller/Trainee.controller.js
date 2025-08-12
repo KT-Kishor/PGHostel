@@ -362,7 +362,7 @@ sap.ui.define([
                     let oSelectedItem = this.byId("T_id_TraineeTable").getSelectedItem();
                     let oTraineeModel = oSelectedItem.getBindingContext("traineeModel").getObject();
                     this.getView().getModel("PDFData").setProperty("/CreateDate", Formatter.formatDate(new Date()));
-                    this.getView().getModel("PDFData").setProperty("/CertificateTitle", "TRAINEE CERTIFICATE");
+                    this.getView().getModel("PDFData").setProperty("/CertificateTitle", `${oTraineeModel.TraineeName} - Trainee Certificate`);
                     // Create the updated trainee data
                     const oUpdatedData = {
                         ID: oTraineeModel.ID,
@@ -596,7 +596,7 @@ sap.ui.define([
                     var oModel = this.byId("T_id_TraineeTable").getSelectedItem().getBindingContext("traineeModel").getObject();
                     var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
                     if (!aAttachments || aAttachments.length === 0) {
-                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                        MessageToast.show(this.i18nModel.getText("attachmentRequired")); 
                         return;
                     }
                     var oPayload = {
@@ -623,17 +623,13 @@ sap.ui.define([
             getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
-                T_DownloadTableData:function(){
-                      var table = this.byId("T_id_TraineeTable");
-          const oModelData = table.getModel("traineeModel").getData();
-          const aFormattedData = oModelData.map(item => {
+            T_DownloadTableData:function(){
+            var table = this.byId("T_id_TraineeTable");
+            const oModelData = table.getModel("traineeModel").getData();
+            const aFormattedData = oModelData.map(item => {
             return {
               ...item,      
               JoiningDate: Formatter.formatDate(item.JoiningDate), 
-            //   toDate: Formatter.formatDate(item.toDate),
-            //   comments:item.comments.map((elem)=>{
-            //     return elem.Comment
-            //   }),
             };
           });
           const aCols = [
@@ -659,10 +655,9 @@ sap.ui.define([
           const oSheet = new Spreadsheet(oSettings);
           oSheet.build().then(function () {
             MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-          }.bind(this))
-            .finally(function () {
+          }.bind(this)).finally(function () {
               oSheet.destroy();
             });
-                }
+        }
         });
     });

@@ -1807,4 +1807,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     margin: 0 !important;
   }
 }
-/* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*//* Jov View Ends Here*/
+
+.employment-toolbar .sapMOTBHiddenInOverflow {
+    display: none !important; 
+}

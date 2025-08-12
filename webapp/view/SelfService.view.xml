@@ -37,70 +37,69 @@
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Transparent" visible="{viewModel>/SelfService}" />
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Transparent" />
-                        <m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn" id="SS_id_Action"/>
+						<m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn" id="SS_id_Action"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
 			<headerContent>
-    <m:FlexBox wrap="Wrap" class="myHeaderContentFlexBox" fitContainer="true" alignItems="Start">
-        <m:FlexBox alignItems="Center" class="sapUiSmallMarginEnd">
-            <m:layoutData>
-                <m:FlexItemData growFactor="1" minWidth="220px"/>
-            </m:layoutData>
-            <m:VBox>
-                <m:layoutData>
-                    <m:FlexItemData growFactor="0" />
-                </m:layoutData>
-                <m:Avatar
+				<m:FlexBox wrap="Wrap" class="myHeaderContentFlexBox" fitContainer="true" alignItems="Start">
+					<m:FlexBox alignItems="Center" class="sapUiSmallMarginEnd">
+						<m:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</m:layoutData>
+						<m:VBox>
+							<m:layoutData>
+								<m:FlexItemData growFactor="0" />
+							</m:layoutData>
+							<m:Avatar
                     src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}"
                     displaySize="L"
                     class="sapUiSmallMarginEnd"
                 />
-            </m:VBox>
-            <layout:VerticalLayout>
-                <m:Text
+						</m:VBox>
+						<layout:VerticalLayout>
+							<m:Text
                     text="{sEmployeeModel>/0/STDCode} {sEmployeeModel>/0/MobileNo}"
                     wrapping="true"
                 />
-                <m:Text
+							<m:Text
                     text="{sEmployeeModel>/0/CompanyEmailID}"
                     wrapping="true"
                 />
-            </layout:VerticalLayout>
-        </m:FlexBox>
-        <!--Permanent Address -->
-        <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-            <layout:layoutData>
-                <m:FlexItemData growFactor="1" minWidth="220px"/>
-            </layout:layoutData>
-            <m:Label
+						</layout:VerticalLayout>
+					</m:FlexBox>
+					<!--Permanent Address -->
+					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+						<layout:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</layout:layoutData>
+						<m:Label
                 text="{i18n>permanentAddress}"
                 class="TextColor"
                 wrapping="true"
             />
-            <m:ExpandableText id="permAddressText"
+						<m:ExpandableText id="permAddressText"
                 text="{sEmployeeModel>/0/PermanentAddress}"
                 width="100%"
                 maxLines="60"/>
-        </layout:VerticalLayout>
-        
-        <!--  Correspondence Address -->
-        <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
-            <layout:layoutData>
-                <m:FlexItemData growFactor="1" minWidth="220px"/>
-            </layout:layoutData>
-            <m:Label
+					</layout:VerticalLayout>
+					<!--  Correspondence Address -->
+					<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+						<layout:layoutData>
+							<m:FlexItemData growFactor="1" minWidth="220px"/>
+						</layout:layoutData>
+						<m:Label
                 text="{i18n>correspondenceAddress}"
                 class="TextColor"
                 wrapping="true"
             />
-            <m:ExpandableText
+						<m:ExpandableText
                 text="{sEmployeeModel>/0/CorrespondenceAddress}"
                 width="100%"
                 maxLines="60"/>
-        </layout:VerticalLayout>
-    </m:FlexBox>
-</headerContent>
+					</layout:VerticalLayout>
+				</m:FlexBox>
+			</headerContent>
 			<sections>
 				<ObjectPageSection 
                     titleUppercase="false"
@@ -145,22 +144,21 @@
                                                 type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
                                                 tooltip="{i18n>editDetails}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
-
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
-                                      <m:Label  text="{i18n>experienceSelectionRequired}"/>
-                                     <m:RadioButtonGroup
+										<m:Label  text="{i18n>experienceSelectionRequired}"/>
+										<m:RadioButtonGroup
                                        id="SS_experienceRadioGroup"
                                        columns="2"
                                        select="onExperienceSelect"
                                        enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"
                                        visible="{= !${viewModel>/TraineeRole} }">
-                                       <m:buttons>
-                                           <m:RadioButton id="SS_fresherRadio" text="{i18n>fresher}" />
-                                           <m:RadioButton id="SS_experiencedRadio" text="{i18n>experienced}" />
-                                       </m:buttons>
-                                   </m:RadioButtonGroup>
+											<m:buttons>
+												<m:RadioButton id="SS_fresherRadio" text="{i18n>fresher}" />
+												<m:RadioButton id="SS_experiencedRadio" text="{i18n>experienced}" />
+											</m:buttons>
+										</m:RadioButtonGroup>
 										<m:Label text="{i18n>employeeID}" />
 										<m:Input
                                             value="{sEmployeeModel>/0/EmployeeID}"
@@ -179,7 +177,7 @@
                                             id="SS_id_Joinn"
                                             editable="false"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>companyMailid}"
                                             required="true"
                                             id="SS_id_lc"
@@ -193,7 +191,7 @@
                                             placeholder="{i18n>companyMailid}"
                                             maxLength="100"
                                         />
-                                        <m:Label text="{i18n>fatherName}" />
+										<m:Label text="{i18n>fatherName}" />
 										<m:Input
                                             value="{sEmployeeModel>/0/FatherName}" editable="{viewModel>/isEditMode}" liveChange="SS_validateName" id="SS_id_FatherName" valueStateText="{i18n>commonNameValueState}"
                                         />
@@ -287,11 +285,9 @@
                                             required="true"
                                             id="SS_id_lbase"
                                         />
-
-                                         <m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
-						                       <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-				                        </m:ComboBox>
-									
+										<m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
+											<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										</m:ComboBox>
 										<m:Label text="{i18n>branchCode}" />
 										<m:Input id="SS_id_BranchCode"
                                             value="{sEmployeeModel>/0/BranchCode}"
@@ -692,10 +688,9 @@
                                 >
 									<f:toolbar>
 										<m:Toolbar>
-                                        	<m:Title
+											<m:Title
                                                 text="{i18n>bankDetails}"
                                             />
-
 											<m:ToolbarSpacer />
 											<m:Button
                                                 id="DocumentBtn"
@@ -703,8 +698,8 @@
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
                                                 tooltip="{i18n>editDetails}"
-                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>      
-                                    </m:Toolbar>
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
+										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
 										<m:Label
@@ -875,96 +870,97 @@
                             titleUppercase="false"
                         >
 							<blocks>
-								<m:Table sticky="ColumnHeaders,HeaderToolbar"
-                                    class="sapUiTinyMargin"
+								<m:VBox>
+									<m:MessageStrip text="{i18n>eduDateNote}" type="Information" showIcon="true" class="sapUiTinyMarginEnd" />
+									<m:Table sticky="ColumnHeaders,HeaderToolbar"
                                     growingScrollToLoad="true"
                                     busyIndicatorDelay="0"
                                     width="auto"
-                                    items="{ path: 'sEducationModel>/', sorter: {path: 'EducationStartDate', descending: false} }"                                    id="EdF_id_EduTable"
+                                    items="{ path: 'sEducationModel>/', sorter: {path: 'EducationStartDate', descending: false} }"                    id="EdF_id_EduTable"
                                     growing="true"
                                     growingThreshold="50"
                                     alternateRowColors="true"
                                     mode="SingleSelectLeft"
                                     selectionChange="EDF_onSelectionChange"
                                 >
-									<m:headerToolbar>
-										<m:OverflowToolbar>
-											<m:Title
+										<m:headerToolbar>
+											<m:OverflowToolbar>
+												<m:Title
                                                 text="{i18n>educationalDetails} ({= ${sEducationModel>/}.length})"
                                             />
-                                            <m:MessageStrip text="{i18n>eduDateNote}" type="Information" showIcon="true" class="sapUiLargeMarginBegin sapUiTinyMarginBottom" />
-											<m:ToolbarSpacer />
-											<m:Button
+												<m:ToolbarSpacer />
+												<m:Button
                                                 text="{i18n>add}"
                                                 id="EdF_id_EduAdd"
                                                 tooltip="{i18n>toolEAddEdu}"
                                                 press="EdF_AddEdu"
                                                 type="Transparent"
                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
-											<m:Button
+												<m:Button
                                                 text="{i18n>edit}"
                                                 id="EdF_id_EduEdit"
                                                 tooltip="{i18n>toolEEditEdu}"
                                                 press="EDF_EditEducation"
                                                 type="Transparent"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
-											<m:Button
+												<m:Button
                                                 text="{i18n>delete}"
                                                 id="EdF_id_EduDelete"
                                                 tooltip="{i18n>toolDeleteEdu}"
                                                 press="EdF_DeletEdu"
                                                 type="Transparent"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
-										</m:OverflowToolbar>
-									</m:headerToolbar>
-									<m:columns>
-										<m:Column demandPopin="true">
-											<m:Text text="{i18n>collegeName}" />
-										</m:Column>
-										<m:Column
+											</m:OverflowToolbar>
+										</m:headerToolbar>
+										<m:columns>
+											<m:Column demandPopin="true">
+												<m:Text text="{i18n>collegeName}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-											<m:Text text="{i18n>degree}" />
-										</m:Column>
-										<m:Column
+												<m:Text text="{i18n>degree}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-											<m:Text text="{i18n>grade}" />
-										</m:Column>
-										<m:Column demandPopin="true">
-											<m:Text text="{i18n>startDate}" />
-										</m:Column>
-										<m:Column
+												<m:Text text="{i18n>grade}" />
+											</m:Column>
+											<m:Column demandPopin="true">
+												<m:Text text="{i18n>startDate}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Desktop"
                                             demandPopin="true"
                                         >
-											<m:Text text="{i18n>endDate}" />
-										</m:Column>
-									</m:columns>
-									<m:items>
-										<m:ColumnListItem>
-											<m:cells>
-												<m:Text
+												<m:Text text="{i18n>endDate}" />
+											</m:Column>
+										</m:columns>
+										<m:items>
+											<m:ColumnListItem>
+												<m:cells>
+													<m:Text
                                                     text="{sEducationModel>CollegeName}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{sEducationModel>DegreeName}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{parts: [ { path: 'sEducationModel>Grade' }, { path: 'sEducationModel>GradeType' }],formatter: '.Formatter.formatGradeWithType' }"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{path:'sEducationModel>EducationStartDate' ,formatter:'.Formatter.formatDate'}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{path:'sEducationModel>EducationEndDate', formatter:'.Formatter.formatDate'}"
                                                 />
-											</m:cells>
-										</m:ColumnListItem>
-									</m:items>
-								</m:Table>
+												</m:cells>
+											</m:ColumnListItem>
+										</m:items>
+									</m:Table>
+								</m:VBox>
 							</blocks>
 						</ObjectPageSubSection>
 						<ObjectPageSubSection
@@ -974,27 +970,31 @@
                             visible="{= !${viewModel>/TraineeRole} &amp;&amp; ${viewModel>/employmentSectionVisible} }"   
                          >
 							<blocks>
-								<m:Table sticky="ColumnHeaders,HeaderToolbar"
-                                    class="sapUiTinyMargin"
-                                    busyIndicatorDelay="0"
-                                    id="EmpF_id_EmpTable"
-                                    growingScrollToLoad="true"
-                                    width="auto"
-                                    items="{ path: 'sEmploymentModel>/', sorter: {path: 'EndDate', descending: true} }"                                    
-                                    growing="true"
-                                    growingThreshold="50"
-                                    alternateRowColors="true"
-                                    mode="SingleSelectLeft"
-                                    selectionChange="EmpF_onSelectionChange"
-                                >
-									<m:headerToolbar>
-										<m:OverflowToolbar>
-											<m:Title
-                                                text="{i18n>employmentDetails} ({= ${sEmploymentModel>/}.length})"
-                                            />
-                                            <m:MessageStrip text="{i18n>empDateNote}" type="Information" showIcon="true" class="sapUiLargeMarginBegin sapUiTinyMarginBottom" />
-											<m:ToolbarSpacer />
-											<m:Button
+								<m:VBox>
+									<m:MessageStrip
+            text="{i18n>empDateNote}"
+            type="Information"
+            showIcon="true"
+            class="sapUiTinyMarginEnd"
+        />
+									<m:Table
+        sticky="ColumnHeaders,HeaderToolbar"
+        busyIndicatorDelay="0"
+        id="EmpF_id_EmpTable"
+        growingScrollToLoad="true"
+        width="auto"
+        items="{ path: 'sEmploymentModel>/', sorter: {path: 'EndDate', descending: true} }"
+        growing="true"
+        growingThreshold="50"
+        alternateRowColors="true"
+        mode="SingleSelectLeft"
+        selectionChange="EmpF_onSelectionChange"
+    >
+										<m:headerToolbar>
+											<m:OverflowToolbar class="employment-toolbar">
+												<m:Title text="{i18n>employmentDetails} ({= ${sEmploymentModel>/}.length})"/>
+												<m:ToolbarSpacer />
+												<m:Button
                                                 id="EmpF_id_RefButton"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                                 tooltip="{i18n>referenceDetails}"
@@ -1002,22 +1002,22 @@
                                                 type="Transparent"
                                                 text="{i18n>referenceDetails}"
                                             />
-											<m:Button
+												<m:Button
                                                 text="{i18n>add}"
                                                 press="EmpF_onAddEmployment"
                                                 type="Transparent"
                                                 tooltip="{i18n>toolAddEmp}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
-											<m:Button
+												<m:Button
                                                 text="{i18n>edit}"
                                                 press="EmpF_onEditEmployment"
                                                 type="Transparent"
                                                 tooltip="{i18n>toolEditEmp}"
                                                 id="EmpF_id_EmpEdit"
-                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
+                                                visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"	
                                             />
-											<m:Button
+												<m:Button
                                                 text="{i18n>delete}"
                                                 press="EmpF_onDeletEmployment"
                                                 type="Transparent"
@@ -1025,58 +1025,59 @@
                                                 id="EmpF_id_EmpDelete"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
-										</m:OverflowToolbar>
-									</m:headerToolbar>
-									<m:columns>
-										<m:Column demandPopin="true">
-											<m:Text text="{i18n>companyName}" />
-										</m:Column>
-										<m:Column
+											</m:OverflowToolbar>
+										</m:headerToolbar>
+										<m:columns>
+											<m:Column demandPopin="true">
+												<m:Text text="{i18n>companyName}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-											<m:Text text="{i18n>designation}" />
-										</m:Column>
-										<m:Column
+												<m:Text text="{i18n>designation}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Tablet"
                                             demandPopin="true"
                                         >
-											<m:Text text="{i18n>startDate}" />
-										</m:Column>
-										<m:Column demandPopin="true">
-											<m:Text text="{i18n>endDate}" />
-										</m:Column>
-										<m:Column
+												<m:Text text="{i18n>startDate}" />
+											</m:Column>
+											<m:Column demandPopin="true">
+												<m:Text text="{i18n>endDate}" />
+											</m:Column>
+											<m:Column
                                             minScreenWidth="Desktop"
                                             demandPopin="true"
                                         >
-											<m:Text
+												<m:Text
                                                 text="{i18n>officeAddress}"
                                             />
-										</m:Column>
-									</m:columns>
-									<m:items>
-										<m:ColumnListItem>
-											<m:cells>
-												<m:Text
+											</m:Column>
+										</m:columns>
+										<m:items>
+											<m:ColumnListItem>
+												<m:cells>
+													<m:Text
                                                     text="{sEmploymentModel>CompanyName}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{sEmploymentModel>Designation}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{path:'sEmploymentModel>StartDate',formatter:'.Formatter.formatDate'}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{path:'sEmploymentModel>EndDate',formatter:'.Formatter.formatDate'}"
                                                 />
-												<m:Text
+													<m:Text
                                                     text="{sEmploymentModel>OfficeAddress}"
                                                 />
-											</m:cells>
-										</m:ColumnListItem>
-									</m:items>
-								</m:Table>
+												</m:cells>
+											</m:ColumnListItem>
+										</m:items>
+									</m:Table>
+								</m:VBox>
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
@@ -1093,7 +1094,6 @@
                         >
 							<blocks>
 								<m:VBox>
-									<!-- MessageStrip appears first -->
 									<m:MessageStrip
                                         text="{i18n>uploadMsg}"
                                         type="Information"
@@ -1225,12 +1225,8 @@
                     id="idSalaryDetails"
                     title="{i18n>salaryDetails}"
                    visible="{= !${viewModel>/TraineeRole} }">
-
 					<subSections>
-						<ObjectPageSubSection
-                            title=""
-                            titleUppercase="false"
-                        >
+						<ObjectPageSubSection title="" titleUppercase="false" >
 							<blocks>
 								<m:VBox id="salaryVBox" />
 							</blocks>
@@ -1243,25 +1239,15 @@
                     title="{i18n>paySlip}"
                     visible="{viewModel>/ResignationVisible}">
 					<subSections>
-						<ObjectPageSubSection
-                            id="connectionsSS"
-                            titleUppercase="false"
-                        >
+						<ObjectPageSubSection id="connectionsSS" titleUppercase="false">
 							<m:Table sticky="ColumnHeaders"
                                 id="SS_id_PaySlipTable"
                                 busyIndicatorDelay="0"
                                 growing="true"
                                 growingThreshold="50"
                                 growingScrollToLoad="true"
-                                items="{
-                                    path: 'PaySlip>/EmpTable',
-                                    sorter: {
-                                        path: 'FinancialYear',
-                                        descending: false,
-                                        group: true
-                                    }
-                                }"
-                            >
+                                items="{path: 'PaySlip>/EmpTable', sorter: { path: 'FinancialYear', descending: false, group: true}
+                                }">
 								<m:columns>
 									<m:Column>
 										<m:Text text="{i18n>monthAndYear}" />
@@ -1272,7 +1258,7 @@
 									<m:Column hAlign="End" demandPopin="true" minScreenWidth="Tablet">
 										<m:Text text="{i18n>totalEarningAmount}" />
 									</m:Column>
-									<m:Column hAlign="End" demandPopin="true" minScreenWidth="Tablet"> 
+									<m:Column hAlign="End" demandPopin="true" minScreenWidth="Tablet">
 										<m:Text text="{i18n>totalDeductionAmount}" />
 									</m:Column>
 									<m:Column hAlign="End">
@@ -1280,25 +1266,22 @@
 									</m:Column>
 								</m:columns>
 								<m:items>
-									<m:ColumnListItem
-                                        type="Navigation"
-                                        press="SS_onPressPayslipRow"
-                                    >
+									<m:ColumnListItem type="Navigation" press="SS_onPressPayslipRow">
 										<m:cells>
 											<m:Text text="{path: 'PaySlip>YearMonth', formatter: '.Formatter.formatMonthYear'}"/>
 										</m:cells>
 										<m:cells>
 											<m:Text text="{PaySlip>PayableDays}" />
 										</m:cells>
-                                        <m:cells>
-                                            <m:Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
-                                        </m:cells>
-                                        <m:cells>
-                                            <m:Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.CurrencyInINRText'}" />
-                                        </m:cells>
+										<m:cells>
+											<m:Text text="{path: 'PaySlip>EarningsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
+										</m:cells>
+										<m:cells>
+											<m:Text text="{path: 'PaySlip>DeductionsTotalMonthly', formatter: '.Formatter.CurrencyInINRText'}" />
+										</m:cells>
+										<m:cells>
+											<m:Text text="{path: 'PaySlip>NetPay', formatter: '.Formatter.CurrencyInINRText'}" />
+										</m:cells>
 									</m:ColumnListItem>
 								</m:items>
 							</m:Table>
@@ -1310,10 +1293,8 @@
 		<m:footer>
 			<m:Bar>
 				<m:contentLeft>
-					<core:Fragment
-                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
-                        type="XML"
-                    />
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"/>
 				</m:contentLeft>
 			</m:Bar>
 		</m:footer>
