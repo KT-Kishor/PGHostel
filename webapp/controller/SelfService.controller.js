@@ -1275,66 +1275,104 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.Camera",
                         controller: this,
-                    }).then(
-                        function (oDialog) {
-                            this.oCameraDialog = oDialog;
-                            this.getView().addDependent(this.oCameraDialog);
-                            this.oCameraDialog.attachAfterOpen(this._StartCamera.bind(this));
-                            this.oCameraDialog.attachAfterClose(this._StopCamera.bind(this));
-                            this.oCameraDialog.open();
-                        }.bind(this)
-                    );
+                    }).then(function (oDialog) {
+                        this.oCameraDialog = oDialog;
+                        this.getView().addDependent(this.oCameraDialog);
+                        this.oCameraDialog.attachAfterOpen(this._StartCamera.bind(this));
+                        this.oCameraDialog.attachAfterClose(this._StopCamera.bind(this));
+                        this.oCameraDialog.open();
+                    }.bind(this));
                 } else {
                     this.oCameraDialog.open();
                 }
             },
+
             _StartCamera: function () {
                 var oVideo = document.getElementById("video");
                 if (!oVideo) return;
-                navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-                    oVideo.srcObject = stream;
-                    oVideo.play();
-                    this._cameraStream = stream;
-                }.bind(this))
-                    .catch(function (err) {
-                        MessageToast.show("Camera access denied");
+
+                // Create segmentation instance only once
+                if (!this.selfieSegmentation) {
+                    this.selfieSegmentation = new SelfieSegmentation({
+                        locateFile: (file) => {
+                            return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+                        }
                     });
+
+                    this.selfieSegmentation.setOptions({
+                        modelSelection: 1 // 0 = general, 1 = landscape
+                    });
+
+                    // Store segmentation results
+                    this.latestSegmentation = null;
+                    this.selfieSegmentation.onResults((results) => {
+                        this.latestSegmentation = results;
+                    });
+                }
+
+                // Always create a new Camera instance when starting
+                this.camera = new Camera(oVideo, {
+                    onFrame: async () => {
+                        await this.selfieSegmentation.send({ image: oVideo });
+                    },
+                    width: 640,
+                    height: 480
+                });
+                this.camera.start();
             },
 
             _StopCamera: function () {
+                if (this.camera) {
+                    this.camera.stop();
+                    this.camera = null;
+                }
                 if (this._cameraStream) {
-                    this._cameraStream.getTracks().forEach(function (track) {
-                        track.stop();
-                    });
+                    this._cameraStream.getTracks().forEach(track => track.stop());
                     this._cameraStream = null;
                 }
                 var oVideo = document.getElementById("video");
-                if (oVideo) oVideo.srcObject = null;
+                if (oVideo) {
+                    oVideo.srcObject = null;
+                }
             },
 
             IC_onCapturePress: function () {
                 var oCanvas = document.getElementById("canvas");
                 var oVideo = document.getElementById("video");
-                if (!oCanvas || !oVideo || oVideo.readyState < oVideo.HAVE_CURRENT_DATA) return
-                var oContext = oCanvas.getContext("2d", {
-                    willReadFrequently: true
-                });
-                if (!oContext) return
+
+                if (!oCanvas || !oVideo || !this.latestSegmentation) return;
+
+                const oContext = oCanvas.getContext("2d");
                 oCanvas.width = oVideo.videoWidth;
                 oCanvas.height = oVideo.videoHeight;
+
+                // Fill background with white
+                oContext.fillStyle = "white";
+                oContext.fillRect(0, 0, oCanvas.width, oCanvas.height);
+
+                // Draw original image
                 oContext.drawImage(oVideo, 0, 0, oCanvas.width, oCanvas.height);
+
+                // Apply segmentation mask
+                const mask = this.latestSegmentation.segmentationMask;
+                oContext.globalCompositeOperation = 'destination-in';
+                oContext.drawImage(mask, 0, 0, oCanvas.width, oCanvas.height);
+                oContext.globalCompositeOperation = 'destination-over';
+                oContext.fillStyle = 'white';
+                oContext.fillRect(0, 0, oCanvas.width, oCanvas.height);
+                oContext.globalCompositeOperation = 'source-over';
                 var base64Image = oCanvas.toDataURL("image/png");
-                var mimeType = base64Image.substring(5, base64Image.indexOf(";"));
+                var mimeType = "image/png";
                 var imageName = "captured_image.png";
-                base64Image = base64Image.replace(
-                    "data:" + mimeType + ";base64,", "");
+                base64Image = base64Image.replace(`data:${mimeType};base64,`, "");
+
                 var oModel = this.getView().getModel("IdCardModel");
                 oModel.setProperty("/Attachment", base64Image);
                 oModel.setProperty("/mimeType", mimeType);
                 oModel.setProperty("/name", imageName);
                 oModel.setProperty("/capturedImage", base64Image);
                 oModel.setProperty("/capturedImageName", imageName);
-                this.getView().getModel("IdCardModel").setProperty("/name", "");
+
                 this._StopCamera();
                 this.oCameraDialog.close();
             },

@@ -1,12 +1,35 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="{i18n>cameraCapture}" >
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="{i18n>cameraCapture}">
         <VBox class="sapUiSmallMargin">
             <HBox class="sapUiTinyMarginTop">
-                <core:HTML content="&lt;video id='video' autoplay class='squareVideo'&gt;&lt;/video&gt;"/>
+                <core:HTML
+                content="
+                &lt;div style='position:relative;display:inline-block;'&gt;
+                    &lt;video id='video' autoplay class='squareVideo' style='border:2px solid #fff;border-radius:10px;'&gt;&lt;/video&gt;
+                    &lt;img src='image/cameraBg.png' style='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;' /&gt;
+                &lt;/div&gt;"
+            />
+
             </HBox>
-             <FlexBox class="sapUiTinyMarginTop" justifyContent="SpaceAround">
-                <Button text="{i18n>Capture}" press="IC_onCapturePress"  type="Accept" width="8rem"/>
-                 <Button text="{i18n>Close}" press="IC_onPressCloseCameraDialog" type="Reject" width="8rem"/>
+            <FlexBox
+                class="sapUiTinyMarginTop"
+                justifyContent="SpaceAround"
+            >
+                <Button
+                    text="{i18n>Capture}"
+                    press="IC_onCapturePress"
+                    type="Accept"
+                    width="8rem"
+                />
+                <Button
+                    text="{i18n>Close}"
+                    press="IC_onPressCloseCameraDialog"
+                    type="Reject"
+                    width="8rem"
+                />
             </FlexBox>
         </VBox>
     </Dialog>
