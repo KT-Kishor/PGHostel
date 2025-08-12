@@ -63,6 +63,9 @@ sap.ui.define([
             if (this.modelData.SubType === "LOP") {
                 oType = "LOP"
                 this.getView().getModel("selectedModel").setProperty("/selectedType", 2);
+            }else if (this.modelData.SubType === "Comp off") {
+                oType = "Comp off"
+                this.getView().getModel("selectedModel").setProperty("/selectedType", 3);
             } else {
                 oType = "All In One Leave"
             }
@@ -128,7 +131,7 @@ sap.ui.define([
                         LeaveType: "Submitted"
                     },
                     properties: {
-                        color: "#fc7b03"
+                        color: "#FFB347"
                     },
                     displayName: "Submitted"
                 },
@@ -144,7 +147,7 @@ sap.ui.define([
             ];
 
             // Add "Quota" only if leaveType is not LOP
-            if (leaveType !== "LOP") {
+            if (leaveType === "All In One Leave") {
                 rules.push({
                     dataContext: {
                         LeaveType: "Quota"
@@ -218,7 +221,7 @@ sap.ui.define([
                         LeaveType: "Submitted"
                     },
                     properties: {
-                        color: "#fc7b03"
+                        color: "#FFB347"
                     },
                     displayName: "Submitted"
                 },
@@ -233,7 +236,7 @@ sap.ui.define([
                 }
             ];
 
-            if (leaveType !== "LOP") {
+           if (leaveType === "All In One Leave") {
                 rules.push({
                     dataContext: {
                         LeaveType: "All Quota"

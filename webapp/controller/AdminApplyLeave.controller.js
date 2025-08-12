@@ -321,6 +321,7 @@ sap.ui.define(
                     this.byId("AL_id_LeaveBarChart").setVisible(true);
                     this.byId("AL_id_LeaveTableStandard").setVisible(false);
                     this.byId("AL_id_leavefilterbar").setVisible(false);
+                    this.getView().byId("AL_id_TypeOfLeave").setSelectedKey("All In One Leave");
                     this.getView().byId("AL_id_LeaveYear").setSelectedKey(this.currentYear);
                     if (this.Type === "Trainee") {
                         this.byId("AL_id_MonthlyChart").setVisible(false);

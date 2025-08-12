@@ -7,7 +7,7 @@ sap.ui.define([], function() {
             if (!oField) return false;
             var oValue = oField.getValue().replace(/[^0-9]/g, "").slice(0, 10);
             if (oField.getValue() !== oValue) oField.setValue(oValue);
-            var regex = /^\d{10}$/;
+            var regex = /^[1-9]\d{9}$/;
             if (!regex.test(oValue)) {
                 oField.setValueState("Error").focus();
                 return false;
