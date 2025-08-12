@@ -396,7 +396,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="{i18n>salaryDetails}" visible="{= !${viewModel>/TraineeRole} }">
+				<ObjectPageSection titleUppercase="false" id="idSalaryDetails" title="{i18n>salaryDetails}" visible="{= !${viewModel>/TraineeRole}  &amp;&amp; ${LoginModel>/Role} === 'Contractor'}">
 					<subSections>
 						<ObjectPageSubSection title="" titleUppercase="false">
 							<blocks>
@@ -405,7 +405,7 @@
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="connections" title="{i18n>paySlip}" visible="{viewModel>/ResignationVisible}">
+				<ObjectPageSection titleUppercase="false" id="connections" title="{i18n>paySlip}" visible="{viewModel>/ResignationVisible} &amp;&amp; ${LoginModel>/Role} === 'Contractor'}">
 					<subSections>
 						<ObjectPageSubSection id="connectionsSS" titleUppercase="false">
 							<m:Table sticky="ColumnHeaders" id="SS_id_PaySlipTable" busyIndicatorDelay="0" growing="true" growingThreshold="50" growingScrollToLoad="true" items="{                                    path: 'PaySlip>/EmpTable',                                    sorter: {                                        path: 'FinancialYear',                                        descending: false,                                        group: true                                    }                                }">
