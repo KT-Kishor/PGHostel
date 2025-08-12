@@ -37,7 +37,7 @@
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Transparent" visible="{viewModel>/SelfService}" />
 						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Transparent" />
-						<m:Button icon="sap-icon://action" text="Actions" press="onOpenActionBtn" id="SS_id_Action"/>
+						<m:Button icon="sap-icon://action" text="{i18n>action}" press="onOpenActionBtn" id="SS_id_Action"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
 			</headerTitle>
@@ -1224,7 +1224,7 @@
                     titleUppercase="false"
                     id="idSalaryDetails"
                     title="{i18n>salaryDetails}"
-                   visible="{= !${viewModel>/TraineeRole} }">
+                    visible="{= !${viewModel>/TraineeRole} &amp;&amp; !${viewModel>/isContractorRole} }">
 					<subSections>
 						<ObjectPageSubSection title="" titleUppercase="false" >
 							<blocks>

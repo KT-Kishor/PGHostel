@@ -34,7 +34,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     // --- Initialization ---
                     this._makeDatePickersReadOnly(["SS_id_Dob", "SS_id_ResgEndDate", "SS_id_DocType"]);
                     const viewModel = new sap.ui.model.json.JSONModel({
-                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: false, employeeType: null, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false,
+                        fragmentSave: false, fragmentSubmit: false, isEditMode: false, isExperienced: false, employeeType: null, EmployeeStatus: false, isRoleMode: false, Max: new Date(), TraineeRole: false, Letter: false, ResignationVisible: false, CanWithdrawResignation: false, ShowStatusControl: false, isContractorRole: false,
                         isVisitMode: true, isIdMode: true, isEditButtonVisible: true, PhotoSave: true, PhotoSubmit: false, BtnVisible: true, AdminRole: false, RelievingLetter: false, SelfService: false, min: new Date(), SetProfile: false, SalarySectionVisible: false, WorkCompletedVisible: false, SelfServiceBtn: false
                     });
                     oView.setModel(viewModel, "viewModel");
@@ -42,13 +42,15 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     await this._fetchCommonData("EmployeeDetailsData", "empModel");
                     // --- Role and Path Determination ---
                     const loginModel = this.getOwnerComponent().getModel("LoginModel");
-                    var sLoggedInRole = loginModel.getProperty("/Role");
-                    this.ViewModel.setProperty("/ShowStatusControl", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole));
+                    const sLoggedInRole = loginModel.getProperty("/Role");
                     this.sNavigatedRole = oEvent.getParameter("arguments").Role;
                     this.sPath = oEvent.getParameter('arguments').sPath;
-                    var bHideSalarySection = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
-                    this.ViewModel.setProperty("/TraineeRole", bHideSalarySection);
-
+                    const bIsTrainee = sLoggedInRole === "Trainee" || this.sNavigatedRole === "Trainee";
+                    this.ViewModel.setProperty("/TraineeRole", bIsTrainee);
+                    const bIsContractor = sLoggedInRole === "Contractor" || this.sNavigatedRole === "Contractor";
+                    this.ViewModel.setProperty("/isContractorRole", bIsContractor);
+                    this.ViewModel.setProperty("/ShowStatusControl", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole));
+                    this.ViewModel.setProperty("/ResignationVisible", this.sPath === "SelfService" && !bIsTrainee && !bIsContractor);
                     var aIds = ["SS_id_ldob", "SS_id_lb", "SS_id_lpa", "SS_id_lca", "SS_id_Lmo", "SS_id_lr", "SS_id_les", "SS_id_Pf", "SS_id_lName", "SS_id_Rf", "SS_id_Mf", "SS_id_Af", "SS_id_Ps", "SS_idEmeSalS", "SS_id_lN", "SS_id_Ms", "SS_id_As",
                         "SS_id_An", "SS_id_Ah", "SS_id_Bn", "SS_id_Bb", "SS_id_Ifc", "SS_id_Ba", "SS_id_LPan", "SS_id_LAdhar"];
                     if (this.sPath === "SelfService") {
@@ -68,11 +70,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         this.byId("SS_id_lbase").setRequired(true);
                         this.byId("SS_id_Lmg").setRequired(true);
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("headerEmpDetails"));
-                        this.ViewModel.setProperty("/Letter", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee");
+                        this.ViewModel.setProperty("/Letter", ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && !bIsTrainee && !bIsContractor);
                         this.ViewModel.setProperty("/RelievingLetter", ["Admin", "HR Manager", "HR"].includes(loginModel.getProperty("/Role")));
                         aIds.forEach(function (sId) { this.byId(sId).setRequired(false); }.bind(this));
                     }
-                    this.ViewModel.setProperty("/ResignationVisible", this.sPath === "SelfService" && sLoggedInRole !== "Trainee" && this.sNavigatedRole !== "Trainee");
                     var employeeModel = new JSONModel();
                     this.getOwnerComponent().setModel(employeeModel, "employeeModel");
                     // --- Data Loading and UI Updates based on Data ---
@@ -104,9 +105,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             if (!oModelAllData.EContactIIStdCode) oModelAllData.EContactIIStdCode = "+91";
 
                             // --- Releving letter Button Visibility Logic ---
-                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && this.sNavigatedRole !== "Trainee") {
+                            if (this.sPath !== "SelfService" && ["Admin", "HR Manager", "HR"].includes(sLoggedInRole) && !bIsTrainee && !bIsContractor) {
                                 this.byId("SS_id_Action").setVisible(true);
-                                this.ViewModel.setProperty("/TraineeRole", false);
                                 if (oModelAllData.EmployeeStatus === "Inactive") {
                                     this.ViewModel.setProperty("/WorkCompletedVisible", true);
                                     this.ViewModel.setProperty("/Letter", false);
@@ -137,7 +137,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     if (oIdCardModel) {
                         oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
                     }
-                    this.byId("SS_id_EmeNameF").setValueState("None");
+                     this.byId("SS_id_EmeNameF").setValueState("None");
                     this.byId("SS_idRelF").setValueState("None");
                     this.byId("SS_id_EmpMoF").setValueState("None");
                     this.byId("SS_id_AddF").setValueState("None");
@@ -1508,12 +1508,12 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             _getLatestEducationEndDate: function () {
                 const aEducationData = this.getOwnerComponent().getModel("sEducationModel")?.getData();
                 if (!aEducationData || aEducationData.length === 0) {
-                    return null; 
+                    return null;
                 }
                 const latestDate = aEducationData.reduce((maxDate, record) => {
                     const currentEndDate = new Date(record.EducationEndDate);
                     return currentEndDate > maxDate ? currentEndDate : maxDate;
-                }, new Date(0)); 
+                }, new Date(0));
                 return latestDate.getTime() === new Date(0).getTime() ? null : latestDate;
             },
 
