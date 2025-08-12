@@ -126,7 +126,7 @@ sap.ui.define(
                     ];
 
                     // Add "Quota" only if leaveType is not LOP
-                    if (leaveType !== "LOP") {
+                    if (leaveType === "All In One Leave") {
                         rules.push({
                             dataContext: { LeaveType: "Quota" },
                             properties: { color: "#4c79e0" },
@@ -175,7 +175,7 @@ sap.ui.define(
                         }
                     ];
 
-                    if (leaveType !== "LOP") {
+                    if (leaveType === "All In One Leave") {
                         rules.push({
                             dataContext: { LeaveType: "All Quota" },
                             properties: { color: "#4c79e0" },
