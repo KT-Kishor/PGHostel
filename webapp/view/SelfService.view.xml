@@ -298,19 +298,20 @@
                                             required="true"
                                             id="SS_id_lds"
                                         />
-										<m:Select
+										<m:ComboBox
                                             items="{DesignationModel>/}"
                                             id="SS_id_Desi"
                                             showSecondaryValues="true"
-                                            selectedKey="{sEmployeeModel>/0/Designation}"
+                                            value="{sEmployeeModel>/0/Designation}"
                                             editable="{viewModel>/AdminRole}"
+                                            change="SS_ValidateCommonFields"
                                         >
 											<core:ListItem
                                                 key="{DesignationModel>designationName}"
                                                 text="{DesignationModel>designationName}"
                                                 additionalText="{DesignationModel>department}"
                                             />
-										</m:Select>
+										</m:ComboBox>
 										<m:Label
                                             text="{i18n>manager}"
                                             id="SS_id_Lmg"

@@ -85,6 +85,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                         var oModelAllData = this.getView().getModel("sEmployeeModel").getData()[0];
 
                         if (oModelAllData) {
+                            this._previousEmployeeStatus  = oModelAllData.EmployeeStatus;
                             const oRadioGroup = this.byId("SS_experienceRadioGroup");
                             const bIsFresher = oModelAllData.EmployeeType === "Fresher";
                             this.ViewModel.setProperty("/employmentSectionVisible", !bIsFresher);
@@ -135,7 +136,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     this.getView().setModel(oTextModel, "TextDisplay");
                     var oIdCardModel = this.getView().getModel("IdCardModel");
                     if (oIdCardModel) {
-                        oIdCardModel.attachPropertyChange(this.IC_onPressDisplayImageOnCanvas.bind(this));
+                        oIdCardModel.attachPropertyChange(this.onPressDisplayImageOnCanvas.bind(this));
                     }
                      this.byId("SS_id_EmeNameF").setValueState("None");
                     this.byId("SS_idRelF").setValueState("None");
@@ -598,9 +599,13 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                 const oDataModel = oView.getModel("sEmployeeModel").getData()[0];
                 let isValid = true;
                 let sMessage = this.i18nModel.getText("selfServiceUpdateAdmin");
-                if (this.sNavigatedRole !== "Trainee" && sButtonId !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
-                    MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
-                    return false;
+                if (this.sNavigatedRole === "Contractor" && this._previousEmployeeStatus === "Inactive" &&  oDataModel.EmployeeStatus === "Active") {
+                        MessageToast.show(this.i18nModel.getText("inactiveContractorError"));
+                        return false;
+                }
+                if (!["Trainee", "Contractor"].includes(this.sNavigatedRole) && sButtonId !== "Submit" && oDataModel.EmployeeStatus === 'Inactive' && !oView.byId("SS_id_ResgEndDate").getValue()) {
+                        MessageToast.show(this.i18nModel.getText("resignationEndDateRequired"));
+                        return false;
                 }
                 // --- Section 1: All Validation Logic ---
                 if (this.sPath === 'SelfService') {
@@ -627,8 +632,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                             utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
                             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
                             utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
-                            utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID");
-
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID")&&
+                            utils._LCvalidateMandatoryField(oView.byId("SS_id_Desi"), "ID");
                     } else if (sButtonId === "DocumentBtn") {
                         // Bank Details & Personal IDs Validation
                         isValid =
@@ -654,7 +659,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     const isOptionalValid =
                         (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) &&
                         (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) &&
-                        (oDataModel.EmployeeStatus === 'Inactive' && this.sNavigatedRole !== "Trainee" ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
+                        (oDataModel.EmployeeStatus === 'Inactive' && !["Trainee", "Contractor"].includes(this.sNavigatedRole) ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
 
                     isValid = isRequiredValid && isOptionalValid;
                 }
@@ -720,7 +725,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
                     });
             },
             onManagerChange: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
                 const oDataModel = this.getView().getModel("sEmployeeModel").getProperty("/0");
                 const requestData = { ManagerID: oDataModel.ManagerID, Status: "Submitted" };
                 oDataModel.ManagerID = oEvent.getSource().getSelectedKey();
