@@ -507,10 +507,6 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            // FAA_onBranchChange: function (oEvent) {
-            //     utils._LCstrictValidationComboBox(oEvent);
-            // },
-
             FAA_onChangeAssignedBy: function(oEvent) {
                 if (utils._LCstrictValidationComboBox(oEvent)) {
                     this.getView().getModel("myform").setProperty("/formData/data/AssignedByEmployeeID", oEvent.getSource().getSelectedItem().getAdditionalText());
