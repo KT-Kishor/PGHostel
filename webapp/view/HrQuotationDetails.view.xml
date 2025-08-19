@@ -11,7 +11,9 @@
         title="{i18n>generateQuotationDetails}"
         navButtonPress="HQD_onBack"
         showNavButton="true"
+        enableScrolling="false"
     >
+    
 		<m:headerContent>
 			<m:Button
                 press="Tile_NotifictionBTN"
@@ -279,10 +281,10 @@
                                             text="{i18n>customerName}"
                                             required="true"
                                         />
-                                         <m:ComboBox items="{path:'CreateCustomerModel>/'}" value="{SingleCompanyModel>/CustomerName}"  id="HQD_id_CustomerName"  change="HQD_onCustomerNameLiveChange"
+                                         <m:ComboBox items="{path:'CreateCustomerModel>/'}" value="{SingleCompanyModel>/CustomerName}"  id="HQD_id_CustomerName"  change="HQD_onCustomerNameLiveChange"     
                                            valueStateText="{i18n>placeName}"
                                             editable="{visiablityPlay>/editable}">
-                                            <core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>name}"/>
+                                            <core:ListItem  key="{CreateCustomerModel>companyName}" text="{CreateCustomerModel>companyName}"/>
                                             </m:ComboBox>
 										<m:Label    
                                             text="{i18n>emailID}"

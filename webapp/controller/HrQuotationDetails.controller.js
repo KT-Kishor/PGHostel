@@ -620,8 +620,48 @@ sap.ui.define(
       },
 
       HQD_onCustomerNameLiveChange: function (oEvent) {
-        utils._LCvalidateName(oEvent);
+        utils._LCvalidateName(oEvent)
+        var oComboBox = oEvent.getSource();
+        var sSelectedCompanyName = oComboBox.getSelectedKey();
+          var alldata = this.getView().getModel("CreateCustomerModel").getProperty("/");
+         var allcompanyname = alldata.map(function(customer)
+          {
+          return customer.companyName  });
+
+        var oModel = this.getView().getModel("CreateCustomerModel");
+        var aCompanies = oModel.getProperty("/"); 
+
+
+           
+        // Find the selected company 
+        var oSelectedCompany = aCompanies.find(function (item) {
+          return item.companyName === sSelectedCompanyName;
+        });
+       
+             
+        if (oSelectedCompany) {
+          var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+
+           oSingleCompanyModel.setProperty("/CustomerName", oSelectedCompany.companyName);
+          oSingleCompanyModel.setProperty("/CustomerEmailID", oSelectedCompany.mailID);
+          oSingleCompanyModel.setProperty("/CustomerSTDCode", oSelectedCompany.stdCode);
+          oSingleCompanyModel.setProperty("/CustomerMobileNo", oSelectedCompany.mobileNo);
+          oSingleCompanyModel.setProperty("/CustomerGSTNO", oSelectedCompany.GST);
+          
+        }
+
+        if(!allcompanyname.includes(sSelectedCompanyName)){
+          var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+
+          oSingleCompanyModel.setProperty("/CustomerEmailID", "");
+          oSingleCompanyModel.setProperty("/CustomerSTDCode", "");
+          oSingleCompanyModel.setProperty("/CustomerMobileNo", "");
+          oSingleCompanyModel.setProperty("/CustomerGSTNO", "");
+        }
+       
+           
       },
+
 
       HQD_EmailIDLiveChange: function (oEvent) {
         utils._LCvalidateEmail(oEvent)
@@ -731,7 +771,7 @@ sap.ui.define(
 
         const bOptionalValid = !!this.UnitAmount;
         if (!bOptionalValid) {
-                return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+          return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
         }
 
         const tmpDiv = document.createElement("div");
@@ -1593,7 +1633,7 @@ sap.ui.define(
 
           const bOptionalValid = !!this.UnitAmount;
           if (!bOptionalValid) {
-                return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+            return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
           }
 
           const tmpDiv = document.createElement("div");

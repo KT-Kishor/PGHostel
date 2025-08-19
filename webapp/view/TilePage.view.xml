@@ -11,7 +11,7 @@
     xmlns:f="sap.f"
     xmlns:card="sap.f.cards">
     <App>
-    <Page id="idPageTile" class="service-background" showHeader="true">
+    <Page id="idPageTile" class="service-background" showHeader="true" enableScrolling="false">
         <headerContent>
             <Text text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }" class="boldBlueText sapUiLargeMarginBegin" />
             <ToolbarSpacer />
