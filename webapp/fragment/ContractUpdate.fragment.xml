@@ -75,7 +75,7 @@
 										<m:Input value="{oFilteredContractModel>/ContarctEmail}" liveChange="CD_validateEmail"  valueStateText="{i18n>emailValueState}" id="CU_id_ContractEmailID" editable="{simpleForm>/editable}" maxLength="100" />
 										<!-- Agreement Date -->
 										<m:Label text="{i18n>agreementDate}" required="true"/>
-										<m:DatePicker value="{path:'oFilteredContractModel>/AgreementDate' ,formatter:'.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="CU_id_AgreementDate" valueFormat="dd/MM/yyyy" displayFormat="dd/M/yyyy" change="onChangeAggrementDate" valueStateText="{i18n>dateValueState}"/>
+										<m:DatePicker value="{path:'oFilteredContractModel>/AgreementDate' ,formatter:'.Formatter.formatDate'}" editable="{simpleForm>/editable}" id="CU_id_AgreementDate" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onChangeAggrementDate" valueStateText="{i18n>dateValueState}"/>
 											<!-- Assignment Start Date -->
 										<m:Label text="{i18n>assignmentStartDate}" required="true"/>
 										<m:DatePicker value="{path:'oFilteredContractModel>/AssignmentStartDate' ,formatter:'.Formatter.formatDate'}" id="CU_id_AssignmentStartDate" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" editable="{simpleForm>/editable}" change="CD_validateDate" valueStateText="{i18n>dateValueState}" maxDate="{oFilteredContractModel>/MaxFromDate}"/>
