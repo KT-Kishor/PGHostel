@@ -72,7 +72,7 @@ sap.ui.define(
         // },
 
         CreateEmployeeModel: function () {
-          var empData = this.getView().getModel("EmpModel").getData() || [];
+          var empData = this.getView().getModel("EmpDetails").getData() || [];
           var filteredData = empData.filter(function (item) {
             return item.Role !== "Trainee" && item.Role !== "Contractor";
           });

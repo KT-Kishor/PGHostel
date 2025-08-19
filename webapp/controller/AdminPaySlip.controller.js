@@ -132,19 +132,11 @@ sap.ui.define(
                     }
 
                     // Call backend
-                    await this._commonGETCall("AdminPaySlip", "EmpTable", params);
-                    const oModel = this.getView().getModel("EmpTable");
-                    const aData = oModel.getData();
-                    aData.forEach((item) => {
-                        if (item.PaySlipDate) {
-                            item.PaySlipDate = this.Formatter.formatDate(item.PaySlipDate);
-                        }
-                    });
-                    oModel.setData(aData);
-                    this.closeBusyDialog();
+                   await this._commonGETCall("AdminPaySlip", "EmpTable", params);
+                   this.closeBusyDialog();
                 } catch (error) {
                     this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
 
@@ -222,7 +214,7 @@ sap.ui.define(
                 };
                 const oSheet = new Spreadsheet(oSettings);
                 oSheet.build().then(function () {
-                    MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
                 }.bind(this)).finally(function () {
                         oSheet.destroy();
                     });
