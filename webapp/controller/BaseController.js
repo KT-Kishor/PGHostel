@@ -1159,9 +1159,16 @@
       }
     },
 
-    Tile_NotifictionBTN: function (oEvent) {
+    //Notification fragment open
+    Tile_NotifictionBTN:async function (oEvent) {
       var oView = this.getView();
-      var oButton = oEvent.getSource();
+      var oButton = oEvent.getSource(); 
+      
+       this.getBusyDialog();
+      await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
+      await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
+      await this._fetchCommonData("getCompanyInvoice","CompanyInvoiceModelData");
+       this.closeBusyDialog();
 
       var oOldCarousel = sap.ui.getCore().byId("TN_id_Carousel");
       if (oOldCarousel) {
