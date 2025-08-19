@@ -64,13 +64,13 @@
 							<Text visible="{= Number(${salaryData>/EmployeePF}) !== 0}" text="{path:'salaryData>/EmployeePF', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>performanceTax}" />
-							<Text text="{path:'salaryData>/PT', formatter: '.Formatter.fromatNumber'}" />
+							<Text visible="{= Number(${salaryData>/PT}) !== 0}" text="{path:'salaryData>/PT', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>incomeTax}" />
 							<Text visible="{= Number(${salaryData>/IncomeTax}) !== 0}" text="{path:'salaryData>/IncomeTax', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>totalDeductionAmount}" class="boldBlackText" />
-							<Text text="{path:'salaryData>/TotalDeduction', formatter: '.Formatter.fromatNumber'}" />
+							<Text visible="{= Number(${salaryData>/TotalDeduction}) !== 0}" text="{path:'salaryData>/TotalDeduction', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>variablePayTotal}" class="boldBlackText" />
 							<Text visible="{= Number(${salaryData>/VariablePay}) !== 0}" text="{path:'salaryData>/VariablePay', formatter: '.Formatter.fromatNumber'}" />
@@ -97,7 +97,7 @@
 							<Text text="{path:'salaryData>/GrossPay', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>yearlyDeduction}" class="boldBlackText" />
-							<Text text="{path:'salaryData>/TotalDeduction', formatter: '.Formatter.fromatNumber'}" />
+							<Text visible="{= Number(${salaryData>/TotalDeduction}) !== 0}" text="{path:'salaryData>/TotalDeduction', formatter: '.Formatter.fromatNumber'}" />
 							
 							<Label text="{i18n>EmpOfferVariablePay}" class="boldBlackText" />
 							<Text visible="{= Number(${salaryData>/VariablePay}) !== 0}" text="{path:'salaryData>/VariablePay', formatter: '.Formatter.fromatNumber'}" />
