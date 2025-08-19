@@ -1219,6 +1219,7 @@
       });
       this.getView().setModel(idModel, "idPassModel");
 
+      var oRawData = this.getView().getModel("CompanyCodeDetailsModel");
       // Step 3: Get sender name from LoginModel
       let loginData = this.getOwnerComponent().getModel("LoginModel").getData();
       let senderName = loginData.EmployeeName;
@@ -1233,7 +1234,7 @@
         Have a fantastic birthday and a wonderful year ahead! 🎂<br/><br/>
         Warm wishes,<br/>
         ${senderName}<br/>
-        Kalapavriksha Technologies`;
+    ${oRawData.getData()[0].companyName}.`;
 
       // Step 5: Set content in BirthdayMailModel
       const mailModel = new sap.ui.model.json.JSONModel({
@@ -1296,6 +1297,7 @@
       }
 
       var oEmpModel = this.getView().getModel("EmpDetails");
+      
       if (!oEmpModel || !oEmpModel.getData()) {
         setTimeout(this.initializeBirthdayCarousel.bind(this), 100); // Try again after 500ms
         return;
@@ -1303,7 +1305,7 @@
 
       var filteredModel = oEmpModel.getData().filter(function (item) {
         return new Date(item.DateOfBirth).getDate() === new Date().getDate() &&
-          new Date(item.DateOfBirth).getMonth() === new Date().getMonth();
+          new Date(item.DateOfBirth).getMonth() === new Date().getMonth() && item.EmployeeStatus === 'Active'
       });
       var oBirthdayModel = new JSONModel(filteredModel);
       this.getView().setModel(oBirthdayModel, "BirthdayModel");
@@ -1331,6 +1333,7 @@
         .getBindingContext("MSASOWModel")
         .getProperty("MsaID");
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
+      this.onClosePopover();
     },
     OnPressNavigationSOW:function (oEvent) {
       var MsaID = oEvent
@@ -1338,6 +1341,7 @@
         .getBindingContext("SOWModel")
         .getProperty("MsaID");
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
+      this.onClosePopover();
     }, 
     CI_onPressInvoiceRow: function (oEvent) {
       var Path = encodeURIComponent(
