@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    "./BaseController",  //import base controller
+    "./BaseController",  
     "../utils/validation",
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
@@ -647,6 +647,7 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/CustomerSTDCode", oSelectedCompany.stdCode);
           oSingleCompanyModel.setProperty("/CustomerMobileNo", oSelectedCompany.mobileNo);
           oSingleCompanyModel.setProperty("/CustomerGSTNO", oSelectedCompany.GST);
+          oSingleCompanyModel.setProperty("/CustomerAddress", oSelectedCompany.address);
           
         }
 
