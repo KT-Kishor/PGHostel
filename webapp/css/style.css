@@ -1811,3 +1811,19 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .employment-toolbar .sapMOTBHiddenInOverflow {
     display: none !important; 
 }
+.sapMTB {
+    /* border-bottom: solid .0625rem #a8b3bd; */
+    background-color: #f2b15b;
+}
+
+
+.sapMIBar .sapMBtn .sapMBtnInner.sapMBtnDefault .sapUiIcon{
+ color:#000 !important;
+}
+
+.chartBox {
+    height: 100%;
+    overflow-y: auto;  /* adds vertical scroll only when needed */
+}
+
+

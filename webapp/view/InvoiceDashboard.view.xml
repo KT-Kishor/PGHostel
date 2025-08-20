@@ -18,7 +18,7 @@
         <content>
             <VBox class="sapUiSmallMargin">
                 <!-- Filter Bar -->
-                <fb:FilterBar id="dashboardFilterBar" liveMode="false" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" >
+                <fb:FilterBar id="dashboardFilterBar"  useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Company" label="Company" groupName="Group1" visibleInFilterBar="true">
                             <fb:control>
@@ -59,7 +59,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-                                                <viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }" selectData="onStatusChartSelect">
+                                                <viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" width="100%"  vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }" selectData="onStatusChartSelect">
                                                     <viz:dataset>
                                                         <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
                                                             <vizData:dimensions> <vizData:DimensionDefinition name="Status" value="{chartData>status}" /> </vizData:dimensions>
@@ -94,7 +94,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-                                                <viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, formatString: '#,##0' } } }">
+                                                <viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%"  vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, formatString: '#,##0' } } }">
                                                     <viz:dataset>
                                                         <vizData:FlattenedDataset data="{chartData>/monthlyValue}">
                                                             <vizData:dimensions> <vizData:DimensionDefinition name="Month" value="{chartData>month}" /> </vizData:dimensions>
@@ -115,39 +115,45 @@
                         
                         <!-- 3. Value by Company Chart -->
                         <f:Card class="sapUiTinyMargin">
-                            <f:header>
-                                <Toolbar>
-                                    <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
-                                    <ToolbarSpacer/>
-                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>verticalchartTooltip}"/>
-                                    <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
-                                </Toolbar>
-                            </f:header>
-                            <f:content>
-                                <com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
-									<com:content>
-										<com:ChartContainerContent>
-											<com:content>
-                                                <ScrollContainer height="300px" width="100%" vertical="true">
-                                                    <viz:VizFrame id="barChartCompany" vizType="{invoiceChartTypeModel>/companyType}" width="100%" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, formatString: '#' } } }">
-                                                        <viz:dataset>
-                                                            <vizData:FlattenedDataset data="{chartData>/companyTotals}">
-                                                                <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
-                                                                <vizData:measures> <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" /> </vizData:measures>
-                                                            </vizData:FlattenedDataset>
-                                                        </viz:dataset>
-                                                        <viz:feeds>
-                                                            <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
-                                                            <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
-                                                        </viz:feeds>
-                                                    </viz:VizFrame>
-                                                </ScrollContainer>
-                                            </com:content>
-										</com:ChartContainerContent>
-									</com:content>
-								</com:ChartContainer>
-                            </f:content>
-                        </f:Card>
+    <f:header>
+        <Toolbar>
+            <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
+            <ToolbarSpacer/>
+            <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>verticalchartTooltip}"/>
+            <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
+        </Toolbar>
+    </f:header>
+    <f:content>
+        <com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+            <com:content>
+                <com:ChartContainerContent>
+                    <com:content>
+                    
+                            <viz:VizFrame
+                                id="barChartCompany"
+                                vizType="{invoiceChartTypeModel>/companyType}"
+                                width="100%">
+                                <viz:dataset>
+                                    <vizData:FlattenedDataset data="{chartData>/companyTotals}">
+                                        <vizData:dimensions>
+                                            <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" />
+                                        </vizData:dimensions>
+                                        <vizData:measures>
+                                            <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
+                                        </vizData:measures>
+                                    </vizData:FlattenedDataset>
+                                </viz:dataset>
+                                <viz:feeds>
+                                    <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+                                    <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
+                                </viz:feeds>
+                            </viz:VizFrame>
+                    </com:content>
+                </com:ChartContainerContent>
+            </com:content>
+        </com:ChartContainer>
+    </f:content>
+</f:Card>
 
                         <!-- 4. Yearly Trend Chart (No Scroll Container Needed) -->
                         <f:Card class="sapUiTinyMargin">
@@ -164,7 +170,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-                                                <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" height="300px" vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, formatString: '#' } }, legend: { visible: true } }">
+                                                <viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%"  vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, formatString: '#' } }, legend: { visible: true } }">
                                                     <viz:dataset>
                                                         <vizData:FlattenedDataset data="{chartData>/yearlyTrend}">
                                                             <vizData:dimensions> <vizData:DimensionDefinition name="Year" value="{chartData>year}" /> </vizData:dimensions>
@@ -203,7 +209,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-                                                <ScrollContainer height="300px" width="100%" vertical="true">
+                                               
                                                     <viz:VizFrame id="stackedChartPayment"
                                                         vizType="{invoiceChartTypeModel>/paymentBreakdownType}"
                                                         width="100%"
@@ -228,7 +234,7 @@
                                                             <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
                                                         </viz:feeds>
                                                     </viz:VizFrame>
-                                                </ScrollContainer>
+                                              
                                             </com:content>
 										</com:ChartContainerContent>
 									</com:content>
@@ -251,7 +257,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-                                                <ScrollContainer height="300px" width="100%" vertical="true">
+                                               
                                                     <viz:VizFrame id="barChartPending"
                                                         vizType="{invoiceChartTypeModel>/pendingByCompanyType}"
                                                         width="100%"
@@ -272,7 +278,7 @@
                                                             <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
                                                         </viz:feeds>
                                                     </viz:VizFrame>
-                                                </ScrollContainer>
+                                              
                                             </com:content>
 										</com:ChartContainerContent>
 									</com:content>

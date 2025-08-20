@@ -232,9 +232,9 @@ sap.ui.define([
             oEvent.getSource().getParent().close();
         },
 
-        onInvoiceNumberPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo),dash:"InvoiceDashboard" }); },
-        onPaymentBreakdownPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo),dash:"InvoiceDashboard" }); },
-        onPendingInvoicePress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo),dash:"InvoiceDashboard" }); },
+        onInvoiceNumberPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo), dash: "InvoiceDashboard" }); },
+        onPaymentBreakdownPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo), dash: "InvoiceDashboard" }); },
+        onPendingInvoicePress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo), dash: "InvoiceDashboard" }); },
 
         // --- CHART TYPE SWITCHERS ---
         IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
@@ -260,6 +260,39 @@ sap.ui.define([
         },
 
         onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
-        onLogout: function () { this.getRouter().navTo("RouteLoginPage"); }
+        onLogout: function () { this.getRouter().navTo("RouteLoginPage"); },
+
+    onAfterRendering: function () {
+    var oVizFrame = this.byId("barChartCompany");
+    var oScroll = this.byId("companyScroll");
+
+    // Get your dataset
+    var aData = this.getView().getModel("chartData").getProperty("/companyTotals");
+
+    if (aData && aData.length > 0) {
+        // Set dynamic height: 60px per bar + some padding
+        var iRowHeight = 100;
+        var iChartHeight = aData.length * iRowHeight;
+
+        // Apply dynamic height to VizFrame
+        oVizFrame.setHeight(iChartHeight + "px");
+    }
+
+    // Apply chart properties
+    oVizFrame.setVizProperties({
+        title: { visible: false },
+        plotArea: {
+            // dataLabel: { visible: true, formatString: "#,##0.##" },
+            isFixedDataPointSize: true // prevents bar compression
+        },
+        valueAxis: { title: { visible: false } },
+        categoryAxis: { title: { visible: false } }
+    });
+}
+
+
+
+
+
     });
 });
