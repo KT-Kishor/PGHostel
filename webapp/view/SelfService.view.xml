@@ -669,6 +669,7 @@
 					<subSections>
 						<ObjectPageSubSection
                             titleUppercase="false"
+                            title="{i18n>bankDetails}"
                         >
 							<blocks>
 								<f:SimpleForm

@@ -1668,6 +1668,21 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             }
           }
         }
+
+        // --- NEW: Check for overlapping employment dates ---
+        const oStartDatePicker = sap.ui.getCore().byId("AddEmp_id_StartDate");
+        const oEndDatePicker = sap.ui.getCore().byId("AddEmp_id_EndDate");
+        const newStartDate = oStartDatePicker.getDateValue();
+        const newEndDate = oEndDatePicker.getDateValue();
+        const aExistingEmployment = this.getOwnerComponent().getModel("sEmploymentModel").getData() || [];
+        const oModelData = this.getView().getModel("employmentModel").getData();
+        const editedRecordId = bIsCreate ? null : oModelData.ID;
+
+        if (this._validateEmploymentOverlap(newStartDate, newEndDate, aExistingEmployment, editedRecordId)) {
+          MessageBox.error(this.i18nModel.getText("employmentOverlapError"));
+          return;
+        }
+
         // Optional Fields Validation
         const name = sap.ui.getCore().byId("AdEmp_id_RCNameI").getValue().trim();
         const mail = sap.ui.getCore().byId("AdEmp_id_RCMailI").getValue().trim();
@@ -1745,7 +1760,29 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     AddEmp_onUpdateEmpDetails: function () {
       this.saveEmploymentDetails(false); // update mode
     },
+_validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedRecordId) {
+    const normalizedNewStart = this._normalizeDate(newStart);
+    const normalizedNewEnd = this._normalizeDate(newEnd);
+    
+    if (!normalizedNewStart || !normalizedNewEnd) {
+        return false;
+    }
 
+    for (const record of existingRecords) {
+        if (editedRecordId && record.ID === editedRecordId) {
+            continue;
+        }
+        const normalizedExistingStart = this._normalizeDate(record.StartDate);
+        const normalizedExistingEnd = this._normalizeDate(record.EndDate);
+        if (!normalizedExistingStart || !normalizedExistingEnd) {
+            continue;
+        }
+        if (normalizedNewStart <= normalizedExistingEnd && normalizedNewEnd >= normalizedExistingStart) {
+            return true;
+        }
+    }
+    return false;
+},
     //Reference details
     EmpF_onReferenceDetails: function () {
       var that = this;
