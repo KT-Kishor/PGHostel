@@ -2819,6 +2819,7 @@ RF_onPressCloseDialog: function () {
       );
     },
 onWithdrawResignation: function () {
+  var that = this;
   const oVM = this.getView().getModel("viewModel");
   const oEmpModel = this.getView().getModel("sEmployeeModel");
   const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
@@ -2882,15 +2883,29 @@ onWithdrawResignation: function () {
     // Clear error once valid
     oCommentField.setValueState("None");
 
-  const oEmployeeModel = oEmpModel.getProperty("/0");
-  const empName = oEmployeeModel.EmployeeName;
-  const body = `Dear ${empName}, your resignation has been successfully withdrawn.`;
+     const oEmployeeModel = oEmpModel.getProperty("/0");
+   var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+   var designation = oEmployeeModel.Designation;
+            var subject = "Confirmation of Resignation Withdrawal";
+
+            var body = `
+    <div style="text-align: justify; font-family: Arial, sans-serif;">
+        <p>Dear <b>${empName}</b>,</p>
+        <p>We acknowledge receipt of your request to withdraw your resignation from the position of <b>${designation}</b> at <b>${that.companyName}</b>.</p>
+        <p>We are pleased to inform you that your request has been accepted, and your resignation has been officially withdrawn. You will continue in your current role with no change to your employment status or responsibilities.</p>
+        <p>We appreciate your continued commitment to the organization and look forward to your continued contributions.</p>
+        <p>Best regards,<br/>
+        HR Department<br/>
+        ${that.companyName}</p>
+    </div>
+`;
 
   const oPayload = {
     isWithdraw: "isWithdraw",
     from: oEmployeeModel.CompanyEmailID,
     ResignComment: sComment,
     fromName: empName,
+    subject: subject,
     to: empName,
     subject: "Confirmation of Resignation Withdrawal",
     body: body,
@@ -3054,6 +3069,6 @@ onWithdrawCancel: function () {
     },
     AddEd_changeDegree:function(oEvent){
       utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-    }
+    },
   });
 });

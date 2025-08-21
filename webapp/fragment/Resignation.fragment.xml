@@ -113,7 +113,7 @@
 		<!-- <Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" type="Transparent"/> -->
 		<Button text="{i18n>withdrawResign}" visible="{viewModel>/CanWithdrawResignation}" type="Emphasized" press="onWithdrawResignation" class="submit"/>
 		<Button text="{= ${PDFData>/PreviewFlag} ? ${i18n>applyResign} : ${i18n>preview} }" type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }" press="RF_onPressHandlePreview" class="submit" visible="{viewModel>/BtnVisible}" />
-		<Button text="{viewModel>/closeButtonText}" press="RF_onPressCloseDialog" type="Reject" class="submit" />
+		<Button text="{i18n>close}" press="RF_onPressCloseDialog" type="Reject" class="submit" />
 	</Toolbar>
 </footer>
     </Dialog>

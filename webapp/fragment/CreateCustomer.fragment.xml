@@ -63,7 +63,7 @@
 						</ComboBox>
 					</VBox>
 					<VBox width="78%">
-						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="10" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
+						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="20" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
 					</VBox>
 				</HBox>
 

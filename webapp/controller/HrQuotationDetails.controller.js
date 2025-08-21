@@ -543,10 +543,6 @@ sap.ui.define(
         utils._LCvalidateMandatoryField(oEvent);
       },
 
-      HQD_onMNumberLiveChange: function (oEvent) {
-        utils._LCvalidateMobileNumber(oEvent);
-      },
-
       HQD_EmailIDLiveChange: function (oEvent) {
         utils._LCvalidateEmail(oEvent);
       },
@@ -559,6 +555,14 @@ sap.ui.define(
       },
       HQD_STDCode: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
+      },
+      HQD_onMNumberLive: function (oEvent) {
+        var sStdCode = this.byId("HQD_id_CustomerNumberSTD").getValue()  
+        utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
+      },
+      HQD_onMNumberLiveChange: function (oEvent) {
+        var sStdCode = this.byId("HQD_id_mobileNumber").getValue()  
+        utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
       },
       HQD_onCurrencyChange: function (oEvent) {
         utils._LCstrictValidationComboBox(oEvent);
@@ -669,10 +673,6 @@ sap.ui.define(
         utils._LCvalidateEmail(oEvent)
       },
 
-      HQD_onMNumberLiveChange: function (oEvent) {
-        utils._LCvalidateMobileNumber(oEvent);
-      },
-
       HQD_onAddressLiveChange: function (oEvent) {
         utils._LCvalidateMandatoryField(oEvent)
       },
@@ -723,6 +723,10 @@ sap.ui.define(
 
         const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
 
+         const CustomerSTDCode = this.byId("HQD_id_CustomerNumberSTD").getValue();
+          const CompanySTDCode = this.byId("HQD_id_mobileNumber").getValue();
+
+
         const isINR = oCurrency1 === "INR";
         oView.getModel("QuotationModel").getData()
         const MainModel = that.getView().getModel("SingleCompanyModel");
@@ -732,14 +736,16 @@ sap.ui.define(
           utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
-          utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCompanyMobileNo"), "ID") &&
+          utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
+          utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCompanyMobileNo"), CompanySTDCode) &&
           utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&
           (!isINR || utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID")) &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") &&
-          utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
-          utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCustomerMobileNo"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_mobileNumber"), "ID") &&
+          utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") && 
+          utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
+          utils._LCstrictValidationComboBox(this.byId("HQD_id_mobileNumber"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
           (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
 
@@ -995,7 +1001,7 @@ sap.ui.define(
         const splitAddress = doc.splitTextToSize(oData.CustomerAddress || "", 80);
         doc.text(splitAddress, 13, y);
         y += splitAddress.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
-        const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.STDCode + " " + oData.CustomerMobileNo;
+        const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.CustomerSTDCode + " " + oData.CustomerMobileNo;
         doc.text(customerMobileText, 13, y);
         y += 5;
         //  Adjust Y for email
@@ -1607,6 +1613,9 @@ sap.ui.define(
           const oCurrency1 = this.byId("HQD_id_Curency").getSelectedKey();
           const isINR = oCurrency1 === "INR";
 
+          const CustomerSTDCode = this.byId("HQD_id_CustomerNumberSTD").getValue();
+          const CompanySTDCode = this.byId("HQD_id_mobileNumber").getValue();
+
           const bIsValid =
             utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
             utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
@@ -1617,9 +1626,11 @@ sap.ui.define(
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
             (!isINR || utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID")) &&
             utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") && utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
+            utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") && 
+            utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
             utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
-            utils._LCvalidateMobileNumber(this.byId("HQD_id_InputCustomerMobileNo"), "ID") &&
+            utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
+            utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCompanyMobileNo"), CompanySTDCode) &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
             (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
           if (!bIsValid) {

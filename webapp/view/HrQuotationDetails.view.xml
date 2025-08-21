@@ -156,7 +156,7 @@
                                             placeholder="{i18n>mobileNo}"
                                             liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
-                                            maxLength="10"
+                                            maxLength="20"
                                         
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
@@ -322,10 +322,10 @@
 										<m:Input
                                             value="{SingleCompanyModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
-                                            liveChange="HQD_onMNumberLiveChange"
+                                            liveChange="HQD_onMNumberLive"
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
-                                            maxLength="10"
+                                            maxLength="20"
                                             placeholder="{i18n>mobileNo}"
                                             
                                         />
