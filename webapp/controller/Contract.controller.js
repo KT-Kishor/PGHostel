@@ -219,12 +219,14 @@ sap.ui.define(
                     }
                 },
 
-                CD_ValidateComboBox: function(oEvent) {
+                 CD_ValidateComboBox: function(oEvent) {
                     utils._LCstrictValidationComboBox(oEvent);
                 },
 
+
                 CD_validateMobileNo: function(oEvent) {
-                    utils._LCvalidateMobileNumber(oEvent);
+                     var sStdCode = sap.ui.getCore().byId("CR_id_codeModel").getValue()  
+                utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
                 },
 
                 CD_validateAmount: function(oEvent) {
@@ -493,7 +495,7 @@ sap.ui.define(
                         if (oContractFormVisible.showMobileFields) {
                             const isValid = (
                                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId("CR_id_codeModel"), "ID") &&
-                                utils._LCvalidateMobileNumber(sap.ui.getCore().byId("CR_id_Mobile"), "ID")
+                                utils._LCvalidateMobileNumberWithSTD(sap.ui.getCore().byId("CR_id_Mobile"), oModel.STDCode) 
                             );
 
                             if (!isValid) {

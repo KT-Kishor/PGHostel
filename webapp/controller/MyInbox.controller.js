@@ -4,7 +4,9 @@ sap.ui.define([
   "../utils/validation",
   "../model/formatter",
    'sap/ui/export/Spreadsheet',
-], (BaseController, JSONModel, utils, Formatter,Spreadsheet) => {
+      "sap/suite/ui/commons/Timeline", // Import Timeline for displaying comments
+        "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
+], (BaseController, JSONModel, utils, Formatter,Spreadsheet,Timeline, TimelineItem,) => {
   "use strict";
 
   return BaseController.extend("sap.kt.com.minihrsolution.controller.MyInbox", {
@@ -280,9 +282,12 @@ sap.ui.define([
       this.getView().setModel(new JSONModel({"RTEText":data}),"PDFData");
       this.getView().setModel(new JSONModel({"CanWithdrawResignation":false,"editableResignatin":false,"BtnVisible":false}), "viewModel");
     },
-    RF_onPressCloseDialog:function() {
-      this.oDiaReg.close(); 
-    },
+    RF_onPressCloseDialog: function() {
+      if (this.oDiaReg) {
+          this.oDiaReg.destroy();   
+          this.oDiaReg = null;     
+      }
+  },
     MTF_onPressOk() {
       const btnText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
       const i18n = this.getView().getModel("i18n").getResourceBundle();
@@ -404,6 +409,74 @@ sap.ui.define([
             .finally(function () {
               oSheet.destroy();
             });
+    },
+    onShowMore: async function () {
+        this.getBusyDialog();
+        const response = await this.ajaxReadWithJQuery("AllComments", {
+            ApplicationName: "Resignation"
+        });
+        const aAllComments = response.data || [];
+        this.closeBusyDialog();
+
+      var oEmployeeData = this.getView().getModel("sEmployeeModel").getData();
+          var sEmpID = oEmployeeData[0].ID 
+
+        var aFilteredComments = aAllComments.filter(function (oComment) {
+            return oComment.ApplicationName === "Resignation" && oComment.ID === sEmpID;
+        });
+
+        let oContent;
+        if (aFilteredComments.length === 0) {
+            // Show "No Data" message
+            oContent = new sap.m.VBox({
+                alignItems: "Center",
+                justifyContent: "Center",
+                items: [
+                    new sap.m.Text({ text: "No Data Found", design: "Bold" })
+                ]
+            }).addStyleClass("sapUiSmallMargin");
+        } else {
+            // Map into Timeline Items
+            var aTimelineItems = aFilteredComments.slice().reverse().map(function (oComment) {
+                return new sap.suite.ui.commons.TimelineItem({
+                    dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                    title: (oComment.CommentedBy || "Anonymous") + " (" + (oComment.Status || "No Status") + ")",
+                    text: oComment.Comment || "No comment provided",
+                    userNameClickable: false,
+                    icon: "sap-icon://comment"
+                });
+            });
+
+            // Create Timeline
+            oContent = new sap.suite.ui.commons.Timeline({
+                showHeader: false,
+                enableBusyIndicator: false,
+                width: "100%",
+                sortOldestFirst: false,
+                enableDoubleSided: false,
+                content: aTimelineItems,
+                showHeaderBar: false
+            });
+        }
+
+        // Dialog
+        var oDialog = new sap.m.Dialog({
+            title: "Resignation Comments",
+            contentWidth: "25rem",
+            contentHeight: "15rem",
+            draggable: true,
+            resizable: true,
+            content: [oContent],
+            endButton: new sap.m.Button({
+                text: "Close",
+                type: "Reject",
+                press: function () {
+                    oDialog.close();
+                    oDialog.destroy();
+                }
+            })
+        });
+        oDialog.open();
     }
   });
 });

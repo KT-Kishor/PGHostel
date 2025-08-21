@@ -166,7 +166,7 @@
 										<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
 										</m:ComboBox>
 
-										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/mobile}" />
+										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="20" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/mobile}" />
 
 										<m:Label text="Comments" />
 										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="100"/>

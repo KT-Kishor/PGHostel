@@ -534,7 +534,7 @@ sap.ui.define(
                         fromDate: "",
                         toDate: "",
                         NoofDays: "",
-                        typeOfLeave: "All In One Leave",
+                        typeOfLeave: "",
                         comments: "",
                         Submit: true,
                         Save: false,
@@ -784,6 +784,7 @@ sap.ui.define(
                     try {
                         // Validate fields
                         if (
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
@@ -805,6 +806,14 @@ sap.ui.define(
 
                             if (!(isCurrentYear || (isFromLastYear && isToLastYear && currentDate <= jan31))) {
                                 return MessageBox.error(this.i18nModel.getText("leaveSameYear"));
+                            }
+
+                            if (oData.typeOfLeave === "All In One Leave") {
+                                var fiveDaysBack = new Date(currentDate);
+                                fiveDaysBack.setDate(currentDate.getDate() - 5);
+                                if (startDate < fiveDaysBack) {
+                                    return MessageBox.error(this.i18nModel.getText("backdatedLeaveNotAllowed"));
+                                }
                             }
 
                             // Check if leave is on holiday
@@ -918,6 +927,7 @@ sap.ui.define(
                     try {
                         // Validate fields
                         if (
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
@@ -956,6 +966,14 @@ sap.ui.define(
                                 });
                                 if (!isValid) {
                                     return MessageBox.error(this.i18nModel.getText("holidaysMess"));
+                                }
+                            }
+
+                             if (oData.typeOfLeave === "All In One Leave") {
+                                var fiveDaysBack = new Date(currentDate);
+                                fiveDaysBack.setDate(currentDate.getDate() - 5);
+                                if (startDate < fiveDaysBack) {
+                                    return MessageBox.error(this.i18nModel.getText("backdatedLeaveNotAllowed"));
                                 }
                             }
 
@@ -1168,47 +1186,47 @@ sap.ui.define(
                 getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
-                     AL_DownalodTableData:function(){
-        var table = this.byId("AL_id_LeaveTableStandard");
-          const oModelData = table.getModel("LeaveModel").getData();
-          const aFormattedData = oModelData.map(item => {
-            return {
-              ...item,      
-              fromDate: Formatter.formatDate(item.fromDate),
-              toDate: Formatter.formatDate(item.toDate),
-            //   comments:item.comments.map((elem)=>{
-            //     return elem.Comment
-            //   }),
-            };
-          });
-          const aCols = [
-            { label: this.i18nModel.getText("fromDate"), property: "fromDate", type: "string" },
-            { label: this.i18nModel.getText("toDate"), property: "toDate", type: "string" },
-            { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
-            { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
-            { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
-            // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
-          ];
-          const oSettings = {
-            workbook: {
-              columns: aCols,
-              context: {
-                sheetName: this.i18nModel.getText("enboxDetails")
+                AL_ValidateLeavetype:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                },
+                AL_DownalodTableData:function(){
+                var table = this.byId("AL_id_LeaveTableStandard");
+                const oModelData = table.getModel("LeaveModel").getData();
+                const aFormattedData = oModelData.map(item => {
+                    return {
+                    ...item,      
+                    fromDate: Formatter.formatDate(item.fromDate),
+                    toDate: Formatter.formatDate(item.toDate),
+                
+                    };
+                });
+                const aCols = [
+                    { label: this.i18nModel.getText("fromDate"), property: "fromDate", type: "string" },
+                    { label: this.i18nModel.getText("toDate"), property: "toDate", type: "string" },
+                    { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
+                    { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
+                    { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
+                    // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
+                ];
+                const oSettings = {
+                    workbook: {
+                    columns: aCols,
+                    context: {
+                        sheetName: this.i18nModel.getText("enboxDetails")
+                    }
+                    },
+                    dataSource: aFormattedData,
+                    fileName: "LeaveDetails.xlsx"
+                };
+                const oSheet = new Spreadsheet(oSettings);
+                oSheet.build().then(function () {
+                    MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+                }.bind(this))
+                    .finally(function () {
+                    oSheet.destroy();
+                    });
               }
-            },
-            dataSource: aFormattedData,
-            fileName: "LeaveDetails.xlsx"
-          };
-          const oSheet = new Spreadsheet(oSettings);
-          oSheet.build().then(function () {
-            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-          }.bind(this))
-            .finally(function () {
-              oSheet.destroy();
-            });
-    
-              }
-            },
+            }
         );
     }
 );

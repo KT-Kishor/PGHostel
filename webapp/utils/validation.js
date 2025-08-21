@@ -17,6 +17,31 @@ sap.ui.define([], function() {
             }
         },
 
+        // Validate mobile number
+        _LCvalidateMobileNumberWithSTD: function(oEventOrControl, sStdCode) {
+        var oField = (typeof oEventOrControl.getSource === "function")
+        ? oEventOrControl.getSource() : oEventOrControl;              
+            var oValue = oField.getValue().replace(/[^0-9]/g, "");
+            oField.setValue(oValue);
+            var isValid = true;
+            if (sStdCode === "+91") {
+                var regexIndia = /^[1-9]\d{9}$/;
+                if (!regexIndia.test(oValue)) {
+                    isValid = false;
+                    oField.setValueState("Error").focus();
+                }
+            } else {
+                if (!oValue) {
+                    isValid = false;
+                    oField.setValueState("Error").focus();
+                }
+            }
+            if (isValid) {
+                oField.setValueState("None");
+            }
+            return isValid;
+        },
+
         // Email validation function
         _LCvalidateEmail: function(oEvent, type) {
             var oField = type === "ID" ? oEvent : oEvent.getSource();

@@ -60,7 +60,7 @@
 				</ComboBox>
 
 				<!-- Mobile No -->				
-				<Input value="{ContractActiveModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="10" id="CR_id_Mobile" valueStateText="{i18n>mobileNoValueState}" visible="{ContractFormVisibleModel>/showMobileFields}" />
+				<Input value="{ContractActiveModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="20" id="CR_id_Mobile" valueStateText="{i18n>mobileNoValueState}" visible="{ContractFormVisibleModel>/showMobileFields}" />
 
 				<!-- Comments -->
 				<Label text="Comments" visible="{ContractFormVisibleModel>/showComments}"/>

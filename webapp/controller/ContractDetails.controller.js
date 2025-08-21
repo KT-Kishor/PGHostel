@@ -369,8 +369,9 @@ sap.ui.define([
                 }
             },
 
-            CD_validateMobileNo: function (oEvent) {
-                utils._LCvalidateMobileNumber(oEvent);
+           CD_validateMobileNo: function (oEvent) {
+                var sStdCode = this.byId("CD_id_codeModel").getValue()  
+                utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
@@ -531,7 +532,7 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID");
+                        utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), oModel.STDCode);
 
                     // Set wizard step validation
                     this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
@@ -556,6 +557,7 @@ sap.ui.define([
 
             CD_onSubmit: async function () {
                 try {
+                    var STDCode = this.byId("CD_id_codeModel").getValue();
                     if (
                         utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
@@ -570,7 +572,7 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMobileNumber(this.byId("CD_id_Mobile"), "ID")
+                        utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), STDCode)
                     ) {
                         var formattedText;
                         switch (this.RadioButton) {
@@ -756,6 +758,7 @@ sap.ui.define([
                 const oEndDatePicker = this.byId("CU_id_AssignmentEndDate");
                 const oStartDate = oStartDatePicker.getDateValue();
                 const oEndDate = oEndDatePicker.getDateValue();
+                const STDCode = this.byId("CU_id_codeModel").getValue();
 
                 let isDateRangeValid = true;
                 if (oStartDate && oEndDate) {
@@ -785,7 +788,7 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_codeModel"), "ID") &&
-                    utils._LCvalidateMobileNumber(this.byId("CU_id_Mobile"), "ID")
+                    utils._LCvalidateMobileNumberWithSTD(this.byId("CU_id_Mobile"), STDCode)
                 );
 
                 if (!isMandatoryValid || !isDateRangeValid) {
