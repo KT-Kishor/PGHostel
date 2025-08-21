@@ -658,6 +658,7 @@ sap.ui.define(
           oSingleCompanyModel.setProperty("/CustomerSTDCode", "");
           oSingleCompanyModel.setProperty("/CustomerMobileNo", "");
           oSingleCompanyModel.setProperty("/CustomerGSTNO", "");
+          oSingleCompanyModel.setProperty("/CustomerAddress", "");
         }
        
            
