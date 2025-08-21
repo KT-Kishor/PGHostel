@@ -82,21 +82,18 @@
                     editable="{viewModel>/editableResignatin}"
                     value="{path:'sEmployeeModel>/0/ResignationEndDate' ,formatter:'.Formatter.formatDate'}"
                 />
-                <Label
-                    text="{i18n>resignComment}"
-                    required="true"
-                />
-                <TextArea
+         <Label text="{viewModel>/commentLabel}" required="true" />
+                      <TextArea
                     rows="4"
                     id="RF_id_ResignReason"
-                    editable="{viewModel>/editableResignatin}"
                     liveChange="onDocumentTypeChange"
                     value="{sEmployeeModel>/0/ResignComment}"
                     maxLength="1000"
                     valueStateText="{i18n>commentsValueState}"
                     placeholder="{i18n>resignComment}"
+                    editable="{= ${viewModel>/editableResignatin} || ${viewModel>/editableWithdrawComment} }" 
                 />
-            </f:content>
+                     </f:content>
         </f:SimpleForm>
         <rich:RichTextEditor
             id="RF_id_RTE"
@@ -109,25 +106,15 @@
               editable="{viewModel>/editableResignatin}"
 			visible="true"
         />
-        <FlexBox justifyContent="End" >
-        	<Button
-    text="{i18n>withdrawResign}"
-    visible="{viewModel>/CanWithdrawResignation}"
-    type="Emphasized"
-    press="onWithdrawResignation" class="submit"/>
-       
-            <Button
-                text="{= ${PDFData>/PreviewFlag} ? ${i18n>applyResign} : ${i18n>preview} }"
-                type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
-                press="RF_onPressHandlePreview" class="submit" visible="{viewModel>/BtnVisible}"
-            />
-        
-            <Button
-                text="{i18n>close}"
-                press="RF_onPressCloseDialog"
-                type="Reject"
-                class="submit"
-            />
-        </FlexBox>   
+<footer>
+	<Toolbar>
+		<ToolbarSpacer/>
+		<Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" type="Transparent" visible="{= !!${CommentsModel>/Comments} &amp;&amp; ${CommentsModel>/Comments}.length > 0 }"/>
+		<!-- <Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" type="Transparent"/> -->
+		<Button text="{i18n>withdrawResign}" visible="{viewModel>/CanWithdrawResignation}" type="Emphasized" press="onWithdrawResignation" class="submit"/>
+		<Button text="{= ${PDFData>/PreviewFlag} ? ${i18n>applyResign} : ${i18n>preview} }" type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }" press="RF_onPressHandlePreview" class="submit" visible="{viewModel>/BtnVisible}" />
+		<Button text="{viewModel>/closeButtonText}" press="RF_onPressCloseDialog" type="Reject" class="submit" />
+	</Toolbar>
+</footer>
     </Dialog>
 </core:FragmentDefinition>

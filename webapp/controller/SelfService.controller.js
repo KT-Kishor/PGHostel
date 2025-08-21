@@ -55,6 +55,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
           SetProfile: false,
           SalarySectionVisible: false,
           WorkCompletedVisible: false,
+          editableResignatin: false,
+          editableWithdrawComment: false,
+          isWithdrawMode: false,
+          commentLabel: this.i18nModel.getText("resignComment"),
+          closeButtonText: this.i18nModel.getText("close"),
           SelfServiceBtn: false,
         });
         oView.setModel(viewModel, "viewModel");
@@ -1566,10 +1571,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       return latestDate.getTime() === new Date(0).getTime() ? null : latestDate;
     },
 
-    saveEducationDetails: async function (bIsCreate) {
+   saveEducationDetails: async function (bIsCreate) {
       try {
         // ---  field validation ---
-        const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
+       const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_Degree"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID")  && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_GradeType"), "ID")
         if (!isValid) {
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
@@ -1763,7 +1768,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedRecordId) {
     const normalizedNewStart = this._normalizeDate(newStart);
     const normalizedNewEnd = this._normalizeDate(newEnd);
-    
+
     if (!normalizedNewStart || !normalizedNewEnd) {
         return false;
     }
@@ -2645,20 +2650,47 @@ _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedR
         this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
       }
     },
-    RF_onPressCloseDialog: function () {
-      // Only clear if resignation is NOT applied
-      if (!this.getView().getModel("viewModel").getProperty("/CanWithdrawResignation")) {
-        // Clear values
-        sap.ui.getCore().byId("RF_id_StartDate").setValue("");
-        sap.ui.getCore().byId("RF_id_EndDate").setValue("");
-        sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
-        sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
-        // Reset preview
-        this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-        this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
-      }
-      this.SSReg_oDialog.close();
-    },
+
+
+RF_onPressCloseDialog: function () {
+  const oVM = this.getView().getModel("viewModel");
+  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+
+  if (oVM.getProperty("/isWithdrawMode")) {
+    // Cancel withdraw → reset
+    oVM.setProperty("/isWithdrawMode", false);
+    oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+    oVM.setProperty("/editableWithdrawComment", false);
+    oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
+
+    const sOriginalComment = oVM.getProperty("/originalComment") || "";
+    oCommentField.setEditable(false);
+    oCommentField.setValue(sOriginalComment);
+
+    sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
+
+    this.SSReg_oDialog.close();
+    return;
+  }
+
+  // Normal close case
+  if (!oVM.getProperty("/CanWithdrawResignation")) {
+    sap.ui.getCore().byId("RF_id_StartDate").setValue("");
+    sap.ui.getCore().byId("RF_id_EndDate").setValue("");
+    sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
+    sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
+    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+    this.getView().getModel("PDFData").setProperty(
+      "/RTEText",
+      "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>"
+    );
+  }
+
+  this.SSReg_oDialog.close();
+  this.SSReg_oDialog.destroy();  
+  this.SSReg_oDialog = null;
+},
+
     RF_onPressHandlePreview: function () {
       const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
       if (bPreviewFlag) {
@@ -2754,7 +2786,7 @@ _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedR
             var subject = `Resignation Notice: ${empName}`;
             // Use the RTE content as the email body
             var body = sap.ui.getCore().byId("RF_id_RTE").getValue();
-
+            delete oEmployeeModel.comments;
             var oPayload = {
               from: oEmployeeModel.CompanyEmailID,
               fromName: empName,
@@ -2786,68 +2818,142 @@ _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedR
         function () {}
       );
     },
-    onWithdrawResignation: async function () {
-      var that = this;
-      this.showConfirmationDialog(
-        this.i18nModel.getText("confirmTitle"),
-        this.i18nModel.getText("withdrawConf"),
-        async function () {
-          try {
-            var oEmployeeModel = that.getView().getModel("sEmployeeModel").getData()[0];
-            var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
-            var designation = oEmployeeModel.Designation;
-            var subject = "Confirmation of Resignation Withdrawal";
+onWithdrawResignation: function () {
+  const oVM = this.getView().getModel("viewModel");
+  const oEmpModel = this.getView().getModel("sEmployeeModel");
+  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+  const oStartDatePicker = sap.ui.getCore().byId("RF_id_StartDate");
+  const oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
 
-            var body = `
-    <div style="text-align: justify; font-family: Arial, sans-serif;">
-        <p>Dear <b>${empName}</b>,</p>
-        <p>We acknowledge receipt of your request to withdraw your resignation from the position of <b>${designation}</b> at <b>${that.companyName}</b>.</p>
-        <p>We are pleased to inform you that your request has been accepted, and your resignation has been officially withdrawn. You will continue in your current role with no change to your employment status or responsibilities.</p>
-        <p>We appreciate your continued commitment to the organization and look forward to your continued contributions.</p>
-        <p>Best regards,<br/>
-        HR Department<br/>
-        ${that.companyName}</p>
-    </div>
-`;
-            var oPayload = {
-              isWithdraw: "isWithdraw",
-              from: oEmployeeModel.CompanyEmailID,
-              fromName: empName,
-              to: oEmployeeModel.CompanyEmailID,
-              to: empName,
-              subject: subject,
-              body: body,
-              CC: [oEmployeeModel.CompanyEmailID],
-              EmployeeID: that.EmployeeID,
-              Inbox: oEmployeeModel,
-            };
-            that.getBusyDialog();
-            await that.ajaxCreateWithJQuery("ResignationMail", oPayload);
-            MessageToast.show(that.i18nModel.getText("resignWithdrw"));
-            that.getView().getModel("viewModel").setProperty("/CanWithdrawResignation", false);
+  const sStartDate = oEmpModel.getProperty("/0/ResignationStartDate");
+  const sEndDate = oEmpModel.getProperty("/0/ResignationEndDate");
+  const sOriginalComment = oEmpModel.getProperty("/0/ResignComment") || "";
 
-            // Reset all fields in the resignation fragment
-            sap.ui.getCore().byId("RF_id_StartDate").setValue("");
-            sap.ui.getCore().byId("RF_id_EndDate").setValue("");
-            sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
-            sap.ui.getCore().byId("RF_id_RTE").setValue(""); // If you want to clear the RTE
-            that.getView().getModel("viewModel").setProperty("/editableResignatin", true);
-            // Reset preview flag and text in PDFData model
-            that.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-            that.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+  const parseDate = (sDate) => {
+    if (!sDate) return null;
+    const isoDate = new Date(sDate);
+    if (!isNaN(isoDate.getTime())) return isoDate;
 
-            // Show the preview button again if you have a flag for it
-            that.getView().getModel("viewModel").setProperty("/BtnVisible", true);
-            that.SSReg_oDialog.close();
-          } catch (error) {
-            MessageToast.show(error.message || "Failed to send withdrawal email.");
-          } finally {
-            that.closeBusyDialog();
-          }
-        },
-        function () {}
-      );
-    },
+    const parts = sDate.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts.map(Number);
+      const d = new Date(year, month - 1, day);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  };
+
+  const restoreDates = () => {
+    setTimeout(() => {
+      const startDateObj = parseDate(sStartDate);
+      const endDateObj = parseDate(sEndDate);
+      if (startDateObj) oStartDatePicker.setDateValue(startDateObj);
+      if (endDateObj) oEndDatePicker.setDateValue(endDateObj);
+    }, 50);
+  };
+
+  // --- CASE 1: Enter withdraw mode ---
+  if (!oVM.getProperty("/isWithdrawMode")) {
+    oVM.setProperty("/isWithdrawMode", true);
+    oVM.setProperty("/closeButtonText", this.i18nModel.getText("cancel"));
+    oVM.setProperty("/editableWithdrawComment", true);
+    oVM.setProperty("/commentLabel", this.i18nModel.getText("withdrawComment"));
+
+    // Save original comment for cancel restore
+    oVM.setProperty("/originalComment", sOriginalComment);
+
+    oCommentField.setEditable(true);
+    oCommentField.setValue("");
+
+    restoreDates();
+
+    MessageBox.information(this.i18nModel.getText("fillWithdrawReason"));
+    return;
+  }
+
+  // --- CASE 2: Submit withdraw ---
+  const sComment = oCommentField.getValue().trim();
+ if (!sComment) {
+        oCommentField.setValueState("Error");
+        oCommentField.setValueStateText(this.i18nModel.getText("withdrawReasonRequired")); 
+        return;
+    }
+
+    // Clear error once valid
+    oCommentField.setValueState("None");
+
+  const oEmployeeModel = oEmpModel.getProperty("/0");
+  const empName = oEmployeeModel.EmployeeName;
+  const body = `Dear ${empName}, your resignation has been successfully withdrawn.`;
+
+  const oPayload = {
+    isWithdraw: "isWithdraw",
+    from: oEmployeeModel.CompanyEmailID,
+    ResignComment: sComment,
+    fromName: empName,
+    to: empName,
+    subject: "Confirmation of Resignation Withdrawal",
+    body: body,
+    CC: [oEmployeeModel.CompanyEmailID],
+    EmployeeID: this.EmployeeID,
+    Inbox: oEmployeeModel
+  };
+
+  this.getBusyDialog();
+  this.ajaxCreateWithJQuery("ResignationMail", oPayload)
+    .then(() => {
+      MessageToast.show(this.i18nModel.getText("resignWithdrw") || "Resignation letter withdrawn");
+      oVM.setProperty("/CanWithdrawResignation", false);
+
+      // Reset UI fields
+      oCommentField.setValue("");
+      oStartDatePicker.setValue("");
+      oEndDatePicker.setValue("");
+
+      const oPDFModel = this.getView().getModel("PDFData");
+      oPDFModel.setProperty("/PreviewFlag", false);
+      oPDFModel.setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+
+      oVM.setProperty("/editableResignatin", true);
+      oVM.setProperty("/BtnVisible", true);
+      oVM.setProperty("/editableWithdrawComment", false);
+      oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
+
+              // reset button back to "Close"
+        oVM.setProperty("/isWithdrawMode", false);
+        oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+
+
+      this.SSReg_oDialog.close();
+    })
+    .catch((error) => {
+      MessageToast.show(error.message || "Failed to withdraw resignation.");
+    })
+    .finally(() => {
+      this.closeBusyDialog();
+    });
+},
+
+// --- SEPARATE CANCEL HANDLER ---
+onWithdrawCancel: function () {
+  const oVM = this.getView().getModel("viewModel");
+  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+
+  const sRestoreComment = oVM.getProperty("/originalComment") || "";
+
+  oVM.setProperty("/isWithdrawMode", false);
+  oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+  oVM.setProperty("/editableWithdrawComment", false);
+  oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
+
+  oCommentField.setEditable(false);
+  oCommentField.setValue(sRestoreComment);
+
+  sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
+
+  this.SSReg_oDialog.close();
+},
+
     SS_onChangeCountry: function (oEvent) {
       utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
       this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
@@ -2862,5 +2968,92 @@ _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedR
         this.ViewModel.setProperty("/employeeType", "Experienced");
       }
     },
+    formatCommentValue: function (sResignComment, sWithdrawReason, bIsWithdrawMode) {
+      return bIsWithdrawMode ? sWithdrawReason : sResignComment;
+    },
+    onCommentChange: function (oEvent) {
+      const oVM = this.getView().getModel("viewModel");
+      const oResignModel = this.getView().getModel("ResignationData");
+      const sNewValue = oEvent.getParameter("value");
+
+      if (oVM.getProperty("/isWithdrawMode")) {
+        oVM.setProperty("/WithdrawReason", sNewValue);
+      } else {
+        oResignModel.setProperty("/ResignComment", sNewValue);
+      }
+    },
+    onShowMore: async function () {
+        this.getBusyDialog();
+        const response = await this.ajaxReadWithJQuery("AllComments", {
+            ApplicationName: "Resignation"
+        });
+        const aAllComments = response.data || [];
+        this.closeBusyDialog();
+ 
+        var oEmployeeData = this.getView().getModel("sEmployeeModel").getData()[0];
+        var sEmpID = oEmployeeData.ID;
+ 
+        var aFilteredComments = aAllComments.filter(function (oComment) {
+            return oComment.ApplicationName === "Resignation" && oComment.ID === sEmpID;
+        });
+ 
+        let oContent;
+ 
+        if (aFilteredComments.length === 0) {
+            // Show "No Data" message
+            oContent = new sap.m.VBox({
+                alignItems: "Center",
+                justifyContent: "Center",
+                items: [
+                    new sap.m.Text({ text: "No Data Found", design: "Bold" })
+                ]
+            }).addStyleClass("sapUiSmallMargin");
+        } else {
+            // Map into Timeline Items
+            var aTimelineItems = aFilteredComments.slice().reverse().map(function (oComment) {
+                return new sap.suite.ui.commons.TimelineItem({
+                    dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                    title: (oComment.CommentedBy || "Anonymous") + " (" + (oComment.Status || "No Status") + ")",
+                    text: oComment.Comment || "No comment provided",
+                    userNameClickable: false,
+                    icon: "sap-icon://comment"
+                });
+            });
+ 
+            // Create Timeline
+            oContent = new sap.suite.ui.commons.Timeline({
+                showHeader: false,
+                enableBusyIndicator: false,
+                width: "100%",
+                sortOldestFirst: false,
+                enableDoubleSided: false,
+                content: aTimelineItems,
+                showHeaderBar: false
+            });
+        }
+ 
+        // Dialog
+        var oDialog = new sap.m.Dialog({
+            title: "Resignation Comments",
+            contentWidth: "25rem",
+            contentHeight: "15rem",
+            draggable: true,
+            resizable: true,
+            content: [oContent],
+            endButton: new sap.m.Button({
+                text: "Close",
+                type: "Reject",
+                press: function () {
+                    oDialog.close();
+                    oDialog.destroy();
+                }
+            })
+        });
+ 
+        oDialog.open();
+    },
+    AddEd_changeDegree:function(oEvent){
+      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+    }
   });
 });
