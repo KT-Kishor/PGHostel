@@ -464,11 +464,28 @@ sap.ui.define(
         },
         TileV_onpressExpenseInvoiceDashboard:function(){
           this.getRouter().navTo("ExpenseInvoice");
-        }
-      }
+        },
+onTileRefresh: async function () {
+    this.getBusyDialog();
+    const backendModels = {
+        EmpModel: "EmployeeDetails",
+        traineeModel: "Trainee",
+        EmailContent: "AppVisibility",
+        LeaveModel: "Leaves",
+        LeaveTypeModel: "Leaves"
+    };
+    await Promise.allSettled(
+        Object.entries(backendModels).map(([model, entity]) =>
+            this._fetchCommonData(entity, model).catch(err => {
+                console.warn(`Failed fetching: ${entity} → ${model}`, err);
+            })
+        )
     );
-  }
-);
+    this.closeBusyDialog();
+    MessageToast.show("Data Refreshed Successfully");
+  },
+  });
+});
 
 
 
