@@ -90,17 +90,27 @@ sap.ui.define([
 
         // --- HELPER to get INR value. Refactored to be reusable --
         _getInrValue: function (item) {
-            const totalAmount = parseFloat(item.TotalAmount || 0);
+            let amount = 0;
+            if (item.Status === "Invoice Sent") {
+                amount = parseFloat(item.TotalAmount || 0);
+            } else if (item.Status === "Payment Partially") {
+                amount = parseFloat(item.DueAmount || 0);
+            } else {
+                //  if needed use DueAmount or TotalAmount
+                amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
+            }
+
             if (item.Currency === "INR") {
-                return totalAmount;
+                return amount;
             }
             const amountInINR = parseFloat(item.AmountInINR || 0);
             if (amountInINR > 0) {
                 return amountInINR;
             }
             const conversionRate = parseFloat(item.ConversionRate || 1);
-            return totalAmount * conversionRate;
+            return amount * conversionRate;
         },
+
 
         _convertToInr: function (value, item) {
             const numValue = parseFloat(value || 0);
@@ -129,11 +139,33 @@ sap.ui.define([
                 acc[year].count++;
                 return acc;
             }, {});
-            const pendingStatuses = ["Submitted", "Payment Partially"];
-            const pendingByCompany = aFilteredData.filter(item => pendingStatuses.includes(item.Status)).reduce((acc, item) => {
-                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
-                return acc;
-            }, {});
+            const pendingStatuses = ["Invoice Sent", "Payment Partially"];
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize today's date to midnight for accurate comparison
+
+        
+            const pendingByCompany = aFilteredData
+                .filter(item => {
+                    if (!pendingStatuses.includes(item.Status)) return false;
+                    if (!item.PayByDate) return false;
+                    const payByDate = new Date(item.PayByDate);
+                    payByDate.setHours(0, 0, 0, 0);
+                    return payByDate <= today;
+                })
+                .reduce((acc, item) => {
+                    let amount = 0;
+                    if (item.Status === "Invoice Sent") {
+                        amount = parseFloat(item.TotalAmount) || 0;
+                    } else if (item.Status === "Payment Partially") {
+                        amount = parseFloat(item.DueAmount) || 0;
+                    } else {
+                        amount = this._getInrValue(item);  // fallback if needed
+                    }
+                    acc[item.CustomerName] = (acc[item.CustomerName] || 0) + amount;
+                    return acc;
+                }, {});
+
 
             this._oGroupedInvoices = {};
             const statusCounts = aFilteredData.reduce((acc, item) => {
@@ -143,6 +175,7 @@ sap.ui.define([
                 acc[status] = (acc[status] || 0) + 1;
                 return acc;
             }, {});
+
 
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const company = item.CustomerName;
@@ -156,6 +189,7 @@ sap.ui.define([
                 return acc;
             }, {});
 
+
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmountInINR: monthlyValue[i] || 0 }));
             const formattedCompanyTotals = Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmountInINR: total })).sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
@@ -165,6 +199,7 @@ sap.ui.define([
             let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => ({ companyName: name, ...values }));
             formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company => company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0);
 
+            // ------ Set model data ------
             this.getView().getModel("chartData").setData({
                 statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
@@ -174,6 +209,8 @@ sap.ui.define([
                 pendingByCompany: formattedPending
             });
         },
+
+
 
         // --- EVENT HANDLERS FOR CHART SELECTIONS ---
         onStatusChartSelect: function (oEvent) {
@@ -215,7 +252,7 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
-            const aPendingStatuses = ["Submitted", "Payment Partially"];
+            const aPendingStatuses = ["Invoice Sent", "Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
             aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
             if (!this.pPendingInvoicesDialog) {
@@ -262,33 +299,33 @@ sap.ui.define([
         onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
         onLogout: function () { this.getRouter().navTo("RouteLoginPage"); },
 
-    onAfterRendering: function () {
-    var oVizFrame = this.byId("barChartCompany");
-    var oScroll = this.byId("companyScroll");
+        onAfterRendering: function () {
+            var oVizFrame = this.byId("barChartCompany");
+            var oScroll = this.byId("companyScroll");
 
-    // Get your dataset
-    var aData = this.getView().getModel("chartData").getProperty("/companyTotals");
+            // Get your dataset
+            var aData = this.getView().getModel("chartData").getProperty("/companyTotals");
 
-    if (aData && aData.length > 0) {
-        // Set dynamic height: 60px per bar + some padding
-        var iRowHeight = 100;
-        var iChartHeight = aData.length * iRowHeight;
+            if (aData && aData.length > 0) {
+                // Set dynamic height: 60px per bar + some padding
+                var iRowHeight = 100;
+                var iChartHeight = aData.length * iRowHeight;
 
-        // Apply dynamic height to VizFrame
-        oVizFrame.setHeight(iChartHeight + "px");
-    }
+                // Apply dynamic height to VizFrame
+                oVizFrame.setHeight(iChartHeight + "px");
+            }
 
-    // Apply chart properties
-    oVizFrame.setVizProperties({
-        title: { visible: false },
-        plotArea: {
-            // dataLabel: { visible: true, formatString: "#,##0.##" },
-            isFixedDataPointSize: true // prevents bar compression
-        },
-        valueAxis: { title: { visible: false } },
-        categoryAxis: { title: { visible: false } }
-    });
-}
+            // Apply chart properties
+            oVizFrame.setVizProperties({
+                title: { visible: false },
+                plotArea: {
+                    // dataLabel: { visible: true, formatString: "#,##0.##" },
+                    isFixedDataPointSize: true // prevents bar compression
+                },
+                valueAxis: { title: { visible: false } },
+                categoryAxis: { title: { visible: false } }
+            });
+        }
 
 
 

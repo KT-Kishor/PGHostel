@@ -46,7 +46,7 @@
                         <!-- 1. Status Distribution Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Toolbar>
+                                <Toolbar class="customdashboard">
                                     <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
@@ -81,7 +81,7 @@
                         <!-- 2. Monthly Trend Chart -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Toolbar>
+                                <Toolbar class="customdashboard">
                                     <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalchartTooltip}"/>
@@ -116,7 +116,7 @@
                         <!-- 3. Value by Company Chart -->
                         <f:Card class="sapUiTinyMargin">
     <f:header>
-        <Toolbar>
+        <Toolbar class="customdashboard">
             <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
             <ToolbarSpacer/>
             <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>verticalchartTooltip}"/>
@@ -158,7 +158,7 @@
                         <!-- 4. Yearly Trend Chart (No Scroll Container Needed) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Toolbar>
+                                <Toolbar class="customdashboard">
                                     <Title text="{i18n>yearlyInvoiceTrend}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChartTooltip}"/>
@@ -196,7 +196,7 @@
                         <!-- 5. Payment Breakdown (Stacked Bar Chart) (WITH SCROLL CONTAINER) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Toolbar>
+                                <Toolbar class="customdashboard">
                                     <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedHorizontalTooltip}"/>
@@ -245,7 +245,7 @@
                         <!-- 6. Pending Payments by Company (WITH SCROLL CONTAINER) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
-                                <Toolbar>
+                                <Toolbar class="customdashboard">
                                     <Title text="{i18n>pendingPaymentsByCompany}" level="H5" wrapping="true"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="{i18n>columnChartTooltip}"/>

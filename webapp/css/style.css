@@ -1811,8 +1811,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .employment-toolbar .sapMOTBHiddenInOverflow {
     display: none !important; 
 }
-.sapMTB {
-    /* border-bottom: solid .0625rem #a8b3bd; */
+.customdashboard {
     background-color: #f2b15b;
 }
 
