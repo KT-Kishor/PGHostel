@@ -885,23 +885,45 @@ sap.ui.define(
                                 return leave.LeaveStatus === "All Quota";
                             });
 
-                            if (oData.typeOfLeave === "All In One Leave") {
-                                    var currentMonth = new Date().getMonth() + 1; 
-                                    var monthlyQuota = currentMonth * 1.33;      
+                             if (oData.typeOfLeave === "All In One Leave") {
+                                var joiningMonth = parseInt(this.JoiningDate[1]); // Joining month (1–12)
+                                var joiningYear  = parseInt(this.JoiningDate[2]);
+                                var currentDate  = new Date();
+                                var currentMonth = currentDate.getMonth() + 1; // Current month (1–12)
+                                var currentYear  = currentDate.getFullYear();
 
-                                    // Get Submitted + Approved leaves for All In One Leave
-                                    var usedLeaves = leaveData
-                                        .filter(l => l.LeaveType === "All In One Leave" &&
-                                                    (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
-                                        .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+                                var monthsSinceJoining = 0;
 
-                                    // Include new leave in calculation
-                                    var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays);
-
-                                    if (projectedLeaves > monthlyQuota) {
-                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                if (joiningYear === currentYear) {
+                                    // Same year → start from joining month
+                                    monthsSinceJoining = (currentMonth - joiningMonth) + 1;
+                                    if (monthsSinceJoining < 1) {
+                                        monthsSinceJoining = 0; // Not eligible yet (future join)
                                     }
+                                } else if (joiningYear < currentYear) {
+                                    // Joined in past years → count from Jan of this year
+                                    monthsSinceJoining = currentMonth; 
+                                } else {
+                                    // Joining year is in the future (not allowed)
+                                    return MessageBox.error("Joining year is in the future. Cannot apply leave.");
                                 }
+
+                                var monthlyQuota = monthsSinceJoining * 1.33;
+
+                                // Get Submitted + Approved leaves for All In One Leave
+                                var leaveData = oLeaveModel.getProperty("/chartData");
+                                var usedLeaves = leaveData
+                                    .filter(l => l.LeaveType === "All In One Leave" &&
+                                                (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                    .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+
+                                // Include new leave in calculation
+                                var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays);
+
+                                if (projectedLeaves > monthlyQuota) {
+                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                }
+                            }
 
                             if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
@@ -1045,21 +1067,44 @@ sap.ui.define(
                             });
 
                             if (oData.typeOfLeave === "All In One Leave") {
-                                    var currentMonth = new Date().getMonth() + 1; 
-                                    var monthlyQuota = currentMonth * 1.33;      
+                                var joiningMonth = parseInt(this.JoiningDate[1]); // Joining month (1–12)
+                                var joiningYear  = parseInt(this.JoiningDate[2]);
+                                var currentDate  = new Date();
+                                var currentMonth = currentDate.getMonth() + 1; // Current month (1–12)
+                                var currentYear  = currentDate.getFullYear();
 
-                                    // Get Submitted + Approved leaves for All In One Leave
-                                    var usedLeaves = leaveData
-                                        .filter(l => l.LeaveType === "All In One Leave" &&
-                                                    (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
-                                        .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+                                var monthsSinceJoining = 0;
 
-                                    var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays) - parseFloat(this.UpdateNoofDays);
-
-                                    if (projectedLeaves > monthlyQuota) {
-                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                if (joiningYear === currentYear) {
+                                    // Same year → start from joining month
+                                    monthsSinceJoining = (currentMonth - joiningMonth) + 1;
+                                    if (monthsSinceJoining < 1) {
+                                        monthsSinceJoining = 0; // Not eligible yet (future join)
                                     }
+                                } else if (joiningYear < currentYear) {
+                                    // Joined in past years → count from Jan of this year
+                                    monthsSinceJoining = currentMonth; 
+                                } else {
+                                    // Joining year is in the future (not allowed)
+                                    return MessageBox.error("Joining year is in the future. Cannot apply leave.");
                                 }
+
+                                var monthlyQuota = monthsSinceJoining * 1.33;
+
+                                // Get Submitted + Approved leaves for All In One Leave
+                                var leaveData = oLeaveModel.getProperty("/chartData");
+                                var usedLeaves = leaveData
+                                    .filter(l => l.LeaveType === "All In One Leave" &&
+                                                (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                    .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+
+                                // Include new leave in calculation
+                                var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays) - parseFloat(this.UpdateNoofDays || 0);
+
+                                if (projectedLeaves > monthlyQuota) {
+                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                }
+                            }
 
                             // Final quota check
                             var valid = true;
