@@ -496,34 +496,28 @@ sap.ui.define(
           this.byId("V1_ID_ExpComboBox").setSelectedKey("");
         },
 
-        onSuggestSkills: function (oEvent) {
-          const sValue =
-            oEvent.getParameter("suggestValue")?.toLowerCase() || "";
+onSuggestSkills: function (oEvent) {
+    const sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
 
-          const aTableData =
-            this.getView()
-              .getModel("JobApplicationModel")
-              ?.getProperty("/Candidates") || [];
+    const aTableData =
+        this.getView()
+            .getModel("JobApplicationModel")
+            ?.getProperty("/Candidates") || [];
+    const aActiveJobs = aTableData.filter(job => job?.Status === "true");
+    const aMatchedSkills = aActiveJobs
+        .map(item => item.PrimarySkills?.trim())
+        .filter(Boolean)
+        .flatMap(skillStr => skillStr.split(",")) 
+        .map(skill => skill.trim())
+        .filter(skill => skill.toLowerCase().includes(sValue));
+    const aUniqueSkills = [...new Set(aMatchedSkills)];
+    const aSuggestionItems = aUniqueSkills.map(skill => ({ skill }));
+    const oSuggestModel = new sap.ui.model.json.JSONModel({
+        skills: aSuggestionItems
+    });
+    this.getView().setModel(oSuggestModel, "skillModel");
+},
 
-          // Match any skill from comma-separated PrimarySkills string
-          const aMatchedSkills = aTableData
-            .map((item) => item.PrimarySkills?.trim())
-            .filter(Boolean)
-            .flatMap((skillStr) => skillStr.split(","))
-            .map((skill) => skill.trim())
-            .filter((skill) => skill.toLowerCase().includes(sValue));
-
-          const aUniqueSkills = [...new Set(aMatchedSkills)];
-
-          const aSuggestionItems = aUniqueSkills.map((skill) => ({
-            skill,
-          }));
-
-          const oSuggestModel = new sap.ui.model.json.JSONModel({
-            skills: aSuggestionItems,
-          });
-          this.getView().setModel(oSuggestModel, "skillModel");
-        },
 
         V1_onSearch: function () {
           const oSkillInput = this.byId("V1_ID_SkillsInput")
@@ -544,30 +538,25 @@ sap.ui.define(
           // --- Send POST to backend ---
           this.getBusyDialog();
           $.ajax({
-            url:
-              "https://rest.kalpavrikshatechnologies.com/JobOpenings" +
-              "?" +
-              $.param(oFilterPayload),
+            url: "https://rest.kalpavrikshatechnologies.com/JobOpenings" + "?" + $.param(oFilterPayload),
 
             method: "GET",
             contentType: "application/json",
             dataType: "json",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password:
-                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
             },
-
             success: function (response) {
-              const aFilteredData = response.data || [];
-
+              const aData = response?.data || [];
+              const aFilteredData = aData.filter((job) => job?.Status === "true");
               const oFilteredModel = new sap.ui.model.json.JSONModel({
                 Candidates: aFilteredData,
               });
               this.getView().setModel(oFilteredModel, "JobApplicationModel");
+
               this.closeBusyDialog();
             }.bind(this),
-
             error: function (err) {
               this.closeBusyDialog();
               if (err?.responseJSON?.message) {
@@ -575,7 +564,7 @@ sap.ui.define(
               } else {
                 MessageToast.show("Failed to load filtered data.");
               }
-            },
+            }.bind(this),
           });
         },
         v1_onViewItem: function (oEvent) {
@@ -585,7 +574,7 @@ sap.ui.define(
             .getObject();
           const sJobId = oSelectedData.ID; // Or whatever your unique field is
 
-          // 🔁 Set global tab info
+          // Set global tab info
           const oAppStateModel =
             this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
