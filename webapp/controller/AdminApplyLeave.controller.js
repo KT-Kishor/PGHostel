@@ -925,7 +925,7 @@ sap.ui.define(
                                 }
                             }
 
-                            if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
+                            if (oData.typeOfLeave === "LOP" || oData.typeOfLeave ==="Comp off" || totalNoofDays <= quotaLeave.Count) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
@@ -1115,7 +1115,7 @@ sap.ui.define(
                             }
 
                             // Check leave type and quota
-                            if (oData.typeOfLeave === "LOP" || valid) {
+                            if (oData.typeOfLeave === "LOP" || oData.typeOfLeave ==="Comp off" ||  valid) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
