@@ -1571,10 +1571,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       return latestDate.getTime() === new Date(0).getTime() ? null : latestDate;
     },
 
-   saveEducationDetails: async function (bIsCreate) {
+      saveEducationDetails: async function (bIsCreate) {
       try {
         // ---  field validation ---
-       const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_Degree"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID")  && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_GradeType"), "ID")
+        const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType");
         if (!isValid) {
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
@@ -3066,9 +3066,6 @@ onWithdrawCancel: function () {
         });
  
         oDialog.open();
-    },
-    AddEd_changeDegree:function(oEvent){
-      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
     },
   });
 });
