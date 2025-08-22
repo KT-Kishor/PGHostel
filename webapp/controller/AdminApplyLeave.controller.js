@@ -885,6 +885,24 @@ sap.ui.define(
                                 return leave.LeaveStatus === "All Quota";
                             });
 
+                            if (oData.typeOfLeave === "All In One Leave") {
+                                    var currentMonth = new Date().getMonth() + 1; 
+                                    var monthlyQuota = currentMonth * 1.33;      
+
+                                    // Get Submitted + Approved leaves for All In One Leave
+                                    var usedLeaves = leaveData
+                                        .filter(l => l.LeaveType === "All In One Leave" &&
+                                                    (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                        .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+
+                                    // Include new leave in calculation
+                                    var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays);
+
+                                    if (projectedLeaves > monthlyQuota) {
+                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                    }
+                                }
+
                             if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
@@ -1026,6 +1044,23 @@ sap.ui.define(
                                 return leave.LeaveStatus === "All Quota";
                             });
 
+                            if (oData.typeOfLeave === "All In One Leave") {
+                                    var currentMonth = new Date().getMonth() + 1; 
+                                    var monthlyQuota = currentMonth * 1.33;      
+
+                                    // Get Submitted + Approved leaves for All In One Leave
+                                    var usedLeaves = leaveData
+                                        .filter(l => l.LeaveType === "All In One Leave" &&
+                                                    (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                        .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
+
+                                    var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays) - parseFloat(this.UpdateNoofDays);
+
+                                    if (projectedLeaves > monthlyQuota) {
+                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                    }
+                                }
+
                             // Final quota check
                             var valid = true;
                             if (parseFloat(this.UpdateNoofDays) === parseFloat(oData.NoofDays)) {
@@ -1079,7 +1114,8 @@ sap.ui.define(
                         this.byId("AL_id_Updatebtn").setVisible(false);
                         this.byId("AL_id_Deletebtn").setVisible(false);
                         // Refresh leave data
-                        await this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                         this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
+                         this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                     } else {
                         MessageToast.show(error.message || error.responseText);
                     }
@@ -1112,6 +1148,7 @@ sap.ui.define(
                                         this.byId("AL_id_LeaveTableStandard").removeSelections(true);
                                         this.byId("AL_id_Updatebtn").setVisible(false);
                                         this.byId("AL_id_Deletebtn").setVisible(false);
+                                        this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
                                         this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
                                     } else {
                                         MessageToast.show(response.message || response.responseText);

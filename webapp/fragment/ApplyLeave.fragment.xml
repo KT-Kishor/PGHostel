@@ -1,4 +1,4 @@
-<core:FragmentDefinition
+<core:FragmentDefinition xmlns:odata="sap.ui.comp.odata"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
@@ -31,9 +31,9 @@
 				<Input value="{LeaveTempModel>/email}" editable="false"/>
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>
-				<Select items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}" editable="{= !${LeaveTempModel>/isUpdate} }">
+				<ComboBox items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}" editable="{= !${LeaveTempModel>/isUpdate} }" id="AL_id_Leavetype" change="AL_ValidateLeavetype">
 				<core:Item key="{leaveTypeModel>name}" text="{leaveTypeModel>name}" />
-				</Select>
+				</ComboBox>
 				<VBox>
 					<!-- From Date -->
 					<Label text="{i18n>fromDate}" required="true" />
