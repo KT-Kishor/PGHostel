@@ -24,6 +24,7 @@
                 selectedKey="{CreateIncomeAssetModel>/Type}"
                  items="{oAssetTypeModel>/}" 
                  change="IA_validateType"
+                 valueStateText="{i18n>selecttype}"
                  >
                    <core:Item
                         key="{oAssetTypeModel>Type}"
@@ -37,6 +38,7 @@
                     showSecondaryValues="true"
                     items="{AdminModel>/}"
                     change="IA_validatePickedBy"
+                    valueStateText="{i18n>selectvaluefromdropdown}"
                 >
                     <core:ListItem
                         text="{AdminModel>EmployeeName}"

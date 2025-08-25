@@ -26,7 +26,7 @@
 				<Label text="{i18n>collegeName}" required="true" />
 				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
 				<Label text="{i18n>degree}" required="true" />
-				<ComboBox  selectedKey="{educationModel>/DegreeName}" items="{Degree>/degree}" id="AddEd_id_Degree" change="AddEd_changeDegree">
+				<ComboBox  selectedKey="{educationModel>/DegreeName}" items="{Degree>/degree}" valueStateText="{i18n>Invaliddegree}" id="AddEd_id_Degree" change="AddEd_changeDegree">
 					<core:Item key="{Degree>DegreeName}" text="{Degree>DegreeName}" />
 				</ComboBox>
 				<Label text="{i18n>startDate}" required="true" />

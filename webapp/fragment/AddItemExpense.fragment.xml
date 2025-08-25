@@ -16,7 +16,7 @@
 					</ComboBox>
 					<!-- Mode Of Payment -->
 					<Label text="{i18n>expModeOfPayment}" required="true"/>
-					<ComboBox id="EXP_ID_modeofPayment" items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" change="EXP_FRG_validatepaymentMode" enabled="{viewModel>/enable}">
+					<ComboBox id="EXP_ID_modeofPayment" valueStateText="{i18n>selectmodeofpayment}" items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" change="EXP_FRG_validatepaymentMode" enabled="{viewModel>/enable}">
 						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
 					</ComboBox>
 					<!-- Expense Date -->

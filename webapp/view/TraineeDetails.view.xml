@@ -212,6 +212,7 @@
                                 items="{DurationTraining>/duration}"
                                 id="TD_id_TDuration"
                                 change="TD_TrainingValidate"
+                                valueStateText="{i18n>choosetrainingduration}"
                             >
                                 <core:Item
                                     key="{DurationTraining>Code}"

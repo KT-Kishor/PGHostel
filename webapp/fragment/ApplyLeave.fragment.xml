@@ -31,7 +31,7 @@
 				<Input value="{LeaveTempModel>/email}" editable="false"/>
 				<!-- Leave Type -->
 				<Label text="{i18n>type}" required="true"/>
-				<ComboBox items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}" editable="{= !${LeaveTempModel>/isUpdate} }" id="AL_id_Leavetype" change="AL_ValidateLeavetype">
+				<ComboBox items="{leaveTypeModel>/}" selectedKey="{LeaveTempModel>/typeOfLeave}" valueStateText="{i18n>invalidleavetype}" editable="{= !${LeaveTempModel>/isUpdate} }" id="AL_id_Leavetype" change="AL_ValidateLeavetype">
 				<core:Item key="{leaveTypeModel>name}" text="{leaveTypeModel>name}" />
 				</ComboBox>
 				<VBox>
