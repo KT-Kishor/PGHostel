@@ -116,7 +116,7 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-            MsaD_validateremove(){
+            MsaD_validateremove:function(){
                 this.byId("MsaD_id_CompanyName").setValueState("None");
                 this.byId("MsaD_id_PaymentTerms").setValueState("None");
                 this.byId("MsaD_id12").setValueState("None");
@@ -134,6 +134,7 @@ sap.ui.define([
                 this.byId("Msa_Id_PayBalance").setValueState("None");
                 this.byId("Msa_Id_Refund").setValueState("None");
                 this.byId("MsaD_id_ContractPeriod").setValueState("None");
+                this.byId("MsaD_id_Branch").setValueState("None");
             },
             MsaD_onBack: function () {
                 this.getRouter().navTo("RouteMSA");
@@ -360,9 +361,5 @@ sap.ui.define([
                  utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.validateStep();
             },
-            MsaD_validateGurantee:function(oEvent){
-                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-                this.validateStep();
-            }
         });
     });

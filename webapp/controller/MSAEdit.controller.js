@@ -163,8 +163,8 @@ sap.ui.define([
             },
 
             onPaymentAdvanceInputChange: function (oEvent) {
-                var sAdvanceInput = sap.ui.getCore().byId("Msa_Id_PayAdvance");
-                var sBalanceInput = sap.ui.getCore().byId("Msa_Id_PayBalance");
+                var sAdvanceInput = sap.ui.getCore().byId("Ms_Id_PayAdvance");
+                var sBalanceInput = sap.ui.getCore().byId("Ms_Id_PayBalance");
 
                 var sAdvanceValue = sAdvanceInput.getValue();
                 var sBalanceValue = sBalanceInput.getValue();
@@ -246,10 +246,10 @@ sap.ui.define([
                 oView.byId("MsaE_id_MsaPanCard")?.setValueState("None");
                 oView.byId("MsaE_id_MSAEmail")?.setValueState("None");
                 oView.byId("MsaE_id_MSA_GSTNO")?.setValueState("None");
-                oView.byId("Msa_Id_RateCharge")?.setValueState("None");
-                oView.byId("Msa_Id_PayAdvance")?.setValueState("None");
-                oView.byId("Msa_Id_PayBalance")?.setValueState("None");
-                oView.byId("Msa_Id_Refund")?.setValueState("None");
+                oView.byId("Ms_Id_RateCharge")?.setValueState("None");
+                oView.byId("Ms_Id_PayAdvance")?.setValueState("None");
+                oView.byId("Ms_Id_PayBalance")?.setValueState("None");
+                oView.byId("Ms_Id_Refund")?.setValueState("None");
             },
 
             MSA_Frg_Close: function () {
@@ -273,8 +273,8 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") && this.GST &&
                     (!isRecruitment || (
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_RateCharge"), "ID") &&
-                        utils._LCvalidateTraineeAmount(get("Msa_Id_Refund"), "ID") &&
+                        utils._LCvalidateTraineeAmount(get("Ms_Id_RateCharge"), "ID") &&
+                        utils._LCvalidateTraineeAmount(get("Ms_Id_Refund"), "ID") &&
                         this.AdvanceBalance
                     ));
 

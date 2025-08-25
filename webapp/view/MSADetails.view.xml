@@ -44,7 +44,7 @@
 							<Label text="{i18n>companyHeadPosition}" required="true" />
 							<Input value="{msaModelWizart>/CompanyHeadPosition}" placeholder="{i18n>placeHedaPosition}" maxLength="50" id="MsaD_id_HeadPosition" liveChange="MsaD_ValidateCommonFields" valueStateText="{i18n>placeHedaPosition}" />
 							<Label text="{i18n>contractPeriod}" required="true" />
-							<ComboBox id="MsaD_id_ContractPeriod"  items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}" change="MsaD_validateCotractperiod">
+							<ComboBox id="MsaD_id_ContractPeriod"  items="{ContractPeriodThree>/ContractPeriod}" selectedKey="{msaModelWizart>/ContractPeriod}" change="MsaD_validateCotractperiod" valueStateText="{i18n>contractPeriodValueState}">
 								<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 							</ComboBox>
 							<Label text="{i18n>CompBranch}" required="true" />
@@ -54,7 +54,7 @@
 							<Label text="{i18n>panCardReg}" required="true" />
 							<Input value="{msaModelWizart>/PanCard}" placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields" maxLength="50" valueStateText="{i18n>placePanCardReg}" />
 							<Label text="{i18n>paymentterms}" required="true"></Label>
-							<ComboBox items="{ContractpaymentModel>/}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" change="MsaD_ValidatepaymentTerms">
+							<ComboBox items="{ContractpaymentModel>/}" selectedKey="{msaModelWizart>/PaymentTerms}" id="MsaD_id_PaymentTerms" change="MsaD_ValidatepaymentTerms" valueStateText="{i18n>selectPaymentTerms}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</ComboBox>
 							<Label text="{i18n>address}" required="true" />
@@ -71,16 +71,11 @@
 							<TextArea value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 							<Label text="{i18n>GSTNO}"/>
 							<Input value="{msaModelWizart>/GST}" placeholder="{i18n>placeholderGST}" id="MsaD_id_GST" maxLength="15" liveChange="MsaD_validateGST" valueStateText="{i18n>gstNoValueState}" />
-<Label text="{i18n>status}" required="true"/>
-<ComboBox change="MsaD_validateSatus"
-    id="MsaD_id12"
-    items="{
-        path: 'AssignmentStatus>/assignmentStatus'
-    }"
-    selectedKey="{msaModelWizart>/Status}"
->
-    <core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}" />
-</ComboBox>
+							<Label text="{i18n>status}" required="true"/>
+							<ComboBox change="MsaD_validateSatus" id="MsaD_id12" items="{path: 'AssignmentStatus>/assignmentStatus'}"
+							selectedKey="{msaModelWizart>/Status}" valueStateText="{i18n>statusValueState}">
+								<core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}" />
+							</ComboBox>
 							<Label text="{i18n>msaRateCharge}" required="true" visible="{VisibleModel>/Recruitment}"></Label>
 							<Input value="{msaModelWizart>/RateCharge}" visible="{VisibleModel>/Recruitment}" maxLength="5" placeholder="{i18n>msaRateChargePlac}" id="Msa_Id_RateCharge" liveChange="LC_MSA_RateCharge" valueStateText="{i18n>msaAmountMess}" />
 							<!-- Payment Section -->

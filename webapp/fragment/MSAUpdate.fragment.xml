@@ -45,11 +45,11 @@
                     select="onRadioButtonGroupSelect"
                 >
                     <RadioButton
-                        id="RB3-2"
+                        id="RB3-3"
                         text="Service"
                     />
                     <RadioButton
-                        id="RB3-1"
+                        id="RB3-4"
                         text="Recruitment"
                     />
                 </RadioButtonGroup>
@@ -227,7 +227,7 @@
                 />
                 <Label text="{i18n>status}" />
                 <Select
-                    id="MsaD_id12"
+                    id="MsaD_id123"
                     items="{
         path: 'AssignmentStatus>/assignmentStatus'
     }"
@@ -250,7 +250,7 @@
                     visible="{simpleForm>/Recruitment}"
                     maxLength="5"
                     placeholder="Enter rate charge"
-                    id="Msa_Id_RateCharge"
+                    id="Ms_Id_RateCharge"
                     liveChange="LC_MSA_RateCharge"
                     valueStateText="{i18n>msaAmountMess}"
                 />
@@ -265,7 +265,7 @@
                     maxLength="5"
                     visible="{simpleForm>/Recruitment}"
                     placeholder="Advance in percentage"
-                    id="Msa_Id_PayAdvance"
+                    id="Ms_Id_PayAdvance"
                     liveChange="onPaymentAdvanceInputChange"
                     valueStateText="{i18n>msaAmountMess}"
                 />
@@ -275,7 +275,7 @@
                     maxLength="5"
                     visible="{simpleForm>/Recruitment}"
                     placeholder="Balance in percentage"
-                    id="Msa_Id_PayBalance"
+                    id="Ms_Id_PayBalance"
                     liveChange="onPaymentAdvanceInputChange"
                     valueStateText="{i18n>msaAmountMess}"
                 />
@@ -301,7 +301,7 @@
                     visible="{simpleForm>/Recruitment}"
                     maxLength="5"
                     placeholder="{i18n>refundPlaceholder}"
-                    id="Msa_Id_Refund"
+                    id="Ms_Id_Refund"
                     liveChange="LC_MSA_RateCharge"
                     valueStateText="{i18n>msaAmountMess}"
                 />

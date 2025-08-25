@@ -346,7 +346,7 @@
                                         <m:ComboBox
                                             id="PO_id_Type"
                                             selectedKey="{PurchaseOrderModel>/Type}"
-                                            change="PO_ValidateType"
+                                            change="PO_ValidateType" valueStateText="Please Select Type"
                                         >
                                             <c:Item
                                                 key="Internal"
@@ -373,6 +373,7 @@
                                             width="100%"
                                             items="{ContractpaymentModel>/}"
                                             change="PO_ValidatePaymentTerms"
+                                            valueStateText="Please Select Payment Terms"
                                         >
                                             <c:Item
                                                 key="{ContractpaymentModel>days}"
