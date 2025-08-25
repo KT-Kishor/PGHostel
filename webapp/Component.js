@@ -2,8 +2,9 @@ sap.ui.define([
     "sap/ui/core/UIComponent",
     "sap/kt/com/minihrsolution/model/models",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], (UIComponent, models, JSONModel, MessageToast) => {
+    "sap/m/MessageToast",
+    "sap/kt/com/minihrsolution/utils/LayoutPatches"
+], (UIComponent, models, JSONModel, MessageToast, LayoutPatches) => {
     "use strict";
 
     return UIComponent.extend("sap.kt.com.minihrsolution.Component", {
@@ -41,6 +42,13 @@ sap.ui.define([
 
             // enable routing
             this.getRouter().initialize();
+
+             // one-liner: apply the global no-spacer patch + bottom padding
+            LayoutPatches.applyNoSpacerPatch({
+            appRootId: "container-sap.kt.com.minihrsolution---App",
+            paddingPx: 20, // tweak if you want more/less breathing room
+            observe: true, // keep fixing after re-renders
+            });
         },
 
         _fetchCommonData: async function (entityName, modelName, filter = "") {
