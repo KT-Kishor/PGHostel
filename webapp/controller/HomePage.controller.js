@@ -32,24 +32,24 @@ sap.ui.define(
           this._careerDataLoaded = false; // flag to avoid repeated fetch
         },
 
-       _onRouteMatched: function () {
-        const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
-        const oTabHeader = this.byId("mainTabHeader");
-        if (oTabHeader) {
-          oTabHeader.setSelectedKey(sStoredTab);
-        }
+        _onRouteMatched: function () {
+          const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
+          const oTabHeader = this.byId("mainTabHeader");
+          if (oTabHeader) {
+            oTabHeader.setSelectedKey(sStoredTab);
+          }
 
-        const oNavContainer = this.byId("pageContainer");
-        if (oNavContainer) {
-          const oPage = this.byId(sStoredTab);
-          if (oPage) {
-            oNavContainer.to(oPage);
-          } 
-        }
+          const oNavContainer = this.byId("pageContainer");
+          if (oNavContainer) {
+            const oPage = this.byId(sStoredTab);
+            if (oPage) {
+              oNavContainer.to(oPage);
+            }
+          }
 
-         sessionStorage.removeItem("homePageReturnTab");
-         this.API = "https://www.rest.kalpavrikshatechnologies.com";
-         var oCarousel = this.byId("videoCarousel");
+          sessionStorage.removeItem("homePageReturnTab");
+          this.API = "https://www.rest.kalpavrikshatechnologies.com";
+          var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
             "../video/Employee offer.mp4",
@@ -59,7 +59,7 @@ sap.ui.define(
             "../video/Scheme upload.mp4",
           ];
 
-           // Add videos dynamically to the carousel
+          // Add videos dynamically to the carousel
           videoUrls.forEach(function (url, index) {
             var oHtmlControl = new sap.ui.core.HTML({
               content:
@@ -424,16 +424,18 @@ sap.ui.define(
 
         FTF_onCancelform: function () {
           var oModel = this.getView().getModel("TraineeData");
-          // Reset Data Model
-          var resetData = {
-            Name: "",
-            CollegeName: "",
-            EmailID: "",
-            MobileNo: "",
-            Comments: "",
-          };
-          oModel.setData(resetData);
-          oModel.refresh(true);
+          if (oModel) {
+            // Reset Data Model
+            var resetData = {
+              Name: "",
+              CollegeName: "",
+              EmailID: "",
+              MobileNo: "",
+              Comments: ""
+            };
+            oModel.setData(resetData);
+            oModel.refresh(true);
+          }
 
           // Reset Value States for Validation
           var aFields = [
@@ -441,7 +443,7 @@ sap.ui.define(
             "FTF_idClgname",
             "FTF_idmail",
             "FTF_idMobnumber",
-            "FTF_idcomments",
+            "FTF_idcomments"
           ];
 
           aFields.forEach(function (sFieldId) {
@@ -450,9 +452,13 @@ sap.ui.define(
               oField.setValueState("None");
             }
           });
-          // Close the Dialog
-          this.oDialog.close();
+
+          // Close the Dialog safely
+          if (this.oDialog) {
+            this.oDialog.close();
+          }
         },
+
 
         _loadComboBoxModels: function (aCandidates, oView) {
           function getUniqueValuesByKey(key) {
@@ -496,27 +502,27 @@ sap.ui.define(
           this.byId("V1_ID_ExpComboBox").setSelectedKey("");
         },
 
-onSuggestSkills: function (oEvent) {
-    const sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
+        onSuggestSkills: function (oEvent) {
+          const sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
 
-    const aTableData =
-        this.getView()
-            .getModel("JobApplicationModel")
-            ?.getProperty("/Candidates") || [];
-    const aActiveJobs = aTableData.filter(job => job?.Status === "true");
-    const aMatchedSkills = aActiveJobs
-        .map(item => item.PrimarySkills?.trim())
-        .filter(Boolean)
-        .flatMap(skillStr => skillStr.split(",")) 
-        .map(skill => skill.trim())
-        .filter(skill => skill.toLowerCase().includes(sValue));
-    const aUniqueSkills = [...new Set(aMatchedSkills)];
-    const aSuggestionItems = aUniqueSkills.map(skill => ({ skill }));
-    const oSuggestModel = new sap.ui.model.json.JSONModel({
-        skills: aSuggestionItems
-    });
-    this.getView().setModel(oSuggestModel, "skillModel");
-},
+          const aTableData =
+            this.getView()
+              .getModel("JobApplicationModel")
+              ?.getProperty("/Candidates") || [];
+          const aActiveJobs = aTableData.filter(job => job?.Status === "true");
+          const aMatchedSkills = aActiveJobs
+            .map(item => item.PrimarySkills?.trim())
+            .filter(Boolean)
+            .flatMap(skillStr => skillStr.split(","))
+            .map(skill => skill.trim())
+            .filter(skill => skill.toLowerCase().includes(sValue));
+          const aUniqueSkills = [...new Set(aMatchedSkills)];
+          const aSuggestionItems = aUniqueSkills.map(skill => ({ skill }));
+          const oSuggestModel = new sap.ui.model.json.JSONModel({
+            skills: aSuggestionItems
+          });
+          this.getView().setModel(oSuggestModel, "skillModel");
+        },
 
 
         V1_onSearch: function () {
