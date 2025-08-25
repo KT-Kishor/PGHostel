@@ -302,7 +302,7 @@ sap.ui.define([
                     AssignedDate: new Date(),
                     Status: "",
                     ReturnDate: "",
-                    AssignedByEmployeeName: this.oLoginModel.getProperty("/EmployeeName"),
+                    AssignedByEmployeeName: "",
                     AssignedByEmployeeID: this.oLoginModel.getProperty("/EmployeeID"),
                     isEdit: false
                 };

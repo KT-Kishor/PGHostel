@@ -51,15 +51,15 @@ sap.ui.define([
                             Amount: "",
                             Currency: "INR",
                             EndClientHirer: "",
-                            Location: "REMOTE",
+                            Location: "",
                             HiringContact: "",
                             AssignmentStatus: "New",
                             StartDate: "",
                             EndDate: "",
-                            InsuranceRequirement: "No",
-                            WarrantyDate: "3 Months",
-                            AdditionalRates: "No",
-                            PaymentTerms: "30 Days",
+                            InsuranceRequirement: "",
+                            WarrantyDate: "",
+                            AdditionalRates: "",
+                            PaymentTerms: "",
                             Status: "Submitted",
                             Salutation: "Mr.",
                             Salutation2: "Mr.",
@@ -68,7 +68,6 @@ sap.ui.define([
                             STDCode: "+91",
                             MobileNo: ""
                         };
-
                         const oModel = new JSONModel(oData);
                         oView.setModel(oModel, "ContractModelWizart");
                         oView.byId("C_id_PageCreate").setVisible(true);
@@ -566,8 +565,13 @@ sap.ui.define([
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_InsuranceReq"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Warranty"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_AddRate"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
@@ -1096,6 +1100,21 @@ sap.ui.define([
                         jsPDF._GenerateContractPDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
                     }
                 }
+            },
+            CD_locationmodeValidate:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            },
+            CD_validateInsurance:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            },
+            CD_validateDuretion:function(oEvent){
+                  utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            },
+            CD_validateExpense:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            },
+            CD_validatepayment:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             }
         });
     });

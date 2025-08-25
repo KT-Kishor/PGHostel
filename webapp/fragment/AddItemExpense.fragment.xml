@@ -16,9 +16,9 @@
 					</ComboBox>
 					<!-- Mode Of Payment -->
 					<Label text="{i18n>expModeOfPayment}" required="true"/>
-					<Select items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" enabled="{viewModel>/enable}">
+					<ComboBox id="EXP_ID_modeofPayment" items="{ModeOfPayment>/}" selectedKey="{ExpenseCreateModel>/ModeOfPayment}" change="EXP_FRG_validatepaymentMode" enabled="{viewModel>/enable}">
 						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
-					</Select>
+					</ComboBox>
 					<!-- Expense Date -->
 					<Label text="{i18n>expDetExpenseDate}" required="true" />
 					<DatePicker minDate="{viewModel>/MinDate}" id="ExpDet_id_ExpenseDate" maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{ExpenseCreateModel>/ExpenseDate}"/>

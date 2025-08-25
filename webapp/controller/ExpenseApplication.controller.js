@@ -109,12 +109,12 @@ sap.ui.define([
                 ExpenseName: "",
                 ExpStartDate: "",
                 ExpEndDate: "",
-                TravelAllowance: "NO",
+                TravelAllowance: "",
                 Country: "",
                 Source: "",
                 Destination: "",
                 CostCenter: "Kvriksha Technologies Private Limited Kalaburagi",
-                TripType: "Customer Facing",
+                TripType: "",
                 Comments: "",
                 Status: "Draft"
             });
@@ -171,11 +171,13 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") &&
+  utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-TravelAllowance"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Country"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
                     (this.ViewModel.getProperty("/required") === true ?
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
                         true) &&
+  utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-ExpenseType"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID");
 
                 if (!isValid) {
@@ -388,10 +390,16 @@ sap.ui.define([
             } else {
                 this.ViewModel.setProperty("/required", true);
             }
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
         getGroupHeader: function(oGroup) {
             return this.getStyledGroupHeader(oGroup);
         },
+
+        exp_validateTravelAllownce:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        }
+
     });
 });

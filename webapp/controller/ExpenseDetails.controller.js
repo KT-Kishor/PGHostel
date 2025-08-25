@@ -214,7 +214,7 @@ sap.ui.define([
                     ItemType: "",
                     ExpenseAmount: "0",
                     Currency: "INR",
-                    ModeOfPayment: "Employee",
+                    ModeOfPayment: "",
                     ExpenseDate: this.Formatter.formatDate(this.getView().getModel("FilteredExpenseModel").getData()[0].ExpEndDate),
                     Comments: "",
                     Submit: true,
@@ -610,7 +610,7 @@ sap.ui.define([
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("ExpenseCreateModel").getData();
                 var oUploadModel = this.getView().getModel("UploadModel").getData();
-                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idCurrency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("ExpDet_id_ExpenseDate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("ExpDet_id_ItemType"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("EXP_ID_modeofPayment"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("ExpDet_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idCurrency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("ExpDet_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("ExpDet_id_ConvertionRate"), "ID") : true)) {
 
                     var Attachment = this.getView().getModel("tokenModel").getData();
                     if (!Attachment.tokens || Attachment.tokens.length === 0) {
@@ -971,6 +971,9 @@ sap.ui.define([
                 var oVBox = oView.byId("timelineContainer");
                 oVBox.removeAllItems();
                 oVBox.addItem(oTimeline);
+            },
+            EXP_FRG_validatepaymentMode:function(oEvent){
+utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             }
 
         });

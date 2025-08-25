@@ -142,7 +142,7 @@ sap.ui.define(
           // Simple validation
           if (
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FNA_id_TaskName"), "ID") &&
-            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("NAF_id_Description"), "ID") &&
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FNA_id_Tasktype"), "ID") && 
             utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_StartDate"), "ID") &&
             utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_EndDate"), "ID")
           ) {
@@ -341,6 +341,9 @@ sap.ui.define(
             .finally(function () {
               oSheet.destroy();
             });
+      },
+      AT_onChangeTaskType:function(oEvent){
+        utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
       }
       },
       

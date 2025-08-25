@@ -32,7 +32,7 @@ sap.ui.define([
                     "ReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "TraineeEmail": "",
-                    "TrainingDuration": "6 Month",
+                    "TrainingDuration": "",
                     "BaseLocation": "Kalaburagi",
                     "Country": "India",
                     "MobileNumber": "",
@@ -197,6 +197,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TrainingType"), "ID") &&
                         utils._LCvalidateJoiningBonus(this.getView().byId("TD_id_TrainingAmount"), "ID") &&
+                         utils._LCstrictValidationComboBox(this.getView().byId("TD_id_TDuration"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("TD_id_Currency"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_ReleaseDate"), "ID") &&
                         utils._LCvalidateDate(this.getView().byId("TD_id_JoiningDate"), "ID") &&
@@ -581,5 +582,8 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.onCountryChange(oEvent, { stdCodeCombo: "TU_id_STDCode", baseLocationCombo: "TU_id_Location", branchInput: "TU_id_BranchCode", mobileInput: "TU_id_Mobile" });
             },
+            TD_TrainingValidate:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            }
         });
     });

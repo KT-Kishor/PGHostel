@@ -125,9 +125,9 @@
 												</buttons>
 											</RadioButtonGroup>
 											<Label text="{i18n>selectYear}" id="EOD_id_Lyear" visible="false" />
-											<Select  selectedKey="{employeeModel>/EmploymentBond}" items="{BondModel>/bond}" id="EOD_id_BondCombo" >
+											<ComboBox  selectedKey="{employeeModel>/EmploymentBond}" items="{BondModel>/bond}" id="EOD_id_BondCombo" >
 													<core:Item key="{BondModel>Code}" text="{BondModel>Code}" />
-											</Select>
+											</ComboBox>
 										</f:content>
 									</f:SimpleForm>
 								</WizardStep>

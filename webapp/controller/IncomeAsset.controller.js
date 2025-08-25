@@ -57,7 +57,7 @@ sap.ui.define([
                     "Status": "Unassigned",
                     "Currency": "INR",
                     "TrashDate": "",
-                    "PickedEmployeeName": loginModel.EmployeeName,
+                    "PickedEmployeeName":"",
                     "PickedEmployeeID": "",
                     "TransferDate": "",
                     "TransferBranch": "",
@@ -175,7 +175,7 @@ sap.ui.define([
 
                 if (matchedBranch) {
                     const branchName = matchedBranch.city;
-                    this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", branchName);
+                    // this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", branchName);
 
                     const branchControl = sap.ui.getCore().byId("FCIA_id_branch");
                     if (branchControl) {
@@ -328,7 +328,9 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
                     }
                     table.removeSelections();
-
+sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey("")
+sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
+sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 }
             },
 
@@ -369,6 +371,8 @@ sap.ui.define([
                 var type = sap.ui.getCore().byId("FCIA_id_type").getSelectedKey() || "Laptop"
                 try {
                     if (
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_type"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_pickedby"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_branch"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FCIA_id_model"), "ID")
                         &&
@@ -1357,6 +1361,12 @@ sap.ui.define([
                     .finally(function () {
                         oSheet.destroy();
                     });
+            },
+            IA_validateType:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            },
+             IA_validatePickedBy:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             }
         });
     });

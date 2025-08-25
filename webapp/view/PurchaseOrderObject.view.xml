@@ -343,9 +343,10 @@
                                             class="oSowFragLabel"
                                             required="true"
                                         />
-                                        <m:Select
+                                        <m:ComboBox
                                             id="PO_id_Type"
                                             selectedKey="{PurchaseOrderModel>/Type}"
+                                            change="PO_ValidateType"
                                         >
                                             <c:Item
                                                 key="Internal"
@@ -359,24 +360,25 @@
                                                 key="Service"
                                                 text="Service"
                                             />
-                                        </m:Select>
+                                        </m:ComboBox>
 
                                         <m:Label
                                             text="{i18n>paymantterms}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
-                                        <m:Select
+                                        <m:ComboBox
                                             id="PO_id_PaymantTerms"
                                             selectedKey="{PurchaseOrderModel>/PaymentTerms}"
                                             width="100%"
                                             items="{ContractpaymentModel>/}"
+                                            change="PO_ValidatePaymentTerms"
                                         >
                                             <c:Item
                                                 key="{ContractpaymentModel>days}"
                                                 text="{ContractpaymentModel>days}"
                                             />
-                                        </m:Select>
+                                        </m:ComboBox>
                                         <m:Label
                                             text="{i18n>podate}"
                                             class="oSowFragLabel"

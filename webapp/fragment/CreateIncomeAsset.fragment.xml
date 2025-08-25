@@ -20,27 +20,30 @@
         >
             <f:content>
                 <Label text="{i18n>type}" required="true" />
-                <Select id="FCIA_id_type"
+                <ComboBox id="FCIA_id_type"
                 selectedKey="{CreateIncomeAssetModel>/Type}"
-                 items="{oAssetTypeModel>/}">
+                 items="{oAssetTypeModel>/}" 
+                 change="IA_validateType"
+                 >
                    <core:Item
                         key="{oAssetTypeModel>Type}"
                         text="{oAssetTypeModel>Type}"
                     />
-                </Select>
+                </ComboBox>
                 <Label text="{i18n>pickedBy}" required="true" />
-                <Select
+                <ComboBox
                     id="FCIA_id_pickedby"
                     selectedKey="{CreateIncomeAssetModel>/PickedEmployeeName}"
                     showSecondaryValues="true"
                     items="{AdminModel>/}"
+                    change="IA_validatePickedBy"
                 >
                     <core:ListItem
                         text="{AdminModel>EmployeeName}"
                         key="{AdminModel>EmployeeName}"
                         additionalText="{AdminModel>EmployeeID}"
                     />
-                </Select>
+                </ComboBox>
                 <Label text="{i18n>branch}" required="true" />
                 <ComboBox
                     id="FCIA_id_branch"
@@ -49,7 +52,7 @@
                     selectionChange="FCIA_onselectionchange"
                     valueStateText="Select Branch"
                     value="{CreateIncomeAssetModel>/PickedBranch}"
-                    selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
+                    
                     showSecondaryValues="true"
                     items="{BaseLocationModel>/}"
                 >

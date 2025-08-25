@@ -41,7 +41,7 @@ sap.ui.define([
                     "OfferReleaseDate": this.Formatter.formatDate(new Date()),
                     "JoiningDate": "",
                     "CTC": "",
-                    "EmploymentBond": "0",
+                    "EmploymentBond": "",
                     "JoiningBonus": "0",
                     "Country": "India",
                     "CountryCode": "IN",

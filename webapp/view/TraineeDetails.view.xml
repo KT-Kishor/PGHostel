@@ -207,16 +207,17 @@
                                 text="{i18n>traineeDuration}"
                                 required="true"
                             />
-                            <Select
+                            <ComboBox
                                 selectedKey="{oTraineeDetails>/TrainingDuration}"
                                 items="{DurationTraining>/duration}"
                                 id="TD_id_TDuration"
+                                change="TD_TrainingValidate"
                             >
                                 <core:Item
                                     key="{DurationTraining>Code}"
                                     text="{DurationTraining>Code}"
                                 />
-                            </Select>
+                            </ComboBox>
                             <Label
                                 text="{i18n>releaseDateT}"
                                 required="true"

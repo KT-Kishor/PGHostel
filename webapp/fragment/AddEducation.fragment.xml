@@ -26,9 +26,9 @@
 				<Label text="{i18n>collegeName}" required="true" />
 				<Input value="{educationModel>/CollegeName}" placeholder="{i18n>collegeName}" id="AddEd_id_College" maxLength="50" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>collegeNameValueState}"/>
 				<Label text="{i18n>degree}" required="true" />
-				<Select  selectedKey="{educationModel>/DegreeName}" items="{Degree>/degree}" id="AddEd_id_Degree" >
+				<ComboBox  selectedKey="{educationModel>/DegreeName}" items="{Degree>/degree}" id="AddEd_id_Degree" change="AddEd_changeDegree">
 					<core:Item key="{Degree>DegreeName}" text="{Degree>DegreeName}" />
-				</Select>
+				</ComboBox>
 				<Label text="{i18n>startDate}" required="true" />
 				<DatePicker id="AddEd_id_StartEdu" 
 				value="{ path: 'educationModel>/EducationStartDate',formatter:'.Formatter.formatDate' }" 
@@ -49,9 +49,9 @@
 				<Label text="{i18n>grade}"  required="true" />
 				<HBox width="70%" justifyContent="Start">
 					<Input  value="{educationModel>/Grade}" id="AddEd_id_Grade" liveChange="SS_validateGrade"  placeholder="{i18n>grade}"  valueStateText="{i18n>gradeValueState}" maxLength="5"/>
-					<Select  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin" change="SS_validateGradeType">
+					<ComboBox  selectedKey="{educationModel>/GradeType}" items="{CollegeGrade>/grade}" id="AddEd_id_GradeType" class="sapUiSmallMarginBegin" change="SS_validateGradeType">
 						<core:Item key="{CollegeGrade>Value}" text="{CollegeGrade>Value}" />
-					</Select>
+					</ComboBox>
 				</HBox>
 			</f:content>
 		</f:SimpleForm>

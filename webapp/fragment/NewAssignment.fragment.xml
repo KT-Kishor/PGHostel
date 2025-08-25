@@ -12,9 +12,9 @@
                 <Input value="{EditTaskModel>/TaskName}" id="FNA_id_TaskName" liveChange="AT_ValidateCommonFields" maxLength="99" valueStateText="{i18n>taskNameValueState}"/>
 
                 <Label text="{i18n>taskType}" required="true" visible="{= !${visiblePlay>/isAssignmentMode} }"/>
-                <Select id="FNA_id_Tasktype" items="{TaskType>/Task}" selectedKey="{EditTaskModel>/TaskType}" change="AT_onChangeTaskType" >
+                <ComboBox id="FNA_id_Tasktype" items="{TaskType>/Task}" selectedKey="{EditTaskModel>/TaskType}" change="AT_onChangeTaskType" >
                     <core:Item key="{TaskType>Task}" text="{TaskType>Task}"/>
-                </Select>
+                </ComboBox>
                 <Label text="{i18n>description}" required="true" id="FNA_id_Ldesc" visible="{= !${visiblePlay>/isAssignmentMode} }"/>
                 <Input value="{EditTaskModel>/TaskTypeDescription}" id="NAF_id_Description" liveChange="AT_ValidateCommonFields"  maxLength="120" valueStateText="{i18n>taskDescription}"/>
                 <Label text="{i18n>startDate}" required="true"/>

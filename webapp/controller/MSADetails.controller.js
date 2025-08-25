@@ -32,8 +32,8 @@ sap.ui.define([
                     CompanyHeadName: "",
                     CompanyHeadPosition: "",
                     MsaEmail: "",
-                    PaymentTerms: "30 Days",
-                    ContractPeriod: "12 Months",
+                    PaymentTerms: "",
+                    ContractPeriod: "",
                     Salutation: "Mr.",
                     Status: "New",
                     MsaContractPeriodEndDate: "",
@@ -42,12 +42,12 @@ sap.ui.define([
                     RateCharge: "",
                     PaymentAdvance: "",
                     PaymentBalance: "",
-                    ReplacementMonth: "2 Months",
+                    ReplacementMonth: "",
                     ReplacementRefund: "",
                     Country: "",
                     City: "",
                     GST: "",
-                    Status:"New"
+                    Status:""
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 
@@ -56,6 +56,7 @@ sap.ui.define([
                 this.AdvanceBalance = true;
                 this.byId("MsaD_id_Type").setSelectedIndex(0);
                 this.GST = true;
+                this.MsaD_validateremove();
             },
 
             onLogout: function () {
@@ -68,6 +69,8 @@ sap.ui.define([
                 } else {
                     this.getView().getModel("VisibleModel").setProperty("/Recruitment", false);
                 }
+                this.validateStep();
+                // MsaD_validateremove()    
             },
 
             T_onResetWizard: function () {
@@ -118,10 +121,11 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-
-            MsaD_onBack: function () {
-                this.getRouter().navTo("RouteMSA");
-                this.byId("MsaD_id_CompanyName").setValueState("None");
+MsaD_validateremove(){
+this.byId("MsaD_id_CompanyName").setValueState("None");
+this.byId("MsaD_id_PaymentTerms").setValueState("None");
+this.byId("MsaD_id12").setValueState("None");
+this.byId("MsaD_id_validateGuarantee").setValueState("None");
                 this.byId("MsaD_id_HeadName").setValueState("None");
                 this.byId("MsaD_id_HeadPosition").setValueState("None");
                 this.byId("MsaD_id_CreateMSADate").setValueState("None");
@@ -135,6 +139,10 @@ sap.ui.define([
                 this.byId("Msa_Id_PayAdvance").setValueState("None");
                 this.byId("Msa_Id_PayBalance").setValueState("None");
                 this.byId("Msa_Id_Refund").setValueState("None");
+                this.byId("MsaD_id_ContractPeriod").setValueState("None");
+},
+            MsaD_onBack: function () {
+                this.getRouter().navTo("RouteMSA");
             },
             MsaD_validateName: function (oEvent) {
                 utils._LCvalidateName(oEvent);
@@ -187,7 +195,7 @@ sap.ui.define([
 
             validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("MsaD_id_CompanyName").getValue() && this.getView().byId("MsaD_id_HeadName").getValue() && this.getView().byId("MsaD_id_HeadPosition").getValue() && this.getView().byId("MsaD_id_CreateMSADate").getValue() && this.getView().byId("MsaD_id_PanCard").getValue() && this.getView().byId("MsaD_id_Email").getValue() && this.getView().byId('MsaD_id_Address').getValue();
+                var allFieldsFilled = this.getView().byId("MsaD_id_CompanyName").getValue() && this.getView().byId("MsaD_id_HeadName").getValue() && this.getView().byId("MsaD_id_HeadPosition").getValue() && this.getView().byId("MsaD_id_ContractPeriod").getValue() && this.getView().byId("MsaD_id_CreateMSADate").getValue() && this.getView().byId("MsaD_id_PanCard").getValue() && this.getView().byId("MsaD_id_PaymentTerms").getValue() && this.getView().byId("MsaD_id_Email").getValue() && this.getView().byId('MsaD_id_Address').getValue() && this.getView().byId('MsaD_id12').getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
                     var isRecruitment = this.getView().getModel("VisibleModel").getProperty("/Recruitment");
@@ -196,13 +204,22 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") &&
                         utils._LCvalidateName(this.getView().byId("MsaD_id_HeadName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_HeadPosition"), "ID") &&
+
+                        //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_ContractPeriod"), "ID") &&
+
                         utils._LCvalidateDate(this.getView().byId("MsaD_id_CreateMSADate"), "ID") &&
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_PanCard"), "ID") &&
+
+                        // utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_PaymentTerms"), "ID") &&
+
                         utils._LCvalidateEmail(this.getView().byId("MsaD_id_Email"), "ID") &&
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") && this.GST &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
+                        //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id12"), "ID") &&
+                        //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_validateGuarantee"), "ID")  &&
+                         this.GST &&
                         (
                             !isRecruitment || (
                                 utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
@@ -353,6 +370,23 @@ sap.ui.define([
                     }
                 }
             },
+
+            MsaD_validateCotractperiod: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.validateStep();
+            },
+            MsaD_ValidatepaymentTerms:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.validateStep();
+            },
+            MsaD_validateSatus:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.validateStep();
+            },
+             MsaD_validateGurantee:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                this.validateStep();
+            }
 
         });
     });

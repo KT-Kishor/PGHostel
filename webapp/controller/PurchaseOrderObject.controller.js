@@ -74,7 +74,7 @@ sap.ui.define([
                 "CustomerHeadName": "",
                 "City": "",
                 "Country": "",
-                "Type": "Internal",
+                "Type": "",
                 "PaymentTerms": "",
                 "Address": "",
                 "CustDescription": "",
@@ -218,6 +218,8 @@ sap.ui.define([
 
                 });
             }
+            this.getView().byId("PO_id_Type").setValueState("None");
+            this.getView().byId("PO_id_PaymantTerms").setValueState("None");
             this.closeBusyDialog()
         },
         PO_onButtonPress: function() {
@@ -384,6 +386,8 @@ sap.ui.define([
             try {
                 if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") &&
                     utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.getView().byId("PO_id_Type"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.getView().byId("PO_id_PaymantTerms"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") &&
                     utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") &&
@@ -935,5 +939,11 @@ sap.ui.define([
                 this.EOU_oDialogMail.close()
             })
         },
+        PO_ValidateType:function(oEvent){
+             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+        PO_ValidatePaymentTerms:function(oEvent){
+             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        }
     });
 });

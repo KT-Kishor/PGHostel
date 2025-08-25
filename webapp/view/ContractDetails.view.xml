@@ -61,9 +61,9 @@
 							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" change="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
 							<Label text="{i18n>locationswhereServices}" />
-							<Select id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}">
+							<ComboBox id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}" change="CD_locationmodeValidate">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
-							</Select>
+							</ComboBox>
 							<Label text="{i18n>startDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/StartDate}" id="CD_id_Datestart" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" maxDate="{ContractModelWizart>/MaxFromDate}"/>
 							<Label text="{i18n>endDate}" required="true"/>
@@ -71,21 +71,21 @@
 							displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
 							<Label text="{i18n>specificInsuranceRequirement}"  />
 
-							<Select id="CD_id_InsuranceReq" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
+							<ComboBox id="CD_id_InsuranceReq" change="CD_validateInsurance" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
-							</Select>
+							</ComboBox>
 							<Label text="{i18n>warrantyDate}" />
-							<Select id="CD_id_Warranty" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}">
+							<ComboBox id="CD_id_Warranty" change="CD_validateDuretion" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}">
 								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
-							</Select>
+							</ComboBox>
 							<Label text="{i18n>calloutadditionalratesexpenses}" />
-							<Select  id="CD_id_AddRate" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
+							<ComboBox  id="CD_id_AddRate" change="CD_validateExpense" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
-							</Select>
+							</ComboBox>
 							<Label text="{i18n>paymentterms}"/>
-							<Select id="CD_id_PaymentTerms" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
+							<ComboBox id="CD_id_PaymentTerms" change="CD_validatepayment" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
-							</Select>
+							</ComboBox>
 
 							<Label text="{i18n>expCountry}" required="true"/>
 				             <ComboBox change="CD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="CD_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{ContractModelWizart>/Country}" showSecondaryValues="true"  >
