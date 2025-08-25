@@ -69,7 +69,7 @@
                 id="TSA_id_Table"
                 mode="MultiSelect"
                 sticky="ColumnHeaders"
-                items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeID',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
+                items="{path:'ApprovalTimesheetModel>/', sorter: {path: 'EmployeeName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
                 growing="true"
                 selectionChange="TSA_onSelect"
                 growingScrollToLoad="true"
@@ -84,9 +84,11 @@
                     <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>assignmentName}"/>
                     </Column>
+                     
                     <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>date}" />
                     </Column>
+                   
                     <Column minScreenWidth="Tablet" demandPopin="true">
                         <Text text="{i18n>day}" />
                     </Column>
@@ -106,6 +108,7 @@
                         <cells>
                             <!-- <Text text="{ApprovalTimesheetModel>EmployeeID}"/> -->
                             <Text text="{ApprovalTimesheetModel>TaskName}"/>
+                         
                             <Text text="{path:'ApprovalTimesheetModel>Date',formatter:'.Formatter.formatDate'}"/>
                             <Text text="{ApprovalTimesheetModel>Day}"/>
                             <Text text="{ApprovalTimesheetModel>HoursWorked}"/>
