@@ -143,6 +143,7 @@ sap.ui.define(
           if (
             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FNA_id_TaskName"), "ID") &&
             utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FNA_id_Tasktype"), "ID") && 
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("NAF_id_Description"), "ID") &&
             utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_StartDate"), "ID") &&
             utils._LCvalidateDate(sap.ui.getCore().byId("NAF_id_EndDate"), "ID")
           ) {

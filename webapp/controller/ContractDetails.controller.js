@@ -562,6 +562,7 @@ sap.ui.define([
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
+                        utils._LCvalidateName(this.byId("CD_id_ConsultingService"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&

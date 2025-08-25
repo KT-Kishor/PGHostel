@@ -60,7 +60,7 @@
 							</Select>
 							<Input value="{ContractModelWizart>/ClientReportContact}"
                              placeholder="{i18n>hiringContactPlaceholder}" maxLength="50" id="CD_id_HiringContact" change="CD_validateName" valueStateText="{i18n>commonNameValueState}"/>
-							<Label text="{i18n>locationswhereServices}" />
+							<Label text="{i18n>locationswhereServices}" required="true"/>
 							<ComboBox id="CD_id_Locationcomb" selectedKey="{ContractModelWizart>/Location}" items="{WorkingMode>/location}" change="CD_locationmodeValidate">
 								<core:Item key="{WorkingMode>Location}" text="{WorkingMode>Location}" />
 							</ComboBox>
@@ -69,20 +69,19 @@
 							<Label text="{i18n>endDate}" required="true"/>
 							<DatePicker value="{ContractModelWizart>/EndDate}" id="CD_id_DateEnd" valueFormat="dd/MM/yyyy"  
 							displayFormat="dd/MM/yyyy" change="validateDate" valueStateText="{i18n>dateValueState}" minDate="{ContractModelWizart>/MinToDate}"/>
-							<Label text="{i18n>specificInsuranceRequirement}"  />
-
+							<Label text="{i18n>specificInsuranceRequirement}" required="true" />
 							<ComboBox id="CD_id_InsuranceReq" change="CD_validateInsurance" selectedKey="{ContractModelWizart>/InsuranceRequirement}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</ComboBox>
-							<Label text="{i18n>warrantyDate}" />
+							<Label text="{i18n>warrantyDate}" required="true"/>
 							<ComboBox id="CD_id_Warranty" change="CD_validateDuretion" selectedKey="{ContractModelWizart>/WarrantyDate}" items="{ContractPeriod>/ContractPeriod}">
 								<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
 							</ComboBox>
-							<Label text="{i18n>calloutadditionalratesexpenses}" />
+							<Label text="{i18n>calloutadditionalratesexpenses}" required="true"/>
 							<ComboBox  id="CD_id_AddRate" change="CD_validateExpense" selectedKey="{ContractModelWizart>/AdditionalRates}" items="{TravelAllowance>/type}">
 							<core:Item key="{TravelAllowance>text}" text="{TravelAllowance>text}" />
 							</ComboBox>
-							<Label text="{i18n>paymentterms}"/>
+							<Label text="{i18n>paymentterms}" required="true"/>
 							<ComboBox id="CD_id_PaymentTerms" change="CD_validatepayment" selectedKey="{ContractModelWizart>/PaymentTerms}" items="{ContractpaymentModel>/}">
 								<core:Item key="{ContractpaymentModel>days}" text="{ContractpaymentModel>days}" />
 							</ComboBox>

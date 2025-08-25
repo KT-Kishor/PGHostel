@@ -71,15 +71,13 @@
 							<TextArea value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 							<Label text="{i18n>GSTNO}"/>
 							<Input value="{msaModelWizart>/GST}" placeholder="{i18n>placeholderGST}" id="MsaD_id_GST" maxLength="15" liveChange="MsaD_validateGST" valueStateText="{i18n>gstNoValueState}" />
-<Label text="{i18n>status}"/>
+<Label text="{i18n>status}" required="true"/>
 <ComboBox change="MsaD_validateSatus"
     id="MsaD_id12"
     items="{
         path: 'AssignmentStatus>/assignmentStatus'
     }"
     selectedKey="{msaModelWizart>/Status}"
-    liveChange="MsaD_validateGST"
-    
 >
     <core:Item key="{AssignmentStatus>Value}" text="{AssignmentStatus>Value}" />
 </ComboBox>
