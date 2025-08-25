@@ -456,6 +456,41 @@ sap.ui.define([
                 }
             },
 
+            CD_locationmodeValidate:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
+            CD_validateInsurance:function(oEvent){
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
+            CD_validateDuretion:function(oEvent){
+                  utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                  if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
+            CD_validateExpense:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                 if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
+            CD_validatepayment:function(oEvent){
+                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                 if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+            },
+
             //back function
             CD_onPressback: function () {
                 this.showConfirmationDialog(
@@ -503,8 +538,13 @@ sap.ui.define([
                 oModel.Amount = this.byId("CD_id_Amount").getValue();
                 oModel.Currency = this.byId("CD_id_Currency").getValue();
                 oModel.ClientReportContact = this.byId("CD_id_HiringContact").getValue();
+                oModel.Location = this.byId("CD_id_Locationcomb").getSelectedKey();
                 oModel.StartDate = this.byId("CD_id_Datestart").getValue();
                 oModel.EndDate = this.byId("CD_id_DateEnd").getValue();
+                oModel.InsuranceRequirement = this.byId("CD_id_InsuranceReq").getSelectedKey();
+                oModel.WarrantyDate = this.byId("CD_id_Warranty").getSelectedKey();
+                oModel.AdditionalRates = this.byId("CD_id_AddRate").getSelectedKey();
+                oModel.PaymentTerms = this.byId("CD_id_PaymentTerms").getSelectedKey();
                 oModel.Country = this.byId("CD_id_Country").getSelectedKey();
                 oModel.contractLocation = this.byId("CD_id_ConLocation").getSelectedKey();
                 oModel.STDCode = this.byId("CD_id_codeModel").getValue();
@@ -512,7 +552,7 @@ sap.ui.define([
 
                 // Include Country and ConLocation in field check
                 const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
-                    oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.StartDate && oModel.EndDate && oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
+                    oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.Location && oModel.StartDate && oModel.EndDate && oModel.InsuranceRequirement && oModel.WarrantyDate && oModel.AdditionalRates && oModel.PaymentTerms && oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
                 if (bAllFieldsFilled) {
                     // Run validations with correct chaining using &&
@@ -526,8 +566,13 @@ sap.ui.define([
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_InsuranceReq"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_Warranty"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_AddRate"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
@@ -1102,20 +1147,5 @@ sap.ui.define([
                     }
                 }
             },
-            CD_locationmodeValidate:function(oEvent){
-                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            },
-            CD_validateInsurance:function(oEvent){
-                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            },
-            CD_validateDuretion:function(oEvent){
-                  utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            },
-            CD_validateExpense:function(oEvent){
-                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            },
-            CD_validatepayment:function(oEvent){
-                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            }
         });
     });
