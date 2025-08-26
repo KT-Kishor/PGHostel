@@ -692,9 +692,7 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onMobileChange: function (oEvent) {
-          utils._LCvalidateMobileNumber(oEvent);
-        },
+
 
         onEmailChange: function (oEvent) {
           utils._LCvalidateEmail(oEvent);
@@ -1095,123 +1093,6 @@ sap.ui.define(
           }
           utils._LCstrictValidationComboBox(oEvent, "genderInvalid");
         },
-
-        MC_onChangeCountry: function (oEvent) {
-          try {
-            const oComboBox = oEvent.getSource();
-            const sInputValue = oComboBox.getValue();
-            const aItems = oComboBox.getItems();
-
-            const oView = this.getView();
-            const oModel = oView.getModel("JobModel");
-
-            // 1. If blank, clear everything, no filter
-            if (!sInputValue) {
-              oComboBox.setValueState(sap.ui.core.ValueState.None);
-              oComboBox.setValueStateText("");
-              oComboBox.setSelectedKey(""); // Clear key
-              if (oModel) {
-                oModel.setProperty("/country", "");
-                oModel.setProperty("/stdCode", "");
-              }
-
-              // Clear ISD combo
-              const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
-              if (oISDCombo) {
-                oISDCombo.setSelectedKey("");
-                oISDCombo.setEnabled(true);
-                if (oISDCombo.getBinding("items")) {
-                  oISDCombo.getBinding("items").filter([]); // Remove filter
-                }
-              }
-
-              // Clear Location combo
-              const oLocationCombo = Fragment.byId(
-                "jobFormFrag",
-                "LocationComboBox"
-              );
-              if (oLocationCombo) {
-                oLocationCombo.setSelectedKey("");
-                if (oLocationCombo.getBinding("items")) {
-                  oLocationCombo.getBinding("items").filter([]); // Remove filter
-                }
-              }
-
-              return;
-            }
-
-            // 2. Check for valid country
-            const oMatchedItem = aItems.find((item) => {
-              return (
-                item.getText().toLowerCase() === sInputValue.toLowerCase() ||
-                item.getKey().toLowerCase() === sInputValue.toLowerCase()
-              );
-            });
-
-            if (!oMatchedItem) {
-              //  Invalid input
-              oComboBox.setValueState(sap.ui.core.ValueState.Error);
-              oComboBox.setValueStateText(
-                this.oResourceBundle.getText("v2_m_errInvalidComboBox")
-              );
-              return;
-            }
-
-            //  Valid country selected
-            oComboBox.setSelectedKey(oMatchedItem.getKey());
-            oComboBox.setValueState(sap.ui.core.ValueState.None);
-            oComboBox.setValueStateText("");
-
-            const selectedKey = oMatchedItem.getKey().toUpperCase();
-            if (oModel) {
-              oModel.setProperty("/country", selectedKey);
-            }
-
-            //  ISD Code Filter
-            const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
-            if (oISDCombo && oISDCombo.getBinding("items")) {
-              const oISDFilter = new sap.ui.model.Filter(
-                "country_code",
-                "EQ",
-                selectedKey
-              );
-              oISDCombo.getBinding("items").filter([oISDFilter]);
-
-              setTimeout(() => {
-                const aISDItems = oISDCombo.getItems();
-                if (aISDItems.length === 1) {
-                  const sCode = aISDItems[0]
-                    .getBindingContext("codeModel")
-                    .getObject().calling_code;
-                  const sFinalCode = sCode.split(",")[0].trim();
-                  oISDCombo.setSelectedKey(sFinalCode);
-                  oISDCombo.setEnabled(false);
-                  oModel.setProperty("/stdCode", sFinalCode);
-                } else {
-                  oISDCombo.setSelectedKey("");
-                  oISDCombo.setEnabled(true);
-                  oModel.setProperty("/stdCode", "");
-                }
-              }, 0);
-            }
-
-            // Location Filter
-            const oLocationCombo = Fragment.byId(
-              "jobFormFrag",
-              "LocationComboBox"
-            );
-            if (oLocationCombo && oLocationCombo.getBinding("items")) {
-              const oLocationFilter = new sap.ui.model.Filter(
-                "CountryCode",
-                "EQ",
-                selectedKey
-              );
-              oLocationCombo.getBinding("items").filter([oLocationFilter]);
-              oLocationCombo.setSelectedKey("");
-            }
-          } catch (error) {}
-        },
-
         MC_onBaseLocationChange: function (oEvent) {
           try {
             const oComboBox = oEvent.getSource();
@@ -1262,173 +1143,343 @@ sap.ui.define(
             });
           });
         },
-        onSubmit: async function () {
-          const i18n = this.oResourceBundle;
-          const f = (id) => sap.ui.core.Fragment.byId("jobFormFrag", id);
+_validateMobileNumberLocal: function (oEvent) {
+    const oInput = oEvent.getSource();
+    const sValue = oInput.getValue();
+    const sValueTrimmed = sValue.trim();
+    const oModel = this.getView().getModel("JobModel");
+    const sCountryCode = oModel.getProperty("/country");
+    oInput.setValueState(sap.ui.core.ValueState.None);
+    oInput.setValueStateText("");
 
-          const scrollToError = (oControl) => {
-            if (oControl?.getDomRef?.()) {
-              oControl.getDomRef().scrollIntoView({
+    // mobile number cannot starts with 0s 
+    if (sValueTrimmed.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile Number begins with non-zero");
+        return false;
+    }
+
+    // only numbers
+    if (!/^\d*$/.test(sValueTrimmed)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only numbers are allowed");
+        return false;
+    }
+    
+    // depending upon country validation (India = 10 digits)
+    if (sCountryCode === "IN") {
+        if (sValueTrimmed.length !== 10) {
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Mobile Number must be 10 digits long");
+            return false;
+        }
+    } else {
+        // Other countries min/max length check
+        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 5) { 
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Enter a valid mobile number (between 5-20 digits)");
+            return false;
+        }
+    }
+    return true;
+},  
+
+
+onMobileChange: function (oEvent) {
+    this._validateMobileNumberLocal(oEvent);
+},
+
+MC_onChangeCountry: function (oEvent) {
+    try {
+        const oComboBox = oEvent.getSource();
+        const sInputValue = oComboBox.getValue();
+        const aItems = oComboBox.getItems();
+
+        const oView = this.getView();
+        const oModel = oView.getModel("JobModel");
+
+        // 1. If blank, clear everything, no filter
+        if (!sInputValue) {
+            oComboBox.setValueState(sap.ui.core.ValueState.None);
+            oComboBox.setValueStateText("");
+            oComboBox.setSelectedKey(""); 
+            if (oModel) {
+                oModel.setProperty("/country", "");
+                oModel.setProperty("/stdCode", "");
+            }
+
+            // Clear ISD combo
+            const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
+            if (oISDCombo) {
+                oISDCombo.setSelectedKey("");
+                oISDCombo.setEnabled(true);
+                if (oISDCombo.getBinding("items")) {
+                    oISDCombo.getBinding("items").filter([]); // Remove filter
+                }
+            }
+
+            // Clear Location combo
+            const oLocationCombo = Fragment.byId(
+                "jobFormFrag",
+                "LocationComboBox"
+            );
+            if (oLocationCombo) {
+                oLocationCombo.setSelectedKey("");
+                if (oLocationCombo.getBinding("items")) {
+                    oLocationCombo.getBinding("items").filter([]); // Remove filter
+                }
+            }
+            
+            // Clear Mobile number & length
+            const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
+            if (oMobileInput) {
+                oMobileInput.setValue("");
+                oMobileInput.setMaxLength(20); 
+            }
+
+            return;
+        }
+
+        // 2. Check for valid country
+        const oMatchedItem = aItems.find((item) => {
+            return (
+                item.getText().toLowerCase() === sInputValue.toLowerCase() ||
+                item.getKey().toLowerCase() === sInputValue.toLowerCase()
+            );
+        });
+
+        if (!oMatchedItem) {
+            // Invalid input
+            oComboBox.setValueState(sap.ui.core.ValueState.Error);
+            oComboBox.setValueStateText(
+                this.oResourceBundle.getText("v2_m_errInvalidComboBox")
+            );
+            return;
+        }
+
+        // Valid country selected
+        oComboBox.setSelectedKey(oMatchedItem.getKey());
+        oComboBox.setValueState(sap.ui.core.ValueState.None);
+        oComboBox.setValueStateText("");
+
+        const selectedKey = oMatchedItem.getKey().toUpperCase();
+        if (oModel) {
+            oModel.setProperty("/country", selectedKey);
+        }
+
+        // ISD Code Filter
+        const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
+        if (oISDCombo && oISDCombo.getBinding("items")) {
+            const oISDFilter = new sap.ui.model.Filter(
+                "country_code",
+                "EQ",
+                selectedKey
+            );
+            oISDCombo.getBinding("items").filter([oISDFilter]);
+
+            setTimeout(() => {
+                const aISDItems = oISDCombo.getItems();
+                if (aISDItems.length === 1) {
+                    const sCode = aISDItems[0]
+                        .getBindingContext("codeModel")
+                        .getObject().calling_code;
+                    const sFinalCode = sCode.split(",")[0].trim();
+                    oISDCombo.setSelectedKey(sFinalCode);
+                    oISDCombo.setEnabled(false);
+                    oModel.setProperty("/stdCode", sFinalCode);
+                } else {
+                    oISDCombo.setSelectedKey("");
+                    oISDCombo.setEnabled(true);
+                    oModel.setProperty("/stdCode", "");
+                }
+            }, 0);
+        }
+
+        // Location Filter
+        const oLocationCombo = Fragment.byId(
+            "jobFormFrag",
+            "LocationComboBox"
+        );
+        if (oLocationCombo && oLocationCombo.getBinding("items")) {
+            const oLocationFilter = new sap.ui.model.Filter(
+                "CountryCode",
+                "EQ",
+                selectedKey
+            );
+            oLocationCombo.getBinding("items").filter([oLocationFilter]);
+            oLocationCombo.setSelectedKey("");
+        }
+        
+        // update Mobile number field 
+        const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
+        if (oMobileInput) {
+            // Set max length based on country
+            if (selectedKey === "IN") {
+                oMobileInput.setMaxLength(10); // for India
+            } else {
+                oMobileInput.setMaxLength(20); // for other countries
+            }
+        }
+    } catch (error) {}
+},
+onSubmit: async function () {
+    const i18n = this.oResourceBundle;
+    const f = (id) => sap.ui.core.Fragment.byId("jobFormFrag", id);
+
+    const scrollToError = (oControl) => {
+        if (oControl?.getDomRef?.()) {
+            oControl.getDomRef().scrollIntoView({
                 behavior: "smooth",
                 block: "center",
-              });
-            }
-          };
+            });
+        }
+    };
 
-          const validateInOrder = (checks) => {
-            for (const { ctrl, fn } of checks) {
-              const valid = fn(ctrl, "ID");
-              if (!valid) {
+    const validateInOrder = (checks) => {
+        for (const {
+                ctrl,
+                fn
+            } of checks) {
+            const valid = fn.call(this, {
+                getSource: () => ctrl
+            });
+            if (!valid) {
                 scrollToError(ctrl);
                 MessageToast.show(i18n.getText("mandetoryFields"));
                 return false;
-              }
             }
-            return true;
-          };
+        }
+        return true;
+    };
 
-          const isExperienced = f("experienceSwitch")?.getState?.();
+    const isExperienced = f("experienceSwitch")?.getState?.();
 
-          const mandatoryChecks = [
-            {
-              ctrl: f("fullNameInput"),
-              fn: utils._LCvalidateMandatoryField,
-            },
-            {
-              ctrl: f("emailInput"),
-              fn: utils._LCvalidateEmail,
-            },
-            {
-              ctrl: f("isd_code"),
-              fn: utils._LCstrictValidationComboBox,
-            },
-            {
-              ctrl: f("mobileInput"),
-              fn: utils._LCvalidateMobileNumber,
-            },
-            {
-              ctrl: f("qualificationCombo"),
-              fn: utils._LCstrictValidationComboBox,
-            },
-            {
-              ctrl: f("skillsInput"),
-              fn: utils._LCvalidateMandatoryField,
-            },
-          ];
+    const mandatoryChecks = [{
+        ctrl: f("fullNameInput"),
+        fn: utils._LCvalidateMandatoryField,
+    }, {
+        ctrl: f("emailInput"),
+        fn: utils._LCvalidateEmail,
+    }, {
+        ctrl: f("isd_code"),
+        fn: utils._LCstrictValidationComboBox,
+    }, {
+        ctrl: f("mobileInput"),
+        fn: this._validateMobileNumberLocal,
+    }, {
+        ctrl: f("qualificationCombo"),
+        fn: utils._LCstrictValidationComboBox,
+    }, {
+        ctrl: f("skillsInput"),
+        fn: utils._LCvalidateMandatoryField,
+    }, ];
 
-          if (isExperienced) {
-            mandatoryChecks.push(
-              {
-                ctrl: f("experienceInput"),
-                fn: utils._LCvalidateMandatoryField,
-              },
-              {
-                ctrl: f("companyInput"),
-                fn: utils._LCvalidateMandatoryField,
-              },
-              {
-                ctrl: f("salaryInput"),
-                fn: function (oCtrl) {
-                  const val = oCtrl.getValue().trim();
-                  const num = parseFloat(val);
-                  const isValid =
+    if (isExperienced) {
+        mandatoryChecks.push({
+            ctrl: f("experienceInput"),
+            fn: utils._LCvalidateMandatoryField,
+        }, {
+            ctrl: f("companyInput"),
+            fn: utils._LCvalidateMandatoryField,
+        }, {
+            ctrl: f("salaryInput"),
+            fn: function (oCtrl) {
+                const val = oCtrl.getValue().trim();
+                const num = parseFloat(val);
+                const isValid =
                     /^\d{1,2}(\.\d{1,2})?$/.test(val) &&
                     num >= 0.5 &&
                     num <= 99;
 
-                  if (!isValid) {
+                if (!isValid) {
                     oCtrl.setValueState("Error");
                     oCtrl.setValueStateText(i18n.getText("v2_m_errSal"));
                     return false;
-                  } else {
+                } else {
                     oCtrl.setValueState("None");
                     oCtrl.setValueStateText("");
                     return true;
-                  }
-                },
-              },
-              {
-                ctrl: f("expectedSalaryInput"),
-                fn: function (oCtrl) {
-                  const val = oCtrl.getValue().trim();
-                  const num = parseFloat(val);
-                  const isValid =
+                }
+            },
+        }, {
+            ctrl: f("expectedSalaryInput"),
+            fn: function (oCtrl) {
+                const val = oCtrl.getValue().trim();
+                const num = parseFloat(val);
+                const isValid =
                     /^\d{1,2}(\.\d{1,2})?$/.test(val) &&
                     num >= 0.5 &&
                     num <= 99;
 
-                  if (!isValid) {
+                if (!isValid) {
                     oCtrl.setValueState("Error");
                     oCtrl.setValueStateText(i18n.getText("v2_m_errSal"));
                     return false;
-                  } else {
+                } else {
                     oCtrl.setValueState("None");
                     oCtrl.setValueStateText("");
                     return true;
-                  }
-                },
-              },
+                }
+            },
+        }, {
+            ctrl: f("noticePeriodCombo"),
+            fn: utils._LCstrictValidationComboBox,
+        });
+    } else {
+        mandatoryChecks.push({
+            ctrl: f("fresherExpertiseInput"),
+            fn: utils._LCvalidateMandatoryField,
+        });
+    }
 
-              {
-                ctrl: f("noticePeriodCombo"),
-                fn: utils._LCstrictValidationComboBox,
-              }
-            );
-          } else {
-            mandatoryChecks.push({
-              ctrl: f("fresherExpertiseInput"),
-              fn: utils._LCvalidateMandatoryField,
-            });
-          }
+    // Validate sequentially
+    const allFieldsValid = validateInOrder(mandatoryChecks);
+    if (!allFieldsValid) return;
 
-          //  Validate sequentially
-          const allFieldsValid = validateInOrder(mandatoryChecks);
-          if (!allFieldsValid) return;
+    // Resume Validation via MessageStrip
+    const tokenModel = this.getView().getModel("tokenModel");
+    const files = tokenModel?.getProperty("/tokens") || [];
 
-          //  Resume Validation via MessageStrip
-          const tokenModel = this.getView().getModel("tokenModel");
-          const files = tokenModel?.getProperty("/tokens") || [];
+    const fileErrorLayout = f("fileErrorLayout");
+    const fileErrorText = f("fileErrorText");
 
-          const fileErrorLayout = f("fileErrorLayout");
-          const fileErrorText = f("fileErrorText");
-
-          if (!files.length) {
-            if (fileErrorLayout && fileErrorText) {
-              fileErrorLayout.setVisible(true);
-              fileErrorText.setVisible(true);
-              fileErrorText.setText(
+    if (!files.length) {
+        if (fileErrorLayout && fileErrorText) {
+            fileErrorLayout.setVisible(true);
+            fileErrorText.setVisible(true);
+            fileErrorText.setText(
                 i18n.getText("uploadRequired") || "Resume upload is required."
-              );
-            }
-            scrollToError(f("id_tokenizer"));
-            return;
-          } else {
-            if (fileErrorLayout && fileErrorText) {
-              fileErrorLayout.setVisible(false);
-              fileErrorText.setVisible(false);
-            }
-          }
+            );
+        }
+        scrollToError(f("id_tokenizer"));
+        return;
+    } else {
+        if (fileErrorLayout && fileErrorText) {
+            fileErrorLayout.setVisible(false);
+            fileErrorText.setVisible(false);
+        }
+    }
 
-          //  If everything is good — proceed
-          const oPayload = this.getFormDataAsJSON();
+    // If everything is good — proceed
+    const oPayload = this.getFormDataAsJSON();
 
-          this.getBusyDialog();
+    this.getBusyDialog();
 
-          try {
-            await this.ajaxCreateWithJQuery("JobApplications", {
-              data: oPayload,
-            });
-            MessageBox.success("Your Job Application Submitted Successfully!", {
-              onClose: () => {
+    try {
+        await this.ajaxCreateWithJQuery("JobApplications", {
+            data: oPayload,
+        });
+        MessageBox.success("Your Job Application Submitted Successfully!", {
+            onClose: () => {
                 this.onClose();
-              },
-            });
-          } catch (err) {
-            MessageToast.show(err.message || " Submission failed.");
-          } finally {
-            this.closeBusyDialog();
-          }
-        },
+            },
+        });
+    } catch (err) {
+        MessageToast.show(err.message || " Submission failed.");
+    } finally {
+        this.closeBusyDialog();
+    }
+},
 
         _appendComboTextFields: function (jsonData) {
           const f = (id) => sap.ui.core.Fragment.byId("jobFormFrag", id);

@@ -39,7 +39,7 @@
 						</VBox>
 						<VBox width="75%" class="sapUiTinyMarginBegin">
 							<Label text="Mobile Number" required="true" class="sapUiSmallMarginTop"/>
-							<Input id="mobileInput" maxLength="10" liveChange=".onMobileChange" required="true" valueStateText="{i18n>JAmobileVal}" placeholder="Enter Mobile Number"/>
+							<Input id="mobileInput"  liveChange=".onMobileChange" required="true" valueStateText="{i18n>JAmobileVal}" placeholder="Enter Mobile Number"/>
 						</VBox>
 					</HBox>
 					<Label class="sapUiSmallMarginTop" text="Date of Birth" required="false"/>
