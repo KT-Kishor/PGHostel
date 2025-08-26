@@ -137,10 +137,51 @@ sap.ui.define([
                 utils._LCvalidateJoiningBonus(oEvent);
                 if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
             },
-            TD_validateMobile: function (oEvent) {
-                utils._LCvalidateMobileNumber(oEvent);
-                if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
-            },
+TD_validateMobile: function (oEvent) {
+    const oInput = oEvent.getSource();
+    const sValue = oInput.getValue();
+    const sValueTrimmed = sValue.trim();
+    // Get country from oTraineeDetails model
+    const sCountryName = this.getView().getModel("oTraineeDetails").getProperty("/Country");
+    oInput.setValueState(sap.ui.core.ValueState.None);
+    oInput.setValueStateText("");
+
+    // Check if the mobile number starts with 0
+    if (sValueTrimmed.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile Number begins with non-zero");
+        return false;
+    }
+
+    // Check if the input contains only numbers
+    if (!/^\d*$/.test(sValueTrimmed)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only numbers are allowed");
+        return false;
+    }
+
+    // Validate based on the country
+    if (sCountryName === "India") {
+        if (sValueTrimmed.length !== 10) {
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Mobile Number must be 10 digits long");
+            return false;
+        }
+    } else {
+        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
+            return false;
+        }
+    }
+
+    // Call TD_validateStep if needed
+    if (this.sArgPara === "CreateTraineeFlag") {
+        this.TD_validateStep();
+    }
+
+    return true;
+},
             TD_onChangeCurrency:function(oEvent){
                 utils._LCstrictValidationComboBox(oEvent);
                 if(this.sArgPara === "CreateTraineeFlag")this.TD_validateStep();
@@ -286,34 +327,61 @@ sap.ui.define([
             },
 
             //Edit/save button visibility function
-            TU_onEditOrSavePress: function () {
-                try {
-                    if (this.viewModel.getProperty("/editable")) {
-                        // Perform validations
-                        var isValid =
-                            utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") &&
-                            utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") &&
-                            utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.byId("TU_id_Currency"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.getView().byId("TU_Id_Country"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Location"), "ID") &&
-                            utils._LCvalidateMobileNumber(this.getView().byId("TU_id_Mobile"), "ID") &&
-                            utils._LCstrictValidationComboBox(this.getView().byId("TU_id_STDCode"), "ID");
-                        if (isValid) {
-                            this.updateCallForTrainee(this.viewModel, "traineeDataUpdated");
-                        } else {
-                            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        }
-                    } else {
-                        this.viewModel.setProperty("/editable", true);
-                        this.viewModel.setProperty("/isEditMode", false);
-                    }
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
-                }
-            },
+TU_onEditOrSavePress: function () {
+    try {
+        if (this.viewModel.getProperty("/editable")) {
+            const oMobileInput = this.getView().byId("TU_id_Mobile");
+            // Call the new validation function
+            const isValidMobile = this.TD_validateMobile.bind(this)({ getSource: () => oMobileInput });
+
+            var isValid =
+                utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") &&
+                utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("TU_id_TrainingType"), "ID") &&
+                utils._LCvalidateJoiningBonus(this.getView().byId("TU_id_TrainingAmount"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("TU_id_Currency"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("TU_Id_Country"), "ID") &&
+                utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Location"), "ID") &&
+                // Use the new mobile validation result
+                isValidMobile &&
+                utils._LCstrictValidationComboBox(this.getView().byId("TU_id_STDCode"), "ID");
+
+            if (isValid) {
+                this.updateCallForTrainee(this.viewModel, "traineeDataUpdated");
+            } else {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            }
+        } else {
+            this.viewModel.setProperty("/editable", true);
+            this.viewModel.setProperty("/isEditMode", false);
+        }
+    } catch (error) {
+        MessageToast.show(this.i18nModel.getText("technicalError"));
+    }
+},
+
+TD_onPressMerge: async function (value) {
+    const oMobileInput = this.getView().byId("TU_id_Mobile");
+    // Call the new validation function
+    const isValidMobile = this.TD_validateMobile.bind(this)({ getSource: () => oMobileInput });
+
+    // Validate mobile number before proceeding
+    if (!isValidMobile) {
+        MessageToast.show("Please enter a valid mobile number.");
+        return;
+    }
+
+    var oModel = this.getView().getModel("oTraineeDetails");
+    this.getView().getModel("oTraineeDetails").setProperty("/Status", "New");
+    if (value !== "create") {
+        await this.updateCallForTrainee(this.viewModel, "silent");
+    }
+    this.offerGeneratingPdfFunction(oModel);
+    this.getView().getModel("oTraineeDetails").refresh(true);
+},
+
+
 
             //Update trainee deatails 
             updateCallForTrainee: async function (oViewModel, text) {
@@ -477,15 +545,7 @@ sap.ui.define([
                 if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
             },
             //PDF generation function
-            TD_onPressMerge: async function (value) {
-                var oModel = this.getView().getModel("oTraineeDetails");
-                this.getView().getModel("oTraineeDetails").setProperty("/Status", "New");
-                if (value !== "create") {
-                    await this.updateCallForTrainee(this.viewModel, "silent");
-                }
-                this.offerGeneratingPdfFunction(oModel);
-                this.getView().getModel("oTraineeDetails").refresh(true);
-            },
+
             async offerGeneratingPdfFunction(oModel) {
                 this.getBusyDialog();
                 var oEmpModel = oModel.getData();
@@ -578,10 +638,19 @@ sap.ui.define([
                 this.onCountryChange(oEvent, { stdCodeCombo: "TD_id_STDCode", baseLocationCombo: "TD_id_Location", branchInput: "TD_id_BranchCode", mobileInput: "TD_id_Mobile" });
                 if(this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
             },
-            TU_onChangeCountry: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-                this.onCountryChange(oEvent, { stdCodeCombo: "TU_id_STDCode", baseLocationCombo: "TU_id_Location", branchInput: "TU_id_BranchCode", mobileInput: "TU_id_Mobile" });
-            },
+TU_onChangeCountry: function (oEvent) {
+    utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+    this.onCountryChange(oEvent, { stdCodeCombo: "TU_id_STDCode", baseLocationCombo: "TU_id_Location", branchInput: "TU_id_BranchCode", mobileInput: "TU_id_Mobile" });
+
+    const sCountry = oEvent.getSource().getSelectedKey();
+    const oMobileInput = this.getView().byId("TU_id_Mobile");
+
+    if (sCountry === "India") {
+        oMobileInput.setMaxLength(10);
+    } else {
+        oMobileInput.setMaxLength(20);
+    }
+},  
             TD_TrainingValidate:function(oEvent){
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             }
