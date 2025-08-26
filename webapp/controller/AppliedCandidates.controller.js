@@ -102,16 +102,67 @@ sap.ui.define([
             });
         },
 
-         EOD_onChangeCountry: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                if (oEvent.getSource().getValue() === '') {
-                    oEvent.getSource().setValueState("None")
+ EOD_onChangeCountry: function(oEvent) {
+            const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
+            const sCountryCode = oEvent.getSource().getSelectedItem().getAdditionalText();
+            if (sCountryCode === "IN") {
+                oMobileInput.setMaxLength(10);
+            } else {
+                oMobileInput.setMaxLength(20);
+            }
+
+            // Existing logic
+            utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            if (oEvent.getSource().getValue() === '') {
+                oEvent.getSource().setValueState("None");
+            }
+            const oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+            const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+            sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
+            sap.ui.getCore().byId("FM_Id_City").setValue("");
+        },
+                _validateMobileNumberLocal: function(oEvent) {
+            const oInput = oEvent.getSource();
+            const sValue = oInput.getValue();
+            const sValueTrimmed = sValue.trim();
+            const oModel = this.getView().getModel("stuDataModel");
+            const sCountry = oModel.getProperty("/Country");
+            const sCountryCode = sap.ui.getCore().byId("FM_Id_Country").getSelectedItem().getAdditionalText();
+
+            oInput.setValueState(sap.ui.core.ValueState.None);
+            oInput.setValueStateText("");
+
+            // Mobile number cannot start with 0s
+            if (sValueTrimmed.startsWith("0")) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText("Mobile Number begins with non-zero");
+                return false;
+            }
+
+            // Only numbers
+            if (!/^\d*$/.test(sValueTrimmed)) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText("Only numbers are allowed");
+                return false;
+            }
+
+            // Depending upon country validation (India = 10 digits)
+            if (sCountryCode === "IN") {
+                if (sValueTrimmed.length !== 10) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Mobile Number must be 10 digits long");
+                    return false;
                 }
-                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
-                sap.ui.getCore().byId("FM_Id_City").setValue("");
-            },
+            } else {
+                // Other countries min/max length check
+                if (sValueTrimmed.length > 20 || sValueTrimmed.length < 5) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Enter a valid mobile number (between 5-20 digits)");
+                    return false;
+                }
+            }
+            return true;
+        },
 
         onFilterBarClear: function() {
             this.byId("filterEmployeeName").setSelectedKey("");
@@ -350,6 +401,7 @@ sap.ui.define([
             return oPayload;
         },
 
+
         onSaveNewCandidate: async function() {
             const oPayload = this._preparePayload();
             if (!oPayload) return;
@@ -410,6 +462,7 @@ sap.ui.define([
             });
         },
 
+
         _closeDialog: function() {
             if (this.oDialog) {
                 this.oDialog.then(oDialog => oDialog.close());
@@ -445,7 +498,7 @@ sap.ui.define([
             this.getView().getModel("stuDataModel").setProperty("/City", "");
         },
 
-        _validateAllDialogFields: function() {
+     _validateAllDialogFields: function() {
             try {
                 const isValid =
                     utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
@@ -453,7 +506,10 @@ sap.ui.define([
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
-                    utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FM_Id_MobileNumber"), "ID") &&
+                    // Updated mobile number validation
+                    this._validateMobileNumberLocal({
+                        getSource: () => sap.ui.getCore().byId("FM_Id_MobileNumber")
+                    }) &&
                     utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
                     utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
@@ -468,35 +524,63 @@ sap.ui.define([
             }
         },
 
-        // validation handlers 
+        // New validation handlers
         onValidateName: (oEvent) => utils._LCvalidateName(oEvent),
         onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
-        onValidateMobile: (oEvent) => utils._LCvalidateMobileNumber(oEvent),
+        onValidateMobile: function(oEvent) {
+            this._validateMobileNumberLocal(oEvent);
+        },
         onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
         onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
         onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
 
-       onExport: function() {
+        onExport: function() {
             const aData = this.getView().getModel("DataTableModel").getData();
             const aFormattedData = aData.map(item => {
-            return {
-              ...item,
-              CurrentSalary: formatter.LPAattach(item.CurrentSalary),
-              ExpectedSalary: formatter.LPAattach(item.ExpectedSalary), 
-              Experience: formatter.ExperienceFormat(item.Experience), 
-            };
-          });
-            const aCols = [
-                { label: "Name", property: "FullName", type: "string"},
-                { label: "Current CTC (LPA)", property: "CurrentSalary", type: "string"},
-                { label: "Expected CTC (LPA)", property: "ExpectedSalary", type: "string"},
-                { label: "Notice Period (Days)", property: "NoticePeriod", type: "string"},
-                { label: "Mobile Number", property: "Mobile", type: "string"},  
-                { label: "Email", property: "Email", type: "string"},
-                { label: "Notice Period (Days)", property: "NoticePeriod", type: "string"},
-                { label: "Experience (Years)", property: "Experience", type: "string"},
-                { label: "Skills", property: "Skills", type: "string"},
-            ];
+                return {
+                    ...item,
+                    CurrentSalary: formatter.LPAattach(item.CurrentSalary),
+                    ExpectedSalary: formatter.LPAattach(item.ExpectedSalary),
+                    Experience: formatter.ExperienceFormat(item.Experience),
+                };
+            });
+            const aCols = [{
+                label: "Name",
+                property: "FullName",
+                type: "string"
+            }, {
+                label: "Current CTC (LPA)",
+                property: "CurrentSalary",
+                type: "string"
+            }, {
+                label: "Expected CTC (LPA)",
+                property: "ExpectedSalary",
+                type: "string"
+            }, {
+                label: "Notice Period (Days)",
+                property: "NoticePeriod",
+                type: "string"
+            }, {
+                label: "Mobile Number",
+                property: "Mobile",
+                type: "string"
+            }, {
+                label: "Email",
+                property: "Email",
+                type: "string"
+            }, {
+                label: "Notice Period (Days)",
+                property: "NoticePeriod",
+                type: "string"
+            }, {
+                label: "Experience (Years)",
+                property: "Experience",
+                type: "string"
+            }, {
+                label: "Skills",
+                property: "Skills",
+                type: "string"
+            }, ];
 
             const oSettings = {
                 workbook: {
@@ -509,7 +593,6 @@ sap.ui.define([
             const oSheet = new sap.ui.export.Spreadsheet(oSettings);
             oSheet.build().finally(() => oSheet.destroy());
         },
-
         SalaryInfoPress: function(oEvent) {
             if (!this._oPopover) {
                 this._oPopover = new sap.m.Popover({

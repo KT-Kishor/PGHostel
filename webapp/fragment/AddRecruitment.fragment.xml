@@ -67,7 +67,7 @@
                     editable="{EditableModeltruefalse>/Editable}" valueStateText="{i18n>NoticePeriod}"
                     change="onValidateMandatoryField">
 					<core:Item key="{NoticePeriod>key}" text="{NoticePeriod>text}" />
-				</ComboBox>
+				</ComboBox>   
 				<Label text="{i18n>expCountry}" required="true" />
                     <ComboBox change="EOD_onChangeCountry"  editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaCountry}" id="FM_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{stuDataModel>/Country}" showSecondaryValues="true"  >
 				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
@@ -92,7 +92,7 @@
 				<Input
                     value="{stuDataModel>/Mobile}"
                     liveChange="onValidateMobile" 
-                    maxLength="10"
+                    maxLength="{= ${stuDataModel>/Country} === 'India' ? 10 : 20 }"
                     id="FM_Id_MobileNumber"
                     valueState="{modelValuStateError>/MobileNumberState}"
                     valueStateText="{i18n>mobileNoValueState}"
