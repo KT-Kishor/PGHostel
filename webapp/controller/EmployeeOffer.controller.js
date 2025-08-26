@@ -376,9 +376,7 @@ sap.ui.define([
                 utils._LCvalidateEmail(oEvent);
             },
             //Validate mobile 
-            validateMobileNo: function(oEvent) {
-                utils._LCvalidateMobileNumber(oEvent);
-            },
+
             //Validate comobox
             validateCombo: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
@@ -387,42 +385,55 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent)
             },
             //Onboard function
-            OEF_onPressOnBoard: function(oEvent) {
-                try {
-                    var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
-                    if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") &&
-                        utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && utils._LCvalidateMobileNumber(sap.ui.getCore().byId("OEF_id_Mobile"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
-                        var oPayload = {
-                            tableName: "EmployeeDetails",
-                            data: oModel
-                        };
-                        oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
-                        oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
-                        this.getBusyDialog();
-                        this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
-                            if (oData.success) {
-                                this.EO_onSearch();
-                                this.oDialog.close();
-                                MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
-                                this.getView().getModel("empModel").refresh(true);
 
-                            } else {
-                                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                            }
-                            this.closeBusyDialog();
-                        }).catch((error) => {
-                            this.closeBusyDialog();
-                            MessageToast.show(error.message || error.responseText);
-                        });
-                    } else {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    }
-                } catch (error) {
-                    this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+       OEF_onPressOnBoard: function(oEvent) {
+    try {
+        var oModel = this.getView().getModel("oEmpolyeeDetailsModel").getData();
+        var bIsMobileValid = this._validateMobileNumberLocal({
+            getSource: () => sap.ui.getCore().byId("OEF_id_Mobile")
+        });
 
+        if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") && 
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") && 
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") && 
+            utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") && 
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") && 
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") &&
+            utils._LCvalidateDate(sap.ui.getCore().byId("OEF_id_DateofBirth"), "ID") && 
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_blood"), "ID") && 
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_STDCode"), "ID") && 
+            bIsMobileValid && // Call the new validation function here
+            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Manager"), "ID")) {
+
+            var oPayload = {
+                tableName: "EmployeeDetails",
+                data: oModel
+            };
+            oModel.DateOfBirth = oModel.DateOfBirth.split("/").reverse().join('-');
+            oModel.ManagerID = sap.ui.getCore().byId("OEF_id_Manager").getSelectedItem().getAdditionalText();
+            this.getBusyDialog();
+            this.ajaxCreateWithJQuery("EmployeeDetails", oPayload).then((oData) => {
+                if (oData.success) {
+                    this.EO_onSearch();
+                    this.oDialog.close();
+                    MessageToast.show(this.i18nModel.getText("onBoardSuccess"));
+                    this.getView().getModel("empModel").refresh(true);
+                } else {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 }
-            },
+                this.closeBusyDialog();
+            }).catch((error) => {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+            });
+        } else {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        }
+    } catch (error) {
+        this.closeBusyDialog();
+        MessageToast.show(this.i18nModel.getText("technicalError"));
+    }
+},     
             //Common update function
             updateCallForEmployeeOffer: async function(oStatus, oDialogRef) {
                 try {
@@ -474,14 +485,71 @@ sap.ui.define([
                     "/BranchCode" // Path in target model
                 );
             },
-            OE_onChangeCountry: function(oEvent) {
-                this.onCountryChange(oEvent, {
-                    stdCodeCombo: "OEF_id_STDCode",
-                    baseLocationCombo: "idSelect",
-                    branchInput: "OE_id_BranchInput",
-                    mobileInput: "OEF_id_Mobile"
-                });
-            },
+            _validateMobileNumberLocal: function (oEvent) {
+    const oInput = oEvent.getSource();
+    const sValue = oInput.getValue();
+    const sValueTrimmed = sValue.trim();
+    const oCountryComboBox = sap.ui.getCore().byId("OEF_id_Country");
+    let sCountryCode = "";
+    if (oCountryComboBox && oCountryComboBox.getSelectedItem()) {
+        sCountryCode = oCountryComboBox.getSelectedItem().getAdditionalText();
+    }
+
+    oInput.setValueState(sap.ui.core.ValueState.None);
+    oInput.setValueStateText("");
+
+    if (sValueTrimmed.length === 0) {
+        return true; 
+    }
+
+    if (!/^\d+$/.test(sValueTrimmed)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only numbers are allowed");
+        return false;
+    }
+
+    if (sValueTrimmed.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile Number should not begin with zero");
+        return false;
+    }
+
+    if (sCountryCode === "IN") {
+        if (sValueTrimmed.length !== 10) {
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Mobile Number must be 10 digits long for India");
+            return false;
+        }
+    } else {
+        if (sValueTrimmed.length < 4 || sValueTrimmed.length > 20) {
+            oInput.setValueState(sap.ui.core.ValueState.Error);
+            oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
+            return false;
+        }
+    }
+    return true;
+},
+validateMobileNo: function(oEvent) {
+    this._validateMobileNumberLocal(oEvent);
+},
+OE_onChangeCountry: function(oEvent) {
+    var sCountryKey = oEvent.getSource().getSelectedItem().getAdditionalText();
+    var oMobileInput = sap.ui.getCore().byId("OEF_id_Mobile");
+    if (oMobileInput) {
+        if (sCountryKey === "IN") {
+            oMobileInput.setMaxLength(10);
+        } else {
+            oMobileInput.setMaxLength(20);
+        }
+    }
+    this.onCountryChange(oEvent, {
+        stdCodeCombo: "OEF_id_STDCode",
+        baseLocationCombo: "idSelect",
+        branchInput: "OE_id_BranchInput",
+        mobileInput: "OEF_id_Mobile"
+    });
+},
+            
             EO_DownloadTableData:function(){
                   var table = this.byId("EO_id_TableEOffer");
           const oModelData = table.getModel("EmployeeOfferModel").getData();
