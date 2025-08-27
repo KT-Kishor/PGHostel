@@ -155,9 +155,9 @@ sap.ui.define([
                 }
             } else {
                 // Other countries min/max length check
-                if (sValueTrimmed.length > 20 || sValueTrimmed.length < 5) {
+                if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
                     oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText("Enter a valid mobile number (between 5-20 digits)");
+                    oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
                     return false;
                 }
             }

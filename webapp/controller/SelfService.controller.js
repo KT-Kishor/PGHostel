@@ -1,4 +1,4 @@
-sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF", "../fonts/EBGaramond", "../fonts/Allura", "../fonts/Poppins", "../fonts/Plight",  "sap/suite/ui/commons/Timeline","sap/suite/ui/commons/TimelineItem"], (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF, EBGaramond, Allura, Poppins, Plight,Timeline, TimelineItem) => {
+sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF", "../fonts/EBGaramond", "../fonts/Allura", "../fonts/Poppins", "../fonts/Plight", "sap/suite/ui/commons/Timeline", "sap/suite/ui/commons/TimelineItem"], (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF, EBGaramond, Allura, Poppins, Plight, Timeline, TimelineItem) => {
   "use strict";
   return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
     Formatter: Formatter,
@@ -12,8 +12,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       var oDateModel = new sap.ui.model.json.JSONModel();
       oDateModel.setData({ maxDate: maxDate18YearsAgo, focusedDate: new Date(2000, 0, 1), minDate: new Date(1950, 0, 1), nextMonthMinDate: nextMonthFirstDate });
       this.getView().setModel(oDateModel, "controller");
-        this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
-     // this.getRouter().navTo("SelfService", { sPath: "SelfService" });
+      this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
+      // this.getRouter().navTo("SelfService", { sPath: "SelfService" });
     },
 
     _onRouteMatched: async function (oEvent) {
@@ -445,9 +445,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       });
       this.getView().setModel(empModel, "employmentModel");
     },
-    SS_validateMobileNo: function (oEvent) {
-      utils._LCvalidateMobileNumber(oEvent);
-    },
+
     SS_validateCombo: function (oEvent) {
       utils._LCstrictValidationComboBox(oEvent);
     },
@@ -540,6 +538,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         }
       }
     },
+    SS_validateMobileNumber: function (oEvent) {
+      this._validateMobileNumberLocal(oEvent);
+    },
+
     _validateAllRequiredFieldsForSubmit: function () {
       const oView = this.getView();
       const bIsValid =
@@ -548,17 +550,20 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         utils._LCstrictValidationComboBox(oView.byId("SS_id_BloodGroup"), "ID") &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
+        // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
-        utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+        this._validateMobileNumberLocal(oView.byId("SS_id_MobileNo")) &&
         // --- Emergency Contact 1 ---
         utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
+        // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+        this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoF")) &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
         // --- Emergency Contact 2 ---
         utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
+        // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-        utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+        this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoS")) &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
         // --- Bank Details Section ---
         utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
@@ -648,7 +653,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     onChangeResigEndDate: function (oEvent) {
       utils._LCvalidateDate(oEvent);
     },
-
     SS_onSavePress: function (sButtonId) {
       const oView = this.getView();
       const oDataModel = oView.getModel("sEmployeeModel").getData()[0];
@@ -669,7 +673,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
           const sEmployeeType = this.ViewModel.getProperty("/employeeType");
           if (!sEmployeeType) {
             MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
-            return false; // Stop the save process
+            return false;
           }
           // Basic Details & Emergency Contacts Validation
           isValid =
@@ -678,37 +682,36 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
-            utils._LCvalidateMobileNumber(oView.byId("SS_id_MobileNo"), "ID") &&
+            this._validateMobileNumberLocal(oView.byId("SS_id_MobileNo")) &&
             utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") &&
             utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoF"), "ID") &&
+            this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoF")) &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
             utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-            utils._LCvalidateMobileNumber(oView.byId("SS_id_EmpMoS"), "ID") &&
+            this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoS")) &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_Desi"), "ID");
         } else if (sButtonId === "DocumentBtn") {
           // Bank Details & Personal IDs Validation
           isValid = utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") && utils._LCvalidateAccountNo(oView.byId("SS_id_Acno"), "ID") && utils._LCvalidateMandatoryField(oView.byId("SS_id_BankName"), "ID") && utils._LCvalidateMandatoryField(oView.byId("SS_id_Branch"), "ID") && utils._LCvalidateIfcCode(oView.byId("SS_id_IfcsCode"), "ID") && utils._LCvalidateMandatoryField(oView.byId("SS_id_Address"), "ID") && utils._LCvalidatePanCard(oView.byId("SS_id_Pan"), "ID") && utils._LCvalidateAadharCard(oView.byId("SS_idAdhar"), "ID");
         }
+      } else if (sButtonId === "Submit") {
+        isValid = this._validateAllRequiredFieldsForSubmit(); // This is the new line
       } else {
         // Admin/HR Edit Validation
         const isRequiredValid = utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID");
-
         const passport = oView.byId("SS_id_Passport").getValue().trim();
         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
         const isOptionalValid = (passport === "" || utils._LCvalidatePassport(oView.byId("SS_id_Passport"), "ID")) && (voterId === "" || utils._LCvalidateVoterId(oView.byId("SS_id_Voterid"), "ID")) && (oDataModel.EmployeeStatus === "Inactive" && !["Trainee", "Contractor"].includes(this.sNavigatedRole) ? utils._LCvalidateDate(oView.byId("SS_id_ResgEndDate"), "ID") : true);
-
         isValid = isRequiredValid && isOptionalValid;
       }
       // --- Section 2: Check Validation Result ---
       if (!isValid) {
         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-        return false; // Stop if validation failed
+        return false;
       }
-
       // --- Section 3: Prepare Data for Payload ---
       oDataModel.EmployeeType = this.ViewModel.getProperty("/employeeType");
       if (sButtonId === "Submit") {
@@ -716,17 +719,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         sMessage = this.i18nModel.getText("confirmSubmitMessage");
       } else {
         oDataModel.DateOfBirth = oView.byId("SS_id_Dob").getValue().split("/").reverse().join("-");
-        oDataModel.EmergencyContactPerson1Salutation = oView.byId("SS_idEmeSalF").getSelectedKey();
-        oDataModel.EmergencyContactPerson2Salutation = oView.byId("SS_idEmeSalS").getSelectedKey();
-        oDataModel.EmergencyContactPerson1Realtion = oView.byId("SS_idRelF").getSelectedKey();
-        oDataModel.EmergencyContactPerson2Realtion = oView.byId("SS_idRelS").getSelectedKey();
-      }
 
+        // Safety check for all ComboBoxes before getting the key
+        const oSalutationF = oView.byId("SS_idEmeSalF");
+        oDataModel.EmergencyContactPerson1Salutation = oSalutationF ? oSalutationF.getSelectedKey() : null;
+
+        const oSalutationS = oView.byId("SS_id_EmeSalS");
+        oDataModel.EmergencyContactPerson2Salutation = oSalutationS ? oSalutationS.getSelectedKey() : null;
+
+        const oRelationF = oView.byId("SS_idRelF");
+        oDataModel.EmergencyContactPerson1Realtion = oRelationF ? oRelationF.getSelectedKey() : null;
+
+        const oRelationS = oView.byId("SS_idRelS");
+        oDataModel.EmergencyContactPerson2Realtion = oRelationS ? oRelationS.getSelectedKey() : null;
+      }
       const oPayload = {
         data: oDataModel,
         filters: { EmployeeID: this.EmployeeID },
       };
-
       // --- Section 4: Show Confirmation and Execute Save ---
       this.showConfirmationDialog(
         this.i18nModel.getText("confirmTitle"),
@@ -738,6 +748,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       );
       return true;
     },
+
     updateFunctionForSelf: function (oPayload, ID) {
       var oView = this.getView();
       var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
@@ -1524,12 +1535,30 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       }
     },
     onAfterRendering: function () {
+      // Existing code for clearing the canvas
       var canvasElement = document.getElementById("canvas");
       if (canvasElement) {
         var context = canvasElement.getContext("2d");
         if (context) {
           context.clearRect(0, 0, canvasElement.width, canvasElement.height);
         }
+      }
+
+      // New code to set the initial maxLength on input fields
+      const oView = this.getView();
+      const oSTDCode = oView.byId("SS_id_STDCode");
+      const oSTDCodeRI = oView.byId("SS_id_STDCodeRI");
+      const oSTDCodeRII = oView.byId("SS_id_STDCodeRII");
+
+      // Call the helper function for each ComboBox to set the corresponding input's maxLength
+      if (oSTDCode) {
+        this._setMobileInputMaxLength(oSTDCode);
+      }
+      if (oSTDCodeRI) {
+        this._setMobileInputMaxLength(oSTDCodeRI);
+      }
+      if (oSTDCodeRII) {
+        this._setMobileInputMaxLength(oSTDCodeRII);
       }
     },
     _normalizeDate: function (date) {
@@ -1574,7 +1603,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     saveEducationDetails: async function (bIsCreate) {
       try {
         // ---  field validation ---
-       const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_Degree"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID")  && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_GradeType"), "ID")
+        const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AddEd_id_College"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_Degree"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_StartEdu"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AddEd_id_EndEdu"), "ID") && utils._LCvalidateGrade(sap.ui.getCore().byId("AddEd_id_Grade"), "ID", "AddEd_id_GradeType") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AddEd_id_GradeType"), "ID");
         if (!isValid) {
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
@@ -1765,29 +1794,29 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     AddEmp_onUpdateEmpDetails: function () {
       this.saveEmploymentDetails(false); // update mode
     },
-_validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedRecordId) {
-    const normalizedNewStart = this._normalizeDate(newStart);
-    const normalizedNewEnd = this._normalizeDate(newEnd);
+    _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedRecordId) {
+      const normalizedNewStart = this._normalizeDate(newStart);
+      const normalizedNewEnd = this._normalizeDate(newEnd);
 
-    if (!normalizedNewStart || !normalizedNewEnd) {
+      if (!normalizedNewStart || !normalizedNewEnd) {
         return false;
-    }
+      }
 
-    for (const record of existingRecords) {
+      for (const record of existingRecords) {
         if (editedRecordId && record.ID === editedRecordId) {
-            continue;
+          continue;
         }
         const normalizedExistingStart = this._normalizeDate(record.StartDate);
         const normalizedExistingEnd = this._normalizeDate(record.EndDate);
         if (!normalizedExistingStart || !normalizedExistingEnd) {
-            continue;
+          continue;
         }
         if (normalizedNewStart <= normalizedExistingEnd && normalizedNewEnd >= normalizedExistingStart) {
-            return true;
+          return true;
         }
-    }
-    return false;
-},
+      }
+      return false;
+    },
     //Reference details
     EmpF_onReferenceDetails: function () {
       var that = this;
@@ -2651,45 +2680,41 @@ _validateEmploymentOverlap: function (newStart, newEnd, existingRecords, editedR
       }
     },
 
+    RF_onPressCloseDialog: function () {
+      const oVM = this.getView().getModel("viewModel");
+      const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
 
-RF_onPressCloseDialog: function () {
-  const oVM = this.getView().getModel("viewModel");
-  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+      if (oVM.getProperty("/isWithdrawMode")) {
+        // Cancel withdraw → reset
+        oVM.setProperty("/isWithdrawMode", false);
+        oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+        oVM.setProperty("/editableWithdrawComment", false);
+        oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
 
-  if (oVM.getProperty("/isWithdrawMode")) {
-    // Cancel withdraw → reset
-    oVM.setProperty("/isWithdrawMode", false);
-    oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
-    oVM.setProperty("/editableWithdrawComment", false);
-    oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
+        const sOriginalComment = oVM.getProperty("/originalComment") || "";
+        oCommentField.setEditable(false);
+        oCommentField.setValue(sOriginalComment);
 
-    const sOriginalComment = oVM.getProperty("/originalComment") || "";
-    oCommentField.setEditable(false);
-    oCommentField.setValue(sOriginalComment);
+        sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
 
-    sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
+        this.SSReg_oDialog.close();
+        return;
+      }
 
-    this.SSReg_oDialog.close();
-    return;
-  }
+      // Normal close case
+      if (!oVM.getProperty("/CanWithdrawResignation")) {
+        sap.ui.getCore().byId("RF_id_StartDate").setValue("");
+        sap.ui.getCore().byId("RF_id_EndDate").setValue("");
+        sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
+        sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
+        this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
+        this.getView().getModel("PDFData").setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+      }
 
-  // Normal close case
-  if (!oVM.getProperty("/CanWithdrawResignation")) {
-    sap.ui.getCore().byId("RF_id_StartDate").setValue("");
-    sap.ui.getCore().byId("RF_id_EndDate").setValue("");
-    sap.ui.getCore().byId("RF_id_ResignReason").setValue("");
-    sap.ui.getCore().byId("RF_id_ResignReason").setValueState("None");
-    this.getView().getModel("PDFData").setProperty("/PreviewFlag", false);
-    this.getView().getModel("PDFData").setProperty(
-      "/RTEText",
-      "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>"
-    );
-  }
-
-  this.SSReg_oDialog.close();
-  this.SSReg_oDialog.destroy();  
-  this.SSReg_oDialog = null;
-},
+      this.SSReg_oDialog.close();
+      this.SSReg_oDialog.destroy();
+      this.SSReg_oDialog = null;
+    },
 
     RF_onPressHandlePreview: function () {
       const bPreviewFlag = this.getView().getModel("PDFData").getProperty("/PreviewFlag");
@@ -2818,77 +2843,77 @@ RF_onPressCloseDialog: function () {
         function () {}
       );
     },
-onWithdrawResignation: function () {
-  var that = this;
-  const oVM = this.getView().getModel("viewModel");
-  const oEmpModel = this.getView().getModel("sEmployeeModel");
-  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
-  const oStartDatePicker = sap.ui.getCore().byId("RF_id_StartDate");
-  const oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
+    onWithdrawResignation: function () {
+      var that = this;
+      const oVM = this.getView().getModel("viewModel");
+      const oEmpModel = this.getView().getModel("sEmployeeModel");
+      const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+      const oStartDatePicker = sap.ui.getCore().byId("RF_id_StartDate");
+      const oEndDatePicker = sap.ui.getCore().byId("RF_id_EndDate");
 
-  const sStartDate = oEmpModel.getProperty("/0/ResignationStartDate");
-  const sEndDate = oEmpModel.getProperty("/0/ResignationEndDate");
-  const sOriginalComment = oEmpModel.getProperty("/0/ResignComment") || "";
+      const sStartDate = oEmpModel.getProperty("/0/ResignationStartDate");
+      const sEndDate = oEmpModel.getProperty("/0/ResignationEndDate");
+      const sOriginalComment = oEmpModel.getProperty("/0/ResignComment") || "";
 
-  const parseDate = (sDate) => {
-    if (!sDate) return null;
-    const isoDate = new Date(sDate);
-    if (!isNaN(isoDate.getTime())) return isoDate;
+      const parseDate = (sDate) => {
+        if (!sDate) return null;
+        const isoDate = new Date(sDate);
+        if (!isNaN(isoDate.getTime())) return isoDate;
 
-    const parts = sDate.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts.map(Number);
-      const d = new Date(year, month - 1, day);
-      return isNaN(d.getTime()) ? null : d;
-    }
-    return null;
-  };
+        const parts = sDate.split("/");
+        if (parts.length === 3) {
+          const [day, month, year] = parts.map(Number);
+          const d = new Date(year, month - 1, day);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+      };
 
-  const restoreDates = () => {
-    setTimeout(() => {
-      const startDateObj = parseDate(sStartDate);
-      const endDateObj = parseDate(sEndDate);
-      if (startDateObj) oStartDatePicker.setDateValue(startDateObj);
-      if (endDateObj) oEndDatePicker.setDateValue(endDateObj);
-    }, 50);
-  };
+      const restoreDates = () => {
+        setTimeout(() => {
+          const startDateObj = parseDate(sStartDate);
+          const endDateObj = parseDate(sEndDate);
+          if (startDateObj) oStartDatePicker.setDateValue(startDateObj);
+          if (endDateObj) oEndDatePicker.setDateValue(endDateObj);
+        }, 50);
+      };
 
-  // --- CASE 1: Enter withdraw mode ---
-  if (!oVM.getProperty("/isWithdrawMode")) {
-    oVM.setProperty("/isWithdrawMode", true);
-    oVM.setProperty("/closeButtonText", this.i18nModel.getText("cancel"));
-    oVM.setProperty("/editableWithdrawComment", true);
-    oVM.setProperty("/commentLabel", this.i18nModel.getText("withdrawComment"));
+      // --- CASE 1: Enter withdraw mode ---
+      if (!oVM.getProperty("/isWithdrawMode")) {
+        oVM.setProperty("/isWithdrawMode", true);
+        oVM.setProperty("/closeButtonText", this.i18nModel.getText("cancel"));
+        oVM.setProperty("/editableWithdrawComment", true);
+        oVM.setProperty("/commentLabel", this.i18nModel.getText("withdrawComment"));
 
-    // Save original comment for cancel restore
-    oVM.setProperty("/originalComment", sOriginalComment);
+        // Save original comment for cancel restore
+        oVM.setProperty("/originalComment", sOriginalComment);
 
-    oCommentField.setEditable(true);
-    oCommentField.setValue("");
+        oCommentField.setEditable(true);
+        oCommentField.setValue("");
 
-    restoreDates();
+        restoreDates();
 
-    MessageBox.information(this.i18nModel.getText("fillWithdrawReason"));
-    return;
-  }
-
-  // --- CASE 2: Submit withdraw ---
-  const sComment = oCommentField.getValue().trim();
- if (!sComment) {
-        oCommentField.setValueState("Error");
-        oCommentField.setValueStateText(this.i18nModel.getText("withdrawReasonRequired")); 
+        MessageBox.information(this.i18nModel.getText("fillWithdrawReason"));
         return;
-    }
+      }
 
-    // Clear error once valid
-    oCommentField.setValueState("None");
+      // --- CASE 2: Submit withdraw ---
+      const sComment = oCommentField.getValue().trim();
+      if (!sComment) {
+        oCommentField.setValueState("Error");
+        oCommentField.setValueStateText(this.i18nModel.getText("withdrawReasonRequired"));
+        return;
+      }
 
-     const oEmployeeModel = oEmpModel.getProperty("/0");
-   var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
-   var designation = oEmployeeModel.Designation;
-            var subject = "Confirmation of Resignation Withdrawal";
+      // Clear error once valid
+      oCommentField.setValueState("None");
 
-            var body = `
+      const oEmployeeModel = oEmpModel.getProperty("/0");
+      var empName = oEmployeeModel.Salutation + " " + oEmployeeModel.EmployeeName;
+      var designation = oEmployeeModel.Designation;
+      var subject = "Confirmation of Resignation Withdrawal";
+
+      var body = `
     <div style="text-align: justify; font-family: Arial, sans-serif;">
         <p>Dear <b>${empName}</b>,</p>
         <p>We acknowledge receipt of your request to withdraw your resignation from the position of <b>${designation}</b> at <b>${that.companyName}</b>.</p>
@@ -2900,74 +2925,73 @@ onWithdrawResignation: function () {
     </div>
 `;
 
-  const oPayload = {
-    isWithdraw: "isWithdraw",
-    from: oEmployeeModel.CompanyEmailID,
-    ResignComment: sComment,
-    fromName: empName,
-    subject: subject,
-    to: empName,
-    subject: "Confirmation of Resignation Withdrawal",
-    body: body,
-    CC: [oEmployeeModel.CompanyEmailID],
-    EmployeeID: this.EmployeeID,
-    Inbox: oEmployeeModel
-  };
+      const oPayload = {
+        isWithdraw: "isWithdraw",
+        from: oEmployeeModel.CompanyEmailID,
+        ResignComment: sComment,
+        fromName: empName,
+        subject: subject,
+        to: empName,
+        subject: "Confirmation of Resignation Withdrawal",
+        body: body,
+        CC: [oEmployeeModel.CompanyEmailID],
+        EmployeeID: this.EmployeeID,
+        Inbox: oEmployeeModel,
+      };
 
-  this.getBusyDialog();
-  this.ajaxCreateWithJQuery("ResignationMail", oPayload)
-    .then(() => {
-      MessageToast.show(this.i18nModel.getText("resignWithdrw") || "Resignation letter withdrawn");
-      oVM.setProperty("/CanWithdrawResignation", false);
+      this.getBusyDialog();
+      this.ajaxCreateWithJQuery("ResignationMail", oPayload)
+        .then(() => {
+          MessageToast.show(this.i18nModel.getText("resignWithdrw") || "Resignation letter withdrawn");
+          oVM.setProperty("/CanWithdrawResignation", false);
 
-      // Reset UI fields
-      oCommentField.setValue("");
-      oStartDatePicker.setValue("");
-      oEndDatePicker.setValue("");
+          // Reset UI fields
+          oCommentField.setValue("");
+          oStartDatePicker.setValue("");
+          oEndDatePicker.setValue("");
 
-      const oPDFModel = this.getView().getModel("PDFData");
-      oPDFModel.setProperty("/PreviewFlag", false);
-      oPDFModel.setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
+          const oPDFModel = this.getView().getModel("PDFData");
+          oPDFModel.setProperty("/PreviewFlag", false);
+          oPDFModel.setProperty("/RTEText", "<p>Please click on <b>Preview Certificate</b> to Preview the Certificate</p>");
 
-      oVM.setProperty("/editableResignatin", true);
-      oVM.setProperty("/BtnVisible", true);
+          oVM.setProperty("/editableResignatin", true);
+          oVM.setProperty("/BtnVisible", true);
+          oVM.setProperty("/editableWithdrawComment", false);
+          oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
+
+          // reset button back to "Close"
+          oVM.setProperty("/isWithdrawMode", false);
+          oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+
+          this.SSReg_oDialog.close();
+        })
+        .catch((error) => {
+          MessageToast.show(error.message || "Failed to withdraw resignation.");
+        })
+        .finally(() => {
+          this.closeBusyDialog();
+        });
+    },
+
+    // --- SEPARATE CANCEL HANDLER ---
+    onWithdrawCancel: function () {
+      const oVM = this.getView().getModel("viewModel");
+      const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
+
+      const sRestoreComment = oVM.getProperty("/originalComment") || "";
+
+      oVM.setProperty("/isWithdrawMode", false);
+      oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
       oVM.setProperty("/editableWithdrawComment", false);
       oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
 
-              // reset button back to "Close"
-        oVM.setProperty("/isWithdrawMode", false);
-        oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
+      oCommentField.setEditable(false);
+      oCommentField.setValue(sRestoreComment);
 
+      sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
 
       this.SSReg_oDialog.close();
-    })
-    .catch((error) => {
-      MessageToast.show(error.message || "Failed to withdraw resignation.");
-    })
-    .finally(() => {
-      this.closeBusyDialog();
-    });
-},
-
-// --- SEPARATE CANCEL HANDLER ---
-onWithdrawCancel: function () {
-  const oVM = this.getView().getModel("viewModel");
-  const oCommentField = sap.ui.getCore().byId("RF_id_ResignReason");
-
-  const sRestoreComment = oVM.getProperty("/originalComment") || "";
-
-  oVM.setProperty("/isWithdrawMode", false);
-  oVM.setProperty("/closeButtonText", this.i18nModel.getText("close"));
-  oVM.setProperty("/editableWithdrawComment", false);
-  oVM.setProperty("/commentLabel", this.i18nModel.getText("resignComment"));
-
-  oCommentField.setEditable(false);
-  oCommentField.setValue(sRestoreComment);
-
-  sap.m.MessageToast.show(this.i18nModel.getText("withdrawCancelMsg") || "Withdrawal canceled");
-
-  this.SSReg_oDialog.close();
-},
+    },
 
     SS_onChangeCountry: function (oEvent) {
       utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
@@ -2998,77 +3022,208 @@ onWithdrawCancel: function () {
       }
     },
     onShowMore: async function () {
-        this.getBusyDialog();
-        const response = await this.ajaxReadWithJQuery("AllComments", {
-            ApplicationName: "Resignation"
-        });
-        const aAllComments = response.data || [];
-        this.closeBusyDialog();
- 
-        var oEmployeeData = this.getView().getModel("sEmployeeModel").getData()[0];
-        var sEmpID = oEmployeeData.ID;
- 
-        var aFilteredComments = aAllComments.filter(function (oComment) {
-            return oComment.ApplicationName === "Resignation" && oComment.ID === sEmpID;
-        });
- 
-        let oContent;
- 
-        if (aFilteredComments.length === 0) {
-            // Show "No Data" message
-            oContent = new sap.m.VBox({
-                alignItems: "Center",
-                justifyContent: "Center",
-                items: [
-                    new sap.m.Text({ text: "No Data Found", design: "Bold" })
-                ]
-            }).addStyleClass("sapUiSmallMargin");
-        } else {
-            // Map into Timeline Items
-            var aTimelineItems = aFilteredComments.slice().reverse().map(function (oComment) {
-                return new sap.suite.ui.commons.TimelineItem({
-                    dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
-                    title: (oComment.CommentedBy || "Anonymous") + " (" + (oComment.Status || "No Status") + ")",
-                    text: oComment.Comment || "No comment provided",
-                    userNameClickable: false,
-                    icon: "sap-icon://comment"
-                });
+      this.getBusyDialog();
+      const response = await this.ajaxReadWithJQuery("AllComments", {
+        ApplicationName: "Resignation",
+      });
+      const aAllComments = response.data || [];
+      this.closeBusyDialog();
+
+      var oEmployeeData = this.getView().getModel("sEmployeeModel").getData()[0];
+      var sEmpID = oEmployeeData.ID;
+
+      var aFilteredComments = aAllComments.filter(function (oComment) {
+        return oComment.ApplicationName === "Resignation" && oComment.ID === sEmpID;
+      });
+
+      let oContent;
+
+      if (aFilteredComments.length === 0) {
+        // Show "No Data" message
+        oContent = new sap.m.VBox({
+          alignItems: "Center",
+          justifyContent: "Center",
+          items: [new sap.m.Text({ text: "No Data Found", design: "Bold" })],
+        }).addStyleClass("sapUiSmallMargin");
+      } else {
+        // Map into Timeline Items
+        var aTimelineItems = aFilteredComments
+          .slice()
+          .reverse()
+          .map(function (oComment) {
+            return new sap.suite.ui.commons.TimelineItem({
+              dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+              title: (oComment.CommentedBy || "Anonymous") + " (" + (oComment.Status || "No Status") + ")",
+              text: oComment.Comment || "No comment provided",
+              userNameClickable: false,
+              icon: "sap-icon://comment",
             });
- 
-            // Create Timeline
-            oContent = new sap.suite.ui.commons.Timeline({
-                showHeader: false,
-                enableBusyIndicator: false,
-                width: "100%",
-                sortOldestFirst: false,
-                enableDoubleSided: false,
-                content: aTimelineItems,
-                showHeaderBar: false
-            });
-        }
- 
-        // Dialog
-        var oDialog = new sap.m.Dialog({
-            title: "Resignation Comments",
-            contentWidth: "25rem",
-            contentHeight: "15rem",
-            draggable: true,
-            resizable: true,
-            content: [oContent],
-            endButton: new sap.m.Button({
-                text: "Close",
-                type: "Reject",
-                press: function () {
-                    oDialog.close();
-                    oDialog.destroy();
-                }
-            })
+          });
+
+        // Create Timeline
+        oContent = new sap.suite.ui.commons.Timeline({
+          showHeader: false,
+          enableBusyIndicator: false,
+          width: "100%",
+          sortOldestFirst: false,
+          enableDoubleSided: false,
+          content: aTimelineItems,
+          showHeaderBar: false,
         });
- 
-        oDialog.open();
+      }
+
+      // Dialog
+      var oDialog = new sap.m.Dialog({
+        title: "Resignation Comments",
+        contentWidth: "25rem",
+        contentHeight: "15rem",
+        draggable: true,
+        resizable: true,
+        content: [oContent],
+        endButton: new sap.m.Button({
+          text: "Close",
+          type: "Reject",
+          press: function () {
+            oDialog.close();
+            oDialog.destroy();
+          },
+        }),
+      });
+
+      oDialog.open();
     },
-    AddEd_changeDegree:function(oEvent){
-      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-    },
+    AddEd_changeDegree: function (oEvent) {
+      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+    },
+
+    onCountryCodeChange: function (oEvent) {
+      const oComboBox = oEvent.getSource();
+      const sSelectedCode = oComboBox.getValue();
+      let oMobileInput;
+      let sMobilePath;
+
+      // Find the related mobile input field and its model path based on ComboBox ID
+      const sId = oComboBox.getId();
+      if (sId.includes("SS_id_STDCodeRII")) {
+        oMobileInput = this.getView().byId("SS_id_EmpMoS");
+        sMobilePath = "/0/EmergencyContactPerson2ContactNo";
+      } else if (sId.includes("SS_id_STDCodeRI")) {
+        oMobileInput = this.getView().byId("SS_id_EmpMoF");
+        sMobilePath = "/0/EmergencyContactPerson1ContactNo";
+      } else {
+        oMobileInput = this.getView().byId("SS_id_MobileNo");
+        sMobilePath = "/0/MobileNo";
+      }
+
+      if (oMobileInput) {
+        // Correctly clear the data-bound field by updating the model
+        const oModel = this.getView().getModel("sEmployeeModel");
+        if (oModel) {
+          oModel.setProperty(sMobilePath, "");
+        }
+
+        // Reset the value state
+        oMobileInput.setValueState(sap.ui.core.ValueState.None);
+
+        // Call the new helper function to set the maxLength
+        this._setMobileInputMaxLength(oComboBox);
+      }
+
+      // Call the utility function to validate the ComboBox itself
+      utils._LCstrictValidationComboBox(oEvent);
+    },
+
+    onMobileNumberLiveChange: function (oEvent) {
+      const oInput = oEvent.getSource();
+      this._validateMobileNumberLocal(oInput);
+    },
+
+    _validateMobileNumberLocal: function (oInput) {
+      if (!(oInput instanceof sap.m.Input)) {
+        return false;
+      }
+
+      const oView = this.getView();
+      const sValueTrimmed = oInput.getValue().trim();
+
+      // Dynamically find the correct country code ComboBox
+      let sCountryCodeId;
+      const sInputId = oInput.getId();
+      if (sInputId.includes("SS_id_EmpMoF")) {
+        sCountryCodeId = oView.createId("SS_id_STDCodeRI");
+      } else if (sInputId.includes("SS_id_EmpMoS")) {
+        sCountryCodeId = oView.createId("SS_id_STDCodeRII");
+      } else {
+        sCountryCodeId = oView.createId("SS_id_STDCode");
+      }
+
+      const oCountryCodeComboBox = sap.ui.getCore().byId(sCountryCodeId);
+
+      // Use getValue() to get the string "+91"
+      const sCountryCode = oCountryCodeComboBox ? oCountryCodeComboBox.getValue() : "";
+
+      oInput.setValueState(sap.ui.core.ValueState.None);
+      oInput.setValueStateText("");
+
+      if (oInput.getRequired() && sValueTrimmed.length === 0) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("This field is mandatory.");
+        return false;
+      }
+
+      if (!oInput.getRequired() && sValueTrimmed.length === 0) {
+        return true;
+      }
+
+      if (!/^\d*$/.test(sValueTrimmed)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only numbers are allowed");
+        return false;
+      }
+
+      if (sValueTrimmed.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile Number cannot begin with zero");
+        return false;
+      }
+
+      // Now this condition will be true when the value is "+91"
+      if (sCountryCode === "+91") {
+        if (sValueTrimmed.length !== 10) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("Mobile Number must be 10 digits long for India");
+          return false;
+        }
+      } else {
+        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("Enter a valid mobile number (between 4 and 20 digits)");
+          return false;
+        }
+      }
+
+      return true;
+    },
+    _setMobileInputMaxLength: function (oComboBox) {
+      const sSelectedCode = oComboBox.getValue();
+      let oMobileInput;
+
+      const sId = oComboBox.getId();
+      if (sId.includes("SS_id_STDCodeRII")) {
+        oMobileInput = this.getView().byId("SS_id_EmpMoS");
+      } else if (sId.includes("SS_id_STDCodeRI")) {
+        oMobileInput = this.getView().byId("SS_id_EmpMoF");
+      } else {
+        oMobileInput = this.getView().byId("SS_id_MobileNo");
+      }
+
+      if (oMobileInput) {
+        if (sSelectedCode === "+91") {
+          oMobileInput.setMaxLength(10);
+        } else {
+          oMobileInput.setMaxLength(20);
+        }
+      }
+    },
   });
 });
