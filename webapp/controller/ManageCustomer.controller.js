@@ -394,6 +394,7 @@ sap.ui.define([
                     }
                     var oCustomerModel = this.getView().getModel("CustomerModel");
                     var oUpdatedData = oCustomerModel.getData();
+                    delete oUpdatedData.currency; // Remove currency for update
                     var oTable = this.byId("MC_id_CustTable");
                     var oSelectedItem = oTable.getSelectedItem();
                     // Ensure a customer is selected
