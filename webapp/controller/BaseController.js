@@ -17,11 +17,170 @@
       return sap.ui.core.UIComponent.getRouterFor(this);
     },
 
-
     getI18nText: function (sKey, aParams) {
       const oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
       return oResourceBundle.getText(sKey, aParams);
     },
+
+   initLocationModels: function(oView) {
+           const aBaseData = oView.getModel("BaseLocationModel").getData();
+           // --- Unique Countries ---
+           const aCountries = [];
+           const oCountryMap = {};
+           aBaseData.forEach(item => {
+               const sCode = item.CountryCode?.trim().toUpperCase() || "";
+               const sName = item.Country?.trim() || "";
+               if (sCode && sName && !oCountryMap[sCode]) {
+                   oCountryMap[sCode] = true;
+                   aCountries.push({
+                       code: sCode,
+                       countryName: sName,
+                       currency: item.Currency || "",
+                       stdCode: item.STDCode || ""
+                   });
+               }
+           });
+           aCountries.sort((a, b) => a.countryName.localeCompare(b.countryName));
+           oView.setModel(new JSONModel(aCountries), "CountryModel");
+
+           // --- Deduplicated States per Country ---
+           const oStateMap = {};
+           const aStates = [];
+           aBaseData.forEach(item => {
+               const key = (item.CountryCode + "_" + item.state).toUpperCase();
+               if (item.CountryCode && item.state && !oStateMap[key]) {
+                   oStateMap[key] = true;
+                   aStates.push({
+                       state: item.state,
+                       countryCode: item.CountryCode
+                   });
+               }
+           });
+           oView.setModel(new JSONModel(aStates), "StateModel");
+
+           // --- Deduplicated Cities per State ---
+           const oCityMap = {};
+           const aCities = [];
+           aBaseData.forEach(item => {
+               const key = (item.state + "_" + item.baseLocation).toUpperCase();
+               if (item.state && item.baseLocation && !oCityMap[key]) {
+                   oCityMap[key] = true;
+                   aCities.push({
+                       baseLocation: item.city,
+                       state: item.state,
+                       countryCode: item.CountryCode,
+                       branchCode: item.branchCode,
+                       currency: item.Currency || "",
+                       stdCode: item.STDCode || ""
+                   });
+               }
+           });
+           oView.setModel(new JSONModel(aCities), "CityModel");
+
+           // --- Deduplicated STD Codes per Country ---
+           const oCodeMap = {};
+           const aCodes = [];
+           aBaseData.forEach(item => {
+               const code = item.STDCode?.trim() || "";
+               const key = (item.CountryCode + "_" + code).toUpperCase();
+               if (code && !oCodeMap[key]) {
+                   oCodeMap[key] = true;
+                   aCodes.push({
+                       stdCode: code,
+                       countryCode: item.CountryCode,
+                       currency: item.Currency || ""
+                   });
+               }
+           });
+           aCodes.sort((a, b) => a.stdCode.localeCompare(b.stdCode));
+           oView.setModel(new JSONModel(aCodes), "CodeModel");
+       },
+
+       onCountry: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
+           const sCountryCode = oEvent.getSource().getSelectedKey();
+           const sCountryName = oEvent.getSource().getSelectedItem()?.getText();
+
+           const oModel = oView.getModel(sCustomerModelName);
+           oModel.setProperty("/countryCode", sCountryCode || "");
+           oModel.setProperty("/country", sCountryName || "");
+
+           const aBaseData = oView.getModel("BaseLocationModel").getData();
+           const aStates = [];
+           const oStateMap = {};
+
+           aBaseData.forEach(item => {
+               if (item.CountryCode === sCountryCode && item.state && !oStateMap[item.state]) {
+                   oStateMap[item.state] = true;
+                   aStates.push({
+                       state: item.state
+                   });
+               }
+           });
+
+           oView.getModel("StateModel").setData(aStates);
+
+           if (mConfig.resetIds) {
+               this.resetComboBoxSelection(oView, mConfig.resetIds);
+           }
+       },
+
+       onStateChange: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
+           const sState = oEvent.getSource().getSelectedKey();
+           const oModel = oView.getModel(sCustomerModelName);
+           oModel.setProperty("/state", sState || "");
+
+           const aBaseData = oView.getModel("BaseLocationModel").getData();
+           const sCountryCode = oModel.getProperty("/countryCode");
+
+           const aCities = aBaseData.filter(item =>
+               item.state === sState &&
+               (!sCountryCode || item.CountryCode === sCountryCode)
+           ).map(item => ({
+               baseLocation: item.city, // ✅ use baseLocation not city
+               state: item.state,
+               countryCode: item.CountryCode,
+               branchCode: item.branchCode,
+               currency: item.Currency || "",
+               stdCode: item.STDCode || ""
+           }));
+
+           oView.getModel("CityModel").setData(aCities);
+           oView.getModel("CityModel").refresh(true);
+
+           if (mConfig.resetIds) {
+               this.resetComboBoxSelection(oView, mConfig.resetIds);
+           }
+       },
+
+       onCityChange: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
+           const sCityName = oEvent.getSource().getSelectedKey();
+           const oModel = oView.getModel(sCustomerModelName);
+           const aBaseData = oView.getModel("BaseLocationModel").getData();
+
+           const oCityData = aBaseData.find(item => item.city === sCityName);
+
+           if (oModel) {
+               oModel.setProperty("/baseLocation", oCityData.city || "");
+               oModel.setProperty("/stdCode", oCityData.STDCode || "");
+               oModel.setProperty("/currency", oCityData.Currency || "");
+               oModel.setProperty("/countryCode", oCityData.CountryCode || "");
+               oModel.setProperty("/state", oCityData.state || "");
+           }
+
+           if (mConfig.resetIds) {
+               this.resetComboBoxSelection(oView, mConfig.resetIds);
+           }
+       },
+
+       resetComboBoxSelection: function(oView, aIds = []) {
+           aIds.forEach(sId => {
+               const oControl = oView.byId(sId) || sap.ui.getCore().byId(sId);
+               if (oControl) {
+                   oControl.setSelectedKey("");
+                   oControl.setValue("");
+               }
+           });
+       },
 
     calculateDateDifference: function (endDate, sStatus) {
       var thresholdDays = 30;

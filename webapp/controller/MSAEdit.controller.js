@@ -953,6 +953,7 @@ sap.ui.define([
                 oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
                 oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
                 oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
+                oPDFModel.setProperty("/ClientCountry", oModel.Country);
                 oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
                 oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
                 oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);

@@ -48,7 +48,7 @@
 								<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 							</ComboBox>
 							<Label text="{i18n>CompBranch}" required="true" />
-							<ComboBox change="Msa_BranchChange" filterSecondaryValues="true" valueStateText="{i18n>selectBranch}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{BaseLocationModel>/}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true">
+							<ComboBox change="Msa_BranchChange" filterSecondaryValues="true" valueStateText="{i18n>selectBranch}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{path:'BaseLocationModel>/',length:1000}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true">
 								<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
 							</ComboBox>
 							<Label text="{i18n>panCardReg}" required="true" />

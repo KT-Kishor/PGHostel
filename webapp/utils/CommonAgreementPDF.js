@@ -29,7 +29,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
             doc.setFont("times", "normal").setFontSize(11);
 
             let titleContentY = titleY + 10; // Initial Y position after titleY
-            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)", "Parties"];
+            const boldWords = ["AND", `${oCompanyModel.companyName}`, "NON-DISCLOSURE AGREEMENT", "India", `${oCompanyModel.headOfCompany} - ${oCompanyModel.designation}`, `${oModel.ClientCompanyName}`, "Company", "Other Party", `${oModel.ClientName} - ${oModel.ClientRole}`, "Disclosing Party", "Receiving Party", "Contractor", "(SOW)", "Parties", `${oModel.ClientCountry}`];
             const trimmedBoldWords = boldWords.map(word => word.trim());
             const boldWordList = trimmedBoldWords.join(" ").split(" ").filter(item => item !== "");
 

@@ -1,4 +1,5 @@
-<core:FragmentDefinition xmlns:mvc="sap.ui.core.mvc"
+<core:FragmentDefinition
+	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core">
@@ -7,7 +8,6 @@
 			<f:content>
 				<Label text="{i18n>companyName}" />
 				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields" value="{CustomerModel>/companyName}" editable="{ViewModel>/update}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
-
 				<Label text="{i18n>customerName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
@@ -31,11 +31,9 @@
 
 				<Label text="{i18n>type}" labelFor="groupC" />
 				<RadioButtonGroup visible="{visiblePlay>/CC_id_CustInput}" select="onRadioButtonChange" id="MC_id_groupCustGst" columns="2" editable="false">
-
 					<RadioButton text="{i18n>cgst}" />
 					<RadioButton text="{i18n>igst}" />
 				</RadioButtonGroup>
-
 				<Label visible="{visiblePlay>/CC_id_CustInput}" text="{i18n>custValue}" />
 				<Input visible="{visiblePlay>/CC_id_CustInput}" id="CC_id_custValue" value="{CustomerModel>/value}" maxLength="5" />
 
@@ -46,30 +44,37 @@
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 
 				<Label text="{i18n>expCountry}" required="true"/>
-				<ComboBox change="MC_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="MC_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}" showSecondaryValues="true">
-					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				<ComboBox id="MC_id_Country" change="MC_onChangeCountry" items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/countryCode}"  valueStateText="{i18n>expValStaCountry}">
+					<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}"/>
+				</ComboBox>
+
+				<Label text="{i18n>state}" required="true"/>
+				<ComboBox id="MC_id_State"  change="MC_onChangeState"  items="{path:'StateModel>/',length:1000}" selectedKey="{CustomerModel>/state}">
+					<core:ListItem key="{StateModel>state}" text="{StateModel>state}"/>
 				</ComboBox>
 
 				<Label text="{i18n>contractLocation}" required="true"/>
-				<ComboBox items="{BaseLocationModel>/}" change="MC_onBaseLocationChange" id="MC_id_BaseCity" showSecondaryValues="true" selectedKey="{CustomerModel>/baseLocation}" valueStateText="{i18n>combovalueState}">
-					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				<ComboBox id="MC_id_City" change="MC_onChangeCity" items="{path:'CityModel>/',length:1000}" selectedKey="{CustomerModel>/baseLocation}">
+					<core:ListItem key="{CityModel>baseLocation}" text="{CityModel>baseLocation}" />
 				</ComboBox>
 
 				<Label text="{i18n>mobileNo}"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
-						<ComboBox selectedKey="{CustomerModel>/stdCode}" showSecondaryValues="true" change="MC_ValidateComboBox" id="MC_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}">
-							<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
+						<ComboBox id="MC_id_codeModel"  selectedKey="{CustomerModel>/stdCode}"  showSecondaryValues="true" 
+			        change="MC_ValidateComboBox"   items="{CodeModel>/}"   filterSecondaryValues="true"  valueStateText="{i18n>combovalueState}">
+							<core:ListItem key="{CodeModel>stdCode}" text="{CodeModel>stdCode}" additionalText="{CodeModel>countryCode}" />
 						</ComboBox>
 					</VBox>
 					<VBox width="78%">
-						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob" placeholder="{i18n>placeholderMobileNo}" maxLength="20" liveChange="MC_ValidateMobileNo" valueStateText="{i18n>mobileNoValueState}" />
+						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob"  placeholder="{i18n>placeholderMobileNo}" 
+                        maxLength="20" liveChange="MC_ValidateMobileNo"  valueStateText="{i18n>mobileNoValueState}" />
 					</VBox>
 				</HBox>
 
 				<Label text="{i18n>custLut}"/>
 				<Input value="{CustomerModel>/LUT}" maxLength="16" placeholder="{i18n>placeholderLUT}" liveChange="MC_ValidateLUTNo" valueStateText="{i18n>placeholderLUT}" id="MC_id_LUTNo"/>
-
+				
 				<Label text="{i18n>address}" required="true" />
 				<TextArea id="MC_id_CustAddress" value="{CustomerModel>/address}" placeholder="{i18n>addressPlaceholder}" maxLength="200" liveChange="MC_ValidateCommonFields" valueStateText="{i18n>addressValueState}"></TextArea>
 			</f:content>
