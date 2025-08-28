@@ -59,10 +59,10 @@
 				<core:ListItem key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />
-				<ComboBox value="{oEmpolyeeDetailsModel>/STDCode}" showSecondaryValues= "true" id="OEF_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="validateCombo" valueStateText="{i18n>combovalueState}">
+				<ComboBox value="{oEmpolyeeDetailsModel>/STDCode}" showSecondaryValues= "true" id="OEF_id_STDCode" items="{codeModel>/}" filterSecondaryValues="true" change="STDcodeChange" valueStateText="{i18n>combovalueState}">
 					<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}"/>
 				</ComboBox>
-<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="validateMobileNo" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
+				<Input value="{oEmpolyeeDetailsModel>/MobileNo}" placeholder="{i18n>mobileNo}" maxLength="10" liveChange="validateMobileNo" id="OEF_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>manager}" required="true"/>
 				<ComboBox value="{oEmpolyeeDetailsModel>/ManagerName}"
 				showSecondaryValues= "true"

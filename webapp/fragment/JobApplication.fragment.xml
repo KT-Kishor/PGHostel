@@ -21,7 +21,7 @@
 					<Label class="sapUiSmallMarginTop" text="Email Address" required="true"/>
 					<Input id="emailInput" type="Email" liveChange="onEmailChange" maxLength="50" required="true" placeholder="Enter email" valueStateText="{i18n>emailValueState}" />
 					<Label class="sapUiSmallMarginTop" text="Country of Residence" />
-					<ComboBox change="MC_onChangeCountry" width="100%" valueStateText="{i18n>expValStaCountry}" id="countryCombo" items="{path:'CountryModel>/',length:1000}" selectedKey="{JobModel>/country}" showSecondaryValues="true">
+					<ComboBox change="MC_onChangeCountry" width="100%" valueStateText="{i18n>JobAppExpValStaCountry}" id="countryCombo" items="{path:'CountryModel>/',length:1000}" selectedKey="{JobModel>/country}" showSecondaryValues="true">
 						<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 					</ComboBox>
 					<Label text="City" class="sapUiSmallMarginTop" />

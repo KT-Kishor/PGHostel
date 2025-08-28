@@ -300,7 +300,7 @@
                                         id="TD_id_STDCode"
                                         items="{codeModel>/}"
                                         filterSecondaryValues="true"
-                                        change="TD_validateCombo"
+                                        change="TD_validateSTD"
                                         valueStateText="{i18n>combovalueState}"
                                     >
                                         <core:ListItem
@@ -315,7 +315,7 @@
                                         value="{oTraineeDetails>/MobileNumber}"
                                         placeholder="{i18n>mobileNo}"
                                         liveChange="TD_validateMobile"
-                                        maxLength="10"
+                                     
                                         id="TD_id_Mobile"
                                         valueStateText="{i18n>mobileNoValueState}"
                                         class="sapUiTinyMarginBegin"
