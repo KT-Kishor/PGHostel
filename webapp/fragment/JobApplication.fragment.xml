@@ -25,7 +25,9 @@
 						<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 					</ComboBox>
 					<Label text="City" class="sapUiSmallMarginTop" />
-					<ComboBox width="100%" items="{BaseLocationModel>/}" change="MC_onBaseLocationChange" id="LocationComboBox" showSecondaryValues="true" selectedKey="{JobModel>/baseLocation}" valueStateText="{i18n>JAcombovalueState}">
+					<ComboBox width="100%"
+					items="{path: 'BaseLocationModel>/', length:5000, sorter: { path: 'text' }}"
+					 change="MC_onBaseLocationChange" id="LocationComboBox" showSecondaryValues="true" selectedKey="{JobModel>/baseLocation}" valueStateText="{i18n>JAcombovalueState}">
 						<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 					</ComboBox>
 					<Label class="sapUiSmallMarginTop" text="Address" required="false"/>
