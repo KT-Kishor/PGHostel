@@ -1318,16 +1318,18 @@
       }
     },
 
-    //Notification fragment open
-    Tile_NotifictionBTN:async function (oEvent) {
-      var oView = this.getView();
-      var oButton = oEvent.getSource(); 
-      
-       this.getBusyDialog();
+    TileNotificationReadData:async function(){
+      this.getBusyDialog();
       await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
       await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
       await this._fetchCommonData("getCompanyInvoice","CompanyInvoiceModelData");
-       this.closeBusyDialog();
+      this.closeBusyDialog();
+    },
+    
+    //Notification fragment open
+    Tile_NotifictionBTN:async function (oEvent) {
+      var oView = this.getView();
+      var oButton = oEvent.getSource();
 
       var oOldCarousel = sap.ui.getCore().byId("TN_id_Carousel");
       if (oOldCarousel) {
@@ -1348,10 +1350,12 @@
           oView.addDependent(this.oPopover);
           this.oPopover.attachAfterOpen(this.initializeBirthdayCarousel.bind(this));
           this.oPopover.openBy(oButton);
+          this.TileNotificationReadData();
           // this.initializeBirthdayCarousel();
         }.bind(this));
       } else {
         this.oPopover.openBy(oButton);
+        this.TileNotificationReadData();
         // this.initializeBirthdayCarousel();
       }
     },

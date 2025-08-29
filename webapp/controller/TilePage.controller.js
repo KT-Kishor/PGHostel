@@ -484,10 +484,128 @@ onTileRefresh: async function () {
     this.closeBusyDialog();
     MessageToast.show("Data Refreshed Successfully");
   },
+     UploadCountryData:function(){
+      let oView = this.getView()
+         if (!this.oLeaveDialog) {
+        sap.ui.core.Fragment.load({
+            name: "sap.kt.com.minihrsolution.fragment.AddHolidayList",
+            controller: this,
+        }).then(function (oLeaveDialog) {
+            this.oLeaveDialog = oLeaveDialog;
+            oView.addDependent(this.oLeaveDialog);
+            this.oLeaveDialog.setTitle("Upload country data");
+            this.oLeaveDialog.open();
+            sap.ui.getCore().byId("ALH_id_Date").setVisible(false);
+            sap.ui.getCore().byId("ALH_id_fileuploaderLabele").setRequired(false);
+            
+        }.bind(this));
+    } else {
+        // this._resetDialogFields();
+        this.oLeaveDialog.open();
+          this.oLeaveDialog.setTitle("Upload country data");
+        sap.ui.getCore().byId("ALH_id_Date").setVisible(false);
+        sap.ui.getCore().byId("ALH_id_fileuploaderLabele").setRequired(false);
+     
+    }
+  },
+  LOH_onPressClose:function(){
+    sap.ui.getCore().byId("ALH_id_LocFileUpload").setValue("");
+    this.oLeaveDialog.close();
+    this.oLeaveDialog.destroy();
+     this.oLeaveDialog = null;
+  },
+
+  LOH_onUpload:function(oEvent){
+    var oFile = oEvent.getParameter("files")[0];
+    if (oFile) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            // Convert file into array buffer
+            var data = new Uint8Array(e.target.result);
+
+            // Read workbook
+            var workbook = XLSX.read(data, { type: 'array' });
+
+            // Take first sheet
+            var sheetName = workbook.SheetNames[0];
+            var sheet = workbook.Sheets[sheetName];
+
+            // Convert sheet → JSON
+            this.jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+            // console.log("Excel JSON Data:", this.jsonData);
+     
+        }.bind(this);
+
+        reader.readAsArrayBuffer(oFile);
+    }
+  },
+
+  LOH_onPressSubmit:function(){    
+        let that = this
+          let stdcodeavlue = sap.ui.getCore().byId("TP_id_STDCode").getValue();
+          let currencyavlue = sap.ui.getCore().byId("TP_id_Currency").getValue();
+          let branchcodevlue =  sap.ui.getCore().byId("TP_id_BranchCode").getValue();
+          let cityvlue = sap.ui.getCore().byId("TP_id_City").getValue();
+          let statevlue = sap.ui.getCore().byId("TP_id_State").getValue();
+          let countryavlue = sap.ui.getCore().byId("TP_id_Country").getValue();
+          let countrycode = sap.ui.getCore().byId("TP_id_CountryCode").getValue();
+
+           const formData = {
+    city: cityvlue,
+    branchCode: branchcodevlue,
+    state: statevlue,
+    CountryCode: countrycode,
+    Country: countryavlue,
+    STDCode: stdcodeavlue,
+    Currency: currencyavlue
+  }
+
+   if(this.jsonData){
+    // let fileEmpty = sap.ui.getCore().byId("ALH_id_LocFileUpload").getValue();
+    // if(!fileEmpty){
+    //    sap.m.MessageToast.show("Please select file");
+    //    return;
+    // } 
+  //   let dataformat = this.jsonData.map((elem)=>{
+  //   return {
+  //       ...elem,                
+  //       STDCode: `+${elem.STDCode}`
+  //   };
+  //  })
+
+if(this.jsonData.length <= 0){
+        sap.m.MessageToast.show("Fill is empty");
+       return;
+      }
+      this.sendExcelfileData=this.jsonData;
+   } else{
+      this.sendExcelfileData=formData
+      if(this.sendExcelfileData.city=== "" || 
+         this.sendExcelfileData.state=== "" || this.sendExcelfileData.CountryCode=== "" || this.sendExcelfileData.Country=== "" ||
+         this.sendExcelfileData.STDCode=== "" || this.sendExcelfileData.Currency=== ""){
+            sap.m.MessageToast.show("Please Fill Data");
+    return;
+        }
+      
+   }
+
+    const datafromexcel = {data: this.sendExcelfileData};
+     that.getBusyDialog();
+     that.ajaxCreateWithJQuery("BaseLocation", datafromexcel).then((res)=>{
+     that.closeBusyDialog();
+     sap.ui.getCore().byId("ALH_id_LocFileUpload").setValue("");
+     that.LOH_onPressClose();
+    sap.m.MessageToast.show("Data saved successfully");
+     }).catch((error)=>{
+      sap.m.MessageToast.show("Duplicate data in file");
+       that.closeBusyDialog();
+     });
+  },
+  onDownloadTemplatexlsx:function(){
+    let fileUrl = window.location.origin.split("index")[0] + "/Template.xlsx";
+      sap.m.URLHelper.redirect(fileUrl, true)
+  }
   });
 });
-
-
-
-
-

@@ -68,15 +68,19 @@ sap.ui.define(
               that.getView().addDependent(that.oHolidayDialog);
               that._resetDialogFields(); // Reset values
               that.oHolidayDialog.open();   // Open dialog
+              that.setVisibleInvisblefragmentField();
             });
           } else {
             this._resetDialogFields();  // Reset fields and open existing dialog
             this.oHolidayDialog.open();
+            this.setVisibleInvisblefragmentField();
           }
         },
 
         LOH_onPressClose: function () {
           this.oHolidayDialog.close(); //Closes the holiday dialog
+          this.oHolidayDialog.destroy();
+          this.oHolidayDialog = null;
         },
 
         _resetDialogFields: function () {
@@ -198,7 +202,7 @@ sap.ui.define(
                         }).then(() => {
                           MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                           that.byId("LOH_id_Holidays").setDateValue(new Date(selectedYear, 0, 1));
-                          that.oHolidayDialog.close();
+                           that.LOH_onPressClose();
                           return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
                             startDate: `${selectedYear}-01-01`,
                             endDate: `${selectedYear}-12-31`
@@ -219,7 +223,7 @@ sap.ui.define(
                 that.ajaxCreateWithJQuery("ListOfHolidays", { data: formattedData }).then(() => {
                   MessageToast.show(that.i18nModel.getText("uploadSuccessfull"));
                   that.byId("LOH_id_Holidays").setDateValue(new Date(selectedYear, 0, 1));
-                  that.oHolidayDialog.close();
+                   that.LOH_onPressClose();
                   return that._fetchCommonData("ListOfHolidays?", "HolidayModel", {
                     startDate: `${selectedYear}-01-01`,
                     endDate: `${selectedYear}-12-31`
@@ -282,6 +286,18 @@ sap.ui.define(
         onLogout: function () {
           this.CommonLogoutFunction(); // Navigate to the login page
         },
+
+        setVisibleInvisblefragmentField:function(){
+          sap.ui.getCore().byId("TP_id_STDCode").setVisible(false)
+          sap.ui.getCore().byId("TP_id_Currency").setVisible(false)
+          sap.ui.getCore().byId("TP_id_BranchCode").setVisible(false)
+          sap.ui.getCore().byId("TP_id_City").setVisible(false)
+          sap.ui.getCore().byId("TP_id_State").setVisible(false)
+          sap.ui.getCore().byId("TP_id_Country").setVisible(false)
+          sap.ui.getCore().byId("TP_id_CountryCode").setVisible(false)
+          sap.ui.getCore().byId("TP_id_exceltemplate").setVisible(false)
+          sap.ui.getCore().byId("TP_messagetripinfomation").setVisible(false)
+        }
       }
     );
   }

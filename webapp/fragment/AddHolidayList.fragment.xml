@@ -5,6 +5,14 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:u="sap.ui.unified">
 	<Dialog title="{i18n>headerListOfHolidays}" stretch="false" contentWidth="38rem">
+  
+               	<MessageStrip
+                id="TP_messagetripinfomation"
+                  text="Please fill the form if you have not selected a file. If you select file no need fill form!"
+                  showIcon="true"
+                  type="Information"
+                  class="">
+			         </MessageStrip>
 		<f:SimpleForm
             editable="true"
             layout="ColumnLayout"
@@ -31,7 +39,8 @@
                 placeholder="yyyy"
                 change="LOH_ValidateYear"
 					      valueStateText="{i18n>selectionYear}"/>
-				<Label text="{i18n>selectFi}" required="true"/>
+
+				<Label text="{i18n>selectFi}" id="ALH_id_fileuploaderLabele" required="true"/>
                <u:FileUploader
                 id="ALH_id_LocFileUpload"
                 width="300px"
@@ -42,6 +51,22 @@
                 sameFilenameAllowed="true"
                 icon="sap-icon://upload"/> 
 			</f:content>
+      <Label text=""></Label>
+      <Button text=" Download Template" id="TP_id_exceltemplate" press="onDownloadTemplatexlsx"/>
+      <Label text="{i18n>expCountry}" ></Label>
+      <Input id="TP_id_Country" required="true" />
+       <Label text="Country Code" ></Label>
+      <Input id="TP_id_CountryCode"  required="true" />
+      <Label text="{i18n>state}"></Label>
+      <Input id="TP_id_State"  required="true" />
+      <Label text="{i18n>city}"></Label>
+      <Input id="TP_id_City"  required="true" />
+      <Label text="{i18n>branchCode}"></Label>
+      <Input id="TP_id_BranchCode"  />
+      <Label text="{i18n>currency}"></Label>
+      <Input id="TP_id_Currency"  required="true" />
+      <Label text="{i18n>stdcode}"></Label>
+      <Input id="TP_id_STDCode"  required="true" />
 		</f:SimpleForm>
 	<beginButton>
       <Button text="{i18n>submit}" id="ALH_id_SubmitButton" type="Accept" press="LOH_onPressSubmit" enabled="{/isFileValid}"/>
