@@ -1,618 +1,651 @@
-sap.ui.define([
-    "./BaseController",
-    "sap/ui/model/json/JSONModel",
-    "sap/ui/model/Filter",
-    "sap/m/MessageToast",
-    "../model/formatter",
-    "../utils/validation",
-    "sap/ui/export/Spreadsheet"
-], function(BaseController, JSONModel, Filter, MessageToast, formatter, utils, Spreadsheet) {
-    "use strict";
-    return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
-        formatter: formatter,
-        onInit: function() {
-            const router = this.getOwnerComponent().getRouter();
-            router.getRoute("AppliedCandidates").attachPatternMatched(this._onObjectMatched, this);
-        },
-        _onObjectMatched: async function() {
-            var LoginFUnction = await this.commonLoginFunction("AppliedCandidates");
-            if (!LoginFUnction) return;
-            this.i18na = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            this.getView().setModel(new JSONModel({
-                minnDate: new Date(),
-                maxDates: new Date(new Date().setDate(new Date().getDate() + 30))
-            }), "myyModel");
-            this.getView().setModel(new JSONModel({
-                NameState: "None",
-                ExpectedCTCState: "None",
-                CurrentCTCState: "None",
-                AvailableForInterviewState: "None",
-                NoticePeriodState: "None",
-                MobileNumberState: "None",
-                DateState: "None",
-                EmailIDState: "None",
-                ExperienceState: "None",
-                RemarkState: "None",
-                SkillsState: "None",
-                City: "None"
-            }), "modelValuStateError");
-            this.getView().setModel(new JSONModel({
-                Editable: true
-            }), "EditableModeltruefalse");
-            this.getView().setModel(new JSONModel({
-                results: [{
-                    key: "YES",
-                    text: "YES"
-                }, {
-                    key: "NO",
-                    text: "NO"
-                }]
-            }), "setInterviewYesNo");
-            this.AC_ReadCall();
-            this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18na.getText("TableHeader"));
-            this.onFilterBarClear();
-            this.getView().setModel(new JSONModel({
-                isEditMode: false,
-                busy: false
-            }), "viewModel");
-            this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
-            this.initializeBirthdayCarousel();
-        },
-        AC_ReadCall: async function() {
-            this.getBusyDialog();
-            try {
-                const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD", "Mobile", "Date", "Email", "Experience", "Skills", "Remark",
-                    "CreateDate", "CreatedBy", "ID"
-                ];
+sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/m/MessageToast", "../model/formatter", "../utils/validation", "sap/ui/export/Spreadsheet"], function (BaseController, JSONModel, Filter, MessageToast, formatter, utils, Spreadsheet) {
+  "use strict";
+  return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
+    formatter: formatter,
+    onInit: function () {
+      const router = this.getOwnerComponent().getRouter();
+      router.getRoute("AppliedCandidates").attachPatternMatched(this._onObjectMatched, this);
+    },
+    _onObjectMatched: async function () {
+      var LoginFUnction = await this.commonLoginFunction("AppliedCandidates");
+      if (!LoginFUnction) return;
+      this.i18na = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+      this.getView().setModel(
+        new JSONModel({
+          minnDate: new Date(),
+          maxDates: new Date(new Date().setDate(new Date().getDate() + 30)),
+        }),
+        "myyModel"
+      );
+      this.getView().setModel(
+        new JSONModel({
+          NameState: "None",
+          ExpectedCTCState: "None",
+          CurrentCTCState: "None",
+          AvailableForInterviewState: "None",
+          NoticePeriodState: "None",
+          MobileNumberState: "None",
+          DateState: "None",
+          EmailIDState: "None",
+          ExperienceState: "None",
+          RemarkState: "None",
+          SkillsState: "None",
+          City: "None",
+        }),
+        "modelValuStateError"
+      );
+      this.getView().setModel(
+        new JSONModel({
+          Editable: true,
+        }),
+        "EditableModeltruefalse"
+      );
+      this.getView().setModel(
+        new JSONModel({
+          results: [
+            {
+              key: "YES",
+              text: "YES",
+            },
+            {
+              key: "NO",
+              text: "NO",
+            },
+          ],
+        }),
+        "setInterviewYesNo"
+      );
+      this.AC_ReadCall();
+      this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18na.getText("TableHeader"));
+      this.onFilterBarClear();
+      this.getView().setModel(
+        new JSONModel({
+          isEditMode: false,
+          busy: false,
+        }),
+        "viewModel"
+      );
+      this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
+      this.initializeBirthdayCarousel();
+    },
+    AC_ReadCall: async function () {
+      this.getBusyDialog();
+      try {
+        const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD", "Mobile", "Date", "Email", "Experience", "Skills", "Remark", "CreateDate", "CreatedBy", "ID"];
 
-                const oQueryParameters = {
-                    fields: aSelectFields.join(",")
-                };
+        const oQueryParameters = {
+          fields: aSelectFields.join(","),
+        };
 
-                const response = await this.ajaxReadWithJQuery("customReadCall", oQueryParameters);
-                const aCandidates = response.data || [];
-                this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aCandidates), "DataTableModel");
+        const response = await this.ajaxReadWithJQuery("customReadCall", oQueryParameters);
+        const aCandidates = response.data || [];
+        this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aCandidates), "DataTableModel");
 
-                const nameSet = new Set(aCandidates.map(c => c.FullName).filter(Boolean));
-                this.getView().setModel(
-                    new sap.ui.model.json.JSONModel(Array.from(nameSet).map(name => ({
-                        FullName: name
-                    }))),
-                    "UniqueNamesModel"
-                );
-            } catch (err) {
-                sap.m.MessageToast.show("Failed to load candidate data.");
-            } finally {
-                this.closeBusyDialog();
-            }
-        },
+        const nameSet = new Set(aCandidates.map((c) => c.FullName).filter(Boolean));
+        this.getView().setModel(
+          new sap.ui.model.json.JSONModel(
+            Array.from(nameSet).map((name) => ({
+              FullName: name,
+            }))
+          ),
+          "UniqueNamesModel"
+        );
+      } catch (err) {
+        sap.m.MessageToast.show("Failed to load candidate data.");
+      } finally {
+        this.closeBusyDialog();
+      }
+    },
 
-        onPressback: function() {
-            this.getOwnerComponent().getRouter().navTo("RouteTilePage");
-        },
+    onPressback: function () {
+      this.getOwnerComponent().getRouter().navTo("RouteTilePage");
+    },
 
-        onLogout: function() {
-            this.CommonLogoutFunction();
-        },
+    onLogout: function () {
+      this.CommonLogoutFunction();
+    },
 
-        onCandidatePress: function(oEvent) {
-            const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
-            this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", {
-                id: id
-            });
-        },
+    onCandidatePress: function (oEvent) {
+      const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
+      this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", {
+        id: id,
+      });
+    },
 
- EOD_onChangeCountry: function(oEvent) {
-            const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
-            const sCountryCode = oEvent.getSource().getSelectedItem().getAdditionalText();
-            if (sCountryCode === "IN") {
-                oMobileInput.setMaxLength(10);
-            } else {
-                oMobileInput.setMaxLength(20);
-            }
+    onValidateMobile: function (oEvent) {
+      this._validateMobileNumberLocal(oEvent);
+    },
+    _validateMobileNumberLocal: function (oEvent) {
+      const oInput = oEvent.getSource();
+      const sValueTrimmed = oInput.getValue().trim();
+      oInput.setValueState(sap.ui.core.ValueState.None);
+      oInput.setValueStateText("");
+      if (sValueTrimmed.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile Number begins with non-zero");
+        return false;
+      }
+      if (!/^\d*$/.test(sValueTrimmed)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only numbers are allowed");
+        return false;
+      }
+      if (oInput.getMaxLength() === 10) {
+        if (sValueTrimmed.length !== 10) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("Mobile Number must be 10 digits long");
+          return false;
+        }
+      } else {
+        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
+          oInput.setValueState(sap.ui.core.ValueState.Error);
+          oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
+          return false;
+        }
+      }
+      return true;
+    },
 
-            // Existing logic
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            if (oEvent.getSource().getValue() === '') {
-                oEvent.getSource().setValueState("None");
-            }
-            const oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-            const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-            sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
-            sap.ui.getCore().byId("FM_Id_City").setValue("");
-        },
-                _validateMobileNumberLocal: function(oEvent) {
-            const oInput = oEvent.getSource();
-            const sValue = oInput.getValue();
-            const sValueTrimmed = sValue.trim();
-            const oModel = this.getView().getModel("stuDataModel");
-            const sCountry = oModel.getProperty("/Country");
-            const sCountryCode = sap.ui.getCore().byId("FM_Id_Country").getSelectedItem().getAdditionalText();
+    EOD_onChangeCountry: function (oEvent) {
+      const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
+      const sCountryCode = oEvent.getSource().getSelectedItem().getAdditionalText();
+      if (sCountryCode === "IN") {
+        oMobileInput.setMaxLength(10);
+      } else {
+        oMobileInput.setMaxLength(20);
+      }
+      oMobileInput.setValue("");
 
-            oInput.setValueState(sap.ui.core.ValueState.None);
-            oInput.setValueStateText("");
+      // Existing logic
+      utils._LCstrictValidationComboBox(oEvent, "oEvent");
+      if (oEvent.getSource().getValue() === "") {
+        oEvent.getSource().setValueState("None");
+      }
 
-            // Mobile number cannot start with 0s
-            if (sValueTrimmed.startsWith("0")) {
-                oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText("Mobile Number begins with non-zero");
-                return false;
-            }
+      const oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
+      const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
+      sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
+      sap.ui.getCore().byId("FM_Id_City").setValue("");
 
-            // Only numbers
-            if (!/^\d*$/.test(sValueTrimmed)) {
-                oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText("Only numbers are allowed");
-                return false;
-            }
+      this._validateMobileNumberLocal({
+        getSource: () => oMobileInput,
+      });
+    },
+    onSTDCodeChange: function (oEvent) {
+      const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
+      const sISDCode = oEvent.getSource().getSelectedKey();
+      if (sISDCode === "+91") {
+        oMobileInput.setMaxLength(10);
+      } else {
+        oMobileInput.setMaxLength(20);
+      }
+      oMobileInput.setValue("");
+      this._validateMobileNumberLocal({
+        getSource: () => oMobileInput,
+      });
+    },
 
-            // Depending upon country validation (India = 10 digits)
-            if (sCountryCode === "IN") {
-                if (sValueTrimmed.length !== 10) {
-                    oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText("Mobile Number must be 10 digits long");
+    onFilterBarClear: function () {
+      this.byId("filterEmployeeName").setSelectedKey("");
+      this.byId("filterNoticePeriod").setValue("");
+      this.byId("filterSkills").setValue("");
+      this.byId("filterExperience").setSelectedKey("");
+      this.byId("filterCreateDate").setValue("");
+    },
+
+    onFilterBarSearch: function () {
+      this.getBusyDialog();
+      setTimeout(() => {
+        try {
+          const oTableBinding = this.byId("appliedCandidatesTable").getBinding("items");
+          const aFilters = [];
+          const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+            pattern: "yyyy-MM-dd",
+          });
+
+          // 1. Name Filter
+          const sName = this.byId("filterEmployeeName").getValue().trim();
+          if (sName) {
+            aFilters.push(new sap.ui.model.Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
+          }
+
+          // 2. Notice Period Filter
+          const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
+          if (sNoticePeriodInput) {
+            aFilters.push(
+              new sap.ui.model.Filter({
+                path: "NoticePeriod",
+                test: function (sDataValue) {
+                  if (!sDataValue || !sNoticePeriodInput) return false;
+                  const data = sDataValue.toString().trim();
+                  const input = sNoticePeriodInput.toString().trim();
+
+                  if (!input.includes("-")) {
+                    return data.toLowerCase() === input.toLowerCase();
+                  } else {
+                    if (data.toLowerCase() === input.toLowerCase()) {
+                      return true;
+                    }
+                    if (!data.includes("-")) {
+                      try {
+                        const numData = parseInt(data, 10);
+                        if (isNaN(numData)) return false;
+                        const rangeParts = input.split("-");
+                        const min = parseInt(rangeParts[0].trim(), 10);
+                        const max = parseInt(rangeParts[1].trim(), 10);
+                        if (isNaN(min) || isNaN(max)) return false;
+                        return numData >= min && numData <= max;
+                      } catch (e) {
+                        return false;
+                      }
+                    }
                     return false;
-                }
-            } else {
-                // Other countries min/max length check
-                if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
-                    oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        onFilterBarClear: function() {
-            this.byId("filterEmployeeName").setSelectedKey("");
-            this.byId("filterNoticePeriod").setValue("");
-            this.byId("filterSkills").setValue("");
-            this.byId("filterExperience").setSelectedKey("");
-            this.byId("filterCreateDate").setValue("");
-        },
-
-        onFilterBarSearch: function() {
-            this.getBusyDialog();
-            setTimeout(() => {
-                try {
-                    const oTableBinding = this.byId("appliedCandidatesTable").getBinding("items");
-                    const aFilters = [];
-                    const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                        pattern: "yyyy-MM-dd"
-                    });
-
-                    // 1. Name Filter
-                    const sName = this.byId("filterEmployeeName").getValue().trim();
-                    if (sName) {
-                        aFilters.push(new sap.ui.model.Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
-                    }
-
-                    // 2. Notice Period Filter
-                    const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
-                    if (sNoticePeriodInput) {
-                        aFilters.push(new sap.ui.model.Filter({
-                            path: "NoticePeriod",
-                            test: function(sDataValue) {
-                                if (!sDataValue || !sNoticePeriodInput) return false;
-                                const data = sDataValue.toString().trim();
-                                const input = sNoticePeriodInput.toString().trim();
-
-                                if (!input.includes('-')) {
-                                    return data.toLowerCase() === input.toLowerCase();
-                                } else {
-                                    if (data.toLowerCase() === input.toLowerCase()) {
-                                        return true;
-                                    }
-                                    if (!data.includes('-')) {
-                                        try {
-                                            const numData = parseInt(data, 10);
-                                            if (isNaN(numData)) return false;
-                                            const rangeParts = input.split('-');
-                                            const min = parseInt(rangeParts[0].trim(), 10);
-                                            const max = parseInt(rangeParts[1].trim(), 10);
-                                            if (isNaN(min) || isNaN(max)) return false;
-                                            return numData >= min && numData <= max;
-                                        } catch (e) {
-                                            return false;
-                                        }
-                                    }
-                                    return false;
-                                }
-                            }
-                        }));
-                    }
-
-                    // 3. Skills Filter
-                    const sSkills = this.byId("filterSkills").getValue().trim();
-                    if (sSkills) {
-                        aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
-                    }
-
-                    const sExperienceInput = this.byId("filterExperience").getValue().trim();
-                    if (sExperienceInput) {
-                        aFilters.push(new sap.ui.model.Filter({
-                            path: "Experience",
-                            test: function(sDataValue) {
-                                const input = sExperienceInput.toString().trim();
-
-                                // If input is a single value (not a range)
-                                if (!input.includes('-')) {
-                                    const data = sDataValue ? sDataValue.toString().trim() : "";
-                                    return data.toLowerCase() === input.toLowerCase();
-                                }
-
-                                // If input is a range like "0-2"
-                                try {
-                                    const rangeParts = input.split('-');
-                                    const min = parseFloat(rangeParts[0].trim());
-                                    const max = parseFloat(rangeParts[1].trim());
-                                    if (isNaN(min) || isNaN(max)) return false;
-
-                                    // If data is empty or null, treat as 0 experience
-                                    const data = sDataValue ? sDataValue.toString().trim() : "0";
-                                    const numData = parseFloat(data);
-                                    if (isNaN(numData)) return false;
-
-                                    return numData >= min && numData <= max;
-                                } catch (e) {
-                                    return false;
-                                }
-                            }
-                        }));
-                    }
-
-                    // 5. CreateDate (DateRangeSelection) Filter
-                    let oStartDate, oEndDate;
-                    let dateProvided = false;
-
-                    const oDateRange = this.byId("filterCreateDate");
-                    if (oDateRange) {
-                        oStartDate = oDateRange.getDateValue();
-                        oEndDate = oDateRange.getSecondDateValue();
-                        if (oStartDate && oEndDate) {
-                            dateProvided = true;
-                        }
-                    }
-
-                    if (oStartDate && oEndDate) {
-                        const sStart = oDateFormat.format(oStartDate); // yyyy-MM-dd
-                        const sEnd = oDateFormat.format(oEndDate);
-                        aFilters.push(new sap.ui.model.Filter("CreateDate", sap.ui.model.FilterOperator.BT, sStart, sEnd));
-                    }
-
-                    // Apply Filters
-                    oTableBinding.filter(aFilters);
-                } catch (error) {
-                    MessageToast.show("Error during filtering.");
-                } finally {
-                    setTimeout(() => this.closeBusyDialog(), 300);
-                }
-            }, 50);
-        },
-
-        onSuggestSkills: function(oEvent) {
-            let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
-            let aTableData = this.getView().getModel("DataTableModel").getData();
-            let aMatchingSkillStrings = aTableData
-                .map(item => item.Skills?.trim())
-                .filter(skillStr => {
-                    if (!skillStr) return false;
-                    return skillStr.split(",").some(skill => skill.trim().toLowerCase().includes(sValue));
-                });
-            let aUniqueSkillStrings = [...new Set(aMatchingSkillStrings)];
-            let aSuggestionItems = aUniqueSkillStrings.map(skill => ({
-                skill
-            }));
-            this.getView().setModel(new JSONModel({
-                skills: aSuggestionItems
-            }), "skillModel");
-        },
-
-        onAddNewCandidate: function() {
-            const oNewCandidate = {
-                FullName: "",
-                ExpectedSalary: "",
-                CurrentSalary: "",
-                AvailableForInterview: "",
-                NoticePeriod: "",
-                Mobile: "",
-                Date: "",
-                Email: "",
-                Experience: "",
-                Remark: "",
-                Skills: "",
-                ISD: "+91",
-                City: "",
-                Country: "India",
-                CreateDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
-            };
-            this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");
-            this._openDialog("Create Candidate", true);
-            this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
-        },
-
-        onEditCandidate: function() {
-            const oTable = this.byId("appliedCandidatesTable");
-            const oSelectedItem = oTable.getSelectedItem();
-            if (!oSelectedItem) {
-                MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
-                return;
-            }
-
-            const oContext = oSelectedItem.getBindingContext("DataTableModel");
-            const oCandidateData = jQuery.extend({}, oContext.getObject());
-
-            // Normalize fields
-            if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
-            if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
-            this.getView().setModel(new JSONModel(oCandidateData), "stuDataModel");
-            this._openDialog("Edit Candidate", false);
-            this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
-        },
-
-        onDeleteCandidate: function() {
-            const oTable = this.byId("appliedCandidatesTable");
-            const oSelectedItem = oTable.getSelectedItem();
-            if (!oSelectedItem) {
-                MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
-                return;
-            }
-            const sID = oSelectedItem.getBindingContext("DataTableModel").getObject().ID;
-            this.showConfirmationDialog(
-                this.i18na.getText("confirmTitle"),
-                this.i18na.getText("ConfirmRecruitmentDeleteMessage"),
-                async () => {
-                    this.getBusyDialog();
-                    try {
-                        await this.ajaxDeleteWithJQuery("JobApplications", {
-                            filters: {
-                                ID: sID
-                            }
-                        });
-                        MessageToast.show(this.i18na.getText("dataDelteSucces"));
-                        this.AC_ReadCall(); // Refresh the table
-                    } catch (error) {
-                        MessageToast.show("Delete failed.");
-                    } finally {
-                        this.closeBusyDialog();
-                        oTable.removeSelections();
-                    }
-                }
-            );
-        },
-
-        _preparePayload: function() {
-            if (!this._validateAllDialogFields()) {
-                return null;
-            }
-            const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
-            let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
-            oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === 'immediate' ? "0" : noticePeriodValue;
-            let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
-            if (dateValue) {
-                oPayload.Date = dateValue.split(".").reverse().join("/");
-            }
-            if (!oPayload.ID) {
-                const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
-                const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
-                oPayload.CreatedBy = `${sUserName} (${sUserID})`;
-            }
-            return oPayload;
-        },
-
-
-        onSaveNewCandidate: async function() {
-            const oPayload = this._preparePayload();
-            if (!oPayload) return;
-            this.getBusyDialog();
-            try {
-                await this.ajaxCreateWithJQuery("JobApplications", {
-                    data: oPayload
-                });
-                MessageToast.show(this.i18na.getText("messageTraineeCreated"));
-                this.AC_ReadCall(); // Refresh data
-                this._closeDialog();
-            } catch (err) {
-                MessageToast.show(err.message || err.responseText);
-            } finally {
-                this.closeBusyDialog();
-            }
-        },
-
-        onUpdateCandidate: async function() {
-            const oPayload = this._preparePayload();
-            if (!oPayload) return;
-            this.getBusyDialog();
-            try {
-                await this.ajaxUpdateWithJQuery("JobApplications", {
-                    data: oPayload,
-                    filters: {
-                        ID: oPayload.ID
-                    }
-                });
-                MessageToast.show(this.i18na.getText("dataUpdatedSuccess"));
-                this.AC_ReadCall(); // Refresh data
-                this._closeDialog();
-            } catch (error) {
-                MessageToast.show("Update failed.");
-            } finally {
-                this.closeBusyDialog();
-            }
-        },
-
-        _openDialog: function(sTitle, bIsCreate) {
-            if (!this.oDialog) {
-                this.oDialog = sap.ui.core.Fragment.load({
-                    name: "sap.kt.com.minihrsolution.fragment.AddRecruitment",
-                    controller: this
-                }).then(oDialog => {
-                    this.getView().addDependent(oDialog);
-                    return oDialog;
-                });
-            }
-            this.oDialog.then(oDialog => {
-                oDialog.setTitle(sTitle);
-                sap.ui.getCore().byId("FM_Id_SubmitBTN").setVisible(bIsCreate);
-                sap.ui.getCore().byId("FM_Id_EditBTN").setVisible(!bIsCreate);
-                if (!bIsCreate) {
-                    sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Emphasized");
-                }
-                oDialog.open();
-            });
-        },
-
-
-        _closeDialog: function() {
-            if (this.oDialog) {
-                this.oDialog.then(oDialog => oDialog.close());
-            }
-            sap.ui.getCore().byId("FM_RE_Name").setValueState("None");
-            sap.ui.getCore().byId("FM_RE_CurrentCTC").setValueState("None");
-            sap.ui.getCore().byId("FM_RE_ExpectedCTC").setValueState("None");
-            sap.ui.getCore().byId("FM_RE_AvlInterview").setValueState("None");
-            sap.ui.getCore().byId("FM_RE_NoticePeriod").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_MobileNumber").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_DateAvlForInterview").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_Email").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_Experience").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_Skills").setValueState("None");
-            sap.ui.getCore().byId("FM_Id_City").setValueState("None");
-            this.getView().byId("appliedCandidatesTable").removeSelections();
-        },
-
-        onDialogEditToggle: function() {
-            const oEditButton = sap.ui.getCore().byId("FM_Id_EditBTN");
-            if (oEditButton.getText() === "Edit") {
-                this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
-                oEditButton.setText("Save").setType("Accept");
-            } else {
-                this.onUpdateCandidate();
-            }
-        },
-
-        onDialogCountryChange: function(oEvent) {
-            const sCountryCode = oEvent.getSource().getSelectedKey();
-            const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
-            oCityComboBox.getBinding("items").filter(new Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
-            this.getView().getModel("stuDataModel").setProperty("/City", "");
-        },
-
-     _validateAllDialogFields: function() {
-            try {
-                const isValid =
-                    utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
-                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
-                    // Updated mobile number validation
-                    this._validateMobileNumberLocal({
-                        getSource: () => sap.ui.getCore().byId("FM_Id_MobileNumber")
-                    }) &&
-                    utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
-                    utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
-
-                if (!isValid) {
-                    MessageToast.show(this.i18na.getText("mandetoryFields"));
-                }
-                return isValid;
-            } catch (error) {
-                MessageToast.show("An error occurred during validation.");
-                return false;
-            }
-        },
-
-        // New validation handlers
-        onValidateName: (oEvent) => utils._LCvalidateName(oEvent),
-        onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
-        onValidateMobile: function(oEvent) {
-            this._validateMobileNumberLocal(oEvent);
-        },
-        onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
-        onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
-        onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
-
-        onExport: function() {
-            const aData = this.getView().getModel("DataTableModel").getData();
-            const aFormattedData = aData.map(item => {
-                return {
-                    ...item,
-                    CurrentSalary: formatter.LPAattach(item.CurrentSalary),
-                    ExpectedSalary: formatter.LPAattach(item.ExpectedSalary),
-                    Experience: formatter.ExperienceFormat(item.Experience),
-                };
-            });
-            const aCols = [{
-                label: "Name",
-                property: "FullName",
-                type: "string"
-            }, {
-                label: "Current CTC (LPA)",
-                property: "CurrentSalary",
-                type: "string"
-            }, {
-                label: "Expected CTC (LPA)",
-                property: "ExpectedSalary",
-                type: "string"
-            }, {
-                label: "Notice Period (Days)",
-                property: "NoticePeriod",
-                type: "string"
-            }, {
-                label: "Mobile Number",
-                property: "Mobile",
-                type: "string"
-            }, {
-                label: "Email",
-                property: "Email",
-                type: "string"
-            }, {
-                label: "Notice Period (Days)",
-                property: "NoticePeriod",
-                type: "string"
-            }, {
-                label: "Experience (Years)",
-                property: "Experience",
-                type: "string"
-            }, {
-                label: "Skills",
-                property: "Skills",
-                type: "string"
-            }, ];
-
-            const oSettings = {
-                workbook: {
-                    columns: aCols
+                  }
                 },
-                dataSource: aFormattedData,
-                fileName: "Candidate_Data.xlsx"
-            };
+              })
+            );
+          }
 
-            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
-            oSheet.build().finally(() => oSheet.destroy());
-        },
-        SalaryInfoPress: function(oEvent) {
-            if (!this._oPopover) {
-                this._oPopover = new sap.m.Popover({
-                    contentWidth: "300px",
-                    contentHeight: "auto",
-                    showHeader: false,
-                    placement: sap.m.PlacementType.Bottom,
-                    content: [new sap.m.VBox({
-                        alignItems: "Center",
-                        justifyContent: "Center",
-                        width: "100%",
-                        items: [new sap.m.Text({
-                            text: this.i18na.getText("salaryPackageInfo"),
-                            wrapping: true
-                        })]
-                    }).addStyleClass("customPopoverContent")]
-                });
-                this.getView().addDependent(this._oPopover);
+          // 3. Skills Filter
+          const sSkills = this.byId("filterSkills").getValue().trim();
+          if (sSkills) {
+            aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
+          }
+
+          const sExperienceInput = this.byId("filterExperience").getValue().trim();
+          if (sExperienceInput) {
+            aFilters.push(
+              new sap.ui.model.Filter({
+                path: "Experience",
+                test: function (sDataValue) {
+                  const input = sExperienceInput.toString().trim();
+
+                  // If input is a single value (not a range)
+                  if (!input.includes("-")) {
+                    const data = sDataValue ? sDataValue.toString().trim() : "";
+                    return data.toLowerCase() === input.toLowerCase();
+                  }
+
+                  // If input is a range like "0-2"
+                  try {
+                    const rangeParts = input.split("-");
+                    const min = parseFloat(rangeParts[0].trim());
+                    const max = parseFloat(rangeParts[1].trim());
+                    if (isNaN(min) || isNaN(max)) return false;
+
+                    // If data is empty or null, treat as 0 experience
+                    const data = sDataValue ? sDataValue.toString().trim() : "0";
+                    const numData = parseFloat(data);
+                    if (isNaN(numData)) return false;
+
+                    return numData >= min && numData <= max;
+                  } catch (e) {
+                    return false;
+                  }
+                },
+              })
+            );
+          }
+
+          // 5. CreateDate (DateRangeSelection) Filter
+          let oStartDate, oEndDate;
+          let dateProvided = false;
+
+          const oDateRange = this.byId("filterCreateDate");
+          if (oDateRange) {
+            oStartDate = oDateRange.getDateValue();
+            oEndDate = oDateRange.getSecondDateValue();
+            if (oStartDate && oEndDate) {
+              dateProvided = true;
             }
-            this._oPopover.openBy(oEvent.getSource());
+          }
+
+          if (oStartDate && oEndDate) {
+            const sStart = oDateFormat.format(oStartDate); // yyyy-MM-dd
+            const sEnd = oDateFormat.format(oEndDate);
+            aFilters.push(new sap.ui.model.Filter("CreateDate", sap.ui.model.FilterOperator.BT, sStart, sEnd));
+          }
+
+          // Apply Filters
+          oTableBinding.filter(aFilters);
+        } catch (error) {
+          MessageToast.show("Error during filtering.");
+        } finally {
+          setTimeout(() => this.closeBusyDialog(), 300);
+        }
+      }, 50);
+    },
+
+    onSuggestSkills: function (oEvent) {
+      let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
+      let aTableData = this.getView().getModel("DataTableModel").getData();
+      let aMatchingSkillStrings = aTableData
+        .map((item) => item.Skills?.trim())
+        .filter((skillStr) => {
+          if (!skillStr) return false;
+          return skillStr.split(",").some((skill) => skill.trim().toLowerCase().includes(sValue));
+        });
+      let aUniqueSkillStrings = [...new Set(aMatchingSkillStrings)];
+      let aSuggestionItems = aUniqueSkillStrings.map((skill) => ({
+        skill,
+      }));
+      this.getView().setModel(
+        new JSONModel({
+          skills: aSuggestionItems,
+        }),
+        "skillModel"
+      );
+    },
+
+    onAddNewCandidate: function () {
+      const oNewCandidate = {
+        FullName: "",
+        ExpectedSalary: "",
+        CurrentSalary: "",
+        AvailableForInterview: "",
+        NoticePeriod: "",
+        Mobile: "",
+        Date: "",
+        Email: "",
+        Experience: "",
+        Remark: "",
+        Skills: "",
+        ISD: "+91",
+        City: "",
+        Country: "India",
+        CreateDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(new Date().getDate()).padStart(2, "0")}`,
+      };
+      this.getView().setModel(new JSONModel(oNewCandidate), "stuDataModel");
+      this._openDialog("Create Candidate", true);
+      this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
+    },
+
+    onEditCandidate: function () {
+      const oTable = this.byId("appliedCandidatesTable");
+      const oSelectedItem = oTable.getSelectedItem();
+      if (!oSelectedItem) {
+        MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
+        return;
+      }
+
+      const oContext = oSelectedItem.getBindingContext("DataTableModel");
+      const oCandidateData = jQuery.extend({}, oContext.getObject());
+
+      // Normalize fields
+      if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
+      if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
+      this.getView().setModel(new JSONModel(oCandidateData), "stuDataModel");
+      this._openDialog("Edit Candidate", false);
+      this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
+    },
+
+    onDeleteCandidate: function () {
+      const oTable = this.byId("appliedCandidatesTable");
+      const oSelectedItem = oTable.getSelectedItem();
+      if (!oSelectedItem) {
+        MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
+        return;
+      }
+      const sID = oSelectedItem.getBindingContext("DataTableModel").getObject().ID;
+      this.showConfirmationDialog(this.i18na.getText("confirmTitle"), this.i18na.getText("ConfirmRecruitmentDeleteMessage"), async () => {
+        this.getBusyDialog();
+        try {
+          await this.ajaxDeleteWithJQuery("JobApplications", {
+            filters: {
+              ID: sID,
+            },
+          });
+          MessageToast.show(this.i18na.getText("dataDelteSucces"));
+          this.AC_ReadCall(); // Refresh the table
+        } catch (error) {
+          MessageToast.show("Delete failed.");
+        } finally {
+          this.closeBusyDialog();
+          oTable.removeSelections();
+        }
+      });
+    },
+
+    _preparePayload: function () {
+      if (!this._validateAllDialogFields()) {
+        return null;
+      }
+      const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
+      let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
+      oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === "immediate" ? "0" : noticePeriodValue;
+      let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
+      if (dateValue) {
+        oPayload.Date = dateValue.split(".").reverse().join("/");
+      }
+      if (!oPayload.ID) {
+        const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
+        const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
+        oPayload.CreatedBy = `${sUserName} (${sUserID})`;
+      }
+      return oPayload;
+    },
+
+    onSaveNewCandidate: async function () {
+      const oPayload = this._preparePayload();
+      if (!oPayload) return;
+      this.getBusyDialog();
+      try {
+        await this.ajaxCreateWithJQuery("JobApplications", {
+          data: oPayload,
+        });
+        MessageToast.show(this.i18na.getText("messageTraineeCreated"));
+        this.AC_ReadCall(); // Refresh data
+        this._closeDialog();
+      } catch (err) {
+        MessageToast.show(err.message || err.responseText);
+      } finally {
+        this.closeBusyDialog();
+      }
+    },
+
+    onUpdateCandidate: async function () {
+      const oPayload = this._preparePayload();
+      if (!oPayload) return;
+      this.getBusyDialog();
+      try {
+        await this.ajaxUpdateWithJQuery("JobApplications", {
+          data: oPayload,
+          filters: {
+            ID: oPayload.ID,
+          },
+        });
+        MessageToast.show(this.i18na.getText("dataUpdatedSuccess"));
+        this.AC_ReadCall(); // Refresh data
+        this._closeDialog();
+      } catch (error) {
+        MessageToast.show("Update failed.");
+      } finally {
+        this.closeBusyDialog();
+      }
+    },
+
+    _openDialog: function (sTitle, bIsCreate) {
+      if (!this.oDialog) {
+        this.oDialog = sap.ui.core.Fragment.load({
+          name: "sap.kt.com.minihrsolution.fragment.AddRecruitment",
+          controller: this,
+        }).then((oDialog) => {
+          this.getView().addDependent(oDialog);
+          return oDialog;
+        });
+      }
+      this.oDialog.then((oDialog) => {
+        oDialog.setTitle(sTitle);
+        sap.ui.getCore().byId("FM_Id_SubmitBTN").setVisible(bIsCreate);
+        sap.ui.getCore().byId("FM_Id_EditBTN").setVisible(!bIsCreate);
+        if (!bIsCreate) {
+          sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Emphasized");
+        }
+        oDialog.open();
+      });
+    },
+
+    _closeDialog: function () {
+      if (this.oDialog) {
+        this.oDialog.then((oDialog) => oDialog.close());
+      }
+      sap.ui.getCore().byId("FM_RE_Name").setValueState("None");
+      sap.ui.getCore().byId("FM_RE_CurrentCTC").setValueState("None");
+      sap.ui.getCore().byId("FM_RE_ExpectedCTC").setValueState("None");
+      sap.ui.getCore().byId("FM_RE_AvlInterview").setValueState("None");
+      sap.ui.getCore().byId("FM_RE_NoticePeriod").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_MobileNumber").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_DateAvlForInterview").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_Email").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_Experience").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_Skills").setValueState("None");
+      sap.ui.getCore().byId("FM_Id_City").setValueState("None");
+      this.getView().byId("appliedCandidatesTable").removeSelections();
+    },
+
+    onDialogEditToggle: function () {
+      const oEditButton = sap.ui.getCore().byId("FM_Id_EditBTN");
+      if (oEditButton.getText() === "Edit") {
+        this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
+        oEditButton.setText("Save").setType("Accept");
+      } else {
+        this.onUpdateCandidate();
+      }
+    },
+
+    onDialogCountryChange: function (oEvent) {
+      const sCountryCode = oEvent.getSource().getSelectedKey();
+      const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
+      oCityComboBox.getBinding("items").filter(new Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
+      this.getView().getModel("stuDataModel").setProperty("/City", "");
+    },
+
+    _validateAllDialogFields: function () {
+      try {
+        const isValid =
+          utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
+          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
+          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
+          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
+          utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
+          // Updated mobile number validation
+          this._validateMobileNumberLocal({
+            getSource: () => sap.ui.getCore().byId("FM_Id_MobileNumber"),
+          }) &&
+          utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
+          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
+          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
+
+        if (!isValid) {
+          MessageToast.show(this.i18na.getText("mandetoryFields"));
+        }
+        return isValid;
+      } catch (error) {
+        MessageToast.show("An error occurred during validation.");
+        return false;
+      }
+    },
+
+    // New validation handlers
+    onValidateName: (oEvent) => utils._LCvalidateName(oEvent),
+    onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
+    onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
+    onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
+    onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
+
+    onExport: function () {
+      const aData = this.getView().getModel("DataTableModel").getData();
+      const aFormattedData = aData.map((item) => {
+        return {
+          ...item,
+          CurrentSalary: formatter.LPAattach(item.CurrentSalary),
+          ExpectedSalary: formatter.LPAattach(item.ExpectedSalary),
+          Experience: formatter.ExperienceFormat(item.Experience),
+        };
+      });
+      const aCols = [
+        {
+          label: "Name",
+          property: "FullName",
+          type: "string",
         },
-    })
-})
+        {
+          label: "Current CTC (LPA)",
+          property: "CurrentSalary",
+          type: "string",
+        },
+        {
+          label: "Expected CTC (LPA)",
+          property: "ExpectedSalary",
+          type: "string",
+        },
+        {
+          label: "Notice Period (Days)",
+          property: "NoticePeriod",
+          type: "string",
+        },
+        {
+          label: "Mobile Number",
+          property: "Mobile",
+          type: "string",
+        },
+        {
+          label: "Email",
+          property: "Email",
+          type: "string",
+        },
+        {
+          label: "Notice Period (Days)",
+          property: "NoticePeriod",
+          type: "string",
+        },
+        {
+          label: "Experience (Years)",
+          property: "Experience",
+          type: "string",
+        },
+        {
+          label: "Skills",
+          property: "Skills",
+          type: "string",
+        },
+      ];
+
+      const oSettings = {
+        workbook: {
+          columns: aCols,
+        },
+        dataSource: aFormattedData,
+        fileName: "Candidate_Data.xlsx",
+      };
+
+      const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+      oSheet.build().finally(() => oSheet.destroy());
+    },
+    SalaryInfoPress: function (oEvent) {
+      if (!this._oPopover) {
+        this._oPopover = new sap.m.Popover({
+          contentWidth: "300px",
+          contentHeight: "auto",
+          showHeader: false,
+          placement: sap.m.PlacementType.Bottom,
+          content: [
+            new sap.m.VBox({
+              alignItems: "Center",
+              justifyContent: "Center",
+              width: "100%",
+              items: [
+                new sap.m.Text({
+                  text: this.i18na.getText("salaryPackageInfo"),
+                  wrapping: true,
+                }),
+              ],
+            }).addStyleClass("customPopoverContent"),
+          ],
+        });
+        this.getView().addDependent(this._oPopover);
+      }
+      this._oPopover.openBy(oEvent.getSource());
+    },
+  });
+});
