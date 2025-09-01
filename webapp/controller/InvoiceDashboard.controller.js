@@ -90,16 +90,29 @@ sap.ui.define([
 
         // --- HELPER to get INR value. Refactored to be reusable --
        _getInrValue: function (item) {
-            const totalAmount = parseFloat(item.TotalAmount || 0);
-            if (item.Currency === "INR") {
-                return totalAmount;
+            let amount = 0;
+            if (item.Status === "Submitted" || item.Status === "Invoice Sent") {
+                amount = parseFloat(item.TotalAmount || 0);
+            } else if (item.Status === "Payment Partially") {
+                amount = parseFloat(item.DueAmount || 0);
+            } else {
+               
+                amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
             }
+
+            if (item.Currency === "INR") {
+                return amount;
+            }
+            // const totalAmount = parseFloat(item.TotalAmount || 0); 
+            // if (item.Currency === "INR") {
+            //     return totalAmount;
+            // }
             const amountInINR = parseFloat(item.AmountInINR || 0);
             if (amountInINR > 0) {
                 return amountInINR;
             }
             const conversionRate = parseFloat(item.ConversionRate || 1);
-            return totalAmount * conversionRate;
+            return amount * conversionRate;
         },
 
 
@@ -220,7 +233,7 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
-            const aPendingStatuses = ["Submitted","Invoice Sent", "Payment Partially"];
+            const aPendingStatuses = ["Submitted","Invoice Sent","Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
             aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
             if (!this.pPendingInvoicesDialog) {
