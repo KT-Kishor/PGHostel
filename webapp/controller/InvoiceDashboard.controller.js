@@ -89,26 +89,17 @@ sap.ui.define([
         },
 
         // --- HELPER to get INR value. Refactored to be reusable --
-        _getInrValue: function (item) {
-            let amount = 0;
-            if (item.Status === "Invoice Sent") {
-                amount = parseFloat(item.TotalAmount || 0);
-            } else if (item.Status === "Payment Partially") {
-                amount = parseFloat(item.DueAmount || 0);
-            } else {
-                //  if needed use DueAmount or TotalAmount
-                amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
-            }
-
+       _getInrValue: function (item) {
+            const totalAmount = parseFloat(item.TotalAmount || 0);
             if (item.Currency === "INR") {
-                return amount;
+                return totalAmount;
             }
             const amountInINR = parseFloat(item.AmountInINR || 0);
             if (amountInINR > 0) {
                 return amountInINR;
             }
             const conversionRate = parseFloat(item.ConversionRate || 1);
-            return amount * conversionRate;
+            return totalAmount * conversionRate;
         },
 
 
@@ -121,7 +112,7 @@ sap.ui.define([
             return numValue * conversionRate;
         },
 
-        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
+       _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
             // --- Aggregation for charts that need currency conversion ---
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const month = new Date(item.InvoiceDate).getMonth();
@@ -139,33 +130,11 @@ sap.ui.define([
                 acc[year].count++;
                 return acc;
             }, {});
-            const pendingStatuses = ["Invoice Sent", "Payment Partially"];
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize today's date to midnight for accurate comparison
-
-        
-            const pendingByCompany = aFilteredData
-                .filter(item => {
-                    if (!pendingStatuses.includes(item.Status)) return false;
-                    if (!item.PayByDate) return false;
-                    const payByDate = new Date(item.PayByDate);
-                    payByDate.setHours(0, 0, 0, 0);
-                    return payByDate <= today;
-                })
-                .reduce((acc, item) => {
-                    let amount = 0;
-                    if (item.Status === "Invoice Sent") {
-                        amount = parseFloat(item.TotalAmount) || 0;
-                    } else if (item.Status === "Payment Partially") {
-                        amount = parseFloat(item.DueAmount) || 0;
-                    } else {
-                        amount = this._getInrValue(item);  // fallback if needed
-                    }
-                    acc[item.CustomerName] = (acc[item.CustomerName] || 0) + amount;
-                    return acc;
-                }, {});
-
+            const pendingStatuses = ["Submitted","Invoice Sent","Payment Partially"];
+            const pendingByCompany = aFilteredData.filter(item => pendingStatuses.includes(item.Status)).reduce((acc, item) => {
+                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
+                return acc;
+            }, {});
 
             this._oGroupedInvoices = {};
             const statusCounts = aFilteredData.reduce((acc, item) => {
@@ -175,7 +144,6 @@ sap.ui.define([
                 acc[status] = (acc[status] || 0) + 1;
                 return acc;
             }, {});
-
 
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const company = item.CustomerName;
@@ -252,7 +220,7 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
-            const aPendingStatuses = ["Invoice Sent", "Payment Partially"];
+            const aPendingStatuses = ["Submitted","Invoice Sent", "Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
             aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
             if (!this.pPendingInvoicesDialog) {

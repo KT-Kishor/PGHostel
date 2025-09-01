@@ -11,9 +11,9 @@
                     labelSpanXL="3" labelSpanL="3" labelSpanM="3"    singleContainerFullSize="false" backgroundDesign="Transparent" class="formBorder" title="{i18n>demoFormtitle}">
                     <f:content>
                         <m:Label text="" />
-                        <m:Input id="idCompanyname" placeholder="{i18n>placeCompany}" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="Invalid entry"/>
+                        <m:Input id="idCompanyname" placeholder="{i18n>placeCompany}" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="{i18n>placeCompany}"/>
                         <m:Label text=""/>
-                        <m:Input id="idcustomername" placeholder="{i18n>placeholderCustName}" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="Invalid entry"/>
+                        <m:Input id="idcustomername" placeholder="{i18n>placeholderCustName}" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="{i18n>placeholderCustName}"/>
                         <m:Label text=""/>
                         <m:Input id="idCustmailid" placeholder="{i18n>placeEmailId}" liveChange="validateEmail" maxLength="50" value="{formData>/Email}" type="Email" valueStateText="Enter Valid Email"/>
                         <m:Label text=""/>
@@ -22,9 +22,9 @@
                         <m:Label text=""/>
                         <m:Input id="idmobilenumber" placeholder="{i18n>placeholderMobileNo}" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="Enter Atleast 10 digit number" />
                         <m:Label text=""/>
-                        <m:TextArea id="idCustaddress" placeholder="{i18n>placeAddress}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="Invalid entry" />
+                        <m:TextArea id="idCustaddress" placeholder="{i18n>placeAddress}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="{i18n>placeAddress}" />
                         <m:Label text=""/>
-                        <m:TextArea id="idcomment" placeholder="{i18n>enterComments}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="Invalid entry" />
+                        <m:TextArea id="idcomment" placeholder="{i18n>enterComments}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="{i18n>enterComments}" />
                         <m:Label text=""/>
                         <m:Button text="{i18n>savebtn}" type="Accept" press="onDemoformSave" />
                     </f:content>

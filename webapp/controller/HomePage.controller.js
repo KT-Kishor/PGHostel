@@ -33,6 +33,7 @@ sap.ui.define(
         },
 
         _onRouteMatched: function () {
+           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
           const oTabHeader = this.byId("mainTabHeader");
           if (oTabHeader) {
@@ -48,7 +49,7 @@ sap.ui.define(
           }
 
           sessionStorage.removeItem("homePageReturnTab");
-          this.API = "https://www.rest.kalpavrikshatechnologies.com";
+          this.API = "https://rest.kalpavrikshatechnologies.com";
           var oCarousel = this.byId("videoCarousel");
 
           var videoUrls = [
@@ -150,6 +151,17 @@ sap.ui.define(
               },
             ],
           };
+          // TraineeData Model for Training Form
+          const oTData = new JSONModel({
+            Name: "",
+            CollegeName: "",
+            EmailID: "",
+            Course: "",
+            MobileNo: "",
+            Comments: "",
+          });
+          this.getView().setModel(oTData, "TraineeData");
+
           var oModel = new JSONModel(oData);
           this.getView().setModel(oModel);
         },
@@ -166,7 +178,7 @@ sap.ui.define(
         },
 
         _loadCareerSectionData: function () {
-          const oAppConfigModel = new sap.ui.model.json.JSONModel({
+          const oAppConfigModel = new JSONModel({
             url: "https://rest.kalpavrikshatechnologies.com/",
             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
@@ -175,17 +187,9 @@ sap.ui.define(
           });
           this.getOwnerComponent().setModel(oAppConfigModel, "AppConfigModel");
 
-          const oTData = new sap.ui.model.json.JSONModel({
-            Name: "",
-            CollegeName: "",
-            EmailID: "",
-            Course: "",
-            MobileNo: "",
-            Comments: "",
-          });
-          this.getView().setModel(oTData, "TraineeData");
+          
 
-          const oExpYears = new sap.ui.model.json.JSONModel();
+          const oExpYears = new JSONModel();
           oExpYears.loadData("model/ExpYears.json", null, false);
           this.getView().setModel(oExpYears, "ExpYears");
 
@@ -204,7 +208,7 @@ sap.ui.define(
             success: function (response) {
               const allCandidates = response?.data || [];
               const activeCandidates = allCandidates.filter((candidate) => candidate.Status === "true");
-              const oModel = new sap.ui.model.json.JSONModel({ Candidates: activeCandidates });
+              const oModel = new JSONModel({ Candidates: activeCandidates });
               oView.setModel(oModel, "JobApplicationModel");
               this._loadComboBoxModels(activeCandidates, oView);
               this.closeBusyDialog();
@@ -365,26 +369,23 @@ sap.ui.define(
 
         FTF_onSubmitForm: function () {
           var oModel = this.getView().getModel("TraineeData");
-          var oData = JSON.parse(JSON.stringify(oModel.getData()));
 
-          // Add selected course from button press
-          oData.Course = this.selectedCourse || ""; // fallback to empty if not set
+          if (!oModel) {
+            MessageToast.show("Form model not found. Please refresh the page.");
+            return;
+          }
+
+          var oData = JSON.parse(JSON.stringify(oModel.getData()));
+          oData.Course = this.selectedCourse || ""; // Add selected course
+
           var that = this;
+
           if (
             utils._LCvalidateName(sap.ui.getCore().byId("FTF_idName"), "ID") &&
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FTF_idClgname"),
-              "ID"
-            ) &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTF_idClgname"), "ID") &&
             utils._LCvalidateEmail(sap.ui.getCore().byId("FTF_idmail"), "ID") &&
-            utils._LCvalidateMobileNumber(
-              sap.ui.getCore().byId("FTF_idMobnumber"),
-              "ID"
-            ) &&
-            utils._LCvalidateMandatoryField(
-              sap.ui.getCore().byId("FTF_idcomments"),
-              "ID"
-            )
+            utils._LCvalidateMobileNumber(sap.ui.getCore().byId("FTF_idMobnumber"), "ID") &&
+            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FTF_idcomments"), "ID")
           ) {
             $.ajax({
               url: this.API + "/Training",
@@ -392,35 +393,36 @@ sap.ui.define(
               headers: {
                 "Content-Type": "application/json",
                 name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
               },
-              data: JSON.stringify({
-                data: oData,
-              }),
+              data: JSON.stringify({ data: oData }),
+
               success: function (response) {
                 var resetData = {
                   Name: "",
                   CollegeName: "",
                   EmailID: "",
                   MobileNo: "",
-                  Comments: "",
+                  Comments: ""
                 };
                 oModel.setData(resetData);
                 oModel.refresh(true);
-                that.oDialog.close();
-                MessageToast.show(
-                  that.i18nModel.getText("msgTraineeformSuccess")
-                );
+
+                if (that.oDialog) {
+                  that.oDialog.close();
+                }
+
+                MessageToast.show(that.i18nModel.getText("msgTraineeformSuccess"));
               },
               error: function () {
                 MessageToast.show("Error saving data. Please try again.");
-              },
+              }
             });
           } else {
-            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            MessageToast.show(that.i18nModel.getText("mandetoryFields"));
           }
         },
+
 
         FTF_onCancelform: function () {
           var oModel = this.getView().getModel("TraineeData");

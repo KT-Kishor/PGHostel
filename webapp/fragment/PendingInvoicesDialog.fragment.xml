@@ -29,7 +29,7 @@
                             <Text text="{dialogData>Status}" />
                              <ObjectNumber number="{
                                 path: 'dialogData>pendingAmountInINR',
-                                formatter: '.formatter.currencyValue'
+                               formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
                         </cells>
                     </ColumnListItem>
