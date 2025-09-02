@@ -111,16 +111,20 @@
 											<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa" />
-										<m:TextArea value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<m:TextArea rows="5" value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 										<m:Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca" />
 										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 										<m:Label text="{i18n>expCountry}" required="true" id="SS_id_lcoun" visible="{viewModel>/RelievingLetter}" />
-										<m:ComboBox change="SS_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="SS_id_Country" items="{path:'CountryModel>/',length:1000}" value="{sEmployeeModel>/0/Country}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
-											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
+										<m:ComboBox id="SS_id_Country" items="{path: 'CountryModel>/', length: 400, sorter: { path: 'countryName', descending: false, group: false} }" value="{sEmployeeModel>/0/Country}" change="onCountryChange" valueStateText="{i18n>expValStaCountry}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
+											<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
+										</m:ComboBox>
+										<m:Label text="{i18n>state}" required="true" id="SS_id_state" />
+										<m:ComboBox id="SS_id_State" items="{StateModel>/}" value="{sEmployeeModel>/0/State}" change="onStateChange" showSecondaryValues="true" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectState}">
+											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" id="SS_id_lbase" />
-										<m:ComboBox items="{BaseLocationModel>/}" showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
-											<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										<m:ComboBox items="{path: 'CityModel>/', length: 4000, sorter: { path: 'cityName', descending: false, group: false }}" showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="onCityChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
+											<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>branchCode}" />
 										<m:Input id="SS_id_BranchCode" value="{sEmployeeModel>/0/BranchCode}" editable="false" />
@@ -133,10 +137,10 @@
 											<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo" />
-										<m:ComboBox value="{sEmployeeModel>/0/STDCode}" showSecondaryValues="true" id="SS_id_STDCode" items="{codeModel>/}" maxLength="5" filterSecondaryValues="true" change="onCountryCodeChange" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
-											<core:ListItem key="{codeModel>country}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
+										<m:ComboBox value="{sEmployeeModel>/0/STDCode}" showSecondaryValues="true" id="SS_id_STDCode" items="{CountryModel>/}" filterSecondaryValues="true" change="onISDChange" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
+											<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>stdCode}" />
 										</m:ComboBox>
-										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="onMobileNumberLiveChange" valueStateText="{i18n>mobileNoValueState}" />
+										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="onMobileLiveChange" valueStateText="{i18n>mobileNoValueState}" />
 										<m:Label text="{i18n>role}" id="SS_id_lr" visible="{viewModel>/RelievingLetter }" />
 										<m:Select editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/Role}" showSecondaryValues="true" id="SS_id_RoleEmpSele" items="{RoleModel>/}" visible="{viewModel>/RelievingLetter}" valueStateText="{i18n>combovalueState}">
 											<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />

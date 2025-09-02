@@ -482,7 +482,7 @@ onTileRefresh: async function () {
         )
     );
     this.closeBusyDialog();
-    MessageToast.show("Data Refreshed Successfully");
+    MessageToast.show("Users accounts synchronized");
   },
      UploadCountryData:function(){
       let oView = this.getView()

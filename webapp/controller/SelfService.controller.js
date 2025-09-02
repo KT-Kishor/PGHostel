@@ -1,4 +1,4 @@
-sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF", "../fonts/EBGaramond", "../fonts/Allura", "../fonts/Poppins", "../fonts/Plight", "sap/suite/ui/commons/Timeline", "sap/suite/ui/commons/TimelineItem"], (Controller, Formatter, utils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF, EBGaramond, Allura, Poppins, Plight, Timeline, TimelineItem) => {
+sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", "../utils/utilsMobileValidation", "sap/ui/model/json/JSONModel", "sap/m/BusyIndicator", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/SalaryCertificatePDF", "../fonts/EBGaramond", "../fonts/Allura", "../fonts/Poppins", "../fonts/Plight", "sap/suite/ui/commons/Timeline", "sap/suite/ui/commons/TimelineItem"], (Controller, Formatter, utils, mobileUtils, JSONModel, BusyIndicator, MessageToast, MessageBox, jsPDF, EBGaramond, Allura, Poppins, Plight, Timeline, TimelineItem) => {
   "use strict";
   return Controller.extend("sap.kt.com.minihrsolution.controller.SelfService", {
     Formatter: Formatter,
@@ -14,6 +14,36 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       this.getView().setModel(oDateModel, "controller");
       this.getRouter().getRoute("SelfService").attachMatched(this._onRouteMatched, this);
       // this.getRouter().navTo("SelfService", { sPath: "SelfService" });
+    },
+
+    onCountryChange: function (oEvent) {
+      mobileUtils.onCountryChange(oEvent, this, {
+        jobModelName: "sEmployeeModel",
+        countryModelName: "CountryModel",
+        stateComboId: "SS_id_State",
+        cityComboId: "SS_id_BaseL",
+        isdComboId: "SS_id_STDCode",
+        mobileInputId: "SS_id_MobileNo",
+        statePath: "/0/State",
+        cityPath: "/0/BaseLocation",
+        mobilePath: "/0/MobileNo",
+        sFragmentId: undefined,
+      });
+      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+      this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+    },
+
+    onStateChange: function (oEvent) {
+      mobileUtils.onStateChange(oEvent, this, { jobModelName: "sEmployeeModel", cityComboId: "SS_id_BaseL" });
+    },
+    onCityChange: function (oEvent) {
+      mobileUtils.onCityChange(oEvent, this, { jobModelName: "sEmployeeModel" });
+    },
+    onISDChange: function (oEvent) {
+      mobileUtils.onISDChange(oEvent, this, { jobModelName: "sEmployeeModel", countryModelName: "CountryModel", mobileInputId: "SS_id_MobileNo" });
+    },
+    onMobileLiveChange: function (oEvent) {
+      mobileUtils.validateMobile(oEvent, this, { mobileInputId: "SS_id_MobileNo" });
     },
 
     _onRouteMatched: async function (oEvent) {
@@ -537,9 +567,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
           sap.m.MessageToast.show(this.i18nModel.getText("permissionDenied"));
         }
       }
-    },
-    SS_validateMobileNumber: function (oEvent) {
-      this._validateMobileNumberLocal(oEvent);
     },
 
     _validateAllRequiredFieldsForSubmit: function () {
@@ -1724,8 +1751,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         const nameTwo = sap.ui.getCore().byId("AdEmp_id_RCNameII").getValue().trim();
         const mailTwo = sap.ui.getCore().byId("AdEmp_id_RCMailII").getValue().trim();
         const mobileNoTwo = sap.ui.getCore().byId("AdEmp_id_RCMobileII").getValue().trim();
-        const optionalValid =
-          (name === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID")) && (mail === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID")) && (mobileNo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID")) && (nameTwo === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID")) && (mailTwo === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID")) && (mobileNoTwo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID"));
+        const optionalValid = (name === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameI"), "ID")) && (mail === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailI"), "ID")) && (mobileNo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileI"), "ID")) && (nameTwo === "" || utils._LCvalidateName(sap.ui.getCore().byId("AdEmp_id_RCNameII"), "ID")) && (mailTwo === "" || utils._LCvalidateEmail(sap.ui.getCore().byId("AdEmp_id_RCMailII"), "ID")) && (mobileNoTwo === "" || utils._LCvalidateMobileNumber(sap.ui.getCore().byId("AdEmp_id_RCMobileII"), "ID"));
         if (!optionalValid) {
           MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           return;
@@ -1911,9 +1937,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       salaryDetailsArray.forEach((offerData, index) => {
         var oEffectiveDate = new Date(offerData.EffectiveDate);
         var isLastRecord = index === salaryDetailsArray.length - 1;
-        var sTitleText = isLastRecord
-          ? `${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}`
-          : `${this.i18nModel.getText("salaryAppraisalDate")}: ${this.Formatter.formatDate(offerData.AppraisalDate)}, ${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
+        var sTitleText = isLastRecord ? `${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}` : `${this.i18nModel.getText("salaryAppraisalDate")}: ${this.Formatter.formatDate(offerData.AppraisalDate)}, ${this.i18nModel.getText("salaryEffectiveDate")}: ${this.Formatter.formatDate(offerData.EffectiveDate || "")}, ${this.i18nModel.getText("salaryYearlyGross")}: ${this.i18nModel.getText("salaryINR")} ${this.Formatter.fromatNumber(offerData.GrossPay)}`;
         var oTitleText = new sap.m.Text({
           text: sTitleText,
           wrapping: true,
@@ -2993,10 +3017,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       this.SSReg_oDialog.close();
     },
 
-    SS_onChangeCountry: function (oEvent) {
-      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-      this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
-    },
     onExperienceSelect: function (oEvent) {
       const iSelectedIndex = oEvent.getParameter("selectedIndex");
       const bIsExperiencedSelected = iSelectedIndex === 1;

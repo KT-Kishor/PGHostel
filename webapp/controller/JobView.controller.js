@@ -365,7 +365,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         ISD: isd,
         Country: country,
         City: city,
-
+        State: sap.ui.core.Fragment.byId("jobFormFrag", "stateCombo").getSelectedKey(),
         JobTitle: jobTitle,
         ResumeFile: fileBase64,
         CreatedBy: "Candidate",
@@ -437,7 +437,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
             oDialog.setTitle("Job Application"); // Set fallback title
           }
 
-          ["CountryModel", "codeModel", "BaseLocationModel"].forEach((sName) => {
+          ["CountryModel", "CityModel"].forEach((sName) => {
             const oGlobalModel = that.getOwnerComponent().getModel(sName);
             if (oGlobalModel) {
               oDialog.setModel(oGlobalModel, sName);
@@ -939,33 +939,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       }
       utils._LCstrictValidationComboBox(oEvent, "genderInvalid");
     },
-    MC_onBaseLocationChange: function (oEvent) {
-      try {
-        const oComboBox = oEvent.getSource();
-        const sEnteredKey = oComboBox.getValue();
-        const sSelectedKey = oComboBox.getSelectedKey();
-
-        if (!sEnteredKey) {
-          // Empty input is allowed
-          oComboBox.setValueState("None");
-          oComboBox.setValueStateText("");
-          return;
-        }
-
-        const aItems = oComboBox.getItems();
-        const bValidMatch = aItems.some(function (oItem) {
-          return oItem.getText().toLowerCase() === sEnteredKey.toLowerCase() || oItem.getKey().toLowerCase() === sEnteredKey.toLowerCase();
-        });
-
-        if (!bValidMatch) {
-          oComboBox.setValueState("Error");
-          oComboBox.setValueStateText("Please select a valid location from the list");
-        } else {
-          oComboBox.setValueState("None");
-          oComboBox.setValueStateText("");
-        }
-      } catch (err) {}
-    },
 
     ajaxCreateWithJQuery: function (sUrl, oPayLoad) {
       return new Promise((resolve, reject) => {
@@ -983,86 +956,86 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         });
       });
     },
+
+    onMobileChange: function (oEvent) {
+      this._validateMobileNumberLocal(oEvent);
+    },
     _validateMobileNumberLocal: function (oEvent) {
       const oInput = oEvent.getSource();
-      const sValue = oInput.getValue();
-      const sValueTrimmed = sValue.trim();
+      const sValue = oInput.getValue().trim();
 
-      // This will now get the correct country code because it's set in MC_ValidateComboBox
-      const oModel = this.getView().getModel("JobModel");
-      const sCountryCode = oModel.getProperty("/country");
-
+      const iMaxLength = oInput.getMaxLength();
       oInput.setValueState(sap.ui.core.ValueState.None);
       oInput.setValueStateText("");
 
-      // mobile number cannot starts with 0s
-      if (sValueTrimmed.startsWith("0")) {
+      // mobile number cannot start with 0
+      if (sValue.startsWith("0")) {
         oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("Mobile Number begins with non-zero");
+        oInput.setValueStateText("Mobile number cannot begin with 0");
         return false;
       }
 
-      // only numbers
-      if (!/^\d*$/.test(sValueTrimmed)) {
+      // only numbers allowed
+      if (!/^\d*$/.test(sValue)) {
         oInput.setValueState(sap.ui.core.ValueState.Error);
         oInput.setValueStateText("Only numbers are allowed");
         return false;
       }
 
-      // depending upon country validation (India = 10 digits)
-      if (sCountryCode === "IN") {
-        if (sValueTrimmed.length !== 10) {
+      // validate length
+      if (iMaxLength === 10) {
+        if (sValue.length !== 10) {
           oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Mobile Number must be 10 digits long");
+          oInput.setValueStateText("Mobile number must be 10 digits long");
           return false;
         }
       } else {
-        // Other countries min/max length check
-        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
+        if (sValue.length < 4 || sValue.length > 20) {
           oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
+          oInput.setValueStateText("Mobile number must be between 4 and 20 digits long");
           return false;
         }
       }
+
       return true;
     },
-    onMobileChange: function (oEvent) {
-      this._validateMobileNumberLocal(oEvent);
+
+    _setMobileMaxLength: function (sCountryCode) {
+      const oJobModel = this.getView().getModel("JobModel");
+      const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
+      if (!oMobileInput) return;
+
+      oMobileInput.setValue("");
+      oJobModel.setProperty("/mobile", "");
+
+      if (sCountryCode === "IN") {
+        oMobileInput.setMaxLength(10);
+      } else {
+        oMobileInput.setMaxLength(20);
+      }
     },
-    MC_ValidateComboBox: function (oEvent) {
-      // Call the existing validation utility
+
+    MC_ValidateISD: function (oEvent) {
       utils._LCstrictValidationComboBox(oEvent);
+
       const oComboBox = oEvent.getSource();
       const selectedKey = oComboBox.getSelectedKey();
 
-      // Get the JobModel
       const oJobModel = this.getView().getModel("JobModel");
 
-      // Get the CodeModel to find the corresponding country code
-      const oCodeModel = this.getView().getModel("codeModel");
-      const aItems = oCodeModel.getProperty("/");
+      const oCountryModel = this.getView().getModel("CountryModel");
+      const aItems = oCountryModel.getProperty("/");
 
-      // Find the country code associated with the selected calling code (+91)
-      const sCountryCode = aItems.find((item) => item.calling_code === selectedKey)?.country_code;
+      const oMatch = aItems.find((item) => item.stdCode === selectedKey);
 
-      // Set the country property in the JobModel
-      // This is the crucial step that links the two functions
-      if (oJobModel && sCountryCode) {
-        oJobModel.setProperty("/country", sCountryCode);
+      if (oJobModel) {
+        oJobModel.setProperty("/stdCode", selectedKey); // ISD
+        oJobModel.setProperty("/country", oMatch ? oMatch.code : ""); // CountryCode
       }
 
-      // Get the mobile input field
-      const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
-      if (oMobileInput) {
-        oMobileInput.setValue("");
-        // Set the maxLength based on the resolved country code
-        if (sCountryCode === "IN") {
-          oMobileInput.setMaxLength(10);
-        } else {
-          oMobileInput.setMaxLength(20);
-        }
-      }
+      this._setMobileMaxLength(oMatch ? oMatch.code : "");
     },
+
     MC_onChangeCountry: function (oEvent) {
       try {
         const oComboBox = oEvent.getSource();
@@ -1070,33 +1043,38 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         const aItems = oComboBox.getItems();
         const oView = this.getView();
         const oModel = oView.getModel("JobModel");
-        // 1. If blank, clear everything, no filter
+
+        // 1. If blank → reset everything
         if (!sInputValue) {
-          oComboBox.setValueState(sap.ui.core.ValueState.None);
-          oComboBox.setValueStateText("");
-          oComboBox.setSelectedKey("");
+          oComboBox.setValueState("None").setValueStateText("").setSelectedKey("");
           if (oModel) {
             oModel.setProperty("/country", "");
             oModel.setProperty("/stdCode", "");
           }
-          // Clear ISD combo
+
+          // Clear ISD
           const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
           if (oISDCombo) {
             oISDCombo.setSelectedKey("");
             oISDCombo.setEnabled(true);
-            if (oISDCombo.getBinding("items")) {
-              oISDCombo.getBinding("items").filter([]); // Remove filter
-            }
+            oISDCombo.getBinding("items")?.filter([]);
           }
-          // Clear Location combo
-          const oLocationCombo = Fragment.byId("jobFormFrag", "LocationComboBox");
-          if (oLocationCombo) {
-            oLocationCombo.setSelectedKey("");
-            if (oLocationCombo.getBinding("items")) {
-              oLocationCombo.getBinding("items").filter([]); // Remove filter
-            }
+
+          // Clear States
+          const oStateCombo = Fragment.byId("jobFormFrag", "StateComboBox");
+          if (oStateCombo) {
+            oStateCombo.setSelectedKey("");
+            oStateCombo.getBinding("items")?.filter([]);
           }
-          // Clear Mobile number & length
+
+          // Clear Cities
+          const oCityCombo = Fragment.byId("jobFormFrag", "LocationComboBox");
+          if (oCityCombo) {
+            oCityCombo.setSelectedKey("");
+            oCityCombo.getBinding("items")?.filter([]);
+          }
+
+          // Reset Mobile
           const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
           if (oMobileInput) {
             oMobileInput.setValue("");
@@ -1104,37 +1082,35 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
           }
           return;
         }
-        // 2. Check for valid country
-        const oMatchedItem = aItems.find((item) => {
-          return item.getText().toLowerCase() === sInputValue.toLowerCase() || item.getKey().toLowerCase() === sInputValue.toLowerCase();
-        });
+
+        // 2. Validate entered country
+        const oMatchedItem = aItems.find((item) => item.getText().toLowerCase() === sInputValue.toLowerCase() || item.getKey().toLowerCase() === sInputValue.toLowerCase());
+
         if (!oMatchedItem) {
-          // Invalid input
-          oComboBox.setValueState(sap.ui.core.ValueState.Error);
+          oComboBox.setValueState("Error");
           oComboBox.setValueStateText(this.oResourceBundle.getText("JobAppExpValStaCountry"));
           return;
         }
-        // Valid country selected
-        oComboBox.setSelectedKey(oMatchedItem.getKey());
-        oComboBox.setValueState(sap.ui.core.ValueState.None);
-        oComboBox.setValueStateText("");
+
+        // 3. Valid country → set key + model
         const selectedKey = oMatchedItem.getKey().toUpperCase();
-        if (oModel) {
-          oModel.setProperty("/country", selectedKey);
-        }
-        // ISD Code Filter
+        oComboBox.setSelectedKey(selectedKey).setValueState("None").setValueStateText("");
+        oModel?.setProperty("/country", selectedKey);
+
+        // 4. Filter ISD codes
+        // Inside step 4
         const oISDCombo = Fragment.byId("jobFormFrag", "isd_code");
-        if (oISDCombo && oISDCombo.getBinding("items")) {
-          const oISDFilter = new sap.ui.model.Filter("country_code", "EQ", selectedKey);
+        if (oISDCombo?.getBinding("items")) {
+          const oISDFilter = new sap.ui.model.Filter("code", "EQ", selectedKey); // CountryCode
           oISDCombo.getBinding("items").filter([oISDFilter]);
+
           setTimeout(() => {
             const aISDItems = oISDCombo.getItems();
             if (aISDItems.length === 1) {
-              const sCode = aISDItems[0].getBindingContext("codeModel").getObject().calling_code;
-              const sFinalCode = sCode.split(",")[0].trim();
-              oISDCombo.setSelectedKey(sFinalCode);
+              const sCode = aISDItems[0].getBindingContext("CountryModel").getObject().stdCode;
+              oISDCombo.setSelectedKey(sCode);
               oISDCombo.setEnabled(false);
-              oModel.setProperty("/stdCode", sFinalCode);
+              oModel.setProperty("/stdCode", sCode);
             } else {
               oISDCombo.setSelectedKey("");
               oISDCombo.setEnabled(true);
@@ -1142,28 +1118,84 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
             }
           }, 0);
         }
-        // Location Filter
-        const oLocationCombo = Fragment.byId("jobFormFrag", "LocationComboBox");
-        if (oLocationCombo && oLocationCombo.getBinding("items")) {
-          const oLocationFilter = new sap.ui.model.Filter("CountryCode", "EQ", selectedKey);
-          oLocationCombo.getBinding("items").filter([oLocationFilter]);
-          oLocationCombo.setSelectedKey("");
+
+        // --- Filter states based on selected country ---
+        const oStateCombo = Fragment.byId("jobFormFrag", "stateCombo");
+        if (oStateCombo?.getBinding("items")) {
+          const oStateFilter = new sap.ui.model.Filter("countryCode", "EQ", selectedKey); // selectedKey = CountryCode
+          oStateCombo.getBinding("items").filter([oStateFilter]);
+
+          // Reset JobModel state + city
+          oModel.setProperty("/state", "");
+          oModel.setProperty("/city", "");
         }
-        // update Mobile number field
-        const oMobileInput = Fragment.byId("jobFormFrag", "mobileInput");
-        if (oMobileInput) {
-          oMobileInput.setValue("");
-          if (oMobileInput) {
-            // Set max length based on country
-            if (selectedKey === "IN") {
-              oMobileInput.setMaxLength(10); // for India
-            } else {
-              oMobileInput.setMaxLength(20); // for other countries
-            }
-          }
+
+        // 6. Clear & reset Cities when country changes
+        const oCityCombo = Fragment.byId("jobFormFrag", "LocationComboBox");
+        if (oCityCombo?.getBinding("items")) {
+          oCityCombo.getBinding("items").filter([]);
+          oCityCombo.setSelectedKey("");
         }
-      } catch (error) {}
+
+        // 7. Mobile input length logic
+        const sSelectedCountryCode = oEvent.getSource().getSelectedKey(); // CountryCode like IN, US
+        const aCountries = this.getView().getModel("CountryModel").getData();
+
+        // Match by country code
+        const oSelectedCountry = aCountries.find((c) => c.code === sSelectedCountryCode);
+
+        if (oSelectedCountry) {
+          const oJobModel = this.getView().getModel("JobModel");
+          oJobModel.setProperty("/country", oSelectedCountry.code); // IN, US, etc.
+          oJobModel.setProperty("/stdCode", oSelectedCountry.stdCode); // ISD code
+        }
+
+        // Pass the resolved country code (IN/US/etc.)
+        this._setMobileMaxLength(oSelectedCountry ? oSelectedCountry.code : "");
+      } catch (error) {
+        console.error("Error in MC_onChangeCountry:", error);
+      }
     },
+
+    MC_onChangeCity: function (oEvent) {
+      try {
+        const oComboBox = oEvent.getSource();
+        const sEnteredKey = oComboBox.getValue();
+
+        if (!sEnteredKey) {
+          oComboBox.setValueState("None");
+          oComboBox.setValueStateText("");
+          return;
+        }
+
+        const aItems = oComboBox.getItems();
+        const bValidMatch = aItems.some((oItem) => oItem.getText().toLowerCase() === sEnteredKey.toLowerCase() || oItem.getKey().toLowerCase() === sEnteredKey.toLowerCase());
+
+        if (!bValidMatch) {
+          oComboBox.setValueState("Error");
+          oComboBox.setValueStateText("Please select a valid city from the list");
+        } else {
+          oComboBox.setValueState("None");
+          oComboBox.setValueStateText("");
+        }
+      } catch (err) {
+        console.error("Error in MC_onChangeCity:", err);
+      }
+    },
+
+    MC_onChangeState: function (oEvent) {
+      const sStateName = oEvent.getSource().getSelectedKey();
+
+      // --- Filter Cities by State ---
+      const oCityCombo = sap.ui.core.Fragment.byId("jobFormFrag", "LocationComboBox");
+      const oCityBinding = oCityCombo.getBinding("items");
+      if (oCityBinding) {
+        oCityBinding.filter([new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName)]);
+      }
+
+      oCityCombo.setSelectedKey("");
+    },
+
     onSubmit: async function () {
       const i18n = this.oResourceBundle;
       const f = (id) => sap.ui.core.Fragment.byId("jobFormFrag", id);
@@ -1351,53 +1383,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       if (qualCombo) {
         const value = qualCombo.getSelectedItem()?.getText?.() || qualCombo.getValue?.();
         jsonData.HighestQualifaction = value || "";
-      }
-    },
-
-    onOpenReferrerDialog: function () {
-      const oView = this.getView();
-      const oSelectedCandidateModel = oView.getModel("SelectedCandidate");
-
-      if (!this.pReferrerDialogPromise) {
-        this.pReferrerDialogPromise = Fragment.load({
-          id: oView.getId(), // ensures scoped IDs
-          name: "sap.kt.com.minihrsolution.fragment.ReferrerDetails",
-          controller: this,
-        }).then((oDialog) => {
-          oView.addDependent(oDialog);
-          oDialog.setModel(oSelectedCandidateModel, "SelectedCandidate");
-          return oDialog;
-        });
-      }
-
-      this.pReferrerDialogPromise.then((oDialog) => {
-        // Set or refresh model
-        oDialog.setModel(oSelectedCandidateModel, "SelectedCandidate");
-
-        //  Delay this part slightly so the control is ready after rendering
-        setTimeout(() => {
-          const oTitle = Fragment.byId(oView.getId(), "positionInput");
-          const jobTitle = oSelectedCandidateModel?.getProperty("/JobTitle");
-
-          if (oTitle && jobTitle) {
-            oTitle.setText(jobTitle);
-          } else {
-          }
-        }, 0);
-
-        oDialog.open();
-      });
-    },
-
-    onReferredToChange: function (oEvent) {
-      const oCombo = oEvent.getSource();
-      const sKey = oCombo.getSelectedKey();
-
-      if (!sKey) {
-        oCombo.setValueState("Error");
-        oCombo.setValueStateText("Please select a valid person from the list.");
-      } else {
-        oCombo.setValueState("None");
       }
     },
 
