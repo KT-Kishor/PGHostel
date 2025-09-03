@@ -6,6 +6,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     PG_DEGREES: ["MTech/ME", "MSc", "MCom", "MA", "MBA", "MCA", "LLM", "MD", "MS", "Pharma D", "MPT", "PG Diploma", "PhD", "MPhil"],
 
     onInit: function () {
+      //   mobileUtils.setMobileMaxLength(this, "");
       const today = new Date();
       const nextMonthFirstDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
       const maxDate18YearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
@@ -17,30 +18,110 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     },
 
     onCountryChange: function (oEvent) {
-      mobileUtils.onCountryChange(oEvent, this, {
-        jobModelName: "sEmployeeModel",
-        countryModelName: "CountryModel",
-        stateComboId: "SS_id_State",
-        cityComboId: "SS_id_BaseL",
-        isdComboId: "SS_id_STDCode",
-        mobileInputId: "SS_id_MobileNo",
-        statePath: "/0/State",
-        cityPath: "/0/BaseLocation",
-        mobilePath: "/0/MobileNo",
-        sFragmentId: undefined,
-      });
-      utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-      this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onCountryChange(oEvent, this, {
+          jobModelName: "sEmployeeModel",
+          countryModelName: "CountryModel",
+          stateComboId: "SS_id_State",
+          cityComboId: "SS_id_BaseL",
+          isdComboId: "SS_id_STDCode",
+          mobileInputId: "SS_id_MobileNo",
+          statePath: "/0/State",
+          cityPath: "/0/BaseLocation",
+          mobilePath: "/0/MobileNo",
+          sFragmentId: undefined,
+        });
+      }
     },
 
     onStateChange: function (oEvent) {
-      mobileUtils.onStateChange(oEvent, this, { jobModelName: "sEmployeeModel", cityComboId: "SS_id_BaseL" });
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onStateChange(oEvent, this, { jobModelName: "sEmployeeModel", cityComboId: "SS_id_BaseL" });
+      }
     },
     onCityChange: function (oEvent) {
-      mobileUtils.onCityChange(oEvent, this, { jobModelName: "sEmployeeModel" });
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onCityChange(oEvent, this, { jobModelName: "sEmployeeModel" });
+      }
     },
-    onISDChange: function (oEvent) {
-      mobileUtils.onISDChange(oEvent, this, { jobModelName: "sEmployeeModel", countryModelName: "CountryModel", mobileInputId: "SS_id_MobileNo" });
+
+    // For primary mobile
+    onISDChangePrimary: function (oEvent) {
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onISDChange(oEvent, this, {
+          jobModelName: "sEmployeeModel",
+          countryModelName: "CountryModel",
+          mobileInputId: "SS_id_MobileNo",
+          sFragmentId: undefined,
+        });
+      }
+    },
+
+    // For emergency contact 1
+    // For emergency contact 1
+    onISDChangeEmergency1: function (oEvent) {
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onISDChange(oEvent, this, {
+          jobModelName: "sEmployeeModel",
+          countryModelName: "CountryModel",
+          mobileInputId: "SS_id_EmpMoF",
+          sFragmentId: undefined,
+        });
+
+        // Explicitly set maxLength after ISD change
+        const sSelectedStdCode = oEvent.getSource().getSelectedKey();
+        const aCountries = this.getView().getModel("CountryModel")?.getData() || [];
+        const oMatch = aCountries.find((c) => c.stdCode === sSelectedStdCode);
+        if (oMatch) {
+          mobileUtils.setMobileMaxLength(this, "SS_id_EmpMoF", undefined, oMatch.code);
+        }
+      }
+    },
+
+    // For emergency contact 2
+    onISDChangeEmergency2: function (oEvent) {
+      if (utils._LCstrictValidationComboBox(oEvent, "event")) {
+        mobileUtils.onISDChange(oEvent, this, {
+          jobModelName: "sEmployeeModel",
+          countryModelName: "CountryModel",
+          mobileInputId: "SS_id_EmpMoS",
+          sFragmentId: undefined,
+        });
+
+        // Explicitly set maxLength after ISD change
+        const sSelectedStdCode = oEvent.getSource().getSelectedKey();
+        const aCountries = this.getView().getModel("CountryModel")?.getData() || [];
+        const oMatch = aCountries.find((c) => c.stdCode === sSelectedStdCode);
+        if (oMatch) {
+          mobileUtils.setMobileMaxLength(this, "SS_id_EmpMoS", undefined, oMatch.code);
+        }
+      }
+    },
+
+    // For primary mobile
+    onMobileLiveChange: function (oEvent) {
+      mobileUtils.validateMobile(oEvent, this, {
+        mobileInputId: "SS_id_MobileNo",
+        sFragmentId: undefined,
+      });
+    },
+
+    // For emergency contacts
+    onMobileNumberLiveChange: function (oEvent) {
+      const sInputId = oEvent.getSource().getId();
+
+      // Determine which mobile input triggered the event
+      if (sInputId.includes("SS_id_EmpMoF")) {
+        mobileUtils.validateMobile(oEvent, this, {
+          mobileInputId: "SS_id_EmpMoF",
+          sFragmentId: undefined,
+        });
+      } else if (sInputId.includes("SS_id_EmpMoS")) {
+        mobileUtils.validateMobile(oEvent, this, {
+          mobileInputId: "SS_id_EmpMoS",
+          sFragmentId: undefined,
+        });
+      }
     },
     onMobileLiveChange: function (oEvent) {
       mobileUtils.validateMobile(oEvent, this, { mobileInputId: "SS_id_MobileNo" });
@@ -98,6 +179,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         // --- Role and Path Determination ---
         const loginModel = this.getOwnerComponent().getModel("LoginModel");
         const sLoggedInRole = loginModel.getProperty("/Role");
+        console.log("sLoggedInRole", sLoggedInRole);
         this.sNavigatedRole = oEvent.getParameter("arguments").Role;
         this.sPath = oEvent.getParameter("arguments").sPath;
 
@@ -569,7 +651,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       }
     },
 
-    _validateAllRequiredFieldsForSubmit: function () {
+_validateAllRequiredFieldsForSubmit: function () {
       const oView = this.getView();
       const bIsValid =
         // --- Basic Details Section ---
@@ -579,18 +661,27 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
         // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
-        this._validateMobileNumberLocal(oView.byId("SS_id_MobileNo")) &&
+        mobileUtils.validateMobile(oView.byId("SS_id_MobileNo"), this, {
+          mobileInputId: "SS_id_MobileNo",
+          sFragmentId: undefined,
+        }) &&
         // --- Emergency Contact 1 ---
         utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
         // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-        this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoF")) &&
+        mobileUtils.validateMobile(oView.byId("SS_id_EmpMoF"), this, {
+          mobileInputId: "SS_id_EmpMoF",
+          sFragmentId: undefined,
+        }) &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
         // --- Emergency Contact 2 ---
         utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
         // Corrected: Pass the ComboBox and Input controls directly
         utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-        this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoS")) &&
+        mobileUtils.validateMobile(oView.byId("SS_id_EmpMoS"), this, {
+          mobileInputId: "SS_id_EmpMoS",
+          sFragmentId: undefined,
+        }) &&
         utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
         // --- Bank Details Section ---
         utils._LCvalidateName(oView.byId("SS_id_AcName"), "ID") &&
@@ -677,10 +768,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       }
     },
 
+
     onChangeResigEndDate: function (oEvent) {
       utils._LCvalidateDate(oEvent);
     },
-    SS_onSavePress: function (sButtonId) {
+ SS_onSavePress: function (sButtonId) {
       const oView = this.getView();
       const oDataModel = oView.getModel("sEmployeeModel").getData()[0];
       let isValid = true;
@@ -709,15 +801,24 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             utils._LCvalidateMandatoryField(oView.byId("SS_id_PAddress"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_CAdress"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCode"), "ID") &&
-            this._validateMobileNumberLocal(oView.byId("SS_id_MobileNo")) &&
+            mobileUtils.validateMobile(oView.byId("SS_id_MobileNo"), this, {
+              mobileInputId: "SS_id_MobileNo",
+              sFragmentId: undefined,
+            }) &&
             utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") &&
             utils._LCvalidateName(oView.byId("SS_id_EmeNameF"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRI"), "ID") &&
-            this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoF")) &&
+            mobileUtils.validateMobile(oView.byId("SS_id_EmpMoF"), this, {
+              mobileInputId: "SS_id_EmpMoF",
+              sFragmentId: undefined,
+            }) &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_AddF"), "ID") &&
             utils._LCvalidateName(oView.byId("SS_id_NameS"), "ID") &&
             utils._LCstrictValidationComboBox(oView.byId("SS_id_STDCodeRII"), "ID") &&
-            this._validateMobileNumberLocal(oView.byId("SS_id_EmpMoS")) &&
+            mobileUtils.validateMobile(oView.byId("SS_id_EmpMoS"), this, {
+              mobileInputId: "SS_id_EmpMoS",
+              sFragmentId: undefined,
+            }) &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_EmpAddS"), "ID") &&
             utils._LCvalidateMandatoryField(oView.byId("SS_id_Desi"), "ID");
         } else if (sButtonId === "DocumentBtn") {
@@ -775,7 +876,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       );
       return true;
     },
-
     updateFunctionForSelf: function (oPayload, ID) {
       var oView = this.getView();
       var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
@@ -3016,7 +3116,10 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
 
       this.SSReg_oDialog.close();
     },
-
+    // SS_onChangeCountry: function (oEvent) {
+    //   utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+    //   this.onCountryChange(oEvent, { stdCodeCombo: "SS_id_STDCode", baseLocationCombo: "SS_id_BaseL", branchInput: "SS_id_BranchCode", mobileInput: "SS_id_MobileNo" });
+    // },
     onExperienceSelect: function (oEvent) {
       const iSelectedIndex = oEvent.getParameter("selectedIndex");
       const bIsExperiencedSelected = iSelectedIndex === 1;
@@ -3114,115 +3217,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     },
     AddEd_changeDegree: function (oEvent) {
       utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-    },
-
-    onCountryCodeChange: function (oEvent) {
-      const oComboBox = oEvent.getSource();
-      const sSelectedCode = oComboBox.getValue();
-      let oMobileInput;
-      let sMobilePath;
-
-      // Find the related mobile input field and its model path based on ComboBox ID
-      const sId = oComboBox.getId();
-      if (sId.includes("SS_id_STDCodeRII")) {
-        oMobileInput = this.getView().byId("SS_id_EmpMoS");
-        sMobilePath = "/0/EmergencyContactPerson2ContactNo";
-      } else if (sId.includes("SS_id_STDCodeRI")) {
-        oMobileInput = this.getView().byId("SS_id_EmpMoF");
-        sMobilePath = "/0/EmergencyContactPerson1ContactNo";
-      } else {
-        oMobileInput = this.getView().byId("SS_id_MobileNo");
-        sMobilePath = "/0/MobileNo";
-      }
-
-      if (oMobileInput) {
-        // Correctly clear the data-bound field by updating the model
-        const oModel = this.getView().getModel("sEmployeeModel");
-        if (oModel) {
-          oModel.setProperty(sMobilePath, "");
-        }
-
-        // Reset the value state
-        oMobileInput.setValueState(sap.ui.core.ValueState.None);
-
-        // Call the new helper function to set the maxLength
-        this._setMobileInputMaxLength(oComboBox);
-      }
-
-      // Call the utility function to validate the ComboBox itself
-      utils._LCstrictValidationComboBox(oEvent);
-    },
-
-    onMobileNumberLiveChange: function (oEvent) {
-      const oInput = oEvent.getSource();
-      this._validateMobileNumberLocal(oInput);
-    },
-
-    _validateMobileNumberLocal: function (oInput) {
-      if (!(oInput instanceof sap.m.Input)) {
-        return false;
-      }
-
-      const oView = this.getView();
-      const sValueTrimmed = oInput.getValue().trim();
-
-      // Dynamically find the correct country code ComboBox
-      let sCountryCodeId;
-      const sInputId = oInput.getId();
-      if (sInputId.includes("SS_id_EmpMoF")) {
-        sCountryCodeId = oView.createId("SS_id_STDCodeRI");
-      } else if (sInputId.includes("SS_id_EmpMoS")) {
-        sCountryCodeId = oView.createId("SS_id_STDCodeRII");
-      } else {
-        sCountryCodeId = oView.createId("SS_id_STDCode");
-      }
-
-      const oCountryCodeComboBox = sap.ui.getCore().byId(sCountryCodeId);
-
-      // Use getValue() to get the string "+91"
-      const sCountryCode = oCountryCodeComboBox ? oCountryCodeComboBox.getValue() : "";
-
-      oInput.setValueState(sap.ui.core.ValueState.None);
-      oInput.setValueStateText("");
-
-      if (oInput.getRequired() && sValueTrimmed.length === 0) {
-        oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("This field is mandatory.");
-        return false;
-      }
-
-      if (!oInput.getRequired() && sValueTrimmed.length === 0) {
-        return true;
-      }
-
-      if (!/^\d*$/.test(sValueTrimmed)) {
-        oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("Only numbers are allowed");
-        return false;
-      }
-
-      if (sValueTrimmed.startsWith("0")) {
-        oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("Mobile Number cannot begin with zero");
-        return false;
-      }
-
-      // Now this condition will be true when the value is "+91"
-      if (sCountryCode === "+91") {
-        if (sValueTrimmed.length !== 10) {
-          oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Mobile Number must be 10 digits long for India");
-          return false;
-        }
-      } else {
-        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
-          oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Enter a valid mobile number (between 4 and 20 digits)");
-          return false;
-        }
-      }
-
-      return true;
     },
     _setMobileInputMaxLength: function (oComboBox) {
       const sSelectedCode = oComboBox.getValue();
