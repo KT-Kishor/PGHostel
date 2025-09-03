@@ -24,6 +24,7 @@
             </Toolbar>
         </customHeader>
         <VBox>
+
             <Carousel
                 id="TN_id_Carousel"
                 visible="{= ${BirthdayModel>/}.length > 0 }"
@@ -56,6 +57,7 @@
                                 width="100%"
                                 renderType="Bare"
                             >
+                            
                                 <Title
                                     level="H3"
                                     text="Happy Birthday!! 🎉"
@@ -96,6 +98,7 @@
                     <Table sticky="ColumnHeaders,HeaderToolbar"
                         items="{MSASOWModel>/}"
                         id=""
+                        busy="{setModelforBusy>/busyIndicator}"
                     >
                         <headerToolbar>
                             <OverflowToolbar>
@@ -168,7 +171,7 @@
       )}"
             >
                 <f:content>
-                    <Table items="{CompanyInvoiceModelData>/}" sticky="ColumnHeaders,HeaderToolbar"> 
+                    <Table id="" items="{CompanyInvoiceModelData>/}" busy="{setModelforBusy>/busyIndicator}" sticky="ColumnHeaders,HeaderToolbar"> 
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
@@ -244,9 +247,9 @@
             >
                 <f:content>
                     <Table
-                        items="{SOWModel>/}" sticky="ColumnHeaders,HeaderToolbar"
-                        id=""
-                    >
+                        items="{SOWModel>/}" sticky="ColumnHeaders,HeaderToolbar"  
+                        busy="{setModelforBusy>/busyIndicator}"                    
+                    >   
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title

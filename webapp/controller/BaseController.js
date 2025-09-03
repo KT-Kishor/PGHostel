@@ -1,4 +1,4 @@
-  sap.ui.define([
+sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "../utils/TraineeCertificatePDF",
@@ -22,165 +22,165 @@
       return oResourceBundle.getText(sKey, aParams);
     },
 
-   initLocationModels: function(oView) {
-           const aBaseData = oView.getModel("BaseLocationModel").getData();
-           // --- Unique Countries ---
-           const aCountries = [];
-           const oCountryMap = {};
-           aBaseData.forEach(item => {
-               const sCode = item.CountryCode?.trim().toUpperCase() || "";
-               const sName = item.Country?.trim() || "";
-               if (sCode && sName && !oCountryMap[sCode]) {
-                   oCountryMap[sCode] = true;
-                   aCountries.push({
-                       code: sCode,
-                       countryName: sName,
-                       currency: item.Currency || "",
-                       stdCode: item.STDCode || ""
-                   });
-               }
-           });
-           aCountries.sort((a, b) => a.countryName.localeCompare(b.countryName));
-           oView.setModel(new JSONModel(aCountries), "CountryModel");
+    initLocationModels: function (oView) {
+      const aBaseData = oView.getModel("BaseLocationModel").getData();
+      // --- Unique Countries ---
+      const aCountries = [];
+      const oCountryMap = {};
+      aBaseData.forEach(item => {
+        const sCode = item.CountryCode?.trim().toUpperCase() || "";
+        const sName = item.Country?.trim() || "";
+        if (sCode && sName && !oCountryMap[sCode]) {
+          oCountryMap[sCode] = true;
+          aCountries.push({
+            code: sCode,
+            countryName: sName,
+            currency: item.Currency || "",
+            stdCode: item.STDCode || ""
+          });
+        }
+      });
+      aCountries.sort((a, b) => a.countryName.localeCompare(b.countryName));
+      oView.setModel(new JSONModel(aCountries), "CountryModel");
 
-           // --- Deduplicated States per Country ---
-           const oStateMap = {};
-           const aStates = [];
-           aBaseData.forEach(item => {
-               const key = (item.CountryCode + "_" + item.state).toUpperCase();
-               if (item.CountryCode && item.state && !oStateMap[key]) {
-                   oStateMap[key] = true;
-                   aStates.push({
-                       state: item.state,
-                       countryCode: item.CountryCode
-                   });
-               }
-           });
-           oView.setModel(new JSONModel(aStates), "StateModel");
+      // --- Deduplicated States per Country ---
+      const oStateMap = {};
+      const aStates = [];
+      aBaseData.forEach(item => {
+        const key = (item.CountryCode + "_" + item.state).toUpperCase();
+        if (item.CountryCode && item.state && !oStateMap[key]) {
+          oStateMap[key] = true;
+          aStates.push({
+            state: item.state,
+            countryCode: item.CountryCode
+          });
+        }
+      });
+      oView.setModel(new JSONModel(aStates), "StateModel");
 
-           // --- Deduplicated Cities per State ---
-           const oCityMap = {};
-           const aCities = [];
-           aBaseData.forEach(item => {
-               const key = (item.state + "_" + item.baseLocation).toUpperCase();
-               if (item.state && item.baseLocation && !oCityMap[key]) {
-                   oCityMap[key] = true;
-                   aCities.push({
-                       baseLocation: item.city,
-                       state: item.state,
-                       countryCode: item.CountryCode,
-                       branchCode: item.branchCode,
-                       currency: item.Currency || "",
-                       stdCode: item.STDCode || ""
-                   });
-               }
-           });
-           oView.setModel(new JSONModel(aCities), "CityModel");
+      // --- Deduplicated Cities per State ---
+      const oCityMap = {};
+      const aCities = [];
+      aBaseData.forEach(item => {
+        const key = (item.state + "_" + item.baseLocation).toUpperCase();
+        if (item.state && item.baseLocation && !oCityMap[key]) {
+          oCityMap[key] = true;
+          aCities.push({
+            baseLocation: item.city,
+            state: item.state,
+            countryCode: item.CountryCode,
+            branchCode: item.branchCode,
+            currency: item.Currency || "",
+            stdCode: item.STDCode || ""
+          });
+        }
+      });
+      oView.setModel(new JSONModel(aCities), "CityModel");
 
-           // --- Deduplicated STD Codes per Country ---
-           const oCodeMap = {};
-           const aCodes = [];
-           aBaseData.forEach(item => {
-               const code = item.STDCode?.trim() || "";
-               const key = (item.CountryCode + "_" + code).toUpperCase();
-               if (code && !oCodeMap[key]) {
-                   oCodeMap[key] = true;
-                   aCodes.push({
-                       stdCode: code,
-                       countryCode: item.CountryCode,
-                       currency: item.Currency || ""
-                   });
-               }
-           });
-           aCodes.sort((a, b) => a.stdCode.localeCompare(b.stdCode));
-           oView.setModel(new JSONModel(aCodes), "CodeModel");
-       },
+      // --- Deduplicated STD Codes per Country ---
+      const oCodeMap = {};
+      const aCodes = [];
+      aBaseData.forEach(item => {
+        const code = item.STDCode?.trim() || "";
+        const key = (item.CountryCode + "_" + code).toUpperCase();
+        if (code && !oCodeMap[key]) {
+          oCodeMap[key] = true;
+          aCodes.push({
+            stdCode: code,
+            countryCode: item.CountryCode,
+            currency: item.Currency || ""
+          });
+        }
+      });
+      aCodes.sort((a, b) => a.stdCode.localeCompare(b.stdCode));
+      oView.setModel(new JSONModel(aCodes), "CodeModel");
+    },
 
-       onCountry: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
-           const sCountryCode = oEvent.getSource().getSelectedKey();
-           const sCountryName = oEvent.getSource().getSelectedItem()?.getText();
+    onCountry: function (oEvent, oView, sCustomerModelName, mConfig = {}) {
+      const sCountryCode = oEvent.getSource().getSelectedKey();
+      const sCountryName = oEvent.getSource().getSelectedItem()?.getText();
 
-           const oModel = oView.getModel(sCustomerModelName);
-           oModel.setProperty("/countryCode", sCountryCode || "");
-           oModel.setProperty("/country", sCountryName || "");
+      const oModel = oView.getModel(sCustomerModelName);
+      oModel.setProperty("/countryCode", sCountryCode || "");
+      oModel.setProperty("/country", sCountryName || "");
 
-           const aBaseData = oView.getModel("BaseLocationModel").getData();
-           const aStates = [];
-           const oStateMap = {};
+      const aBaseData = oView.getModel("BaseLocationModel").getData();
+      const aStates = [];
+      const oStateMap = {};
 
-           aBaseData.forEach(item => {
-               if (item.CountryCode === sCountryCode && item.state && !oStateMap[item.state]) {
-                   oStateMap[item.state] = true;
-                   aStates.push({
-                       state: item.state
-                   });
-               }
-           });
+      aBaseData.forEach(item => {
+        if (item.CountryCode === sCountryCode && item.state && !oStateMap[item.state]) {
+          oStateMap[item.state] = true;
+          aStates.push({
+            state: item.state
+          });
+        }
+      });
 
-           oView.getModel("StateModel").setData(aStates);
+      oView.getModel("StateModel").setData(aStates);
 
-           if (mConfig.resetIds) {
-               this.resetComboBoxSelection(oView, mConfig.resetIds);
-           }
-       },
+      if (mConfig.resetIds) {
+        this.resetComboBoxSelection(oView, mConfig.resetIds);
+      }
+    },
 
-       onStateChange: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
-           const sState = oEvent.getSource().getSelectedKey();
-           const oModel = oView.getModel(sCustomerModelName);
-           oModel.setProperty("/state", sState || "");
+    onStateChange: function (oEvent, oView, sCustomerModelName, mConfig = {}) {
+      const sState = oEvent.getSource().getSelectedKey();
+      const oModel = oView.getModel(sCustomerModelName);
+      oModel.setProperty("/state", sState || "");
 
-           const aBaseData = oView.getModel("BaseLocationModel").getData();
-           const sCountryCode = oModel.getProperty("/countryCode");
+      const aBaseData = oView.getModel("BaseLocationModel").getData();
+      const sCountryCode = oModel.getProperty("/countryCode");
 
-           const aCities = aBaseData.filter(item =>
-               item.state === sState &&
-               (!sCountryCode || item.CountryCode === sCountryCode)
-           ).map(item => ({
-               baseLocation: item.city, // ✅ use baseLocation not city
-               state: item.state,
-               countryCode: item.CountryCode,
-               branchCode: item.branchCode,
-               currency: item.Currency || "",
-               stdCode: item.STDCode || ""
-           }));
+      const aCities = aBaseData.filter(item =>
+        item.state === sState &&
+        (!sCountryCode || item.CountryCode === sCountryCode)
+      ).map(item => ({
+        baseLocation: item.city, // ✅ use baseLocation not city
+        state: item.state,
+        countryCode: item.CountryCode,
+        branchCode: item.branchCode,
+        currency: item.Currency || "",
+        stdCode: item.STDCode || ""
+      }));
 
-           oView.getModel("CityModel").setData(aCities);
-           oView.getModel("CityModel").refresh(true);
+      oView.getModel("CityModel").setData(aCities);
+      oView.getModel("CityModel").refresh(true);
 
-           if (mConfig.resetIds) {
-               this.resetComboBoxSelection(oView, mConfig.resetIds);
-           }
-       },
+      if (mConfig.resetIds) {
+        this.resetComboBoxSelection(oView, mConfig.resetIds);
+      }
+    },
 
-       onCityChange: function(oEvent, oView, sCustomerModelName, mConfig = {}) {
-           const sCityName = oEvent.getSource().getSelectedKey();
-           const oModel = oView.getModel(sCustomerModelName);
-           const aBaseData = oView.getModel("BaseLocationModel").getData();
+    onCityChange: function (oEvent, oView, sCustomerModelName, mConfig = {}) {
+      const sCityName = oEvent.getSource().getSelectedKey();
+      const oModel = oView.getModel(sCustomerModelName);
+      const aBaseData = oView.getModel("BaseLocationModel").getData();
 
-           const oCityData = aBaseData.find(item => item.city === sCityName);
+      const oCityData = aBaseData.find(item => item.city === sCityName);
 
-           if (oModel) {
-               oModel.setProperty("/baseLocation", oCityData.city || "");
-               oModel.setProperty("/stdCode", oCityData.STDCode || "");
-               oModel.setProperty("/currency", oCityData.Currency || "");
-               oModel.setProperty("/countryCode", oCityData.CountryCode || "");
-               oModel.setProperty("/state", oCityData.state || "");
-           }
+      if (oModel) {
+        oModel.setProperty("/baseLocation", oCityData.city || "");
+        oModel.setProperty("/stdCode", oCityData.STDCode || "");
+        oModel.setProperty("/currency", oCityData.Currency || "");
+        oModel.setProperty("/countryCode", oCityData.CountryCode || "");
+        oModel.setProperty("/state", oCityData.state || "");
+      }
 
-           if (mConfig.resetIds) {
-               this.resetComboBoxSelection(oView, mConfig.resetIds);
-           }
-       },
+      if (mConfig.resetIds) {
+        this.resetComboBoxSelection(oView, mConfig.resetIds);
+      }
+    },
 
-       resetComboBoxSelection: function(oView, aIds = []) {
-           aIds.forEach(sId => {
-               const oControl = oView.byId(sId) || sap.ui.getCore().byId(sId);
-               if (oControl) {
-                   oControl.setSelectedKey("");
-                   oControl.setValue("");
-               }
-           });
-       },
+    resetComboBoxSelection: function (oView, aIds = []) {
+      aIds.forEach(sId => {
+        const oControl = oView.byId(sId) || sap.ui.getCore().byId(sId);
+        if (oControl) {
+          oControl.setSelectedKey("");
+          oControl.setValue("");
+        }
+      });
+    },
 
     calculateDateDifference: function (endDate, sStatus) {
       var thresholdDays = 30;
@@ -1318,16 +1318,23 @@
       }
     },
 
-    TileNotificationReadData:async function(){
-      this.getBusyDialog();
+    TileNotificationReadData: async function () {
+
+      this.getView().getModel("setModelforBusy").setProperty("/busyIndicator",true);
+      // this.getBusyDialog();
       await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
       await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
-      await this._fetchCommonData("getCompanyInvoice","CompanyInvoiceModelData");
-      this.closeBusyDialog();
+      await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
+      // this.closeBusyDialog();
+       this.getView().getModel("setModelforBusy").setProperty("/busyIndicator",false);
     },
-    
+
     //Notification fragment open
-    Tile_NotifictionBTN:async function (oEvent) {
+    Tile_NotifictionBTN: async function (oEvent) {
+      const BusyModel = new sap.ui.model.json.JSONModel({
+        busyIndicator:true
+      })
+      this.getView().setModel(BusyModel,"setModelforBusy");
       var oView = this.getView();
       var oButton = oEvent.getSource();
 
@@ -1336,10 +1343,10 @@
         oOldCarousel.destroy(true);
       }
 
-      if (this.oPopover) {
-        this.oPopover.destroy();
-        this.oPopover = null;
-      }
+          if (this.oPopover) {
+            this.oPopover.destroy();
+            this.oPopover = null;
+          }
 
       if (!this.oPopover) {
         sap.ui.core.Fragment.load({
@@ -1460,7 +1467,7 @@
       }
 
       var oEmpModel = this.getView().getModel("EmpDetails");
-      
+
       if (!oEmpModel || !oEmpModel.getData()) {
         setTimeout(this.initializeBirthdayCarousel.bind(this), 100); // Try again after 500ms
         return;
@@ -1498,14 +1505,14 @@
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
       this.onClosePopover();
     },
-    OnPressNavigationSOW:function (oEvent) {
+    OnPressNavigationSOW: function (oEvent) {
       var MsaID = oEvent
         .getSource()
         .getBindingContext("SOWModel")
         .getProperty("MsaID");
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
       this.onClosePopover();
-    }, 
+    },
     CI_onPressInvoiceRow: function (oEvent) {
       var Path = encodeURIComponent(
         oEvent
@@ -1513,151 +1520,152 @@
           .getBindingContext("CompanyInvoiceModelData")
           .getObject().InvNo
       );
-      var navigate = encodeURIComponent( oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
-      this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path ,dash: navigate});
+      var navigate = encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModelData").getObject().InvNo);
+      this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path, dash: navigate });
+      this.onClosePopover();
     },
 
     getGroupHeader: function (oGroup) {
-                // Same color for ALL group headers
-                const bgColor = "rgb(214 230 235)"; 
-                const textColor = "#000000"; 
+      // Same color for ALL group headers
+      const bgColor = "rgb(214 230 235)";
+      const textColor = "#000000";
 
-                const oHeader = new sap.m.GroupHeaderListItem({
-                    title: oGroup.key,
-                    upperCase: false
-                });
+      const oHeader = new sap.m.GroupHeaderListItem({
+        title: oGroup.key,
+        upperCase: false
+      });
 
-                oHeader.addEventDelegate({
-                    onAfterRendering: function () {
-                        this.$()
-                            .css("background-color", bgColor)
-                            .css("color", textColor)
-                           
-                    }
-                }, oHeader);
+      oHeader.addEventDelegate({
+        onAfterRendering: function () {
+          this.$()
+            .css("background-color", bgColor)
+            .css("color", textColor)
 
-                return oHeader;
-            },
-            
-            getStyledGroupHeader: function (oGroup) {
-            const statusStyles = {
-                "New": {
-                    background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
-                    textColor: "#000000"
-                },
-                "Offer Sent": {
-                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Rejected": {
-                    background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
-                    textColor: "#000000"
-                    // rgb(255 70 70), rgb(250 16 16));
-                },
-                "Saved": {
-                    background: "linear-gradient(to bottom right,rgb(218, 233, 236), rgb(2 94 171))",
-                    textColor: "#000000"
-                },
-                "Onboarded": {
-                    background: "linear-gradient(to bottom right,rgb(231 241 231), rgb(131 230 131))",
-                    textColor: "#000000"
-                },
-                "Training Completed": {
-                    background: "linear-gradient(to bottom right,rgb(190 228 190), rgb(4 154 4))",
-                    textColor: "#000000"
-                },
-                "Draft": {
-                    background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
-                    textColor: "#000000"
-                },
-                "Submitted": {
-                     background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Approved": {
-                    background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
-                    textColor: "#000000"
-                },
-                "Revised": {
-                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Send back by manager": {
-                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Send back by account": {
-                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Send to account": {
-                   background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                "Active": {
-                    background: "linear-gradient(to bottom right, rgb(194 243 194), rgb(37 200 37))",
-                    textColor: "#000000"
-                },
-                "Inactive": {
-                    background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
-                    textColor: "#000000"
-                },
-                "Asset Assigned": {
-                    background: "linear-gradient(to bottom right, #8ed1fc, #3ba0ff)",
-                    textColor: "#000000"
-                },
-                "Returned": {
-                    background: "linear-gradient(to bottom right, #fcb69f, #ffb199)",
-                    textColor: "#000000"
-                },
-                "Transferred": {
-                    background: "linear-gradient(to bottom right, #ffe47a, #f9d423)",
-                    textColor: "#000000"
-                },
-                "Available": {
-                    background: "linear-gradient(to bottom right, #d4fc79, #96e6a1)",
-                    textColor: "#000000"
-                },
-                "Trashed": {
-                    background: "linear-gradient(to bottom right, #ff6a6a, #d32f2f)",
-                    textColor: "#000000"
-                },
-                "Assigned": {
-                    background: "linear-gradient(to bottom right, #93f9b9, #1d976c)",
-                    textColor: "#000000"
-                },
-                "Admin": {
-                    background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
-                    textColor: "#000000"
-                },
-                 "Paid": {
-                    background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
-                    textColor: "#000000"
-                },
-            };
-
-            const defaultStyle = {
-                background: "linear-gradient(to bottom right, rgba(200, 200, 200, 0.4), rgba(220, 220, 220, 0.4))",
-                textColor: "#000000"
-            };
-
-            const currentStyle = statusStyles[oGroup.key] || defaultStyle;
-
-            const oHeader = new sap.m.GroupHeaderListItem({
-                title: oGroup.key
-            });
-
-            oHeader._customBackground = currentStyle.background;
-            oHeader._customTextColor = currentStyle.textColor;
-
-            oHeader.addEventDelegate({
-                onAfterRendering: function () {
-                    this.$().css("background", this._customBackground);
-                    this.$().css("color", this._customTextColor);
-                }
-            }, oHeader);
-
-            return oHeader;
         }
+      }, oHeader);
+
+      return oHeader;
+    },
+
+    getStyledGroupHeader: function (oGroup) {
+      const statusStyles = {
+        "New": {
+          background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
+          textColor: "#000000"
+        },
+        "Offer Sent": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Rejected": {
+          background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
+          textColor: "#000000"
+          // rgb(255 70 70), rgb(250 16 16));
+        },
+        "Saved": {
+          background: "linear-gradient(to bottom right,rgb(218, 233, 236), rgb(2 94 171))",
+          textColor: "#000000"
+        },
+        "Onboarded": {
+          background: "linear-gradient(to bottom right,rgb(231 241 231), rgb(131 230 131))",
+          textColor: "#000000"
+        },
+        "Training Completed": {
+          background: "linear-gradient(to bottom right,rgb(190 228 190), rgb(4 154 4))",
+          textColor: "#000000"
+        },
+        "Draft": {
+          background: "linear-gradient(to bottom right, rgb(218 233 236), rgb(129 190 241))",
+          textColor: "#000000"
+        },
+        "Submitted": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Approved": {
+          background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
+          textColor: "#000000"
+        },
+        "Revised": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Send back by manager": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Send back by account": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Send to account": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Active": {
+          background: "linear-gradient(to bottom right, rgb(194 243 194), rgb(37 200 37))",
+          textColor: "#000000"
+        },
+        "Inactive": {
+          background: "linear-gradient(to bottom right, rgb(238 191 191), rgb(241 32 32))",
+          textColor: "#000000"
+        },
+        "Asset Assigned": {
+          background: "linear-gradient(to bottom right, #8ed1fc, #3ba0ff)",
+          textColor: "#000000"
+        },
+        "Returned": {
+          background: "linear-gradient(to bottom right, #fcb69f, #ffb199)",
+          textColor: "#000000"
+        },
+        "Transferred": {
+          background: "linear-gradient(to bottom right, #ffe47a, #f9d423)",
+          textColor: "#000000"
+        },
+        "Available": {
+          background: "linear-gradient(to bottom right, #d4fc79, #96e6a1)",
+          textColor: "#000000"
+        },
+        "Trashed": {
+          background: "linear-gradient(to bottom right, #ff6a6a, #d32f2f)",
+          textColor: "#000000"
+        },
+        "Assigned": {
+          background: "linear-gradient(to bottom right, #93f9b9, #1d976c)",
+          textColor: "#000000"
+        },
+        "Admin": {
+          background: "linear-gradient(to bottom right, rgb(212 228 242), rgb(24 118 195))",
+          textColor: "#000000"
+        },
+        "Paid": {
+          background: "linear-gradient(to bottom right, #a3e899, #5fc266)",
+          textColor: "#000000"
+        },
+      };
+
+      const defaultStyle = {
+        background: "linear-gradient(to bottom right, rgba(200, 200, 200, 0.4), rgba(220, 220, 220, 0.4))",
+        textColor: "#000000"
+      };
+
+      const currentStyle = statusStyles[oGroup.key] || defaultStyle;
+
+      const oHeader = new sap.m.GroupHeaderListItem({
+        title: oGroup.key
+      });
+
+      oHeader._customBackground = currentStyle.background;
+      oHeader._customTextColor = currentStyle.textColor;
+
+      oHeader.addEventDelegate({
+        onAfterRendering: function () {
+          this.$().css("background", this._customBackground);
+          this.$().css("color", this._customTextColor);
+        }
+      }, oHeader);
+
+      return oHeader;
+    }
   })
 });

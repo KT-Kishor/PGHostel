@@ -6,13 +6,13 @@
 	xmlns:u="sap.ui.unified">
 	<Dialog title="{i18n>headerListOfHolidays}" stretch="false" contentWidth="38rem">
   
-               	<MessageStrip
+               	<!-- <MessageStrip
                 id="TP_messagetripinfomation"
                   text="Please fill the form if you have not selected a file. If you select file no need fill form!"
                   showIcon="true"
                   type="Information"
                   class="">
-			         </MessageStrip>
+			         </MessageStrip> -->
 		<f:SimpleForm
             editable="true"
             layout="ColumnLayout"
@@ -51,7 +51,7 @@
                 sameFilenameAllowed="true"
                 icon="sap-icon://upload"/> 
 			</f:content>
-      <Label text=""></Label>
+      <!-- <Label text=""></Label>
       <Button text=" Download Template" id="TP_id_exceltemplate" press="onDownloadTemplatexlsx"/>
       <Label text="{i18n>expCountry}" ></Label>
       <Input id="TP_id_Country" required="true" />
@@ -66,8 +66,9 @@
       <Label text="{i18n>currency}"></Label>
       <Input id="TP_id_Currency"  required="true" />
       <Label text="{i18n>stdcode}"></Label>
-      <Input id="TP_id_STDCode"  required="true" />
+      <Input id="TP_id_STDCode"  required="true" /> -->
 		</f:SimpleForm>
+
 	<beginButton>
       <Button text="{i18n>submit}" id="ALH_id_SubmitButton" type="Accept" press="LOH_onPressSubmit" enabled="{/isFileValid}"/>
     </beginButton>

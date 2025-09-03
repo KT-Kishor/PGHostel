@@ -606,6 +606,9 @@ if(this.jsonData.length <= 0){
   onDownloadTemplatexlsx:function(){
     let fileUrl = window.location.origin.split("index")[0] + "/Template.xlsx";
       sap.m.URLHelper.redirect(fileUrl, true)
+  },
+  TileV_MaintainData:function(){
+    this.getRouter().navTo("MaintainData");
   }
   });
 });

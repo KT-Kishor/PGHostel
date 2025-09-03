@@ -285,12 +285,20 @@
                                     </TileContent>
                                 </GenericTile>
                                 <GenericTile visible="{= ${AppVisibilityModel>/JobPosting} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>JobPosting}" press="TileV_JobPosting">
-	<TileContent unit="{i18n>careers}">
-		<!-- <ImageContent src="sap-icon://employee-lookup" /> -->
-		<ImageContent src="sap-icon://visits" />
-	</TileContent>
-</GenericTile>
-                                        </layout:HorizontalLayout>
+                                    <TileContent unit="{i18n>careers}">
+                                        <!-- <ImageContent src="sap-icon://employee-lookup" /> -->
+                                        <ImageContent src="sap-icon://visits" />
+                                    </TileContent>
+                                </GenericTile>
+
+                                  <GenericTile class="sapUiMediumMargin" header="{i18n>TilePage}" press="TileV_MaintainData">
+                                    <TileContent unit="{i18n>TilePage}">
+                                        <!-- <ImageContent src="sap-icon://employee-lookup" /> -->
+                                        <ImageContent src="sap-icon://cancel-maintenance" />
+                                    </TileContent>
+                                </GenericTile>
+                                   
+                                    </layout:HorizontalLayout>
                                     </ux:blocks>
                                 </ux:ObjectPageSubSection>
                             </ux:subSections>
@@ -308,7 +316,6 @@
                     <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
                 </contentLeft>
                 <contentRight>
-                <Button text="{i18n>UploadCData}" press="UploadCountryData"/>
                 <Button text="{i18n>updatepassword2}" press="TP_onupdatepress" visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Consultant' || ${LoginModel>/Role} === 'IT Manager' }" />
                 </contentRight>
             </Bar>

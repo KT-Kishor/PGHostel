@@ -731,6 +731,11 @@
                    "name": "ExpenseInvoiceDetail",
                    "pattern": "ExpenseInvoiceDetail/{sPath}",
                    "target": ["TargetExpenseInvoiceDetails"]
+                 },
+                 {
+                   "name": "MaintainData",
+                   "pattern": "MaintainData",
+                   "target": ["TargetMaintainData"]
                  }
             ],
             "targets": {
@@ -1126,8 +1131,15 @@
           "clearControlAggregation": false,
           "viewId": "ExpenseInvoiceDetail",
           "viewName": "ExpenseInvoiceDetail"
+        },
+          "TargetMaintainData":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "MaintainData",
+                "viewName": "MaintainData"
+          
         }
-
             }
         },
         "rootView": {

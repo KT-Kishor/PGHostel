@@ -1,0 +1,21 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+>
+    <Dialog title="{i18n>FillDetails}"
+     resizable="true"         
+    draggable="true"        
+    contentWidth="40rem"     
+    >
+        <VBox id="dynamicForm" class="sapUiSmallMargin"/>
+        <Bar
+            design="Auto"
+            titleAlignment="None"
+        >
+            <contentRight>
+                <Button text="{i18n>save}" press="MD_onSaveButtonPress"/>
+                <Button text="{i18n>CancelButton}" press="MD_onCancelButtonPress"/>
+            </contentRight>
+        </Bar>
+    </Dialog>
+</c:FragmentDefinition>
