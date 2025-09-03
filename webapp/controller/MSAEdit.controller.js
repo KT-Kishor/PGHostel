@@ -92,15 +92,61 @@ sap.ui.define([
                 sap.ui.getCore().byId("SOW_id_EndDate").getValue();
                 utils._LCvalidateDate(oEvent);
             },
-            MSACountryComboBox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                sap.ui.getCore().byId("MSA_Nav_Id_City").setValue("");
-                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                sap.ui.getCore().byId("MSA_Nav_Id_Country").getBinding("items").filter(oFilter);
+            MSA_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oStateCombo   = sap.ui.getCore().byId("MSA_Nav_Id_State");
+                const oCityCombo    = sap.ui.getCore().byId("MSA_Nav_Id_City");
+                const oModel        = this.getView().getModel("FilteredMsaModel");
+                oStateCombo.setSelectedKey("");   // clear dependents first
+                oStateCombo.getBinding("items")?.filter([]);
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+                if (!oSelectedItem) {
+                    oModel.setProperty("/Country", "");  // reset model
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // fetch country details
+                    const sCountryName = oSelectedItem.getText();
+                    oStateCombo.getBinding("items")?.filter([   // filter states
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+                    oModel.setProperty("/Country", sCountryName || "");  // update model
+                }
+            },
+            MSA_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oCityCombo    = sap.ui.getCore().byId("MSA_Nav_Id_City");
+                const oCountryCB    = sap.ui.getCore().byId("MSA_Nav_Id_Country");
+                const oModel        = this.getView().getModel("FilteredMsaModel");
+                oCityCombo.setSelectedKey("");  // clear city
+                oCityCombo.getBinding("items")?.filter([]);
+                if (!oSelectedItem) {
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+                    // filter cities
+                    oCityCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+                    oModel.setProperty("/State", sStateName || "");
+                }
             },
             MSA_onChangeCity: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oModel        = this.getView().getModel("FilteredMsaModel");
+                if (!oSelectedItem) {
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sCityName = oSelectedItem.getKey() || oSelectedItem.getText();
+                    oModel.setProperty("/City", sCityName || "");
+                }
             },
             MsaE_ValidateCommonFields: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
@@ -270,6 +316,7 @@ sap.ui.define([
                     utils._LCvalidateEmail(get("MsaE_id_MSAEmail"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MsaE_id_MsaAddress"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_Country"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("MSA_Nav_Id_State"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") && this.GST &&
                     (!isRecruitment || (

@@ -48,15 +48,20 @@
 				<ComboBox change="Exp_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="exp-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CreateExpenseModel>/Country}" showSecondaryValues="true">
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
+				<!-- State -->
+				<Label text="{i18n>state}" required="true" />
+				<ComboBox change="Exp_onChangeState" valueStateText="{i18n>expValStaState}" id="exp-Id-State" items="{path:'StateModel>/',length:1000}" selectedKey="{CreateExpenseModel>/State}" showSecondaryValues="true"  >
+				<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+				</ComboBox>
 				<!-- Source -->
 				<Label text="{i18n>expSource}"  required="true"/>
-				<ComboBox change="Exp_onChangeSource" valueStateText="{i18n>expValStaSource}" id="exp-Id-Source" items="{path:'BaseLocationModel>/',length:1000}"  value="{CreateExpenseModel>/Source}" >
-					<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				<ComboBox change="Exp_onChangeSource" valueStateText="{i18n>expValStaSource}" id="exp-Id-Source" items="{path:'CityModel>/',length:1000}" value="{CreateExpenseModel>/Source}" >
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 				<!-- Destination -->
 				<Label text="{i18n>expDestination}" required="{viewModel>/required}"/>
-				<ComboBox change="Exp_onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{path:'BaseLocationModel>/',length:1000}"  value="{CreateExpenseModel>/Destination}"  >
-					<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{CreateExpenseModel>branchCode}"/>
+				<ComboBox change="Exp_onChangeDestination" valueStateText="{i18n>expValStaDestination}" id="exp-Id-Destination" items="{path:'CityModel>/',length:1000}"  value="{CreateExpenseModel>/Destination}"  >
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 				<!-- Cost Center -->
 				<Label text="{i18n>expCostCenter}" required="true"/>

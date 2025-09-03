@@ -59,14 +59,22 @@
 							</ComboBox>
 							<Label text="{i18n>address}" required="true" />
 							<TextArea value="{msaModelWizart>/Address}" placeholder="{i18n>placeAddress}" id="MsaD_id_Address" liveChange="MsaD_ValidateCommonFields" maxLength="120" valueStateText="{i18n>addressValueState}"/>
+
 							<Label text="{i18n>expCountry}" required="true"/>
-							<ComboBox valueStateText="{i18n>expValStaCountry}" filterSecondaryValues="true" change="MSACountryComboBox" id="MSA_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{msaModelWizart>/Country}" showSecondaryValues="true">
+							<ComboBox valueStateText="{i18n>expValStaCountry}" filterSecondaryValues="true" change="MSA_onChangeCountry" id="MSA_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{msaModelWizart>/Country}" showSecondaryValues="true">
 								<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 							</ComboBox>
+
+							<Label text="{i18n>state}" required="true" />
+							<ComboBox valueStateText="{i18n>expValStaState}" filterSecondaryValues="true" change="MSA_onChangeState" id="MSA_Id_State" items="{path:'StateModel>/',length:1000}" value="{msaModelWizart>/State}" showSecondaryValues="true">
+								 <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+				            </ComboBox>
+
 							<Label text="{i18n>city}" required="true"/>
-							<ComboBox change="MSA_onChangeCity" filterSecondaryValues="true" valueStateText="{i18n>cityValueText}" id="MSA_Id_City" items="{BaseLocationModel>/}" value="{msaModelWizart>/City}">
-								<core:ListItem key="{BaseLocationModel>CountryCode}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							<ComboBox change="MSA_onChangeCity" filterSecondaryValues="true" valueStateText="{i18n>cityValueText}" id="MSA_Id_City" items="{path:'CityModel>/',length:1000}" value="{msaModelWizart>/City}">
+								<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 							</ComboBox>
+
 							<Label text="{i18n>emailId}" required="true" />
 							<TextArea value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 							<Label text="{i18n>GSTNO}"/>
@@ -117,6 +125,8 @@
 							<Text text="{msaModelWizart>/Address}" />
 							<Label text="{i18n>expCountry}"/>
 							<Text text="{msaModelWizart>/Country}" />
+							<Label text="{i18n>state}"/>
+							<Text text="{msaModelWizart>/State}"/>
 							<Label text="{i18n>city}"/>
 							<Text text="{msaModelWizart>/City}" />
 

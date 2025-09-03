@@ -171,13 +171,12 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-ExpenseName"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-StartDate"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("exp-Id-EndDate"), "ID") &&
-  utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-TravelAllowance"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-TravelAllowance"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-Country"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-State"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Source"), "ID") &&
-                    (this.ViewModel.getProperty("/required") === true ?
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") :
-                        true) &&
-  utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-ExpenseType"), "ID") &&
+                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-Destination"), "ID") : true) &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("exp-Id-ExpenseType"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("exp-Id-EmployeeRemark"), "ID");
 
                 if (!isValid) {
@@ -231,31 +230,90 @@ sap.ui.define([
             // sap.ui.getCore().byId("exp-Id-EndDate").setMinDate(new Date(oEvent.getSource().getValue().split("/").reverse().join('-')));
         },
 
-        Exp_onChangeCountry: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            if (oEvent.getSource().getValue() === '') {
-                oEvent.getSource().setValueState("None")
-            }
-            var oModel = this.getView().getModel("CreateExpenseModel");
-            oModel.setProperty("/Destination", "");
-            oModel.setProperty("/Source", "");
-            var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-            var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-            sap.ui.getCore().byId("exp-Id-Source").getBinding("items").filter(oFilter);
-            sap.ui.getCore().byId("exp-Id-Destination").getBinding("items").filter(oFilter);
-        },
+        Exp_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oStateCombo   = sap.ui.getCore().byId("exp-Id-State");
+                const oSourceCombo  = sap.ui.getCore().byId("exp-Id-Source");
+                const oDestCombo    = sap.ui.getCore().byId("exp-Id-Destination");
+                const oModel        = this.getView().getModel("CreateExpenseModel");
 
-        Exp_onChangeSource: function(oEvent) {
+                // Clear dependents first
+                oStateCombo.setSelectedKey("");
+                oStateCombo.getBinding("items")?.filter([]);
+                oSourceCombo.setSelectedKey("");
+                oSourceCombo.getBinding("items")?.filter([]);
+                oDestCombo.setSelectedKey("");
+                oDestCombo.getBinding("items")?.filter([]);
+
+                if (!oSelectedItem) {
+                    // Reset model properties
+                    oModel.setProperty("/Country", "");
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/Source", "");
+                    oModel.setProperty("/Destination", "");
+                } else {
+                    // Fetch selected country
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // e.g. "IN"
+                    const CountryName  = oSelectedItem.getText();
+
+                    // Filter States
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    // Update model
+                    oModel.setProperty("/Country", CountryName || "");
+                }
+            },
+
+            Exp_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oCitySource   = sap.ui.getCore().byId("exp-Id-Source");
+                const oCityDest     = sap.ui.getCore().byId("exp-Id-Destination");
+                const oCountryCB    = sap.ui.getCore().byId("exp-Id-Country");
+                const oModel        = this.getView().getModel("CreateExpenseModel");
+
+                // Clear cities
+                oCitySource.setSelectedKey("");
+                oCitySource.getBinding("items")?.filter([]);
+                oCityDest.setSelectedKey("");
+                oCityDest.getBinding("items")?.filter([]);
+
+                if (!oSelectedItem) {
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/Source", "");
+                    oModel.setProperty("/Destination", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+                    // Filter Cities (Source + Destination)
+                    const aFilters = [
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ];
+
+                    oCitySource.getBinding("items")?.filter(aFilters);
+                    oCityDest.getBinding("items")?.filter(aFilters);
+
+                    oModel.setProperty("/State", sStateName || "");
+                }
+            },
+
+        Exp_onChangeSource: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if (oEvent.getSource().getValue() === '') {
-                oEvent.getSource().setValueState("None")
+                oEvent.getSource().setValueState("None");
             }
         },
 
-        Exp_onChangeDestination: function(oEvent) {
+        Exp_onChangeDestination: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
             if (oEvent.getSource().getValue() === '') {
-                oEvent.getSource().setValueState("None")
+                oEvent.getSource().setValueState("None");
             }
         },
 

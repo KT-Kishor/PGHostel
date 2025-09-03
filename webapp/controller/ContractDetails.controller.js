@@ -49,7 +49,7 @@ sap.ui.define([
                             ConsultingService: "",
                             Rate: "Day",
                             Amount: "",
-                            Currency: "INR",
+                            Currency: "",
                             EndClientHirer: "",
                             Location: "",
                             HiringContact: "",
@@ -63,9 +63,10 @@ sap.ui.define([
                             Status: "Submitted",
                             Salutation: "Mr.",
                             Salutation2: "Mr.",
-                            Country: "India",
-                            contractLocation: "Kalaburagi",
-                            STDCode: "+91",
+                            Country: "",
+                            State: "",
+                            contractLocation: "",
+                            STDCode: "",
                             MobileNo: ""
                         };
                         const oModel = new JSONModel(oData);
@@ -378,38 +379,85 @@ sap.ui.define([
 
             CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                const oSource = oEvent.getSource();
-                const selectedKey = oSource.getSelectedKey?.();
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                // pick correct controls/model
+                const isCreate     = this.sArgPara === "CreateContractFlag";
+                const oStateCombo  = this.byId(isCreate ? "CD_id_State"        : "CU_id_State");
+                const oCityCombo   = this.byId(isCreate ? "CD_id_ConLocation"  : "CU_id_ContractCity");
+                const oCurrencyCB  = this.byId(isCreate ? "CD_id_Currency"     : "CU_id_CurrencySelect");
+                const oStdCodeCB   = this.byId(isCreate ? "CD_id_codeModel"    : "CU_id_codeModel");
+                const oModel       = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
 
-                let oModel;
-                if (this.sArgPara === "CreateContractFlag") {
-                    this.onCountryChange(oEvent, {
-                        stdCodeCombo: "CD_id_codeModel",
-                        baseLocationCombo: "CD_id_ConLocation",
-                        mobileInput: "CD_id_Mobile"
-                    });
-                    oModel = this.getView().getModel("ContractModelWizart");
+                // clear dependents first
+                oStateCombo.setSelectedKey("");
+                oStateCombo.getBinding("items")?.filter([]);
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+                oCurrencyCB.setValue("");
+                oStdCodeCB.setValue("");
+
+                if (!oSelectedItem) { // reset model
+                    oModel.setProperty("/Country", "");
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/contractLocation", "");
+                    oModel.setProperty("/Currency", "");
+                    oModel.setProperty("/STDCode", "");
                 } else {
-                    this.onCountryChange(oEvent, {
-                        stdCodeCombo: "CU_id_codeModel",
-                        baseLocationCombo: "CU_id_ContractCity",
-                        mobileInput: "CU_id_Mobile"
-                    });
-                    oModel = this.getView().getModel("oFilteredContractModel");
+                    // fetch country data
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // "IN"
+                    const oCountryData = oSelectedItem.getBindingContext("CountryModel").getObject();
+                    const CountryName = oSelectedItem.getText();
+                    // filter states
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    // set model props (directly from CountryModel)
+                    oModel.setProperty("/Country",  CountryName || "");
+                    oModel.setProperty("/Currency", oCountryData?.currency || "");
+                    oModel.setProperty("/STDCode",  oCountryData?.stdCode   || "");
+
+                    // reflect in UI
+                    oCurrencyCB.setValue(oCountryData?.currency || "");
+                    oStdCodeCB.setValue(oCountryData?.stdCode || "");
                 }
 
-                if (oModel) {
-                    if (selectedKey) {
-                        oModel.setProperty("/Country", selectedKey); // Set or clear country and STDCode 
-                        oModel.setProperty("/STDCode", this.byId("CU_id_codeModel").getValue() || this.getView().byId("CD_id_codeModel").getValue());
+                if (isCreate) this.validateStep();
+            },
 
-                    } else {
-                        oModel.setProperty("/Country", "");
-                        oModel.setProperty("/STDCode", "");
-                    }
-                    oSource.setValueState("None");
+            CD_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const isCreate      = this.sArgPara === "CreateContractFlag";
+                const oCityCombo    = this.byId(isCreate ? "CD_id_ConLocation" : "CU_id_ContractCity");
+                const oCountryCB    = this.byId(isCreate ? "CD_id_Country"     : "CU_id_Country");
+                const oModel        = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
+
+                // clear cities
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+
+                if (!oSelectedItem) {
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/contractLocation", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+                    oCityCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    oModel.setProperty("/State", sStateName || "");
                 }
 
+                if (isCreate) this.validateStep();
+            },
+
+            CD_onBaseLocationChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
@@ -428,22 +476,15 @@ sap.ui.define([
                 }
             },
 
-            CD_onBaseLocationChange: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                if (this.sArgPara === "CreateContractFlag") {
-                    this.validateStep(); //  validation if in create flow
-                }
-            },
-
             CD_ValidateComboBox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                utils._LCvalidateMandatoryField(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
             },
 
             CD_onChangeCurrency: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                utils._LCvalidateMandatoryField(oEvent);
                  if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
                 }
@@ -546,13 +587,14 @@ sap.ui.define([
                 oModel.AdditionalRates = this.byId("CD_id_AddRate").getSelectedKey();
                 oModel.PaymentTerms = this.byId("CD_id_PaymentTerms").getSelectedKey();
                 oModel.Country = this.byId("CD_id_Country").getSelectedKey();
+                oModel.State= this.byId("CD_id_State").getSelectedKey();
                 oModel.contractLocation = this.byId("CD_id_ConLocation").getSelectedKey();
                 oModel.STDCode = this.byId("CD_id_codeModel").getValue();
                 oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
 
                 // Include Country and ConLocation in field check
                 const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
-                    oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.Location && oModel.StartDate && oModel.EndDate && oModel.InsuranceRequirement && oModel.WarrantyDate && oModel.AdditionalRates && oModel.PaymentTerms && oModel.Country && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
+                    oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.Location && oModel.StartDate && oModel.EndDate && oModel.InsuranceRequirement && oModel.WarrantyDate && oModel.AdditionalRates && oModel.PaymentTerms && oModel.Country && oModel.State && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
                 if (bAllFieldsFilled) {
                     // Run validations with correct chaining using &&
@@ -564,7 +606,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
@@ -574,8 +616,9 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_AddRate"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
                         utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), oModel.STDCode);
 
                     // Set wizard step validation
@@ -609,7 +652,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_ConsultingService"), "ID") &&
                         utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_Currency"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_Currency"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
@@ -620,8 +663,9 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_codeModel"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
                         utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), STDCode)
                     ) {
                         var formattedText;
@@ -667,6 +711,7 @@ sap.ui.define([
                             "AgreementNo": String(1).padStart(2, '0'),
                             "BranchCode": branchCode,
                             "Country": oModel.oData.Country,
+                            "State":oModel.oData.State,
                             "MobileNo": oModel.oData.MobileNo,
                             "STDCode": oModel.oData.STDCode,
                         };
@@ -834,10 +879,11 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CD_id_contractStatus"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ClientReportContact"), "ID") &&
                     utils._LCvalidateAmount(this.byId("CU_id_EditAmountInput"), "ID") &&
-                    utils._LCstrictValidationComboBox(this.byId("CU_id_CurrencySelect"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CU_id_CurrencySelect"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_State"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
-                    utils._LCstrictValidationComboBox(this.byId("CU_id_codeModel"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CU_id_codeModel"), "ID") &&
                     utils._LCvalidateMobileNumberWithSTD(this.byId("CU_id_Mobile"), STDCode)
                 );
 
@@ -904,6 +950,7 @@ sap.ui.define([
                     Comments: oModel.Comments,
                     BranchCode: branchCode,
                     Country: oModel.Country,
+                    State: oModel.State,
                     MobileNo: oModel.MobileNo,
                     STDCode: oModel.STDCode,
                 };

@@ -350,12 +350,68 @@ sap.ui.define([
 
             Exp_Det_CountryChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                if (oEvent.getSource().getValue() === '') {
-                    oEvent.getSource().setValueState("None")
+                const oCountryCB = this.byId("Exp_id_Country");
+                const oStateCB   = this.byId("Exp_id_State");
+                const oSourceCB  = this.byId("Exp_id_Source");
+                const oDestCB    = this.byId("Exp_id_Destination");
+                const oModel     = this.getView().getModel("FilteredExpenseModel");
+                oStateCB.setValue("");
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.setValue("");
+                oSourceCB.getBinding("items")?.filter([]);
+                oDestCB.setValue("");
+                oDestCB.getBinding("items")?.filter([]);
+
+                const oSelectedItem = oCountryCB.getSelectedItem();
+                if (!oSelectedItem) {
+                    oModel.setProperty("/0/Country", "");  // reset model
+                    oModel.setProperty("/0/State", "");
+                    oModel.setProperty("/0/Source", "");
+                    oModel.setProperty("/0/Destination", "");
+                    return;
                 }
-                this.byId("Exp_id_Source").setValue("");
-                this.byId("Exp_id_Destination").setValue("");
+
+                const sCountryCode = oSelectedItem.getAdditionalText();   // --- Filter States by Country ---
+                oStateCB.getBinding("items")?.filter([
+                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                ]);
+
+                // update model 
+                oModel.setProperty("/0/Country", oSelectedItem.getText());
                 this.CountryAndCity();
+            },
+
+            Exp_Det_StateChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oStateCB   = this.byId("Exp_id_State");
+                const oSourceCB  = this.byId("Exp_id_Source");
+                const oDestCB    = this.byId("Exp_id_Destination");
+                const oCountryCB = this.byId("Exp_id_Country");
+                const oModel     = this.getView().getModel("FilteredExpenseModel");
+
+                oSourceCB.setValue("");  // Reset cities
+                oSourceCB.getBinding("items")?.filter([]);
+                oDestCB.setValue("");
+                oDestCB.getBinding("items")?.filter([]);
+
+                const oSelectedItem = oStateCB.getSelectedItem();
+                if (!oSelectedItem) {
+                    oModel.setProperty("/0/State", "");
+                    oModel.setProperty("/0/Source", "");
+                    oModel.setProperty("/0/Destination", "");
+                    return;
+                }
+
+                const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+                const aFilters = [
+                    new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                ];
+
+                oSourceCB.getBinding("items")?.filter(aFilters);
+                oDestCB.getBinding("items")?.filter(aFilters);
+                oModel.setProperty("/0/State", sStateName);
             },
 
             CountryAndCity: function () {
@@ -366,10 +422,8 @@ sap.ui.define([
             },
 
             onPressSave: async function () {
-                if (
-                    utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&
-                    (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID")) {
-                    var oModel = this.getView().getModel("FilteredExpenseModel");
+            if (utils._LCvalidateMandatoryField(this.byId("Exp_id_Source"), "ID") &&(this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("Exp_id_Destination"), "ID"): true) && utils._LCstrictValidationComboBox(this.byId("Exp_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.byId("Exp_id_State"), "ID")) {
+             var oModel = this.getView().getModel("FilteredExpenseModel");
                     oModel.getData()[0].ExpStartDate = oModel.getData()[0].ExpStartDate.split("T")[0];
                     oModel.getData()[0].ExpEndDate = oModel.getData()[0].ExpEndDate.split("T")[0];
                     delete oModel.getData()[0].Comments;

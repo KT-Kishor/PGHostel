@@ -85,13 +85,17 @@
 											</m:items>
 										</m:ComboBox>
 										<m:Label text="{i18n>expCountry}" required="true"/>
-										<m:ComboBox change="EUD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EUD_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="{viewModel>/editable}">
+										<m:ComboBox change="EUD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOUF_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" editable="{viewModel>/editable}">
 											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
+										<m:Label text="{i18n>state}" required="true" />
+										<m:ComboBox change="EUD_onChangeState" valueStateText="{i18n>expValStaState}" id="EOUF_id_State" items="{path:'StateModel>/',length:1000}" selectedKey="{employeeModel>/State}" showSecondaryValues="true"  editable="{viewModel>/editable}">
+					                        <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+				                            </m:ComboBox>
 										<m:Label text="{i18n>baseLocation}" required="true" />
-										<m:ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
+										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
 											<m:items>
-												<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+												 <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 											</m:items>
 										</m:ComboBox>
 										<m:Label text="{i18n>offerReleaseDate}" required="true" />

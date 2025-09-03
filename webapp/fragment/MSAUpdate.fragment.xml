@@ -1,10 +1,10 @@
 <core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
 >
-    <Dialog title="MSA Deatils">
-        <f:SimpleForm
+	<Dialog title="MSA Deatils">
+		<f:SimpleForm
             id="MsaEdit_Id_Form"
             editable="true"
             layout="ColumnLayout"
@@ -21,43 +21,43 @@
             columnsL="2"
             columnsM="1"
         >
-            <f:content>
-                <Label
+			<f:content>
+				<Label
                     text="{i18n>companyName}"
                     required="true"
                 />
-                <Input
+				<Input
                     liveChange="Msa_LC_CompanyName"
                     id="MsaE_id_CompanyName"
                     maxLength="200"
                     value="{FilteredMsaModel>/0/CompanyName}"
                     valueStateText="{i18n>placeCompany}"
                 />
-                <Label
+				<Label
                     text="{i18n>type}"
                     required="true"
                 />
-                <RadioButtonGroup
+				<RadioButtonGroup
                     editable="false"
                     id="MsaE_id_Type"
                     columns="5"
                     valueState="Warning"
                     select="onRadioButtonGroupSelect"
                 >
-                    <RadioButton
+					<RadioButton
                         id="RB3-3"
                         text="Service"
                     />
-                    <RadioButton
+					<RadioButton
                         id="RB3-4"
                         text="Recruitment"
                     />
-                </RadioButtonGroup>
-                <Label
+				</RadioButtonGroup>
+				<Label
                     text="{i18n>createMSADate}"
                     required="true"
                 />
-                <DatePicker
+				<DatePicker
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="Msa_ChangeMsaDate"
@@ -65,61 +65,57 @@
                     valueStateText="{i18n>CreateMSADateVST}"
                     id="MsaE_id_CreateMSADate"
                 />
-
-                <Label
+				<Label
                     text="{i18n>companyHeadName}"
                     required="true"
                 />
-                <Select
+				<Select
                     selectedKey="{FilteredMsaModel>/0/Salutation}"
                     items="{Salutation>/salutation}"
                     width="100%"
                 >
-                    <core:Item
+					<core:Item
                         key="{Salutation>text}"
                         text="{Salutation>text}"
                     />
-                </Select>
-                <Input
+				</Select>
+				<Input
                     liveChange="Msa_LC_CompanyHeadName"
                     id="MsaE_id_MsaHead"
                     value="{FilteredMsaModel>/0/CompanyHeadName}"
                     maxLength="50"
                     valueStateText="{i18n>placeHeadName}"
                 />
-
-                <Label
+				<Label
                     text="{i18n>companyHeadPosition}"
                     required="true"
                 />
-                <Input
+				<Input
                     liveChange="Msa_LC_HeadPosition"
                     value="{FilteredMsaModel>/0/CompanyHeadPosition}"
                     id="MsaE_id_HeadPosition"
                     valueStateText="{i18n>placeHedaPosition}"
                     maxLength="50"
                 />
-
-                <Label
+				<Label
                     text="{i18n>contractPeriod}"
                     required="true"
                 />
-                <Select
+				<Select
                     items="{ContractPeriodThree>/ContractPeriod}"
                     selectedKey="{FilteredMsaModel>/0/ContractPeriod}"
                     change="onContractPeriodSelectChange"
                 >
-                    <core:Item
+					<core:Item
                         key="{ContractPeriodThree>Months}"
                         text="{ContractPeriodThree>Months}"
                     />
-                </Select>
-
-                <Label
+				</Select>
+				<Label
                     text="{i18n>CompBranch}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="MsaE_Id_Branch"
                     filterSecondaryValues="true"
                     change="Msa_onComboBoxChange"
@@ -128,105 +124,109 @@
                     value="{FilteredMsaModel>/0/BranchCode}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{BaseLocationModel>branchCode}"
                         text="{BaseLocationModel>branchCode}"
                         additionalText="{BaseLocationModel>city}"
                     />
-                </ComboBox>
-
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>panCardReg}"
                     required="true"
                 />
-                <Input
+				<Input
                     id="MsaE_id_MsaPanCard"
                     maxLength="50"
                     value="{FilteredMsaModel>/0/PanCard}"
                     valueStateText="{i18n>placePanCardReg}"
                     liveChange="Msa_LC_PanCard"
                 />
-                <Label
+				<Label
                     text="{i18n>paymentterms}"
                     required="true"
                 />
-                <Select
+				<Select
                     items="{ContractpaymentModel>/}"
                     selectedKey="{FilteredMsaModel>/0/PaymentTerms}"
                 >
-                    <core:Item
+					<core:Item
                         key="{ContractpaymentModel>days}"
                         text="{ContractpaymentModel>days}"
                     />
-                </Select>
-                <Label
+				</Select>
+				<Label
                     text="{i18n>Address}"
                     required="true"
                 />
-                <TextArea
+				<TextArea
                     id="MsaE_id_MsaAddress"
                     value="{FilteredMsaModel>/0/Address}"
                     maxLength="120"
                     valueStateText="{i18n>addressValueState}"
                     liveChange="Msa_LC_Address"
                 />
-                <Label
+				<Label
                     text="{i18n>expCountry}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     valueStateText="{i18n>expValStaCountry}"
-                    change="MSACountryComboBox"
+                    change="MSA_onChangeCountry"
                     id="MSA_Nav_Id_Country"
                     items="{path:'CountryModel>/',length:1000}"
                     value="{FilteredMsaModel>/0/Country}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{CountryModel>countryName}"
                         text="{CountryModel>countryName}"
                         additionalText="{CountryModel>code}"
                     />
-                </ComboBox>
-
-                <Label
+				</ComboBox>
+				<Label text="{i18n>state}" required="true"/>
+				<ComboBox
+                    valueStateText="{i18n>expValStaState}"
+                    change="MSA_onChangeState"
+                    id="MSA_Nav_Id_State"
+                    items="{path:'StateModel>/',length:1000}"
+                    value="{FilteredMsaModel>/0/State}"
+                    showSecondaryValues="true">
+					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+				</ComboBox>
+				<Label
                     text="{i18n>city}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     change="MSA_onChangeCity"
                     valueStateText="{i18n>cityValueText}"
                     id="MSA_Nav_Id_City"
-                    items="{BaseLocationModel>/}"
+                    items="{path:'CityModel>/',length:1000}"
                     value="{FilteredMsaModel>/0/City}"
                 >
-                    <core:ListItem
-                        key="{BaseLocationModel>CountryCode}"
-                        text="{BaseLocationModel>city}"
-                        additionalText="{BaseLocationModel>branchCode}"
-                    />
-                </ComboBox>
-                <Label
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
+				</ComboBox>
+				<Label
                     text="{i18n>emailId}"
                     required="true"
                 />
-                <TextArea
+				<TextArea
                     liveChange="Msa_LC_EmailID"
                     maxLength="500"
                     id="MsaE_id_MSAEmail"
                     valueStateText="{i18n>emailValueState}"
                     value="{FilteredMsaModel>/0/MsaEmail}"
                 />
-                <Label text="{i18n>GSTNO}" />
-                <Input
+				<Label text="{i18n>GSTNO}" />
+				<Input
                     liveChange="Msa_LC_GSTNO"
                     maxLength="15"
                     id="MsaE_id_MSA_GSTNO"
                     valueStateText="{i18n>gstNoValueState}"
                     value="{FilteredMsaModel>/0/GST}"
                 />
-                <Label text="{i18n>status}" />
-                <Select
+				<Label text="{i18n>status}" />
+				<Select
                     id="MsaD_id123"
                     items="{
         path: 'AssignmentStatus>/assignmentStatus'
@@ -234,18 +234,17 @@
                     selectedKey="{FilteredMsaModel>/0/Status}"
                     liveChange="MsaD_validateGST"
                 >
-                    <core:Item
+					<core:Item
                         key="{AssignmentStatus>Value}"
                         text="{AssignmentStatus>Value}"
                     />
-                </Select>
-
-                <Label
+				</Select>
+				<Label
                     text="{i18n>msaRateCharge}"
                     required="true"
                     visible="{simpleForm>/Recruitment}"
                 />
-                <Input
+				<Input
                     value="{FilteredMsaModel>/0/RateCharge}"
                     visible="{simpleForm>/Recruitment}"
                     maxLength="5"
@@ -254,13 +253,12 @@
                     liveChange="LC_MSA_RateCharge"
                     valueStateText="{i18n>msaAmountMess}"
                 />
-
-                <Label
+				<Label
                     text="{i18n>paymentLabel}"
                     required="true"
                     visible="{simpleForm>/Recruitment}"
                 />
-                <Input
+				<Input
                     value="{FilteredMsaModel>/0/PaymentAdvance}"
                     maxLength="5"
                     visible="{simpleForm>/Recruitment}"
@@ -269,8 +267,7 @@
                     liveChange="onPaymentAdvanceInputChange"
                     valueStateText="{i18n>msaAmountMess}"
                 />
-
-                <Input
+				<Input
                     value="{FilteredMsaModel>/0/PaymentBalance}"
                     maxLength="5"
                     visible="{simpleForm>/Recruitment}"
@@ -279,24 +276,23 @@
                     liveChange="onPaymentAdvanceInputChange"
                     valueStateText="{i18n>msaAmountMess}"
                 />
-
-                <Label
+				<Label
                     text="{i18n>replacementGratuityLabel}"
                     required="true"
                     visible="{simpleForm>/Recruitment}"
                 />
-                <Select
+				<Select
                     items="{ContractPeriod>/ContractPeriod}"
                     selectedKey="{FilteredMsaModel>/0/ReplacementMonth}"
                     width="100%"
                     visible="{simpleForm>/Recruitment}"
                 >
-                    <core:Item
+					<core:Item
                         key="{ContractPeriod>Months}"
                         text="{ContractPeriod>Months}"
                     />
-                </Select>
-                <Input
+				</Select>
+				<Input
                     value="{FilteredMsaModel>/0/ReplacementRefund}"
                     visible="{simpleForm>/Recruitment}"
                     maxLength="5"
@@ -305,25 +301,25 @@
                     liveChange="LC_MSA_RateCharge"
                     valueStateText="{i18n>msaAmountMess}"
                 />
-            </f:content>
-        </f:SimpleForm>
-        <!-- Buttons for Submit and Close actions -->
-        <FlexBox
+			</f:content>
+		</f:SimpleForm>
+		<!-- Buttons for Submit and Close actions -->
+		<FlexBox
             justifyContent="End"
             width="100%"
         >
-            <Button
+			<Button
                 text="{i18n>save}"
                 type="Accept"
                 press="MSA_Frg_Update"
                 class="sendMail"
             />
-            <Button
+			<Button
                 text="{i18n>close}"
                 type="Reject"
                 class="sendMail"
                 press="MSA_Frg_Close"
             />
-        </FlexBox>
-    </Dialog>
+		</FlexBox>
+	</Dialog>
 </core:FragmentDefinition>

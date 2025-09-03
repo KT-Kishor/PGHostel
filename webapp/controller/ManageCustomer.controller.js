@@ -38,7 +38,6 @@ sap.ui.define([
                     this.closeBusyDialog(); // Hide in all cases
                 }
                 this.initializeBirthdayCarousel();
-                this.initLocationModels(this.getView());
             },
 
             //common Dialog Function
@@ -82,12 +81,11 @@ sap.ui.define([
                         mobileNo: "",
                         LUT: "",
                         type: "",
-                        value: "0",
+                        value: "",
                         salutation: "Mr.",
                         customerEmail: "",
                         stdCode: "",
                         country: "",
-                        countryCode: "",
                         state: "",
                         baseLocation: "",
                         HeadPosition: ""
@@ -112,64 +110,46 @@ sap.ui.define([
                 }
             },
 
-            _resetDialogFields: function(bIsEdit) {
-                // Clear ValueStates
-                ["MC_id_CustCompanyName", "MC_id_CustCustomerName", "MC_id_CustomGst",
-                    "MC_id_CustomPan", "MC_id_CustMail", "MC_id_FinanceEmail", "MC_id_CustMob",
-                    "MC_id_Country", "MC_id_codeModel", "MC_id_CustAddress", "MC_id_HeadPosition"
-                ]
-                .forEach(id => sap.ui.getCore().byId(id).setValueState("None"));
+             _resetDialogFields: function (bIsEdit) {
+                // Clear all ValueStates
+                sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustCustomerName").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustomGst").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustomPan").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustMail").setValueState("None");
+                sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
+                sap.ui.getCore().byId("MC_id_Country").setValueState("None");
+                sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
+                sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
+                sap.ui.getCore().byId("MC_id_HeadPosition").setValueState("None");
 
                 if (bIsEdit && this._originalCustomerData) {
-                    let oData = this._originalCustomerData;
+                // Set fallback/default values if fields are missing or empty
+                this._originalCustomerData.stdCode = this._originalCustomerData.stdCode || "";
+                this._originalCustomerData.GST = this._originalCustomerData.GST || "";
+                this._originalCustomerData.LUT = this._originalCustomerData.LUT || "";
+                this._originalCustomerData.mobileNo = this._originalCustomerData.mobileNo || "";
+                this._originalCustomerData.type = this._originalCustomerData.type || "";
+                this._originalCustomerData.value = this._originalCustomerData.value || "";
 
-                    // Defaults
-                    oData.stdCode = oData.stdCode  || "";
-                    oData.GST = oData.GST || "";
-                    oData.LUT = oData.LUT || "";
-                    oData.mobileNo = oData.mobileNo || "";
-                    oData.type = oData.type  || "";
-                    oData.value = oData.value  || "";
-                    oData.countryCode = oData.countryCode || "";
-                    oData.state = oData.state || "";
-                    oData.baseLocation = oData.baseLocation || "";
+                // Set data back to CustomerModel
+                this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(this._originalCustomerData)));
 
-                    this.getView().getModel("CustomerModel").setData(JSON.parse(JSON.stringify(oData)));
-
-                    // --- Trigger dependent loaders in order ---
-                    const oCountryBox = sap.ui.getCore().byId("MC_id_Country");
-                    oCountryBox.setSelectedKey(oData.countryCode || "");
-                    this.onCountry({
-                        getSource: () => oCountryBox
-                    }, this.getView(), "CustomerModel");
-
-                    const oStateBox = sap.ui.getCore().byId("MC_id_State");
-                    oStateBox.setSelectedKey(oData.state || "");
-                    this.onStateChange({
-                        getSource: () => oStateBox
-                    }, this.getView(), "CustomerModel");
-
-                    const oCityBox = sap.ui.getCore().byId("MC_id_City");
-                    oCityBox.setSelectedKey(oData.baseLocation || "");
-
-                    sap.ui.getCore().byId("MC_id_codeModel").setSelectedKey(oData.stdCode || "");
-
-                    // RadioGroup
-                    if (oData.type === "IGST") {
-                        sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
-                    } else {
-                        sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
-                    }
+                // Set selected index of radio group based on type
+                if (this._originalCustomerData.type === "IGST") {
+                    sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
+                } else {
+                    sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
+                }
                 }
             },
-
 
             MC_onPressClose: function() {
                 this.oManageCustomerDialog.close(); // Close the dialog
                 this.byId("MC_id_CustTable").removeSelections(true); // Clear table selection
                 this.MC_onTableSelectionChange(); // Update button states
                 this.getView().setModel(new JSONModel({}), "CustomerModel"); // Clear CustomerModel data
-
             },
 
             onRadioButtonChange: function() {
@@ -289,26 +269,91 @@ sap.ui.define([
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
 
-            MC_onChangeCountry: function(oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                this.onCountry(oEvent, this.getView(), "CustomerModel", {
-                    resetIds: ["MC_id_State", "MC_id_City", "MC_id_codeModel"],
-                });
+            MC_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oStateCombo = sap.ui.getCore().byId("MC_id_State");
+                const oCityCombo  = sap.ui.getCore().byId("MC_id_City");
+                const oStdCodeInp = sap.ui.getCore().byId("MC_id_codeModel");
+                const oModel      = this.getView().getModel("CustomerModel");
+
+                // Reset dependent fields
+                oStateCombo.setSelectedKey("");
+                oStateCombo.getBinding("items")?.filter([]);
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+                oStdCodeInp.setValue("");
+
+                if (!oSelectedItem) {
+                    // reset model
+                    oModel.setProperty("/country", "");
+                    oModel.setProperty("/state", "");
+                    oModel.setProperty("/baseLocation", "");
+                    oModel.setProperty("/stdCode", "");
+                } else {
+                    // fetch country data
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // "IN"
+                    const oCountryData = oSelectedItem.getBindingContext("CountryModel").getObject();
+                    const sCountryName = oSelectedItem.getText();
+
+                    // filter states by countryCode
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    // set model props
+                    oModel.setProperty("/country", sCountryName || "");
+                    oModel.setProperty("/stdCode", oCountryData?.stdCode || "");
+
+                    // reflect in UI
+                    oStdCodeInp.setValue(oCountryData?.stdCode || "");
+                }
             },
 
-            MC_onChangeState: function(oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                this.onStateChange(oEvent, this.getView(), "CustomerModel", {
-                    resetIds: ["MC_id_City", "MC_id_codeModel"],
-                });
+            MC_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+
+                // Controls
+                const oCityCombo = sap.ui.getCore().byId("MC_id_City");
+                const oCountryCB = sap.ui.getCore().byId("MC_id_Country");
+                const oModel     = this.getView().getModel("CustomerModel");
+
+                // Clear cities
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+
+                if (!oSelectedItem) {
+                    oModel.setProperty("/state", "");
+                    oModel.setProperty("/baseLocation", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+                    // filter cities based on state + country
+                    oCityCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    oModel.setProperty("/state", sStateName || "");
+                }
             },
 
-            MC_onChangeCity: function(oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
-                this.onCityChange(oEvent, this.getView(), "CustomerModel");
+            MC_onChangeCity: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oModel        = this.getView().getModel("CustomerModel");
+
+                if (!oSelectedItem) {
+                    oModel.setProperty("/baseLocation", "");
+                } else {
+                    const sCityName = oSelectedItem.getKey() || oSelectedItem.getText();
+                    oModel.setProperty("/baseLocation", sCityName || "");
+                }
             },
-
-
 
             MC_OnPressMSASOW: function() {
                 this.getRouter().navTo("RouteMSA"); // Navigate to MSASOW page
@@ -327,6 +372,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
+                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_City"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
                     );
@@ -335,7 +381,6 @@ sap.ui.define([
                         return;
                     }
                     var oData = this.getView().getModel("CustomerModel").getData();
-                    delete oData.currency; // Remove ID for new customer
                     var isValid = true;
                     // Optional Field Validations
                     if (oData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
@@ -385,6 +430,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_City"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
                     );

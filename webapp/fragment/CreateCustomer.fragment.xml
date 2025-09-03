@@ -44,27 +44,27 @@
 				<Input value="{CustomerModel>/customerEmail}" id="MC_id_FinanceEmail" placeholder="{i18n>placeholderFinanceEmail}" maxLength="190" liveChange="MC_ValidateEmail" valueStateText="{i18n>emailValueState}" />
 
 				<Label text="{i18n>expCountry}" required="true"/>
-				<ComboBox id="MC_id_Country" change="MC_onChangeCountry" items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/countryCode}"  valueStateText="{i18n>expValStaCountry}">
-					<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}"/>
+				<ComboBox id="MC_id_Country" change="MC_onChangeCountry" valueStateText="{i18n>expValStaCountry}"
+				items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}" showSecondaryValues="true">
+				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 
 				<Label text="{i18n>state}" required="true"/>
-				<ComboBox id="MC_id_State"  change="MC_onChangeState"  items="{path:'StateModel>/',length:1000}" selectedKey="{CustomerModel>/state}">
-					<core:ListItem key="{StateModel>state}" text="{StateModel>state}"/>
+				<ComboBox id="MC_id_State" change="MC_onChangeState" valueStateText="{i18n>expValStaState}"
+				items="{path:'StateModel>/',length:1000}" selectedKey="{CustomerModel>/state}" showSecondaryValues="true">
+				<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" />
 				</ComboBox>
 
 				<Label text="{i18n>contractLocation}" required="true"/>
-				<ComboBox id="MC_id_City" change="MC_onChangeCity" items="{path:'CityModel>/',length:1000}" selectedKey="{CustomerModel>/baseLocation}">
-					<core:ListItem key="{CityModel>baseLocation}" text="{CityModel>baseLocation}" />
+				<ComboBox id="MC_id_City" change="MC_onChangeCity" valueStateText="{i18n>combovalueState}" items="{path:'CityModel>/',length:1000}" selectedKey="{CustomerModel>/baseLocation}" value="{CustomerModel>/baseLocation}" 
+				showSecondaryValues="true">
+				<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 
 				<Label text="{i18n>mobileNo}"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
 					<VBox width="22%">
-						<ComboBox id="MC_id_codeModel"  selectedKey="{CustomerModel>/stdCode}"  showSecondaryValues="true" 
-			        change="MC_ValidateComboBox"   items="{CodeModel>/}"   filterSecondaryValues="true"  valueStateText="{i18n>combovalueState}">
-							<core:ListItem key="{CodeModel>stdCode}" text="{CodeModel>stdCode}" additionalText="{CodeModel>countryCode}" />
-						</ComboBox>
+						<Input id="MC_id_codeModel" value="{CustomerModel>/stdCode}" editable="false"/>
 					</VBox>
 					<VBox width="78%">
 						<Input value="{CustomerModel>/mobileNo}" id="MC_id_CustMob"  placeholder="{i18n>placeholderMobileNo}" 

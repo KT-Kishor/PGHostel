@@ -82,15 +82,20 @@
 										<m:ComboBox id="Exp_id_Country" valueStateText="{i18n>expValStaCountry}" change="Exp_Det_CountryChange" items="{path:'CountryModel>/',length:1000}" value="{FilteredExpenseModel>/0/Country}" editable="{viewModel>/editable}">
 											<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
+										<!-- State -->
+										<m:Label text="{i18n>state}" required="true"/>
+										<m:ComboBox id="Exp_id_State" valueStateText="{i18n>expValStaState}" change="Exp_Det_StateChange" items="{path:'StateModel>/',length:1000}" value="{FilteredExpenseModel>/0/State}" editable="{viewModel>/editable}">
+										<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+										</m:ComboBox>
 										<!-- Source -->
 										<m:Label text="{i18n>expSource}" required="true"/>
-										<m:ComboBox id="Exp_id_Source" valueStateText="{i18n>expValStaSource}"  change="Exp_Det_SourceChange" items="{BaseLocationModel>/}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
-											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										<m:ComboBox id="Exp_id_Source" valueStateText="{i18n>expValStaSource}"  change="Exp_Det_SourceChange" items="{path:'CityModel>/',length:1000}"  value="{FilteredExpenseModel>/0/Source}" editable="{viewModel>/editable}">
+											<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 										</m:ComboBox>
 										<!-- Destination -->
 										<m:Label text="{i18n>expDestination}" required="{viewModel>/required}"/>
-										<m:ComboBox  id="Exp_id_Destination" valueStateText="{i18n>expValStaDestination}"  change="Exp_Det_DestinationChange" items="{BaseLocationModel>/}" editable="{viewModel>/editable}" value="{FilteredExpenseModel>/0/Destination}">
-											<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+										<m:ComboBox  id="Exp_id_Destination" valueStateText="{i18n>expValStaDestination}"  change="Exp_Det_DestinationChange" items="{path:'CityModel>/',length:1000}" editable="{viewModel>/editable}" value="{FilteredExpenseModel>/0/Destination}">
+											<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 										</m:ComboBox>
 										<!-- CostCenter -->
 										<m:Label text="{i18n>expCostCenter}" required="true"/>

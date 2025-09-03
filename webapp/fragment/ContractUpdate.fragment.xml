@@ -123,11 +123,9 @@
 										<!-- Input for Amount -->
 										<m:Label text="{i18n>amount}" required="true" />
 										<m:Input value="{oFilteredContractModel>/Amount}" valueState="None" id="CU_id_EditAmountInput"  placeholder="{i18n>placeAmount}" liveChange="CD_validateAmount"  maxLength="10" valueStateText="{i18n>ammountValuState}"  editable="{simpleForm>/editable}" />
-										<m:ComboBox  id="CU_id_CurrencySelect" items="{CurrencyModel>/}" 
-    									selectedKey="{oFilteredContractModel>/Currency}" visible="true"  valueStateText="{i18n>selectCurrency}" width="100%" class="marginLeft" editable="{simpleForm>/editable}" change="CD_onChangeCurrency">
-										<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-									    </m:ComboBox>
-											<!-- Contract Period -->
+										<m:Input id="CU_id_CurrencySelect" value="{oFilteredContractModel>/Currency}"
+										editable="false" visible="true" width="100%" class="marginLeft" change="CD_onChangeCurrency" valueStateText="{i18n>selectCurrency}"/>
+										<!-- Contract Period -->
 										<m:Label text="{i18n>warrantyDate}"  />
 										<m:Select id="CU_id_WarrantyDate" selectedKey="{oFilteredContractModel>/ContractPeriod}" items="{ContractPeriod>/ContractPeriod}" editable="{simpleForm>/editable}" >
 											<core:Item key="{ContractPeriod>Months}" text="{ContractPeriod>Months}" />
@@ -150,21 +148,37 @@
 											<core:Item key="No" text="{i18n>no}" />
 										</m:Select>
 
+										<!-- Country -->
 										<m:Label text="{i18n>expCountry}" required="true"/>
-										<m:ComboBox change="CD_onChangeCountry"  editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaCountry}" id="CU_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oFilteredContractModel>/Country}" showSecondaryValues="true"  >
-										<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+										<m:ComboBox id="CU_id_Country" items="{path:'CountryModel>/',length:1000}" 
+										value="{oFilteredContractModel>/Country}" selectedKey="{oFilteredContractModel>/Country}" 
+										showSecondaryValues="true" valueStateText="{i18n>expValStaCountry}" 
+										editable="{simpleForm>/editable}" change="CD_onChangeCountry">
+										<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" 
+										additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
 
-						                <m:Label text="{i18n>contractLocation}" required="true"/>
-										<m:ComboBox items="{BaseLocationModel>/}" change="CD_onBaseLocationChange"  editable="{simpleForm>/editable}" id="CU_id_ContractCity"  showSecondaryValues="true" selectedKey="{oFilteredContractModel>/ContractLocation}" valueStateText="{i18n>combovalueState}">  
-												   <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
-										   </m:ComboBox>
-										   
-										<m:Label text="{i18n>mobileNo}" required="true" />
-										<m:ComboBox selectedKey="{oFilteredContractModel>/STDCode}" showSecondaryValues="true" change="CD_ValidateComboBox"
-                                        id="CU_id_codeModel" items="{codeModel>/}" filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" editable="{simpleForm>/mobile}">
-										<core:ListItem key="{codeModel>calling_code}" text="{codeModel>calling_code}" additionalText="{codeModel>country_code}" />
+										<!-- State -->
+										<m:Label text="{i18n>state}" required="true"/>
+										<m:ComboBox id="CU_id_State" items="{path:'StateModel>/',length:1000}"
+										selectedKey="{oFilteredContractModel>/State}" showSecondaryValues="true"
+										valueStateText="{i18n>expValStaState}" editable="{simpleForm>/editable}" 
+										change="CD_onChangeState">
+											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 										</m:ComboBox>
+
+										<!-- City  -->
+										<m:Label text="{i18n>contractLocation}" required="true"/>
+										<m:ComboBox id="CU_id_ContractCity" items="{path:'CityModel>/',length:1000}"
+										value="{oFilteredContractModel>/ContractLocation}" selectedKey="{oFilteredContractModel>/ContractLocation}" showSecondaryValues="true" valueStateText="{i18n>combovalueState}" 
+										editable="{simpleForm>/editable}" change="CD_onBaseLocationChange">
+										 <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
+										</m:ComboBox>
+
+										<!-- STD Code -->
+										<m:Label text="{i18n>mobileNo}" required="true" />
+										<m:Input id="CU_id_codeModel" value="{oFilteredContractModel>/STDCode}"
+										editable="false" visible="true" class="marginLeft" change="CD_ValidateComboBox" />
 
 										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="20" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/mobile}" />
 

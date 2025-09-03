@@ -75,13 +75,17 @@
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
 											<Label text="{i18n>expCountry}" required="true"/>
-				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true"  >
+				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true"  >
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </ComboBox>
+											<Label text="{i18n>state}" required="true" />
+											<ComboBox change="EOD_onChangeState" valueStateText="{i18n>expValStaState}" id="EOD_id_State" items="{path:'StateModel>/',length:1000}" selectedKey="{employeeModel>/State}" showSecondaryValues="true"  >
+					                        <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+				                            </ComboBox>
 											<Label text="{i18n>baseLocation}" required="true" />
-											<ComboBox items="{BaseLocationModel>/}"  showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOD_id_Location" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
+											<ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/CityModel}" id="EOD_id_Location" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox">
 											<items>
-						                        <core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+						                        <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 											</items>
 				                            </ComboBox>
 											<Label text="{i18n>emailId}" required="true" />

@@ -171,16 +171,63 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-            MSACountryComboBox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+            MSA_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oStateCombo   = this.byId("MSA_Id_State");
+                const oCityCombo    = this.byId("MSA_Id_City");
+                const oModel        = this.getView().getModel("msaModelWizart");
+                oStateCombo.setSelectedKey("");   // clear dependents first
+                oStateCombo.getBinding("items")?.filter([]);
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+                if (!oSelectedItem) {
+                    oModel.setProperty("/Country", "");  // reset model
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // fetch country details
+                    const sCountryName = oSelectedItem.getText();
+                    oStateCombo.getBinding("items")?.filter([   // filter states
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+                    oModel.setProperty("/Country", sCountryName || "");  // update model
+                }
                 this.validateStep();
-                this.byId("MSA_Id_City").setValue("");
-                var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                this.byId("MSA_Id_City").getBinding("items").filter(oFilter);
+            },
+            MSA_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oCityCombo    = this.byId("MSA_Id_City");
+                const oCountryCB    = this.byId("MSA_Id_Country");
+                const oModel        = this.getView().getModel("msaModelWizart");
+                oCityCombo.setSelectedKey("");  // clear city
+                oCityCombo.getBinding("items")?.filter([]);
+                if (!oSelectedItem) {
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+                    // filter cities
+                    oCityCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+                    oModel.setProperty("/State", sStateName || "");
+                }
+                this.validateStep();
             },
             MSA_onChangeCity: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent);
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oModel        = this.getView().getModel("msaModelWizart");
+                if (!oSelectedItem) {
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sCityName = oSelectedItem.getKey() || oSelectedItem.getText();
+                    oModel.setProperty("/City", sCityName || "");
+                }
                 this.validateStep();
             },
             validateStep: function () {
@@ -202,6 +249,7 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_Address"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_Branch"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
+                        utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
                         //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id12"), "ID") &&
                         //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_validateGuarantee"), "ID")  &&
