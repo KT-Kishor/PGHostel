@@ -1,59 +1,23 @@
-<mvc:View
-    controllerName="sap.kt.com.minihrsolution.controller.AppliedCanDetail"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
+<mvc:View controllerName="sap.kt.com.minihrsolution.controller.AppliedCanDetail" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:core="sap.ui.core" 
+	xmlns:f="sap.ui.layout.form" 
 	xmlns:u="sap.ui.unified">
-	<Page  title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
+	<Page title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
 		<headerContent>
-			<Button
-                press="Tile_NotifictionBTN"
-                icon="sap-icon://bell"
-                type="Transparent"
-                tooltip="Notifications"
-            />
-			<Button
-                press="onLogout"
-                icon="sap-icon://log"
-                tooltip="{i18n>logoutTooltip}"
-                type="Transparent"
-            />
+			<Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications" />
+			<Button press="onLogout" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}" type="Transparent" />
 		</headerContent>
-		<f:SimpleForm
-            layout="ColumnLayout"
-            labelSpanXL="12"
-            labelSpanL="12"
-            labelSpanM="12"
-            labelSpanS="12"
-            adjustLabelSpan="false"
-            emptySpanXL="0"
-            emptySpanL="0"
-            emptySpanM="0"
-            emptySpanS="0"
-            columnsXL="3"
-            columnsL="3"
-            columnsM="1"
-            singleContainerFullSize="false"
-        >
+		<f:SimpleForm layout="ColumnLayout" labelSpanXL="12" labelSpanL="12" labelSpanM="12" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="3" columnsL="3" columnsM="1" singleContainerFullSize="false">
 			<!-- form header  -->
 			<f:toolbar>
 				<Toolbar>
-					<Title text="{i18n>TableHeader}"  />
+					<Title text="{i18n>TableHeader}" />
 					<ToolbarSpacer />
-					<Button
-                        id="ACD_id_EditButton"
-                        text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
-                        press="ACD_onEditPress"
-                        type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
-                        tooltip="{i18n>editDetails}"
-                    />
-					<Button
-                        text="{i18n>viewResume}"
-                        press="openResumePreview"
-                        type="Transparent"
-                    />
-					<Button  tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard"   press="ACD_onBoardCandidate"   type="Transparent"/>
+					<Button id="ACD_id_EditButton" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="ACD_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" tooltip="{i18n>editDetails}" />
+					<Button text="{i18n>viewResume}" press="openResumePreview" type="Transparent" />
+					<Button tooltip="{i18n>onboardTraineeTool}" text="{i18n>generateOffer}" id="ACD_id_EmpOnBoard" press="ACD_onBoardCandidate" type="Transparent"/>
 				</Toolbar>
 			</f:toolbar>
 			<f:content>
@@ -63,17 +27,20 @@
 				<Label text="{i18n>gender}" />
 				<Input value="{setDataToForm>/Gender}" maxLength="6" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>FormField}" />
-				<DatePicker id="CD_id_DOB" value="{path: 'setDataToForm>/DOB'}"	editable="{viewModel>/isEditMode}" change=".onDOBChange" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy"/>
+				<DatePicker id="CD_id_DOB" value="{path: 'setDataToForm>/DOB'}" editable="{viewModel>/isEditMode}" change=".onDOBChange" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy"/>
 				<Label text="{i18n>email}" />
 				<Input value="{setDataToForm>/Email}" maxLength="50" editable="{viewModel>/isEditMode}"/>
-				<Label text="{i18n>expCountry}"  />
-				<ComboBox items="{path:'CountryModel>/',length:1000}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}"
-                value="{setDataToForm>/Country}" editable="{viewModel>/isEditMode}" change="onDialogCountryChange">
-				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				<Label text="{i18n>expCountry}" />
+				<ComboBox items="{path:'CountryModel>/',length:1000}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}" value="{setDataToForm>/Country}" editable="{viewModel>/isEditMode}" change="onDialogCountryChange">
+					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				</ComboBox>
+				<Label text="State" />
+				<ComboBox items="{path: 'StateModel>/', length: 1000}" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}">
+					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 				</ComboBox>
 				<Label text="{i18n>city}" />
-				<ComboBox items="{BaseLocationModel>/}" editable="{viewModel>/isEditMode}" id="AN_Id_City"  showSecondaryValues="true" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}">  
-				<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				<ComboBox items="{BaseLocationModel>/}" editable="{viewModel>/isEditMode}" id="AN_Id_City" showSecondaryValues="true" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}">
+					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 				</ComboBox>
 				<Label text="{i18n>address}" />
 				<TextArea rows="3" value="{setDataToForm>/Address}" maxLength="200" editable="{viewModel>/isEditMode}"/>
@@ -89,20 +56,15 @@
 				<Label text="{i18n>TableColExperience}" />
 				<Input value="{setDataToForm>/Experience}" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>TableColNoticePeriod}" />
-				<ComboBox id="AN_RE_NoticePeriod" items="{NoticePeriod>/}" value="{setDataToForm>/NoticePeriod}"
-                valueState="{modelValuStateError>/NoticePeriodState}" editable="{viewModel>/isEditMode}"
-   				valueStateText="{i18n>NoticePeriod}" change="onValidateMandatoryField">
+				<ComboBox id="AN_RE_NoticePeriod" items="{NoticePeriod>/}" value="{setDataToForm>/NoticePeriod}" valueState="{modelValuStateError>/NoticePeriodState}" editable="{viewModel>/isEditMode}" valueStateText="{i18n>NoticePeriod}" change="onValidateMandatoryField">
 					<core:Item key="{NoticePeriod>key}" text="{NoticePeriod>text}" />
 				</ComboBox>
 				<Label text="{i18n>CurrentSalaryField}" />
-				<Input value="{setDataToForm>/CurrentSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information"
-                valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}"
-                 maxLength="10"/>
+				<Input value="{setDataToForm>/CurrentSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}" maxLength="10"/>
 				<Label text="{i18n>ExpectedSalaryField}" />
-				<Input value="{setDataToForm>/ExpectedSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}"
-                maxLength="10"/>
+				<Input value="{setDataToForm>/ExpectedSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}" maxLength="10"/>
 				<Label text="{i18n>Jobtitle}" />
-				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'DesignationModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{setDataToForm>/JobTitle}"  showSecondaryValues="true"  change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
+				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'DesignationModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{setDataToForm>/JobTitle}" showSecondaryValues="true" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
 					<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}"/>
 				</ComboBox>
 				<Label text="{i18n>RolesFields}" />
@@ -128,24 +90,8 @@
 		<VBox class="uploaderSection noBottomSpace">
 			<HBox alignItems="Center" wrap="Wrap" class="fileUploaderHBox">
 				<Label text="{i18n>attachmentLabel} :" class="sapUiSmallMargin" />
-				<u:FileUploader
-            id="FM_jobFileUploader"
-            fileSizeExceed="onFileSizeExceeds"
-            maximumFileSize="5MB"
-            typeMissmatch="onFileTypeMissmatch"
-            fileType="pdf,doc,docx"
-            change="onBeforeUploadStarts"
-            buttonOnly="true"
-            sameFilenameAllowed="true"
-            iconFirst="true"
-            buttonText="{i18n>attachmentButtonText}" 
-        />
-				<Tokenizer
-            id="FM_tokenizer"
-            width="auto"
-            tokenDelete="onTokenDelete"
-            editable="{viewModel>/isEditMode}"
-            tokens="{tokenModel>/tokens}">
+				<u:FileUploader id="FM_jobFileUploader" fileSizeExceed="onFileSizeExceeds" maximumFileSize="5MB" typeMissmatch="onFileTypeMissmatch" fileType="pdf,doc,docx" change="onBeforeUploadStarts" buttonOnly="true" sameFilenameAllowed="true" iconFirst="true" buttonText="{i18n>attachmentButtonText}" />
+				<Tokenizer id="FM_tokenizer" width="auto" tokenDelete="onTokenDelete" editable="{viewModel>/isEditMode}" tokens="{tokenModel>/tokens}">
 					<Token key="{tokenModel>key}" text="{tokenModel>text}" />
 				</Tokenizer>
 			</HBox>
@@ -153,10 +99,7 @@
 		<footer>
 			<Bar id="ACD_id_FooterBar">
 				<contentLeft>
-					<core:Fragment
-                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
-                        type="XML"
-                    />
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
 				</contentLeft>
 			</Bar>
 		</footer>

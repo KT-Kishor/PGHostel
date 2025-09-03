@@ -1,5 +1,4 @@
-sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/m/MessageToast", "../model/formatter", "../utils/validation", "sap/ui/export/Spreadsheet"], function (BaseController, JSONModel, Filter, MessageToast, formatter, utils, Spreadsheet) {
-  "use strict";
+sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/Filter", "sap/m/MessageToast", "../model/formatter", "../utils/validation", "sap/ui/export/Spreadsheet", "sap/ui/core/Fragment"], function (BaseController, JSONModel, Filter, MessageToast, formatter, utils, Spreadsheet, Fragment) {
   return BaseController.extend("sap.kt.com.minihrsolution.controller.AppliedCandidates", {
     formatter: formatter,
     onInit: function () {
@@ -68,19 +67,176 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
       this._FragmentDatePickersReadOnly(["FM_Id_DateAvlForInterview"]);
       this.initializeBirthdayCarousel();
     },
+    getFragmentControl: function (sControlId) {
+      let oControl = sap.ui.getCore().byId("myDialog--" + sControlId);
+
+      if (!oControl) {
+        oControl = sap.ui.getCore().byId(sControlId);
+      }
+
+      return oControl;
+    },
+    myFilterCombo: function (sComboBoxId, sField, sValue) {
+      const oCombo = this.getFragmentControl(sComboBoxId);
+
+      const oBinding = oCombo.getBinding("items");
+      if (oBinding) {
+        oBinding.filter([new sap.ui.model.Filter(sField, "EQ", sValue)]);
+      }
+    },
+    myOnCountryChange: function (oEvent) {
+      const oCombo = oEvent.getSource();
+      const sSelectedCountry = oCombo.getSelectedKey();
+      const oCountryModel = this.getView().getModel("CountryModel");
+      const aCountries = oCountryModel.getData();
+
+      this.myResetCountryDependencies();
+
+      if (!sSelectedCountry) {
+        return;
+      }
+
+      const oMatch = aCountries.find((c) => {
+        return c.countryName === sSelectedCountry;
+      });
+
+      if (!oMatch) {
+        oCombo.setValueState(sap.ui.core.ValueState.Error);
+        oCombo.setValueStateText("Invalid country");
+        return;
+      }
+
+      oCombo.setValueState(sap.ui.core.ValueState.None);
+      oCombo.setValueStateText("");
+
+      const oStuDataModel = this.getView().getModel("stuDataModel");
+      oStuDataModel.setProperty("/Country", oMatch.countryName);
+
+      this.myFilterCombo("FM_Id_State", "countryCode", oMatch.code);
+
+      this.myFilterCombo("HQD_id_mFM_Id_STDCodeobileNumber", "code", oMatch.code);
+
+      this.mySetMobileMaxLength(oMatch.code);
+
+      this.myAutoSelectISD(oMatch.code);
+    },
+    myResetCountryDependencies: function () {
+      const oStuDataModel = this.getView().getModel("stuDataModel");
+      if (oStuDataModel) {
+        oStuDataModel.setProperty("/State", "");
+        oStuDataModel.setProperty("/City", "");
+        oStuDataModel.setProperty("/Mobile", "");
+      }
+
+      const oStateCombo = this.getFragmentControl("FM_Id_State");
+      if (oStateCombo) {
+        oStateCombo.setSelectedKey("");
+        const oStateBinding = oStateCombo.getBinding("items");
+        if (oStateBinding) {
+          oStateBinding.filter([]);
+        }
+      }
+
+      const oCityCombo = this.getFragmentControl("FM_Id_City");
+      if (oCityCombo) {
+        oCityCombo.setSelectedKey("");
+        const oCityBinding = oCityCombo.getBinding("items");
+        if (oCityBinding) {
+          oCityBinding.filter([]);
+        }
+      }
+
+      const oMobile = this.getFragmentControl("FM_Id_MobileNumber");
+      if (oMobile) {
+        oMobile.setValue("");
+        oMobile.setValueState(sap.ui.core.ValueState.None);
+        oMobile.setValueStateText("");
+      }
+    },
+    mySetMobileMaxLength: function (sCountryCode) {
+      const oMobileInput = this.getFragmentControl("FM_Id_MobileNumber");
+      if (!oMobileInput) return;
+
+      const iMaxLength = (sCountryCode || "").trim().toUpperCase() === "IN" ? 10 : 20;
+      oMobileInput.setMaxLength(iMaxLength);
+    },
+    myAutoSelectISD: function (sCountryCode) {
+      const oISDCombo = this.getFragmentControl("HQD_id_mFM_Id_STDCodeobileNumber");
+      if (!oISDCombo) return;
+
+      // Get filtered items
+      const aItems = oISDCombo.getItems();
+      if (aItems.length === 1) {
+        const sCode = aItems[0].getKey();
+        oISDCombo.setSelectedKey(sCode);
+
+        const oStuDataModel = this.getView().getModel("stuDataModel");
+        oStuDataModel.setProperty("/ISD", sCode);
+      }
+    },
+    myOnStateChange: function (oEvent) {
+      const oCombo = oEvent.getSource();
+      const sSelectedState = oCombo.getSelectedKey();
+
+      // Reset city when state changes
+      const oStuDataModel = this.getView().getModel("stuDataModel");
+      oStuDataModel.setProperty("/City", "");
+
+      // Filter cities based on selected state
+      if (sSelectedState) {
+        this.myFilterCombo("FM_Id_City", "stateName", sSelectedState);
+      }
+    },
+    myOnCityChange: function (oEvent) {
+      const oCombo = oEvent.getSource();
+      const sSelectedCity = oCombo.getSelectedKey();
+
+      const oStuDataModel = this.getView().getModel("stuDataModel");
+      oStuDataModel.setProperty("/City", sSelectedCity);
+    },
+    myOnISDChange: function (oEvent) {
+      const oCombo = oEvent.getSource();
+      const sSelectedStdCode = oCombo.getSelectedKey();
+      const oCountryModel = this.getView().getModel("CountryModel");
+      const aCountries = oCountryModel.getData();
+
+      // Find country matching the selected ISD code
+      const oMatch = aCountries.find((c) => c.stdCode === sSelectedStdCode);
+      if (oMatch) {
+        // Set mobile max length based on country
+        this.mySetMobileMaxLength(oMatch.code);
+      }
+    },
+    EOD_onChangeCountry: function (oEvent) {
+      this.myOnCountryChange(oEvent);
+    },
+    FM_onChangeState: function (oEvent) {
+      this.myOnStateChange(oEvent);
+    },
+    FM_onChangeCity: function (oEvent) {
+      this.myOnCityChange(oEvent);
+    },
+    onSTDCodeChange: function (oEvent) {
+      this.myOnISDChange(oEvent);
+    },
+    debugControlsAccess: function () {
+      const aControlIds = ["FM_Id_Country", "FM_Id_State", "FM_Id_City", "HQD_id_mFM_Id_STDCodeobileNumber", "FM_Id_MobileNumber"];
+
+      aControlIds.forEach((id) => {
+        const oControl = this.getFragmentControl(id);
+      });
+    },
+
     AC_ReadCall: async function () {
       this.getBusyDialog();
       try {
         const aSelectFields = ["FullName", "CurrentSalary", "ExpectedSalary", "AvailableForInterview", "NoticePeriod", "Country", "City", "ISD", "Mobile", "Date", "Email", "Experience", "Skills", "Remark", "CreateDate", "CreatedBy", "ID"];
-
         const oQueryParameters = {
           fields: aSelectFields.join(","),
         };
-
         const response = await this.ajaxReadWithJQuery("customReadCall", oQueryParameters);
         const aCandidates = response.data || [];
         this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aCandidates), "DataTableModel");
-
         const nameSet = new Set(aCandidates.map((c) => c.FullName).filter(Boolean));
         this.getView().setModel(
           new sap.ui.model.json.JSONModel(
@@ -96,95 +252,18 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         this.closeBusyDialog();
       }
     },
-
     onPressback: function () {
       this.getOwnerComponent().getRouter().navTo("RouteTilePage");
     },
-
     onLogout: function () {
       this.CommonLogoutFunction();
     },
-
     onCandidatePress: function (oEvent) {
       const id = oEvent.getSource().getBindingContext("DataTableModel").getObject().ID;
       this.getOwnerComponent().getRouter().navTo("AppliedCanDetail", {
         id: id,
       });
     },
-
-    onValidateMobile: function (oEvent) {
-      this._validateMobileNumberLocal(oEvent);
-    },
-    _validateMobileNumberLocal: function (oEvent) {
-      const oInput = oEvent.getSource();
-      const sValueTrimmed = oInput.getValue().trim();
-      oInput.setValueState(sap.ui.core.ValueState.None);
-      oInput.setValueStateText("");
-      if (sValueTrimmed.startsWith("0")) {
-        oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("Mobile Number begins with non-zero");
-        return false;
-      }
-      if (!/^\d*$/.test(sValueTrimmed)) {
-        oInput.setValueState(sap.ui.core.ValueState.Error);
-        oInput.setValueStateText("Only numbers are allowed");
-        return false;
-      }
-      if (oInput.getMaxLength() === 10) {
-        if (sValueTrimmed.length !== 10) {
-          oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Mobile Number must be 10 digits long");
-          return false;
-        }
-      } else {
-        if (sValueTrimmed.length > 20 || sValueTrimmed.length < 4) {
-          oInput.setValueState(sap.ui.core.ValueState.Error);
-          oInput.setValueStateText("Enter a valid mobile number (between 4-20 digits)");
-          return false;
-        }
-      }
-      return true;
-    },
-
-    EOD_onChangeCountry: function (oEvent) {
-      const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
-      const sCountryCode = oEvent.getSource().getSelectedItem().getAdditionalText();
-      if (sCountryCode === "IN") {
-        oMobileInput.setMaxLength(10);
-      } else {
-        oMobileInput.setMaxLength(20);
-      }
-      oMobileInput.setValue("");
-
-      // Existing logic
-      utils._LCstrictValidationComboBox(oEvent, "oEvent");
-      if (oEvent.getSource().getValue() === "") {
-        oEvent.getSource().setValueState("None");
-      }
-
-      const oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-      const oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-      sap.ui.getCore().byId("FM_Id_City").getBinding("items").filter(oFilter);
-      sap.ui.getCore().byId("FM_Id_City").setValue("");
-
-      this._validateMobileNumberLocal({
-        getSource: () => oMobileInput,
-      });
-    },
-    onSTDCodeChange: function (oEvent) {
-      const oMobileInput = sap.ui.getCore().byId("FM_Id_MobileNumber");
-      const sISDCode = oEvent.getSource().getSelectedKey();
-      if (sISDCode === "+91") {
-        oMobileInput.setMaxLength(10);
-      } else {
-        oMobileInput.setMaxLength(20);
-      }
-      oMobileInput.setValue("");
-      this._validateMobileNumberLocal({
-        getSource: () => oMobileInput,
-      });
-    },
-
     onFilterBarClear: function () {
       this.byId("filterEmployeeName").setSelectedKey("");
       this.byId("filterNoticePeriod").setValue("");
@@ -192,7 +271,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
       this.byId("filterExperience").setSelectedKey("");
       this.byId("filterCreateDate").setValue("");
     },
-
     onFilterBarSearch: function () {
       this.getBusyDialog();
       setTimeout(() => {
@@ -202,13 +280,11 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
           const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
             pattern: "yyyy-MM-dd",
           });
-
           // 1. Name Filter
           const sName = this.byId("filterEmployeeName").getValue().trim();
           if (sName) {
             aFilters.push(new sap.ui.model.Filter("FullName", sap.ui.model.FilterOperator.Contains, sName));
           }
-
           // 2. Notice Period Filter
           const sNoticePeriodInput = this.byId("filterNoticePeriod").getValue().trim();
           if (sNoticePeriodInput) {
@@ -219,7 +295,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
                   if (!sDataValue || !sNoticePeriodInput) return false;
                   const data = sDataValue.toString().trim();
                   const input = sNoticePeriodInput.toString().trim();
-
                   if (!input.includes("-")) {
                     return data.toLowerCase() === input.toLowerCase();
                   } else {
@@ -245,13 +320,11 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
               })
             );
           }
-
           // 3. Skills Filter
           const sSkills = this.byId("filterSkills").getValue().trim();
           if (sSkills) {
             aFilters.push(new sap.ui.model.Filter("Skills", sap.ui.model.FilterOperator.Contains, sSkills));
           }
-
           const sExperienceInput = this.byId("filterExperience").getValue().trim();
           if (sExperienceInput) {
             aFilters.push(
@@ -259,25 +332,21 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
                 path: "Experience",
                 test: function (sDataValue) {
                   const input = sExperienceInput.toString().trim();
-
                   // If input is a single value (not a range)
                   if (!input.includes("-")) {
                     const data = sDataValue ? sDataValue.toString().trim() : "";
                     return data.toLowerCase() === input.toLowerCase();
                   }
-
                   // If input is a range like "0-2"
                   try {
                     const rangeParts = input.split("-");
                     const min = parseFloat(rangeParts[0].trim());
                     const max = parseFloat(rangeParts[1].trim());
                     if (isNaN(min) || isNaN(max)) return false;
-
                     // If data is empty or null, treat as 0 experience
                     const data = sDataValue ? sDataValue.toString().trim() : "0";
                     const numData = parseFloat(data);
                     if (isNaN(numData)) return false;
-
                     return numData >= min && numData <= max;
                   } catch (e) {
                     return false;
@@ -286,11 +355,9 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
               })
             );
           }
-
           // 5. CreateDate (DateRangeSelection) Filter
           let oStartDate, oEndDate;
           let dateProvided = false;
-
           const oDateRange = this.byId("filterCreateDate");
           if (oDateRange) {
             oStartDate = oDateRange.getDateValue();
@@ -299,13 +366,11 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
               dateProvided = true;
             }
           }
-
           if (oStartDate && oEndDate) {
             const sStart = oDateFormat.format(oStartDate); // yyyy-MM-dd
             const sEnd = oDateFormat.format(oEndDate);
             aFilters.push(new sap.ui.model.Filter("CreateDate", sap.ui.model.FilterOperator.BT, sStart, sEnd));
           }
-
           // Apply Filters
           oTableBinding.filter(aFilters);
         } catch (error) {
@@ -315,7 +380,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         }
       }, 50);
     },
-
     onSuggestSkills: function (oEvent) {
       let sValue = oEvent.getParameter("suggestValue")?.toLowerCase() || "";
       let aTableData = this.getView().getModel("DataTableModel").getData();
@@ -336,7 +400,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         "skillModel"
       );
     },
-
     onAddNewCandidate: function () {
       const oNewCandidate = {
         FullName: "",
@@ -346,6 +409,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         NoticePeriod: "",
         Mobile: "",
         Date: "",
+        State: "",
         Email: "",
         Experience: "",
         Remark: "",
@@ -359,7 +423,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
       this._openDialog("Create Candidate", true);
       this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
     },
-
     onEditCandidate: function () {
       const oTable = this.byId("appliedCandidatesTable");
       const oSelectedItem = oTable.getSelectedItem();
@@ -367,10 +430,8 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         MessageToast.show(this.i18na.getText("MessageNoRowSelected"));
         return;
       }
-
       const oContext = oSelectedItem.getBindingContext("DataTableModel");
       const oCandidateData = jQuery.extend({}, oContext.getObject());
-
       // Normalize fields
       if (oCandidateData.Date === "1899-11-30T00:00:00.000Z") oCandidateData.Date = null;
       if (oCandidateData.NoticePeriod === "0") oCandidateData.NoticePeriod = "Immediate";
@@ -378,7 +439,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
       this._openDialog("Edit Candidate", false);
       this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", false);
     },
-
     onDeleteCandidate: function () {
       const oTable = this.byId("appliedCandidatesTable");
       const oSelectedItem = oTable.getSelectedItem();
@@ -405,26 +465,155 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         }
       });
     },
-
     _preparePayload: function () {
       if (!this._validateAllDialogFields()) {
         return null;
       }
-      const oPayload = jQuery.extend({}, this.getView().getModel("stuDataModel").getData());
-      let noticePeriodValue = sap.ui.getCore().byId("FM_RE_NoticePeriod").getValue().trim();
-      oPayload.NoticePeriod = noticePeriodValue.toLowerCase() === "immediate" ? "0" : noticePeriodValue;
-      let dateValue = sap.ui.getCore().byId("FM_Id_DateAvlForInterview").getValue();
-      if (dateValue) {
-        oPayload.Date = dateValue.split(".").reverse().join("/");
+
+      const oStuDataModel = this.getView().getModel("stuDataModel");
+      const oData = oStuDataModel.getData();
+
+      // Get values from controls
+      const oCountryCombo = this.getFragmentControl("FM_Id_Country");
+      const oStateCombo = this.getFragmentControl("FM_Id_State");
+      const oCityCombo = this.getFragmentControl("FM_Id_City");
+      const oISDCombo = this.getFragmentControl("HQD_id_mFM_Id_STDCodeobileNumber");
+      const oMobileInput = this.getFragmentControl("FM_Id_MobileNumber");
+      const oCurrentCTC = this.getFragmentControl("FM_RE_CurrentCTC");
+      const oExpectedCTC = this.getFragmentControl("FM_RE_ExpectedCTC");
+      const oExperience = this.getFragmentControl("FM_Id_Experience");
+
+      // Create payload - REMOVE FullMobileNumber field
+      const oPayload = {
+        FullName: oData.FullName || "",
+        CurrentSalary: parseFloat(oCurrentCTC.getValue()) || 0,
+        ExpectedSalary: parseFloat(oExpectedCTC.getValue()) || 0,
+        AvailableForInterview: oData.AvailableForInterview || "",
+        NoticePeriod: this.getFragmentControl("FM_RE_NoticePeriod").getValue().trim(),
+        Country: oCountryCombo.getSelectedKey() || "",
+        State: oStateCombo.getSelectedKey() || "",
+        City: oCityCombo.getSelectedKey() || "",
+        ISD: oISDCombo.getSelectedKey() || "", // Keep as ISD (matches successful payload)
+        Mobile: oMobileInput.getValue().trim() || "",
+        Date: oData.Date || "",
+        Email: oData.Email || "",
+        Experience: parseFloat(oExperience.getValue()) || 0,
+        Skills: oData.Skills || "",
+        Remark: oData.Remark || "",
+      };
+
+      // Handle notice period conversion
+      if (oPayload.NoticePeriod && oPayload.NoticePeriod.toLowerCase() === "immediate") {
+        oPayload.NoticePeriod = "0";
       }
-      if (!oPayload.ID) {
+
+      // Handle date format
+      if (oPayload.Date) {
+        oPayload.Date = oPayload.Date.split(".").reverse().join("/");
+      }
+
+      // Add created by info for new records
+      if (!oData.ID) {
         const sUserName = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeName");
         const sUserID = this.getOwnerComponent().getModel("LoginModel").getProperty("/EmployeeID");
         oPayload.CreatedBy = `${sUserName} (${sUserID})`;
+      } else {
+        oPayload.ID = oData.ID;
       }
+
+      Object.keys(oPayload).forEach((key) => {});
+
       return oPayload;
     },
+    myValidateMobile: function (oEventOrControl) {
+      let oInput;
 
+      // Handle both event object and direct control reference
+      if (oEventOrControl && typeof oEventOrControl.getSource === "function") {
+        oInput = oEventOrControl.getSource();
+      } else {
+        oInput = oEventOrControl;
+      }
+
+      if (!oInput) {
+        return false;
+      }
+
+      const sValue = (oInput.getValue() || "").trim();
+      const iMaxLength = oInput.getMaxLength();
+
+      oInput.setValueState(sap.ui.core.ValueState.None);
+      oInput.setValueStateText("");
+
+      if (!sValue) {
+        return true; // Empty is okay during live validation, will be caught in final validation
+      }
+
+      if (sValue.startsWith("0")) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile number cannot begin with 0");
+        return false;
+      }
+
+      if (!/^\d+$/.test(sValue)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Only digits are allowed");
+        return false;
+      }
+
+      if (iMaxLength === 10 && sValue.length !== 10) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile number must be exactly 10 digits");
+        return false;
+      }
+
+      if (iMaxLength === 20 && (sValue.length < 4 || sValue.length > 20)) {
+        oInput.setValueState(sap.ui.core.ValueState.Error);
+        oInput.setValueStateText("Mobile number must be between 4 and 20 digits long");
+        return false;
+      }
+
+      return true;
+    },
+    onValidateMobile: function (oEvent) {
+      // This will handle live validation during input
+      this.myValidateMobile(oEvent);
+    },
+    onAfterDialogOpen: function () {
+      // Initialize with empty filters for state and city
+      const oStateCombo = this.getFragmentControl("FM_Id_State");
+      if (oStateCombo) {
+        oStateCombo.getBinding("items").filter([]);
+      }
+
+      const oCityCombo = this.getFragmentControl("FM_Id_City");
+      if (oCityCombo) {
+        oCityCombo.getBinding("items").filter([]);
+      }
+
+      // Initialize ISD combo with all countries
+      const oISDCombo = this.getFragmentControl("HQD_id_mFM_Id_STDCodeobileNumber");
+      if (oISDCombo) {
+        oISDCombo.getBinding("items").filter([]);
+      }
+
+      // Set default mobile max length
+      this.mySetMobileMaxLength(""); // Default to international format
+
+      // Reset validation states
+      this._resetValidationStates();
+    },
+    _resetValidationStates: function () {
+      const aControls = ["FM_Id_Country", "FM_Id_State", "FM_Id_City", "HQD_id_mFM_Id_STDCodeobileNumber", "FM_Id_MobileNumber"];
+
+      aControls.forEach((controlId) => {
+        const oControl = this.getFragmentControl(controlId);
+        if (oControl) {
+          oControl.setValueState(sap.ui.core.ValueState.None);
+          oControl.setValueStateText("");
+        }
+      });
+    },
     onSaveNewCandidate: async function () {
       const oPayload = this._preparePayload();
       if (!oPayload) return;
@@ -442,7 +631,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         this.closeBusyDialog();
       }
     },
-
     onUpdateCandidate: async function () {
       const oPayload = this._preparePayload();
       if (!oPayload) return;
@@ -463,7 +651,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         this.closeBusyDialog();
       }
     },
-
     _openDialog: function (sTitle, bIsCreate) {
       if (!this.oDialog) {
         this.oDialog = sap.ui.core.Fragment.load({
@@ -484,7 +671,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         oDialog.open();
       });
     },
-
     _closeDialog: function () {
       if (this.oDialog) {
         this.oDialog.then((oDialog) => oDialog.close());
@@ -502,7 +688,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
       sap.ui.getCore().byId("FM_Id_City").setValueState("None");
       this.getView().byId("appliedCandidatesTable").removeSelections();
     },
-
     onDialogEditToggle: function () {
       const oEditButton = sap.ui.getCore().byId("FM_Id_EditBTN");
       if (oEditButton.getText() === "Edit") {
@@ -512,30 +697,29 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         this.onUpdateCandidate();
       }
     },
-
     onDialogCountryChange: function (oEvent) {
       const sCountryCode = oEvent.getSource().getSelectedKey();
       const oCityComboBox = sap.ui.getCore().byId("FM_Id_City");
       oCityComboBox.getBinding("items").filter(new Filter("CountryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
       this.getView().getModel("stuDataModel").setProperty("/City", "");
     },
-
     _validateAllDialogFields: function () {
       try {
+        // Use getFragmentControl instead of sap.ui.getCore().byId for fragment controls
         const isValid =
-          utils._LCvalidateName(sap.ui.getCore().byId("FM_RE_Name"), "ID") &&
-          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_CurrentCTC"), "ID") &&
-          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_RE_ExpectedCTC"), "ID") &&
-          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_RE_NoticePeriod"), "ID") &&
-          utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FM_Id_City"), "ID") &&
-          // Updated mobile number validation
-          this._validateMobileNumberLocal({
-            getSource: () => sap.ui.getCore().byId("FM_Id_MobileNumber"),
-          }) &&
-          utils._LCvalidateEmail(sap.ui.getCore().byId("FM_Id_Email"), "ID") &&
-          utils._LCvalidateAmount(sap.ui.getCore().byId("FM_Id_Experience"), "ID") &&
-          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("FM_Id_Skills"), "ID");
-
+          utils._LCvalidateName(this.getFragmentControl("FM_RE_Name"), "ID") &&
+          utils._LCvalidateAmount(this.getFragmentControl("FM_RE_CurrentCTC"), "ID") &&
+          utils._LCvalidateAmount(this.getFragmentControl("FM_RE_ExpectedCTC"), "ID") &&
+          utils._LCvalidateMandatoryField(this.getFragmentControl("FM_RE_NoticePeriod"), "ID") &&
+          // Country, State, City validation
+          this._validateCountry() &&
+          this._validateState() &&
+          this._validateCity() &&
+          // Mobile number validation (using our custom validation)
+          this._validateMobileNumber() &&
+          utils._LCvalidateEmail(this.getFragmentControl("FM_Id_Email"), "ID") &&
+          utils._LCvalidateAmount(this.getFragmentControl("FM_Id_Experience"), "ID") &&
+          utils._LCvalidateMandatoryField(this.getFragmentControl("FM_Id_Skills"), "ID");
         if (!isValid) {
           MessageToast.show(this.i18na.getText("mandetoryFields"));
         }
@@ -545,14 +729,74 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         return false;
       }
     },
+    _validateCountry: function () {
+      const oCountryCombo = this.getFragmentControl("FM_Id_Country");
+      const sCountry = oCountryCombo.getSelectedKey();
 
-    // New validation handlers
+      if (!sCountry) {
+        oCountryCombo.setValueState(sap.ui.core.ValueState.Error);
+        oCountryCombo.setValueStateText("Please select a country");
+        return false;
+      }
+
+      oCountryCombo.setValueState(sap.ui.core.ValueState.None);
+      return true;
+    },
+    _validateState: function () {
+      const oStateCombo = this.getFragmentControl("FM_Id_State");
+      const sState = oStateCombo.getSelectedKey();
+
+      if (!sState) {
+        oStateCombo.setValueState(sap.ui.core.ValueState.Error);
+        oStateCombo.setValueStateText("Please select a state");
+        return false;
+      }
+
+      oStateCombo.setValueState(sap.ui.core.ValueState.None);
+      return true;
+    },
+    _validateCity: function () {
+      const oCityCombo = this.getFragmentControl("FM_Id_City");
+      const sCity = oCityCombo.getSelectedKey();
+
+      if (!sCity) {
+        oCityCombo.setValueState(sap.ui.core.ValueState.Error);
+        oCityCombo.setValueStateText("Please select a city");
+        return false;
+      }
+
+      oCityCombo.setValueState(sap.ui.core.ValueState.None);
+      return true;
+    },
+    _validateMobileNumber: function () {
+      const oMobileInput = this.getFragmentControl("FM_Id_MobileNumber");
+      const sMobile = oMobileInput.getValue().trim();
+      const oISDCombo = this.getFragmentControl("HQD_id_mFM_Id_STDCodeobileNumber");
+      const sISD = oISDCombo.getSelectedKey();
+
+      // Validate ISD code
+      if (!sISD) {
+        oISDCombo.setValueState(sap.ui.core.ValueState.Error);
+        oISDCombo.setValueStateText("Please select country code");
+        return false;
+      }
+      oISDCombo.setValueState(sap.ui.core.ValueState.None);
+
+      // Validate mobile number
+      if (!sMobile) {
+        oMobileInput.setValueState(sap.ui.core.ValueState.Error);
+        oMobileInput.setValueStateText("Please enter mobile number");
+        return false;
+      }
+
+      // Use our custom mobile validation
+      return this.myValidateMobile({ getSource: () => oMobileInput });
+    },
     onValidateName: (oEvent) => utils._LCvalidateName(oEvent),
     onValidateCTC: (oEvent) => utils._LCvalidateAmount(oEvent),
     onValidateEmail: (oEvent) => utils._LCvalidateEmail(oEvent),
     onValidateMandatoryField: (oEvent) => utils._LCvalidateMandatoryField(oEvent),
     onDropdownChange: (oEvent) => utils._LCstrictValidationComboBox(oEvent),
-
     onExport: function () {
       const aData = this.getView().getModel("DataTableModel").getData();
       const aFormattedData = aData.map((item) => {
@@ -610,7 +854,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
           type: "string",
         },
       ];
-
       const oSettings = {
         workbook: {
           columns: aCols,
@@ -618,7 +861,6 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
         dataSource: aFormattedData,
         fileName: "Candidate_Data.xlsx",
       };
-
       const oSheet = new sap.ui.export.Spreadsheet(oSettings);
       oSheet.build().finally(() => oSheet.destroy());
     },

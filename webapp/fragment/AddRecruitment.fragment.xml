@@ -4,7 +4,7 @@
 	xmlns:layout="sap.ui.layout.form" 
 	xmlns:u="sap.ui.unified" 
 	xmlns:l="sap.ui.layout">
-	<Dialog id="myDialog" title="Add Candidate" draggable="true" resizable="true" class="sapUiResponsivePadding" contentWidth="750px" contentHeight="615px">
+	<Dialog id="myDialog" title="Add Candidate" draggable="true" resizable="true" class="sapUiResponsivePadding" contentWidth="80%" contentHeight="auto">
 		<MessageStrip text="{i18n>uploadCandidateMessage}" type="Warning" showIcon="true" class="sapUiTinyMarginBottom" />
 		<layout:SimpleForm editable="true" labelSpanXL="4" labelSpanL="4" labelSpanM="12" labelSpanS="12" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="2" layout="ColumnLayout" id="candidateForm">
 			<layout:content>
@@ -23,18 +23,22 @@
 					<core:Item key="{NoticePeriod>key}" text="{NoticePeriod>text}" />
 				</ComboBox>
 				<Label text="{i18n>expCountry}" required="true" />
-				<ComboBox change="EOD_onChangeCountry" editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaCountry}" id="FM_Id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{stuDataModel>/Country}" showSecondaryValues="true">
-					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+				<ComboBox change="EOD_onChangeCountry" editable="{simpleForm>/editable}" valueStateText="{i18n>expValStaCountry}" id="FM_Id_Country" items="{path: 'CountryModel>/' , length: 1000, sorter:{ path: 'countryName'}}" selectedKey="{stuDataModel>/Country}" showSecondaryValues="true">
+					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
+				</ComboBox>
+				<Label text="State" required="true" />
+				<ComboBox id="FM_Id_State" selectedKey="{stuDataModel>/State}" width="100%" change="FM_onChangeState" items="{path: 'StateModel>/', length: 200, sorter: { path: 'stateName'}}" showSecondaryValues="true" valueStateText="{i18n>JobAppExpValStaState}" editable="{simpleForm>/editable}">
+					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 				</ComboBox>
 				<Label text="{i18n>city}" required="true" />
-				<ComboBox items="{BaseLocationModel>/}" editable="{simpleForm>/editable}" id="FM_Id_City" showSecondaryValues="true" selectedKey="{stuDataModel>/City}" valueStateText="{i18n>combovalueState}">
-					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				<ComboBox change="FM_onChangeCity" items="{path: 'CityModel>/', length: 200, sorter: { path: 'cityName'}}" editable="{simpleForm>/editable}" id="FM_Id_City" showSecondaryValues="true" selectedKey="{stuDataModel>/City}" valueStateText="{i18n>combovalueState}">
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
 				</ComboBox>
-				<Label text="{i18n>mobilenumber}" required="true" />
-				<Select id="FM_Id_STDCode" items="{codeModel>/}" selectedKey="{stuDataModel>/ISD}" editable="{EditableModeltruefalse>/Editable}" change="onSTDCodeChange">
-					<core:Item key="{codeModel>calling_code}" text="{codeModel>calling_code}" />
-				</Select>
-				<Input value="{stuDataModel>/Mobile}" liveChange="onValidateMobile" maxLength="{= ${stuDataModel>/Country} === 'India' ? 10 : 20 }" id="FM_Id_MobileNumber" valueState="{modelValuStateError>/MobileNumberState}" valueStateText="{i18n>mobileNoValueState}" editable="{EditableModeltruefalse>/Editable}" type="Tel" placeholder="{i18n>placeholderMobileNo}" />
+				<Label text="{i18n>mobileNo}" required="true" />
+				<ComboBox showSecondaryValues="true" id="HQD_id_mFM_Id_STDCodeobileNumber" items="{path: 'CountryModel>/', length: 3000, sorter: { path: 'stdCode'}}" filterSecondaryValues="true" change="onSTDCodeChange" editable="{EditableModeltruefalse>/Editable}" selectedKey="{stuDataModel>/ISD}" valueStateText="{i18n>combovalueState}">
+					<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+				</ComboBox>
+				<Input value="{stuDataModel>/Mobile}" liveChange="onValidateMobile" id="FM_Id_MobileNumber" valueState="{modelValuStateError>/MobileNumberState}" valueStateText="{i18n>mobileNoValueState}" editable="{EditableModeltruefalse>/Editable}" type="Tel" placeholder="{i18n>placeholderMobileNo}" />
 				<Label text="{i18n>LabeleAvlForInterviewDate}" />
 				<DatePicker displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" minDate="{path:'myyModel>/minnDate'}" maxDate="{path:'myyModel>/maxDates'}" id="FM_Id_DateAvlForInterview" value="{path:'stuDataModel>/Date',formatter:'.formatter.formatDate'}" class="sapUiSmallMarginBottom" valueState="{modelValuStateError>/DateState}" valueStateText="{i18n>dateValueState}" editable="{EditableModeltruefalse>/Editable}" change="onValidateMandatoryField" />
 				<Label text="{i18n>emailId}" required="true" />
