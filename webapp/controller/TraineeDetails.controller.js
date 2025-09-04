@@ -722,7 +722,11 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
         },
         TD_validateMobile: function(oEventOrControl) {
             const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
-            const sValue = oInput.getValue().trim();
+            var sValue = oInput.getValue()
+                 if (/[^0-9]/.test(sValue)) {
+                    sValue = sValue.replace(/[^0-9]/g, ""); // remove all non-numeric chars
+                    oInput.setValue(sValue); // reset value without alphabets
+                }
             const sCountryName = this.getView().getModel("oTraineeDetails").getProperty("/Country");
             const maxLength = oInput.getMaxLength();
             oInput.setValueState(sap.ui.core.ValueState.None);

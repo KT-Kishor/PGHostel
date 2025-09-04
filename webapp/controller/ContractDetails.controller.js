@@ -431,6 +431,11 @@ sap.ui.define([
 
             CD_validateMobileNo: function(oEventOrControl) {
                 const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
+                var sValue = oInput.getValue()
+                 if (/[^0-9]/.test(sValue)) {
+                    sValue = sValue.replace(/[^0-9]/g, ""); // remove all non-numeric chars
+                    oInput.setValue(sValue); // reset value without alphabets
+                }
                 const isCreate = this.sArgPara === "CreateContractFlag";
                 const oModel = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
                 const sCountryName = oModel.getProperty("/Country");

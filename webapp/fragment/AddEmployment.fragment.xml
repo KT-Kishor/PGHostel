@@ -22,7 +22,7 @@
 										<core:Item key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" />
 									</ComboBox>
 									<Label text="{i18n>companyAddress}" required="true" />
-									<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" placeholder="{i18n>companyAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>companyaddress}" />
+									<TextArea value="{employmentModel>/OfficeAddress}" id="AddEmp_id_OfcAddress" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 									<Label text="{i18n>startDate}" required="true" />
 									<DatePicker value="{path:'employmentModel>/StartDate',formatter:'.Formatter.formatDate'}" maxDate="{viewModel>/Max}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" id="AddEmp_id_StartDate" change="oEmpStartDateChange" valueStateText="{i18n>dateValueState}" />
 									<Label text="{i18n>endDate}" required="true" />

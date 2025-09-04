@@ -83,12 +83,12 @@
 										<m:Toolbar>
 											<m:Title text="{i18n>basicDetails}" />
 											<m:ToolbarSpacer />
-											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" tooltip="{i18n>editDetails}" visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
+											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" tooltip="{i18n>edit}" visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
 										<m:Label text="{i18n>experienceSelectionRequired}"/>
-										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }" visible="{= !${viewModel>/TraineeRole} }">
+										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }">
 											<m:buttons>
 												<m:RadioButton id="SS_fresherRadio" text="{i18n>fresher}" />
 												<m:RadioButton id="SS_experiencedRadio" text="{i18n>experienced}" />
@@ -111,9 +111,9 @@
 											<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa" />
-										<m:TextArea rows="5" value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<m:TextArea rows="2" value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 										<m:Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca" />
-										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" rows="2" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 										<m:Label text="{i18n>expCountry}" required="true" id="SS_id_lcoun" visible="{viewModel>/RelievingLetter}" />
 										<m:ComboBox id="SS_id_Country" items="{path: 'CountryModel>/', length: 400, sorter: { path: 'countryName', descending: false, group: false} }" value="{sEmployeeModel>/0/Country}" change="onCountryChange" valueStateText="{i18n>expValStaCountry}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
 											<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
