@@ -75,6 +75,11 @@
 								<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 							</ComboBox>
 
+							<Label text="{i18n>mobileNo}" required="true" />
+							<Input id="MSA_Id_codeModel" value="{msaModelWizart>/STDCode}" editable="false"
+                            visible="true" class="marginLeft" />
+							<Input value="{msaModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="MSA_validateMobile" id="MSA_Id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
+
 							<Label text="{i18n>emailId}" required="true" />
 							<TextArea value="{msaModelWizart>/MsaEmail}" placeholder="{i18n>placeMsaEmail}" id="MsaD_id_Email" maxLength="500" liveChange="MsaD_validateEmail" valueStateText="{i18n>emailValueState}" />
 							<Label text="{i18n>GSTNO}"/>

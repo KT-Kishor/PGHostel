@@ -206,6 +206,12 @@
                 >
 					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
+
+                <Label text="{i18n>mobileNo}" required="true" />
+				<Input id="Msa_LC_odeModel" value="{FilteredMsaModel>/0/STDCode}" editable="false"
+                visible="true" class="marginLeft" />
+				<Input value="{FilteredMsaModel>/0/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="MSA_validateMobile" id="Msa_LC_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
+
 				<Label
                     text="{i18n>emailId}"
                     required="true"

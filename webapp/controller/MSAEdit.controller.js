@@ -1,30 +1,47 @@
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "../utils/CommonAgreementPDF",
-    "sap/m/MessageToast",
-    "../model/formatter",
-],
-    function (BaseController, utils, JSONModel, jsPDF, MessageToast, Formatter) {
+        "./BaseController",
+        "../utils/validation",
+        "sap/ui/model/json/JSONModel",
+        "../utils/CommonAgreementPDF",
+        "sap/m/MessageToast",
+        "../model/formatter",
+    ],
+    function(BaseController, utils, JSONModel, jsPDF, MessageToast, Formatter) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSAEdit", {
             Formatter: Formatter,
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteMSAEdit").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function (oEvent) {
+            _onRouteMatched: async function(oEvent) {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
                 this.getBusyDialog();
                 this.scrollToSection("MsaE_id_ObjectPageLayout", "MsaE_id_SowDetailsSection");
-                this._fetchCommonData("EmailContent", "CCMailModel", { Type: "MSA", Action: "CC" });
+                this._fetchCommonData("EmailContent", "CCMailModel", {
+                    Type: "MSA",
+                    Action: "CC"
+                });
 
                 this.MSAID = oEvent.getParameter("arguments").sPath;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                var editable = new JSONModel({ editable: false, isEnabled: true, Mode: "Delete", save: false, submitBtn: false, ExpendBtn: false, RelesedBtn: false, Recruitment: true, BtnEnable: false, addSowBtn: false, ExpendBtn: false, minDate: new Date(), secondMinDate: new Date() });
+                var editable = new JSONModel({
+                    editable: false,
+                    isEnabled: true,
+                    Mode: "Delete",
+                    save: false,
+                    submitBtn: false,
+                    ExpendBtn: false,
+                    RelesedBtn: false,
+                    Recruitment: true,
+                    BtnEnable: false,
+                    addSowBtn: false,
+                    ExpendBtn: false,
+                    minDate: new Date(),
+                    secondMinDate: new Date()
+                });
                 this.getView().setModel(editable, "simpleForm");
 
                 this.SimpleFormModel = this.getView().getModel("simpleForm");
@@ -46,11 +63,11 @@ sap.ui.define([
                 this.GST = true;
             },
 
-            onLogout: function () {
+            onLogout: function() {
                 this.CommonLogoutFunction();
             },
 
-            onRadioButtonGroupSelect: function (oEvent) {
+            onRadioButtonGroupSelect: function(oEvent) {
                 if (oEvent.getSource().getSelectedButton().getText() === 'Recruitment') {
                     this.SimpleFormModel.setProperty("/Recruitment", true);
                 } else {
@@ -58,14 +75,16 @@ sap.ui.define([
                 }
             },
 
-            MsaE_GoToInvoice: function () {
+            MsaE_GoToInvoice: function() {
                 this.getRouter().navTo("RouteCompanyInvoice");
             },
 
-            MSADetailsReadCall: async function () {
+            MSADetailsReadCall: async function() {
                 if (this.BusyIndicater) this.getBusyDialog();
                 try {
-                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", { MsaID: this.MSAID });
+                    await this._fetchCommonData("MSADetails", "FilteredMsaModel", {
+                        MsaID: this.MSAID
+                    });
                     this.SimpleFormModel.setProperty("/minDate", new Date(this.getView().getModel("FilteredMsaModel").getData()[0].CreateMSADate));
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -74,73 +93,125 @@ sap.ui.define([
                 }
             },
 
-            MsaE_onBack: function () {
+            MsaE_onBack: function() {
                 this.getRouter().navTo("RouteMSA");
             },
 
-            SOW_onCloseFrag: function () {
+            SOW_onCloseFrag: function() {
                 sap.ui.getCore().byId("SOW_id_MsaDesc").setValueState("None");
                 sap.ui.getCore().byId("SOW_id_EndDate").setValueState("None");
                 sap.ui.getCore().byId("SOW_id_StartDate").setValueState("None");
                 this.SOW_oDialog.close();
                 this.byId("Sow_Id_ReadTable").removeSelections();
             },
-            MsaE_validateDate: function (oEvent) {
+
+            MsaE_validateDate: function(oEvent) {
                 if (oEvent.getParameter('id').split('_').pop() === 'StartDate') {
                     sap.ui.getCore().byId("SOW_id_EndDate").setMinDate(new Date(oEvent.getParameter('value').split('/').reverse().join('-')));
                 }
                 sap.ui.getCore().byId("SOW_id_EndDate").getValue();
                 utils._LCvalidateDate(oEvent);
             },
-            MSA_onChangeCountry: function (oEvent) {
+
+            MSA_onChangeCountry: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oStateCombo   = sap.ui.getCore().byId("MSA_Nav_Id_State");
-                const oCityCombo    = sap.ui.getCore().byId("MSA_Nav_Id_City");
-                const oModel        = this.getView().getModel("FilteredMsaModel");
-                oStateCombo.setSelectedKey("");   // clear dependents first
+                const oStateCombo = sap.ui.getCore().byId("MSA_Nav_Id_State");
+                const oCityCombo = sap.ui.getCore().byId("MSA_Nav_Id_City");
+                const oModel = this.getView().getModel("FilteredMsaModel");
+                oStateCombo.setSelectedKey(""); // clear dependents first
                 oStateCombo.getBinding("items")?.filter([]);
                 oCityCombo.setSelectedKey("");
                 oCityCombo.getBinding("items")?.filter([]);
                 if (!oSelectedItem) {
-                    oModel.setProperty("/Country", "");  // reset model
+                    oModel.setProperty("/Country", ""); // reset model
                     oModel.setProperty("/State", "");
                     oModel.setProperty("/City", "");
+                    oModel.setProperty("/STDCode", "");
                 } else {
                     const sCountryCode = oSelectedItem.getAdditionalText(); // fetch country details
+                    const oCountryData = oSelectedItem.getBindingContext("CountryModel").getObject();
                     const sCountryName = oSelectedItem.getText();
-                    oStateCombo.getBinding("items")?.filter([   // filter states
+                    oStateCombo.getBinding("items")?.filter([ // filter states
                         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                     ]);
-                    oModel.setProperty("/Country", sCountryName || "");  // update model
+                    oModel.setProperty("/Country", sCountryName || ""); // update model
+                    oModel.setProperty("/STDCode", oCountryData?.stdCode || "");
+                    this._setMobilelength();
                 }
             },
-            MSA_onChangeState: function (oEvent) {
+
+            _setMobilelength: function() {
+                const oModel = this.getView().getModel("FilteredMsaModel");
+                const sCountry = oModel.getProperty("/Country");
+                const oMobileInput = sap.ui.getCore().byId("Msa_LC_Mobile");
+                if (sCountry === "India") {
+                    oMobileInput.setMaxLength(10);
+                } else {
+                    oMobileInput.setMaxLength(20);
+                }
+            },
+
+            MSA_validateMobile: function(oEventOrControl) {
+                const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
+                const sValue = oInput.getValue().trim();
+                const sCountryName = this.getView().getModel("FilteredMsaModel").oData[0].Country
+                const maxLength = oInput.getMaxLength();
+                oInput.setValueState(sap.ui.core.ValueState.None);
+                oInput.setValueStateText("");
+                if (!/^\d*$/.test(sValue)) { // only digits
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Only numbers are allowed");
+                    return false;
+                }
+                if (sValue.startsWith("0")) { // cannot start with 0
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Mobile Number cannot begin with 0");
+                    return false;
+                }
+                if (sCountryName === "India") { // separate India vs Others
+                    if (sValue.length !== 10) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Mobile Number must be exactly 10 digits long");
+                        return false;
+                    }
+                } else {
+                    if (sValue.length < 4 || sValue.length > maxLength) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Enter a valid mobile number (between 4-" + maxLength + " digits)");
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            MSA_onChangeState: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oCityCombo    = sap.ui.getCore().byId("MSA_Nav_Id_City");
-                const oCountryCB    = sap.ui.getCore().byId("MSA_Nav_Id_Country");
-                const oModel        = this.getView().getModel("FilteredMsaModel");
-                oCityCombo.setSelectedKey("");  // clear city
+                const oCityCombo = sap.ui.getCore().byId("MSA_Nav_Id_City");
+                const oCountryCB = sap.ui.getCore().byId("MSA_Nav_Id_Country");
+                const oModel = this.getView().getModel("FilteredMsaModel");
+                oCityCombo.setSelectedKey(""); // clear city
                 oCityCombo.getBinding("items")?.filter([]);
                 if (!oSelectedItem) {
                     oModel.setProperty("/State", "");
                     oModel.setProperty("/City", "");
                 } else {
-                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sStateName = oSelectedItem.getKey() || oSelectedItem.getText();
                     const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
                     // filter cities
                     oCityCombo.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                     ]);
                     oModel.setProperty("/State", sStateName || "");
                 }
             },
-            MSA_onChangeCity: function (oEvent) {
+
+            MSA_onChangeCity: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oModel        = this.getView().getModel("FilteredMsaModel");
+                const oModel = this.getView().getModel("FilteredMsaModel");
                 if (!oSelectedItem) {
                     oModel.setProperty("/City", "");
                 } else {
@@ -148,38 +219,39 @@ sap.ui.define([
                     oModel.setProperty("/City", sCityName || "");
                 }
             },
-            MsaE_ValidateCommonFields: function (oEvent) {
+
+            MsaE_ValidateCommonFields: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            Msa_LC_CompanyName: function (oEvent) {
+            Msa_LC_CompanyName: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            Msa_LC_CompanyHeadName: function (oEvent) {
+            Msa_LC_CompanyHeadName: function(oEvent) {
                 utils._LCvalidateName(oEvent);
             },
 
-            Msa_LC_HeadPosition: function (oEvent) {
+            Msa_LC_HeadPosition: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            Msa_onComboBoxChange: function (oEvent) {
+            Msa_onComboBoxChange: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
-            Msa_LC_GSTNO: function (oEvent) {
+            Msa_LC_GSTNO: function(oEvent) {
                 this.GST = utils._LCvalidateGstNumber(oEvent);
                 if (oEvent.getSource().getValue() === "") {
                     this.GST = true;
                     sap.ui.getCore().byId("MsaE_id_MSA_GSTNO").setValueState("None");
                 }
             },
-            Msa_ChangeMsaDate: function (oEvent) {
+            Msa_ChangeMsaDate: function(oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.onContractPeriodSelectChange();
             },
 
-            onContractPeriodSelectChange: function (oEvent) {
+            onContractPeriodSelectChange: function(oEvent) {
                 const oModelData = this.getView().getModel("FilteredMsaModel").getData()[0];
                 const [day, month, year] = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split('/');
                 const assignmentEndDate = new Date(year, month - 1, day);
@@ -191,24 +263,22 @@ sap.ui.define([
                 oModelData.CreateMSADate = sap.ui.getCore().byId("MsaE_id_CreateMSADate").getValue().split("/").reverse().join("-");
             },
 
-            Msa_LC_PanCard: function (oEvent) {
+            Msa_LC_PanCard: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            Msa_LC_EmailID: function (oEvent) {
+            Msa_LC_EmailID: function(oEvent) {
                 utils._LCvalidateEmail(oEvent);
             },
 
-            Msa_LC_Address: function (oEvent) {
+            Msa_LC_Address: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
-
-
-            LC_MSA_RateCharge: function (oEvent) {
+            LC_MSA_RateCharge: function(oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
             },
 
-            onPaymentAdvanceInputChange: function (oEvent) {
+            onPaymentAdvanceInputChange: function(oEvent) {
                 var sAdvanceInput = sap.ui.getCore().byId("Ms_Id_PayAdvance");
                 var sBalanceInput = sap.ui.getCore().byId("Ms_Id_PayBalance");
 
@@ -250,38 +320,38 @@ sap.ui.define([
                 this.validateStep();
             },
 
-            LC_MSA_RateCharge: function (oEvent) {
+            LC_MSA_RateCharge: function(oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
             },
 
-            MsaE_onEditOrSavePress: async function () {
+            MsaE_onEditOrSavePress: async function() {
                 var type = this.getView().getModel("FilteredMsaModel").getData()[0].Type;
-                (type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment", true) : this.SimpleFormModel.setProperty("/Recruitment", false);
+                (type === "Recruitment") ? this.SimpleFormModel.setProperty("/Recruitment", true): this.SimpleFormModel.setProperty("/Recruitment", false);
                 if (!this.MSA_oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.MSAUpdate",
                         controller: this,
-                    }).then(function (MSA_oDialog) {
+                    }).then(function(MSA_oDialog) {
                         this.MSA_oDialog = MSA_oDialog;
                         this.getView().addDependent(this.MSA_oDialog);
                         this.MSA_oDialog.open();
-                        type !== "Recruitment"
-                            ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
-                            : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
+                        type !== "Recruitment" ?
+                            sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0) :
+                            sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
                         this.resetMsaDialogFields();
                         this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
                     }.bind(this));
                 } else {
                     this.MSA_oDialog.open();
-                    type !== "Recruitment"
-                        ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0)
-                        : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
+                    type !== "Recruitment" ?
+                        sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0) :
+                        sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1)
                     this.resetMsaDialogFields();
                     this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
                 }
             },
 
-            resetMsaDialogFields: function () {
+            resetMsaDialogFields: function() {
                 var oView = sap.ui.getCore();
 
                 // Input Fields
@@ -298,11 +368,11 @@ sap.ui.define([
                 oView.byId("Ms_Id_Refund")?.setValueState("None");
             },
 
-            MSA_Frg_Close: function () {
+            MSA_Frg_Close: function() {
                 this.MSA_oDialog.close();
             },
 
-            MSA_Frg_Update: async function () {
+            MSA_Frg_Update: async function() {
                 const isRecruitment = sap.ui.getCore().byId("MsaE_id_Type").getSelectedIndex() === 1;
 
                 const get = sap.ui.getCore().byId.bind(sap.ui.getCore());
@@ -318,6 +388,8 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_Country"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_State"), "ID") &&
                     utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
+                    utils._LCvalidateMandatoryField(get("Msa_LC_odeModel"), "ID") &&
+                    this.MSA_validateMobile(get("Msa_LC_Mobile")) &&
                     utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") && this.GST &&
                     (!isRecruitment || (
                         utils._LCvalidateTraineeAmount(get("Ms_Id_RateCharge"), "ID") &&
@@ -340,9 +412,9 @@ sap.ui.define([
 
                     try {
                         const oResponse = await this.ajaxUpdateWithJQuery("MSADetails", oPayload);
-                        const messageKey = oResponse
-                            ? "msaupdateSuccess"
-                            : "msaupdateFailed";
+                        const messageKey = oResponse ?
+                            "msaupdateSuccess" :
+                            "msaupdateFailed";
 
                         MessageToast.show(this.i18nModel.getText(messageKey));
                         this.MSA_oDialog.close();
@@ -358,21 +430,23 @@ sap.ui.define([
                 }
             },
 
-            CommonReadCallForSow: async function () {
+            CommonReadCallForSow: async function() {
                 if (this.BusyIndicater) this.getBusyDialog();
                 const selectedKey = this.byId("MsaE_id_SowStatus").getValue();
-                let oFilter = { MsaID: this.MSAID };
+                let oFilter = {
+                    MsaID: this.MSAID
+                };
                 if (selectedKey !== "All") oFilter.Status = selectedKey;
 
                 await this._fetchCommonData("SowDetails", "SowReadModel", oFilter);
                 this.closeBusyDialog();
             },
 
-            MsaE_onChangeSowStatus: async function () {
+            MsaE_onChangeSowStatus: async function() {
                 await this.CommonReadCallForSow();
             },
 
-            SOW_onSaveFrag: async function () {
+            SOW_onSaveFrag: async function() {
                 if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SOW_id_MsaDesc"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_StartDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("SOW_id_EndDate"), "ID") && this.Rate && this.Desiganation && this.ConsultantName) {
                     var sowCreateModel = this.getView().getModel("sowCreateModel").getData();
                     var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
@@ -422,12 +496,12 @@ sap.ui.define([
                 }
             },
 
-            FragmentOpen: function () {
+            FragmentOpen: function() {
                 if (!this.SOW_oDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.SowDetails",
                         controller: this,
-                    }).then(function (SOW_oDialog) {
+                    }).then(function(SOW_oDialog) {
                         this.SOW_oDialog = SOW_oDialog;
                         this.getView().addDependent(this.SOW_oDialog);
                         this.SOW_oDialog.open();
@@ -443,7 +517,7 @@ sap.ui.define([
                 }
             },
 
-            SOW_onAddConsultant: function () {
+            SOW_onAddConsultant: function() {
                 var oModelPro = this.getView().getModel("oModelDataPro");
                 this.SNoValue = this.SNoValue + 1;
                 var oDataPro = oModelPro.getProperty("/");
@@ -460,7 +534,7 @@ sap.ui.define([
                 oModelPro.setProperty("/", oDataPro);
             },
 
-            onPressDeleteModeCreateSow: function (oEvent) {
+            onPressDeleteModeCreateSow: function(oEvent) {
                 var that = this;
                 var oModel = this.getView().getModel("oModelDataPro");
                 var oContext = oEvent.getParameter("listItem").getBindingContext("oModelDataPro");
@@ -473,10 +547,12 @@ sap.ui.define([
                     this.showConfirmationDialog(
                         this.i18nModel.getText("msgBoxConfirm"),
                         this.i18nModel.getText("msgBoxConfirmDelete"),
-                        function () {
+                        function() {
                             that.getBusyDialog();
                             that.ajaxDeleteWithJQuery("/SowDetails", {
-                                filters: { SNo: selectedItem.SNo }
+                                filters: {
+                                    SNo: selectedItem.SNo
+                                }
                             }).then(() => {
                                 MessageToast.show(that.i18nModel.getText("sowDeleteSuccess"));
                                 that.CommonReadCallForSow();
@@ -490,7 +566,9 @@ sap.ui.define([
                                 MessageToast.show(error.responseText);
                             });
                         },
-                        function () { that.closeBusyDialog(); }
+                        function() {
+                            that.closeBusyDialog();
+                        }
                     );
                 } else {
                     // Local item – delete directly
@@ -501,7 +579,7 @@ sap.ui.define([
                 }
             },
 
-            MsaE_onPressCreateSow: function () {
+            MsaE_onPressCreateSow: function() {
                 this.SimpleFormModel.setProperty("/save", true);
                 this.SimpleFormModel.setProperty("/submitBtn", false);
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
@@ -530,12 +608,12 @@ sap.ui.define([
                 // sap.ui.getCore().byId("SOW_id_oTableCreateSow").setMode("delete");
             },
 
-            onPressChangeSow: function (oEvent) {
+            onPressChangeSow: function(oEvent) {
                 this.Selected = oEvent.getParameter("listItem").getBindingContext("SowReadModel").getObject();
                 if (this.Selected) this.SimpleFormModel.setProperty("/BtnEnable", true);
             },
 
-            MsaE_onPressSOWActive: async function (oEvent) {
+            MsaE_onPressSOWActive: async function(oEvent) {
                 if (!this.byId("Sow_Id_ReadTable").getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("noRowSelected"))
                 }
@@ -559,7 +637,7 @@ sap.ui.define([
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
-            CommonUpdateCall: async function (Data, Message, type) {
+            CommonUpdateCall: async function(Data, Message, type) {
                 var oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                 if (type !== "ActiveInactive") {
                     if (!oModelDataPro || oModelDataPro.length === 0) return MessageToast.show(this.i18nModel.getText("msaTableValidation"));
@@ -592,11 +670,13 @@ sap.ui.define([
                 }
             },
 
-            TableGetData: async function (value) {
+            TableGetData: async function(value) {
                 // Get full data from model
                 this.getBusyDialog();
                 var SowID = this.byId("Sow_Id_ReadTable").getSelectedItem().getBindingContext("SowReadModel").getObject().SowID;
-                await this._fetchCommonData("SowDetails", "SowAllDataModel", { SowID: SowID });
+                await this._fetchCommonData("SowDetails", "SowAllDataModel", {
+                    SowID: SowID
+                });
                 this.closeBusyDialog();
                 var SowReadModel = this.getView().getModel("SowAllDataModel").getData();
 
@@ -677,7 +757,7 @@ sap.ui.define([
                 this.getView().getModel("oModelDataPro").setData(oFilteredData);
             },
 
-            MsaE_onPressRelesedSow: async function () {
+            MsaE_onPressRelesedSow: async function() {
                 this.SimpleFormModel.setProperty("/addSowBtn", false);
                 await this.TableGetData("Relesed");
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
@@ -689,7 +769,7 @@ sap.ui.define([
                 if (this.RelesedBtn === true) this.FragmentOpen();
             },
 
-            MasE_onPressExpendSow: async function () {
+            MasE_onPressExpendSow: async function() {
                 var endDateObj = new Date(this.Selected.EndDate);
                 var currentDate = new Date();
                 var timeDiff = endDateObj.getTime() - currentDate.getTime();
@@ -707,7 +787,7 @@ sap.ui.define([
                 if (this.ExtendBtn) this.FragmentOpen();
             },
 
-            MsaE_onPressUpdateSOW: async function () {
+            MsaE_onPressUpdateSOW: async function() {
                 this.SimpleFormModel.setProperty("/ExpendBtn", false);
                 this.SimpleFormModel.setProperty("/addSowBtn", true);
                 await this.TableGetData("Update");
@@ -719,14 +799,14 @@ sap.ui.define([
                 this.FragmentOpen();
             },
 
-            SOW_onExpendFrag: async function () {
+            SOW_onExpendFrag: async function() {
                 var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                 if (!oTable.getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("msaSelectMess"));
                 }
                 this.getBusyDialog();
                 var aSelectedItems = oTable.getSelectedItems();
-                var aSelectedData = aSelectedItems.map(function (oItem) {
+                var aSelectedData = aSelectedItems.map(function(oItem) {
                     return oItem.getBindingContext("oModelDataPro").getObject();
                 });
 
@@ -768,14 +848,14 @@ sap.ui.define([
                 }
             },
 
-            SOW_onReleaseFrag: async function () {
+            SOW_onReleaseFrag: async function() {
                 var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                 if (!sap.ui.getCore().byId("SOW_id_oTableCreateSow").getSelectedItem()) {
                     return MessageToast.show(this.i18nModel.getText("msaSelectMess"))
                 }
                 this.closeBusyDialog();
                 var aSelectedItems = oTable.getSelectedItems();
-                var aSelectedData = aSelectedItems.map(function (oItem) {
+                var aSelectedData = aSelectedItems.map(function(oItem) {
                     return oItem.getBindingContext("oModelDataPro").getObject();
                 });
                 var oJson = {
@@ -789,12 +869,12 @@ sap.ui.define([
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("Inactive");
-                await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"),"");
+                await this.CommonUpdateCall(oJson, this.i18nModel.getText("sowAllRelesedUpdate"), "");
                 // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
-            SOW_onSubmitFrag: async function () {
+            SOW_onSubmitFrag: async function() {
                 // this.getBusyDialog();
                 const oModelDataPro = this.getView().getModel("oModelDataPro").getData();
                 const sowCreateModel = this.getView().getModel("sowCreateModel").getData();
@@ -821,24 +901,24 @@ sap.ui.define([
                     }))
                 };
                 this.byId("MsaE_id_SowStatus").setValue("New");
-                await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"),"");
+                await this.CommonUpdateCall(oData, this.i18nModel.getText("sowUpdate"), "");
                 // this.SOW_oDialog.close();
                 this.SimpleFormModel.setProperty("/BtnEnable", false);
             },
 
-            onLiveConsultantName: function (oEvent) {
+            onLiveConsultantName: function(oEvent) {
                 this.ConsultantName = utils._LCvalidateName(oEvent);
             },
 
-            onLiveChangeDesiganation: function (oEvent) {
+            onLiveChangeDesiganation: function(oEvent) {
                 this.Desiganation = utils._LCvalidateMandatoryField(oEvent);
             },
 
-            onRateChange: function (oEvent) {
+            onRateChange: function(oEvent) {
                 this.Rate = utils._LCvalidateAmount(oEvent);
             },
 
-            onOpenActionSheet: function (oEvent) {
+            onOpenActionSheet: function(oEvent) {
                 var oButton = oEvent.getSource();
                 if (!this._oActionSheet) {
                     this._oActionSheet = sap.ui.xmlfragment("sap.kt.com.minihrsolution.fragment.ActionsDialog", this);
@@ -847,7 +927,7 @@ sap.ui.define([
                 this._oActionSheet.openBy(oButton);
             },
 
-            MsaE_onSendEmailMSA: function (oEvent) {
+            MsaE_onSendEmailMSA: function(oEvent) {
                 this.Type = oEvent.getSource().sId.split('--').pop();
                 var oEmployeeEmail = this.getView().getModel("FilteredMsaModel").getData()[0].MsaEmail;
                 if (!oEmployeeEmail || oEmployeeEmail.length === 0) {
@@ -869,18 +949,18 @@ sap.ui.define([
                 this.validateSendButton();
             },
 
-            Mail_onPressClose: function () {
+            Mail_onPressClose: function() {
                 this.EOU_oDialogMail.close();
                 this.EOU_oDialogMail.destroy(true);
                 this.EOU_oDialogMail = null;
             },
 
-            EOD_commonOpenDialog: function (fragmentName) {
+            EOD_commonOpenDialog: function(fragmentName) {
                 if (!this.EOU_oDialogMail) {
                     sap.ui.core.Fragment.load({
                         name: fragmentName,
                         controller: this,
-                    }).then(function (EOU_oDialogMail) {
+                    }).then(function(EOU_oDialogMail) {
                         this.EOU_oDialogMail = EOU_oDialogMail;
                         this.getView().addDependent(this.EOU_oDialogMail);
                         this.EOU_oDialogMail.open();
@@ -890,23 +970,23 @@ sap.ui.define([
                 }
             },
 
-            Mail_onUpload: function (oEvent) {
+            Mail_onUpload: function(oEvent) {
                 this.handleFileUpload(
                     oEvent,
-                    this,                      // context
-                    "UploaderData",            // model name
-                    "/attachments",            // path to attachment array
-                    "/name",                   // path to comma-separated file names
-                    "/isFileUploaded",         // boolean flag path
-                    "uploadSuccessfull",       // i18n success key
-                    "fileAlreadyUploaded",     // i18n duplicate key
-                    "noFileSelected",          // i18n no file selected
-                    "fileReadError",           // i18n file read error
+                    this, // context
+                    "UploaderData", // model name
+                    "/attachments", // path to attachment array
+                    "/name", // path to comma-separated file names
+                    "/isFileUploaded", // boolean flag path
+                    "uploadSuccessfull", // i18n success key
+                    "fileAlreadyUploaded", // i18n duplicate key
+                    "noFileSelected", // i18n no file selected
+                    "fileReadError", // i18n file read error
                     () => this.validateSendButton()
                 );
             },
             //Mail dialog button visibility
-            validateSendButton: function () {
+            validateSendButton: function() {
                 const sendBtn = sap.ui.getCore().byId("SendMail_Button");
                 const emailField = sap.ui.getCore().byId("CCMail_TextArea");
                 const uploaderModel = this.getView().getModel("UploaderData");
@@ -919,7 +999,7 @@ sap.ui.define([
                 sendBtn.setEnabled(isEmailValid && isFileUploaded);
             },
 
-            Mail_onEmailChange: function () {
+            Mail_onEmailChange: function() {
                 this.validateSendButton();
             },
 
@@ -927,7 +1007,7 @@ sap.ui.define([
             //     this.getView().getModel("UploaderData").setProperty("/attachments",[]);
             // },
             //Send mail
-            Mail_onSendEmail: function () {
+            Mail_onSendEmail: function() {
                 try {
                     var aAttachments = this.getView().getModel("UploaderData").getProperty("/attachments");
 
@@ -960,21 +1040,21 @@ sap.ui.define([
                 }
             },
 
-            SOW_onDeleteExtendItem: function () {
+            SOW_onDeleteExtendItem: function() {
                 var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                 var oModel = this.getView().getModel("oModelDataPro");
                 var aData = oModel.getData();
-                var aSelectedPaths = oTable.getSelectedItems().map(function (oItem) {
+                var aSelectedPaths = oTable.getSelectedItems().map(function(oItem) {
                     return oItem.getBindingContext("oModelDataPro").getPath(); // Full path like '/data/2'
                 });
                 // Extract indexes and sort in descending order to prevent reindexing issues while splicing
-                var aIndexesToDelete = aSelectedPaths.map(function (path) {
+                var aIndexesToDelete = aSelectedPaths.map(function(path) {
                     return parseInt(path.split("/").pop());
-                }).sort(function (a, b) {
+                }).sort(function(a, b) {
                     return b - a;
                 });
                 // Remove items from data array
-                aIndexesToDelete.forEach(function (index) {
+                aIndexesToDelete.forEach(function(index) {
                     aData.splice(index, 1);
                 });
                 // Update the model with the new data
@@ -988,11 +1068,21 @@ sap.ui.define([
             async MsaE_onPressMerge() {
                 this.getBusyDialog();
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
-                var msa = "MSA", nda = "NDA";
-                if (oModel.Type === "Recruitment") { msa = "R-MSA"; nda = "R-NDA"; }
-                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: nda });
-                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: msa });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                    branchCode: oModel.BranchCode
+                });
+                var msa = "MSA",
+                    nda = "NDA";
+                if (oModel.Type === "Recruitment") {
+                    msa = "R-MSA";
+                    nda = "R-NDA";
+                }
+                await this._fetchCommonData("PDFCondition", "PDFNDAModel", {
+                    Type: nda
+                });
+                await this._fetchCommonData("PDFCondition", "PDFMSAModel", {
+                    Type: msa
+                });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
@@ -1013,10 +1103,18 @@ sap.ui.define([
                 var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
+                            type: "image/png"
+                        });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], {
+                            type: "image/png"
+                        });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], {
+                            type: "image/png"
+                        });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], {
+                            type: "image/png"
+                        });
 
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
@@ -1053,8 +1151,12 @@ sap.ui.define([
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/TableData", tableData);
                 var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
-                await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                    branchCode: "KLB01"
+                });
+                await this._fetchCommonData("PDFCondition", "PDFSOWModel", {
+                    Type: "SOW"
+                });
                 oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
                 oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
@@ -1069,10 +1171,18 @@ sap.ui.define([
                 var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
+                            type: "image/png"
+                        });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], {
+                            type: "image/png"
+                        });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], {
+                            type: "image/png"
+                        });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], {
+                            type: "image/png"
+                        });
 
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
@@ -1100,7 +1210,7 @@ sap.ui.define([
                 }
             },
 
-            onPressOpenRTE: function () {
+            onPressOpenRTE: function() {
                 var data = `
                     <div style="text-align: justify;">
                         <h3>Terms And Conditions</h3>
@@ -1119,7 +1229,7 @@ sap.ui.define([
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.CommonRTE",
                         controller: this,
-                    }).then(function (oDialog) {
+                    }).then(function(oDialog) {
                         this.PORTE_oDialog = oDialog;
                         this.getView().addDependent(this.PORTE_oDialog);
                         this.PORTE_oDialog.open();
@@ -1129,29 +1239,41 @@ sap.ui.define([
                 }
             },
 
-            FCR_onDownloadPDF: function () {
+            FCR_onDownloadPDF: function() {
                 this.getBusyDialog();
                 this.PORTE_oDialog.close();
                 let htmlContent = sap.ui.getCore().byId("FCR_id_RTE").getValue();
                 this.MsaE_onPressMergePO(htmlContent);
             },
 
-            FCR_onCloseDialog: function () {
+            FCR_onCloseDialog: function() {
                 this.PORTE_oDialog.close();
             },
 
-            MsaE_onPressMergePO: async function (htmlContent) {
+            MsaE_onPressMergePO: async function(htmlContent) {
                 var oPDFModel = this.getView().getModel("PDFData");
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
-                await this._fetchCommonData("PDFCondition", "PDFSOWModel", { Type: "SOW" });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                    branchCode: "KLB01"
+                });
+                await this._fetchCommonData("PDFCondition", "PDFSOWModel", {
+                    Type: "SOW"
+                });
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 var oPDFSOWModel = this.getView().getModel("PDFSOWModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
+                            type: "image/png"
+                        });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], {
+                            type: "image/png"
+                        });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], {
+                            type: "image/png"
+                        });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], {
+                            type: "image/png"
+                        });
 
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),

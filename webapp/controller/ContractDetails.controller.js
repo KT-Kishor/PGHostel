@@ -610,7 +610,6 @@ sap.ui.define([
 
             validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
-
                 oModel.AgreementDate = this.byId("CD_id_AgreeDate").getValue();
                 oModel.ConsultantName = this.byId("CD_id_CName").getValue();
                 oModel.Address = this.byId("CD_id_Address").getValue();
@@ -685,7 +684,6 @@ sap.ui.define([
 
             CD_onSubmit: async function () {
                 try {
-                    var STDCode = this.byId("CD_id_codeModel").getValue();
                     if (
                         utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
@@ -894,7 +892,6 @@ sap.ui.define([
                 const oEndDatePicker = this.byId("CU_id_AssignmentEndDate");
                 const oStartDate = oStartDatePicker.getDateValue();
                 const oEndDate = oEndDatePicker.getDateValue();
-                const STDCode = this.byId("CU_id_codeModel").getValue();
 
                 let isDateRangeValid = true;
                 if (oStartDate && oEndDate) {
@@ -932,7 +929,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
-
 
                 const oModel = oView.getModel("oFilteredContractModel").getData();
 
@@ -1081,6 +1077,7 @@ sap.ui.define([
                     this.CUD_oDialogMail.open();
                 }
             },
+
             CUD_onSendEmail: function () {
                 var oContractEmail = this.getView().getModel("oFilteredContractModel").getData().ContarctEmail;
                 if (!oContractEmail || oContractEmail.length === 0) {
@@ -1101,11 +1098,13 @@ sap.ui.define([
                 this.CUD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail");
                 this.validateSendButton();
             },
+
             Mail_onPressClose: function () {
                 this.CUD_oDialogMail.destroy();
                 this.CUD_oDialogMail = null;
                 // this.CUD_oDialogMail.close();
             },
+
             Mail_onUpload: function (oEvent) {
                 this.handleFileUpload(
                     oEvent,
@@ -1138,6 +1137,7 @@ sap.ui.define([
             Mail_onEmailChange: function () {
                 this.validateSendButton(); // Reuse from BaseController
             },
+
             Mail_onSendEmail: function () {
                 var oModel = this.getView().getModel("oFilteredContractModel").getData();
                var aAttachments = this.getView().getModel("UploaderData").getData().attachments;

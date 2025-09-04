@@ -1,19 +1,19 @@
 sap.ui.define([
-    "./BaseController",
-    "../utils/validation",
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast",
-    "../model/formatter",
-    "../utils/CommonAgreementPDF",
-],
-    function (BaseController, utils, JSONModel, MessageToast, Formatter, jsPDF) {
+        "./BaseController",
+        "../utils/validation",
+        "sap/ui/model/json/JSONModel",
+        "sap/m/MessageToast",
+        "../model/formatter",
+        "../utils/CommonAgreementPDF",
+    ],
+    function(BaseController, utils, JSONModel, MessageToast, Formatter, jsPDF) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.MSADetails", {
             Formatter: Formatter,
-            onInit: function () {
+            onInit: function() {
                 this.getRouter().getRoute("RouteMSADetails").attachMatched(this._onRouteMatched, this);
             },
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function() {
                 var LoginFUnction = await this.commonLoginFunction("MSA&SOW");
                 if (!LoginFUnction) return;
                 this._ViewDatePickersReadOnly(["MsaD_id_CreateMSADate"], this.getView());
@@ -46,21 +46,23 @@ sap.ui.define([
                     Country: "",
                     City: "",
                     GST: "",
-                    Status:""
+                    Status: ""
                 });
                 this.getView().setModel(oModelMSA, "msaModelWizart");
 
-                var oModel = new JSONModel({ Recruitment: false });
+                var oModel = new JSONModel({
+                    Recruitment: false
+                });
                 this.getView().setModel(oModel, "VisibleModel")
                 this.AdvanceBalance = true;
                 this.byId("MsaD_id_Type").setSelectedIndex(0);
                 this.GST = true;
                 this.MsaD_validateremove();
             },
-            onLogout: function () {
+            onLogout: function() {
                 this.CommonLogoutFunction();
             },
-            onRadioButtonGroupSelect: function (oEvent) {
+            onRadioButtonGroupSelect: function(oEvent) {
                 if (oEvent.getSource().getSelectedButton().getText() === 'Recruitment') {
                     this.getView().getModel("VisibleModel").setProperty("/Recruitment", true);
                 } else {
@@ -69,13 +71,13 @@ sap.ui.define([
                 this.validateStep();
                 // MsaD_validateremove()    
             },
-            T_onResetWizard: function () {
+            T_onResetWizard: function() {
                 var oWizard = this.getView().byId("MsaD_id_Wizard");
                 oWizard.discardProgress(oWizard.getSteps()[0]); // Discard progress 
                 oWizard.goToStep(oWizard.getSteps()[0]); // Go to the first step
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
             },
-            onPaymentAdvanceInputChange: function (oEvent) {
+            onPaymentAdvanceInputChange: function(oEvent) {
                 var sAdvanceInput = this.byId("Msa_Id_PayAdvance");
                 var sBalanceInput = this.byId("Msa_Id_PayBalance");
 
@@ -116,7 +118,7 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-            MsaD_validateremove:function(){
+            MsaD_validateremove: function() {
                 this.byId("MsaD_id_CompanyName").setValueState("None");
                 this.byId("MsaD_id_PaymentTerms").setValueState("None");
                 this.byId("MsaD_id12").setValueState("None");
@@ -136,34 +138,34 @@ sap.ui.define([
                 this.byId("MsaD_id_ContractPeriod").setValueState("None");
                 this.byId("MsaD_id_Branch").setValueState("None");
             },
-            MsaD_onBack: function () {
+            MsaD_onBack: function() {
                 this.getRouter().navTo("RouteMSA");
             },
-            MsaD_validateName: function (oEvent) {
+            MsaD_validateName: function(oEvent) {
                 utils._LCvalidateName(oEvent);
                 this.validateStep();
             },
-            MsaD_validateEmail: function (oEvent) {
+            MsaD_validateEmail: function(oEvent) {
                 utils._LCvalidateEmail(oEvent);
                 this.validateStep();
             },
-            MsaD_ValidateCommonFields: function (oEvent) {
+            MsaD_ValidateCommonFields: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 this.validateStep();
             },
-            MsaD_validateDate: function (oEvent) {
+            MsaD_validateDate: function(oEvent) {
                 utils._LCvalidateDate(oEvent);
                 this.validateStep();
             },
-            Msa_BranchChange: function (oEvent) {
+            Msa_BranchChange: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.validateStep();
             },
-            LC_MSA_RateCharge: function (oEvent) {
+            LC_MSA_RateCharge: function(oEvent) {
                 utils._LCvalidateTraineeAmount(oEvent);
                 this.validateStep();
             },
-            MsaD_validateGST: function (oEvent) {
+            MsaD_validateGST: function(oEvent) {
                 this.GST = utils._LCvalidateGstNumber(oEvent);
                 if (oEvent.getSource().getValue() === "") {
                     this.GST = true; // If GST field is empty, consider it valid
@@ -171,57 +173,104 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-            MSA_onChangeCountry: function (oEvent) {
+            MSA_onChangeCountry: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oStateCombo   = this.byId("MSA_Id_State");
-                const oCityCombo    = this.byId("MSA_Id_City");
-                const oModel        = this.getView().getModel("msaModelWizart");
-                oStateCombo.setSelectedKey("");   // clear dependents first
+                const oStateCombo = this.byId("MSA_Id_State");
+                const oCityCombo = this.byId("MSA_Id_City");
+                const oModel = this.getView().getModel("msaModelWizart");
+                oStateCombo.setSelectedKey(""); // clear dependents first
                 oStateCombo.getBinding("items")?.filter([]);
                 oCityCombo.setSelectedKey("");
                 oCityCombo.getBinding("items")?.filter([]);
                 if (!oSelectedItem) {
-                    oModel.setProperty("/Country", "");  // reset model
+                    oModel.setProperty("/Country", ""); // reset model
                     oModel.setProperty("/State", "");
                     oModel.setProperty("/City", "");
+                    oModel.setProperty("/STDCode", "");
                 } else {
                     const sCountryCode = oSelectedItem.getAdditionalText(); // fetch country details
+                    const oCountryData = oSelectedItem.getBindingContext("CountryModel").getObject();
                     const sCountryName = oSelectedItem.getText();
-                    oStateCombo.getBinding("items")?.filter([   // filter states
+                    oStateCombo.getBinding("items")?.filter([ // filter states
                         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                     ]);
-                    oModel.setProperty("/Country", sCountryName || "");  // update model
+                    oModel.setProperty("/Country", sCountryName || ""); // update model
+                    oModel.setProperty("/STDCode", oCountryData?.stdCode || "");
                 }
+                this._setMobilelength();
                 this.validateStep();
             },
-            MSA_onChangeState: function (oEvent) {
+            _setMobilelength: function() {
+                const oModel = this.getView().getModel("msaModelWizart");
+                const sCountry = oModel.getProperty("/Country");
+                const oMobileInput = this.getView().byId("MSA_Id_Mobile");
+                if (sCountry === "India") {
+                    oMobileInput.setMaxLength(10);
+                } else {
+                    oMobileInput.setMaxLength(20);
+                }
+            },
+            MSA_validateMobile: function(oEventOrControl) {
+                const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
+                const sValue = oInput.getValue().trim();
+                const sCountryName = this.getView().getModel("msaModelWizart").getProperty("/Country");
+                const maxLength = oInput.getMaxLength();
+                oInput.setValueState(sap.ui.core.ValueState.None);
+                oInput.setValueStateText("");
+                if (!/^\d*$/.test(sValue)) { // only digits
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Only numbers are allowed");
+                    return false;
+                }
+                if (sValue.startsWith("0")) { // cannot start with 0
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Mobile Number cannot begin with 0");
+                    return false;
+                }
+                if (sCountryName === "India") { // separate India vs Others
+                    if (sValue.length !== 10) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Mobile Number must be exactly 10 digits long");
+                        return false;
+                    }
+                } else {
+                    if (sValue.length < 4 || sValue.length > maxLength) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Enter a valid mobile number (between 4-" + maxLength + " digits)");
+                        return false;
+                    }
+                }
+                this.validateStep();
+                return true;
+            },
+            MSA_onChangeState: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oCityCombo    = this.byId("MSA_Id_City");
-                const oCountryCB    = this.byId("MSA_Id_Country");
-                const oModel        = this.getView().getModel("msaModelWizart");
-                oCityCombo.setSelectedKey("");  // clear city
+                const oCityCombo = this.byId("MSA_Id_City");
+                const oCountryCB = this.byId("MSA_Id_Country");
+                const oModel = this.getView().getModel("msaModelWizart");
+                oCityCombo.setSelectedKey(""); // clear city
                 oCityCombo.getBinding("items")?.filter([]);
                 if (!oSelectedItem) {
                     oModel.setProperty("/State", "");
                     oModel.setProperty("/City", "");
                 } else {
-                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sStateName = oSelectedItem.getKey() || oSelectedItem.getText();
                     const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
                     // filter cities
                     oCityCombo.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                     ]);
                     oModel.setProperty("/State", sStateName || "");
                 }
                 this.validateStep();
             },
-            MSA_onChangeCity: function (oEvent) {
+            MSA_onChangeCity: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
-                const oModel        = this.getView().getModel("msaModelWizart");
+                const oModel = this.getView().getModel("msaModelWizart");
                 if (!oSelectedItem) {
                     oModel.setProperty("/City", "");
                 } else {
@@ -230,12 +279,13 @@ sap.ui.define([
                 }
                 this.validateStep();
             },
-            validateStep: function () {
+            validateStep: function() {
                 // Check if all fields have values
                 var allFieldsFilled = this.getView().byId("MsaD_id_CompanyName").getValue() && this.getView().byId("MsaD_id_HeadName").getValue() && this.getView().byId("MsaD_id_HeadPosition").getValue() && this.getView().byId("MsaD_id_ContractPeriod").getValue() && this.getView().byId("MsaD_id_CreateMSADate").getValue() && this.getView().byId("MsaD_id_PanCard").getValue() && this.getView().byId("MsaD_id_PaymentTerms").getValue() && this.getView().byId("MsaD_id_Email").getValue() && this.getView().byId('MsaD_id_Address').getValue() && this.getView().byId('MsaD_id12').getValue();
                 if (allFieldsFilled) {
                     // Validate each field 
                     var isRecruitment = this.getView().getModel("VisibleModel").getProperty("/Recruitment");
+                    const oMobileInput = this.getView().byId("MSA_Id_Mobile");
 
                     var isValid =
                         utils._LCvalidateMandatoryField(this.getView().byId("MsaD_id_CompanyName"), "ID") &&
@@ -251,9 +301,10 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
+                        oMobileInput.getValue().length <= oMobileInput.getMaxLength() &&
                         //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id12"), "ID") &&
                         //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_validateGuarantee"), "ID")  &&
-                         this.GST &&
+                        this.GST &&
                         (
                             !isRecruitment || (
                                 utils._LCvalidateTraineeAmount(this.byId("Msa_Id_RateCharge"), "ID") &&
@@ -266,25 +317,32 @@ sap.ui.define([
                     this.byId("MsaD_id_WizardO").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
                 }
             },
-            MsaD_onComplete: function () {
+            MsaD_onComplete: function() {
                 this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
                 this.byId("MsaD_id_Submit").setEnabled(true);
                 this.byId("MsaD_id_Type").setEditable(false);
                 this.byId("reviewPageType").setText(this.byId("MsaD_id_Type").getSelectedButton().getText());
             },
-            MsaD_reviewSubmit: async function () {
+            MsaD_reviewSubmit: async function() {
                 var that = this;
                 const oWizard = this.byId("MsaD_id_Wizard");
-                if (this.byId("MsaD_id_ContractPeriod").getValueState() === "Error" || 
-                    this.byId("MsaD_id_PaymentTerms").getValueState() === "Error" || 
-                    this.byId("MsaD_id12").getValueState() === "Error" ) {
+                if (this.byId("MsaD_id_ContractPeriod").getValueState() === "Error" ||
+                    this.byId("MsaD_id_PaymentTerms").getValueState() === "Error" ||
+                    this.byId("MsaD_id12").getValueState() === "Error") {
                     sap.m.MessageToast.show("Make sure all the mandatory fields are filled/validate the entered value");
                     return;
-                    }
+                }
                 if (!oWizard.getSteps()[0].getValidated()) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
+                const oMobileInput = this.getView().byId("MSA_Id_Mobile");
+                const bMobileValid = this.MSA_validateMobile(oMobileInput);
+                if (!bMobileValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
                 try {
                     this.getBusyDialog();
                     const oModelData = this.getView().getModel("msaModelWizart").getData();
@@ -302,7 +360,9 @@ sap.ui.define([
                     if (!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.PaymentAdvance = "0"
                     if (!this.getView().getModel("VisibleModel").getProperty("/Recruitment")) oModelData.RateCharge = "0"
 
-                    const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", { data: oModelData });
+                    const oCreateResponse = await this.ajaxCreateWithJQuery("MSADetails", {
+                        data: oModelData
+                    });
                     if (oCreateResponse) {
                         var oDialog = new sap.m.Dialog({
                             title: this.i18nModel.getText("success"),
@@ -314,7 +374,7 @@ sap.ui.define([
                             beginButton: new sap.m.Button({
                                 text: "OK",
                                 type: "Accept",
-                                press: function () {
+                                press: function() {
                                     oDialog.close();
                                     that.closeBusyDialog();
                                     that.getRouter().navTo("RouteMSA");
@@ -324,7 +384,7 @@ sap.ui.define([
                             endButton: new sap.m.Button({
                                 text: "Generate PDF",
                                 type: "Attention",
-                                press: function () {
+                                press: function() {
                                     oDialog.close();
                                     that.MsaE_onPressMerge();
                                     that.closeBusyDialog();
@@ -332,7 +392,7 @@ sap.ui.define([
                                     that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
                                 }
                             }),
-                            afterClose: function () {
+                            afterClose: function() {
                                 oDialog.destroy();
                             }
                         });
@@ -349,11 +409,21 @@ sap.ui.define([
             async MsaE_onPressMerge() {
                 this.getBusyDialog();
                 var oModel = this.getView().getModel("msaModelWizart").getData();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oModel.BranchCode });
-                var msa = "MSA", nda = "NDA";
-                if (oModel.Type === "Recruitment") { msa = "R-MSA"; nda = "R-NDA"; }
-                await this._fetchCommonData("PDFCondition", "PDFNDAModel", { Type: nda });
-                await this._fetchCommonData("PDFCondition", "PDFMSAModel", { Type: msa });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                    branchCode: oModel.BranchCode
+                });
+                var msa = "MSA",
+                    nda = "NDA";
+                if (oModel.Type === "Recruitment") {
+                    msa = "R-MSA";
+                    nda = "R-NDA";
+                }
+                await this._fetchCommonData("PDFCondition", "PDFNDAModel", {
+                    Type: nda
+                });
+                await this._fetchCommonData("PDFCondition", "PDFMSAModel", {
+                    Type: msa
+                });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
                 oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
@@ -374,10 +444,18 @@ sap.ui.define([
                 var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
+                            type: "image/png"
+                        });
+                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], {
+                            type: "image/png"
+                        });
+                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], {
+                            type: "image/png"
+                        });
+                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], {
+                            type: "image/png"
+                        });
 
                         const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
                             this._convertBLOBToImage(logoBlob),
@@ -404,16 +482,16 @@ sap.ui.define([
                     }
                 }
             },
-            MsaD_validateCotractperiod: function (oEvent) {
+            MsaD_validateCotractperiod: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.validateStep();
             },
-            MsaD_ValidatepaymentTerms:function(oEvent){
-                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            MsaD_ValidatepaymentTerms: function(oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.validateStep();
             },
-            MsaD_validateSatus:function(oEvent){
-                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            MsaD_validateSatus: function(oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 this.validateStep();
             },
         });
