@@ -5,7 +5,6 @@
 	xmlns:u="sap.ui.unified" 
 	xmlns:l="sap.ui.layout">
 	<Dialog id="myDialog" title="Add Candidate" draggable="true" resizable="true" class="sapUiResponsivePadding" contentWidth="80%" contentHeight="auto">
-		<MessageStrip text="{i18n>uploadCandidateMessage}" type="Warning" showIcon="true" class="sapUiTinyMarginBottom" />
 		<layout:SimpleForm editable="true" labelSpanXL="4" labelSpanL="4" labelSpanM="12" labelSpanS="12" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="2" layout="ColumnLayout" id="candidateForm">
 			<layout:content>
 				<Label text="{i18n>compName}" required="true" />

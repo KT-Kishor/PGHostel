@@ -114,11 +114,83 @@ sap.ui.define([
             oViewModel.setProperty("/isEditMode", !bIsEditMode);
         },
 
-        onDialogCountryChange: function (oEvent) {
-             var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
-                var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, oValue);
-                this.getView().byId("AN_Id_City").getBinding("items").filter(oFilter);
-                this.byId("AN_Id_City").setValue("");
+         AC_onChangeCountry: function (oEvent) {
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oStateCombo = this.getView().byId("AN_Id_State");
+                const oCityCombo  = this.getView().byId("AN_Id_City");
+                const oStdCodeInp = this.getView().byId("AC_id_ISD");
+                const oModel      = this.getView().getModel("setDataToForm");
+
+                // Reset dependent fields
+                oStateCombo.setSelectedKey("");
+                oStateCombo.getBinding("items")?.filter([]);
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+                oStdCodeInp.setValue("");
+
+                if (!oSelectedItem) {
+                    // reset model
+                    oModel.setProperty("/Country", "");
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                    oModel.setProperty("/ISD", "");
+                } else {
+                    // fetch country data
+                    const sCountryCode = oSelectedItem.getAdditionalText(); // "IN"
+                    const oCountryData = oSelectedItem.getBindingContext("CountryModel").getObject();
+                    const sCountryName = oSelectedItem.getText();
+
+                    // filter states by countryCode
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    // set model props
+                    oModel.setProperty("/Country", sCountryName || "");
+                    oModel.setProperty("/ISD", oCountryData?.stdCode || "");
+
+                    // reflect in UI
+                    oStdCodeInp.setValue(oCountryData?.stdCode || "");
+                }
+            },
+
+            AC_onChangeState: function (oEvent) {
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                // Controls
+                const oCityCombo = this.getView().byId("AN_Id_City");
+                const oCountryCB = this.getView().byId("AC_Id_Country");
+                const oModel     = this.getView().getModel("setDataToForm");
+
+                // Clear cities
+                oCityCombo.setSelectedKey("");
+                oCityCombo.getBinding("items")?.filter([]);
+
+                if (!oSelectedItem) {
+                    oModel.setProperty("/State", "");
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                    const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+                    // filter cities based on state + country
+                    oCityCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    oModel.setProperty("/State", sStateName || "");
+                }
+            },
+
+            AC_onChangeCity: function (oEvent) {
+                const oSelectedItem = oEvent.getSource().getSelectedItem();
+                const oModel        = this.getView().getModel("setDataToForm");
+                if (!oSelectedItem) {
+                    oModel.setProperty("/City", "");
+                } else {
+                    const sCityName = oSelectedItem.getKey() || oSelectedItem.getText();
+                    oModel.setProperty("/City", sCityName || "");
+                }
             },
 
         onPageNavButtonPress: function() {

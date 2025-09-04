@@ -31,21 +31,21 @@
 				<Label text="{i18n>email}" />
 				<Input value="{setDataToForm>/Email}" maxLength="50" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>expCountry}" />
-				<ComboBox items="{path:'CountryModel>/',length:1000}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}" value="{setDataToForm>/Country}" editable="{viewModel>/isEditMode}" change="onDialogCountryChange">
+				<ComboBox items="{path:'CountryModel>/',length:1000}" id="AC_Id_Country" selectedKey="{setDataToForm>/Country}" value="{setDataToForm>/Country}" editable="{viewModel>/isEditMode}" change="AC_onChangeCountry">
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 				<Label text="State" />
-				<ComboBox items="{path: 'StateModel>/', length: 1000}" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}">
+				<ComboBox items="{path: 'StateModel>/', length: 1000}" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" value="{setDataToForm>/State}" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}" change="">
 					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 				</ComboBox>
 				<Label text="{i18n>city}" />
-				<ComboBox items="{BaseLocationModel>/}" editable="{viewModel>/isEditMode}" id="AN_Id_City" showSecondaryValues="true" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}">
-					<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+				<ComboBox items="{path:'CityModel>/',length:1000}" editable="{viewModel>/isEditMode}" id="AN_Id_City" showSecondaryValues="true" value="{setDataToForm>/City}" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}" change="">
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" />
 				</ComboBox>
 				<Label text="{i18n>address}" />
 				<TextArea rows="3" value="{setDataToForm>/Address}" maxLength="200" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>mobilenumber}" />
-				<Input value="{setDataToForm>/ISD}" editable="{viewModel>/isEditMode}"/>
+				<Input value="{setDataToForm>/ISD}" editable="{viewModel>/isEditMode}" id="AC_id_ISD"/>
 				<Input value="{setDataToForm>/Mobile}" editable="{viewModel>/isEditMode}"/>
 				<Label text="{i18n>CurrentCompanyField}" />
 				<Input value="{setDataToForm>/CurrentCompany}" editable="{viewModel>/isEditMode}"/>
