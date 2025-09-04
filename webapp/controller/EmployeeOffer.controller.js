@@ -280,7 +280,8 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/m/MessageToast", 
               EmployeeEmail: oSelectedData.EmployeeEmail,
               PermanentAddress: oSelectedData.ConsultantAddress,
               CorrespondenceAddress: oSelectedData.ConsultantAddress,
-              Country: "India",
+              Country: oSelectedData.Country,
+              State: oSelectedData.State,
               CountryCode: oSelectedData.CountryCode ? oSelectedData.CountryCode : "IN",
               BaseLocation: oSelectedData.BaseLocation,
               AppraisalDate: oSelectedData.JoiningDate.split("T")[0],
@@ -553,24 +554,39 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/m/MessageToast", 
     validateMobileNo: function (oEvent) {
       this._validateMobileNumberLocal(oEvent);
     },
-    OE_onChangeCountry: function (oEvent) {
-      var sCountryKey = oEvent.getSource().getSelectedItem().getAdditionalText();
-      var oMobileInput = sap.ui.getCore().byId("OEF_id_Mobile");
-      if (oMobileInput) {
-        if (sCountryKey === "IN") {
-          oMobileInput.setMaxLength(10);
-        } else {
-          oMobileInput.setMaxLength(20);
-        }
-      }
-      this.onCountryChange(oEvent, {
-        stdCodeCombo: "OEF_id_STDCode",
-        baseLocationCombo: "idSelect",
-        branchInput: "OE_id_BranchInput",
-        mobileInput: "OEF_id_Mobile",
-      });
-    },
-
+    OE_onChangeCountry: function(oEvent) {
+         utils._LCstrictValidationComboBox(oEvent, "oEvent");
+         if (oEvent.getSource().getValue() === '') {
+             oEvent.getSource().setValueState("None")
+         }
+         var oSelectedItem = oEvent.getSource().getSelectedItem();
+         if (!oSelectedItem) return;
+         var sCountryCode = oSelectedItem.getAdditionalText();
+         var oStateCombo = this.byId("OEF_id_State"); // Filter States
+         var oStateBinding = oStateCombo.getBinding("items");
+         oStateBinding.filter(new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
+         oStateCombo.setSelectedKey(""); // Reset state selection
+         var oCityCombo = this.byId("idSelect"); // Clear city
+         oCityCombo.getBinding("items").filter([]);
+         oCityCombo.setSelectedKey("");
+     },
+     OE_onChangeState: function(oEvent) {
+         utils._LCstrictValidationComboBox(oEvent, "oEvent");
+         if (oEvent.getSource().getValue() === '') {
+             oEvent.getSource().setValueState("None")
+         }
+         var oSelectedItem = oEvent.getSource().getSelectedItem();
+         if (!oSelectedItem) return;
+         var sStateName = oSelectedItem.getAdditionalText() || oSelectedItem.getKey();
+         var sCountryCode = this.byId("OEF_id_Country").getSelectedItem().getAdditionalText();
+         var oCityCombo = this.byId("idSelect"); // Filter Cities
+         var oCityBinding = oCityCombo.getBinding("items");
+         oCityBinding.filter([
+             new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
+             new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+         ]);
+         oCityCombo.setSelectedKey(""); // Reset city selection
+     }, 
     EO_DownloadTableData: function () {
       var table = this.byId("EO_id_TableEOffer");
       const oModelData = table.getModel("EmployeeOfferModel").getData();
