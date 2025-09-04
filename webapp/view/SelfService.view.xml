@@ -33,7 +33,7 @@
 					</snappedTitleOnMobile>
 					<actions>
 						<m:Button id="Submit" text="{i18n>submit}" press="onPressSubmit" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" type="Transparent" visible="{viewModel>/SelfService}" />
-						<m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Transparent" />
+						<!-- <m:Button text="{i18n>setProfileBtn}" press="onPressSetPhoto" enabled="{= ${viewModel>/isEditMode} === true ? false : true}" visible="{viewModel>/SetProfile}" type="Transparent" /> -->
 						<m:Button icon="sap-icon://action" text="{i18n>action}" press="onOpenActionBtn" id="SS_id_Action" visible="{= !${viewModel>/isContractorRole} }"/>
 					</actions>
 				</ObjectPageDynamicHeaderTitle>
@@ -48,7 +48,7 @@
 							<m:layoutData>
 								<m:FlexItemData growFactor="0" />
 							</m:layoutData>
-							<m:Avatar src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}" displaySize="L" class="sapUiSmallMarginEnd" />
+							<m:Avatar src="{path: 'sEmployeeModel>/0/ProfilePhoto', formatter: '.Formatter.getImageSrc'}" displaySize="XL" press=".onPressSetPhoto" class="sapUiTinyMargin avatarClickable" />
 						</m:VBox>
 						<layout:VerticalLayout>
 							<m:Text text="{sEmployeeModel>/0/STDCode} {sEmployeeModel>/0/MobileNo}" wrapping="true" />
@@ -83,12 +83,12 @@
 										<m:Toolbar>
 											<m:Title text="{i18n>basicDetails}" />
 											<m:ToolbarSpacer />
-											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" tooltip="{i18n>edit}" visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
+											<m:Button id="BasicDetailsBtn" text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }" press="SS_onEditPress" type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }" tooltip="{i18n>editDetails}" visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"/>
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
 										<m:Label text="{i18n>experienceSelectionRequired}"/>
-										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }">
+										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }" visible="{= !${viewModel>/TraineeRole} }">
 											<m:buttons>
 												<m:RadioButton id="SS_fresherRadio" text="{i18n>fresher}" />
 												<m:RadioButton id="SS_experiencedRadio" text="{i18n>experienced}" />
@@ -111,19 +111,22 @@
 											<core:Item key="{BloodGroup>Code}" text="{BloodGroup>Code}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>permanentAddress}" required="true" id="SS_id_lpa" />
-										<m:TextArea rows="2" value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<m:TextArea value="{sEmployeeModel>/0/PermanentAddress}" editable="{viewModel>/isEditMode}" id="SS_id_PAddress" placeholder="{i18n>permanentAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 										<m:Label text="{i18n>correspondenceAddress}" required="true" id="SS_id_lca" />
-										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" rows="2" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<m:TextArea value="{sEmployeeModel>/0/CorrespondenceAddress}" editable="{viewModel>/isEditMode}" id="SS_id_CAdress" placeholder="{i18n>correspondenceAddress}" maxLength="120" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
+										<!-- Country -->
 										<m:Label text="{i18n>expCountry}" required="true" id="SS_id_lcoun" visible="{viewModel>/RelievingLetter}" />
-										<m:ComboBox id="SS_id_Country" items="{path: 'CountryModel>/', length: 400, sorter: { path: 'countryName', descending: false, group: false} }" value="{sEmployeeModel>/0/Country}" change="onCountryChange" valueStateText="{i18n>expValStaCountry}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
-											<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
+										<m:ComboBox change="SS_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="SS_id_Country" items="{path:'CountryModel>/',length:400}" value="{sEmployeeModel>/0/Country}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
+											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
 										</m:ComboBox>
-										<m:Label text="{i18n>state}" required="true" id="SS_id_state" />
-										<m:ComboBox visible="{viewModel>/RelievingLetter}" id="SS_id_State" items="{StateModel>/}" value="{sEmployeeModel>/0/State}" change="onStateChange" showSecondaryValues="true" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectState}">
+										<!-- State -->
+										<m:Label text="{i18n>state}" required="true" id="SS_id_StateLabel" visible="{viewModel>/RelievingLetter}" />
+										<m:ComboBox change="SS_onStateChange" valueStateText="{i18n>selectState}" id="SS_id_State" items="{path:'StateModel>/',length:4000}" value="{sEmployeeModel>/0/State}" showSecondaryValues="true" editable="{viewModel>/AdminRole}" visible="{viewModel>/RelievingLetter}">
 											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 										</m:ComboBox>
+										<!-- BaseLocation (now using CityModel) -->
 										<m:Label text="{i18n>baseLocation}" required="true" id="SS_id_lbase" />
-										<m:ComboBox items="{path: 'CityModel>/', length: 4000, sorter: { path: 'cityName', descending: false, group: false }}" showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="onCityChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
+										<m:ComboBox items="{path:'CityModel>/',length:4000}" showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
 											<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>branchCode}" />
@@ -137,10 +140,11 @@
 											<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>mobileNo}" required="true" id="SS_id_Lmo" />
-										<m:ComboBox value="{sEmployeeModel>/0/STDCode}" showSecondaryValues="true" id="SS_id_STDCode" items="{path: 'CountryModel>/', length: 400, sorter: { path: 'stdCode', descending: false, group: false }}" filterSecondaryValues="true" change="onISDChangePrimary" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
-											<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>stdCode}" />
+										<!-- value="{sEmployeeModel>/0/STDCode}" -->
+										<m:ComboBox showSecondaryValues="true" id="SS_id_STDCode" items="{path:'CountryModel>/',length:4000}" filterSecondaryValues="true" change="SS_BD_onStdCodeChange" selectedKey="{sEmployeeModel>/0/STDCode}" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
+											<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 										</m:ComboBox>
-										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="onMobileLiveChange" valueStateText="{i18n>mobileNoValueState}" />
+										<m:Input value="{sEmployeeModel>/0/MobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" id="SS_id_MobileNo" placeholder="{i18n>mobileNo}" liveChange="SS_validateMobileNo1" valueStateText="{i18n>mobileNoValueState}" />
 										<m:Label text="{i18n>role}" id="SS_id_lr" visible="{viewModel>/RelievingLetter }" />
 										<m:Select editable="{viewModel>/AdminRole}" selectedKey="{sEmployeeModel>/0/Role}" showSecondaryValues="true" id="SS_id_RoleEmpSele" items="{RoleModel>/}" visible="{viewModel>/RelievingLetter}" valueStateText="{i18n>combovalueState}">
 											<core:ListItem key="{RoleModel>Role}" text="{RoleModel>Role}" />
@@ -174,10 +178,10 @@
 															<core:Item key="{RelationModel>Relationship}" text="{RelationModel>Relationship}" />
 														</m:Select>
 														<m:Label text="{i18n>contact}" required="true" id="SS_id_Mf" />
-														<m:ComboBox value="{sEmployeeModel>/0/EContactIStdCode}" showSecondaryValues="true" id="SS_id_STDCodeRI" items="{path: 'CountryModel>/', length:400, sorter: { path: 'countryName', descending: false, group: false }}" filterSecondaryValues="true" change="onISDChangeEmergency1" selectedKey="+91" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
+														<m:ComboBox value="{sEmployeeModel>/0/EContactIStdCode}" showSecondaryValues="true" id="SS_id_STDCodeRI" items="{path:'CountryModel>/',length:4000}" filterSecondaryValues="true" change="SS_EC_onStdCodeChange" selectedKey="+91" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
 															<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 														</m:ComboBox>
-														<m:Input value="{sEmployeeModel>/0/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" liveChange="onMobileNumberLiveChange" id="SS_id_EmpMoF" valueStateText="{i18n>mobileNoValueState}" />
+														<m:Input value="{sEmployeeModel>/0/EmergencyContactPerson1ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" liveChange="SS_validateMobileNo2" id="SS_id_EmpMoF" valueStateText="{i18n>mobileNoValueState}" />
 														<m:Label text="{i18n>address}" required="true" id="SS_id_Af" />
 														<m:TextArea value="{sEmployeeModel>/0/EmergencyContactPerson1Address}" placeholder="{i18n>address}" id="SS_id_AddF" editable="{viewModel>/isEditMode}" liveChange="SS_ValidateCommonFields" maxLength="120" valueStateText="{i18n>addressValueState}" />
 													</f:content>
@@ -197,10 +201,10 @@
 															<core:Item key="{RelationModel>Relationship}" text="{RelationModel>Relationship}" />
 														</m:Select>
 														<m:Label text="{i18n>contact}" required="true" id="SS_id_Ms" />
-														<m:ComboBox value="{sEmployeeModel>/0/EContactIIStdCode}" showSecondaryValues="true" id="SS_id_STDCodeRII" items="{path: 'CountryModel>/', length:400, sorter: { path: 'stdCode	', descending: false, group: false }}" filterSecondaryValues="true" change="onISDChangeEmergency2" selectedKey="+91" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
+														<m:ComboBox value="{sEmployeeModel>/0/EContactIIStdCode}" showSecondaryValues="true" id="SS_id_STDCodeRII" items="{path:'CountryModel>/',length:4000}" filterSecondaryValues="true" change="SS_ECII_onStdCodeChange" selectedKey="+91" valueStateText="{i18n>combovalueState}" editable="{viewModel>/isEditMode}">
 															<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 														</m:ComboBox>
-														<m:Input value="{sEmployeeModel>/0/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" liveChange="onMobileNumberLiveChange" id="SS_id_EmpMoS" valueStateText="{i18n>mobileNoValueState}" />
+														<m:Input value="{sEmployeeModel>/0/EmergencyContactPerson2ContactNo}" placeholder="{i18n>mobileNo}" editable="{viewModel>/isEditMode}" maxLength="10" liveChange="SS_validateMobileNo3" id="SS_id_EmpMoS" valueStateText="{i18n>mobileNoValueState}" />
 														<m:Label text="{i18n>address}" required="true" id="SS_id_As" />
 														<m:TextArea value="{sEmployeeModel>/0/EmergencyContactPerson2Address}" placeholder="{i18n>address}" editable="{viewModel>/isEditMode}" maxLength="120" id="SS_id_EmpAddS" liveChange="SS_ValidateCommonFields" valueStateText="{i18n>addressValueState}" />
 													</f:content>

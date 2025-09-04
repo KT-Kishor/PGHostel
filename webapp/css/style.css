@@ -4,6 +4,9 @@
   background-color: #fff0f0;
 }
 
+.avatarClickable {
+  cursor: pointer;
+}
 .onClassTarineStatus {
   background-color: red;
   border-color: greenyellow;
