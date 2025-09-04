@@ -19,6 +19,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "../utils/utilsMobileV
       this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
       var oVisiModel = new JSONModel();
       this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
+      this._fetchCommonData("Country", "CountryModel");
       if (sQuotationNo === "new") {
         // Create new mode
         var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
@@ -1429,9 +1430,25 @@ sap.ui.define(["./BaseController", "../utils/validation", "../utils/utilsMobileV
         }
       }
     },
+
+
+          CountryAndCity: function () {
+        var Code = this.getView().getModel("CountryModel").getData().filter((item) => item.countryName === this.byId("HQD_id_Country").getValue());
+        var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, Code[0].code);
+        this.byId("HQD_id_BranchCode").getBinding("items").filter(oFilter);
+      },
     HQD_onCountryChange: function (oEvent) {
-      // Perform strict validation and trigger mobile-specific country change logic
       utils._LCstrictValidationComboBox(oEvent);
+      var sSelectedKey = oEvent.getSource().getSelectedKey();
+      
+var oSTDCodeField = this.byId("HQD_id_mobileNumber");
+var oCustomerSTDCodeField = this.byId("HQD_id_CustomerNumberSTD");
+var oCurrencyCombo = this.byId("HQD_id_Curency");
+var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+var oQuotationModel = this.getView().getModel("QuotationModel");
+var oVisibilityModel = this.getView().getModel("visiablityPlay");
+const oBranchComboBox = this.byId("HQD_id_BranchCode");
+oBranchComboBox.setBusy(true);
       mobileUtils.onISDChange(oEvent, this, {
         jobModelName: "SingleCompanyModel",
         countryModelName: "CountryModel",
@@ -1455,25 +1472,24 @@ sap.ui.define(["./BaseController", "../utils/validation", "../utils/utilsMobileV
         oCustomerMobileInput.setValue(""); // Clear the value
         oCustomerMobileInput.setValueState("None"); // Reset validation state
       }
-      const sSelectedKey = oEvent.getSource().getSelectedKey();
-      const oCountryModel = this.getView().getModel("CountryModel");
-      const oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
-      // Add this log to verify the selected key
-      const aCountryData = oCountryModel.getProperty("/") || [];
-      const oCountryData = aCountryData.find((item) => item.countryName && item.countryName.toLowerCase() === sSelectedKey.toLowerCase());
-
-      // Add this log to see if a match was found
-      let sCurrency = "";
-      let sSTDCode = "";
-      if (oCountryData) {
-        sCurrency = oCountryData.currency;
-        sSTDCode = oCountryData.stdCode;
-      }
-      // Set both currency and STD code directly in the model.
-      oSingleCompanyModel.setProperty("/Currency", sCurrency);
-      oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
-      oSingleCompanyModel.setProperty("/CustomerSTDCode", sSTDCode);
-
+ var oCountryModel = this.getView().getModel("CountryModel");
+var aCountryData = (oCountryModel && oCountryModel.getProperty("/")) || [];
+var sSTDCode = "", sCurrency = "";
+// Find matching entry from CountryModel based on country
+var oCountryData = aCountryData.find(function (item) {
+  return item.countryName === sSelectedKey;
+});
+if (oCountryData) {
+  // Set STD code and Currency
+  sSTDCode = oCountryData.stdCode;
+  sCurrency = oCountryData.currency;
+  oSTDCodeField.setValue(sSTDCode);
+  oCustomerSTDCodeField.setValue(sSTDCode);
+  oCurrencyCombo.setSelectedKey(sCurrency);
+  oSingleCompanyModel.setProperty("/STDCode", sSTDCode);
+  oSingleCompanyModel.setProperty("/Currency", sCurrency);
+  oSingleCompanyModel.setProperty("/CustomerSTDCode", sSTDCode);
+}
       // Set the selected keys in the UI
       this.byId("HQD_id_Curency").setSelectedKey(sCurrency);
       this.byId("HQD_id_CustomerNumberSTD").setSelectedKey(sSTDCode);
@@ -1482,7 +1498,10 @@ sap.ui.define(["./BaseController", "../utils/validation", "../utils/utilsMobileV
       if (sSelectedKey === "India") {
         var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
         oSingleCompanyModel.setProperty("/Branch", "Kalaburagi");
-        this._fetchCommonData("BaseLocation", "BaseLocationModel");
+        oSingleCompanyModel.setProperty("/State", "Karnataka");
+          this._fetchCommonData("State", "StateModel");
+        this._fetchCommonData("City", "CityModel");                   
+          
         oVisibilityModel.setProperty("/showBranch", true);
         oQuotationModel.setProperty("/ShowGSTFields", true);
         oQuotationModel.setProperty("/CGSTSelected", true);
