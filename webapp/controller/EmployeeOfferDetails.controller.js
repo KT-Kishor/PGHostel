@@ -186,7 +186,6 @@ sap.ui.define([
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
                     oModel.CountryCode = this.getView().byId("EOD_id_Country").getSelectedItem().getAdditionalText();
-                    oModel.BranchCode = this.getView().byId("EOUF_id_Location").getSelectedItem().getAdditionalText();
                     oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                     oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                     delete oModel.CityModel;
