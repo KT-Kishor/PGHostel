@@ -275,6 +275,12 @@ sap.ui.define([
             MsaD_reviewSubmit: async function () {
                 var that = this;
                 const oWizard = this.byId("MsaD_id_Wizard");
+                if (this.byId("MsaD_id_ContractPeriod").getValueState() === "Error" || 
+                    this.byId("MsaD_id_PaymentTerms").getValueState() === "Error" || 
+                    this.byId("MsaD_id12").getValueState() === "Error" ) {
+                    sap.m.MessageToast.show("Make sure all the mandatory fields are filled/validate the entered value");
+                    return;
+                    }
                 if (!oWizard.getSteps()[0].getValidated()) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;

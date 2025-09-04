@@ -180,7 +180,7 @@
 										<m:Input id="CU_id_codeModel" value="{oFilteredContractModel>/STDCode}"
 										editable="false" visible="true" class="marginLeft" change="CD_ValidateComboBox" />
 
-										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" maxLength="20" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/mobile}" />
+										<m:Input value="{oFilteredContractModel>/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="CD_validateMobileNo" id="CU_id_Mobile" valueStateText="{i18n>mobileNoValueState}" editable="{simpleForm>/mobile}" />
 
 										<m:Label text="Comments" />
 										<m:TextArea  value="{oFilteredContractModel>/Comments}" id="CU_id_Comments" editable="{simpleForm>/Status}" valueStateText="{i18n>commentsValueState}"  maxLength="100"/>

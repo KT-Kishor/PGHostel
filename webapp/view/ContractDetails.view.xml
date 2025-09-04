@@ -99,7 +99,7 @@
 							<Label text="{i18n>mobileNo}" required="true" />
 							<Input id="CD_id_codeModel" value="{ContractModelWizart>/STDCode}" editable="false"
                             visible="true" class="marginLeft" />
-							<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="CD_validateMobileNo" maxLength="20" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}" change="CD_ValidateComboBox" />
+							<Input value="{ContractModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="CD_validateMobileNo" id="CD_id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 
 						</f:content>
 					</f:SimpleForm>

@@ -247,12 +247,38 @@ sap.ui.define([
                 }
             },
 
-            // Validate Mobile Number on Input
-            MC_ValidateMobileNo: function(oEvent) {
-                var oInput = oEvent.getSource();
-                var sStdCode = sap.ui.getCore().byId("MC_id_codeModel").getValue()
-                utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
-                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+             // Validate Mobile Number on Input
+            MC_ValidateMobileNo: function(oEventOrControl) {
+                const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
+                const sValue = oInput.getValue().trim();
+                const sCountryName = this.getView().getModel("CustomerModel").getProperty("/country");
+                const maxLength = oInput.getMaxLength();
+                oInput.setValueState(sap.ui.core.ValueState.None);
+                oInput.setValueStateText("");
+                if (!/^\d*$/.test(sValue)) { // only digits
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Only numbers are allowed");
+                    return false;
+                }
+                if (sValue.startsWith("0")) { // cannot start with 0
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Mobile Number cannot begin with 0");
+                    return false;
+                }
+                if (sCountryName === "India") { // separate India vs Others
+                    if (sValue.length !== 10) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Mobile Number must be exactly 10 digits long");
+                        return false;
+                    }
+                } else {
+                    if (sValue.length < 4 || sValue.length > maxLength) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Enter a valid mobile number (between 4-" + maxLength + " digits)");
+                        return false;
+                    }
+                }
+                return true;
             },
 
             // Validate PAN Card on Input
@@ -307,6 +333,18 @@ sap.ui.define([
 
                     // reflect in UI
                     oStdCodeInp.setValue(oCountryData?.stdCode || "");
+                }
+                 this._setMobileMaxLength();
+            },
+
+             _setMobileMaxLength: function() {
+                const oModel = this.getView().getModel("CustomerModel");
+                const sCountry = oModel.getProperty("/country");
+                const oMobileInput = sap.ui.getCore().byId("MC_id_CustMob");
+                if (sCountry === "India") {
+                    oMobileInput.setMaxLength(10);
+                } else {
+                    oMobileInput.setMaxLength(20);
                 }
             },
 
@@ -363,7 +401,6 @@ sap.ui.define([
             MC_onPressSubmit: async function() {
                 var that = this;
                 try {
-                    const STDCode = sap.ui.getCore().byId("MC_id_codeModel").getValue();
                     // Validate Mandatory Fields
                     var isMandatoryValid = (
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
@@ -372,7 +409,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
-                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_State"), "ID") &&
+                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_City"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
                     );
@@ -385,7 +422,7 @@ sap.ui.define([
                     // Optional Field Validations
                     if (oData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
                     if (oData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
-                    if (oData.mobileNo && !utils._LCvalidateMobileNumberWithSTD(sap.ui.getCore().byId("MC_id_CustMob"), STDCode)) isValid = false;
+                    if (oData.mobileNo && ! this.MC_ValidateMobileNo(sap.ui.getCore().byId("MC_id_CustMob"))) isValid = false;
                     if (oData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
                     if (!isValid) {
                         MessageToast.show(this.i18nModel.getText("mandetoryChecks"));
@@ -453,7 +490,7 @@ sap.ui.define([
                     // Optional Field Validations
                     if (oUpdatedData.PAN && !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustomPan"), "ID")) isValid = false;
                     if (oUpdatedData.GST && !utils._LCvalidateGstNumber(sap.ui.getCore().byId("MC_id_CustomGst"), "ID")) isValid = false;
-                    if (oUpdatedData.mobileNo && !utils._LCvalidateMobileNumberWithSTD(sap.ui.getCore().byId("MC_id_CustMob"), STDCode)) isValid = false;
+                    if (oUpdatedData.mobileNo && !this.MC_ValidateMobileNo(sap.ui.getCore().byId("MC_id_CustMob"))) isValid = false;
                     if (oUpdatedData.LUT && !utils._LCvalidateLutNumber(sap.ui.getCore().byId("MC_id_LUTNo"), "ID")) isValid = false;
                     // Check if any mandatory fields are invalid
                     if (!isValid) {

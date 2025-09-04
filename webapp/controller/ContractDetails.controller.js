@@ -369,14 +369,6 @@ sap.ui.define([
                 }
             },
 
-           CD_validateMobileNo: function (oEvent) {
-                var sStdCode = this.byId("CD_id_codeModel").getValue()  
-                utils._LCvalidateMobileNumberWithSTD(oEvent, sStdCode);
-                if (this.sArgPara === "CreateContractFlag") {
-                    this.validateStep(); //  validation if in create flow
-                }
-            },
-
             CD_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
@@ -421,8 +413,64 @@ sap.ui.define([
                     oCurrencyCB.setValue(oCountryData?.currency || "");
                     oStdCodeCB.setValue(oCountryData?.stdCode || "");
                 }
-
+                this._setMobileMaxLength();
                 if (isCreate) this.validateStep();
+            },
+
+             _setMobileMaxLength: function() {
+                    const isCreate     = this.sArgPara === "CreateContractFlag";
+                    const oModel       = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
+                    const sCountry = oModel.getProperty("/Country");
+                    const oMobileInput   = this.byId(isCreate ? "CD_id_Mobile"  : "CU_id_Mobile");
+                    if (sCountry === "India") {
+                        oMobileInput.setMaxLength(10);
+                    } else {
+                        oMobileInput.setMaxLength(20);
+                    }
+            },
+
+            CD_validateMobileNo: function(oEventOrControl) {
+                const oInput = oEventOrControl.getSource ? oEventOrControl.getSource() : oEventOrControl;
+                const isCreate = this.sArgPara === "CreateContractFlag";
+                const oModel = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
+                const sCountryName = oModel.getProperty("/Country");
+                const sValue = oInput.getValue().trim();
+                const maxLength = oInput.getMaxLength();
+                oInput.setValueState(sap.ui.core.ValueState.None);
+                oInput.setValueStateText("");
+
+                // Only digits
+                if (!/^\d*$/.test(sValue)) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Only numbers are allowed");
+                    return false;
+                }
+
+                // Cannot start with 0
+                if (sValue.startsWith("0")) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText("Mobile Number cannot begin with 0");
+                    return false;
+                }
+
+                // India vs Others validation
+                if (sCountryName === "India") {
+                    if (sValue.length !== 10) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Mobile Number must be exactly 10 digits long");
+                        return false;
+                    }
+                } else {
+                    if (sValue.length < 4 || sValue.length > maxLength) {
+                        oInput.setValueState(sap.ui.core.ValueState.Error);
+                        oInput.setValueStateText("Enter a valid mobile number (between 4-" + maxLength + " digits)");
+                        return false;
+                    }
+                }
+                 if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+                return true;
             },
 
             CD_onChangeState: function (oEvent) {
@@ -470,13 +518,6 @@ sap.ui.define([
             },
 
             CD_ValidateCommonFields: function (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
-                if (this.sArgPara === "CreateContractFlag") {
-                    this.validateStep(); //  validation if in create flow
-                }
-            },
-
-            CD_ValidateComboBox: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 if (this.sArgPara === "CreateContractFlag") {
                     this.validateStep(); //  validation if in create flow
@@ -596,37 +637,37 @@ sap.ui.define([
                 const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
                     oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.Location && oModel.StartDate && oModel.EndDate && oModel.InsuranceRequirement && oModel.WarrantyDate && oModel.AdditionalRates && oModel.PaymentTerms && oModel.Country && oModel.State && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
-                if (bAllFieldsFilled) {
-                    // Run validations with correct chaining using &&
-                    let bValid =
-                        utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_ConsultingService"), "ID") &&
-                        utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
-                        utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_Currency"), "ID") &&
-                        utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
-                        utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
-                        utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_InsuranceReq"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_Warranty"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_AddRate"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), oModel.STDCode);
+               if (bAllFieldsFilled) {
+                const oMobileInput = this.getView().byId("CD_id_Mobile");
+                let bValid =
+                    utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
+                    utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
+                    utils._LCvalidateName(this.byId("CD_id_ConsultingService"), "ID") &&
+                    utils._LCvalidateEmail(this.byId("CD_id_Email"), "ID") &&
+                    utils._LCvalidateName(this.byId("CD_id_EndClientHirer"), "ID") &&
+                    utils._LCvalidateAmount(this.byId("CD_id_Amount"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CD_id_Currency"), "ID") &&
+                    utils._LCvalidateName(this.byId("CD_id_HiringContact"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_Locationcomb"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CD_id_Datestart"), "ID") &&
+                    utils._LCvalidateDate(this.byId("CD_id_DateEnd"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_InsuranceReq"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_Warranty"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_AddRate"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_PaymentTerms"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
+                    oMobileInput.getValue().length <= oMobileInput.getMaxLength() &&
+                    utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID");
 
-                    // Set wizard step validation
-                    this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
-                } else {
-                    this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
-                    this.byId("CD_id_Firststep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
-                }
+                // Set wizard step validation
+                this.byId("CD_id_Wizard").getSteps()[0].setValidated(bValid);
+            } else {
+                this.byId("CD_id_Wizard").getSteps()[0].setValidated(false);
+                this.byId("CD_id_Firststep").getAggregation("_nextButton").setText(this.i18nModel.getText("review"));
+            }
             },
 
             //radio button select function
@@ -666,7 +707,7 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
-                        utils._LCvalidateMobileNumberWithSTD(this.byId("CD_id_Mobile"), STDCode)
+                        this.CD_validateMobileNo(this.getView().byId("CD_id_Mobile"))
                     ) {
                         var formattedText;
                         switch (this.RadioButton) {
@@ -884,7 +925,7 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(this.byId("CU_id_State"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_codeModel"), "ID") &&
-                    utils._LCvalidateMobileNumberWithSTD(this.byId("CU_id_Mobile"), STDCode)
+                    this.CD_validateMobileNo(this.getView().byId("CU_id_Mobile"))
                 );
 
                 if (!isMandatoryValid || !isDateRangeValid) {
