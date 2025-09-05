@@ -533,6 +533,7 @@ sap.ui.define(
                                 ContractLocation: oModelData.ContractLocation,
                                 BranchCode: oModelData.BranchCode,
                                 Country: oModelData.Country,
+                                State:oModelData.State
                             };
 
                             if (oContractFormVisible.showMobileFields) {

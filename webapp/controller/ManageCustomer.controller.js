@@ -120,6 +120,8 @@ sap.ui.define([
                 sap.ui.getCore().byId("MC_id_FinanceEmail").setValueState("None");
                 sap.ui.getCore().byId("MC_id_CustMob").setValueState("None");
                 sap.ui.getCore().byId("MC_id_Country").setValueState("None");
+                sap.ui.getCore().byId("MC_id_State").setValueState("None");
+                sap.ui.getCore().byId("MC_id_City").setValueState("None");
                 sap.ui.getCore().byId("MC_id_codeModel").setValueState("None");
                 sap.ui.getCore().byId("MC_id_CustAddress").setValueState("None");
                 sap.ui.getCore().byId("MC_id_HeadPosition").setValueState("None");
