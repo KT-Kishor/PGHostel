@@ -939,7 +939,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         sMessage = this.i18nModel.getText("selfServiceUpdateEmployee");
         if (sButtonId === "BasicDetailsBtn") {
           const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-          if (this.sNavigatedRole !== "Trainee" && !sEmployeeType) {
+          if (this.sNavigatedRole === "Trainee" && !sEmployeeType) {
               MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
               return false; // Stop the save process
           }

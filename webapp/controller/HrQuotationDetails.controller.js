@@ -550,16 +550,16 @@ sap.ui.define(
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
           utils._LCstrictValidationComboBox(this.byId("HRQstate"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
-          utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
           utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCompanyMobileNo"), CompanySTDCode) &&
+          utils._LCstrictValidationComboBox(this.byId("HQD_id_mobileNumber"), "ID") &&
           utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&
           (!isINR || utils._LCvalidateGstNumber(this.byId("HQD_id_CompGSTNO"), "ID")) &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Curency"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") &&
           utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
+           utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
-          utils._LCstrictValidationComboBox(this.byId("HQD_id_mobileNumber"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
           (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
         if (!bIsValid) {
