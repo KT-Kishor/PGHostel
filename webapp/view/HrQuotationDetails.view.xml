@@ -174,12 +174,12 @@
                                             />
                                         </m:ComboBox>
                                         <m:Input
+                                            maxLength="{= ${SingleCompanyModel>/STDCode} === '+91' ? 10 : 20 }"  
                                             value="{SingleCompanyModel>/CompanyMobileNo}"
                                             id="HQD_id_InputCompanyMobileNo"
                                             placeholder="{i18n>mobileNo}"
                                             liveChange="HQD_onMNumberLiveChange"
                                             editable="{visiablityPlay>/editable}"
-                                            maxLength="20"
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
@@ -347,12 +347,12 @@
                                             />
                                         </m:ComboBox>
                                         <m:Input
+                                            maxLength="{= ${SingleCompanyModel>/STDCode} === '+91' ? 10 : 20 }"
                                             value="{SingleCompanyModel>/CustomerMobileNo}"
                                             id="HQD_id_InputCustomerMobileNo"
                                             liveChange="HQD_onMNumberLive"
                                             valueStateText="{i18n>mobileNoValueState}"
                                             editable="{visiablityPlay>/editable}"
-                                            maxLength="20"
                                             placeholder="{i18n>mobileNo}"
                                         />
                                         <m:Label text="{i18n>customerGSTNO}" />
