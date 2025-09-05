@@ -511,13 +511,13 @@ sap.ui.define([
                         this.SOW_oDialog.open();
                         var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                         if (oTable) oTable.removeSelections(true);
-                        this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate"]);
+                        this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate","Sow_id_Currency"]);
                     }.bind(this));
                 } else {
                     this.SOW_oDialog.open();
                     var oTable = sap.ui.getCore().byId("SOW_id_oTableCreateSow");
                     if (oTable) oTable.removeSelections(true);
-                    this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate"]);
+                    this._FragmentDatePickersReadOnly(["SOW_id_EndDate", "SOW_id_StartDate","Sow_id_Currency"]);
                 }
             },
 

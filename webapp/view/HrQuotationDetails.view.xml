@@ -59,7 +59,7 @@
                                             visible="{visiablityPlay>/editVisi}"
                                         />
                                         <m:Label
-                                            text="{i18n>quotaiodate}"
+                                            text="{i18n>qDate}"
                                             required="true"
                                         />
                                         <m:DatePicker
