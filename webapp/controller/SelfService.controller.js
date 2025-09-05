@@ -855,7 +855,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       this.getBusyDialog();
       try {
         const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-        if (!sEmployeeType) {
+        if (this.sNavigatedRole === "Trainee" && !sEmployeeType) {
           MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
           this.closeBusyDialog();
           return;
