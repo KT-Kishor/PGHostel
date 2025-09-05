@@ -439,7 +439,6 @@ sap.ui.define([
                 const isCreate = this.sArgPara === "CreateContractFlag";
                 const oModel = this.getView().getModel(isCreate ? "ContractModelWizart" : "oFilteredContractModel");
                 const sCountryName = oModel.getProperty("/Country");
-                const sValue = oInput.getValue().trim();
                 const maxLength = oInput.getMaxLength();
                 oInput.setValueState(sap.ui.core.ValueState.None);
                 oInput.setValueStateText("");
