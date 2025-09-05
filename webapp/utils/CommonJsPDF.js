@@ -376,56 +376,75 @@ sap.ui.define([], function () {
                     doc.setLineWidth(1);
                     doc.line(margin, monComp0BotLineY, pageWidth - margin, monComp0BotLineY);
 
-                    let deductionsTitleY = monComp0BotLineY + 5;
-                    let deductionsTitle = "Deductions";
-                    let deductionsTitleWidth = doc.getTextWidth(deductionsTitle);
-                    let deductionsTitleX = (pageWidth - deductionsTitleWidth) / 2;
-                    let deductionsTitleBotLineY = deductionsTitleY + 2;
-                    doc.line(margin, deductionsTitleBotLineY, pageWidth - margin, deductionsTitleBotLineY);
-                    doc.setLineWidth(0.5);
-                    doc.setFillColor(191, 191, 191);
-                    doc.rect(margin, monComp0BotLineY, maxWidth, deductionsTitleBotLineY - monComp0BotLineY, 'F');
-                    doc.text(deductionsTitle, deductionsTitleX, deductionsTitleY);
+                    // === Deductions ===
+                    var deductions = oModel.Deductions || [];
+                    let hasDeductions = deductions.some((item, idx) => idx > 0 && item.Text && item.Text !== "0")
+                                    || (deductions[0] && deductions[0].Text && deductions[0].Text !== "0");
 
-                    doc.setFont("helvetica", "normal");
-                    var deductions = oModel.Deductions;
-                    let dedCurrentY = deductionsTitleBotLineY + 5;  // Initial Y position
+                    let nextSectionStartY; // for next section (variable / gross)
+                    let deductionsSectionTopY, deductionsSectionBotY; 
 
-                    for (let i = 1; i <= deductions.length - 1; i++) {
-                        if (!deductions[i].Text) continue; // Skip if no value
+                    if (hasDeductions) {
+                        let deductionsTitleY = monComp0BotLineY + 5;
+                        let deductionsTitle = "Deductions";
+                        let deductionsTitleWidth = doc.getTextWidth(deductionsTitle);
+                        let deductionsTitleX = (pageWidth - deductionsTitleWidth) / 2;
+                        let deductionsTitleBotLineY = deductionsTitleY + 2;
 
-                        doc.text(deductions[i].Title, margin + 3, dedCurrentY);
+                        doc.line(margin, deductionsTitleBotLineY, pageWidth - margin, deductionsTitleBotLineY);
+                        doc.setLineWidth(0.5);
+                        doc.setFillColor(191, 191, 191);
+                        doc.rect(margin, monComp0BotLineY, maxWidth, deductionsTitleBotLineY - monComp0BotLineY, 'F');
+                        doc.text(deductionsTitle, deductionsTitleX, deductionsTitleY);
 
-                        let compText = deductions[i].Text;
-                        let compTextWidth = doc.getTextWidth(compText);
-                        let compTextX = pageWidth - compTextWidth - margin - 3;
-                        doc.text(compText, compTextX, dedCurrentY);
+                        doc.setFont("helvetica", "normal");
+                        let dedCurrentY = deductionsTitleBotLineY + 5;
 
-                        let botLineY = dedCurrentY + 2;
-                        doc.line(margin, botLineY, pageWidth - margin, botLineY);
+                        for (let i = 1; i <= deductions.length - 1; i++) {
+                            if (!deductions[i].Text || deductions[i].Text === "0") continue;
 
-                        dedCurrentY = botLineY + 5;
+                            doc.text(deductions[i].Title, margin + 3, dedCurrentY);
+
+                            let compText = deductions[i].Text;
+                            let compTextWidth = doc.getTextWidth(compText);
+                            let compTextX = pageWidth - compTextWidth - margin - 3;
+                            doc.text(compText, compTextX, dedCurrentY);
+
+                            let botLineY = dedCurrentY + 2;
+                            doc.line(margin, botLineY, pageWidth - margin, botLineY);
+
+                            dedCurrentY = botLineY + 5;
+                        }
+
+                        doc.setFont("helvetica", "bold");
+                        let deductions0Y = dedCurrentY;
+                        doc.text(deductions[0].Title, margin + 3, deductions0Y);
+
+                        let deductions0Text = deductions[0].Text;
+                        let deductions0TextWidth = doc.getTextWidth(deductions0Text);
+                        let deductions0TextX = pageWidth - deductions0TextWidth - margin - 3;
+                        doc.text(deductions0Text, deductions0TextX, deductions0Y);
+
+                        let deductions0BotLineY = deductions0Y + 2;
+                        doc.setLineWidth(1);
+                        doc.line(margin, deductions0BotLineY, pageWidth - margin, deductions0BotLineY);
+
+                        nextSectionStartY = deductions0BotLineY;
+                        deductionsSectionTopY = deductionsTitleBotLineY;
+                        deductionsSectionBotY = deductions0BotLineY;
+                    } else {
+                        nextSectionStartY = monComp0BotLineY;
+                        deductionsSectionTopY = monComp0BotLineY;
+                        deductionsSectionBotY = monComp0BotLineY;
                     }
 
-                    doc.setFont("helvetica", "bold");
-                    let deductions0Y = dedCurrentY;
-                    doc.text(deductions[0].Title, margin + 3, deductions0Y);
-                    let deductions0Text = deductions[0].Text;
-                    let deductions0TextWidth = doc.getTextWidth(deductions0Text);
-                    let deductions0TextX = pageWidth - deductions0TextWidth - margin - 3;
-                    doc.text(deductions0Text, deductions0TextX, deductions0Y);
-                    let deductions0BotLineY = deductions0Y + 2;
-                    doc.setLineWidth(1);
-                    doc.line(margin, deductions0BotLineY, pageWidth - margin, deductions0BotLineY);
-
-                    let nextSectionStartY = deductions0BotLineY + 5;
-                    let varComp = oModel.VariableComponents || [];
+                    // === Variable Components ===
+                    var varComp = oModel.VariableComponents || [];
                     let hasVariable = varComp.some((item, idx) => idx > 0 && item.Text && item.Text !== "0")
-                                || (varComp[0] && varComp[0].Text && varComp[0].Text !== "0");
+                                    || (varComp[0] && varComp[0].Text && varComp[0].Text !== "0");
 
                     if (hasVariable) {
-                        // Header Y
-                        let varCompTitleY = deductions0BotLineY + 5;
+                        let varCompTitleY = nextSectionStartY + 5;
                         let varCompTitle = "Variable Component";
                         let varCompTitleWidth = doc.getTextWidth(varCompTitle);
                         let varCompTitleX = (pageWidth - varCompTitleWidth) / 2;
@@ -434,7 +453,7 @@ sap.ui.define([], function () {
                         doc.setLineWidth(0.5);
                         doc.line(margin, varCompTitleBotLineY, pageWidth - margin, varCompTitleBotLineY);
                         doc.setFillColor(191, 191, 191);
-                        doc.rect(margin, deductions0BotLineY, maxWidth, varCompTitleBotLineY - deductions0BotLineY, 'F');
+                        doc.rect(margin, nextSectionStartY, maxWidth, varCompTitleBotLineY - nextSectionStartY, 'F');
                         doc.text(varCompTitle, varCompTitleX, varCompTitleY);
 
                         let centerX = (typeof pageMiddle !== 'undefined') ? (pageMiddle + 10) : (pageWidth / 2);
@@ -442,7 +461,7 @@ sap.ui.define([], function () {
                         doc.setFont("helvetica", "normal");
                         let varCompCurrentY = varCompTitleBotLineY + 5;
 
-                        for (let i = 1; i <= varComp.length - 1; i++) {
+                       for (let i = 1; i <= varComp.length - 1; i++) {
                             if (!varComp[i] || !varComp[i].Text || varComp[i].Text === "0") continue;
 
                             // Left column - Title
@@ -450,12 +469,9 @@ sap.ui.define([], function () {
 
                             // Right column - Value (right-aligned)
                             let compText = varComp[i].Text;
-                            let compTextWidth = doc.getTextWidth(compText);
+                             let compTextWidth = doc.getTextWidth(compText);
                             let compTextX = pageWidth - compTextWidth - margin - 3;
                             doc.text(compText, compTextX, varCompCurrentY);
-
-                            // Horizontal line under this row
-                            let botLineY = varCompCurrentY + 2;
                             doc.setLineWidth(0.4);
                             doc.line(margin, botLineY, pageWidth - margin, botLineY);
                             lastBotY = botLineY;
@@ -545,8 +561,7 @@ sap.ui.define([], function () {
                     doc.setTextColor(0, 0, 0);
 
                     doc.line(pageMiddle + 10, yearlyCompTitleBotLineY, pageMiddle + 10, monComp0BotLineY);
-                    doc.line(pageMiddle + 10, deductionsTitleBotLineY, pageMiddle + 10, deductions0BotLineY);
-                    doc.line(pageMiddle + 10, nextSectionStartY, pageMiddle + 10, nextSectionStartY);
+                    doc.line(pageMiddle + 10, deductionsSectionTopY, pageMiddle + 10, deductionsSectionBotY);
                     doc.line(pageMiddle + 10, grossTitleBotLineY, pageMiddle + 10, grossPayBotLineY);
                     doc.line(margin, topLineY, margin, grossPayBotLineY);
                     doc.line(pageWidth - margin, topLineY, pageWidth - margin, grossPayBotLineY);
