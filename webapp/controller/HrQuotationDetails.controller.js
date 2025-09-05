@@ -1372,6 +1372,7 @@ sap.ui.define(
             State: this.byId("HRQstate").getSelectedKey(),
             Branch: this.byId("HQD_id_BranchCode").getSelectedKey(),
             CompanyGSTNO: this.byId("HQD_id_CompGSTNO").getValue(),
+            STDCode:this.byId("HQD_id_mobileNumber").getValue(),
             CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
             CustomerSTDCode: this.byId("HQD_id_CustomerNumberSTD").getValue(),
             CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
