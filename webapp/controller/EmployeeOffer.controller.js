@@ -407,7 +407,8 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/m/MessageToast", 
         if (
           utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_EmployeeRole"), "ID") &&
           utils._LCstrictValidationComboBox(sap.ui.getCore().byId("OEF_id_Country"), "ID") &&
-          utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idSelect"), "ID") &&
+          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_State"), "ID") &&
+          utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idSelect"), "ID") &&
           utils._LCvalidateEmail(sap.ui.getCore().byId("OEF_id_CompanyMail"), "ID") &&
           utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_PAddress"), "ID") &&
           utils._LCvalidateMandatoryField(sap.ui.getCore().byId("OEF_id_CAddress"), "ID") &&
