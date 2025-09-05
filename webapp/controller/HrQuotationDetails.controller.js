@@ -22,6 +22,8 @@ sap.ui.define(
         var oVisiModel = new JSONModel();
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
         this._fetchCommonData("Country", "CountryModel");
+        this._fetchCommonData("State", "StateModel");
+        
         if (sQuotationNo === "new") {
           // Create new mode
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
