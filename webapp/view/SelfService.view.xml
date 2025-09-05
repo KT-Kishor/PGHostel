@@ -87,8 +87,7 @@
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
-										<m:Label text="{i18n>experienceSelectionRequired}"/>
-										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }">
+										<m:RadioButtonGroup id="SS_experienceRadioGroup" columns="2" select="onExperienceSelect" enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }" visible="{= !${viewModel>/TraineeRole} }">
 											<m:buttons>
 												<m:RadioButton id="SS_fresherRadio" text="{i18n>fresher}" />
 												<m:RadioButton id="SS_experiencedRadio" text="{i18n>experienced}" />
