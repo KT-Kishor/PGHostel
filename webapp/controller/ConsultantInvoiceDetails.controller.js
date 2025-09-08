@@ -37,9 +37,9 @@ sap.ui.define(
                         this.UnitAmount = true;
                         this.getBusyDialog()
                         // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
-                         // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
+                        // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
                         if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice", Action: "CC" });
-                       
+
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",
                             InvoiceNo: "", InvoiceDate: "", ConsultantAddress: "", GSTNO: "",
@@ -82,7 +82,7 @@ sap.ui.define(
                             this.byId("CI_id_ConsultantInvoiceDeatailTable").setMode("Delete");
                         } else {
                             await this.commonFetchInvoiceData(this.decodedPath, this.decodedEmployeeID),
-                            await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
+                                await this.commonFetchInvoiceItems(this.decodedPath, this.decodedEmployeeID)
                             await this.setVisibilityForEdit();
                             await this.onFetchContractDetails();
                         }
@@ -308,8 +308,10 @@ sap.ui.define(
                             var InvoiceTo = oCompanyDetails.companyName;
                             var InvoiceAddress = oCompanyDetails.longAddress;
                             var CompanyGSTNO = oCompanyDetails.gstin;
+                            var CompanyCode = oCompanyDetails.companyCode;
 
                             oInvoiceModel.setProperty("/InvoiceTo", InvoiceTo);
+                            oInvoiceModel.setProperty("/CompanyCode", CompanyCode);
                             oInvoiceModel.setProperty("/InvoiceAddress", InvoiceAddress);
                             oInvoiceModel.setProperty("/CompanyGSTNO", CompanyGSTNO);
                             oInvoiceModel.setProperty("/InvoiceDate", oToday);
@@ -358,6 +360,23 @@ sap.ui.define(
                         this.closeBusyDialog();
                         sap.m.MessageToast.show(error.message || error.responseText);
                     }.bind(this));
+                },
+                CI_onCompanyCodeChange: function (oEvent) {
+                    var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
+                    var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
+                    var oSelectedCompany = aCompanyData.find(function (item) {
+                        return item.companyCode === sSelectedCompanyCode;
+                    });
+                    if (oSelectedCompany) {
+                        var oSingleCompanyModel = this.getView().getModel("ConsultantInvoiceModel");
+                        if (!oSingleCompanyModel) return;
+
+
+                        oSingleCompanyModel.setProperty("/CompanyCode", oSelectedCompany.companyCode);
+                        oSingleCompanyModel.setProperty("/InvoiceTo", oSelectedCompany.companyName);
+                        oSingleCompanyModel.setProperty("/InvoiceAddress", oSelectedCompany.longAddress);
+                        oSingleCompanyModel.setProperty("/CompanyGSTNO", oSelectedCompany.gstin);
+                    }
                 },
 
                 setVisibilityForEdit: function () {
@@ -430,7 +449,7 @@ sap.ui.define(
                 },
 
                 CI_onInputChange: async function (oEvent) {
-                     this.UnitAmount = utils._LCvalidateAmount(oEvent);
+                    this.UnitAmount = utils._LCvalidateAmount(oEvent);
 
                     const oInput = oEvent.getSource();
                     const oBindingContext = oInput.getBindingContext("ConsultantInvoiceModel");
@@ -1028,6 +1047,7 @@ sap.ui.define(
                     try {
                         const that = this;
                         var isMandatoryValid = (
+                            utils._LCstrictValidationComboBox(this.byId("CI_id_CompanyCode"), "ID") &&
                             utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
                             utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
@@ -1125,6 +1145,7 @@ sap.ui.define(
                                 EmployeeID: invoiceData.EmployeeID,
                                 ConsultantName: invoiceData.ConsultantName,
                                 InvoiceTo: invoiceData.InvoiceTo,
+                                CompanyCode: invoiceData.CompanyCode,
                                 InvoiceAddress: invoiceData.InvoiceAddress,
                                 InvoiceDate: sInvoiceDate,
                                 ConsultantAddress: invoiceData.ConsultantAddress,
@@ -1224,6 +1245,7 @@ sap.ui.define(
                     const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
 
                     var isMandatoryValid = (
+                        utils._LCstrictValidationComboBox(this.byId("CI_id_CompanyCode"), "ID") &&
                         utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
                         utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&
@@ -1280,6 +1302,7 @@ sap.ui.define(
                         // Prepare main invoice data payload
                         var data = {
                             InvoiceNo: oConsultantInvoiceModel.InvoiceNo,
+                            CompanyCode: oConsultantInvoiceModel.CompanyCode,
                             EmployeeID: oConsultantInvoiceModel.EmployeeID,
                             ConsultantName: oConsultantInvoiceModel.ConsultantName,
                             InvoiceTo: oConsultantInvoiceModel.InvoiceTo,

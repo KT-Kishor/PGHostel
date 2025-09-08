@@ -49,6 +49,7 @@
                                     columnsM="1"
                                 >
                                     <f:content>
+                                    
                                         <m:Label
                                             text="{i18n>quotaionNo}"
                                             visible="{visiablityPlay>/editVisi}"
@@ -59,7 +60,27 @@
                                             visible="{visiablityPlay>/editVisi}"
                                         />
                                         <m:Label
-                                            text="{i18n>qDate}"
+                                            text="Company Branch"
+                                           required="true"
+                                        />
+                                        <m:ComboBox
+                                            items="{path:'CompanyCodeDetailsModel>/',length: 1000}"
+                                         selectedKey="{SingleCompanyModel>/CompanyCode}"
+                                            width="100%"
+                                            showSecondaryValues="true"
+                                            valueStateText=""
+                                            editable="{visiablityPlay>/editable}"
+                                            id="HQD_id_CompanyCode"
+                                            change="HQD_onCompanyCodeChange"
+                                        >
+                                            <core:ListItem
+                                                key="{CompanyCodeDetailsModel>companyCode}"
+                                                text="{CompanyCodeDetailsModel>companyCode}"
+                                                additionalText="{CompanyCodeDetailsModel>companyName}"
+                                            />
+                                        </m:ComboBox>
+                                        <m:Label
+                                            text="{i18n>qD  ate}"
                                             required="true"
                                         />
                                         <m:DatePicker
@@ -83,6 +104,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_QuotationValid"
                                         />
+                                        
                                         <m:Label
                                             text="{i18n>expCountry}"
                                             required="true"
@@ -110,6 +132,7 @@
                                         <m:ComboBox
                                             id="HRQstate"
                                             selectedKey="{SingleCompanyModel>/State}"
+                                            value="{SingleCompanyModel>/State}"
                                             width="100%"
                                             change="HR_onChangeState"
                                             items="{path: 'StateModel>/', length: 200, sorter: { path: 'stateName'}}"

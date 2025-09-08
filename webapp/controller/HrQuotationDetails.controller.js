@@ -23,7 +23,7 @@ sap.ui.define(
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
         this._fetchCommonData("Country", "CountryModel");
         this._fetchCommonData("State", "StateModel");
-        
+
         if (sQuotationNo === "new") {
           // Create new mode
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
@@ -43,11 +43,12 @@ sap.ui.define(
             CompanyGSTNO: oRawData.gstin,
             CompanyEmailID: oRawData.carrerEmail,
             CompanyMobileNo: sActualMobileNo,
+            CompanyCode: oRawData.companyCode,
             STDCode: "+91",
             CustomerSTDCode: "+91",
-            Country: "India",
-            State: "Karnataka",
-            Branch: "Kalaburagi",
+            Country:oRawData.country ,
+            State: oRawData.state ,
+            Branch:oRawData.branch ,
             Currency: "INR",
             gstEditable: true,
             IGSTSelected: false,
@@ -170,10 +171,40 @@ sap.ui.define(
         }
         this.getView().setModel(oVisiModel, "visiablityPlay");
         this.closeBusyDialog();
+        this.HQD_onCompanyCodeChange()
       },
       onLogout: function () {
         this.CommonLogoutFunction();
       },
+HQD_onCompanyCodeChange: function (oEvent) {
+    var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
+    var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
+    var oSelectedCompany = aCompanyData.find(function (item) {
+        return item.companyCode === sSelectedCompanyCode;
+    });
+    if (oSelectedCompany) {
+        var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+        if (!oSingleCompanyModel) return;
+        var sMobileNo = oSelectedCompany.mobileNo || "";
+        var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+
+        oSingleCompanyModel.setProperty("/CompanyCode", oSelectedCompany.companyCode);
+        oSingleCompanyModel.setProperty("/CompanyName", oSelectedCompany.companyName);
+        oSingleCompanyModel.setProperty("/CompanyAddress", oSelectedCompany.longAddress);
+        oSingleCompanyModel.setProperty("/CompanyGSTNO", oSelectedCompany.gstin);
+        oSingleCompanyModel.setProperty("/CompanyEmailID", oSelectedCompany.carrerEmail);
+        oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+        oSingleCompanyModel.setProperty("/Country", oSelectedCompany.country);
+        oSingleCompanyModel.setProperty("/State", oSelectedCompany.state);
+        oSingleCompanyModel.setProperty("/Branch", oSelectedCompany.branch);
+        oSingleCompanyModel.setProperty("/STDCode", "+91");
+        oSingleCompanyModel.setProperty("/Percentage", 9);
+        oSingleCompanyModel.setProperty("/Currency", "INR");
+        // Customer fields remain untouched
+    }
+},
+
+
 
       HQD_onComGSTLiveChange: function (oEvent) {
         utils._LCvalidateGstNumber(oEvent);
@@ -547,6 +578,7 @@ sap.ui.define(
         const bIsValid =
           utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
           utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
+          utils._LCstrictValidationComboBox(this.byId("HQD_id_CompanyCode"), "ID") &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_Country"), "ID") &&
           utils._LCstrictValidationComboBox(this.byId("HRQstate"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
@@ -558,7 +590,7 @@ sap.ui.define(
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyAddress"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_CustomerName"), "ID") &&
           utils._LCvalidateEmail(this.byId("HQD_id_CustomerEmailID"), "ID") &&
-           utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
+          utils._LCvalidateMobileNumberWithSTD(this.byId("HQD_id_InputCustomerMobileNo"), CustomerSTDCode) &&
           utils._LCstrictValidationComboBox(this.byId("HQD_id_CustomerNumberSTD"), "ID") &&
           utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCustomerAddress"), "ID") &&
           (!isINR || utils._LCvalidateMandatoryField(this.byId("HQD_id_Percentage"), "ID"));
@@ -623,10 +655,12 @@ sap.ui.define(
         const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
         const sValidUntilDate = oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue());
         const oCurrency = this.byId("HQD_id_Curency").getSelectedKey();
+        const oComapnyCode = this.byId("HQD_id_CompanyCode").getSelectedKey();
         const data = {
           Date: sQuotationDate,
           ValidUntil: sValidUntilDate,
           CompanyName: this.byId("HQD_id_InputCompanyName").getValue(),
+          CompanyCode: oComapnyCode,
           CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
           CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
           Country: this.byId("HQD_id_Country").getSelectedKey(),
@@ -1221,6 +1255,7 @@ sap.ui.define(
           "HQD_id_UnitPriceInput",
           "HQD_id_DiscountInput",
           "HQD_id_DaysInput",
+          "HQD_id_CompanyCode"
         ];
         fields.forEach((id) => {
           const oControl = this.byId(id);
@@ -1324,6 +1359,7 @@ sap.ui.define(
           const bIsValid =
             utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
             utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
+            utils._LCstrictValidationComboBox(this.byId("HQD_id_CompanyCode"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
             mobileUtils.validateMobile(this.byId("HQD_id_InputCompanyMobileNo"), "ID") &&
             utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&
@@ -1365,14 +1401,16 @@ sap.ui.define(
           const sQuotationNo = oSingleModel.getProperty("/QuotationNo");
           const data = {
             CompanyName: this.byId("HQD_id_InputCompanyName").getValue(),
+            CompanyCode: this.byId("HQD_id_CompanyCode").getSelectedKey(),
             CompanyAddress: this.byId("HQD_id_InputCompanyAddress").getValue(),
             Date: sQuotationDate,
             ValidUntil: sValidUntilDate,
+
             Country: this.byId("HQD_id_Country").getSelectedKey(),
             State: this.byId("HRQstate").getSelectedKey(),
             Branch: this.byId("HQD_id_BranchCode").getSelectedKey(),
             CompanyGSTNO: this.byId("HQD_id_CompGSTNO").getValue(),
-            STDCode:this.byId("HQD_id_mobileNumber").getValue(),
+            STDCode: this.byId("HQD_id_mobileNumber").getValue(),
             CompanyMobileNo: this.byId("HQD_id_InputCompanyMobileNo").getValue(),
             CustomerSTDCode: this.byId("HQD_id_CustomerNumberSTD").getValue(),
             CompanyEmailID: this.byId("HQD_id_CompanyEmailID").getValue(),
