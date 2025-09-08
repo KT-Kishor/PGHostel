@@ -275,7 +275,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
       this.getBusyDialog();
       var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
-        CompanyCode: selectedkey,
+        companyCode: selectedkey,
       }).then((oData) => {
         var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
         return PoData[0];

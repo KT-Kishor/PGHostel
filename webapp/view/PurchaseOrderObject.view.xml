@@ -64,7 +64,7 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="{i18n>branchCode}"
+                                            text="{i18n>companyCode}"
                                             class="oSowFragLabel"
                                             required="true"
                                         />
