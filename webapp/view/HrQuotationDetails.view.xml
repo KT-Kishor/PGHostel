@@ -68,7 +68,7 @@
                                          selectedKey="{SingleCompanyModel>/CompanyCode}"
                                             width="100%"
                                             showSecondaryValues="true"
-                                            valueStateText=""
+                                            valueStateText="Enter Company Code"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_CompanyCode"
                                             change="HQD_onCompanyCodeChange"

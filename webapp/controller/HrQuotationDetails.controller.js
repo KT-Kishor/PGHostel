@@ -177,6 +177,7 @@ sap.ui.define(
         this.CommonLogoutFunction();
       },
 HQD_onCompanyCodeChange: function (oEvent) {
+  utils._LCstrictValidationComboBox(oEvent);
     var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
     var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
     var oSelectedCompany = aCompanyData.find(function (item) {
