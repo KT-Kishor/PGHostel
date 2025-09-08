@@ -80,7 +80,7 @@
                                             />
                                         </m:ComboBox>
                                         <m:Label
-                                            text="{i18n>qD  ate}"
+                                            text="{i18n>qDate}"
                                             required="true"
                                         />
                                         <m:DatePicker

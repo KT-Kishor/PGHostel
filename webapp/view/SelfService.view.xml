@@ -124,10 +124,11 @@
 											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 										</m:ComboBox>
 										<!-- BaseLocation (now using CityModel) -->
-										<m:Label text="{i18n>baseLocation}" required="true" id="SS_id_lbase" />
+										<m:Label text="{i18n>city}" required="true" id="SS_id_lbase" />
 										<m:ComboBox items="{path:'CityModel>/',length:4000}" showSecondaryValues="true" value="{sEmployeeModel>/0/BaseLocation}" change="SS_onBaseLocationChange" id="SS_id_BaseL" editable="{viewModel>/AdminRole}" valueStateText="{i18n>selectBase}">
 											<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
 										</m:ComboBox>
+										
 										<m:Label text="{i18n>branchCode}" />
 										<m:Input id="SS_id_BranchCode" value="{sEmployeeModel>/0/BranchCode}" editable="false" />
 										<m:Label text="{i18n>designation}" required="true" id="SS_id_lds" />
