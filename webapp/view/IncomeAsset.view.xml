@@ -152,14 +152,14 @@
                          <ComboBox
                     id="IA_id_branch"
                     showSecondaryValues="true"
-                    items="{BaseLocationModel>/}"
+                    items="{CompanyCodeDetailsModel>/}"
                     showClearIcon="true"
 
                 >
                     <core:ListItem
-                        key="{BaseLocationModel>city}" 
-                        text="{BaseLocationModel>city}"
-                        additionalText="{BaseLocationModel>branchCode}"
+                        key="{CompanyCodeDetailsModel>city}" 
+                        text="{CompanyCodeDetailsModel>city}"
+                        additionalText="{CompanyCodeDetailsModel>companyCode}"
                     />
                 </ComboBox>
                     </fb:control>

@@ -21,6 +21,7 @@
             <f:content>
                 <Label text="{i18n>type}" required="true" />
                 <ComboBox id="FCIA_id_type"
+                placeholder="Select Asset Type"
                 selectedKey="{CreateIncomeAssetModel>/Type}"
                  items="{oAssetTypeModel>/}" 
                  change="IA_validateType"
@@ -34,6 +35,8 @@
                 <Label text="{i18n>pickedBy}" required="true" />
                 <ComboBox
                     id="FCIA_id_pickedby"
+                    placeholder="Select Employee"
+
                     selectedKey="{CreateIncomeAssetModel>/PickedEmployeeName}"
                     showSecondaryValues="true"
                     items="{AdminModel>/}"
@@ -56,12 +59,12 @@
                     value="{CreateIncomeAssetModel>/PickedBranch}"
                     
                     showSecondaryValues="true"
-                    items="{BaseLocationModel>/}"
+                    items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
-                        key="{BaseLocationModel>city}" 
-                        text="{BaseLocationModel>city}"
-                        additionalText="{BaseLocationModel>branchCode}"
+                        key="{CompanyCodeDetailsModel>city}" 
+                        text="{CompanyCodeDetailsModel>city}"
+                        additionalText="{CompanyCodeDetailsModel>companyCode}"
                     />
                 </ComboBox>
                 <Label text="{i18n>vehicleModel}" required="true" />
@@ -120,12 +123,12 @@
                     valueStateText="Select Branch"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
                     showSecondaryValues="true"
-                    items="{BaseLocationModel>/}"
+                    items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
-                        key="{BaseLocationModel>city}" 
-                        text="{BaseLocationModel>city}"
-                        additionalText="{BaseLocationModel>branchCode}"
+                        key="{CompanyCodeDetailsModel>city}" 
+                        text="{CompanyCodeDetailsModel>city}"
+                        additionalText="{CompanyCodeDetailsModel>branchCode}"
                     />
                 </ComboBox>
 
@@ -186,12 +189,12 @@
                     value="{CreateIncomeAssetModel>/TransferBranch}"
                     selectedKey="{CreateIncomeAssetModel>/TransferBranch}"
                     showSecondaryValues="true"
-                    items="{BaseLocationModel>/}"
+                    items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
-                        key="{BaseLocationModel>city}" 
-                        text="{BaseLocationModel>city}"
-                        additionalText="{BaseLocationModel>branchCode}"
+                        key="{CompanyCodeDetailsModel>city}" 
+                        text="{CompanyCodeDetailsModel>city}"
+                        additionalText="{CompanyCodeDetailsModel>companyCode}"
                     />
                 </ComboBox>
                  <Label text="{i18n>refrenceNo}" required="true" />

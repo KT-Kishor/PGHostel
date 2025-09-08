@@ -37,7 +37,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
       this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
       //  this._fetchCommonData("Currency", "CurrencyModel");
-      // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
       //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
       this._fetchCommonData("EmailContent", "CCMailModel", {
         Type: "PurchaseOrder",
@@ -95,6 +95,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         SerialNo: "",
         TotalAmount: "",
         BranchCode: "",
+        companyCode: "",
         CompanyName: "",
         CompanyPANNo: "",
         CompanyGSTNo: "",
@@ -105,13 +106,13 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       this.getView().setModel(model, "PurchaseOrderModel");
 
       var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
-        branchCode: "KLB01",
+        companyCode: "KT001",
       }).then((oData) => {
         var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
         return PoData[0];
       });
 
-      this.getView().getModel("PurchaseOrderModel").setProperty("/BranchCode", PoData.branchCode);
+      this.getView().getModel("PurchaseOrderModel").setProperty("/companyCode", PoData.companyCode);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", PoData.companyName);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyAddress", PoData.longAddress);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", PoData.gstin);
@@ -174,6 +175,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
 
           purchaseOrderModel.setProperty("/City", purchaseOrderData.PurchaseOrder[0].City);
           purchaseOrderModel.setProperty("/CustomerDesignation", purchaseOrderData.PurchaseOrder[0].CustomerDesignation);
+          purchaseOrderModel.setProperty("/companyCode", purchaseOrderData.PurchaseOrder[0].CompanyCode);
 
           var length = this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0;
           if (length == false) {
@@ -273,7 +275,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
       this.getBusyDialog();
       var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
-        branchCode: selectedkey,
+        CompanyCode: selectedkey,
       }).then((oData) => {
         var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
         return PoData[0];
@@ -427,6 +429,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
             STDCode: oModel.STDCode || "",
             LUT: oModel.LUT || "",
             BranchCode: oModel.BranchCode,
+            CompanyCode: oModel.companyCode,
             CompanyName: oModel.CompanyName,
             CompanyPANNo: oModel.CompanyPANNo || "",
             CompanyGSTNo: oModel.CompanyGSTNo,
@@ -560,6 +563,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
           STDCode: oModel.STDCode || "",
           LUT: oModel.LUT || "",
           BranchCode: oModel.BranchCode,
+          CompanyCode: oModel.companyCode,
           CompanyName: oModel.CompanyName,
           CompanyPANNo: oModel.CompanyPANNo || "",
           CompanyGSTNo: oModel.CompanyGSTNo,

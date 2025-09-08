@@ -26,7 +26,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 if (loginModel.Role === "IT Consultant") {
                     // await this._fetchCommonData("BaseLocation", "branchModel")
-                    let branchData = await this.getOwnerComponent().getModel("BaseLocationModel").getData() || [];
+                    let branchData = await this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData() || [];
                     let branch = branchData.find(item => item.branchCode == loginModel.BranchCode);
                     if (branch) {
                         loginModel.BranchName = branch.city;
@@ -169,7 +169,7 @@ sap.ui.define([
             },
             Branchname: function () {
                 const loginBranchCode = this.getView().getModel("LoginModel").getProperty("/BranchCode");
-                const baseData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                const baseData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
 
                 const matchedBranch = baseData.find(branch => branch.branchCode === loginBranchCode);
 
@@ -202,7 +202,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
 
                 // var matchedBranch = branchData.find(branch => branch.city === data.PickedBranch);
                 // var branchCode = matchedBranch ? matchedBranch.branchCode : null;
@@ -549,7 +549,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 // this.Visible.setProperty("/SubmitBtn", true);
                 // this.Visible.setProperty("/SaveBtn", true);
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
@@ -706,7 +706,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                // var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                // var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
 
 
 
@@ -845,7 +845,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
 
 
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
                 var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
 
                 var branchCode = matchedBranch ? matchedBranch.branchCode : null;
@@ -943,7 +943,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
 
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
-                var branchData = this.getOwnerComponent().getModel("BaseLocationModel").getData();
+                var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
                 if (data.Status === "Available") {
                     var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
                 } else if (data.Status === "Returned") {
