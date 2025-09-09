@@ -39,7 +39,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       //  this._fetchCommonData("Currency", "CurrencyModel");
       // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
       //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
-      this._fetchCommonData("EmailContent", "CCMailModel", {
+     await this._fetchCommonData("EmailContent", "CCMailModel", {
         Type: "PurchaseOrder",
         Action: "CC",
       });
@@ -893,7 +893,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
     //Mail dialog button visibility
     validateSendButton: function () {
       const sendBtn = sap.ui.getCore().byId("SendMail_Button");
-      const emailField = sap.ui.getCore().byId("CCMail_TextArea");
+      const emailField = sap.ui.getCore().byId("CCMail_TextArea");  
       const uploaderModel = this.getView().getModel("UploaderData");
       if (!sendBtn || !emailField || !uploaderModel) {
         return;
