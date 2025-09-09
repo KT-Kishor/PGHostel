@@ -75,6 +75,11 @@ sap.ui.define([
                 oView.setModel(new JSONModel(), "ExpenseInvoiceItemModel");
                 this.byId("EID_id_TableInvoiceItem").setMode("Delete");
 
+                 if (sArg === "X") {
+                    this.byId("EID_id_CompanyCode").setEditable(true);
+                } else {
+                    this.byId("EID_id_CompanyCode").setEditable(false);
+                }
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -660,6 +665,7 @@ sap.ui.define([
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
+                    companyCode: this.byId("EID_id_CompanyCode").getSelectedKey()
                 };
                 const aItemsRaw = oExpenseInvoiceItemModel.ExpenseInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -722,7 +728,7 @@ sap.ui.define([
                 try {
                     var that = this;
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
-                    const bMandatoryValid =
+                    const bMandatoryValid = utils._LCvalidateMandatoryField(this.byId("EID_id_CompanyCode"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("EID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateDate(this.byId("EID_id_Invoice"), "ID") &&
                         utils._LCvalidateDate(this.byId("EID_id_Payby"), "ID") &&
@@ -1397,16 +1403,23 @@ sap.ui.define([
 
             CID_onPressGeneratePdf: async function () {
                 const { jsPDF } = window.jspdf;
+                var that = this
                 const oView = this.getView();
                 const oModel = oView.getModel("SelectedCustomerModel").getData();
                 var data = this.getView().getModel("FilteredSOWModel").getData();
                 const oExpenseInvoiceItemModel = oView.getModel("ExpenseInvoiceItemModel").getData();
                 const oCompanyItemModel = oExpenseInvoiceItemModel.ExpenseInvoiceItem || [];
                 // const type = this.getView().byId("EID_id_Type").getText();
-                const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
+                // const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
+                 let filter = {
+                    companyCode: oModel.CompanyCode
+                }
+                const oCompanyDetailsModel = await that.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+               const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].transparentComplogo?.data)], { type: "image/png" });
+                const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].signature?.data)], { type: "image/png" });
 
-                const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                // const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                // const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
                 const img = await this._convertBLOBToImage(imgblob);
                 const signature = await this._convertBLOBToImage(signBlob);
 
@@ -1598,14 +1611,13 @@ sap.ui.define([
                 currentY += 5;
 
                 const paymentDetails = [
-                    { label: "Bank Name", value: "Kotak Mahindra Bank Limited" },
-                    { label: "Account Name", value: "Kalpavriksha Technologies" },
-                    { label: "Account No", value: "0648506056" },
-                    { label: "IFSC Code", value: "KKBK0008249" },
-                    { label: "Swift Code", value: "KKBKINBBCPC" },
+                    { label: "Bank Name", value: oCompanyDetailsModel.data[0].bankName },
+                    { label: "Account Name", value: oCompanyDetailsModel.data[0].accountName },
+                    { label: "Account No", value: oCompanyDetailsModel.data[0].accountNo },
+                    { label: "IFSC Code", value: oCompanyDetailsModel.data[0].ifscCode },
+                    { label: "Swift Code", value: oCompanyDetailsModel.data[0].swiftCode },
                     { label: 'Pay By', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.PayByDate : Formatter.formatDate(oModel.PayByDate) },
                 ];
-
                 paymentDetails.forEach(detail => {
                     doc.setFont("times", "bold");
                     const label = `${detail.label} :`;
@@ -1620,7 +1632,7 @@ sap.ui.define([
                 const rightEdgeX = pageWidth - margin;
                 const lineSpacing = 5;
                 const maxLineLength = 45;
-                const forText = "For: " + oCompanyDetailsModel.companyName;
+                 const forText = "For: " + oCompanyDetailsModel.data[0].companyName;
 
                 // Split text if more than 45 characters
                 let forTextLines = [];
@@ -1666,7 +1678,7 @@ sap.ui.define([
                 doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, signatureWidth, signatureHeight);
 
                 // Head of Company (Right-aligned)
-                const headName = oCompanyDetailsModel.headOfCompany || "";
+                 const headName = oCompanyDetailsModel.data[0].headOfCompany || "";
                 const headWidth = doc.getTextWidth(headName);
                 const partnersYPosition = logoYPosition + signatureHeight + 2;
 
@@ -1674,7 +1686,7 @@ sap.ui.define([
                 doc.text(headName, rightEdgeX - headWidth, partnersYPosition);
 
                 // Designation (Right-aligned)
-                const designation = oCompanyDetailsModel.designation || "";
+                  const designation = oCompanyDetailsModel.data[0].designation || "";
                 const designationWidth = doc.getTextWidth(designation);
                 doc.text(designation, rightEdgeX - designationWidth, partnersYPosition + lineSpacing);
 
@@ -1712,21 +1724,23 @@ sap.ui.define([
                 const lineHeight = 5;
 
                 doc.setFontSize(8);
-                doc.text(`SUBJECT TO ${CompJURISDICTION} JURISDICTION`, footerWidth / 2, textYPosition, { align: 'center' });
-
+                doc.text(`SUBJECT TO ${oCompanyDetailsModel.data[0].city.toUpperCase()} JURISDICTION`, footerWidth / 2, textYPosition, { align: 'center' });
                 doc.setFontSize(10);
-                const addressLines = doc.splitTextToSize(compFooterAddress, footerWidth - 100);
+                const addressLines = doc.splitTextToSize(oCompanyDetailsModel.data[0].longAddress, footerWidth - 100);
                 let currentYPosition = textYPosition + 5;
 
                 doc.setFontSize(10);
-                doc.text(` GSTIN : ${CompGSTIN}`, footerWidth - 5, currentYPosition, { align: 'right' });
-                doc.text(` Mobile No : ${CompMobileNo}`, footerWidth / 2 - 44, currentYPosition + 5, { align: 'center' });
-                doc.text(`LUT No : ${CompLUTNo}`, footerWidth - 5, currentYPosition + 5, { align: 'right' });
+                doc.text(` GSTIN : ${oCompanyDetailsModel.data[0].gstin}`, footerWidth - 5, currentYPosition, { align: 'right' });
+                doc.text(` Mobile No : ${oCompanyDetailsModel.data[0].mobileNo}`, footerWidth / 2 - 44, currentYPosition + 5, { align: 'center' });
+                doc.text(`LUT No : ${oCompanyDetailsModel.data[0].lutno}`, footerWidth - 5, currentYPosition + 5, { align: 'right' });
 
                 addressLines.forEach((line) => {
                     doc.text(line, 5, currentYPosition);
                     currentYPosition += lineHeight;
                 });
+            },
+             EID_validateCombobox: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
             }
         });
     });

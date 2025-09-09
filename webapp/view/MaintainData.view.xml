@@ -20,13 +20,21 @@
             <detailPages>
                 <Page
                     id="detail"
-                    title="{i18n>masterTableDetails}"
+                    title="{i18n>masterTableDetails} ({= ${dataModel>/}.length })"
                     backgroundDesign="Solid"
                     showNavButton="{= !${device>/system/desktop} }"
                     navButtonPress=".onPressDetailBack"
                 >
                     <headerContent>
                         <ToolbarSpacer />
+                        <Button
+                            text="{i18n>assestAssignupdate}"
+                            press="MD_UpdateTableRow"
+                        />
+                        <Button
+                            text="{i18n>delete}"
+                            press="MD_DeleteTableRow"
+                        />
                         <Button
                             text="{i18n>add}"
                             press="MD_AddButtonPress"

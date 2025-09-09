@@ -30,6 +30,10 @@
 							<blocks>
 								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
+									<m:Label text="{i18n>companyBranch}" required="true" />
+											<m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{SelectedCustomerModel>/CompanyCode}" id="CID_id_CompanyCode" valueStateText="{i18n>selectBase}"  change="CID_validateCombobox">
+						                        <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}" />			
+				                            </m:ComboBox>
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
 										<m:ComboBox change="onChangeAddCustomer" showClearIcon="true" id="CID_id_AddCustComboBox" showButton="true" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" valueStateText="{i18n>selectCustomer}" showSecondaryValues="true">
 											<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}" />
