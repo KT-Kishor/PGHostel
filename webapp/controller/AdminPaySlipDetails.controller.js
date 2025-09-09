@@ -325,7 +325,7 @@ sap.ui.define([
 
             APD_onPressGeneratePdf: async function () {
                 this.getBusyDialog();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: "KLB01" });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode : this.oModel.getProperty("/EmpData").CompanyCode });
                 var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.backgroundLogoBase64) {
                     try {
