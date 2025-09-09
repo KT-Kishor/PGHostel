@@ -369,6 +369,8 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 var model = this.getView().getModel("incomeModel").getData()
                 var oModel = this.getView().getModel("CreateIncomeAssetModel").getData()
                 var type = sap.ui.getCore().byId("FCIA_id_type").getSelectedKey() || "Laptop"
+                var picked = sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedKey()
+
                 try {
                     if (
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FCIA_id_type"), "ID") &&
@@ -399,7 +401,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                             "Description": oModel.Description,
                             "EquipmentNumber": oModel.EquipmentNumber,
                             "SerialNumber": oModel.SerialNumber,
-                            "PickedEmployeeName": oModel.PickedEmployeeName,
+                            "PickedEmployeeName": picked,
                             "AssetCreationDate": oModel.AssetCreationDate.split("/").reverse().join("-"),
                             "PickedBranch": oModel.PickedBranch,
                             "AssetValue": oModel.AssetValue,
@@ -525,7 +527,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                         "Status": "Transferred",
                         "TrashDate": null,
                         "IsCurrent": "1",
-                        "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText(),
+                        "PickedEmployeeID": oModel.PickedEmployeeID,
                         "TransferBranch": oModel.TransferBranch,
                         "TransferDate": oModel.TransferDate.split("/").reverse().join("-"),
                         "TransferByName": sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedKey(),
@@ -964,7 +966,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();
                 var loginRole = this.getView().getModel("LoginModel").getProperty("/Role");
-
+                var oModel = this.getView().getModel("CreateIncomeAssetModel");
 
                 if (!this.FCIA_Dialog) {
                     var oView = this.getView();
@@ -1009,6 +1011,12 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                     sap.ui.getCore().byId("FCIA_id_eqno").setValue(data.EquipmentNumber).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_slno").setValue(data.SerialNumber).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(false)
+                    oModel.setProperty("/PickedEmployeeID", data.PickedEmployeeID)
+                    oModel.setProperty("/PickedEmployeeName", data.PickedEmployeeName)
+
+                    
+
+
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue(data.AssetValue).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
@@ -1072,6 +1080,11 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                     sap.ui.getCore().byId("FCIA_id_eqno").setValue(data.EquipmentNumber).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_slno").setValue(data.SerialNumber).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_pickedby").setVisible(false)
+                    oModel.setProperty("/PickedEmployeeID", data.PickedEmployeeID)
+                    oModel.setProperty("/PickedEmployeeName", data.PickedEmployeeName)
+
+
+
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue(data.AssetValue).setEditable(false).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_currency").setValue(data.Currency)
@@ -1278,6 +1291,9 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 this.closeBusyDialog()
                 // this.Branchname()
                 sap.ui.getCore().byId("FCIA_id_branch").setValue("")
+                sap.ui.getCore().byId("FCIA_id_pickedby").setValue("").setValueState("None")
+                sap.ui.getCore().byId("FCIA_id_type").setValue("").setValueState("None")
+
                 sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setValueState("None")
                 this.getView().byId("IA_id_OdataTable").removeSelections();
                 this.FCIA_Dialog.close();

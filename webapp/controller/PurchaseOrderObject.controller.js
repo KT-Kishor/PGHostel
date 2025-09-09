@@ -37,7 +37,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
       this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
       //  this._fetchCommonData("Currency", "CurrencyModel");
-      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+      // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
       //  this._fetchCommonData("PaymentTerms", "ContractpaymentModel")
       this._fetchCommonData("EmailContent", "CCMailModel", {
         Type: "PurchaseOrder",
@@ -104,13 +104,17 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         PurchaseOrders: [],
       });
       this.getView().setModel(model, "PurchaseOrderModel");
-
-      var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
-        companyCode: "KT001",
-      }).then((oData) => {
-        var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
-        return PoData[0];
-      });
+     var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var PoData=Data.find((item) => {
+      return item.companyCode === "KT001"
+    
+    })
+      // var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
+      //   companyCode: "KT001",
+      // }).then((oData) => {
+      //   var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
+      //   return PoData[0];
+      // });
 
       this.getView().getModel("PurchaseOrderModel").setProperty("/companyCode", PoData.companyCode);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", PoData.companyName);
@@ -273,21 +277,27 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
     },
     PO_onComboBoxBranchChange: async function () {
       var selectedkey = this.byId("FPO_id_BranchCode").getSelectedKey();
-      this.getBusyDialog();
-      var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
-        companyCode: selectedkey,
-      }).then((oData) => {
-        var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
-        return PoData[0];
-      });
-      this.closeBusyDialog();
+      this.byId("FPO_id_BranchCode").setValueState("None");
+
+      // this.getBusyDialog();
+     var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var PoData=Data.find((item) => {
+      return item.companyCode === selectedkey
+    
+    })
+      // var PoData = await this.ajaxReadWithJQuery("CompanyCodeDetails", {
+      //   companyCode: selectedkey,
+      // }).then((oData) => {
+      //   var PoData = Array.isArray(oData.data) ? oData.data : [oData.data];
+      //   return PoData[0];
+      // });
+      // this.closeBusyDialog();
 
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyName", PoData.companyName);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyAddress", PoData.longAddress);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyGSTNo", PoData.gstin);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyEmail", PoData.carrerEmail);
       this.getView().getModel("PurchaseOrderModel").setProperty("/CompanyPANNo", PoData.pan);
-      this.byId("FPO_id_BranchCode").setValueState("None");
     },
     onAddItemButtonPress: function () {
       var oModel = this.getView().getModel("PurchaseOrderModel");
@@ -777,10 +787,15 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       oPDFModel.setProperty("/POAmountInWords", amountInWords);
       var htmlContent = oPOModel.Notes;
       this.getBusyDialog();
-      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-        branchCode: oPOModel.BranchCode,
-      });
-      var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+      // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+      //   companyCode: oPOModel.companyCode,
+      // });
+           var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var PoData=Data.find((item) => {
+      return item.companyCode ===  oPOModel.companyCode
+    
+    })
+      var oCompanyDetailsModel =PoData;
       if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
         try {
           const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {

@@ -97,7 +97,7 @@
                                             text="{i18n>address}"
                                             class="oSowFragLabel"
                                         />
-                                        <m:Input
+                                        <m:TextArea
                                             value="{PurchaseOrderModel>/CompanyAddress}"
                                             id="FPO_id_CompanyAddress"
                                             editable="false"
