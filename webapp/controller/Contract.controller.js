@@ -532,6 +532,8 @@ sap.ui.define(
                                 ContarctEmail: oModelData.ContarctEmail,
                                 ContractLocation: oModelData.ContractLocation,
                                 BranchCode: oModelData.BranchCode,
+                                CompanyCode: oModelData.CompanyCode,
+                                Branch : oModelData.Branch,
                                 Country: oModelData.Country,
                                 State:oModelData.State
                             };

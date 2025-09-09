@@ -515,6 +515,30 @@ sap.ui.define([
                 }
             },
 
+            CD_onCompanyChange: function (oEvent) {
+            this.onCompanyCodeChangeCommon(
+                oEvent,
+                "ContractModelWizart",     // Model name
+                "/CompanyCode",        // Path to company code property
+                "/Branch",             // Path to branch property
+                "CD_id_Branch"         // Branch control ID
+            );
+             if (this.sArgPara === "CreateContractFlag") {
+                    this.validateStep(); //  validation if in create flow
+                }
+           },
+
+            CU_onCompanyCodeChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+                this.onCompanyCodeChangeCommon(
+                    oEvent,
+                    "oFilteredContractModel",     // Model name
+                    "/CompanyCode",        // Path to company code property
+                    "/Branch",             // Path to branch property
+                    "CU_id_Branch"         // Branch control ID
+                );
+            },
+
             // Format date string to Date object
             onFormatDate: function (dateString) {
                 var parts = dateString.split('/');
@@ -614,6 +638,7 @@ sap.ui.define([
 
             validateStep: function () {
                 var oModel = this.getView().getModel("ContractModelWizart").getData();
+                oModel.CompanyCode = this.byId("CD_id_CompanyCode").getSelectedKey();
                 oModel.AgreementDate = this.byId("CD_id_AgreeDate").getValue();
                 oModel.ConsultantName = this.byId("CD_id_CName").getValue();
                 oModel.Address = this.byId("CD_id_Address").getValue();
@@ -637,12 +662,13 @@ sap.ui.define([
                 oModel.MobileNo = this.byId("CD_id_Mobile").getValue();
 
                 // Include Country and ConLocation in field check
-                const bAllFieldsFilled = oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
+                const bAllFieldsFilled = oModel.CompanyCode && oModel.AgreementDate && oModel.ConsultantName && oModel.ConsultantAddress && oModel.ConsultingService && oModel.ContarctEmail &&
                     oModel.EndClientHirer && oModel.Amount && oModel.Currency && oModel.ClientReportContact && oModel.Location && oModel.StartDate && oModel.EndDate && oModel.InsuranceRequirement && oModel.WarrantyDate && oModel.AdditionalRates && oModel.PaymentTerms && oModel.Country && oModel.State && oModel.contractLocation && oModel.STDCode && oModel.MobileNo;
 
                if (bAllFieldsFilled) {
                 const oMobileInput = this.getView().byId("CD_id_Mobile");
                 let bValid =
+                    utils._LCstrictValidationComboBox(this.byId("CD_id_CompanyCode"), "ID") &&
                     utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
                     utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
@@ -689,6 +715,7 @@ sap.ui.define([
             CD_onSubmit: async function () {
                 try {
                     if (
+                        utils._LCstrictValidationComboBox(this.byId("CD_id_CompanyCode"), "ID") &&
                         utils._LCvalidateDate(this.byId("CD_id_AgreeDate"), "ID") &&
                         utils._LCvalidateName(this.byId("CD_id_CName"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CD_id_Address"), "ID") &&
@@ -728,7 +755,7 @@ sap.ui.define([
 
                         var oModel = this.getView().getModel("ContractModelWizart");
                         var selectedCurrency = this.byId("CD_id_Currency").getValue();
-                        var branchCode = this.getView().byId("CD_id_ConLocation").getSelectedItem().getAdditionalText();
+                        var branchCode = this.getView().byId("CD_id_CompanyCode").getSelectedItem().getAdditionalText();
 
                         var data = {
                             "ConsultantNameSalutation": oModel.oData.Salutation,
@@ -753,6 +780,8 @@ sap.ui.define([
                             "ContractLocation": oModel.oData.contractLocation !== "" ? oModel.oData.contractLocation : this.getView().byId("CD_id_ConLocation"),
                             "AgreementNo": String(1).padStart(2, '0'),
                             "BranchCode": branchCode,
+                            "CompanyCode": oModel.oData.CompanyCode,
+                            "Branch": oModel.oData.Branch,
                             "Country": oModel.oData.Country,
                             "State":oModel.oData.State,
                             "MobileNo": oModel.oData.MobileNo,
@@ -910,6 +939,7 @@ sap.ui.define([
 
                 // Mandatory validation
                 const isMandatoryValid = (
+                    utils._LCstrictValidationComboBox(this.byId("CU_id_CompanyCode"), "ID") &&
                     utils._LCvalidateName(this.byId("CU_id_ConsultantName"), "ID") &&
                     utils._LCvalidateEmail(this.byId("CU_id_ContractEmailID"), "ID") &&
                     utils._LCvalidateDate(this.byId("CU_id_AgreementDate"), "ID") &&
@@ -956,12 +986,12 @@ sap.ui.define([
                     return sap.m.MessageBox.error(this.i18nModel.getText("renewOperation"));
                 }
 
+                
                 const rateType = oModel.HrDaliyMonth;
                 const rateText = rateType === 0 ? "Hour" : rateType === 1 ? "Day" : "Month";
                 const selectedCurrency = this.byId("CU_id_CurrencySelect").getValue();
                 const ConsultantRate = `${Formatter.fromatNumber(oModel.Amount)} ${selectedCurrency} Per ${rateText}`;
                 const LocationService = this.byId("CD_id_contractLocation").getSelectedKey();
-                const branchCode = this.byId("CU_id_ContractCity").getSelectedItem().getAdditionalText();
                 const startDate = this.byId("CU_id_AssignmentStartDate").getDateValue();
                 const endDate = this.byId("CU_id_AssignmentEndDate").getDateValue();
                 const aggrementDate = this.byId("CU_id_AgreementDate").getDateValue();
@@ -989,7 +1019,9 @@ sap.ui.define([
                     ContarctEmail: oModel.ContarctEmail,
                     ContractLocation: oModel.ContractLocation ? oModel.ContractLocation : this.byId("CD_id_ConLocation").getSelectedKey(),
                     Comments: oModel.Comments,
-                    BranchCode: branchCode,
+                    BranchCode: oModel.BranchCode,
+                    CompanyCode: oModel.CompanyCode,
+                    Branch: oModel.Branch,
                     Country: oModel.Country,
                     State: oModel.State,
                     MobileNo: oModel.MobileNo,
@@ -1175,9 +1207,9 @@ sap.ui.define([
 
             contractPDFgenerate: async function (oEmpModel) {
                 this.getBusyDialog();
-                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                //     branchCode: oEmpModel.BranchCode
-                // });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                    companyCode: oEmpModel.CompanyCode
+                });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                     Type: "Contract"
                 });

@@ -20,10 +20,14 @@
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="BaseLocation" label="{i18n>baseLocation}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="BaseLocation" label="{i18n>companyBranch}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true" id="EO_id_DesiFilter">
-								<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							<ComboBox items="{CompanyCodeDetailsModel>/}" showClearIcon="true" showSecondaryValues="true" id="EO_id_DesiFilter">
+								 <core:ListItem
+                                key="{CompanyCodeDetailsModel>city}"
+                                text="{CompanyCodeDetailsModel>city}"
+                                additionalText="{CompanyCodeDetailsModel>companyCode}"
+                            />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -61,7 +65,7 @@
 						<Text text="{i18n>designation}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>baseLocation}" />
+						<Text text="{i18n>city}" />
 					</Column>
 					<Column minScreenWidth="Desktop" demandPopin="true">
 						<Text text="{i18n>joiningDate}" />

@@ -175,6 +175,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             oModel.TrainingDuration = this.getView().byId("TD_id_TDuration").getSelectedKey();
 
             const bAllFieldsFilled =
+                this.getView().byId("TD_id_CompanyCode").getSelectedKey() &&
                 this.getView().byId("TD_id_Name").getValue() &&
                 this.getView().byId("TD_id_ReportingManager").getSelectedKey() &&
                 this.getView().byId("TD_id_EmailID").getValue() &&
@@ -193,6 +194,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             if (bAllFieldsFilled) {
                 const oMobileInput = this.getView().byId("TD_id_Mobile");
                 const bValid =
+                    utils._LCstrictValidationComboBox(this.getView().byId("TD_id_CompanyCode"), "ID") &&
                     utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") &&
                     utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") &&
                     utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
@@ -223,6 +225,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             try {
                 if (this.viewModel.getProperty("/editable")) {
                     var isValid =
+                        utils._LCstrictValidationComboBox(this.getView().byId("TU_id_CompanyCode"), "ID") && 
                         utils._LCvalidateName(this.getView().byId("TU_id_Name"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Manager"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("TU_id_TraineeMail"), "ID") &&
@@ -276,7 +279,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 var oModel = this.getView().getModel("oTraineeDetails").getData();
                 oModel.BaseLocation = this.byId("TU_id_Location").getSelectedKey();
                 //  oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TU_id_Location").getSelectedKey();
-                oModel.BranchCode = this.getView().byId("TU_id_Location").getSelectedItem().getAdditionalText();
+                // oModel.BranchCode = this.getView().byId("TU_id_CompanyCode").getSelectedItem().getAdditionalText();
 
                 var sSelectedKey = this.byId("TU_id_Manager").getSelectedKey();
                 oModel.ManagerID = sSelectedKey ? sSelectedKey : oModel.ManagerID;
@@ -440,7 +443,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             this.getBusyDialog();
             var oEmpModel = oModel.getData();
             await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                branchCode: oEmpModel.BranchCode
+                companyCode: oEmpModel.CompanyCode
             });
             await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                 Type: "TraineeOffer"
@@ -629,6 +632,27 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             utils._LCstrictValidationComboBox(oEvent);
             if (this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
         },
+        TD_onCompanyCodeChange: function (oEvent) {
+            this.onCompanyCodeChangeCommon(
+                oEvent,
+                "oTraineeDetails",     // Model name
+                "/CompanyCode",        // Path to company code property
+                "/Branch",             // Path to branch property
+                "TD_id_Branch"         // Branch control ID
+            );
+            utils._LCstrictValidationComboBox(oEvent);
+            if (this.sArgPara === "CreateTraineeFlag") this.TD_validateStep();
+        },
+        TU_onCompanyCodeChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            this.onCompanyCodeChangeCommon(
+                oEvent,
+                "oTraineeDetails",     // Model name
+                "/CompanyCode",        // Path to company code property
+                "/Branch",             // Path to branch property
+                "TU_id_Branch"         // Branch control ID
+            );
+        },
         TU_onChangeCountry: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             const oCombo = oEvent.getSource();
@@ -766,6 +790,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
 
                 // Perform all validations, including the direct call to TD_validateMobile
                 var isValid =
+                    utils._LCstrictValidationComboBox(this.getView().byId("TD_id_CompanyCode"), "ID") && 
                     utils._LCvalidateName(this.getView().byId("TD_id_Name"), "ID") &&
                     utils._LCstrictValidationComboBox(this.getView().byId("TD_id_ReportingManager"), "ID") &&
                     utils._LCvalidateEmail(this.getView().byId("TD_id_EmailID"), "ID") &&
@@ -789,7 +814,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 this.getBusyDialog();
                 // Prepare payload
                 oModel.Currency = this.getView().byId("TD_id_Currency").getValue();
-                oModel.BranchCode = this.getView().byId("TD_id_Location").getSelectedItem().getAdditionalText();
+                oModel.BranchCode = this.getView().byId("TD_id_CompanyCode").getSelectedItem().getAdditionalText();
                 oModel.ManagerID = this.getView().byId("TD_id_ReportingManager").getSelectedItem().getAdditionalText();
                 oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("TD_id_Location").getSelectedKey();
                 oModel.Status = "Saved";

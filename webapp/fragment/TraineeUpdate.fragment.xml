@@ -64,6 +64,22 @@
 							busyIndicatorDelay="0"
                             singleContainerFullSize="false">
 									<f:content>
+										<m:Label text="{i18n>companyBranch}" required="true" />
+										<m:ComboBox change="TU_onCompanyCodeChange" valueStateText="{i18n>selectBranch}" 
+										id="TU_id_CompanyCode" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
+										value="{oTraineeDetails>/CompanyCode}" showSecondaryValues="true" 
+										editable="{viewModel>/editable}">
+										<core:ListItem	key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}"/>
+										</m:ComboBox>
+
+										<m:Label text="{i18n>branch}"/>
+										<m:ComboBox valueStateText="{i18n>selectBranch}" 
+										id="TU_id_Branch" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
+										value="{oTraineeDetails>/Branch}" showSecondaryValues="true" enabled="false">
+										<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
+										additionalText="{CompanyCodeDetailsModel>companyName}" />
+										</m:ComboBox>
+
 										<m:Label text="{i18n>traineeName}" required="true" />
 										<m:HBox width="100%" justifyContent="Start" alignItems="Center">
 											<m:VBox width="23%">
@@ -137,10 +153,10 @@
 										change="TU_onChangeState">
 											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 										</m:ComboBox>
-										<m:Label text="{i18n>baseLocation}" required="true" />
-										<m:ComboBox items="{CityModel>/}"  showSecondaryValues="true" value="{oTraineeDetails>/BaseLocation}" id="TU_id_Location" valueStateText="{i18n>selectBase}" change="TD_validateCombo"  editable="{viewModel>/editable}" selectedKey="{oTraineeDetails>/BaseLocation}" >
+										<m:Label text="{i18n>city}" required="true" />
+										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{oTraineeDetails>/BaseLocation}" id="TU_id_Location" valueStateText="{i18n>cityValueText}" change="TD_validateCombo"  editable="{viewModel>/editable}" selectedKey="{oTraineeDetails>/BaseLocation}" >
 											<m:items>
-												<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
+												<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}"/>
 											</m:items>
 										</m:ComboBox>
 										<!-- <Label text="{i18n>branchCode}" /><Input id="TU_id_BranchCode" value="{oTraineeDetails>BranchCode}"  editable="false" /> -->

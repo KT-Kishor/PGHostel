@@ -62,6 +62,19 @@
                                               columnsL="2"
                                               columnsXL="2">
 									<f:content>
+										<m:Label text="{i18n>companyBranch}" required="true" />
+										<m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" editable="{viewModel>/editable}" id="EOUF_id_CompanyCode" showSecondaryValues="true" selectedKey="{employeeModel>/CompanyCode}" change="EU_onCompanyCodeChange" valueStateText="{i18n>selectBranch}">
+										<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}"/>
+										</m:ComboBox>
+
+										<m:Label text="{i18n>branch}"/>
+										<m:ComboBox valueStateText="{i18n>selectBranch}" 
+										id="EOUF_id_Branch" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
+										value="{employeeModel>/Branch}" showSecondaryValues="true" enabled="false">
+										<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
+										additionalText="{CompanyCodeDetailsModel>companyName}" />
+										</m:ComboBox>
+										
 										<m:Label text="{i18n>salutation}" required="true" />
 										<!-- Consultant Name Field -->
 										<m:Select editable="{viewModel>/editable}"
@@ -92,8 +105,8 @@
 										<m:ComboBox change="EUD_onChangeState" valueStateText="{i18n>expValStaState}" id="EOUF_id_State" items="{path:'StateModel>/',length:1000}" selectedKey="{employeeModel>/State}" showSecondaryValues="true"  editable="{viewModel>/editable}">
 					                        <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 				                            </m:ComboBox>
-										<m:Label text="{i18n>baseLocation}" required="true" />
-										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>selectBase}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
+										<m:Label text="{i18n>city}" required="true" />
+										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/BaseLocation}" id="EOUF_id_Location" editable="{viewModel>/editable}" valueStateText="{i18n>cityValueText}" change="EOD_validateCombobox" selectedKey="{employeeModel>/BaseLocation}">
 											<m:items>
 												 <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 											</m:items>

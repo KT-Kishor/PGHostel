@@ -809,6 +809,22 @@ sap.ui.define([
         oView.byId(sGenderControlId).setEnabled(true);
       }
     },
+    onCompanyCodeChangeCommon: function (oEvent, sModelName, sCompanyCodePath, sBranchPath, sBranchControlId) {
+        var oView = this.getView();
+        var oModel = oView.getModel(sModelName);
+        var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
+        var aCompanyData = oView.getModel("CompanyCodeDetailsModel").getData();
+        var oSelectedCompany = aCompanyData.find(function (item) {
+            return item.companyCode === sSelectedCompanyCode;
+        });
+        if (oSelectedCompany) {
+            oModel.setProperty(sBranchPath, oSelectedCompany.branch);
+            oView.byId(sBranchControlId).setEnabled(false);
+        } else {
+            oModel.setProperty(sBranchPath, "");
+            oView.byId(sBranchControlId).setEnabled(false);
+        }
+    },
     onCountryChange: function (oEvent, oIds) {
       const oSource = oEvent.getSource();
       const oSelectedItem = oSource.getSelectedItem();

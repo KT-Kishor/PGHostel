@@ -129,7 +129,7 @@ sap.ui.define([
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID") &&
+                    var isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) {
@@ -186,6 +186,7 @@ sap.ui.define([
                     var oModel = this.getView().getModel("employeeModel").getData();
                     oModel.Status = oModel.Status === "Rejected" ? "Saved" : oModel.Status;
                     oModel.CountryCode = this.getView().byId("EOD_id_Country").getSelectedItem().getAdditionalText();
+                    oModel.BranchCode = this.getView().byId("EOUF_id_CompanyCode").getSelectedItem().getAdditionalText();
                     oModel.JoiningDate = this.byId("EOUF_id_Joindate").getValue().split("/").reverse().join("-");
                     oModel.OfferReleaseDate = this.byId("EOUF_id_Reldate").getValue().split("/").reverse().join("-");
                     delete oModel.CityModel;
@@ -324,6 +325,27 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oEvent);
                 this.EOD_validateStep();
             },
+            EOD_onCompanyCodeChange: function (oEvent) {
+            this.onCompanyCodeChangeCommon(
+                oEvent,
+                "employeeModel",     // Model name
+                "/CompanyCode",        // Path to company code property
+                "/Branch",             // Path to branch property
+                "EOD_id_Branch"         // Branch control ID
+            );
+             utils._LCstrictValidationComboBox(oEvent);
+                this.EOD_validateStep();
+           },
+            EU_onCompanyCodeChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            this.onCompanyCodeChangeCommon(
+                oEvent,
+                "employeeModel",     // Model name
+                "/CompanyCode",        // Path to company code property
+                "/Branch",             // Path to branch property
+                "EOUF_id_Branch"         // Branch control ID
+            );
+           },
             //validate variable pay
             EOD_validatevariable: function (oEvent) {
                 utils._LCvalidateVariablePay(oEvent);
@@ -360,10 +382,11 @@ sap.ui.define([
             //Step validation
             EOD_validateStep: function () {
                 // Check if all fields have values
-                var allFieldsFilled = this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_Country").getSelectedKey() && this.getView().byId("EOD_id_State").getSelectedKey() && this.getView().byId("EOD_id_Location").getSelectedKey()  && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOD_id_VariablePay").getValue();
+                var allFieldsFilled = this.getView().byId("EOD_id_CompanyCode").getSelectedKey() && this.getView().byId("EOD_id_Name").getValue() && this.getView().byId("EOD_id_Reldate").getValue() && this.getView().byId("EOD_id_Designation").getSelectedKey() && this.getView().byId("EOD_id_Country").getSelectedKey() && this.getView().byId("EOD_id_State").getSelectedKey() && this.getView().byId("EOD_id_Location").getSelectedKey() && this.getView().byId("EOD_id_mail").getValue() && this.getView().byId("EOD_id_Address").getValue() && this.getView().byId("EOD_id_CTC").getValue() && this.getView().byId("EOD_id_Bonus").getValue() && this.getView().byId("EOD_id_VariablePay").getValue();
                 if (allFieldsFilled) {
                     // Validate each field directly
-                    let isValid = utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                    let isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_CompanyCode"), "ID") &&
+                     utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
                          utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
@@ -383,13 +406,13 @@ sap.ui.define([
             //Submit the data
             EOD_onSubmitData: async function () {
                 try {
-                    if (utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                    if (utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
                         this.getBusyDialog();
                         var oModel = this.getView().getModel("employeeModel").getData();
                         oModel.Gender = this.getView().byId("EOD_id_Gender").getSelectedKey();
                         oModel.CountryCode = this.getView().byId("EOD_id_Country").getSelectedItem().getAdditionalText();
-                        oModel.BranchCode = this.getView().byId("EOD_id_Location").getSelectedItem().getAdditionalText();
+                        oModel.BranchCode = this.getView().byId("EOD_id_CompanyCode").getSelectedItem().getAdditionalText();
                         oModel.Department = this.getView().byId("EOD_id_Designation").getSelectedItem().getAdditionalText();
                         oModel.BaseLocation = oModel.BaseLocation !== "" ? oModel.BaseLocation : this.getView().byId("EOD_id_Location").getSelectedKey();
                         oModel.JoiningDate = oModel.JoiningDate.split("/").reverse().join("-");
@@ -661,7 +684,7 @@ sap.ui.define([
                 };
 
                 var oEmpModel = oModel.getData();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: oEmpModel.BranchCode });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode : oEmpModel.CompanyCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "Employee Offer");

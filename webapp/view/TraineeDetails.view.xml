@@ -59,6 +59,22 @@
                         singleContainerFullSize="false"
                     >
 						<f:content>
+                       <Label text="{i18n>companyBranch}" required="true" />
+                        <ComboBox  items="{path:'CompanyCodeDetailsModel>/',length:1000}"  showSecondaryValues="true" 
+                        selectedKey="{oTraineeDetails>/CompanyCode}" id="TD_id_CompanyCode" valueStateText="{i18n>selectBranch}" 
+                        selectionChange="TD_onCompanyCodeChange">
+                        <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" 
+                        additionalText="{CompanyCodeDetailsModel>branchCode}" />
+                        </ComboBox>
+
+                        <Label text="{i18n>branch}"/>
+                        <ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" 
+                        selectedKey="{oTraineeDetails>/Branch}" id="TD_id_Branch" valueStateText="{i18n>selectBranch}" 
+                        enabled="false">
+                        <core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
+                             additionalText="{CompanyCodeDetailsModel>companyName}" />
+                        </ComboBox>
+
 							<Label
                                 text="{i18n>traineeName}"
                                 required="true"
@@ -257,14 +273,14 @@
 								<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 							</ComboBox>
 							<Label
-                                text="{i18n>baseLocation}"
+                                text="{i18n>city}"
                                 required="true"
                             />
 							<ComboBox
                                 items="{path:'CityModel>/',length:1000}" 
                                 showSecondaryValues="true"
                                 id="TD_id_Location"
-                                valueStateText="{i18n>selectBase}"
+                                valueStateText="{i18n>cityValueText}"
                                 change="TD_validateCombo"
                                 selectedKey="{oTraineeDetails>/BaseLocation}"
                             >
@@ -321,6 +337,10 @@
                         columnsM="1"
                     >
 						<f:content>
+                            <Label text="{i18n>companyBranch}" />
+							<Text text="{oTraineeDetails>/CompanyCode}" />
+                            <Label text="{i18n>branch}" />
+							<Text text="{oTraineeDetails>/Branch}" />
 							<Label text="{i18n>traineeName}" />
 							<Text  text="{= ${oTraineeDetails>/NameSalutation} + ' ' + ${oTraineeDetails>/TraineeName}}"/>
 							<Label text="{i18n>gender}" />

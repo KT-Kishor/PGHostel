@@ -54,6 +54,19 @@
               adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
               emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
+									    <!-- Select Company Code -->
+										<m:Label text="{i18n>companyBranch}" required="true" />
+										<m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" valueStateText="{i18n>combovalueState}" showSecondaryValues="true" value="{oFilteredContractModel>/CompanyCode}" id="CU_id_CompanyCode" change="CU_onCompanyCodeChange" editable="{simpleForm>/editable}">
+										<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}"/>
+										</m:ComboBox>	
+										  <!-- Select Branch -->
+										<m:Label text="{i18n>branch}" />
+										<m:ComboBox valueStateText="{i18n>selectBranch}" 
+										id="CU_id_Branch" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
+										value="{oFilteredContractModel>/Branch}" showSecondaryValues="true" enabled="false">
+										<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
+										additionalText="{CompanyCodeDetailsModel>companyName}" />
+										</m:ComboBox>
 										<!-- Agreement Number -->
 										<m:Label text="{i18n>contractNo}"/>
 										<m:Text text="{oFilteredContractModel>/ContractNo} / {oFilteredContractModel>/AgreementNo}" />
@@ -168,9 +181,9 @@
 										</m:ComboBox>
 
 										<!-- City  -->
-										<m:Label text="{i18n>contractLocation}" required="true"/>
+										<m:Label text="{i18n>city}" required="true"/>
 										<m:ComboBox id="CU_id_ContractCity" items="{path:'CityModel>/',length:1000}"
-										value="{oFilteredContractModel>/ContractLocation}" selectedKey="{oFilteredContractModel>/ContractLocation}" showSecondaryValues="true" valueStateText="{i18n>combovalueState}" 
+										value="{oFilteredContractModel>/ContractLocation}" selectedKey="{oFilteredContractModel>/ContractLocation}" showSecondaryValues="true" valueStateText="{i18n>cityValueText}" 
 										editable="{simpleForm>/editable}" change="CD_onBaseLocationChange">
 										 <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 										</m:ComboBox>
