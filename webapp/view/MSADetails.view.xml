@@ -48,9 +48,24 @@
 								<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 							</ComboBox>
 							<Label text="{i18n>CompBranch}" required="true" />
-							<ComboBox change="Msa_BranchChange" filterSecondaryValues="true" valueStateText="{i18n>selectBranch}" selectedKey="{LoginModel>/BranchCode}" id="MsaD_id_Branch" items="{path:'BaseLocationModel>/',length:1000}" value="{msaModelWizart>/BranchCode}" showSecondaryValues="true">
-								<core:ListItem key="{BaseLocationModel>branchCode}" text="{BaseLocationModel>branchCode}" additionalText="{BaseLocationModel>city}" />
-							</ComboBox>
+				
+				
+				<ComboBox 
+				change="Msa_BranchChange" 
+				filterSecondaryValues="true" 
+				valueStateText="{i18n>selectBranch}" 
+				selectedKey="{LoginModel>/BranchCode}" 
+				id="MsaD_id_Branch" 
+				items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
+				value="{msaModelWizart>/BranchCode}" 
+				showSecondaryValues="true">
+	
+						<core:ListItem 
+							key="{CompanyCodeDetailsModel>companyCode}" 
+							text="{CompanyCodeDetailsModel>companyCode}" 
+							additionalText="{CompanyCodeDetailsModel>branchCode}" />
+				</ComboBox>
+
 							<Label text="{i18n>panCardReg}" required="true" />
 							<Input value="{msaModelWizart>/PanCard}" placeholder="{i18n>placePanCardReg}" id="MsaD_id_PanCard" liveChange="MsaD_ValidateCommonFields" maxLength="50" valueStateText="{i18n>placePanCardReg}" />
 							<Label text="{i18n>paymentterms}" required="true"></Label>
