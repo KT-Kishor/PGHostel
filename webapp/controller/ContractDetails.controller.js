@@ -841,6 +841,7 @@ sap.ui.define([
             },
 
             onChangeContractStatus: function (oEvent) {
+                 utils._LCvalidateMandatoryField(oEvent);
                 var oSelectedItem = oEvent.getSource().getSelectedItem();
                 var oSelectedValue = oSelectedItem ? oSelectedItem.getText() : "";
                 if (oSelectedValue === "Renewed") {
