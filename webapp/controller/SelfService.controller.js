@@ -46,11 +46,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         oBaseCombo.setValueState("None");
       }
 
-      const oBranchInput = getById("SS_id_BranchCode");
-      if (oBranchInput) {
-        oBranchInput.setValue("");
-        oBranchInput.setValueState("None");
-      }
+      // const oBranchInput = getById("SS_id_CompanyCode");
+      // if (oBranchInput) {
+      //   oBranchInput.setValue("");
+      //   oBranchInput.setValueState("None");
+      // }
 
       // Refactored Mobile Number Logic
       const oMobileInput = getById("SS_id_MobileNo");
@@ -247,20 +247,17 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         oEvent,
         "BaseLocationModel", // Source model
         "sEmployeeModel", // Target model
-        "/0/BranchCode" // Path in target model
+        "/0/CompanyCode" // Path in target model
       );
     },
 
     updateFunctionForSelf: function (oPayload, ID) {
       var oView = this.getView();
-      var oDataModel = oView.getModel("sEmployeeModel").getData()[0];
-
-      // Add state to payload data
+      // Add state to payload data if needed (optional)
       const oStateCombo = this.byId("SS_id_State");
       if (oStateCombo && oStateCombo.getSelectedKey()) {
         oPayload.data.State = oStateCombo.getSelectedKey();
       }
-
       this.ajaxUpdateWithJQuery("EmployeeDetails", oPayload)
         .then((oData) => {
           if (oData.success) {
@@ -270,6 +267,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             MessageToast.show(this.i18nModel.getText("dataSaved"));
             oView.getModel("viewModel").setProperty("/isEditMode", false);
             oView.getModel("viewModel").setProperty("/AdminRole", false);
+            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+
+            // Refresh employee data from server
             this._fetchCommonData("EmployeeDetails", "sEmployeeModel", {
               EmployeeID: this.EmployeeID,
             });
@@ -286,6 +286,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
           MessageToast.show(oError.responseText || oError.message);
         });
     },
+
 
     _onRouteMatched: async function (oEvent) {
       try {
@@ -342,7 +343,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         this.sNavigatedRole = oEvent.getParameter("arguments").Role;
         this.sPath = oEvent.getParameter("arguments").sPath;
 
-        // 👇 decide icon based on sPath value
+        //  decide icon based on sPath value
         if (this.sPath === "SelfService") {
           this._setHeaderButtonIcon("home");
         } else {
@@ -473,6 +474,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       }
       this.oModel = this.getView().getModel("PaySlip");
       this._currentSection = this.byId("ObjectPageLayout").getSelectedSection();
+      this.getView().getModel("CompanyCodeDetailsModel").getData()
+
     },
     _setHeaderButtonIcon: function (sType) {
       var oPage = this.byId("SelfService_id_page");
@@ -809,6 +812,30 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         }
       }
     },
+    SS_onCompanyChange: function (oEvent) {
+      utils._LCstrictValidationComboBox(oEvent);
+
+      const oComboBox = oEvent.getSource();
+      const sSelectedCompanyCode = oComboBox.getSelectedKey() || oComboBox.getValue();
+
+      const oCompanyModel = this.getView().getModel("CompanyCodeDetailsModel");
+      const aCompanyData = oCompanyModel.getData() || [];
+
+      // Find selected company object by companyCode
+      const oSelectedCompany = aCompanyData.find(item => item.companyCode === sSelectedCompanyCode);
+
+      const oEmployeeModel = this.getView().getModel("sEmployeeModel");
+      if (oSelectedCompany) {
+       oEmployeeModel.setProperty("/0/CompanyCode", oSelectedCompany.companyCode);
+oEmployeeModel.setProperty("/0/BranchCode", oSelectedCompany.branchCode || "");
+oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
+      } else {
+        oEmployeeModel.setProperty("/0/CompanyCode", "");
+        oEmployeeModel.setProperty("/0/Branch", "");
+      }
+    },
+
+
     _validateAllRequiredFieldsForSubmit: function () {
       const oView = this.getView();
       const bIsValid =
@@ -855,7 +882,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       this.getBusyDialog();
       try {
         const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-        if (this.sNavigatedRole === "Trainee" && !sEmployeeType) {
+        if (this.sNavigatedRole !== "Trainee" && !sEmployeeType) {
           MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
           this.closeBusyDialog();
           return;
@@ -874,7 +901,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
           this.closeBusyDialog();
           return;
         }
-        // --- 2. Validate Employment Data (if experienced) ---
+        // 2. Validate Employment Data (if experienced) ---
         if (bIsExperienced) {
           const oEmploymentModel = await this.SS_readEmploymentDetails(this.EmployeeID, false);
           if (!oEmploymentModel || oEmploymentModel.getData().length < 1) {
@@ -939,9 +966,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         sMessage = this.i18nModel.getText("selfServiceUpdateEmployee");
         if (sButtonId === "BasicDetailsBtn") {
           const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-          if (this.sNavigatedRole === "Trainee" && !sEmployeeType) {
-              MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
-              return false; // Stop the save process
+          if (this.sNavigatedRole !== "Trainee" && !sEmployeeType) {
+            MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
+            return false; // Stop the save process
           }
           // Basic Details & Emergency Contacts Validation
           isValid =
@@ -970,7 +997,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         }
       } else {
         // Admin/HR Edit Validation
-        const isRequiredValid = utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_State"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID");
+        const isRequiredValid = utils._LCvalidateEmail(oView.byId("SS_id_Compmail"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Country"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_CompanyCode"), "ID") &&
+          utils._LCstrictValidationComboBox(oView.byId("SS_id_State"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_BaseL"), "ID") && utils._LCstrictValidationComboBox(oView.byId("SS_id_Manager"), "ID");
 
         const passport = oView.byId("SS_id_Passport").getValue().trim();
         const voterId = oView.byId("SS_id_Voterid").getValue().trim();
@@ -2365,7 +2393,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     onDownloadVisitCard: function () {
       var oEmployeeData = this.getView().getModel("sEmployeeModel").getData();
       if (oEmployeeData) {
-        this.CommonVisitingCard(oEmployeeData[0].EmployeeName, oEmployeeData[0].MobileNo, oEmployeeData[0].CompanyEmailID, oEmployeeData[0].Designation, oEmployeeData[0].BranchCode);
+        this.CommonVisitingCard(oEmployeeData[0].EmployeeName, oEmployeeData[0].MobileNo, oEmployeeData[0].CompanyEmailID, oEmployeeData[0].Designation, oEmployeeData[0].CompanyCode);
       }
     },
     SS_onDownloadExperienceLetter: function () {
@@ -2457,7 +2485,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     FCR_onDownloadPDF: async function () {
       const empData = this.getView().getModel("sEmployeeModel").getData()[0];
       if (this.getView().getModel("PDFData").getProperty("/OnlyRTEFlag")) {
-        this.generateCertificatePDF(this.getView().getModel("PDFData").getProperty("/RTEText"), empData.BranchCode);
+        this.generateCertificatePDF(this.getView().getModel("PDFData").getProperty("/RTEText"), empData.CompanyCode);
       } else {
         try {
           const empID = this.getView().getModel("sEmployeeModel").getData()[0].EmployeeID;
@@ -2489,7 +2517,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         }
         this.SSRTE_oDialog.close();
         var oModel = this.getView().getModel("PDFData").getData();
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode });
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode });
         var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
         if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
           try {
@@ -2559,7 +2587,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
     FSA_onPressSubmit: async function () {
       try {
         await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-          branchCode: this.getView().getModel("sEmployeeModel").getData()[0].BranchCode,
+          companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode,
         });
 
         var oComapnyModel = this.getView().getModel("CompanyCodeDetailsModel").getData()[0];
@@ -2694,7 +2722,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         DOB: this.Formatter.formatDate(employeeDetails.DateOfBirth) || "",
         MobileNo: employeeDetails.MobileNo || "",
         BaseLocation: employeeDetails.BaseLocation || "",
-        BranchCode: employeeDetails.BranchCode || "",
+        CompanyCode: employeeDetails.CompanyCode || "",
         ProfilePhoto: employeeDetails.ProfilePhoto || "",
       };
 
@@ -2742,7 +2770,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         const oView = this.getView();
         const oModelData = oView.getModel("IdCardModel").getData();
 
-        const isAllDataPresent = oModelData.EmployeeID && oModelData.EmployeeName && oModelData.Designation && oModelData.Email && oModelData.DOB && oModelData.MobileNo && oModelData.BloodGroup && oModelData.BaseLocation && oModelData.BranchCode && (oModelData.ProfilePhoto || oModelData.Attachment);
+        const isAllDataPresent = oModelData.EmployeeID && oModelData.EmployeeName && oModelData.Designation && oModelData.Email && oModelData.DOB && oModelData.MobileNo && oModelData.BloodGroup && oModelData.BaseLocation && oModelData.CompanyCode && (oModelData.ProfilePhoto || oModelData.Attachment);
 
         if (isAllDataPresent) {
           oView.getModel("sEmployeeModel").setProperty("/ProfilePhoto", "");
@@ -2764,7 +2792,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       const { jsPDF } = window.jspdf;
       this.getBusyDialog(); // open BusyDialog immediately
       try {
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { branchCode: employeeDetails.BranchCode });
+        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: employeeDetails.CompanyCode });
         var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
 
         const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.transparentComplogo?.data);
@@ -3046,7 +3074,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             that.closeBusyDialog();
           }
         },
-        function () {}
+        function () { }
       );
     },
     onWithdrawResignation: function () {
