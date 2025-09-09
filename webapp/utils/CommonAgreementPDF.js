@@ -932,7 +932,7 @@ sap.ui.define(["../model/formatter"], function (Formatter) {
                 doc.rect(0, bottomLimit + 6, pageWidth, pageHeight - (bottomLimit + 6), 'F');
                 doc.setFont("times", "normal").setFontSize(11);
                 doc.setTextColor(255, 255, 255);
-                doc.text(`SUBJECT TO ${oCompanyModel.city} JURISDICTION`, pageMiddle, bottomLimit + 11, { maxWidth: 100, align: "center" });
+                doc.text(`SUBJECT TO ${oCompanyModel.city.toUpperCase()} JURISDICTION`, pageMiddle, bottomLimit + 11, { maxWidth: 100, align: "center" });
                 let addressLines = doc.splitTextToSize(oCompanyModel.longAddress, 120);
                 let addressY = bottomLimit + 17;
                 addressLines.forEach((line) => {
