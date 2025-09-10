@@ -26,8 +26,8 @@
 					<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 				</Select>
 				<Label text="{i18n>CompBranch}" required="true" />
-				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>selectBranch}" items="{CompanyCodeDetailsModel>/}" value="{FilteredMsaModel>/0/BranchCode}" showSecondaryValues="true">
-					<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}" />
+				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>selectBranch}" items="{CompanyCodeDetailsModel>/}" value="{FilteredMsaModel>/0/CompanyCode}" showSecondaryValues="true">
+					<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}" />
 				</ComboBox>
 				<Label text="{i18n>panCardReg}" required="true" />
 				<Input id="MsaE_id_MsaPanCard" maxLength="50" value="{FilteredMsaModel>/0/PanCard}" valueStateText="{i18n>placePanCardReg}" liveChange="Msa_LC_PanCard" />
