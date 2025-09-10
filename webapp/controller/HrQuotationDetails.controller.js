@@ -764,10 +764,12 @@ HQD_onCompanyCodeChange: function (oEvent) {
         oView.getModel("SingleCompanyModel").updateBindings(true);
         oView.getModel("QuotationModel").updateBindings(true);
         // Now safely read the latest data
-        const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
+        // const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
         const oData = oView.getModel("SingleCompanyModel").getData();
         const oQuotaionItem = oView.getModel("QuotationModel").getData();
         const aItems = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
+         let filter = {   companyCode: oData.CompanyCode}
+        const oCompanyDetailsModel = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
           unit: "mm",
@@ -777,7 +779,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
         let y = 10; // Starting Y position
         const pageHeight = doc.internal.pageSize.getHeight();
         // Logo
-        const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+        const imgblob = new Blob([new Uint8Array( oCompanyDetailsModel.data[0].companylogo?.data)], { type: "image/png" });
         const img = await this._convertBLOBToImage(imgblob);
         doc.addImage(img, "PNG", 13, y, 45, 45);
         y += 50;

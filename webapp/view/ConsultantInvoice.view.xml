@@ -31,6 +31,13 @@
 							<DateRangeSelection id="CI_id_DatePicker" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onDateRangeChange" />
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem id="CI_filterItem_CompanyCode" name="CompanyCode" label="{i18n>coCode}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="CI_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table  class="sapUiResponsiveMargin" sticky="ColumnHeaders,HeaderToolbar" items="{path: 'ConsultantModel>/', sorter: {path: 'EmployeeID',descending: false,group: true}}" growingScrollToLoad="true" width="auto" growing="true"  growingThreshold="50"  alternateRowColors="true"  busyIndicatorDelay="0"  id="CI_id_ConsultantInvoiceTable">

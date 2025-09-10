@@ -198,7 +198,8 @@ sap.ui.define(
                         QuotationNo: params.QuotationNo || null,
                         CustomerName: params.CustomerName || null,
                         DateFrom: params.DateFrom,
-                        DateTo: params.DateTo
+                        DateTo: params.DateTo,
+                        CompanyCode: params.CompanyCode || null,
                     });
 
                     // Filter table
@@ -216,6 +217,9 @@ sap.ui.define(
                         }
                         if (params.CustomerName) {
                             aFilters.push(new sap.ui.model.Filter("CustomerName", "Contains", params.CustomerName));
+                        }
+                        if (params.CompanyCode) {
+                            aFilters.push(new sap.ui.model.Filter("CompanyCode", "EQ", params.CompanyCode));
                         }
 
                         const oFilter = aFilters.length ? new sap.ui.model.Filter(aFilters, true) : null;
@@ -309,6 +313,7 @@ sap.ui.define(
                 this.byId("HQ_id_quotationNo").setSelectedKey("");
                 this.byId("HQ_id_CustomerName").setSelectedKey("");
                 this.byId("HQ_id_Quotaiondate").setValue("");
+                this.byId("HQ_id_CompanyCodeComboBox").setSelectedKey("");
                 this._isClearPressed = true;
             },
 

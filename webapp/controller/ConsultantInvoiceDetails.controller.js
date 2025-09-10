@@ -228,7 +228,7 @@ sap.ui.define(
                     }
                 },
 
-                CI_onChangeContractDetails: function (oEvent) {
+               CI_onChangeContractDetails: function (oEvent) {
                     let sValue = oEvent.getSource().getValue().split(' - ');   // Extract contract ID and name
                     let contractID = sValue[0];
                     let contractName = sValue[1];
@@ -244,8 +244,9 @@ sap.ui.define(
                         return;
                     }
 
-                    let sMobileNo = oSelectedContract.MobileNo || "";  // Get required fields
-                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";  // Get required fields
+                    let sMobileNo = oSelectedContract.MobileNo || "";  
+                    let sConsultantAddress = oSelectedContract.ConsultantAddress || "";  
+                    let sCompanyCode = oSelectedContract.CompanyCode || "";   // <-- new
 
                     // Show confirmation dialog
                     this.showConfirmationDialog(
@@ -254,17 +255,26 @@ sap.ui.define(
                         function () {
                             this.selectedContractID = contractID;
                             this.Copy = true;
-                            this.readFunction("/ConsultantInvoice", "ConsultantInvoiceModel", true, contractID, contractName, sMobileNo, sConsultantAddress);
+                            this.readFunction(
+                                "/ConsultantInvoice",
+                                "ConsultantInvoiceModel",
+                                true,
+                                contractID,
+                                contractName,
+                                sMobileNo,
+                                sConsultantAddress,
+                                sCompanyCode   
+                            );
                             sap.m.MessageToast.show(this.i18nModel.getText("datadestroy"));
                         }.bind(this),
-                        function () { }, // Cancel
+                        function () {}, // Cancel
                         this.i18nModel.getText("OkButton"),
                         this.i18nModel.getText("CancelButton")
                     );
                 },
 
-                readFunction: function (entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress) {
-                    this.ajaxReadWithJQuery(entitySet, {}).then(function (oData) {
+                readFunction: function(entitySet, modelName, isCreate, contractID, contractName, MobileNo, ConsultantAddress, CompanyCode) {
+                    this.ajaxReadWithJQuery(entitySet, {}).then(function(oData) {
                         var oJSONModel = new sap.ui.model.json.JSONModel(oData);
                         this.getView().setModel(oJSONModel, modelName);
 
@@ -304,16 +314,30 @@ sap.ui.define(
                             var oValidUntil = new Date(oToday);
                             oValidUntil.setDate(oValidUntil.getDate() + 30);
 
-                            var oCompanyDetails = this.getView().getModel("CompanyCodeDetailsModel").getData()[0];
-                            var InvoiceTo = oCompanyDetails.companyName;
-                            var InvoiceAddress = oCompanyDetails.longAddress;
-                            var CompanyGSTNO = oCompanyDetails.gstin;
-                            var CompanyCode = oCompanyDetails.companyCode;
+                            if (this.Copy === false && this.copiedData && Object.keys(this.copiedData).length > 0) {
+                                oInvoiceModel.setProperty("/CompanyCode", this.copiedData.CompanyCode || "");
+                                oInvoiceModel.setProperty("/InvoiceTo", this.copiedData.InvoiceTo || "");
+                                oInvoiceModel.setProperty("/InvoiceAddress", this.copiedData.InvoiceAddress || "");
+                                oInvoiceModel.setProperty("/CompanyGSTNO", this.copiedData.CompanyGSTNO || "");
+                            } else {
+                                var filter = {};
+                                if (CompanyCode) {
+                                    filter = { companyCode: CompanyCode };   
+                                } else {
+                                    filter = { companyCode: loginData.CompanyCode }; 
+                                }
 
-                            oInvoiceModel.setProperty("/InvoiceTo", InvoiceTo);
-                            oInvoiceModel.setProperty("/CompanyCode", CompanyCode);
-                            oInvoiceModel.setProperty("/InvoiceAddress", InvoiceAddress);
-                            oInvoiceModel.setProperty("/CompanyGSTNO", CompanyGSTNO);
+                                this.ajaxReadWithJQuery("CompanyCodeDetails", filter).then(function(oCompanyDetailsModel) {
+                                    oInvoiceModel.setProperty("/CompanyCode", oCompanyDetailsModel.data[0].companyCode);
+                                    oInvoiceModel.setProperty("/InvoiceTo", oCompanyDetailsModel.data[0].companyName);
+                                    oInvoiceModel.setProperty("/InvoiceAddress", oCompanyDetailsModel.data[0].longAddress); 
+                                    oInvoiceModel.setProperty("/CompanyGSTNO", oCompanyDetailsModel.data[0].gstin);
+                                }.bind(this)).catch(function(error) {
+                                    sap.m.MessageToast.show(error.message || error.responseText);
+                                });
+                            }
+
+                            // ===== Defaults =====
                             oInvoiceModel.setProperty("/InvoiceDate", oToday);
                             oInvoiceModel.setProperty("/PayBy", oValidUntil);
                             oInvoiceModel.setProperty("/GSTValid", false);
@@ -322,7 +346,7 @@ sap.ui.define(
                             oInvoiceModel.setProperty("/MobileNo", MobileNo || "");
                             oInvoiceModel.setProperty("/ConsultantAddress", ConsultantAddress || "");
 
-                            // Set visibility and enabled states
+                            // ===== Visibility settings =====
                             var oColumnGST = this.getView().byId("CI_id_ColumnGST");
                             if (oColumnGST) oColumnGST.setVisible(false);
 
@@ -330,11 +354,11 @@ sap.ui.define(
                             if (oGSTCalc) oGSTCalc.setVisible(false);
 
                             this.getView().getModel("visiablityPlay").setProperty("/copyBtn", false);
-                            // this.getView().getModel("visiablityPlay").setProperty("/pasteBtn", false);
 
                             var oGSTInput = this.getView().byId("CI_id_InputGSTNO");
                             if (oGSTInput) oGSTInput.setEnabled(oInvoiceModel.getProperty("/Currency") === "INR");
 
+                            // ===== Contractor specific data =====
                             var oContractModel = this.getView().getModel("contractModel");
                             if (oContractModel) {
                                 var contData = oContractModel.getData();
@@ -354,29 +378,12 @@ sap.ui.define(
                                 }
                             }
                             this.CI_onPressPasteBtn();
-                            this.closeBusyDialog();
                         }
-                    }.bind(this)).catch(function (error) {
+                        this.closeBusyDialog();
+                    }.bind(this)).catch(function(error) {
                         this.closeBusyDialog();
                         sap.m.MessageToast.show(error.message || error.responseText);
                     }.bind(this));
-                },
-                CI_onCompanyCodeChange: function (oEvent) {
-                    var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
-                    var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
-                    var oSelectedCompany = aCompanyData.find(function (item) {
-                        return item.companyCode === sSelectedCompanyCode;
-                    });
-                    if (oSelectedCompany) {
-                        var oSingleCompanyModel = this.getView().getModel("ConsultantInvoiceModel");
-                        if (!oSingleCompanyModel) return;
-
-
-                        oSingleCompanyModel.setProperty("/CompanyCode", oSelectedCompany.companyCode);
-                        oSingleCompanyModel.setProperty("/InvoiceTo", oSelectedCompany.companyName);
-                        oSingleCompanyModel.setProperty("/InvoiceAddress", oSelectedCompany.longAddress);
-                        oSingleCompanyModel.setProperty("/CompanyGSTNO", oSelectedCompany.gstin);
-                    }
                 },
 
                 setVisibilityForEdit: function () {
@@ -724,6 +731,7 @@ sap.ui.define(
 
                     if (oData.InvoiceNo) {
                         this.copiedData = {
+                            CompanyCode: oData.CompanyCode,
                             ConsultantName: oData.ConsultantName,
                             InvoiceTo: oData.InvoiceTo,
                             InvoiceAddress: oData.InvoiceAddress,

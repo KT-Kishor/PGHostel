@@ -78,18 +78,18 @@
                                         />
                                         <m:ComboBox
                                             items="{path:'CompanyCodeDetailsModel>/',length: 1000}"
-                                         selectedKey="{ConsultantInvoiceModel>/CompanyCode}"
+                                            selectedKey="{ConsultantInvoiceModel>/CompanyCode}"
                                             width="100%"
                                             showSecondaryValues="true"
                                             valueStateText=""
-                                            editable="{visiablityPlay>/editable}"
+                                            editable="false"
                                             id="CI_id_CompanyCode"
                                             change="CI_onCompanyCodeChange"
                                         >
                                             <core:ListItem
                                                 key="{CompanyCodeDetailsModel>companyCode}"
                                                 text="{CompanyCodeDetailsModel>companyCode}"
-                                                additionalText="{CompanyCodeDetailsModel>branchCode}"
+                                                additionalText="{CompanyCodeDetailsModel>branch}"
                                             />
                                         </m:ComboBox>
 												<m:Label text="{i18n>invoiceDate}" required="true" />

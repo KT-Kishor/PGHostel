@@ -39,6 +39,7 @@ sap.ui.define(
                     if (userData.Role === "Contractor") {
                         oView.byId("CI_filterItem_EmployeeID").setVisible(false);
                         filterObj.EmployeeID = userData.EmployeeID;
+                         oView.byId("CI_filterItem_CompanyCode").setVisible(false);
                     } else {
                         oView.byId("CI_filterItem_EmployeeID").setVisible(true);
                         if (userData.Role === "Admin" || userData.Role === "Account Manager") {
