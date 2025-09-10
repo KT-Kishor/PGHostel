@@ -158,10 +158,10 @@
                         >
                             <m:Label
                                 showColon="true"
-                                text="{i18n>branch}"
+                                text="{i18n>companyBranch}"
                             />
                             <m:Text
-                                text="{FilteredMsaModel>/0/BranchCode}"
+                                text="{FilteredMsaModel>/0/CompanyCode}"
                                 class="sapUiTinyMarginBegin"
                             />
                         </layout:HorizontalLayout>

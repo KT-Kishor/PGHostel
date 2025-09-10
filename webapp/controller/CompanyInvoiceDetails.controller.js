@@ -36,7 +36,6 @@ sap.ui.define([
                 this.mobileNo = true;
                 this.ResivedTDSFlag = true;
                 this.byId("CID_id_AddCustComboBox").setValueState("None");
-                // this.byId("CID_id_CompanyCode").setValueState("None");
                 this.byId("CID_id_InvoiceDesc").setValueState("None");
                 this.byId("CID_id_SowPO").setValueState("None");
                 this.byId("CID_id_ConversionRate").setValueState("None");
@@ -44,7 +43,6 @@ sap.ui.define([
                 this.byId("CID_id_IncomeTaxPercentage").setValueState("None");
                 this.byId("CID_id_SowDetails").setValueState("None");
                 this.byId("CID_id_CurrencySelect").setEditable(true);
-                // this.byId("CID_id_CompanyCode").setEditable(false);                
                 const oView = this.getView();
                 if (this.getView().getModel("CompanyInvoiceModel")) {
                     if (this.getView().getModel("CompanyInvoiceModel").getData().length === 0) {
@@ -56,7 +54,7 @@ sap.ui.define([
                 oView.setModel(new JSONModel({
                     CustomerName: "", InvNo: "", InvoiceDate: "", Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
                     SOWDetails: "", Type: "", InvoiceDescription: "", Currency: "INR", PayByDate: "", POSOW: "", Status: "Submitted",
-                    SubTotalNotGST: "0", SubTotalInGST: "0", LUT: "", IncomePerc: "10", companyCode: ""
+                    SubTotalNotGST: "0", SubTotalInGST: "0", LUT: "", IncomePerc: "10", CompanyCode: ""
                 }), "SelectedCustomerModel");
 
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
@@ -80,12 +78,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "CompanyInvoiceItemModel");
                 this.byId("CID_id_TableInvoiceItem").setMode("Delete");
-
-                if (sArg === "X") {
-                    this.byId("CID_id_CompanyCode").setEditable(true);
-                } else {
-                    this.byId("CID_id_CompanyCode").setEditable(false);
-                }
+                
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -204,6 +197,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
                 this.SelectedCustomerModel.setProperty("/Type", SelectedData.type);
                 this.SelectedCustomerModel.setProperty("/Value", SelectedData.value);
+                this.SelectedCustomerModel.setProperty("/CompanyCode", SelectedData.CompanyCode);
                 this.getView().getModel("CompanyInvoiceItemModel").setProperty("/CompanyInvoiceItem", []);
                 this.byId("CID_id_SowDetails").setValue("").setSelectedKey("")
                 this.SelectedCustomerModel.refresh(true)
@@ -673,7 +667,7 @@ sap.ui.define([
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
-                    companyCode: this.byId("CID_id_CompanyCode").getSelectedKey()
+                    CompanyCode: oSelectedCustomerModel.CompanyCode
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -733,12 +727,11 @@ sap.ui.define([
             },
 
             CID_onPressSubmit: async function (oEvent) {
-                // const oComboBoxCompanycode = this.byId("CID_id_CompanyCode").getSelectedKey();
-                // const sSelectedCompanyCode = oComboBox.getSelectedKey();
                 try {
                     var that = this;
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
-                    const bMandatoryValid = utils._LCvalidateMandatoryField(this.byId("CID_id_CompanyCode"), "ID") &&
+                    const bMandatoryValid =
+                    //  utils._LCvalidateMandatoryField(this.byId("CID_id_CompanyCode"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
@@ -1768,8 +1761,8 @@ sap.ui.define([
                     currentYPosition += lineHeight;
                 });
             },
-            CID_validateCombobox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            }
+            // CID_validateCombobox: function (oEvent) {
+            //     utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            // }
         });
     });

@@ -72,7 +72,7 @@ sap.ui.define(
                             inset: false,
                             growing: true,
                             growingScrollToLoad: true,
-                            mode: sap.m.ListMode.SingleSelect,
+                            mode: sap.m.ListMode.SingleSelectLeft,
                             sticky: ["ColumnHeaders"],
                             autoPopinMode: true, // enables pop-in of columns on small screens
                             demandPopin: true, // automatically moves extra columns into pop-in
@@ -348,7 +348,7 @@ sap.ui.define(
                     oSheet
                         .build()
                         .then(function () {
-                            sap.m.MessageToast.show("Excel file has been downloaded!");
+                            sap.m.MessageToast.showthat.i18nModel.getText("exceldownload");
                         })
                         .finally(function () {
                             oSheet.destroy();
@@ -438,8 +438,8 @@ sap.ui.define(
 
                     this.getBusyDialog();
                     that.ajaxCreateWithJQuery(this.sTitle, oPayload)
-                        .then(async(res) => {
-                             that.MD_onCancelButtonPress();
+                        .then(async (res) => {
+                            that.MD_onCancelButtonPress();
                             let oModel = that.getView().getModel("dataModel");
                             const tableUpdateData = await that.ajaxReadWithJQuery(that.sTitle, "");
                             oModel.setData(tableUpdateData.data);
@@ -541,6 +541,18 @@ sap.ui.define(
                         .getData();
                     let formData = this.oUpdatePass.getModel("formModel");
                     let myfragmentData = formData.getData();
+
+
+                    let entityMeta = this.getView().getModel("EntityModel").getData()
+                        .ListData.find(e => e.Entity === this.sTitle);
+
+                    let keys = (entityMeta && entityMeta.unikey) ? entityMeta.unikey.split(",") : [];
+                    let missingFields = keys.filter(k => !myfragmentData[k] || myfragmentData[k].toString().trim() === "");
+
+                    if (missingFields.length > 0) {
+                        sap.m.MessageToast.show("Please fill mandatory details");
+                        return;
+                    }
 
                     for (let i = 0; i < datafromlocalEntity.ListData.length; i++) {
                         if (datafromlocalEntity.ListData[i].Entity === that.sTitle) {

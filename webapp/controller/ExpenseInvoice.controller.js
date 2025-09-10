@@ -118,6 +118,7 @@ sap.ui.define(
           this.byId("EI_id_InvoiceDatePicker").setValue("");
           this.byId("EI_id_CustomerNameComboBox").setValue("");
           this.byId("EI_id_StatusComboBox").setValue("");
+          this.byId("EI_id_CompanyCodeComboBox").setValue("");
         },
 
         onSelectionChange: function (oEvent) {
@@ -203,7 +204,6 @@ sap.ui.define(
             .finally(function () {
               oSheet.destroy();
             });
-
         }
       }
     );

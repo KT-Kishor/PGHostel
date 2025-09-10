@@ -134,6 +134,7 @@ sap.ui.define(
           this.byId("CI_id_InvoiceDatePicker").setValue("");
           this.byId("CI_id_CustomerNameComboBox").setValue("");
           this.byId("CI_id_StatusComboBox").setValue("");
+          this.byId("CI_id_CompanyCodeComboBox").setValue("");
           this._isClearPressed = true;
         },
 

@@ -8,7 +8,7 @@ sap.ui.define([
 ],
     function (BaseController, JSONModel, MessageToast, utils, Currency, Formatter) {
         "use strict";
-        return BaseController.extend("sap.kt.com.minihrsolution.controller.CompanyInvoiceDetails", {
+        return BaseController.extend("sap.kt.com.minihrsolution.controller.ExpenseInvoiceDetail", {
             Formatter: Formatter,
             onInit: function () {
                 this.getRouter().getRoute("ExpenseInvoiceDetail").attachMatched(this._onRouteMatched, this);
@@ -1741,6 +1741,9 @@ sap.ui.define([
             },
              EID_validateCombobox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            },
+            onExit: function() {
+                
             }
         });
     });

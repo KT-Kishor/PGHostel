@@ -61,6 +61,14 @@
                             />
                         </fb:control>
                     </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem id="AP_CompanyCode" name="CompanyCode" label="{i18n>coCode}" groupName="ConsultantInvoice" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="AP_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
