@@ -62,9 +62,9 @@
                     items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
-                        key="{CompanyCodeDetailsModel>city}" 
-                        text="{CompanyCodeDetailsModel>city}"
-                        additionalText="{CompanyCodeDetailsModel>companyCode}"
+                        key="{CompanyCodeDetailsModel>companyCode}" 
+                        text="{CompanyCodeDetailsModel>companyCode}"
+                        additionalText="{CompanyCodeDetailsModel>branch}"
                     />
                 </ComboBox>
                 <Label text="{i18n>vehicleModel}" required="true" />
@@ -192,9 +192,9 @@
                     items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
-                        key="{CompanyCodeDetailsModel>city}" 
-                        text="{CompanyCodeDetailsModel>city}"
-                        additionalText="{CompanyCodeDetailsModel>companyCode}"
+                        key="{CompanyCodeDetailsModel>companyCode}" 
+                        text="{CompanyCodeDetailsModel>companyCode}"
+                        additionalText="{CompanyCodeDetailsModel>branch}"
                     />
                 </ComboBox>
                  <Label text="{i18n>refrenceNo}" required="true" />

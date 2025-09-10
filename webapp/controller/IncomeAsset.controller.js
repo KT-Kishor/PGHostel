@@ -207,7 +207,7 @@ sap.ui.define([
                 // var matchedBranch = branchData.find(branch => branch.city === data.PickedBranch);
                 // var branchCode = matchedBranch ? matchedBranch.branchCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === loginModel.CompanyCode && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -328,9 +328,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(true);
                     }
                     table.removeSelections();
-sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey("")
-sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
-sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
+
                 }
             },
 
@@ -403,17 +401,16 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                             "SerialNumber": oModel.SerialNumber,
                             "PickedEmployeeName": picked,
                             "AssetCreationDate": oModel.AssetCreationDate.split("/").reverse().join("-"),
-                            "PickedBranch": oModel.PickedBranch,
+                            "PickedBranch": selectedBranch.getAdditionalText(),
                             "AssetValue": oModel.AssetValue,
                             "Currency": oModel.Currency,
                             "TransferBranch": "",
                             "TransferDate": "",
                             "IsCurrent": "1",
                             "Status": "Available",
-                            "TrashDate": null
-
-
-                        };
+                            "TrashDate": null,
+                            "CompanyCode": oModel.PickedBranch
+                            };
 
 
                         if (!selected) {
@@ -528,7 +525,8 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                         "TrashDate": null,
                         "IsCurrent": "1",
                         "PickedEmployeeID": oModel.PickedEmployeeID,
-                        "TransferBranch": oModel.TransferBranch,
+                        "TransferBranch": selectedBranch.getAdditionalText(),
+                        "CompanyCode":oModel.TransferBranch,
                         "TransferDate": oModel.TransferDate.split("/").reverse().join("-"),
                         "TransferByName": sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedKey(),
                         "TransferByID": sap.ui.getCore().byId("FCIA_id_transferBy").getSelectedItem().getAdditionalText(),
@@ -554,7 +552,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
                 let loginModel = this.getView().getModel("LoginModel").getData();
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === loginModel.CompanyCode && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -712,7 +710,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
 
 
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === loginModel.CompanyCode && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
                 var oModel = new JSONModel(filteredEmp);
                 this.getView().setModel(oModel, "AdminModel");
@@ -843,7 +841,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 var data = Model.getObject();
 
 
-                var pickedBranchName = data.PickedBranch;
+                var pickedBranchName = data.CompanyCode;
 
 
                 var empData = this.getView().getModel("EmpModel").getData();
@@ -852,7 +850,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
 
                 var branchCode = matchedBranch ? matchedBranch.branchCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === pickedBranchName && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -940,20 +938,20 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 }
                 var Model = selected.getBindingContext("incomeModel");
                 var data = Model.getObject();
-                var pickedBranchName = data.PickedBranch;
+                var pickedBranchName = data.CompanyCode;
 
 
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
                 var branchData = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
                 if (data.Status === "Available") {
-                    var matchedBranch = branchData.find(branch => branch.city === pickedBranchName);
+                    var matchedBranch = branchData.find(branch => branch.companyCode === pickedBranchName);
                 } else if (data.Status === "Returned") {
-                    var matchedBranch = branchData.find(branch => branch.city === data.ReturnBranch);
+                    var matchedBranch = branchData.find(branch => branch.companyCode === data.ReturnBranch);
                 }
-                var branchCode = matchedBranch ? matchedBranch.branchCode : null;
+                var branchCode = matchedBranch ? matchedBranch.companyCode : null;
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === branchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === pickedBranchName && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -1183,7 +1181,10 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 var oEndDate = oDateRange.getSecondDateValue();
                 var slNo = this.getView().byId("IA_id_SlNo").getSelectedKey() ? this.getView().byId("IA_id_SlNo").getSelectedKey() : this.getView().byId("IA_id_SlNo").getValue();
                 var status = this.getView().byId("IA_id_Status").getSelectedKey() ? this.getView().byId("IA_id_Status").getSelectedKey() : this.getView().byId("IA_id_Status").getValue();
-                var sBranch = this.getView().byId("IA_id_branch").getSelectedKey() ? this.getView().byId("IA_id_branch").getSelectedKey() : this.getView().byId("IA_id_branch").getValue();
+                var sBranch = this.getView().byId("IA_id_branch").getSelectedKey()? this.getView().byId("IA_id_branch").getSelectedKey() : this.getView().byId("IA_id_branch").getValue();
+                if(sBranch !== "") {
+                var sBranchCode = this.getView().byId("IA_id_branch").getSelectedItem().getAdditionalText()? this.getView().byId("IA_id_branch").getSelectedItem().getAdditionalText() : "";
+                }
 
 
                 var filters = {
@@ -1193,20 +1194,25 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 if (sBranch) {
                     if (status === "" || status === "Available") {
                         filters.PickedBranch = sBranch;
-                        filters.Status = "Available";
+                        filters.CompanyCode = sBranchCode;
+                          filters.Status = "Available";
                     } else if (status == "Assigned") {
                         filters.AssignBranch = sBranch;
-                        filters.Status = "Assigned";
+                        filters.CompanyCode = sBranchCode;
+                         filters.Status = "Assigned";
                     } else if (status == "Transferred") {
                         filters.TransferBranch = sBranch;
-                        filters.Status = "Transferred";
+                        filters.CompanyCode = sBranchCode;
+                       filters.Status = "Transferred";
 
                     } else if (status == "Returned") {
                         filters.ReturnBranch = sBranch;
-                        filters.Status = "Returned";
+                        filters.CompanyCode = sBranchCode;
+                           filters.Status = "Returned";
                     } else if (status == "Trashed") {
                         filters.TrashBranch = sBranch;
-                        filters.Status = "Trashed";
+                        filters.CompanyCode = sBranchCode;
+                         filters.Status = "Trashed";
                     }
                 }
                 if (sEqNo) {
@@ -1243,7 +1249,6 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
 
                         item.showPickButton = isStatusTransferred && isRoleAllowed && branchCondition;
                     });
-
                     if (loginModel.Role === "IT Consultant") {
                         const filteredData = oFCIAerData.filter(item =>
                             item.PickedBranch === loginModel.BranchName ||
@@ -1265,13 +1270,9 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                         })
 
                     }
-
                     this.closeBusyDialog()
                 })
-
-
-
-            },
+              },
             IA_onPressClear: function () {
                 this.getView().byId("IA_id_EqNo").setSelectedKey("");
                 this.getView().byId("IA_id_PickedBy").setSelectedKey("");
@@ -1279,8 +1280,7 @@ sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey("")
                 this.getView().byId("IA_id_SlNo").setSelectedKey("");
                 this.getView().byId("IA_id_Status").setSelectedKey("");
                 this.getView().byId("IA_id_branch").setSelectedKey("");
-
-            },
+               },
             FTIA_onCancelPress: function () {
                 var table = this.byId("IA_id_OdataTable");
                 table.removeSelections();
