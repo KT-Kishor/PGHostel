@@ -104,7 +104,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
         PurchaseOrders: [],
       });
       this.getView().setModel(model, "PurchaseOrderModel");
-     var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var Data = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
      var PoData=Data.find((item) => {
       return item.companyCode === "KT001"
     
@@ -280,7 +280,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       this.byId("FPO_id_BranchCode").setValueState("None");
 
       // this.getBusyDialog();
-     var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var Data = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
      var PoData=Data.find((item) => {
       return item.companyCode === selectedkey
     
@@ -790,7 +790,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
       //   companyCode: oPOModel.companyCode,
       // });
-           var Data = this.getView().getModel("CompanyCodeDetailsModel").getData();
+     var Data = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
      var PoData=Data.find((item) => {
       return item.companyCode ===  oPOModel.companyCode
     

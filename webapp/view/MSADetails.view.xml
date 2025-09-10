@@ -57,13 +57,13 @@
 				selectedKey="{LoginModel>/BranchCode}" 
 				id="MsaD_id_Branch" 
 				items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
-				value="{msaModelWizart>/BranchCode}" 
+				value="{msaModelWizart>/CompanyCode}" 
 				showSecondaryValues="true">
 	
 						<core:ListItem 
 							key="{CompanyCodeDetailsModel>companyCode}" 
 							text="{CompanyCodeDetailsModel>companyCode}" 
-							additionalText="{CompanyCodeDetailsModel>branchCode}" />
+							additionalText="{CompanyCodeDetailsModel>branch}" />
 				</ComboBox>
 
 							<Label text="{i18n>panCardReg}" required="true" />
@@ -135,7 +135,7 @@
 							<Label text="{i18n>contractPeriod}" />
 							<Text text="{msaModelWizart>/ContractPeriod}" />
 							<Label text="{i18n>CompBranch}" />
-							<Text text="{msaModelWizart>/BranchCode}" />
+							<Text text="{msaModelWizart>/CompanyCode}" />
 							<Label text="{i18n>panCardReg}" />
 							<Text text="{msaModelWizart>/PanCard}" />
 							<Label text="{i18n>paymentterms}" />

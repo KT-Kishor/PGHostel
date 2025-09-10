@@ -76,7 +76,7 @@
                                             <core:ListItem
                                                 key="{CompanyCodeDetailsModel>companyCode}"
                                                 text="{CompanyCodeDetailsModel>companyCode}"
-                                                additionalText="{CompanyCodeDetailsModel>companyName}"
+                                                additionalText="{CompanyCodeDetailsModel>branchCode}"
                                             />
                                         </m:ComboBox>
                                         <m:Label

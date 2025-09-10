@@ -139,6 +139,12 @@ sap.ui.define([
                 if (CustName) {
                     filters.CustomerName = CustName;
                 }
+
+                 var Cmpname1 = this.getView().byId("PO_id_CompanyName")
+                var Cmpname = Cmpname1.getSelectedKey() ? Cmpname1.getSelectedKey() : Cmpname1.getValue()
+                if (Cmpname) {
+                    filters.CompanyCode = Cmpname;
+                }
                 // Date Picker (range)
                 const oDateRange = this.byId("PO_idECreationDatePicker");
                 const oStartDate = oDateRange.getDateValue();
@@ -189,7 +195,12 @@ sap.ui.define([
                     EndDate: filters.EndDate
                 });
                 // Fetch filtered data
-                await this._fetchCommonData("PurchaseOrder", "POModel", filters);
+                        await this.ajaxReadWithJQuery("PurchaseOrder",filters).then((oData) => {
+                            var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data]
+                        this.getOwnerComponent().setModel(new JSONModel(oFCIAerData1), "POModel");
+
+                        })
+
                 this.closeBusyDialog();
             } catch (error) {
                 this.closeBusyDialog();

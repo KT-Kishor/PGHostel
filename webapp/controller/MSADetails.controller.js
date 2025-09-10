@@ -40,6 +40,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
         City: "",
         GST: "",
         Status: "",
+        CompanyCode:""
       });
       this.getView().setModel(oModelMSA, "msaModelWizart");
 

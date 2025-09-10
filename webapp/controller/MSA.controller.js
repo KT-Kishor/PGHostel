@@ -53,6 +53,8 @@ sap.ui.define(
         this.byId("MSA_id_CompanyName").setValue("");
         this.byId("MSA_id_Type").setValue("");
         this.byId("id_msa_date").setValue("");
+        this.byId("MSA_id_CompanyCode").setSelectedKey("");
+
         this._isClearPressed = true;
       },
       MSA_onAddCustomer: function () {
@@ -82,6 +84,12 @@ sap.ui.define(
             this.byId("MSA_id_AdminFilter").getFilterGroupItems();
           const params = {};
           let msaDateProvided = false;
+
+              var Cmpname1 = this.getView().byId("MSA_id_CompanyCode")
+                var Cmpname = Cmpname1.getSelectedKey() ? Cmpname1.getSelectedKey() : Cmpname1.getValue()
+                if (Cmpname) {
+                    params.CompanyCode = Cmpname;
+                }
 
           filterItems.forEach((item) => {
             const control = item.getControl();
@@ -143,7 +151,13 @@ sap.ui.define(
           }
 
           // Fetch and format data
-          await this._fetchCommonData("MSADetails", "MSADisplayModel", params);
+             await this.ajaxReadWithJQuery("MSADetails",params).then((oData) => {
+                            var oFCIAerData1 = Array.isArray(oData.data) ? oData.data : [oData.data]
+                        this.getOwnerComponent().setModel(new JSONModel(oFCIAerData1), "MSADisplayModel");
+
+                        })
+
+          // await this._fetchCommonData("MSADetails", "MSADisplayModel", params);
           const oModel = this.getView().getModel("MSADisplayModel");
           const aData = oModel.getData();
           aData.forEach((item) => {

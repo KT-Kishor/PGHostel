@@ -16,6 +16,15 @@
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+  
+					<fb:FilterGroupItem name="Company Code" label="{i18n>companyCode}" groupName="Group1" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox showSecondaryValues= "true" items="{CompanyCodeDetailsModel>/}" id="MSA_id_CompanyCode" showClearIcon="true">
+								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					
 					<fb:FilterGroupItem name="Type" label="{i18n>type}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox id="MSA_id_Type" showClearIcon="true">
