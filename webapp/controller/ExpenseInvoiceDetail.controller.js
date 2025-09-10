@@ -75,11 +75,11 @@ sap.ui.define([
                 oView.setModel(new JSONModel(), "ExpenseInvoiceItemModel");
                 this.byId("EID_id_TableInvoiceItem").setMode("Delete");
 
-                 if (sArg === "X") {
-                    this.byId("EID_id_CompanyCode").setEditable(true);
-                } else {
-                    this.byId("EID_id_CompanyCode").setEditable(false);
-                }
+                //  if (sArg === "X") {
+                //     this.byId("EID_id_CompanyCode").setEditable(true);
+                // } else {
+                //     this.byId("EID_id_CompanyCode").setEditable(false);
+                // }
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -200,6 +200,7 @@ sap.ui.define([
                 this.SelectedCustomerModel.setProperty("/MobileNo", SelectedData.mobileNo);
                 this.SelectedCustomerModel.setProperty("/Type", SelectedData.type);
                 this.SelectedCustomerModel.setProperty("/Value", SelectedData.value);
+                this.SelectedCustomerModel.setProperty("/CompanyCode", SelectedData.CompanyCode);
                 this.getView().getModel("ExpenseInvoiceItemModel").setProperty("/ExpenseInvoiceItem", []);
                 this.byId("EID_id_SowDetails").setValue("").setSelectedKey("")
                 this.SelectedCustomerModel.refresh(true)
@@ -665,7 +666,7 @@ sap.ui.define([
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
-                    companyCode: this.byId("EID_id_CompanyCode").getSelectedKey()
+                    companyCode: this.byId("EID_id_CompanyCode").getValue()
                 };
                 const aItemsRaw = oExpenseInvoiceItemModel.ExpenseInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -728,7 +729,8 @@ sap.ui.define([
                 try {
                     var that = this;
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
-                    const bMandatoryValid = utils._LCvalidateMandatoryField(this.byId("EID_id_CompanyCode"), "ID") &&
+                    const bMandatoryValid = 
+                    // utils._LCvalidateMandatoryField(this.byId("EID_id_CompanyCode"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("EID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateDate(this.byId("EID_id_Invoice"), "ID") &&
                         utils._LCvalidateDate(this.byId("EID_id_Payby"), "ID") &&
@@ -1739,11 +1741,8 @@ sap.ui.define([
                     currentYPosition += lineHeight;
                 });
             },
-             EID_validateCombobox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
-            },
-            onExit: function() {
-                
-            }
+            //  EID_validateCombobox: function (oEvent) {
+            //     utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            // },
         });
     });
