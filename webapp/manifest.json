@@ -846,7 +846,7 @@
                 "transition": "slide",
                 "clearControlAggregation": false,
                 "viewId": "compOff",
-                "viewName": "CompOff"
+                "viewName": "compOff"
               },
               "TargetContractDetails": {
                 "viewType": "XML",

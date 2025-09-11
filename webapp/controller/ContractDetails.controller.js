@@ -797,7 +797,7 @@ sap.ui.define([
                         if (response.success === true) {
                             this.closeBusyDialog(); // Close busy dialog
                             data.ContractNo = response.ContractNo;
-                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
 
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -1049,7 +1049,7 @@ sap.ui.define([
 
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
-                    this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                    this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                     await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                     this.closeBusyDialog();
                     this.getRouter().navTo("RouteContractDetails", {

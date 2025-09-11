@@ -309,7 +309,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                 MessageToast.show(this.i18nModel.getText(text));
                             }
                             this.getView().getModel("oTraineeDetails").refresh(true);
-                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                         }
                     })
                     .catch((error) => {
@@ -846,7 +846,6 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                             value: "Trainee",
                                         });
                                         this.getView().getModel("oTraineeDetails").refresh(true);
-                                        this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                                     }.bind(this),
                                 }),
                                 endButton: new sap.m.Button({
@@ -873,7 +872,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                                         value: "Trainee",
                                                     });
                                                     this.getView().getModel("oTraineeDetails").refresh(true);
-                                                    this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                                                    this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                                 }
                                             })
                                             .catch((error) => {

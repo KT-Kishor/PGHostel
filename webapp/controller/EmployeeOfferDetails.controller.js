@@ -209,7 +209,7 @@ sap.ui.define([
                                 MessageToast.show(this.i18nModel.getText(text));
                             }
                             this.getView().getModel("employeeModel").refresh(true);
-                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                         }
                     }).catch((error) => {
                         this.closeBusyDialog();
@@ -438,7 +438,7 @@ sap.ui.define([
                                         press: function () {
                                             oDialog.close();
                                             this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
+                                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                             this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                         }.bind(this)
                                     }),
