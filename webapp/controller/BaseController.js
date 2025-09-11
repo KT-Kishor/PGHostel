@@ -247,7 +247,7 @@ sap.ui.define([
 
     _calculateSalaryComponents: function (isTDSIncluded) {
       var oModel = this.getView().getModel("employeeModel");
-      // Convert and fetch values
+      // Convert and nd values
       var CTC = parseFloat(oModel.getProperty("/CTC").replaceAll(",", ""));
       var VariableData = parseFloat(oModel.getProperty("/VariablePercentage"));
       var joiningBonus = parseFloat(oModel.getProperty("/JoiningBonus").replaceAll(",", ""));

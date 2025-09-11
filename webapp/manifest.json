@@ -401,6 +401,13 @@
                         "TargetAdminApplyLeave"
                     ]
                 },
+                 {
+                    "name": "RouteCompOff",
+                    "pattern": "compOff",
+                    "target": [
+                        "TargetCompOff"
+                    ]
+                },
                 {
                     "name": "RouteContractDetails",
                     "pattern": "ContractDetails/{sParContract}/:sID:",
@@ -833,6 +840,13 @@
                 "clearControlAggregation": false,
                 "viewId": "AdminApplyLeave",
                 "viewName": "AdminApplyLeave"
+              },
+              "TargetCompOff": {
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "compOff",
+                "viewName": "CompOff"
               },
               "TargetContractDetails": {
                 "viewType": "XML",

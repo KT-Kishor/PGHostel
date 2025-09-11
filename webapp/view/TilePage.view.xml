@@ -47,11 +47,33 @@
                                                     <ImageContent src="sap-icon://employee" />
                                                 </TileContent>
                                             </GenericTile>
+
+
+
+
+
+                                            
                                             <GenericTile visible="{= ${AppVisibilityModel>/ApplyLeave} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerLeave}" press="TileV_onpressLeave" subheader="{i18n>subhead}">
                                                 <TileContent unit="{i18n>createLeave}">
                                                     <ImageContent src="sap-icon://time-off" />
                                                 </TileContent>
                                             </GenericTile>
+
+
+
+
+
+
+                                            <GenericTile visible="{= ${AppVisibilityModel>/ApplyLeave} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerCompOff}" press="TileV_onpresscompoff">
+	                                            <TileContent unit="{i18n>createcompoff}">
+		                                            <ImageContent src="sap-icon://create-leave-request" />
+	                                            </TileContent>
+                                            </GenericTile>
+
+
+
+
+
                                             <GenericTile visible="{= ${AppVisibilityModel>/ListOfHolidays} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerListOfHolidays}" press="TileV_onpresslistofholidays">
                                                 <TileContent unit="{i18n>tileLeaveFooter}">
                                                     <ImageContent src="sap-icon://general-leave-request" />

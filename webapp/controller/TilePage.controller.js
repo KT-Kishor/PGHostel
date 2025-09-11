@@ -350,6 +350,9 @@ sap.ui.define(
         TileV_onpressLeave: function () {
           this.getRouter().navTo("RouteAdminApplyLeave");
         },
+          TileV_onpresscompoff: function () {
+            this.getRouter().navTo("RouteCompOff");
+          },
         TileV_onpressConsultantInvoice: function () {
           this.getRouter().navTo("RouteConsultantInvoiceApplication");
         },
