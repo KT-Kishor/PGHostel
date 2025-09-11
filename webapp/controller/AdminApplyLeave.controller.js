@@ -56,6 +56,8 @@ sap.ui.define(
                         // Fetch holidays data
                         return that._fetchCommonData("ListOfSateData", "HolidayModel", { branchCode: that.branch });
                     }).then(() => {
+                        return that._fetchCommonData("Compoff", "CompoffModel", { Employee: this.userId });
+                    }).then(() => {
                         return that.BarDisplayFunction("All In One Leave", that.currentYear, that.userId);
                     }).then(() => {
                         var barDataModel = new JSONModel({ Name: 'line', type: 'column', AllStatus: 'column' });
@@ -565,6 +567,11 @@ sap.ui.define(
                         this.previousLeaveDates.push(d.toDateString());
                     }
 
+                     if (oModelData.typeOfLeave === "CompOff") {
+                        MessageToast.show(this.i18nModel.getText("compoffedit")); 
+                        return; // stop execution
+                    }
+
                     // Prepare leave data for dialog model
                     var leaveJson = {
                         ID: oModelData.ID,
@@ -816,6 +823,20 @@ sap.ui.define(
                                 }
                             }
 
+                            if (oData.typeOfLeave === "CompOff") {
+                                var compOffData = this.getView().getModel("CompoffModel").getData();
+                                var availableQuota = 0;
+                                if (Array.isArray(compOffData) && compOffData.length > 0) {
+                                    availableQuota = parseFloat(compOffData[0].Quota || "0");
+                                } else if (compOffData && compOffData.Quota) {
+                                    availableQuota = parseFloat(compOffData.Quota || "0");
+                                }
+                                var appliedDays = parseFloat(oData.NoofDays);
+                                if (appliedDays > availableQuota) {
+                                    return MessageBox.error("You have only " + availableQuota + " CompOff days left.");
+                                }
+                            }
+
                             // Check if leave is on holiday
                             if (oData.fromDate === oData.toDate) {
                                 var isValid = true;
@@ -925,7 +946,7 @@ sap.ui.define(
                                 }
                             }
 
-                            if (oData.typeOfLeave === "LOP" || oData.typeOfLeave ==="Comp off" || totalNoofDays <= quotaLeave.Count) {
+                            if (oData.typeOfLeave === "LOP" || totalNoofDays <= quotaLeave.Count) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
@@ -1115,7 +1136,7 @@ sap.ui.define(
                             }
 
                             // Check leave type and quota
-                            if (oData.typeOfLeave === "LOP" || oData.typeOfLeave ==="Comp off" ||  valid) {
+                            if (oData.typeOfLeave === "LOP" ||  valid) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
