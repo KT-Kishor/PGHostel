@@ -179,7 +179,7 @@
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
-                                    text="Near Overdue Pending Company Invoices"
+                                    text="{i18n>tileNotificationtablename}"
                                     level="H1"
                                 />
                             </OverflowToolbar>
@@ -257,7 +257,7 @@
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
-                                    text="Overdue Pending Company Invoices"
+                                    text="{i18n>tileNotificationOverdue}"
                                     level="H1"
                                 />
                             </OverflowToolbar>
