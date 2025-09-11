@@ -510,34 +510,36 @@ sap.ui.define([
             if (!aData || !aData[0] || !aData[0].data) return;
 
             const oSelectedData = aData[0].data;
-            const sYear = oSelectedData.Year;   // from chart dimension
-            if (!sYear) return;
+            // Chart dimension is usually "Year" 
+            const sYearRaw = oSelectedData.Year || oSelectedData.year;
+            const iYear = parseInt(String(sYearRaw), 10);
+            if (isNaN(iYear)) {
+                MessageToast.show(this.i18nModel.getText("noDataForSelectedYear"));
+                return;
+            }
 
-            const iYear = parseInt(sYear, 10);
+            // Use the full invoice source so we show ALL invoices for that calendar year
+            const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
 
-
-            const dStart = new Date(iYear, 0, 1);   // Jan 1
-            const dEnd = new Date(iYear, 11, 31);   // Dec 31
-
-            // Take from full invoices source
-            const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || [];
-
+            // Filter by calendar year (Jan 1 -> Dec 31 of iYear)
             const aInvoices = aAllInvoices.filter(inv => {
                 if (!inv || !inv.InvoiceDate) return false;
-                const dInvDate = new Date(inv.InvoiceDate);
-                return dInvDate >= dStart && dInvDate <= dEnd;
+                const dInv = new Date(inv.InvoiceDate);
+                if (isNaN(dInv.getTime())) return false;
+                return dInv.getFullYear() === iYear;
             });
 
-            // Calculate INR values safely
+            // Convert values to numeric INR and attach to each invoice
             aInvoices.forEach(inv => {
                 const raw = this._getInrValue(inv);
                 const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
                 inv.totalAmountInINR = isNaN(num) ? 0 : num;
             });
 
-            // Total for the year (all Jan–Dec invoices)
+            // Compute total for that calendar year
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
 
+            // Lazy load / open fragment
             if (!this.pYearlyInvoicesDialog) {
                 this.pYearlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
@@ -556,7 +558,9 @@ sap.ui.define([
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
-        }
+        },
+
+
 
 
 
