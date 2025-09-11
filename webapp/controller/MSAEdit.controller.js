@@ -1079,7 +1079,7 @@ MsaE_onEditOrSavePress: async function () {
       this.getBusyDialog();
       var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
       await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-        branchCode: oModel.BranchCode, 
+        companyCode: oModel.CompanyCode, 
       });
       var msa = "MSA",
         nda = "NDA";

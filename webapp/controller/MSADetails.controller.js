@@ -403,7 +403,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       this.getBusyDialog();
       var oModel = this.getView().getModel("msaModelWizart").getData();
       await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-        branchCode: oModel.BranchCode,
+       companyCode: oModel.CompanyCode,
       });
       var msa = "MSA",
         nda = "NDA";

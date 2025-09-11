@@ -882,7 +882,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
       this.getBusyDialog();
       try {
         const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-        if (this.sNavigatedRole !== "Trainee" && !sEmployeeType) {
+        if (!sEmployeeType) {
           MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
           this.closeBusyDialog();
           return;
@@ -966,7 +966,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         sMessage = this.i18nModel.getText("selfServiceUpdateEmployee");
         if (sButtonId === "BasicDetailsBtn") {
           const sEmployeeType = this.ViewModel.getProperty("/employeeType");
-          if (this.sNavigatedRole !== "Trainee" && !sEmployeeType) {
+          if (!sEmployeeType) {
             MessageToast.show(this.i18nModel.getText("experienceSelectionRequired"));
             return false; // Stop the save process
           }

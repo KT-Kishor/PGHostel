@@ -211,7 +211,6 @@
                                             columns="2"
                                             select="onExperienceSelect"
                                             enabled="{= ${viewModel>/isEditMode} &amp;&amp; ${sEmployeeModel>/0/Type} !== 'Submit' }"
-                                            visible="{= !${viewModel>/TraineeRole} }"
                                         >
                                             <m:buttons>
                                                 <m:RadioButton
