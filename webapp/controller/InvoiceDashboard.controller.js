@@ -510,7 +510,7 @@ sap.ui.define([
             if (!aData || !aData[0] || !aData[0].data) return;
 
             const oSelectedData = aData[0].data;
-            // Chart dimension is usually "Year" 
+            // Chart  "Year" 
             const sYearRaw = oSelectedData.Year || oSelectedData.year;
             const iYear = parseInt(String(sYearRaw), 10);
             if (isNaN(iYear)) {

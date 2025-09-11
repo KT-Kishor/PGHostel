@@ -28,7 +28,7 @@
                 </columns>
                 
                 <items>
-                    <ColumnListItem>
+                    <ColumnListItem type="Navigation" press="onInvoiceNumberPress">
                         <cells>
                             <Link text="{popoverData>InvNo}" press="onInvoiceNumberPress" />
                             <Text text="{popoverData>CustomerName}" />
