@@ -31,15 +31,15 @@
 					</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{path: 'BaseLocationModel>/', sorter: {path: 'CountryCode',descending: false,group: true}}">
-							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{path:'FilterExpenseModel>/',length:1000}">
+							<core:ListItem key="{FilterExpenseModel>Source}" text="{FilterExpenseModel>Source}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path: 'BaseLocationModel>/', sorter: {path: 'CountryCode',descending: false,group: true}}">
-							<core:ListItem key="{BaseLocationModel>city}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path:'FilterExpenseModel>/',length:1000}">
+							<core:ListItem key="{FilterExpenseModel>Destination}" text="{FilterExpenseModel>Destination}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
