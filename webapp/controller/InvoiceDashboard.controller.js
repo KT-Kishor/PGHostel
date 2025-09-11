@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast, Fragment, Formatter) {
     "use strict";
     // Define the initial default chart types as a constant for clarity and easy maintenance.
-    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "bar", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
+    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
         Formatter: Formatter,
 
@@ -184,28 +184,37 @@ sap.ui.define([
         },
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
-            // --- Aggregation for charts that need currency conversion ---
+            // Aggregation for charts that need currency conversion 
             const monthlyValue = aFilteredData.reduce((acc, item) => {
-                const month = new Date(item.InvoiceDate).getMonth();
+                const d = new Date(item.InvoiceDate);
+                if (isNaN(d.getTime())) return acc;
+                const month = d.getMonth(); // 0=Jan ... 11=Dec
                 acc[month] = (acc[month] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
+
             const companyTotals = aFilteredData.reduce((acc, item) => {
                 acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
+
             const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
-                const year = new Date(item.InvoiceDate).getFullYear();
+                const d = new Date(item.InvoiceDate);
+                if (isNaN(d.getTime())) return acc;
+                const year = d.getFullYear();
                 if (!acc[year]) { acc[year] = { totalAmountInINR: 0, count: 0 }; }
                 acc[year].totalAmountInINR += this._getInrValue(item);
                 acc[year].count++;
                 return acc;
             }, {});
+
             const pendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
-            const pendingByCompany = aFilteredData.filter(item => pendingStatuses.includes(item.Status)).reduce((acc, item) => {
-                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
-                return acc;
-            }, {});
+            const pendingByCompany = aFilteredData
+                .filter(item => pendingStatuses.includes(item.Status))
+                .reduce((acc, item) => {
+                    acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
+                    return acc;
+                }, {});
 
             this._oGroupedInvoices = {};
             const statusCounts = aFilteredData.reduce((acc, item) => {
@@ -228,15 +237,60 @@ sap.ui.define([
                 return acc;
             }, {});
 
+            // --- Determine Fiscal Year Start based on filtered data ---
+            const getFiscalStartYearFromDate = (date) => {
+                const m = date.getMonth(); // 0 to 11
+                const y = date.getFullYear();
+                return (m >= 3) ? y : (y - 1); // Apr(3)..Dec => same year; Jan(0)..Mar(2) => prev year
+            };
 
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const formattedMonthly = monthNames.map((monthName, i) => ({ month: monthName, totalAmountInINR: monthlyValue[i] || 0 }));
-            const formattedCompanyTotals = Object.entries(companyTotals).map(([name, total]) => ({ companyName: name, totalAmountInINR: total })).sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
-            const formattedYearlyTrend = Object.entries(yearlyTrend).map(([yr, data]) => ({ year: yr, ...data })).sort((a, b) => a.year - b.year);
-            const formattedPending = Object.entries(pendingByCompany).map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount })).sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR).slice(0, 5);
+            let fyStartYear;
+            if (aFilteredData && aFilteredData.length > 0) {
+                // find the earliest invoice date in the filtered set
+                let minDate = null;
+                for (let i = 0; i < aFilteredData.length; i++) {
+                    const d = new Date(aFilteredData[i].InvoiceDate);
+                    if (isNaN(d.getTime())) continue;
+                    if (!minDate || d < minDate) minDate = d;
+                }
+                fyStartYear = minDate ? getFiscalStartYearFromDate(minDate) : getFiscalStartYearFromDate(new Date());
+            } else {
+                // no data: derive from today
+                fyStartYear = getFiscalStartYearFromDate(new Date());
+            }
+
+            // --- Financial Year Monthly Aggregation (Apr → Mar with Year) ---
+            const monthNames = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+
+            const formattedMonthly = monthNames.map((monthName, idx) => {
+                const realMonth = (idx + 3) % 12; // map Apr idx 0 -> realMonth 3
+                const displayYear = (realMonth >= 3) ? fyStartYear : (fyStartYear + 1);
+                return {
+                    month: `${monthName}-${displayYear}`,
+                    totalAmountInINR: monthlyValue[realMonth] || 0
+                };
+            });
+
+            const formattedCompanyTotals = Object.entries(companyTotals)
+                .map(([name, total]) => ({ companyName: name, totalAmountInINR: total }))
+                .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
+
+            const formattedYearlyTrend = Object.entries(yearlyTrend)
+                .map(([yr, data]) => ({ year: yr, ...data }))
+                .sort((a, b) => a.year - b.year);
+
+            const formattedPending = Object.entries(pendingByCompany)
+                .map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount }))
+                .sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR)
+                .slice(0, 5);
+
             const formattedStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
-            let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => ({ companyName: name, ...values }));
-            formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company => company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0);
+
+            let formattedPaymentBreakdown = Object.entries(paymentBreakdown)
+                .map(([name, values]) => ({ companyName: name, ...values }));
+            formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company =>
+                company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0
+            );
 
             // ------ Set model data ------
             this.getView().getModel("chartData").setData({
@@ -247,7 +301,9 @@ sap.ui.define([
                 paymentBreakdown: formattedPaymentBreakdown,
                 pendingByCompany: formattedPending
             });
-        },
+        }
+        ,
+
 
 
 
@@ -264,7 +320,7 @@ sap.ui.define([
             }
             this._pPopover.then(oPopover => {
                 oPopover.setModel(new JSONModel({ status: sStatus, invoices: aInvoicesForStatus }), "popoverData");
-                oPopover.openBy(oEvent.getParameter("data")[0].target);
+                oPopover.open(oEvent.getParameter("data")[0].target);
             });
         },
 
@@ -392,53 +448,42 @@ sap.ui.define([
         onMonthlyInvoiceSelect: function (oEvent) {
             const aData = oEvent.getParameter("data");
             if (!aData || !aData[0] || !aData[0].data) return;
+
             const oSelectedData = aData[0].data;
-            const sMonth = oSelectedData.Month;
-            if (!sMonth) return;
+            const sMonthLabel = oSelectedData.Month;  // e.g. "Apr-2024"
+            if (!sMonthLabel) return;
 
-            const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            // const monthNamesLong = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-            let monthIndex = monthNamesShort.indexOf(sMonth);
-            // if (monthIndex === -1) monthIndex = monthNamesLong.indexOf(sMonth);
+            // --- extract month and year from label like "Apr-2024"
+            const [sMonth, sYear] = sMonthLabel.split("-");
+            const monthIndex = monthNamesShort.indexOf(sMonth); // JS month index (0–11)
+            const iYear = parseInt(sYear, 10);
 
-            // support numeric month strings like "1" or "01" or "12"
-            if (monthIndex === -1 && /^\d+$/.test(sMonth)) {
-                const num = parseInt(sMonth, 10);
-                if (num >= 1 && num <= 12) monthIndex = num - 1;
-            }
-
-            //match by prefix ('Jan' )
-            if (monthIndex === -1) {
-                monthIndex = monthNamesShort.findIndex(m => m.toLowerCase().startsWith(sMonth.toLowerCase()));
-            }
-
-            if (monthIndex === -1) {
-                // couldn't determine month index — bail out gracefully
+            if (monthIndex === -1 || isNaN(iYear)) {
                 MessageToast.show(this.i18nModel.getText("noDataForSelectedMonth"));
                 return;
             }
 
-            // filter invoices by month index
+            // filter invoices by month + year
             const aInvoices = (this._aCurrentFilteredData || []).filter(inv => {
                 if (!inv || !inv.InvoiceDate) return false;
                 const invDate = new Date(inv.InvoiceDate);
                 if (isNaN(invDate.getTime())) return false;
-                return invDate.getMonth() === monthIndex;
+                return invDate.getMonth() === monthIndex && invDate.getFullYear() === iYear;
             });
 
-            // convert and normalize INR values (strip commas/currency if any)
+            // convert to INR properly
             aInvoices.forEach(inv => {
-                const raw = this._getInrValue(inv); // keep your existing conversion logic
-                // make sure it's a Number (remove currency symbols/commas)
+                const raw = this._getInrValue(inv);
                 const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
                 inv.totalAmountInINR = isNaN(num) ? 0 : num;
             });
 
-            // compute total
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
 
-            // open fragment (same as your existing pattern)
+            // lazy load fragment
             if (!this.pMonthlyInvoicesDialog) {
                 this.pMonthlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
@@ -449,7 +494,7 @@ sap.ui.define([
 
             this.pMonthlyInvoicesDialog.then(oDialog => {
                 oDialog.setModel(new JSONModel({
-                    month: monthNamesShort[monthIndex], // pass short name to fragment
+                    month: `${sMonth}-${iYear}`, // pass month + year
                     invoices: aInvoices,
                     totalValue: totalValue
                 }), "dialogData");
@@ -458,6 +503,8 @@ sap.ui.define([
                 oDialog.open();
             });
         },
+
+
         onYearlyInvoiceSelect: function (oEvent) {
             const aData = oEvent.getParameter("data");
             if (!aData || !aData[0] || !aData[0].data) return;

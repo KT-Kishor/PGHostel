@@ -1,22 +1,51 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core">
-    <ResponsivePopover
-        id="invoiceListPopover"
-        title="{i18n>invoiceFor} '{popoverData>/status}'"
-        placement="Right">
+
+    <Dialog
+        id="invoiceListDialog"
+        title="{i18n>invoiceFor} '{dialogData>/status}'"
+        contentWidth="900px"
+        contentHeight="500px"
+        resizable="true"
+        draggable="true">
+        
         <content>
-            <List
+            <Table
+                id="invoiceListTable"
+                inset="false"
+                sticky="ColumnHeaders"
                 items="{popoverData>/invoices}"
                 noDataText="{i18n>noInvoiceStatus}">
+                
+                <columns>
+                    <Column><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column><Text text="{i18n>customerName}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>amount}" /></Column>
+                    <!-- <Column><Text text="{i18n>currency}" /></Column> -->
+                    <Column><Text text="{i18n>date}" /></Column>
+                    <Column><Text text="{i18n>status}" /></Column>
+                </columns>
+                
                 <items>
-                    <StandardListItem
-                        title="{popoverData>InvNo}"
-                        description=" {popoverData>CustomerName} Amount: {popoverData>TotalAmount} {popoverData>Currency} "
-                        type="Navigation"
-                        press="onInvoiceNumberPress" />
+                    <ColumnListItem>
+                        <cells>
+                            <Link text="{popoverData>InvNo}" press="onInvoiceNumberPress" />
+                            <Text text="{popoverData>CustomerName}" />
+                            <ObjectNumber number="{path:'popoverData>TotalAmount',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+                            <!-- <Text text="{popoverData>Currency}" /> -->
+                            <Text text="{
+                                path: 'popoverData>InvoiceDate',
+                             formatter:'.Formatter.formatDate'}" />
+                            <Text text="{popoverData>Status}" />
+                        </cells>
+                    </ColumnListItem>
                 </items>
-            </List>
+            </Table>
         </content>
-    </ResponsivePopover>
+        
+        <endButton>
+            <Button text="{i18n>close}" type="Reject" press="onCloseDialog" />
+        </endButton>
+    </Dialog>
 </core:FragmentDefinition>
