@@ -37,28 +37,7 @@ sap.ui.define(
           this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          await this._fetchCommonData(
-            "getCompanyInvoice",
-            "CompanyInvoiceModelData"
-          );
-          this.getView()
-            .getModel("CompanyInvoiceModelData")
-            .setProperty(
-              "/length",
-              this.getView().getModel("CompanyInvoiceModelData").getData()
-                .length
-            );
-          await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
-          this.getView()
-            .getModel("MSASOWModel")
-            .setProperty(
-              "/length",
-              this.getView().getModel("MSASOWModel").getData().length
-            );
-
-            await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
-           this.getView().getModel("SOWModel").setProperty("/length",this.getView().getModel("SOWModel").getData().length);
-
+         
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");
@@ -443,24 +422,6 @@ sap.ui.define(
         TileV_JobPosting: function () {
           this.getRouter().navTo("RouteHP_View");
         },
-
-        // OnPressNavigationMsaDet: function (oEvent) {
-        //   var MsaID = oEvent
-        //     .getSource()
-        //     .getBindingContext("MSASOWModel")
-        //     .getProperty("MsaID");
-        //   this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
-        // },
-
-        // CI_onPressInvoiceRow: function (oEvent) {
-        //   var Path = encodeURIComponent(
-        //     oEvent
-        //       .getSource()
-        //       .getBindingContext("CompanyInvoiceModelData")
-        //       .getObject().InvNo
-        //   );
-        //   this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: Path });
-        // },
 
         TileV_onpressInvoiceDashboard: function () {
           this.getRouter().navTo("RouteInvoiceDashboard");

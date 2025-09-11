@@ -149,7 +149,7 @@ sap.ui.define([
             if (daysDiff < 0) {
                 return "Error"; // Overdue
             } else if (daysDiff <= 10) {
-                return "Indication17"; // Due soon
+                return "Information"; // Due soon
             } else {
                 return "None"; // Not urgent
             }

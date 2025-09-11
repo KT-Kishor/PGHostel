@@ -810,20 +810,20 @@ sap.ui.define([
       }
     },
     onCompanyCodeChangeCommon: function (oEvent, sModelName, sCompanyCodePath, sBranchPath, sBranchControlId) {
-        var oView = this.getView();
-        var oModel = oView.getModel(sModelName);
-        var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
-        var aCompanyData = oView.getModel("CompanyCodeDetailsModel").getData();
-        var oSelectedCompany = aCompanyData.find(function (item) {
-            return item.companyCode === sSelectedCompanyCode;
-        });
-        if (oSelectedCompany) {
-            oModel.setProperty(sBranchPath, oSelectedCompany.branch);
-            oView.byId(sBranchControlId).setEnabled(false);
-        } else {
-            oModel.setProperty(sBranchPath, "");
-            oView.byId(sBranchControlId).setEnabled(false);
-        }
+      var oView = this.getView();
+      var oModel = oView.getModel(sModelName);
+      var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
+      var aCompanyData = oView.getModel("CompanyCodeDetailsModel").getData();
+      var oSelectedCompany = aCompanyData.find(function (item) {
+        return item.companyCode === sSelectedCompanyCode;
+      });
+      if (oSelectedCompany) {
+        oModel.setProperty(sBranchPath, oSelectedCompany.branch);
+        oView.byId(sBranchControlId).setEnabled(false);
+      } else {
+        oModel.setProperty(sBranchPath, "");
+        oView.byId(sBranchControlId).setEnabled(false);
+      }
     },
     onCountryChange: function (oEvent, oIds) {
       const oSource = oEvent.getSource();
@@ -1176,21 +1176,25 @@ sap.ui.define([
 
     TileNotificationReadData: async function () {
 
-      this.getView().getModel("setModelforBusy").setProperty("/busyIndicator",true);
+      this.getView().getModel("setModelforBusy").setProperty("/busyIndicator", true);
       // this.getBusyDialog();
       await this._fetchCommonData("getMSAEndingSoon", "MSASOWModel");
       await this._fetchCommonData("getSOWEndingSoon", "SOWModel");
-      await this._fetchCommonData("getCompanyInvoice", "CompanyInvoiceModelData");
-      // this.closeBusyDialog();
-       this.getView().getModel("setModelforBusy").setProperty("/busyIndicator",false);
+      await this._fetchCommonData("getCompanyInvoice","CompanyInvoiceModelData");
+
+      // this.getView().getModel("CompanyInvoiceModelData").setProperty("/length",this.getView().getModel("CompanyInvoiceModelData").getData().length);
+      // this.getView().getModel("MSASOWModel").setProperty("/length",this.getView().getModel("MSASOWModel").getData().length);
+      // this.getView().getModel("SOWModel").setProperty("/length",this.getView().getModel("SOWModel").getData().length);
+
+      this.getView().getModel("setModelforBusy").setProperty("/busyIndicator", false);
     },
 
     //Notification fragment open
     Tile_NotifictionBTN: async function (oEvent) {
       const BusyModel = new sap.ui.model.json.JSONModel({
-        busyIndicator:true
+        busyIndicator: true
       })
-      this.getView().setModel(BusyModel,"setModelforBusy");
+      this.getView().setModel(BusyModel, "setModelforBusy");
       var oView = this.getView();
       var oButton = oEvent.getSource();
 
@@ -1199,10 +1203,10 @@ sap.ui.define([
         oOldCarousel.destroy(true);
       }
 
-          if (this.oPopover) {
-            this.oPopover.destroy();
-            this.oPopover = null;
-          }
+      if (this.oPopover) {
+        this.oPopover.destroy();
+        this.oPopover = null;
+      }
 
       if (!this.oPopover) {
         sap.ui.core.Fragment.load({
@@ -1369,7 +1373,7 @@ sap.ui.define([
       this.getRouter().navTo("RouteMSAEdit", { sPath: MsaID });
       this.onClosePopover();
     },
-    CI_onPressInvoiceRow: function (oEvent) {
+    CIB_onPressInvoiceRow: function (oEvent) {
       var Path = encodeURIComponent(
         oEvent
           .getSource()

@@ -24,7 +24,6 @@
             </Toolbar>
         </customHeader>
         <VBox>
-
             <Carousel
                 id="TN_id_Carousel"
                 visible="{= ${BirthdayModel>/}.length > 0 }"
@@ -57,7 +56,6 @@
                                 width="100%"
                                 renderType="Bare"
                             >
-                            
                                 <Title
                                     level="H3"
                                     text="Happy Birthday!! 🎉"
@@ -95,7 +93,8 @@
                         )}"
             >
                 <f:content>
-                    <Table sticky="ColumnHeaders,HeaderToolbar"
+                    <Table
+                        sticky="ColumnHeaders,HeaderToolbar"
                         items="{MSASOWModel>/}"
                         id=""
                         busy="{setModelforBusy>/busyIndicator}"
@@ -163,7 +162,7 @@
             <f:Card
                 width="auto"
                 class="sapUiSmallMargin"
-                visible="{= ${CompanyInvoiceModelData>/length} > 0
+                visible="{= ${CompanyInvoiceModelData>/AfterData}.length > 0 
       &amp;&amp; (
         ${LoginModel>/Role} === 'Admin' ||
         ${LoginModel>/Role} === 'Demo' ||
@@ -171,11 +170,16 @@
       )}"
             >
                 <f:content>
-                    <Table id="" items="{CompanyInvoiceModelData>/}" busy="{setModelforBusy>/busyIndicator}" sticky="ColumnHeaders,HeaderToolbar"> 
+                    <Table
+                        id=""
+                        items="{CompanyInvoiceModelData>/AfterData}"
+                        busy="{setModelforBusy>/busyIndicator}"
+                        sticky="ColumnHeaders,HeaderToolbar"
+                    >
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
-                                    text="{i18n>invoiceTileDetail}"
+                                    text="Near Overdue Pending Company Invoices"
                                     level="H1"
                                 />
                             </OverflowToolbar>
@@ -209,7 +213,85 @@
                         <items>
                             <ColumnListItem
                                 type="Navigation"
-                                press="CI_onPressInvoiceRow"
+                                press="CIB_onPressInvoiceRow"
+                            >
+                                <cells>
+                                    <Text
+                                        text="{CompanyInvoiceModelData>InvNo}"
+                                    />
+                                    <Text
+                                        text="{CompanyInvoiceModelData>CustomerName}"
+                                    />
+                                    <Text
+                                        text="{path:'CompanyInvoiceModelData>InvoiceDate',formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <ObjectStatus
+                                        class="PayByDateClass"
+                                        text="{path:'CompanyInvoiceModelData>PayByDate',formatter:'.Formatter.formatDate'}"
+                                        inverted="false"
+                                        state="{ parts: [{path: 'CompanyInvoiceModelData>PayByDate'},{path: 'CompanyInvoiceModelData>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </f:content>
+            </f:Card>
+
+            <f:Card
+                width="auto"
+                class="sapUiSmallMargin"
+                visible="{= ${CompanyInvoiceModelData>/AfterData}.length > 0 
+      &amp;&amp; (
+        ${LoginModel>/Role} === 'Admin' ||
+        ${LoginModel>/Role} === 'Demo' ||
+        ${LoginModel>/Role} === 'Account Manager' 
+      )}"
+            >
+                <f:content>
+                    <Table
+                        items="{CompanyInvoiceModelData>/BeforeData}"
+                        busy="{setModelforBusy>/busyIndicator}"
+                        sticky="ColumnHeaders,HeaderToolbar"
+                    >
+                        <headerToolbar>
+                            <OverflowToolbar>
+                                <Title
+                                    text="Overdue Pending Company Invoices"
+                                    level="H1"
+                                />
+                            </OverflowToolbar>
+                        </headerToolbar>
+                        <columns>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>invoiceNo}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>customerName}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>invoiceDate}" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>PayByDate}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem
+                                type="Navigation"
+                                press="CIB_onPressInvoiceRow"
                             >
                                 <cells>
                                     <Text
@@ -247,9 +329,10 @@
             >
                 <f:content>
                     <Table
-                        items="{SOWModel>/}" sticky="ColumnHeaders,HeaderToolbar"  
-                        busy="{setModelforBusy>/busyIndicator}"                    
-                    >   
+                        items="{SOWModel>/}"
+                        sticky="ColumnHeaders,HeaderToolbar"
+                        busy="{setModelforBusy>/busyIndicator}"
+                    >
                         <headerToolbar>
                             <OverflowToolbar>
                                 <Title
