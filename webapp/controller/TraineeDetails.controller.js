@@ -234,7 +234,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                         utils._LCvalidateMandatoryField(this.byId("TU_id_Currency"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TU_Id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.getView().byId("TU_id_State"), "ID") &&
-                        utils._LCstrictValidationComboBox(this.getView().byId("TU_id_Location"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.getView().byId("TU_id_Location"), "ID") &&
                         this.TD_validateMobile(this.getView().byId("TU_id_Mobile")) &&
                         utils._LCvalidateMandatoryField(this.getView().byId("TU_id_STDCode"), "ID");
 
@@ -309,6 +309,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                 MessageToast.show(this.i18nModel.getText(text));
                             }
                             this.getView().getModel("oTraineeDetails").refresh(true);
+                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                         }
                     })
                     .catch((error) => {
@@ -845,6 +846,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                             value: "Trainee",
                                         });
                                         this.getView().getModel("oTraineeDetails").refresh(true);
+                                        this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                                     }.bind(this),
                                 }),
                                 endButton: new sap.m.Button({
@@ -871,6 +873,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                                         value: "Trainee",
                                                     });
                                                     this.getView().getModel("oTraineeDetails").refresh(true);
+                                                    this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                                                 }
                                             })
                                             .catch((error) => {

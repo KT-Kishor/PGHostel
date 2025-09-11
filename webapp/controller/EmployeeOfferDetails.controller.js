@@ -129,7 +129,7 @@ sap.ui.define([
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Location"), "ID") &&
+                    var isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Location"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) {
@@ -209,6 +209,7 @@ sap.ui.define([
                                 MessageToast.show(this.i18nModel.getText(text));
                             }
                             this.getView().getModel("employeeModel").refresh(true);
+                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                         }
                     }).catch((error) => {
                         this.closeBusyDialog();
@@ -437,6 +438,7 @@ sap.ui.define([
                                         press: function () {
                                             oDialog.close();
                                             this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
+                                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                                             this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                         }.bind(this)
                                     }),

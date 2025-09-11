@@ -483,7 +483,7 @@ sap.ui.define([
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_FinanceEmail"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_State"), "ID") &&
-                        utils._LCstrictValidationComboBox(sap.ui.getCore().byId("MC_id_City"), "ID") &&
+                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_City"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustAddress"), "ID")
                     );
                     if (!isMandatoryValid) {

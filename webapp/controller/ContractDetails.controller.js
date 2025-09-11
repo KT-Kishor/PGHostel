@@ -797,6 +797,7 @@ sap.ui.define([
                         if (response.success === true) {
                             this.closeBusyDialog(); // Close busy dialog
                             data.ContractNo = response.ContractNo;
+                            this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
 
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -955,7 +956,7 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(this.byId("CU_id_CurrencySelect"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_Country"), "ID") &&
                     utils._LCstrictValidationComboBox(this.byId("CU_id_State"), "ID") &&
-                    utils._LCstrictValidationComboBox(this.byId("CU_id_ContractCity"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.byId("CU_id_ContractCity"), "ID") &&
                     utils._LCvalidateMandatoryField(this.byId("CU_id_codeModel"), "ID") &&
                     this.CD_validateMobileNo(this.getView().byId("CU_id_Mobile"))
                 );
@@ -1048,6 +1049,7 @@ sap.ui.define([
 
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
+                    this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                     await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                     this.closeBusyDialog();
                     this.getRouter().navTo("RouteContractDetails", {
