@@ -40,7 +40,8 @@ sap.ui.define([
                             ReturnEmpID: "",
                             Description: "",
                             AssetCondition: "",
-                            RepairPrice: ""
+                            RepairPrice: "",
+                            CompanyCode:""
                         },
                         filters: {}
                     },
@@ -277,7 +278,7 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
-                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
+                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.CompanyCode === this.oLoginModel.getProperty("/CompanyCode")));
                     this.getView().setModel(oModel, "EmpModel");
                 } else {
                     var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
@@ -534,6 +535,7 @@ sap.ui.define([
             FAA_onPressSave: async function() {
                 if (this._checkValidation()) {
                     try {
+                        
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
                         var oAssignedDate = new Date(sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue());
                         var sAssetCreationDate = this.getView().getModel("myform").getProperty("/formData/data/AssetCreationDate");
@@ -638,6 +640,10 @@ sap.ui.define([
                             params["AssignedEndDate"] = oDateFormat.format(new Date(oControl.getValue().split('-')[1]));
                         } else if (sValue === "AssignBranch") {
                             params[sValue] = oControl.getValue()
+                            if(sValue!=="")
+                                {
+                                  params["CompanyCode"] =oControl.getSelectedItem().getAdditionalText()
+                                 }
                             params["Status"] = "Assigned"
                         } else {
                             params[sValue] = oControl.getValue();
@@ -749,6 +755,8 @@ sap.ui.define([
                 formData.setProperty("/formData/data/ReturnEmpID", oSelectedData.ReturnEmpID);
                 formData.setProperty("/formData/data/ReturnEmpName", oSelectedData.ReturnEmpName);
                 formData.setProperty("/formData/data/ReturnBranch", oSelectedData.ReturnBranch);
+                formData.setProperty("/formData/data/CompanyCode", oSelectedData.CompanyCode);
+
                 var oAssignedDate;
                 var oMinDate;
                 var today = new Date();
@@ -839,7 +847,7 @@ sap.ui.define([
             FAU_onSaveReturn: async function() {
                 var oCore = sap.ui.getCore();
                 var oFormDataModel = this.getView().getModel("myform").getProperty("/formData");
-                oFormDataModel.data.ReturnDate = this.Formatter.formatDate(oFormDataModel.data.ReturnDate);
+                oFormDataModel.data.ReturnDate = this.Formatter.formatDate(oFormDataModel.data.ReturnDate).split('/').reverse().join('-');
                 if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")) {
                     this.getBusyDialog();
                     oFormDataModel.data.Status = "Returned";

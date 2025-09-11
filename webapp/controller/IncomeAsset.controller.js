@@ -40,7 +40,7 @@ sap.ui.define([
 
                 var empData = this.getView().getModel("EmpModel").getData();
 
-                var filteredEmp = empData.filter(emp => emp.BranchCode === loginModel.BranchCode && (emp.Role.includes("Admin") ||
+                var filteredEmp = empData.filter(emp => emp.CompanyCode === loginModel.CompanyCode && (emp.Role.includes("Admin") ||
                     emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
                 var oModel = new JSONModel(filteredEmp);
@@ -103,7 +103,7 @@ sap.ui.define([
             },
             IA_CommonReadCall: function (filter) {
                 this.getBusyDialog();
-                this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => {
+                this.ajaxReadWithJQuery("IncomeAsset", "IsCurrent=1").then((oData) => { 
 
                     let loginModel = this.getView().getModel("LoginModel").getData();
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -476,7 +476,6 @@ sap.ui.define([
                         "Status": "Available",
                         "TrashDate": null,
                         "PickedEmployeeID": sap.ui.getCore().byId("FCIA_id_pickedby").getSelectedItem().getAdditionalText(),
-                        "PickedBranch": oModel.PickedBranch,
                     };
 
                     await this.ajaxUpdateWithJQuery("IncomeAsset", { data: oPayLoad, filters: { ID: this.item } });
