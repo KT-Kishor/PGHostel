@@ -1,0 +1,43 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog
+        id="YearlyInvoiceDialog"
+        title="{i18n>yearlyinvoicefor} {dialogData>/year}"
+        contentWidth="800px"
+        contentHeight="400px"
+        resizable="true"
+        draggable="true">
+        <content>
+            <Table
+            sticky="ColumnHeaders"
+                items="{dialogData>/invoices}"
+                noDataText="{i18n>noPendingData}">
+                <columns>
+                    <Column><Text text="{i18n>invoiceNo}" /></Column>
+               <Column><Text text="{i18n>invoiceDate}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>yearlyinvoice}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press="onPendingInvoicePress">
+                        <cells>
+                            <!-- <Text text="{dialogData>year}" /> -->
+                            <Text text="{dialogData>InvNo}" />
+                            <Text text="{
+                                path: 'dialogData>InvoiceDate',
+                             formatter:'.Formatter.formatDate'}" />
+                            
+                             <ObjectNumber number="{
+                                path: 'dialogData>totalAmountInINR',
+                               formatter: '.Formatter.fromatNumber'
+                            }" unit="INR" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="{i18n>close}" type="Reject" press="onCloseDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

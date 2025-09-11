@@ -26,19 +26,19 @@
                             <Text text="{dialogData>InvNo}" />
                             <ObjectNumber number="{
                                 path: 'dialogData>SubTotalInGST',
-                                formatter: '.formatter.currencyValue'
+                               formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
                              <ObjectNumber number="{
                                 path: 'dialogData>gstAmount',
-                                formatter: '.formatter.currencyValue'
+                       formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
                              <ObjectNumber number="{
                                 path: 'dialogData>IncomeTax',
-                                formatter: '.formatter.currencyValue'
+                         formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
                              <ObjectNumber number="{
                                 path: 'dialogData>totalAmountInINR',
-                                formatter: '.formatter.currencyValue'
+                           formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
                         </cells>
                     </ColumnListItem>

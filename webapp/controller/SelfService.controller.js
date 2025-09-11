@@ -46,11 +46,11 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         oBaseCombo.setValueState("None");
       }
 
-      // const oBranchInput = getById("SS_id_CompanyCode");
-      // if (oBranchInput) {
-      //   oBranchInput.setValue("");
-      //   oBranchInput.setValueState("None");
-      // }
+      const oBranchInput = getById("SS_id_CompanyCode");
+      if (oBranchInput) {
+        oBranchInput.setValue("");
+        oBranchInput.setValueState("None");
+      }
 
       // Refactored Mobile Number Logic
       const oMobileInput = getById("SS_id_MobileNo");

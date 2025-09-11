@@ -1816,6 +1816,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 .customdashboard {
     background-color: #f2b15b;
+    border-radius: 15px 15px 0 0 !important;
 }
 
 

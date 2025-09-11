@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast, Fragment, Formatter) {
     "use strict";
     // Define the initial default chart types as a constant for clarity and easy maintenance.
-    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
+    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "bar", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
         Formatter: Formatter,
 
@@ -42,43 +42,100 @@ sap.ui.define([
                 this.rawInvoiceData = (Array.isArray(oData.data) ? oData.data : [oData.data]);
                 const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CustomerName))];
                 this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c, text: c })));
-                this.byId("yearFilter").setValue(new Date().getFullYear().toString());
+                const today = new Date();
+                let year = today.getFullYear();
+                let month = today.getMonth() + 1;
+
+                //   before April, financial year is (previous year - current year)
+                //   April or later, financial year is (current year - next year)
+                let financialYear;
+                if (month < 4) {
+                    financialYear = (year - 1) + "-" + year;
+                } else {
+                    financialYear = year + "-" + (year + 1);
+                }
+
+                this.byId("yearFilter").setValue(financialYear);
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
                 this.closeBusyDialog();
             }
         },
+        onDateRangeselection: function () {
+            const oYearFilter = this.byId("yearFilter");
+            oYearFilter.setValue("");
+        },
+        onchangeFY: function (oEvent) {
+            // get selected year from DatePicker
+            const sYear = oEvent.getSource().getValue();
+            if (!sYear) return;
+
+            const year = parseInt(sYear, 10);
+
+            // Financial Year = selectedYear - (selectedYear+1)
+            const financialYear = year + "-" + (year + 1);
+
+            // set back to DatePicker as string
+            this.byId("yearFilter").setValue(financialYear);
+        }
+        ,
 
         onFilterChange: function () {
             if (!this.rawInvoiceData) return;
             this.getBusyDialog();
+
             setTimeout(() => {
                 try {
-                    const aSelectedCompanies = this.byId("companyFilter").getSelectedKeys();
-                    const sSelectedYear = this.byId("yearFilter").getValue();
+                    const oCompanyFilter = this.byId("companyFilter");
+                    const oYearFilter = this.byId("yearFilter");
                     const oDateRange = this.byId("DashI_id_Date");
-                    const dFrom = oDateRange.getDateValue();
-                    const dTo = oDateRange.getSecondDateValue();
+
+                    const aSelectedCompanies = oCompanyFilter.getSelectedKeys();
+                    let sSelectedYear = oYearFilter.getValue();
+                    let dFrom = oDateRange.getDateValue();
+                    let dTo = oDateRange.getSecondDateValue();
+
+                    //  Clear year if date range is selected
+                    // if (dFrom && dTo) {
+                    //     oYearFilter.setValue("");
+                    //     sSelectedYear = "";
+                    // }
+
+                    //  Clear date range if year is selected
+                    if (sSelectedYear) {
+                        oDateRange.setValue("");
+                        dFrom = null;
+                        dTo = null;
+                    }
 
                     let aFilteredData = this.rawInvoiceData.filter(item => {
                         const invoiceDate = new Date(item.InvoiceDate);
+
                         let bCompanyMatch = aSelectedCompanies.length === 0 || aSelectedCompanies.includes(item.CustomerName);
                         let bDateMatch = true;
+
                         if (dFrom && dTo) {
                             const dEndDate = new Date(dTo);
-                            dEndDate.setDate(dEndDate.getDate() + 1);
+                            dEndDate.setDate(dEndDate.getDate() + 1); // include last date
                             bDateMatch = invoiceDate >= dFrom && invoiceDate < dEndDate;
                         } else if (sSelectedYear) {
-                            bDateMatch = invoiceDate.getFullYear().toString() === sSelectedYear;
+                            //  Financial Year filtering
+                            // Example: if yearFilter = "2024" → Apr 1, 2024 – Mar 31, 2025
+                            const fyStart = new Date(parseInt(sSelectedYear), 3, 1); // April 1
+                            const fyEnd = new Date(parseInt(sSelectedYear) + 1, 2, 31, 23, 59, 59); // March 31 next year
+                            bDateMatch = invoiceDate >= fyStart && invoiceDate <= fyEnd;
                         }
+
                         return bCompanyMatch && bDateMatch;
                     });
+
                     this._aCurrentFilteredData = aFilteredData;
 
                     let aYearlyTrendData = (aSelectedCompanies.length > 0) ?
                         this.rawInvoiceData.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName)) :
                         this.rawInvoiceData;
+
                     this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData);
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -88,15 +145,16 @@ sap.ui.define([
             }, 100);
         },
 
+
         // --- HELPER to get INR value. Refactored to be reusable --
-       _getInrValue: function (item) {
+        _getInrValue: function (item) {
             let amount = 0;
             if (item.Status === "Submitted" || item.Status === "Invoice Sent") {
                 amount = parseFloat(item.TotalAmount || 0);
             } else if (item.Status === "Payment Partially") {
                 amount = parseFloat(item.DueAmount || 0);
             } else {
-               
+
                 amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
             }
 
@@ -125,7 +183,7 @@ sap.ui.define([
             return numValue * conversionRate;
         },
 
-       _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
+        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
             // --- Aggregation for charts that need currency conversion ---
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const month = new Date(item.InvoiceDate).getMonth();
@@ -143,7 +201,7 @@ sap.ui.define([
                 acc[year].count++;
                 return acc;
             }, {});
-            const pendingStatuses = ["Submitted","Invoice Sent","Payment Partially"];
+            const pendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
             const pendingByCompany = aFilteredData.filter(item => pendingStatuses.includes(item.Status)).reduce((acc, item) => {
                 acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
                 return acc;
@@ -233,7 +291,7 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
-            const aPendingStatuses = ["Submitted","Invoice Sent","Payment Partially"];
+            const aPendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
             aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
             if (!this.pPendingInvoicesDialog) {
@@ -274,39 +332,217 @@ sap.ui.define([
         onClearFilters: function () {
             this.byId("companyFilter").setSelectedKeys(null);
             this.byId("DashI_id_Date").setValue("");
-            this.byId("yearFilter").setValue(new Date().getFullYear().toString());
+
+            const today = new Date();
+            let year = today.getFullYear();
+            let month = today.getMonth() + 1;
+
+            //   before April, financial year is (previous year - current year)
+            //   April or later, financial year is (current year - next year)
+            let financialYear;
+            if (month < 4) {
+                financialYear = (year - 1) + "-" + year;
+            } else {
+                financialYear = year + "-" + (year + 1);
+            }
+
+            this.byId("yearFilter").setValue(financialYear);
         },
+
 
         onPressback: function () { this.getRouter().navTo("RouteTilePage"); },
         onLogout: function () { this.getRouter().navTo("RouteLoginPage"); },
 
-        onAfterRendering: function () {
-            var oVizFrame = this.byId("barChartCompany");
-            var oScroll = this.byId("companyScroll");
+        onTotalInvoiceValueSelect: function (oEvent) {
+            const oSelectedData = oEvent.getParameter("data")[0].data;
+            if (!oSelectedData || !oSelectedData.Company) return;
 
-            // Get your dataset
-            var aData = this.getView().getModel("chartData").getProperty("/companyTotals");
+            const sCompanyName = oSelectedData.Company;
 
-            if (aData && aData.length > 0) {
-                // Set dynamic height: 60px per bar + some padding
-                var iRowHeight = 100;
-                var iChartHeight = aData.length * iRowHeight;
+            // Get all invoices of that company from filtered data
+            const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName);
 
-                // Apply dynamic height to VizFrame
-                oVizFrame.setHeight(iChartHeight + "px");
+            //  converted INR value for each invoice
+            aInvoices.forEach(inv => { inv.totalAmountInINR = this._getInrValue(inv); });
+
+            // Calculate total value
+            const totalValue = aInvoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
+
+            // Lazy-load the fragment if not already loaded
+            if (!this.pTotalInvoicesDialog) {
+                this.pTotalInvoicesDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.TotalInVoiceValue",
+                    controller: this
+                });
             }
 
-            // Apply chart properties
-            oVizFrame.setVizProperties({
-                title: { visible: false },
-                plotArea: {
-                    // dataLabel: { visible: true, formatString: "#,##0.##" },
-                    isFixedDataPointSize: true // prevents bar compression
-                },
-                valueAxis: { title: { visible: false } },
-                categoryAxis: { title: { visible: false } }
+            this.pTotalInvoicesDialog.then(oDialog => {
+                // Bind model with data for dialog
+                oDialog.setModel(new JSONModel({
+                    companyName: sCompanyName,
+                    invoices: aInvoices,
+                    totalValue: totalValue
+                }), "dialogData");
+
+                this.getView().addDependent(oDialog);
+                oDialog.open();
+            });
+        },
+        onMonthlyInvoiceSelect: function (oEvent) {
+            const aData = oEvent.getParameter("data");
+            if (!aData || !aData[0] || !aData[0].data) return;
+            const oSelectedData = aData[0].data;
+            const sMonth = oSelectedData.Month;
+            if (!sMonth) return;
+
+            const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            // const monthNamesLong = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            let monthIndex = monthNamesShort.indexOf(sMonth);
+            // if (monthIndex === -1) monthIndex = monthNamesLong.indexOf(sMonth);
+
+            // support numeric month strings like "1" or "01" or "12"
+            if (monthIndex === -1 && /^\d+$/.test(sMonth)) {
+                const num = parseInt(sMonth, 10);
+                if (num >= 1 && num <= 12) monthIndex = num - 1;
+            }
+
+            //match by prefix ('Jan' )
+            if (monthIndex === -1) {
+                monthIndex = monthNamesShort.findIndex(m => m.toLowerCase().startsWith(sMonth.toLowerCase()));
+            }
+
+            if (monthIndex === -1) {
+                // couldn't determine month index — bail out gracefully
+                MessageToast.show(this.i18nModel.getText("noDataForSelectedMonth"));
+                return;
+            }
+
+            // filter invoices by month index
+            const aInvoices = (this._aCurrentFilteredData || []).filter(inv => {
+                if (!inv || !inv.InvoiceDate) return false;
+                const invDate = new Date(inv.InvoiceDate);
+                if (isNaN(invDate.getTime())) return false;
+                return invDate.getMonth() === monthIndex;
+            });
+
+            // convert and normalize INR values (strip commas/currency if any)
+            aInvoices.forEach(inv => {
+                const raw = this._getInrValue(inv); // keep your existing conversion logic
+                // make sure it's a Number (remove currency symbols/commas)
+                const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
+                inv.totalAmountInINR = isNaN(num) ? 0 : num;
+            });
+
+            // compute total
+            const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
+
+            // open fragment (same as your existing pattern)
+            if (!this.pMonthlyInvoicesDialog) {
+                this.pMonthlyInvoicesDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.MonthlyInvoice",
+                    controller: this
+                });
+            }
+
+            this.pMonthlyInvoicesDialog.then(oDialog => {
+                oDialog.setModel(new JSONModel({
+                    month: monthNamesShort[monthIndex], // pass short name to fragment
+                    invoices: aInvoices,
+                    totalValue: totalValue
+                }), "dialogData");
+
+                this.getView().addDependent(oDialog);
+                oDialog.open();
+            });
+        },
+        onYearlyInvoiceSelect: function (oEvent) {
+            const aData = oEvent.getParameter("data");
+            if (!aData || !aData[0] || !aData[0].data) return;
+
+            const oSelectedData = aData[0].data;
+            const sYear = oSelectedData.Year;   // from chart dimension
+            if (!sYear) return;
+
+            const iYear = parseInt(sYear, 10);
+
+
+            const dStart = new Date(iYear, 0, 1);   // Jan 1
+            const dEnd = new Date(iYear, 11, 31);   // Dec 31
+
+            // Take from full invoices source
+            const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || [];
+
+            const aInvoices = aAllInvoices.filter(inv => {
+                if (!inv || !inv.InvoiceDate) return false;
+                const dInvDate = new Date(inv.InvoiceDate);
+                return dInvDate >= dStart && dInvDate <= dEnd;
+            });
+
+            // Calculate INR values safely
+            aInvoices.forEach(inv => {
+                const raw = this._getInrValue(inv);
+                const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
+                inv.totalAmountInINR = isNaN(num) ? 0 : num;
+            });
+
+            // Total for the year (all Jan–Dec invoices)
+            const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
+
+            if (!this.pYearlyInvoicesDialog) {
+                this.pYearlyInvoicesDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.YearlyInvoice",
+                    controller: this
+                });
+            }
+
+            this.pYearlyInvoicesDialog.then(oDialog => {
+                oDialog.setModel(new JSONModel({
+                    year: iYear,
+                    invoices: aInvoices,
+                    totalValue: totalValue
+                }), "dialogData");
+
+                this.getView().addDependent(oDialog);
+                oDialog.open();
             });
         }
+
+
+
+
+
+
+        // onAfterRendering: function () {
+        //     var oVizFrame = this.byId("barChartCompany");
+        //     var oScroll = this.byId("companyScroll");
+
+        //     // Get your dataset
+        //     var aData = this.getView().getModel("chartData").getProperty("/companyTotals");
+
+        //     if (aData && aData.length > 0) {
+        //         // Set dynamic height: 60px per bar + some padding
+        //         var iRowHeight = 100;
+        //         var iChartHeight = aData.length * iRowHeight;
+
+        //         // Apply dynamic height to VizFrame
+        //         oVizFrame.setHeight(iChartHeight + "px");
+        //     }
+
+        //     // Apply chart properties
+        //     oVizFrame.setVizProperties({
+        //         title: { visible: false },
+        //         plotArea: {
+        //             // dataLabel: { visible: true, formatString: "#,##0.##" },
+        //             isFixedDataPointSize: true // prevents bar compression
+        //         },
+        //         valueAxis: { title: { visible: false } },
+        //         categoryAxis: { title: { visible: false } }
+        //     });
+        // }
 
 
 
