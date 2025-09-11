@@ -66,7 +66,7 @@ sap.ui.define([
                 this.closeBusyDialog();
                 var empData = this.getView().getModel("EmpModel").getData();
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
-                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.BranchCode === this.oLoginModel.getProperty("/BranchCode")));
+                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.CompanyCode= this.oLoginModel.getProperty("/CompanyCode")));
                     this.getView().setModel(oModel, "EmpModel");
                 } else {
                     var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||

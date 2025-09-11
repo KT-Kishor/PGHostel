@@ -250,8 +250,8 @@ sap.ui.define([
 
 
                     if (loginRole === "IT Consultant") {
-                        sap.ui.getCore().byId("FCIA_id_branch").setEditable(false);
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(loginModel.CompanyCode).setEditable(false);
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setEditable(false);
 
 
                     } else {
@@ -295,7 +295,7 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_slno").setValue("").setValueState("None").setEditable(true).setVisible(true)
                     sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEnabled(true)
                     sap.ui.getCore().byId("FCIA_id_Date").setValue("").setValueState("None").setVisible(true).setEditable(true)
-                    sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(oModel.getProperty("/PickedBranch")).setValueState("None");
+                    sap.ui.getCore().byId("FCIA_id_branch").setSelectedKey(loginModel.CompanyCode).setValueState("None");
                     sap.ui.getCore().byId("FCIA_id_branch").setVisible(true).setEditable(true)
                     sap.ui.getCore().byId("FCIA_id_pickbranch").setVisible(false)
                     sap.ui.getCore().byId("FCIA_id_assetvalue").setValue("").setValueState("None").setEditable(true).setVisible(true)
