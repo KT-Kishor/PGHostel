@@ -51,22 +51,7 @@
                 sameFilenameAllowed="true"
                 icon="sap-icon://upload"/> 
 			</f:content>
-      <!-- <Label text=""></Label>
-      <Button text=" Download Template" id="TP_id_exceltemplate" press="onDownloadTemplatexlsx"/>
-      <Label text="{i18n>expCountry}" ></Label>
-      <Input id="TP_id_Country" required="true" />
-       <Label text="Country Code" ></Label>
-      <Input id="TP_id_CountryCode"  required="true" />
-      <Label text="{i18n>state}"></Label>
-      <Input id="TP_id_State"  required="true" />
-      <Label text="{i18n>city}"></Label>
-      <Input id="TP_id_City"  required="true" />
-      <Label text="{i18n>branchCode}"></Label>
-      <Input id="TP_id_BranchCode"  />
-      <Label text="{i18n>currency}"></Label>
-      <Input id="TP_id_Currency"  required="true" />
-      <Label text="{i18n>stdcode}"></Label>
-      <Input id="TP_id_STDCode"  required="true" /> -->
+
 		</f:SimpleForm>
 
 	<beginButton>

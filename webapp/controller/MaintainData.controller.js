@@ -277,6 +277,7 @@ sap.ui.define(
 
                             // Convert sheet → JSON
                             this.jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+                            this.excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
                         }.bind(this);
 
                         reader.readAsArrayBuffer(oFile);
@@ -285,6 +286,26 @@ sap.ui.define(
 
                 LOH_onPressSubmit: async function () {
                     let that = this;
+
+                    let getModel = this.getView().getModel("dataModel");
+                    if (!getModel) {
+                        sap.m.MessageToast.show("Please select table");
+                        return;
+                    }
+                    // Get dynamic field names (columns)
+                    var aFields = Object.keys(getModel.getData()[0]);
+                    let inUpperCasecol = aFields.map((elem) => {
+                        return elem.toUpperCase();
+                    })
+
+                    let columnfromEX = this.excelData;
+
+                    const missingColumns = inUpperCasecol.filter(col => !columnfromEX.includes(col));
+                    if (missingColumns.length > 0) {
+                        sap.m.MessageToast.show("Upload correct Excel columns: " + missingColumns.join(", "));
+                        return;
+                    }
+
                     let fileUploaderInput = sap.ui
                         .getCore()
                         .byId("ALH_id_LocFileUpload")
@@ -298,11 +319,12 @@ sap.ui.define(
 
                     const datafromexcel = { data: this.jsonData };
                     that.getBusyDialog();
-
+                    let successCount = 0;
                     for (let i = 0; i < datafromexcel.data.length; i++) {
                         let row = datafromexcel.data[i];
                         try {
                             await that.ajaxCreateWithJQuery(that.sTitle, { data: row });
+                            successCount++;
                         } catch (error) {
                             continue;
                         }
@@ -310,6 +332,11 @@ sap.ui.define(
                     that.LOH_onPressClose();
                     that.closeBusyDialog();
                     this.oTable.removeSelections();
+                    if (successCount > 0) {
+                        sap.m.MessageToast.show(successCount + " record uploaded successfully.");
+                    } else {
+                        sap.m.MessageToast.show("No records uploaded.");
+                    }
                 },
 
                 LOH_onPressClose: function () {
@@ -370,47 +397,6 @@ sap.ui.define(
                     }
                     return result;
                 },
-
-                // MD_onSubmitButtonPress: function () {
-                //     var that = this;
-                //     let formData = this.oUpdatePass.getModel("formModel");
-                //     let myfragmentData = formData.getData();
-
-                //     let cleanedData = this.normalizeData(myfragmentData);
-                //     // let cleanedData = myfragmentData;
-
-                //     if (Object.keys(cleanedData).length === 0) {
-                //         sap.m.MessageToast.show("Please fill the details");
-                //         return; // stop execution
-                //     }
-
-                //     let oPayload = {
-                //         data: cleanedData,
-                //     };
-
-                //     this.getBusyDialog();
-                //     that
-                //         .ajaxCreateWithJQuery(this.sTitle, oPayload)
-                //         .then((res) => {
-                //             that.closeBusyDialog();
-                //             that.MD_onCancelButtonPress();
-                //             sap.m.MessageToast.show("Data saved successfully");
-                //         })
-                //         .catch((error) => {
-                //             console.log(error.status);//500
-                //             // if (Object.keys(cleanedData).length !== 0) {
-                //             //     sap.m.MessageToast.show("Data alredy exist");
-                //             //     that.closeBusyDialog();
-                //             //     return
-                //             // }
-                //             sap.m.MessageToast.show("Please fill mandatory details");
-                //             that.closeBusyDialog();
-                //             that.MD_onCancelButtonPress();
-                //         });
-
-                //     this.oTable.removeSelections();
-                // },
-
                 MD_onSubmitButtonPress: function () {
                     var that = this;
                     let formData = this.oUpdatePass.getModel("formModel");
