@@ -470,7 +470,7 @@ sap.ui.define([
                         "SerialNumber": data.SerialNumber,
                         "PickedEmployeeName": oModel.PickedEmployeeName,
                         "AssetCreationDate": oModel.AssetCreationDate.split("/").reverse().join("-"),
-                        "PickedBranch": data.PickedBranch,
+                        "PickedBranch": oModel.PickedBranch,
                         "AssetValue": data.AssetValue,
                         "Currency": data.Currency,
                         "Status": "Available",
@@ -625,7 +625,7 @@ sap.ui.define([
                         oModel.setProperty("/SerialNumber", data.SerialNumber);
                         oModel.setProperty("/PickedEmployeeName", data.PickedEmployeeName);
                         sap.ui.getCore().byId("FCIA_id_Date").setDateValue(new Date(data.AssetCreationDate)).setValueState("None");
-                        oModel.setProperty("/PickedBranch", data.PickedBranch);
+                        oModel.setProperty("/PickedBranch", data.CompanyCode);
                         oModel.setProperty("/AssetValue", data.AssetValue);
                         oModel.setProperty("/Currency", data.Currency);
                         sap.ui.getCore().byId("FCIA_id_transferdate").setVisible(false)
@@ -666,11 +666,12 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_ID_DescriptionTextArea").setValue(data.Description).setValueState("None").setEditable(true).setVisible(true)
                     oCore.byId("FCIA_id_eqno").setValue(data.EquipmentNumber).setValueState("None").setEditable(true).setVisible(true);
                     oCore.byId("FCIA_id_slno").setValue(data.SerialNumber).setValueState("None").setEditable(true).setVisible(true);
-                    oCore.byId("FCIA_id_pickedby").setValue(data.PickedEmployeeName)
+                    oModel.setProperty("/PickedEmployeeName", data.PickedEmployeeName);
+
                     oCore.byId("FCIA_id_pickedby").setVisible(true);
 
                     oCore.byId("FCIA_id_Date").setDateValue(new Date(data.AssetCreationDate)).setValueState("None").setEditable(true).setVisible(true);
-                    oCore.byId("FCIA_id_branch").setSelectedKey(data.PickedBranch).setValueState("None").setVisible(true).setEditable(true);
+                    oCore.byId("FCIA_id_branch").setSelectedKey(data.CompanyCode).setValueState("None").setVisible(true).setEditable(true);
                     oCore.byId("FCIA_id_pickbranch").setVisible(false)
                     oCore.byId("FCIA_id_assetvalue").setValue(data.AssetValue).setValueState("None").setEditable(true).setVisible(true);
                     oCore.byId("FCIA_id_currency").setSelectedKey(data.Currency).setEditable(true).setVisible(true);

@@ -211,6 +211,8 @@ sap.ui.define([
             this.getView().byId("PO_id_CustomerName").setSelectedKey("");
             this.getView().byId("PO_id_PoNumber").setSelectedKey("");
             this.byId("PO_idECreationDatePicker").setValue("");
+            this.byId("PO_id_CompanyName").setSelectedKey("");
+
             this._isClearPressed = true;
         },
         onClearNotesPress: function() {
