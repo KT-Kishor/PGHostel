@@ -312,17 +312,34 @@ sap.ui.define([
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Status) return;
             const sStatus = oSelectedData.Status;
-            const aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
+            let aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
+            aInvoicesForStatus = aInvoicesForStatus.slice().sort((a, b) => {
+                const dA = new Date(a.InvoiceDate);
+                const dB = new Date(b.InvoiceDate);
+                return dB - dA; // latest first
+            });
             const oView = this.getView();
             if (!this._pPopover) {
-                this._pPopover = Fragment.load({ id: oView.getId(), name: "sap.kt.com.minihrsolution.fragment.InvoiceListPopover", controller: this })
-                    .then(oPopover => { oView.addDependent(oPopover); return oPopover; });
+                this._pPopover = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.InvoiceListPopover",
+                    controller: this
+                }).then(oPopover => {
+                    oView.addDependent(oPopover);
+                    return oPopover;
+                });
             }
+
             this._pPopover.then(oPopover => {
-                oPopover.setModel(new JSONModel({ status: sStatus, invoices: aInvoicesForStatus }), "popoverData");
+                oPopover.setModel(new JSONModel({
+                    status: sStatus,
+                    invoices: aInvoicesForStatus
+                }), "popoverData");
+
                 oPopover.open(oEvent.getParameter("data")[0].target);
             });
         },
+
 
         onPaymentBreakdownSelect: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
@@ -350,6 +367,12 @@ sap.ui.define([
             const aPendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
             aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
+            //sort
+            aInvoices.sort((a, b) => {
+                const dA = new Date(a.InvoiceDate);
+                const dB = new Date(b.InvoiceDate);
+                return dB - dA; // latest first
+            });
             if (!this.pPendingInvoicesDialog) {
                 this.pPendingInvoicesDialog = Fragment.load({ id: this.getView().getId(), name: "sap.kt.com.minihrsolution.fragment.PendingInvoicesDialog", controller: this });
             }
@@ -420,6 +443,12 @@ sap.ui.define([
 
             //  converted INR value for each invoice
             aInvoices.forEach(inv => { inv.totalAmountInINR = this._getInrValue(inv); });
+
+            aInvoices.sort((a, b) => {
+                const dA = new Date(a.InvoiceDate);
+                const dB = new Date(b.InvoiceDate);
+                return dB - dA; // latest first
+            });
 
             // Calculate total value
             const totalValue = aInvoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
@@ -510,7 +539,6 @@ sap.ui.define([
             if (!aData || !aData[0] || !aData[0].data) return;
 
             const oSelectedData = aData[0].data;
-            // Chart  "Year" 
             const sYearRaw = oSelectedData.Year || oSelectedData.year;
             const iYear = parseInt(String(sYearRaw), 10);
             if (isNaN(iYear)) {
@@ -518,28 +546,33 @@ sap.ui.define([
                 return;
             }
 
-            // Use the full invoice source so we show ALL invoices for that calendar year
+            // Take invoices from the full source
             const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
 
-            // Filter by calendar year (Jan 1 -> Dec 31 of iYear)
-            const aInvoices = aAllInvoices.filter(inv => {
+            // Filter invoices belonging to that calendar year
+            let aInvoices = aAllInvoices.filter(inv => {
                 if (!inv || !inv.InvoiceDate) return false;
                 const dInv = new Date(inv.InvoiceDate);
                 if (isNaN(dInv.getTime())) return false;
                 return dInv.getFullYear() === iYear;
             });
 
-            // Convert values to numeric INR and attach to each invoice
+            // Attach numeric INR value
             aInvoices.forEach(inv => {
                 const raw = this._getInrValue(inv);
                 const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
                 inv.totalAmountInINR = isNaN(num) ? 0 : num;
             });
+            aInvoices.sort((a, b) => {
+                const dA = new Date(a.InvoiceDate);
+                const dB = new Date(b.InvoiceDate);
+                return dB - dA;
+            });
 
-            // Compute total for that calendar year
+            // Compute yearly total
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
 
-            // Lazy load / open fragment
+            // Lazy load dialog
             if (!this.pYearlyInvoicesDialog) {
                 this.pYearlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
@@ -558,7 +591,8 @@ sap.ui.define([
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
-        },
+        }
+
 
 
 
