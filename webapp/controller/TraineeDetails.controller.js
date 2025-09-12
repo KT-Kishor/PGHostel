@@ -37,6 +37,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 Action: "CC"
             });
             this._fetchCommonData("EmployeeDetailsData", "empModel");
+            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
             this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
             var oViewModel = new JSONModel({
                 isEditMode: true,

@@ -24,6 +24,7 @@ sap.ui.define([
                     Type: "ContractActive", Action: "CC"
                 });
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
+             await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
 
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID
@@ -38,7 +39,7 @@ sap.ui.define([
 
                 this._wizard = oView.byId("wizardContentPage");
                 oWizard.getSteps()[0].setValidated(false);
-                this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+                // this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
 
                 if (this.sArgPara === "CreateContractFlag") {
                     try {
@@ -1051,7 +1052,7 @@ sap.ui.define([
 
                     this.byId("CU_id_Merge").setEnabled(true);
                     this.byId("CU_id_Mail").setEnabled(true);
-                    this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+                    // this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                     await this.updateContractdata(oModel.ContractNo, oModel.AgreementNo);
                     this.closeBusyDialog();
                     this.getRouter().navTo("RouteContractDetails", {

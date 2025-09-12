@@ -23,8 +23,8 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
-            
+
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();
                 // Sort by city name
@@ -130,7 +130,7 @@ sap.ui.define([
                 var oViewModel = this.getView().getModel("viewModel");
                 // Check if in edit mode
                 if (oViewModel.getProperty("/editable")) {
-                    var isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Location"), "ID") &&
+                    var isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_CompanyCode"), "ID") && utils._LCvalidateName(this.getView().byId("EOUF_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOUF_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOUF_id_Country"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Location"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOUF_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOUF_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOUF_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOUF_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOUF_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID");
                     // Save the changes
                     if (isValid) {
@@ -210,7 +210,7 @@ sap.ui.define([
                                 MessageToast.show(this.i18nModel.getText(text));
                             }
                             this.getView().getModel("employeeModel").refresh(true);
-                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+                            // this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                         }
                     }).catch((error) => {
                         this.closeBusyDialog();
@@ -284,70 +284,70 @@ sap.ui.define([
                 utils._LCvalidateJoiningBonus(oEvent);
                 this.EOD_validateStep();
             },
-            EOD_onChangeCountry: function(oEvent) {
-                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            EOD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 this._TDSslabCall(oValue, this.getView().byId("EOD_id_CTC"));
-                    var oSelectedItem = oEvent.getSource().getSelectedItem();
-                    if (!oSelectedItem) return;
-                    var sCountryCode = oSelectedItem.getAdditionalText();
-                    var oStateCombo = this.byId("EOD_id_State");  // Filter States
-                    var oStateBinding = oStateCombo.getBinding("items");
-                    oStateBinding.filter(new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
-                    oStateCombo.setSelectedKey(""); // Reset state selection
-                    var oCityCombo = this.byId("EOD_id_Location"); // Clear city
-                    oCityCombo.getBinding("items").filter([]);
-                    oCityCombo.setSelectedKey("");
-                    this.EOD_validateStep();
-                },
-                EOD_onChangeState: function(oEvent) {
-                    utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                    
-                    if (oEvent.getSource().getValue() === '') {
-                        oEvent.getSource().setValueState("None")
-                    }
-                    var oSelectedItem = oEvent.getSource().getSelectedItem();
-                    if (!oSelectedItem) return;
-                    var sStateName = oSelectedItem.getAdditionalText() || oSelectedItem.getKey();
-                    var sCountryCode = this.byId("EOD_id_Country").getSelectedItem().getAdditionalText();
-                    var oCityCombo = this.byId("EOD_id_Location");   // Filter Cities
-                    var oCityBinding = oCityCombo.getBinding("items");
-                    oCityBinding.filter([
-                        new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                    ]);
-                    oCityCombo.setSelectedKey(""); // Reset city selection
-                    this.EOD_validateStep();
-                },
+                var oSelectedItem = oEvent.getSource().getSelectedItem();
+                if (!oSelectedItem) return;
+                var sCountryCode = oSelectedItem.getAdditionalText();
+                var oStateCombo = this.byId("EOD_id_State");  // Filter States
+                var oStateBinding = oStateCombo.getBinding("items");
+                oStateBinding.filter(new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
+                oStateCombo.setSelectedKey(""); // Reset state selection
+                var oCityCombo = this.byId("EOD_id_Location"); // Clear city
+                oCityCombo.getBinding("items").filter([]);
+                oCityCombo.setSelectedKey("");
+                this.EOD_validateStep();
+            },
+            EOD_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None")
+                }
+                var oSelectedItem = oEvent.getSource().getSelectedItem();
+                if (!oSelectedItem) return;
+                var sStateName = oSelectedItem.getAdditionalText() || oSelectedItem.getKey();
+                var sCountryCode = this.byId("EOD_id_Country").getSelectedItem().getAdditionalText();
+                var oCityCombo = this.byId("EOD_id_Location");   // Filter Cities
+                var oCityBinding = oCityCombo.getBinding("items");
+                oCityBinding.filter([
+                    new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
+                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                ]);
+                oCityCombo.setSelectedKey(""); // Reset city selection
+                this.EOD_validateStep();
+            },
             //validate combobox
             EOD_validateCombobox: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 this.EOD_validateStep();
             },
             EOD_onCompanyCodeChange: function (oEvent) {
-            this.onCompanyCodeChangeCommon(
-                oEvent,
-                "employeeModel",     // Model name
-                "/CompanyCode",        // Path to company code property
-                "/Branch",             // Path to branch property
-                "EOD_id_Branch"         // Branch control ID
-            );
-             utils._LCstrictValidationComboBox(oEvent);
+                this.onCompanyCodeChangeCommon(
+                    oEvent,
+                    "employeeModel",     // Model name
+                    "/CompanyCode",        // Path to company code property
+                    "/Branch",             // Path to branch property
+                    "EOD_id_Branch"         // Branch control ID
+                );
+                utils._LCstrictValidationComboBox(oEvent);
                 this.EOD_validateStep();
-           },
+            },
             EU_onCompanyCodeChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent);
-            this.onCompanyCodeChangeCommon(
-                oEvent,
-                "employeeModel",     // Model name
-                "/CompanyCode",        // Path to company code property
-                "/Branch",             // Path to branch property
-                "EOUF_id_Branch"         // Branch control ID
-            );
-           },
+                utils._LCstrictValidationComboBox(oEvent);
+                this.onCompanyCodeChangeCommon(
+                    oEvent,
+                    "employeeModel",     // Model name
+                    "/CompanyCode",        // Path to company code property
+                    "/Branch",             // Path to branch property
+                    "EOUF_id_Branch"         // Branch control ID
+                );
+            },
             //validate variable pay
             EOD_validatevariable: function (oEvent) {
                 utils._LCvalidateVariablePay(oEvent);
@@ -388,8 +388,8 @@ sap.ui.define([
                 if (allFieldsFilled) {
                     // Validate each field directly
                     let isValid = utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_CompanyCode"), "ID") &&
-                     utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
-                         utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
+                        utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                        utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOD_id_VariablePay"), "ID");
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(isValid);
                 } else {
                     this.byId("EOD_id_Wizard").getSteps()[0].setValidated(false);
@@ -408,7 +408,7 @@ sap.ui.define([
             //Submit the data
             EOD_onSubmitData: async function () {
                 try {
-                    if (utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_CompanyCode"), "ID")  && utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID")  && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
+                    if (utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_CompanyCode"), "ID") && utils._LCvalidateName(this.getView().byId("EOD_id_Name"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Reldate"), "ID") && utils._LCvalidateDate(this.getView().byId("EOD_id_Joindate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Designation"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_State"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("EOD_id_Location"), "ID") &&
                         utils._LCvalidateEmail(this.getView().byId("EOD_id_mail"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("EOD_id_Address"), "ID") && utils._LCvalidatePinCode(this.getView().byId("EOD_id_PinCode"), "ID") && utils._LCvalidateCTC(this.getView().byId("EOD_id_CTC"), "ID") && utils._LCvalidateJoiningBonus(this.getView().byId("EOD_id_Bonus"), "ID") && utils._LCvalidateVariablePay(this.getView().byId("EOUF_id_VariablePerc"), "ID")) {
                         this.getBusyDialog();
                         var oModel = this.getView().getModel("employeeModel").getData();
@@ -439,7 +439,7 @@ sap.ui.define([
                                         press: function () {
                                             oDialog.close();
                                             this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+                                            // this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                             this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                         }.bind(this)
                                     }),
@@ -452,13 +452,14 @@ sap.ui.define([
                                                 "data": { Status: "New" },
                                                 "filters": { "ID": oData.ID }
                                             };
+
                                             this.ajaxUpdateWithJQuery("EmployeeOffer", oUpdatePayload).then((oData) => {
                                                 this.closeBusyDialog();
                                                 if (oData.success) {
                                                     oDialog.close();
                                                     MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                     this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
-                                                    this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
+                                                    //  this.getView().getModel("CompanyCodeDetailsModel").refresh(true);
                                                     this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                                 }
                                             }).catch((error) => {
@@ -634,41 +635,41 @@ sap.ui.define([
                 );
                 this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
             },
-             EUD_onChangeCountry: function(oEvent) {
-                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            EUD_onChangeCountry: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
                 var oValue = oEvent.getSource().getSelectedItem().getAdditionalText();
                 this._TDSslabCall(oValue, this.getView().byId("EOUF_id_CTC"));
-                    var oSelectedItem = oEvent.getSource().getSelectedItem();
-                    if (!oSelectedItem) return;
-                    var sCountryCode = oSelectedItem.getAdditionalText();
-                    var oStateCombo = this.byId("EOUF_id_State");  // Filter States
-                    var oStateBinding = oStateCombo.getBinding("items");
-                    oStateBinding.filter(new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
-                    oStateCombo.setSelectedKey(""); // Reset state selection
-                    var oCityCombo = this.byId("EOUF_id_Location"); // Clear city
-                    oCityCombo.getBinding("items").filter([]);
-                    oCityCombo.setSelectedKey("");
-                },
-                EUD_onChangeState: function(oEvent) {
-                    utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                    if (oEvent.getSource().getValue() === '') {
-                        oEvent.getSource().setValueState("None")
-                    }
-                    var oSelectedItem = oEvent.getSource().getSelectedItem();
-                    if (!oSelectedItem) return;
-                    var sStateName = oSelectedItem.getAdditionalText() || oSelectedItem.getKey();
-                    var sCountryCode = this.byId("EOUF_id_Country").getSelectedItem().getAdditionalText();
-                    var oCityCombo = this.byId("EOUF_id_Location");   // Filter Cities
-                    var oCityBinding = oCityCombo.getBinding("items");
-                    oCityBinding.filter([
-                        new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                    ]);
-                    oCityCombo.setSelectedKey(""); // Reset city selection
-                },
+                var oSelectedItem = oEvent.getSource().getSelectedItem();
+                if (!oSelectedItem) return;
+                var sCountryCode = oSelectedItem.getAdditionalText();
+                var oStateCombo = this.byId("EOUF_id_State");  // Filter States
+                var oStateBinding = oStateCombo.getBinding("items");
+                oStateBinding.filter(new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode));
+                oStateCombo.setSelectedKey(""); // Reset state selection
+                var oCityCombo = this.byId("EOUF_id_Location"); // Clear city
+                oCityCombo.getBinding("items").filter([]);
+                oCityCombo.setSelectedKey("");
+            },
+            EUD_onChangeState: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                if (oEvent.getSource().getValue() === '') {
+                    oEvent.getSource().setValueState("None")
+                }
+                var oSelectedItem = oEvent.getSource().getSelectedItem();
+                if (!oSelectedItem) return;
+                var sStateName = oSelectedItem.getAdditionalText() || oSelectedItem.getKey();
+                var sCountryCode = this.byId("EOUF_id_Country").getSelectedItem().getAdditionalText();
+                var oCityCombo = this.byId("EOUF_id_Location");   // Filter Cities
+                var oCityBinding = oCityCombo.getBinding("items");
+                oCityBinding.filter([
+                    new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
+                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                ]);
+                oCityCombo.setSelectedKey(""); // Reset city selection
+            },
             //PDF download function
             EOUF_onPressMerge: async function () {
                 var oModel = this.getView().getModel("employeeModel");
@@ -688,7 +689,7 @@ sap.ui.define([
                 };
 
                 var oEmpModel = oModel.getData();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode : oEmpModel.CompanyCode });
+                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: oEmpModel.CompanyCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "Employee Offer");
