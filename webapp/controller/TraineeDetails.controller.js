@@ -37,7 +37,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 Action: "CC"
             });
             this._fetchCommonData("EmployeeDetailsData", "empModel");
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+            // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
             this.getView().setModel(new JSONModel(jsonData), "oTraineeDetails");
             var oViewModel = new JSONModel({
                 isEditMode: true,
@@ -444,9 +444,9 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
         async offerGeneratingPdfFunction(oModel) {
             this.getBusyDialog();
             var oEmpModel = oModel.getData();
-            await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                companyCode: oEmpModel.CompanyCode
-            });
+            // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+            //     companyCode: oEmpModel.CompanyCode
+            // });
             await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                 Type: "TraineeOffer"
             });
@@ -461,7 +461,18 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             oPDFModel.setProperty("/StipendOrFees", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.Amount));
             oPDFModel.setProperty("/StipendSkipLine", oEmpModel.Type === "Paid" || parseInt(oEmpModel.Amount) === 0 ? 5 : null);
             oPDFModel.setProperty("/TrainingFeesSkipLine", oEmpModel.Type === "Stipend" || parseInt(oEmpModel.Amount) === 0 ? 6 : null);
-            var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+            
+          let filter = {companyCode: oEmpModel.CompanyCode,};
+                const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
+                    this.closeBusyDialog();
+                    return;
+                }
+                const oCompanyDetailsModel = apiResponse.data[0];
+                if (!oCompanyDetailsModel) {
+                    this.closeBusyDialog();
+                    return;
+                }
             var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
             if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                 try {

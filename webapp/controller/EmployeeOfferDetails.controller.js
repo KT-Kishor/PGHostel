@@ -24,7 +24,7 @@ sap.ui.define([
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();
                 // Sort by city name
@@ -689,7 +689,6 @@ sap.ui.define([
                 };
 
                 var oEmpModel = oModel.getData();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: oEmpModel.CompanyCode });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
                 var oPDFModel = this.getView().getModel("PDFData");
                 oPDFModel.setProperty("/Type", "Employee Offer");
@@ -736,7 +735,18 @@ sap.ui.define([
                 else {
                     oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
                 }
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+
+                 let filter = {companyCode: oEmpModel.CompanyCode,};
+                const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
+                    this.closeBusyDialog();
+                    return;
+                }
+                const oCompanyDetailsModel = apiResponse.data[0];
+                if (!oCompanyDetailsModel) {
+                    this.closeBusyDialog();
+                    return;
+                }
                 oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
                 oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();

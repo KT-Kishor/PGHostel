@@ -1213,9 +1213,9 @@ sap.ui.define([
 
             contractPDFgenerate: async function (oEmpModel) {
                 this.getBusyDialog();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-                    companyCode: oEmpModel.CompanyCode
-                });
+                // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
+                //     companyCode: oEmpModel.CompanyCode
+                // });
                 await this._fetchCommonData("PDFCondition", "PDFConditionModel", {
                     Type: "Contract"
                 });
@@ -1239,7 +1239,17 @@ sap.ui.define([
                 oPDFModel.setProperty("/AgreementDuration", oEmpModel.ContractPeriod);
                 oPDFModel.setProperty("/ExpensesClaim", oEmpModel.ExpensesClaim);
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                let filter = {companyCode: oEmpModel.CompanyCode,};
+                const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
+                    this.closeBusyDialog();
+                    return;
+                }
+                const oCompanyDetailsModel = apiResponse.data[0];
+                if (!oCompanyDetailsModel) {
+                    this.closeBusyDialog();
+                    return;
+                }
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
                     try {
                         const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {
