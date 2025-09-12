@@ -797,7 +797,6 @@ sap.ui.define([
                         if (response.success === true) {
                             this.closeBusyDialog(); // Close busy dialog
                             data.ContractNo = response.ContractNo;
-                            this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
 
                             var oDialog = new sap.m.Dialog({
                                 title: this.i18nModel.getText("success"),
@@ -812,6 +811,7 @@ sap.ui.define([
                                     press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
+                                        this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                         this.getRouter().navTo("RouteContract");
                                     }.bind(this)
                                 }),
@@ -821,6 +821,7 @@ sap.ui.define([
                                     press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);
+                                        this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                         this.getRouter().navTo("RouteContract");
                                         this.contractPDFgenerate(data);
                                     }.bind(this)

@@ -372,6 +372,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 that.closeBusyDialog();
                 that.getRouter().navTo("RouteMSA");
                 that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
+                that.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
               },
             }),
             endButton: new sap.m.Button({
@@ -383,6 +384,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 that.closeBusyDialog();
                 that.getRouter().navTo("RouteMSA");
                 that.byId("MasD_id_ThirdStep").getParent().setShowNextButton(true);
+                that.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
               },
             }),
             afterClose: function () {

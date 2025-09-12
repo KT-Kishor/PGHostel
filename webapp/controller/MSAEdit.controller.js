@@ -412,8 +412,8 @@ MsaE_onEditOrSavePress: async function () {
         try {
           const oResponse = await this.ajaxUpdateWithJQuery("MSADetails", oPayload);
           const messageKey = oResponse ? "msaupdateSuccess" : "msaupdateFailed";
-
           MessageToast.show(this.i18nModel.getText(messageKey));
+          this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
           this.MSA_oDialog.close();
         } catch (error) {
           MessageToast.show(this.i18nModel.getText("commonErrorMessage"));

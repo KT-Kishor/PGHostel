@@ -846,6 +846,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                             value: "Trainee",
                                         });
                                         this.getView().getModel("oTraineeDetails").refresh(true);
+                                        this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                     }.bind(this),
                                 }),
                                 endButton: new sap.m.Button({

@@ -457,6 +457,7 @@ sap.ui.define([
                                                     oDialog.close();
                                                     MessageToast.show(this.i18nModel.getText("pdfSucces"));
                                                     this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);
+                                                    this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                                                     this.getRouter().navTo("RouteEmployeeOffer", { valueEmp: "EmployeeOffer" });
                                                 }
                                             }).catch((error) => {
