@@ -118,6 +118,8 @@ sap.ui.define(
           // Directly fetch using ajaxReadWithJQuery
           const oData = await this.ajaxReadWithJQuery("AllLoginDetails", {});
 
+
+          
           // oData.data will contain the array from backend
           let aFiltered = (oData.data || []).filter((item) => item.Role !== "Contractor");
 
@@ -162,6 +164,11 @@ sap.ui.define(
             "MonthlyBar"
           );
 
+          // Filter bar visibility
+          const oFilterBar = this.byId("AL_id_compofffilterbar");
+          if (oFilterBar) {
+            oFilterBar.setVisible(this.Type === "Admin");
+          }
           await this._fetchCommonData("ListOfSateData", "HolidayModel", {
             branchCode: this.branch,
           });
@@ -426,8 +433,11 @@ sap.ui.define(
           }.bind(this)
         );
 
-        // Open the dialog once the promise resolves
-        this.pLeaveDialog.then((oLeaveDialog) => oLeaveDialog.open());
+   this.pLeaveDialog.then((oLeaveDialog) => {
+        // Reset fields before opening
+        this._resetDialogFields();
+        oLeaveDialog.open();
+    });
       },
 
       _resetDialogFields: function () {
@@ -442,6 +452,7 @@ sap.ui.define(
         this.byId("AL_id_compOffTableStandard").removeSelections(true); // Clear table selection
         this.byId("AL_id_compoffUpdatebtn").setVisible(false);
         this.byId("AL_id_compoffDeletebtn").setVisible(false);
+        AL_id_CompoffComments
         if (this._originalLeaveData) {
           var aLeaveData = this.getView().getModel("LeaveModel").getProperty("/");
           var iIndex = aLeaveData.findIndex((item) => item.ID === this._originalLeaveData.ID);
@@ -451,6 +462,7 @@ sap.ui.define(
           }
           this._originalLeaveData = null;
         }
+        this._resetDialogFields();
       },
 
       // Format date string to Date object
