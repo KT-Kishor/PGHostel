@@ -24,7 +24,6 @@ sap.ui.define([
                     Type: "ContractActive", Action: "CC"
                 });
                 this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-             await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel");
 
                 this.sArgPara = oEvent.getParameter("arguments").sParContract;
                 var AgreementNo = oEvent.getParameter("arguments").sID

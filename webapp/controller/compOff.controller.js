@@ -235,6 +235,11 @@ sap.ui.define(
               return MessageBox.error("Number of days must be greater than zero.");
             }
 
+             // Check if leave is already applied
+            if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate)) {
+                                return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+            }
+
             // ✅ Keep current-month check (remove if not needed)
             const currentDateNew = new Date();
             const firstOfMonth = new Date(currentDateNew.getFullYear(), currentDateNew.getMonth(), 1);
@@ -380,6 +385,10 @@ sap.ui.define(
 
           const oData = this.getView().getModel("LeaveTempModel")?.getData();
           if (!oData) return MessageToast.show("Leave data not found.");
+
+           if (this.isLeaveAlreadyApplied(oData.fromDate, oData.toDate, this.previousLeaveDates)) {
+              return MessageBox.error(this.i18nModel.getText("leaveAlreadyApplied"));
+          }
 
           // Parse dates
           const fromDateParts = (oData.fromDate || "").split("/").map(Number);
@@ -622,28 +631,15 @@ sap.ui.define(
 
       onMarkCalendarDatesAndLeaves: function () {
         var that = this;
-        this.oDatePicker.removeAllSpecialDates();
 
         // Get leave and holiday data
         var leaveRecords = that.getView().getModel("LeaveModel").getData();
-        var holidays = that.getView().getModel("HolidayModel").getData();
-
-        // Create a map of holiday date string -> holiday name
-        var holidayMap = new Map(
-          holidays.map(function (holiday) {
-            return [new Date(holiday.Date).toDateString(), holiday.Name];
-          })
-        );
-
         var appliedLeaves = [];
-        var yearStart = new Date(new Date().getFullYear(), 0, 1);
-        var yearEnd = new Date(new Date().getFullYear(), 11, 31);
-
         // Process leave records
         leaveRecords.forEach(function (record) {
           if (record["status"] !== "Rejected") {
-            var fromDate = that.onFormatDate(that.Formatter.formatDate(record.fromDate));
-            var toDate = that.onFormatDate(that.Formatter.formatDate(record.toDate));
+            var fromDate = that.onFormatDate(that.Formatter.formatDate(record.StartDate));
+            var toDate = that.onFormatDate(that.Formatter.formatDate(record.EndDate));
             if (fromDate && toDate) {
               for (var d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
                 appliedLeaves.push({
@@ -656,34 +652,6 @@ sap.ui.define(
         });
 
         var appliedLeavesSet = new Set(appliedLeaves.map((leave) => leave.date.toDateString()));
-
-        // Mark each day of the year
-        for (var d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate() + 1)) {
-          var day = d.getDay();
-          var isWeekend = day === 0 || day === 6;
-          var isAppliedLeave = appliedLeavesSet.has(d.toDateString());
-          var holidayName = holidayMap.get(d.toDateString());
-
-          var dateRange = new sap.ui.unified.DateTypeRange({
-            startDate: new Date(d),
-            endDate: new Date(d),
-          });
-
-          if (holidayName) {
-            dateRange.setType("Type04");
-            dateRange.setTooltip("Holiday : " + holidayName);
-          } else if (isWeekend) {
-            dateRange.setType("Type09");
-            dateRange.setTooltip("Weekend");
-          } else if (isAppliedLeave) {
-            dateRange.setType("Type05");
-            dateRange.setTooltip("Applied Leave");
-          } else {
-            dateRange.setType("Type06");
-            dateRange.setTooltip("Working Day");
-          }
-          this.oDatePicker.addSpecialDate(dateRange);
-        }
         that.appliedLeavesSet = appliedLeavesSet;
       },
 
@@ -819,6 +787,7 @@ sap.ui.define(
         }
         this.onValidation();
         this.onLiveChange();
+        this.onMarkCalendarDatesAndLeaves(); // Update calendar markings
         return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
       },
 
@@ -841,7 +810,7 @@ sap.ui.define(
         }
 
         this.onLiveChange();
-
+        this.onMarkCalendarDatesAndLeaves(); // Update calendar markings
         return !!this.getView().getModel("LeaveTempModel").getProperty("/toDate");
       },
 
