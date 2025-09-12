@@ -82,7 +82,7 @@ sap.ui.define([
                       
                         text: item.Comments ? "Comment: " + item.Comments : "",
                         title: "The asset was returned by " + item.AssignEmployeeName + " (" + item.AssignEmployeeID + ") to " + item.ReturnEmpName
-                            + " (" + item.ReturnEmpID + ") at " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
+                            + " (" + item.ReturnEmpID + ") in " + item.ReturnBranch + " " + "on " + new Date(item.ReturnDate).toLocaleDateString('en-GB')
 
                     });
                 }

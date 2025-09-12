@@ -278,9 +278,13 @@ sap.ui.define([
                 let loginModel = this.getView().getModel("LoginModel").getData();
                 var empData = this.getView().getModel("EmpModel").getData();
                 if (this.oLoginModel.getProperty("/Role") === "IT Consultant") {
-                    var oModel = new JSONModel(this.getView().getModel("EmpModel").getData().filter((item) => item.CompanyCode === this.oLoginModel.getProperty("/CompanyCode")));
-                    this.getView().setModel(oModel, "EmpModel");
-                } else {
+                    var data=this.getView().getModel("EmpModel").getData().filter((item) => item.EmployeeID=== loginModel.EmployeeID)[0]
+                    var oModel = new JSONModel(data);
+                    this.getView().setModel(oModel, "AdminModel");
+
+
+                }
+                 else {
                     var filteredEmp = empData.filter(emp => (emp.Role.includes("Admin") ||
                         emp.Role.includes("IT Manager") || emp.Role.includes("IT Consultant")));
 
@@ -336,6 +340,7 @@ sap.ui.define([
                     var typeModel = new sap.ui.model.json.JSONModel(uniqueTypes);
                     this.getView().setModel(typeModel, "typeModel");
                 })
+                 var model=this.getView().getModel("myform")
                 if (!this.FAA_Dialog) {
                     var oView = this.getView();
                     this.FAA_Dialog = sap.ui.core.Fragment.load({
@@ -345,6 +350,10 @@ sap.ui.define([
                         this.FAA_Dialog = FAA_Dialog;
                         oView.addDependent(this.FAA_Dialog);
                         this.FAA_Dialog.open();
+                        if( this.oLoginModel.getProperty("/Role") === "IT Consultant"){
+           model.setProperty("/formData/data/AssignedByEmployeeName", data.EmployeeName);
+                        }
+
                         var aAssignEditable = [
                             "FAA_id_employeeID",
                             "FAA_id_Type",
@@ -371,6 +380,10 @@ sap.ui.define([
                     }.bind(this));
                 } else {
                     this.FAA_Dialog.open();
+                 if( this.oLoginModel.getProperty("/Role") === "IT Consultant"){
+           model.setProperty("/formData/data/AssignedByEmployeeName", data.EmployeeName);
+                        }
+
                     sap.ui.getCore().byId("FAA_id_employeeID").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_id_Type").setSelectedKey("");
                     sap.ui.getCore().byId("FAA_id_Model").setSelectedKey("");
