@@ -58,7 +58,7 @@ sap.ui.define([
                     timelineData.push({
                         type: "Asset Creation",
                        
-                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") at " + item.PickedBranch + " "
+                        title: "The asset was picked by " + item.PickedEmployeeName + " (" + item.PickedEmployeeID + ") in " + item.PickedBranch + " "
                             + "on " + new Date(item.AssetCreationDate).toLocaleDateString('en-GB')
                     })
                 }
@@ -91,7 +91,7 @@ sap.ui.define([
                         type: "Trash",
                        
                         text: item.TrashComments ? "Comment: " + item.TrashComments : "",
-                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") at " + item.TrashBranch + " on " +
+                        title: "The asset was Trashed by " + item.TrashByEmployeeName + " (" + item.TrashByEmployeeID + ") in " + item.TrashBranch + " on " +
                             new Date(item.TrashDate).toLocaleDateString('en-GB')
                     });
                 }

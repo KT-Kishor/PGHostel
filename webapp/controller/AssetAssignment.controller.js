@@ -548,7 +548,9 @@ sap.ui.define([
             FAA_onPressSave: async function() {
                 if (this._checkValidation()) {
                     try {
-                        
+                        if( this.oLoginModel.getProperty("/Role") === "Admin" || this.oLoginModel.getProperty("/Role") === "IT Manager"){
+                            utils._LCstrictValidationComboBox(oCore.byId("FAA_id_AssignedBy"), "ID")
+                        }
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
                         var oAssignedDate = new Date(sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue());
                         var sAssetCreationDate = this.getView().getModel("myform").getProperty("/formData/data/AssetCreationDate");
@@ -889,8 +891,9 @@ sap.ui.define([
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_employeeID"), "ID") &&
                     utils._LCstrictValidationComboBox(oCore.byId("FAA_id_Type"), "ID") &&
                     utils._LCvalidateMandatoryField(oCore.byId("FAA_id_Model"), "ID") &&
-                    utils._LCstrictValidationComboBox(oCore.byId("FAA_branch_Id"), "ID") &&
-                    utils._LCstrictValidationComboBox(oCore.byId("FAA_id_AssignedBy"), "ID")) {
+                    utils._LCstrictValidationComboBox(oCore.byId("FAA_branch_Id"), "ID") 
+                    
+                ) {
                     return true
                 } else {
                     return false
