@@ -162,12 +162,11 @@
             <f:Card
                 width="auto"
                 class="sapUiSmallMargin"
-                visible="{= ${CompanyInvoiceModelData>/AfterData}.length > 0 
-      &amp;&amp; (
-        ${LoginModel>/Role} === 'Admin' ||
-        ${LoginModel>/Role} === 'Demo' ||
-        ${LoginModel>/Role} === 'Account Manager' 
-      )}"
+                visible="{= ${CompanyInvoiceModelData>/AfterData} &amp;&amp; ${CompanyInvoiceModelData>/AfterData}.length > 0 &amp;&amp; (
+    ${LoginModel>/Role} === 'Admin' ||
+    ${LoginModel>/Role} === 'Demo' ||
+    ${LoginModel>/Role} === 'Account Manager'
+)}"
             >
                 <f:content>
                     <Table
@@ -241,12 +240,11 @@
             <f:Card
                 width="auto"
                 class="sapUiSmallMargin"
-                visible="{= ${CompanyInvoiceModelData>/AfterData}.length > 0 
-      &amp;&amp; (
-        ${LoginModel>/Role} === 'Admin' ||
-        ${LoginModel>/Role} === 'Demo' ||
-        ${LoginModel>/Role} === 'Account Manager' 
-      )}"
+                visible="{= ${CompanyInvoiceModelData>/Before} &amp;&amp; ${CompanyInvoiceModelData>/Before}.length > 0 &amp;&amp; (
+    ${LoginModel>/Role} === 'Admin' ||
+    ${LoginModel>/Role} === 'Demo' ||
+    ${LoginModel>/Role} === 'Account Manager'
+)}"
             >
                 <f:content>
                     <Table
