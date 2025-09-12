@@ -1078,9 +1078,6 @@ MsaE_onEditOrSavePress: async function () {
     async MsaE_onPressMerge() {
       this.getBusyDialog();
       var oModel = this.getView().getModel("FilteredMsaModel").getData()[0];
-      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-        companyCode: oModel.CompanyCode, 
-      });
       var msa = "MSA",
         nda = "NDA";
       if (oModel.Type === "Recruitment") {
@@ -1110,7 +1107,7 @@ MsaE_onEditOrSavePress: async function () {
       oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
 
       let filter = {
-        companyCode: oModel.BranchCode,
+        companyCode: oModel.CompanyCode
       };
       const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
       if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {

@@ -404,9 +404,6 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
     async MsaE_onPressMerge() {
       this.getBusyDialog();
       var oModel = this.getView().getModel("msaModelWizart").getData();
-      await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-       companyCode: oModel.CompanyCode,
-      });
       var msa = "MSA",
         nda = "NDA";
       if (oModel.Type === "Recruitment") {
@@ -437,7 +434,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       // var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
 
       let filter = {
-        companyCode: oModel.BranchCode,
+        companyCode: oModel.CompanyCode,
       };
       const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
       if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
