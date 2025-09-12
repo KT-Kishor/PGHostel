@@ -1114,7 +1114,7 @@
                             id="employmentSS1"
                             title="{i18n>employmentDetails}"
                             titleUppercase="false"
-                            visible="{= !${viewModel>/TraineeRole} &amp;&amp; ${viewModel>/employmentSectionVisible} }"
+                            visible="{= ${viewModel>/employmentSectionVisible} }"
                         >
                             <blocks>
                                 <m:VBox>
