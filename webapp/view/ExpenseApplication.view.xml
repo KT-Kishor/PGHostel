@@ -24,21 +24,21 @@
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="ExpenseName" label="{i18n>expExpenseName}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="ExpenseName"  items="{FilterExpenseModel>/}" showClearIcon="true" id="Exp_id_ConsFilterBar">
+							<ComboBox name="ExpenseName"  items="{FilterExpenseModel>/ExpenseNameSet}" showClearIcon="true" id="Exp_id_ConsFilterBar">
 								<core:Item key="{FilterExpenseModel>ExpenseName}" text="{FilterExpenseModel>ExpenseName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{path:'FilterExpenseModel>/',length:1000}">
+						<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="Exp_id_SourceFilter" items="{path:'FilterExpenseModel>/SourceSet',length:1000}">
 							<core:ListItem key="{FilterExpenseModel>Source}" text="{FilterExpenseModel>Source}" />
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path:'FilterExpenseModel>/',length:1000}">
+						<ComboBox name="Destination" id="Exp_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path:'FilterExpenseModel>/DestinationSet',length:1000}">
 							<core:ListItem key="{FilterExpenseModel>Destination}" text="{FilterExpenseModel>Destination}" />
 						</ComboBox>
 					</fb:control>

@@ -84,21 +84,25 @@ sap.ui.define([
                 EmployeeID: EmployeeID
             };
 
-            if (params?.startDate && params?.endDate) { // Add date range if provided
+            if (params?.startDate && params?.endDate) { 
                 fetchParams.startDate = params.startDate;
                 fetchParams.endDate = params.endDate;
             }
 
             await this._fetchCommonData("Expense", "FilterExpenseModel", fetchParams);
-            var FilterModel = this.getView().getModel("FilterExpenseModel"); // Remove duplicate ExpenseName entries
-            if (FilterModel) {
-                var uniqueData = [
-                    ...new Map(
-                        FilterModel.getData().map(item => [item.ExpenseName, item])
-                    ).values()
-                ];
-                FilterModel.setData(uniqueData);
-            }
+
+            var FilterModel = this.getView().getModel("FilterExpenseModel");
+                if (FilterModel) {
+            var data = FilterModel.getData();
+            var uniqueExpenseName = [...new Map(data.map(item => [item.ExpenseName, item])).values()];
+            var uniqueSource = [...new Map(data.map(item => [item.Source, item])).values()];
+            var uniqueDestination = [...new Map(data.map(item => [item.Destination, item])).values()];
+            FilterModel.setData({
+                ExpenseNameSet: uniqueExpenseName,
+                SourceSet: uniqueSource,
+                DestinationSet: uniqueDestination
+            });
+        }
         },
 
         // Function to initialize the common model for expense creation
@@ -424,33 +428,6 @@ sap.ui.define([
                     }
                 }
                 await this._fetchCommonData("Expense", "ExpenseModel", params, ["exp_Id_Expense"]); // Fetch Data
-                const oExpModel = this.getView().getModel("ExpenseModel");
-                const aData = oExpModel.getData();
-                const uniqueSources = [];
-                const seenSources = new Set();
-
-                aData.forEach(item => {
-                    if (item.Source && !seenSources.has(item.Source)) {
-                        seenSources.add(item.Source);
-                        uniqueSources.push({ Source: item.Source });
-                    }
-                });
-
-                const oSourceModel = new sap.ui.model.json.JSONModel(uniqueSources);
-                this.getView().setModel(oSourceModel, "SourceModel");
-
-                const uniqueDestinations = [];
-                const seenDestinations = new Set();
-
-                aData.forEach(item => {
-                    if (item.Destination && !seenDestinations.has(item.Destination)) {
-                        seenDestinations.add(item.Destination);
-                        uniqueDestinations.push({ Destination: item.Destination });
-                    }
-                });
-
-                const oDestinationModel = new sap.ui.model.json.JSONModel(uniqueDestinations);
-                this.getView().setModel(oDestinationModel, "DestinationModel");
                 this.onChangeEmployeeID(params);
                 this.closeBusyDialog();
             } catch (error) {
