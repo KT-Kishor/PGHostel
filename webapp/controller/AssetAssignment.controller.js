@@ -860,8 +860,14 @@ sap.ui.define([
             FAU_onSaveReturn: async function() {
                 var oCore = sap.ui.getCore();
                 var oFormDataModel = this.getView().getModel("myform").getProperty("/formData");
+              
                 oFormDataModel.data.ReturnDate = this.Formatter.formatDate(oFormDataModel.data.ReturnDate).split('/').reverse().join('-');
                 if (utils._LCstrictValidationComboBox(oCore.byId("FAU_id_returnTo"), "ID") && utils._LCstrictValidationComboBox(oCore.byId("FAU_id_branch"), "ID") && utils._LCvalidateMandatoryField(oCore.byId("FAU_id_Comments"), "ID")) {
+                      var Index=sap.ui.getCore().byId("FAU_id_Type").getSelectedIndex()
+                if(Index===-1){
+                    MessageToast.show("Please select the Asset Condition");
+                    return;
+                }
                     this.getBusyDialog();
                     oFormDataModel.data.Status = "Returned";
                     delete oFormDataModel.data.isEdit
