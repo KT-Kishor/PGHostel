@@ -15,7 +15,7 @@
 							<DateRangeSelection id="AL_id_compoff_DateRangeSelection" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy"/>
 						</filterbar:control>
 					</filterbar:FilterGroupItem>
-					<filterbar:FilterGroupItem name="typeOfLeave" label="Employee ID" groupName="LeaveGroup" visibleInFilterBar="true">
+					<filterbar:FilterGroupItem id="CO_id_compoff_EmpID" name="typeOfLeave" label="Employee ID" groupName="LeaveGroup" visibleInFilterBar="true">
 						<filterbar:control>
 							<ComboBox id="AL_id_compoff_Leavetype_fil" showClearIcon="true" items="{Employees>/}" showSecondaryValues="true">
 								<core:ListItem key="{Employees>EmployeeID}" text="{Employees>EmployeeID}" additionalText="{Employees>EmployeeName}" />
@@ -35,3 +35,5 @@
 		</footer>
 	</Page>
 </mvc:View>
+
+<!-- HalfDay -->
