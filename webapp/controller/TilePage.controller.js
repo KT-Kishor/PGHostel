@@ -37,7 +37,7 @@ sap.ui.define(
           this.scrollToSection("id_ObjectPageLayoutTile", "id_Sectiontile");
           this.getBusyDialog();
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-         
+          this.byId("id_ObjectPageLayoutTile").setSelectedSection('0');
           this.AppVisibilityReadCall();
           await this._fetchCommonData("AllLoginDetails", "EmpModel");
           await this._fetchCommonData("EmployeeDetails", "EmpDetails");

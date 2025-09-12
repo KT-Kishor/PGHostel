@@ -268,7 +268,7 @@
 															<ImageContent src="sap-icon://visits" />
 														</TileContent>
 													</GenericTile>
-													<GenericTile class="sapUiMediumMargin" header="{i18n>TilePage}" press="TileV_MaintainData">
+													<GenericTile visible="{= ${AppVisibilityModel>/MaintainData} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>TilePage}" press="TileV_MaintainData">
 														<TileContent unit="{i18n>TilePage}">
 															<!-- <ImageContent src="sap-icon://employee-lookup" /> -->
 															<ImageContent src="sap-icon://cancel-maintenance" />
