@@ -47,7 +47,7 @@
 					<Text text="{path:'LeaveModel>EndDate' ,formatter:'.Formatter.formatDate'}" />
 					<Text text="{LeaveModel>NoofDays}" />
 					<Text text="{LeaveModel>SubType}" />
-					<CheckBox selected="{= ${LeaveModel>halfDay} === 'true'}" editable="false"/>
+					<CheckBox selected="{= ${LeaveModel>HalfDay} === 'true'}" editable="false"/>
 					<Button icon="sap-icon://display-more" text="{i18n>View}" press="AL_onShowEmployeeComments" />
 				</cells>
 			</ColumnListItem>

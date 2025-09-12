@@ -36,7 +36,7 @@ sap.ui.define(
             oFilter.EmpID = this.userId;
             oFilter.Type = "CompOff";
           }
-     
+
           // Correct server-side date param names
           if (params.fromDate && params.toDate) {
             oFilter.FromDate = params.fromDate;
@@ -78,15 +78,12 @@ sap.ui.define(
         });
         try {
           await this._fetchCompOffData("InboxDetails", "LeaveModel", params);
-          //  this._handleResponse(response, "compSubmitted");
         } catch (error) {
           sap.m.MessageToast.show(error.message || error.responseText || "Error fetching data");
         } finally {
           this.closeBusyDialog();
         }
       },
-
-   
 
       _onRouteMatched: async function () {
         const oOwnerComponent = this.getOwnerComponent();
@@ -110,19 +107,14 @@ sap.ui.define(
           this.branch = oLoginModel.getProperty("/BranchCode");
           this.currentYear = new Date().getFullYear();
 
-          // Set UI visibility and properties
-          // this.byId("AL_id_LeaveBarChart").setVisible(false);
           this.byId("AL_id_compOffTableStandard").setVisible(true);
           this.byId("AL_id_compofffilterbar").setVisible(true);
-          // this.byId("AL_id_LeaveYear").setSelectedKey(this.currentYear);
           this.onClearAndSearch("AL_id_compofffilterbar");
           this._makeDatePickersReadOnly(["AL_id_compoff_DateRangeSelection"]);
 
           // Directly fetch using ajaxReadWithJQuery
           const oData = await this.ajaxReadWithJQuery("AllLoginDetails", {});
 
-
-          
           // oData.data will contain the array from backend
           let aFiltered = (oData.data || []).filter((item) => item.Role !== "Contractor");
 
@@ -175,77 +167,12 @@ sap.ui.define(
           await this._fetchCommonData("ListOfSateData", "HolidayModel", {
             branchCode: this.branch,
           });
-          // await this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId);
 
-          // Employee detail call
-          // await this._fetchCompOffData();
-            await this._fetchCompOffData("InboxDetails", "LeaveModel", "");
+          await this._fetchCompOffData("InboxDetails", "LeaveModel", "");
         } catch (error) {
           MessageToast.show(error.message || error.responseText);
         } finally {
           this.closeBusyDialog();
-        }
-      },
-
-      AL_onPressSubmit: async function () {
-        try {
-          if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_compoff_Leavetype"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_CF_FromDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_CF_ToDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_CompoffComments"), "ID")) {
-            var oData = this.getView().getModel("LeaveTempModel").getData();
-
-            // Parse dates
-            var fromDateParts = oData.fromDate.split("/").map(Number);
-            var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
-            var toDateParts = oData.toDate.split("/").map(Number);
-            var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
-
-            // Ensure days are valid
-            if (parseFloat(oData.NoofDays) <= 0) {
-              return MessageBox.error("Number of days must be greater than zero.");
-            }
-
-            // ✅ Keep current-month check (remove if not needed)
-            const currentDateNew = new Date();
-            const firstOfMonth = new Date(currentDateNew.getFullYear(), currentDateNew.getMonth(), 1);
-            const lastOfMonth = new Date(currentDateNew.getFullYear(), currentDateNew.getMonth() + 1, 0);
-
-            if (startDate < firstOfMonth || startDate > lastOfMonth || endDate < firstOfMonth || endDate > lastOfMonth) {
-              return MessageBox.error("Comp-Off must be within the current month.");
-            }
-
-            // Always Comp Off
-            oData.typeOfLeave = "CompOff";
-            oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
-            oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
-            oData.status = "Submitted";
-
-            // Clean unnecessary props
-            delete oData.Save;
-            delete oData.Submit;
-            delete oData.MinToDate;
-            delete oData.maxDate;
-            delete oData.minDate;
-            delete oData.isUpdate;
-
-            this.getBusyDialog();
-
-            this.ajaxCreateWithJQuery("CompOff", { data: oData })
-              .then(async (response) => {
-                this.closeBusyDialog();
-                this._handleResponse(response, "compApplySubmitted");
-                // await this._fetchCompOffData();
-                 //await this._fetchCompOffData("InboxDetails", "LeaveModel", "");
-    
-              })
-              .catch((error) => {
-                this.closeBusyDialog();
-                MessageToast.show(error.message || error.responseText);
-              });
-          } else {
-            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-          }
-        } catch (error) {
-          this.closeBusyDialog();
-          MessageToast.show(error.message || error.responseText);
         }
       },
 
@@ -291,6 +218,67 @@ sap.ui.define(
 
         this.openLeaveDialog(oView);
       },
+
+      AL_onPressSubmit: async function () {
+        try {
+          if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_compoff_Leavetype"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_CF_FromDate"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_CF_ToDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_CompoffComments"), "ID")) {
+            var oData = this.getView().getModel("LeaveTempModel").getData();
+
+            // Parse dates
+            var fromDateParts = oData.fromDate.split("/").map(Number);
+            var startDate = new Date(fromDateParts[2], fromDateParts[1] - 1, fromDateParts[0]);
+            var toDateParts = oData.toDate.split("/").map(Number);
+            var endDate = new Date(toDateParts[2], toDateParts[1] - 1, toDateParts[0]);
+
+            // Ensure days are valid
+            if (parseFloat(oData.NoofDays) <= 0) {
+              return MessageBox.error("Number of days must be greater than zero.");
+            }
+
+            // ✅ Keep current-month check (remove if not needed)
+            const currentDateNew = new Date();
+            const firstOfMonth = new Date(currentDateNew.getFullYear(), currentDateNew.getMonth(), 1);
+            const lastOfMonth = new Date(currentDateNew.getFullYear(), currentDateNew.getMonth() + 1, 0);
+
+            if (startDate < firstOfMonth || startDate > lastOfMonth || endDate < firstOfMonth || endDate > lastOfMonth) {
+              return MessageBox.error("Comp-Off must be within the current month.");
+            }
+
+            // Always Comp Off
+            oData.typeOfLeave = "CompOff";
+            oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+            oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+            oData.status = "Submitted";
+            oData.halfDay = oData.halfDay.toString();
+
+            // Clean unnecessary props
+            delete oData.Save;
+            delete oData.Submit;
+            delete oData.MinToDate;
+            delete oData.maxDate;
+            delete oData.minDate;
+            delete oData.isUpdate;
+
+            this.getBusyDialog();
+
+            this.ajaxCreateWithJQuery("CompOff", { data: oData })
+              .then(async (response) => {
+                this.closeBusyDialog();
+                this._handleResponse(response, "compApplySubmitted");
+              })
+              .catch((error) => {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+              });
+          } else {
+            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+          }
+        } catch (error) {
+          this.closeBusyDialog();
+          MessageToast.show(error.message || error.responseText);
+        }
+      },
+
       calculateDays: function (startDate, endDate) {
         var start = this.onFormatDate(startDate);
         var end = this.onFormatDate(endDate);
@@ -299,6 +287,78 @@ sap.ui.define(
         var totalDays = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1; // inclusive of start + end
 
         return totalDays;
+      },
+
+      // Update leave button handler
+      AL_onPressUpdate: function () {
+        var oView = this.getView();
+        var oTable = this.byId("AL_id_compOffTableStandard").getSelectedItem();
+        if (!oTable) return MessageToast.show("Please select a leave row to update.");
+
+        var oModelData = JSON.parse(JSON.stringify(oTable.getBindingContext("LeaveModel").getObject()));
+        this._originalLeaveData = JSON.parse(JSON.stringify(oModelData));
+        this.UpdateNoofDays = oModelData.NoofDays;
+        this.previousLeaveDates = [];
+
+        // Collect previous leave dates if needed
+        let prevFrom = this.onFormatDate(this.Formatter.formatDate(oModelData.StartDate));
+        let prevTo = this.onFormatDate(this.Formatter.formatDate(oModelData.EndDate));
+        for (let d = new Date(prevFrom); d <= new Date(prevTo); d.setDate(d.getDate() + 1)) {
+          this.previousLeaveDates.push(d.toDateString());
+        }
+
+        // Normalize EmpComment for dialog
+        let sComment = "";
+        if (oModelData.EmpComment) {
+          if (Array.isArray(oModelData.EmpComment)) {
+            sComment = oModelData.EmpComment[0]?.Comment || "";
+          } else if (typeof oModelData.EmpComment === "string") {
+            sComment = oModelData.EmpComment;
+          }
+        }
+
+        // Prepare leave data for dialog model
+        var leaveJson = {
+          ID: oModelData.ID,
+          employeeID: oModelData.EmpID,
+          employeeName: oModelData.EmpName,
+          email: oModelData.EmpEmailID,
+          fromDate: this.Formatter.formatDate(oModelData.StartDate),
+          toDate: this.Formatter.formatDate(oModelData.EndDate),
+          NoofDays: oModelData.NoofDays,
+          typeOfLeave: oModelData.SubType,
+          Comments: sComment,
+          Submit: false,
+          Save: true,
+          halfDay: oModelData.HalfDay === "false" ? false : true,
+          managerRemark: oModelData.ManagerRemark,
+          maxDate: null,
+          minDate: null,
+          isUpdate: true,
+        };
+
+        // Set min/max dates for current month
+        const currentDate = new Date();
+        const firstOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+        leaveJson.minDate = firstOfMonth;
+        leaveJson.maxDate = lastOfMonth;
+
+        // Apply limits to the datepickers directly
+        const oFromDate = sap.ui.getCore().byId("AL_id_CF_FromDate");
+        const oToDate = sap.ui.getCore().byId("AL_id_CF_ToDate");
+        if (oFromDate && oToDate) {
+          oFromDate.setMinDate(firstOfMonth);
+          oFromDate.setMaxDate(lastOfMonth);
+          oToDate.setMinDate(firstOfMonth);
+          oToDate.setMaxDate(lastOfMonth);
+        }
+
+        // Set data into LeaveTempModel and open dialog
+        var oLeaveTempModel = new JSONModel(leaveJson);
+        oView.setModel(oLeaveTempModel, "LeaveTempModel");
+        this.openLeaveDialog(oView);
       },
 
       AL_onPressSave: async function () {
@@ -357,7 +417,7 @@ sap.ui.define(
               NoofDays: parseFloat(oData.NoofDays),
               typeOfLeave: oData.typeOfLeave,
               Comments: oData.Comments || "",
-              halfDay: oData.halfDay === "true" || oData.halfDay === true,
+              halfDay: oData.halfDay.toString(),
               managerRemark: oData.managerRemark || "",
               email: oData.email,
             },
@@ -368,8 +428,8 @@ sap.ui.define(
           const res = await this.ajaxUpdateWithJQuery("CompOff", payload);
           this.closeBusyDialog();
           this._handleResponse(res, "compoffUpdatedSuccess");
-         // await this._fetchCompOffData("InboxDetails", "LeaveModel", "");
-    
+          // await this._fetchCompOffData("InboxDetails", "LeaveModel", "");
+
           // await this._fetchCompOffData();
         } catch (error) {
           this.closeBusyDialog();
@@ -405,9 +465,8 @@ sap.ui.define(
                   this.byId("AL_id_compOffTableStandard").removeSelections(true);
                   this.byId("AL_id_compoffUpdatebtn").setVisible(false);
                   this.byId("AL_id_compoffDeletebtn").setVisible(false);
-                                      //  this._fetchCommonData("InboxDetails", "LeaveModel", { employeeID: this.userId, Type: "CompOff", Role: this.Type });
-                                      
-      await this._fetchCompOffData();
+
+                  await this._fetchCompOffData();
                 } else {
                   MessageToast.show(response.message || response.responseText);
                 }
@@ -442,11 +501,11 @@ sap.ui.define(
           }.bind(this)
         );
 
-   this.pLeaveDialog.then((oLeaveDialog) => {
-        // Reset fields before opening
-        this._resetDialogFields();
-        oLeaveDialog.open();
-    });
+        this.pLeaveDialog.then((oLeaveDialog) => {
+          // Reset fields before opening
+          this._resetDialogFields();
+          oLeaveDialog.open();
+        });
       },
 
       _resetDialogFields: function () {
@@ -461,7 +520,7 @@ sap.ui.define(
         this.byId("AL_id_compOffTableStandard").removeSelections(true); // Clear table selection
         this.byId("AL_id_compoffUpdatebtn").setVisible(false);
         this.byId("AL_id_compoffDeletebtn").setVisible(false);
-        AL_id_CompoffComments
+        AL_id_CompoffComments;
         if (this._originalLeaveData) {
           var aLeaveData = this.getView().getModel("LeaveModel").getProperty("/");
           var iIndex = aLeaveData.findIndex((item) => item.ID === this._originalLeaveData.ID);
@@ -488,145 +547,79 @@ sap.ui.define(
         this.MonthBarDisplayFunction(type, year, this.userId);
       },
 
-      // AL_onShowEmployeeComments: function (oEvent) {
-      //   var oContext = oEvent.getSource().getBindingContext("LeaveModel");
-      //   var oData = oContext.getObject();
-
-      //   // ✅ Normalize EmpComment (can be array or string)
-      //   var aComments = [];
-      //   if (Array.isArray(oData.EmpComment)) {
-      //     aComments = oData.EmpComment;
-      //   } else if (typeof oData.EmpComment === "string" && oData.EmpComment.trim() !== "") {
-      //     aComments = [
-      //       {
-      //         Comment: oData.EmpComment,
-      //         CommentDateTime: oData.SubmittedDate || new Date().toISOString(),
-      //         EmpName: oData.EmpName || "Anonymous",
-      //       },
-      //     ];
-      //   }
-
-      //   // ✅ Build Timeline items
-      //   var aTimelineItems = aComments
-      //     .slice()
-      //     .reverse()
-      //     .map(function (oComment) {
-      //       var sComment = oComment.Comment || oComment || "No comment provided";
-      //       return new TimelineItem({
-      //         dateTime: oComment.CommentDateTime ? new Date(oComment.CommentDateTime).toLocaleString() : oData.SubmittedDate ? new Date(oData.SubmittedDate).toLocaleString() : "",
-      //         title: oComment.EmpName || oData.EmpName || "Anonymous", // Always use EmpName
-      //         text: sComment,
-      //         userNameClickable: false,
-      //         icon: "sap-icon://comment",
-      //       });
-      //     });
-
-      //   // ✅ Timeline control
-      //   var oTimeline = new Timeline({
-      //     showHeader: false,
-      //     enableBusyIndicator: false,
-      //     width: "100%",
-      //     sortOldestFirst: false,
-      //     enableDoubleSided: false,
-      //     content: aTimelineItems,
-      //     showHeaderBar: false,
-      //   });
-
-      //   // ✅ Dialog
-      //   var oDialog = new sap.m.Dialog({
-      //     title: "Comp Off Comments",
-      //     contentWidth: "25rem",
-      //     contentHeight: "15rem",
-      //     draggable: true,
-      //     resizable: true,
-      //     content: [oTimeline],
-      //     endButton: new sap.m.Button({
-      //       text: "Close",
-      //       type: "Reject",
-      //       press: function () {
-      //         oDialog.close();
-      //         oDialog.destroy();
-      //       },
-      //     }),
-      //   });
-
-      //   oDialog.open();
-      // },
-      
       AL_onShowEmployeeComments: async function (oEvent) {
-      this.getBusyDialog();
-      const response = await this.ajaxReadWithJQuery("AllComments", {
-        ApplicationName: "CompOff",
-      });
-      const aAllComments = response.data || [];
-      this.closeBusyDialog();
- 
-       var oContext = oEvent.getSource().getBindingContext("LeaveModel");
-        var oData = oContext.getObject();
-         var sEmpID = oData.ID;
- 
-      var aFilteredComments = aAllComments.filter(function (oComment) {
-        return oComment.ApplicationName === "CompOff" && oComment.ID === sEmpID;
-      });
- 
-      let oContent;
- 
-      if (aFilteredComments.length === 0) {
-        // Show "No Data" message
-        oContent = new sap.m.VBox({
-          alignItems: "Center",
-          justifyContent: "Center",
-          items: [new sap.m.Text({ text: "No Data Found", design: "Bold" })],
-        }).addStyleClass("sapUiSmallMargin");
-      } else {
-        // Map into Timeline Items
-        var aTimelineItems = aFilteredComments
-          .slice()
-          .reverse()
-          .map(function (oComment) {
-            return new sap.suite.ui.commons.TimelineItem({
-              dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
-              title: (oComment.CommentedBy),
-              text: oComment.Comment || "No comment provided",
-              userNameClickable: false,
-              icon: "sap-icon://comment",
-            });
-          });
- 
-        // Create Timeline
-        oContent = new sap.suite.ui.commons.Timeline({
-          showHeader: false,
-          enableBusyIndicator: false,
-          width: "100%",
-          sortOldestFirst: false,
-          enableDoubleSided: false,
-          content: aTimelineItems,
-          showHeaderBar: false,
+        this.getBusyDialog();
+        const response = await this.ajaxReadWithJQuery("AllComments", {
+          ApplicationName: "CompOff",
         });
-      }
- 
-      // Dialog
-      var oDialog = new sap.m.Dialog({
-        title: "CompOff Comments",
-        contentWidth: "25rem",
-        contentHeight: "15rem",
-        draggable: true,
-        resizable: true,
-        content: [oContent],
-        endButton: new sap.m.Button({
-          text: "Close",
-          type: "Reject",
-          press: function () {
-            oDialog.close();
-            oDialog.destroy();
-          },
-        }),
-      });
- 
-      oDialog.open();
-    },
-      
-      
+        const aAllComments = response.data || [];
+        this.closeBusyDialog();
+
+        var oContext = oEvent.getSource().getBindingContext("LeaveModel");
+        var oData = oContext.getObject();
+        var sEmpID = oData.ID;
+
+        var aFilteredComments = aAllComments.filter(function (oComment) {
+          return oComment.ApplicationName === "CompOff" && oComment.ID === sEmpID;
+        });
+
+        let oContent;
+
+        if (aFilteredComments.length === 0) {
+          // Show "No Data" message
+          oContent = new sap.m.VBox({
+            alignItems: "Center",
+            justifyContent: "Center",
+            items: [new sap.m.Text({ text: "No Data Found", design: "Bold" })],
+          }).addStyleClass("sapUiSmallMargin");
+        } else {
+          // Map into Timeline Items
+          var aTimelineItems = aFilteredComments
+            .slice()
+            .reverse()
+            .map(function (oComment) {
+              return new sap.suite.ui.commons.TimelineItem({
+                dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
+                title: oComment.CommentedBy,
+                text: oComment.Comment || "No comment provided",
+                userNameClickable: false,
+                icon: "sap-icon://comment",
+              });
+            });
+
+          // Create Timeline
+          oContent = new sap.suite.ui.commons.Timeline({
+            showHeader: false,
+            enableBusyIndicator: false,
+            width: "100%",
+            sortOldestFirst: false,
+            enableDoubleSided: false,
+            content: aTimelineItems,
+            showHeaderBar: false,
+          });
+        }
+
+        // Dialog
+        var oDialog = new sap.m.Dialog({
+          title: "CompOff Comments",
+          contentWidth: "25rem",
+          contentHeight: "15rem",
+          draggable: true,
+          resizable: true,
+          content: [oContent],
+          endButton: new sap.m.Button({
+            text: "Close",
+            type: "Reject",
+            press: function () {
+              oDialog.close();
+              oDialog.destroy();
+            },
+          }),
+        });
+
+        oDialog.open();
+      },
+
       onMarkCalendarDatesAndLeaves: function () {
         var that = this;
         this.oDatePicker.removeAllSpecialDates();
@@ -713,109 +706,35 @@ sap.ui.define(
         }
       },
 
-      // Update leave button handler
-      AL_onPressUpdate: function () {
-        var oView = this.getView();
-        var oTable = this.byId("AL_id_compOffTableStandard").getSelectedItem();
-        if (!oTable) return MessageToast.show("Please select a leave row to update.");
-
-        var oModelData = JSON.parse(JSON.stringify(oTable.getBindingContext("LeaveModel").getObject()));
-        this._originalLeaveData = JSON.parse(JSON.stringify(oModelData));
-        this.UpdateNoofDays = oModelData.NoofDays;
-        this.previousLeaveDates = [];
-
-        // Collect previous leave dates if needed
-        let prevFrom = this.onFormatDate(this.Formatter.formatDate(oModelData.StartDate));
-        let prevTo = this.onFormatDate(this.Formatter.formatDate(oModelData.EndDate));
-        for (let d = new Date(prevFrom); d <= new Date(prevTo); d.setDate(d.getDate() + 1)) {
-          this.previousLeaveDates.push(d.toDateString());
-        }
-
-        // Normalize EmpComment for dialog
-        let sComment = "";
-        if (oModelData.EmpComment) {
-          if (Array.isArray(oModelData.EmpComment)) {
-            sComment = oModelData.EmpComment[0]?.Comment || "";
-          } else if (typeof oModelData.EmpComment === "string") {
-            sComment = oModelData.EmpComment;
-          }
-        }
-
-        // Prepare leave data for dialog model
-        var leaveJson = {
-          ID: oModelData.ID,
-          employeeID: oModelData.EmpID,
-          employeeName: oModelData.EmpName,
-          email: oModelData.EmpEmailID,
-          fromDate: this.Formatter.formatDate(oModelData.StartDate),
-          toDate: this.Formatter.formatDate(oModelData.EndDate),
-          NoofDays: oModelData.NoofDays,
-          typeOfLeave: oModelData.SubType,
-          Comments: sComment,
-          Submit: false,
-          Save: true,
-          halfDay: oModelData.halfDay === "false" ? false : true,
-          managerRemark: oModelData.ManagerRemark,
-          maxDate: null,
-          minDate: null,
-          isUpdate: true,
-        };
-
-        // Set min/max dates for current month
-        const currentDate = new Date();
-        const firstOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const lastOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-
-        leaveJson.minDate = firstOfMonth;
-        leaveJson.maxDate = lastOfMonth;
-
-        // Apply limits to the datepickers directly
-        const oFromDate = sap.ui.getCore().byId("AL_id_CF_FromDate");
-        const oToDate = sap.ui.getCore().byId("AL_id_CF_ToDate");
-        if (oFromDate && oToDate) {
-          oFromDate.setMinDate(firstOfMonth);
-          oFromDate.setMaxDate(lastOfMonth);
-          oToDate.setMinDate(firstOfMonth);
-          oToDate.setMaxDate(lastOfMonth);
-        }
-
-        // Set data into LeaveTempModel and open dialog
-        var oLeaveTempModel = new JSONModel(leaveJson);
-        oView.setModel(oLeaveTempModel, "LeaveTempModel");
-        this.openLeaveDialog(oView);
-      },
-
-
-
       onLiveChange: function () {
-    var oLeaveModel = this.getView().getModel("LeaveTempModel");
-    var sFromDate = oLeaveModel.getProperty("/fromDate");
-    var sToDate = oLeaveModel.getProperty("/toDate");
-    var isHalfDay = oLeaveModel.getProperty("/halfDay");
-    
-    // Yahan date ki availability check karo
-    if (!sFromDate || !sToDate) {
-        oLeaveModel.setProperty("/NoofDays", "0");
-        return; // Calculation skip kar do
-    }
-    
-    var LeaveModel = this.getView().getModel("LeaveModel").getData();
-    var filterData = LeaveModel.filter((item) => {
-        return item.ID === oLeaveModel.getData().ID;
-    });
+        var oLeaveModel = this.getView().getModel("LeaveTempModel");
+        var sFromDate = oLeaveModel.getProperty("/fromDate");
+        var sToDate = oLeaveModel.getProperty("/toDate");
+        var isHalfDay = oLeaveModel.getProperty("/halfDay");
 
-    // Calculate business days excluding weekends and holidays
-    var holidays = this.getView().getModel("HolidayModel").getData();
-    var sNoofDays = this.calculateDays(sFromDate, sToDate, holidays);
-    if (isHalfDay && sNoofDays > 0) {
-        sNoofDays -= 0.5;
-    }
+        // Yahan date ki availability check karo
+        if (!sFromDate || !sToDate) {
+          oLeaveModel.setProperty("/NoofDays", "0");
+          return; // Calculation skip kar do
+        }
 
-    oLeaveModel.setProperty("/NoofDays", sNoofDays.toString());
-    if (filterData.length !== 0) {
-        filterData[0].NoofDays = oLeaveModel.getProperty("/NoofDays");
-    }
-},
+        var LeaveModel = this.getView().getModel("LeaveModel").getData();
+        var filterData = LeaveModel.filter((item) => {
+          return item.ID === oLeaveModel.getData().ID;
+        });
+
+        // Calculate business days excluding weekends and holidays
+        var holidays = this.getView().getModel("HolidayModel").getData();
+        var sNoofDays = this.calculateDays(sFromDate, sToDate, holidays);
+        if (isHalfDay && sNoofDays > 0) {
+          sNoofDays -= 0.5;
+        }
+
+        oLeaveModel.setProperty("/NoofDays", sNoofDays.toString());
+        if (filterData.length !== 0) {
+          filterData[0].NoofDays = oLeaveModel.getProperty("/NoofDays");
+        }
+      },
       // Calculate business days between two dates
       calculateBusinessDays: function (startDate, endDate, holidays) {
         var start = this.onFormatDate(startDate);
@@ -879,32 +798,29 @@ sap.ui.define(
         }
       },
 
-
-
-
       AL_ValidateFromDate: function (oEvent) {
-    const oDate = oEvent.getSource().getDateValue();
-    if (oDate) {
-        oEvent.getSource().setValueState("None");
-    }
-    const oFromDatePicker = sap.ui.getCore().byId("AL_id_CF_FromDate");
-    const oToDatePicker = sap.ui.getCore().byId("AL_id_CF_ToDate");
-    const oFromDate = oFromDatePicker.getDateValue();
-    const oToDate = oToDatePicker.getDateValue();
-    if (oFromDate && oToDate && oFromDate > oToDate) {
-        oToDatePicker.setDateValue(null);
-        oToDatePicker.setValue("");
-        oToDatePicker.setValueState("Error");
-        oToDatePicker.setValueStateText("From Date cannot be greater than To Date");
-        // LeaveTempModel ki toDate property ko bhi clear karo
-        this.getView().getModel("LeaveTempModel").setProperty("/toDate", null);
+        const oDate = oEvent.getSource().getDateValue();
+        if (oDate) {
+          oEvent.getSource().setValueState("None");
+        }
+        const oFromDatePicker = sap.ui.getCore().byId("AL_id_CF_FromDate");
+        const oToDatePicker = sap.ui.getCore().byId("AL_id_CF_ToDate");
+        const oFromDate = oFromDatePicker.getDateValue();
+        const oToDate = oToDatePicker.getDateValue();
+        if (oFromDate && oToDate && oFromDate > oToDate) {
+          oToDatePicker.setDateValue(null);
+          oToDatePicker.setValue("");
+          oToDatePicker.setValueState("Error");
+          oToDatePicker.setValueStateText("From Date cannot be greater than To Date");
+          // LeaveTempModel ki toDate property ko bhi clear karo
+          this.getView().getModel("LeaveTempModel").setProperty("/toDate", null);
+          this.onValidation();
+          return false;
+        }
         this.onValidation();
-        return false;
-    }
-    this.onValidation();
-    this.onLiveChange();
-    return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
-},
+        this.onLiveChange();
+        return !!this.getView().getModel("LeaveTempModel").getProperty("/fromDate");
+      },
 
       // Validate to date
       AL_ValidateToDate: function (oEvent) {
@@ -936,39 +852,22 @@ sap.ui.define(
         if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
       },
 
-      // Handle response from backend
-      // _handleResponse: async function (response, successMessageKey) {
-      //   if (response.success === true) {
-      //     MessageToast.show(this.i18nModel.getText(successMessageKey));
-      //     this.oLeaveDialog.close();
-      //     this.byId("AL_id_compOffTableStandard").removeSelections(true); // Clear table selection
-      //     this.byId("AL_id_compoffUpdatebtn").setVisible(false);
-      //     this.byId("AL_id_compoffDeletebtn").setVisible(false);
-      //     // Refresh leave data
-      //     //  this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId);
-      //     this._fetchCommonData("InboxDetails", "LeaveModel", { employeeID: this.userId, Type : "CompOff" });
-      //   } else {
-      //     MessageToast.show(error.message || error.responseText);
-      //   }
-      // },
+      _handleResponse: async function (response, successMessageKey) {
+        if (response.success === true) {
+          MessageToast.show(this.i18nModel.getText(successMessageKey));
+          this.oLeaveDialog.close();
+          this.byId("AL_id_compOffTableStandard").removeSelections(true); // Clear table selection
+          this.byId("AL_id_compoffUpdatebtn").setVisible(false);
+          this.byId("AL_id_compoffDeletebtn").setVisible(false);
+          // Refresh leave data
+          // this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId);
 
-
-_handleResponse: async function (response, successMessageKey) {
-    if (response.success === true) {
-        MessageToast.show(this.i18nModel.getText(successMessageKey));
-        this.oLeaveDialog.close();
-        this.byId("AL_id_compOffTableStandard").removeSelections(true); // Clear table selection
-        this.byId("AL_id_compoffUpdatebtn").setVisible(false);
-        this.byId("AL_id_compoffDeletebtn").setVisible(false);
-        // Refresh leave data
-        // this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId);
-        
-        // Yahaan _fetchCompOffData ko call karein
-        await this._fetchCompOffData();
-    } else {
-        MessageToast.show(error.message || error.responseText);
-    }
-},
+          // Yahaan _fetchCompOffData ko call karein
+          await this._fetchCompOffData();
+        } else {
+          MessageToast.show(error.message || error.responseText);
+        }
+      },
 
       // Selection change handler for leave table
       onSelectionChange: function (oEvent) {
@@ -1030,7 +929,6 @@ _handleResponse: async function (response, successMessageKey) {
           { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
           { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
           { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
-          // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
         ];
         const oSettings = {
           workbook: {
