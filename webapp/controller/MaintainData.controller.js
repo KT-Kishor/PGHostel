@@ -416,7 +416,7 @@ sap.ui.define(
                     let missingFields = keys.filter(k => !cleanedData[k] || cleanedData[k].toString().trim() === "");
 
                     if (missingFields.length > 0) {
-                        sap.m.MessageToast.show("Please fill mandatory details");
+                        sap.m.MessageToast.show("Please fill mandatory Field - " +" " + missingFields);
                         return;
                     }
 
@@ -448,7 +448,7 @@ sap.ui.define(
                     var aSelectedItems = this.oTable.getSelectedItems();
 
                     if (aSelectedItems.length === 0) {
-                        sap.m.MessageToast.show("please select column");
+                        sap.m.MessageToast.show(that.i18nModel.getText("selctRowtoDelete"));
                         return;
                     }
 
@@ -490,7 +490,7 @@ sap.ui.define(
                                                     const tableUpdateData = await that.ajaxReadWithJQuery(that.sTitle, "");
                                                     oModel.setData(tableUpdateData.data);
                                                     that.closeBusyDialog();
-                                                    sap.m.MessageToast.show("Deleted successfully!");
+                                                    sap.m.MessageToast.show(that.i18nModel.getText("dataDelteSucces"));
                                                 });
                                         }
                                     }
@@ -508,7 +508,7 @@ sap.ui.define(
                     var aSelectedItems = this.oTable.getSelectedItem();
 
                     if (!aSelectedItems) {
-                        sap.m.MessageToast.show("please select column");
+                        sap.m.MessageToast.show(that.i18nModel.getText("selectRowUpdate"));
                         return;
                     }
                     let oData = aSelectedItems.getBindingContext("dataModel").getObject();
