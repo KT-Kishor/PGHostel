@@ -33,7 +33,7 @@ sap.ui.define([
       this._isAccountant = ["Account Manager", "Account Consultant"].includes(oLoginData.Role);
       this.getBusyDialog();
       this.sParams = sParams;
-      oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }]), "oTypeModel");
+      oView.setModel(new JSONModel([{ type: "Leave" }, { type: "Expense" }, { type: "Resignation" }, { type: "CompOff" }]), "oTypeModel");
       this.i18nModel = oView.getModel("i18n").getResourceBundle();
       oLoginModel.setProperty("/HeaderName",this.i18nModel.getText("inboxDetails"));
       this.idEmp = oLoginData.EmployeeID;
@@ -231,7 +231,7 @@ sap.ui.define([
         });
       } else if (oData.Type === "Leave") {
         this.getRouter().navTo("RouteDetailLeave", { sLeaveID: oData.ID });
-      } else {
+      } else if(oData.Type === "Resignation" ) {
         this.getBusyDialog();
         await this._fetchCommonData("EmployeeDetails", "sEmployeeModel", { EmployeeID: oData.EmpID });
         const oView = this.getView();
