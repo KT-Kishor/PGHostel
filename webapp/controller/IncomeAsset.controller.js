@@ -769,9 +769,9 @@ sap.ui.define([
                          sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
 
                         if (loginModel.Role === "IT Consultant") {
-                            sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(oRowData.PickedEmployeeName).setVisible(true).setEnabled(false)
+                            sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEnabled(false)
                         } else {
-                            sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(oRowData.PickedEmployeeName).setVisible(true).setEnabled(true)
+                            sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEnabled(true)
 
                         }
                         this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", oRowData.TransferBranch);
@@ -819,10 +819,11 @@ sap.ui.define([
                     sap.ui.getCore().byId("FCIA_id_submitButton").setVisible(false)
 
 
+
                     if (loginModel.Role === "IT Consultant") {
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(oRowData.PickedEmployeeName).setVisible(true).setEditable(false)
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEditable(false)
                     } else {
-                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(oRowData.PickedEmployeeName).setVisible(true).setEditable(true)
+                        sap.ui.getCore().byId("FCIA_id_pickedby").setSelectedKey(loginModel.EmployeeName).setVisible(true).setEditable(true)
 
                     }
                     this.getView().getModel("CreateIncomeAssetModel").setProperty("/PickedBranch", oRowData.TransferBranch);
