@@ -15,6 +15,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       this.byId("MsaD_id_Submit").setEnabled(false);
       this.byId("MasD_id_ThirdStep").getParent().setShowNextButton(false);
       this.byId("MsaD_id_Type").setEditable(true);
+      this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
       this.T_onResetWizard();
       var oModelMSA = new JSONModel({
         CompanyName: "",

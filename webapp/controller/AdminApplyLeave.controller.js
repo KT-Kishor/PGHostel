@@ -1182,6 +1182,7 @@ sap.ui.define(
                         // Refresh leave data
                          this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
                          this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                         this._fetchCommonData("Compoff", "CompoffModel", { Employee: this.userId });
                     } else {
                         MessageToast.show(error.message || error.responseText);
                     }
@@ -1216,6 +1217,7 @@ sap.ui.define(
                                         this.byId("AL_id_Deletebtn").setVisible(false);
                                         this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
                                         this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                                        this._fetchCommonData("Compoff", "CompoffModel", { Employee: this.userId });
                                     } else {
                                         MessageToast.show(response.message || response.responseText);
                                     }

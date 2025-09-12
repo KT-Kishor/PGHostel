@@ -23,6 +23,7 @@ sap.ui.define([
                 this.getView().byId("EOD_id_BondCombo").setVisible(false);
                 this.getView().byId("EOD_id_Lyear").setVisible(false);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
             
                 let oModel = this.getView().getModel("BaseLocationModel");
                 let aData = oModel.getData();

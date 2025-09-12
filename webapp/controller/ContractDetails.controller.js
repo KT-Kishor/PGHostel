@@ -38,6 +38,7 @@ sap.ui.define([
 
                 this._wizard = oView.byId("wizardContentPage");
                 oWizard.getSteps()[0].setValidated(false);
+                this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
 
                 if (this.sArgPara === "CreateContractFlag") {
                     try {
