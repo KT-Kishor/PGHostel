@@ -50,52 +50,53 @@ sap.ui.define(
 
           sessionStorage.removeItem("homePageReturnTab");
           this.API = "https://rest.kalpavrikshatechnologies.com";
-          var oCarousel = this.byId("videoCarousel");
+          
+          // var oCarousel = this.byId("videoCarousel");
 
-          var videoUrls = [
-            "../video/Employee offer.mp4",
-            "../video/Self Service.mp4",
-            "../video/Employee details Part 1.mp4",
-            "../video/Quotation.mp4",
-            "../video/Scheme upload.mp4",
-          ];
+          // var videoUrls = [
+          //   "../video/Employee offer.mp4",
+          //   "../video/Self Service.mp4",
+          //   "../video/Employee details Part 1.mp4",
+          //   "../video/Quotation.mp4",
+          //   "../video/Scheme upload.mp4",
+          // ];
 
-          // Add videos dynamically to the carousel
-          videoUrls.forEach(function (url, index) {
-            var oHtmlControl = new sap.ui.core.HTML({
-              content:
-                '<video width="100%" height="100%" autoplay muted loop>' +
-                '<source src="' +
-                url +
-                '" type="video/mp4">' +
-                "</video>",
-            });
+          // // Add videos dynamically to the carousel
+          // videoUrls.forEach(function (url, index) {
+          //   var oHtmlControl = new sap.ui.core.HTML({
+          //     content:
+          //       '<video width="100%" height="100%" autoplay muted loop>' +
+          //       '<source src="' +
+          //       url +
+          //       '" type="video/mp4">' +
+          //       "</video>",
+          //   });
 
-            var oVBox = new sap.m.VBox({
-              alignItems: "Center",
-              items: [
-                new sap.m.Title({
-                  level: "H2",
-                  class: "custom-text2",
-                }),
-                oHtmlControl,
-              ],
-            });
+          //   var oVBox = new sap.m.VBox({
+          //     alignItems: "Center",
+          //     items: [
+          //       new sap.m.Title({
+          //         level: "H2",
+          //         class: "custom-text2",
+          //       }),
+          //       oHtmlControl,
+          //     ],
+          //   });
 
-            oVBox.addStyleClass("sapUiTinyMargin"); // Apply transparent background class
-            oCarousel.addPage(oVBox);
-          });
+          //   oVBox.addStyleClass("sapUiTinyMargin"); // Apply transparent background class
+          //   oCarousel.addPage(oVBox);
+          // });
 
-          var iCurrentIndex = 0;
-          var aPages = oCarousel.getPages(); // Get all slides
+          // var iCurrentIndex = 0;
+          // var aPages = oCarousel.getPages(); // Get all slides
 
-          function autoSlide() {
-            if (aPages.length > 1) {
-              iCurrentIndex = (iCurrentIndex + 1) % aPages.length; // Move to next slide
-              oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
-            }
-          }
-          setInterval(autoSlide, 30000);
+          // function autoSlide() {
+          //   if (aPages.length > 1) {
+          //     iCurrentIndex = (iCurrentIndex + 1) % aPages.length; // Move to next slide
+          //     oCarousel.setActivePage(aPages[iCurrentIndex]); // Update active slide
+          //   }
+          // }
+          // setInterval(autoSlide, 30000);
 
           var oData = {
             pages: [
@@ -592,6 +593,23 @@ sap.ui.define(
           this.getRouter().navTo("RouteJobView", {
             jobId: sJobId,
           });
+        },
+
+        onOpenForm: function () {
+          if (!this._oDemoFormDialog) {
+            this._oDemoFormDialog = sap.ui.xmlfragment(
+              this.getView().getId(), "sap.kt.com.minihrsolution.fragment.NewDemoform",
+              this
+            );
+            this.getView().addDependent(this._oDemoFormDialog);
+          }
+          this._oDemoFormDialog.open();
+        },
+
+        onCloseDemoForm: function () {
+          if (this._oDemoFormDialog) {
+            this._oDemoFormDialog.close();
+          }
         },
       }
     );

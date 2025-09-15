@@ -2,39 +2,197 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:l="sap.ui.layout"
     xmlns:m="sap.m"
-    xmlns:f="sap.ui.layout.form">
+    xmlns:g="sap.f"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+<m:HBox
+        justifyContent="End"
+        class="sapUiLargeMarginEnd"
+    >
+        <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+    </m:HBox>
+    
+    <!-- EMPLOYEE -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
 
-    <l:Grid defaultSpan="L4 M6 S12" vSpacing="2" hSpacing="2" class="sapUiTinyMargin">   
-        <l:content>
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="Employee" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+        </m:VBox>
 
-                <f:SimpleForm editable="true" layout="ResponsiveGridLayout"
-                    labelSpanXL="3" labelSpanL="3" labelSpanM="3"    singleContainerFullSize="false" backgroundDesign="Transparent" class="formBorder" title="{i18n>demoFormtitle}">
-                    <f:content>
-                        <m:Label text="" />
-                        <m:Input id="idCompanyname" placeholder="{i18n>placeCompany}" liveChange="validateCompnayname" maxLength="50" value="{formData>/CompanyName}" valueStateText="{i18n>placeCompany}"/>
-                        <m:Label text=""/>
-                        <m:Input id="idcustomername" placeholder="{i18n>placeholderCustName}" liveChange="validateName" maxLength="50" value="{formData>/CustomerName}" valueStateText="{i18n>placeholderCustName}"/>
-                        <m:Label text=""/>
-                        <m:Input id="idCustmailid" placeholder="{i18n>placeEmailId}" liveChange="validateEmail" maxLength="50" value="{formData>/Email}" type="Email" valueStateText="Enter Valid Email"/>
-                        <m:Label text=""/>
-                        <m:DateTimePicker id="idtimeslot" placeholder="{i18n>placeholdertimeslote}" liveChange="ValidateCommonFields" value="{formData>/TimeSlot}" valueFormat="yyyy-MM-dd HH:mm"
-                            displayFormat="dd/MM/yyyy HH:mm" valueStateText="Enter Timeslot"/>
-                        <m:Label text=""/>
-                        <m:Input id="idmobilenumber" placeholder="{i18n>placeholderMobileNo}" liveChange="validateMobileNo" maxLength="10" value="{formData>/MobileNo}" valueStateText="Enter Atleast 10 digit number" />
-                        <m:Label text=""/>
-                        <m:TextArea id="idCustaddress" placeholder="{i18n>placeAddress}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Address}" rows="2" valueStateText="{i18n>placeAddress}" />
-                        <m:Label text=""/>
-                        <m:TextArea id="idcomment" placeholder="{i18n>enterComments}" liveChange="ValidateCommonFields" maxLength="120" value="{formData>/Comments}" rows="2" valueStateText="{i18n>enterComments}" />
-                        <m:Label text=""/>
-                        <m:Button text="{i18n>savebtn}" type="Accept" press="onDemoformSave" />
-                    </f:content>
-                </f:SimpleForm>
-        </l:content>
-    </l:Grid>
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML
+                    content="&lt;iframe src='https://www.youtube.com/embed/Sk62JG5EELI' allowfullscreen style='width:560px;height:315px;border:none;&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
 
-     <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="TRAINEE" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>TRAINEE}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- QUOTATION -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="Quotation" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>QUOTATION}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+              <core:HTML
+                    content="&lt;iframe src='https://www.youtube.com/embed/AY8uG5826fo' allowfullscreen&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- MSA -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML
+                    content="&lt;iframe src='https://www.youtube.com/embed/EjnEOznAsHg' allowfullscreen&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="MSA" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>MSA}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- LEAVE -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="LEAVE" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>BAT}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML
+                    content="&lt;iframe src='https://www.youtube.com/embed/aYaWP-U6yFE' allowfullscreen&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- PURCHASE ORDER -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML
+                    content="&lt;div class='responsive-video'&gt;&lt;iframe src='https://www.youtube.com/embed/zk2GGsXRfuo' frameborder='0'allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="PURCHASE ORDER" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>CAT}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+
+
+    
+
+   <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
         <l:content>
             <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>
          </l:content>
-     </l:Grid>
+     </l:Grid> -->
+   
+       
 </mvc:View>
