@@ -39,8 +39,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml"
+        <m:VBox id="videoBox1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml1"
         content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
@@ -61,8 +61,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-            <core:HTML
+        <m:VBox alignItems="Center" id="videoBox2" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML id="videoFrameHtml2"
                     content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -95,8 +95,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-              <core:HTML
+        <m:VBox alignItems="Center" id="videoBox3" justifyContent="Center" class="sapUiMediumMarginTop">
+              <core:HTML id="videoFrameHtml3"
                     content="&lt;iframe src='https://www.youtube.com/embed/AY8uG5826fo' allowfullscreen&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -117,8 +117,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-             <core:HTML
+        <m:VBox alignItems="Center" id="videoBox4" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml4"
                     content="&lt;iframe src='https://www.youtube.com/embed/EjnEOznAsHg' allowfullscreen&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -151,8 +151,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-           <core:HTML
+        <m:VBox alignItems="Center" id="videoBox5" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml5"
                     content="&lt;iframe src='https://www.youtube.com/embed/aYaWP-U6yFE' allowfullscreen&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -173,8 +173,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-            <core:HTML
+        <m:VBox alignItems="Center" id="videoBox6" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML id="videoFrameHtml6"
                     content="&lt;div class='responsive-video'&gt;&lt;iframe src='https://www.youtube.com/embed/zk2GGsXRfuo' frameborder='0'allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;"
                 />
         </m:VBox>

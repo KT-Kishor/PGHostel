@@ -613,24 +613,28 @@ sap.ui.define(
           }
         },
 onAfterRendering: function () {
-    var oVBox = this.byId("videoBox");
-    var oHtml = this.byId("videoFrameHtml");
-    var iWidth = window.innerWidth;
+ this._applyResponsiveVideo("videoBox1", "videoFrameHtml1", "https://www.youtube.com/embed/zk2GGsXRfuo");
+ this._applyResponsiveVideo("videoBox2", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
+ this._applyResponsiveVideo("videoBox3", "videoFrameHtml3", "https://www.youtube.com/embed/AY8uG5826fo");
+ this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "https://www.youtube.com/embed/EjnEOznAsHg");
+ this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
+ this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "https://www.youtube.com/embed/zk2GGsXRfuo");
 
+},
+_applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
     if (!oVBox || !oHtml) return;
-    
-    // Track responsive state
+
+    var iWidth = window.innerWidth;
     var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
 
-    // Set up iframe HTML for both states
-    var sNormal = "<iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
-    var sMobile = "<iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+    var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+    var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
 
-    // If on phone/less than 400px, use responsive style and allow manual toggling
     if (bResponsive) {
         oHtml.setContent(sMobile);
 
-        // Optional: Add a "Full Size" / "Fit Mobile" toggle button just like your "Show More"
         // var bExpanded = false;
         // var oToggleBtn = new sap.m.Link({
         //     text: "Full Size",
@@ -646,15 +650,18 @@ onAfterRendering: function () {
         //         sap.ui.getCore().applyChanges();
         //     }
         // });
-       
-        if (oVBox.getItems().length < 2) {
+
+        // Add toggle button if not already added
+     if (oVBox.getItems().length < 2) {
             oVBox.addItem(oToggleBtn);
         }
+        
     } else {
-        // Always set to normal video size for larger screens
         oHtml.setContent(sNormal);
     }
-}
+},
+
+
 
 
        
