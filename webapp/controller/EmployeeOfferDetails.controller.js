@@ -272,7 +272,7 @@ sap.ui.define([
                         this.closeBusyDialog();
                         MessageToast.show(err.message || err.responseText);
                     });
-                } catch (error) {
+                } catch (err) {
                     this.closeBusyDialog();
                     MessageToast.show(err.message || err.responseText);
                 }
