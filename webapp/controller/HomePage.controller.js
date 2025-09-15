@@ -14,6 +14,7 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
+            
           this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
 
           // Form Data
@@ -611,6 +612,52 @@ sap.ui.define(
             this._oDemoFormDialog.close();
           }
         },
+onAfterRendering: function () {
+    var oVBox = this.byId("videoBox");
+    var oHtml = this.byId("videoFrameHtml");
+    var iWidth = window.innerWidth;
+
+    if (!oVBox || !oHtml) return;
+    
+    // Track responsive state
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+
+    // Set up iframe HTML for both states
+    var sNormal = "<iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+    var sMobile = "<iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+
+    // If on phone/less than 400px, use responsive style and allow manual toggling
+    if (bResponsive) {
+        oHtml.setContent(sMobile);
+
+        // Optional: Add a "Full Size" / "Fit Mobile" toggle button just like your "Show More"
+        // var bExpanded = false;
+        // var oToggleBtn = new sap.m.Link({
+        //     text: "Full Size",
+        //     press: function () {
+        //         if (bExpanded) {
+        //             oHtml.setContent(sMobile);
+        //             oToggleBtn.setText("Full Size");
+        //         } else {
+        //             oHtml.setContent(sNormal);
+        //             oToggleBtn.setText("Fit Mobile");
+        //         }
+        //         bExpanded = !bExpanded;
+        //         sap.ui.getCore().applyChanges();
+        //     }
+        // });
+       
+        if (oVBox.getItems().length < 2) {
+            oVBox.addItem(oToggleBtn);
+        }
+    } else {
+        // Always set to normal video size for larger screens
+        oHtml.setContent(sNormal);
+    }
+}
+
+
+       
       }
     );
   }
