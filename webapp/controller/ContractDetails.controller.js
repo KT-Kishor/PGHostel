@@ -112,7 +112,7 @@ sap.ui.define([
                     });
                     this.getView().setModel(oViewModel, "viewModel");
                     this.getView().getModel("viewModel").refresh(true);
-
+                    
                     try {
                         var response = await this.ajaxReadWithJQuery("Contract", {
                             ContractNo: this.sArgPara,
@@ -127,7 +127,7 @@ sap.ui.define([
                         this.ContractStatus = oResult.ContractStatus;
                         this.AgreementDate = this.Formatter.formatDate(oResult.AgreementDate);
                         this._previousContractStatus = oResult.ContractStatus;
-
+                      
                         if (this.ContractStatus === "Active") {
                             this.getView().getModel("ContractStatus").setProperty("/status", true);
                             this.getView().getModel("ContractStatus").setProperty("/sendMail", false);
@@ -155,6 +155,7 @@ sap.ui.define([
                         this.onChangeAggrementDate();
                         this.CU_CommonID();
                         this.closeBusyDialog(); // Close BusyDialog
+                         this._applyCountryStateCityFilters();
                     } catch (error) {
                         this.closeBusyDialog(); // Close BusyDialog
                         MessageToast.show(error.message || error.responseText || this.i18nModel.getText("commonErrorMessage"));
@@ -164,6 +165,54 @@ sap.ui.define([
 
             onLogout: function () {
                 this.CommonLogoutFunction();
+            },
+            _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("oFilteredContractModel");
+                const oCountryCB = this.byId("CU_id_Country");
+                const oStateCB   = this.byId("CU_id_State");
+                const oSourceCB  = this.byId("CU_id_ContractCity");
+                // const oDestCB    = this.byId("Exp_id_Destination");
+ 
+                const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
+                const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/ContractLocation");      // e.g. "Bongaree"
+                // const sDest      = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
+ 
+                // Reset all filters
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.getBinding("items")?.filter([]);
+                // oDestCB.getBinding("items")?.filter([]);
+ 
+                if (sCountry) {
+                    // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+ 
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+ 
+                        // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+ 
+                        if (sState) {
+                            // Filter Cities by State + Country
+                            const aFilters = [
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                            // oDestCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+ 
+                // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || "");
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+                // oDestCB.setValue(sDest || "");
             },
 
             CD_CommonID: function () {

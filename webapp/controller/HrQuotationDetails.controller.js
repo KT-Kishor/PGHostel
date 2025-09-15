@@ -83,6 +83,7 @@ sap.ui.define(
           this.UnitAmount = true;
         } else {
           // Edit Mode
+         
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
           this.UnitAmount = true;
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
@@ -148,6 +149,7 @@ sap.ui.define(
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
               }
+               this._applyCountryStateCityFilters();
             } catch (e) {
               MessageToast.show("Error loading items", e);
             }
@@ -176,6 +178,54 @@ sap.ui.define(
       onLogout: function () {
         this.CommonLogoutFunction();
       },
+      _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("SingleCompanyModel");
+                const oCountryCB = this.byId("HQD_id_Country");
+                const oStateCB   = this.byId("HRQstate");
+                const oSourceCB  = this.byId("HQD_id_BranchCode");
+                // const oDestCB    = this.byId("Exp_id_Destination");
+ 
+                const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
+                const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/Branch");      // e.g. "Bongaree"
+                // const sDest      = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
+ 
+                // Reset all filters
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.getBinding("items")?.filter([]);
+                // oDestCB.getBinding("items")?.filter([]);
+ 
+                if (sCountry) {
+                    // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+ 
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+ 
+                        // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+ 
+                        if (sState) {
+                            // Filter Cities by State + Country
+                            const aFilters = [
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                            // oDestCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+ 
+                // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || "");
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+                // oDestCB.setValue(sDest || "");
+            },
 HQD_onCompanyCodeChange: function (oEvent) {
   utils._LCstrictValidationComboBox(oEvent);
     var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
