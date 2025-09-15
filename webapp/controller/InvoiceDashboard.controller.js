@@ -149,7 +149,7 @@ sap.ui.define([
         // --- HELPER to get INR value. Refactored to be reusable --
         _getInrValue: function (item) {
             let amount = 0;
-            if (item.Status === "Submitted" || item.Status === "Invoice Sent") {
+            if (item.Status === "Submitted" || item.Status === "Invoice Sent" ||item.Status === "Payment Received") {
                 amount = parseFloat(item.TotalAmount || 0);
             } else if (item.Status === "Payment Partially") {
                 amount = parseFloat(item.DueAmount || 0);
@@ -184,11 +184,11 @@ sap.ui.define([
         },
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
-            // Aggregation for charts that need currency conversion 
+            
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
                 if (isNaN(d.getTime())) return acc;
-                const month = d.getMonth(); // 0=Jan ... 11=Dec
+                const month = d.getMonth(); // 0 to 11
                 acc[month] = (acc[month] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
