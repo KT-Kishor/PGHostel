@@ -652,9 +652,9 @@ _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
         // });
 
         // Add toggle button if not already added
-     if (oVBox.getItems().length < 2) {
-            oVBox.addItem(oToggleBtn);
-        }
+    //  if (oVBox.getItems().length < 2) {
+    //         oVBox.addItem(oToggleBtn);
+    //     }
         
     } else {
         oHtml.setContent(sNormal);
