@@ -827,7 +827,8 @@ HQD_onCompanyCodeChange: function (oEvent) {
         const oData = oView.getModel("SingleCompanyModel").getData();
         const oQuotaionItem = oView.getModel("QuotationModel").getData();
         const aItems = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
-         let filter = {   companyCode: oData.CompanyCode}
+        let filter = {   companyCode: oData.CompanyCode}
+         try {
         const oCompanyDetailsModel = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
@@ -1036,6 +1037,10 @@ HQD_onCompanyCodeChange: function (oEvent) {
         }
         // Save PDF
         doc.save(`${oData.CustomerName}_Quotation.pdf`);
+      }catch (error) {
+          this.closeBusyDialog();
+          MessageToast.show(error.message || error.responseText);
+        }
       },
       HQD_onPressAddQuotationItem: function () {
         var oView = this.getView();

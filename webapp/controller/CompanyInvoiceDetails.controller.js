@@ -1412,10 +1412,10 @@ sap.ui.define([
                 const oCompanyInvoiceItemModel = oView.getModel("CompanyInvoiceItemModel").getData();
                 const oCompanyItemModel = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 const type = this.getView().byId("CID_id_Type").getText();
-                // const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
                 let filter = {
                     companyCode: oModel.CompanyCode
                 }
+                try {
                 const oCompanyDetailsModel = await that.ajaxReadWithJQuery("CompanyCodeDetails", filter);
 
                 const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].transparentComplogo?.data)], { type: "image/png" });
@@ -1727,8 +1727,11 @@ sap.ui.define([
                 }
 
                 doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
+             } catch (error) {
+                   that.closeBusyDialog();
+                   MessageToast.show(error.message || error.responseText);
+                }
             },
-
 
             addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
                 const footerHeight = 18;
