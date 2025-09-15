@@ -108,15 +108,60 @@ sap.ui.define([
                         function (oManageCustomerDialog) {
                             this.oManageCustomerDialog = oManageCustomerDialog;
                             this.getView().addDependent(this.oManageCustomerDialog);
+                            this._applyCountryStateCityFilters()
                             this.oManageCustomerDialog.open(); // Open the dialog
                         }.bind(this)
                     );
                 } else {
-                    this._resetDialogFields(bIsEdit); // Reset fields to original data
+                    this._resetDialogFields(bIsEdit);
+                    this._applyCountryStateCityFilters()
+                    // Reset fields to original data
                     this.oManageCustomerDialog.open(); // Open the dialog
                 }
             },
+            _applyCountryStateCityFilters: function () {
+                const oModel = this.getView().getModel("CustomerModel");
+                const oCountryCB = sap.ui.getCore().byId("MC_id_Country");
+                const oStateCB = sap.ui.getCore().byId("MC_id_State");
+                const oSourceCB = sap.ui.getCore().byId("MC_id_City");
 
+                const sCountry = oModel.getProperty("/country");     // e.g. "Australia"
+                const sState = oModel.getProperty("/state");       // e.g. "Queensland"
+                const sSource = oModel.getProperty("/cityName");      // e.g. "Bongaree"
+
+                // Reset all filters
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.getBinding("items")?.filter([]);
+
+                if (sCountry) {
+                    // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+
+                        // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+
+                        if (sState) {
+                            // Filter Cities by State + Country
+                            const aFilters = [
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+
+                // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || "");
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+            },
             _resetDialogFields: function (bIsEdit) {
                 // Clear all ValueStates
                 sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");

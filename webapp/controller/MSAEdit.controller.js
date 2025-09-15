@@ -35,7 +35,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
         secondMinDate: new Date(),
       });
       this.getView().setModel(editable, "simpleForm");
-
+       
       this.SimpleFormModel = this.getView().getModel("simpleForm");
       var oModelDataPro = new JSONModel();
       this.getView().setModel(oModelDataPro, "oModelDataPro");
@@ -342,16 +342,61 @@ MsaE_onEditOrSavePress: async function () {
                 type !== "Recruitment" ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0) : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
                 this.resetMsaDialogFields();
                 this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
+                this._applyCountryStateCityFilters()
             }.bind(this)
         );
     } else {
         this.MSA_oDialog.open();
+                this._applyCountryStateCityFilters()
+
         type !== "Recruitment" ? sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(0) : sap.ui.getCore().byId("MsaE_id_Type").setSelectedIndex(1);
         this.resetMsaDialogFields();
         this._FragmentDatePickersReadOnly(["MsaE_id_CreateMSADate"]);
     }
 },
-
+_applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("FilteredMsaModel");
+                const oCountryCB = sap.ui.getCore().byId("MSA_Nav_Id_Country");
+                const oStateCB   = sap.ui.getCore().byId("MSA_Nav_Id_State");
+                const oSourceCB  = sap.ui.getCore().byId("MSA_Nav_Id_City");
+ 
+                const sCountry   = oModel.getProperty("/0/Country");     // e.g. "Australia"
+                const sState     = oModel.getProperty("/0/State");       // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/0/City");      // e.g. "Bongaree"
+ 
+                // Reset all filters
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.getBinding("items")?.filter([]);
+ 
+                if (sCountry) {
+                    // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+ 
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+ 
+                        // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+ 
+                        if (sState) {
+                            // Filter Cities by State + Country
+                            const aFilters = [
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+ 
+                // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || "");
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+            },
 
     resetMsaDialogFields: function () {
       var oView = sap.ui.getCore();

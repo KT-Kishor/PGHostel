@@ -66,14 +66,56 @@ sap.ui.define([
                 sap.m.MessageToast.show("Failed to load application details.");
             }
         },
-
+_applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("setDataToForm");
+                const oCountryCB = this.byId("AC_Id_Country");
+                const oStateCB   = this.byId("AN_Id_State");
+                const oSourceCB  = this.byId("AN_Id_City");
+ 
+                const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
+                const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/City");      // e.g. "Bongaree"
+ 
+                // Reset all filters
+                oStateCB.getBinding("items")?.filter([]);
+                oSourceCB.getBinding("items")?.filter([]);
+ 
+                if (sCountry) {
+                    // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+ 
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+ 
+                        // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+ 
+                        if (sState) {
+                            // Filter Cities by State + Country
+                            const aFilters = [
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+ 
+                // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || "");
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+            },
         ACD_onEditPress: async function() {
             const oViewModel = this.getView().getModel("viewModel");
             const bIsEditMode = oViewModel.getProperty("/isEditMode");
             const oUploadModel = this.getView().getModel("UploadModel");
-
+                 
             const oPayload = {};
-
+             this._applyCountryStateCityFilters()
             if (oUploadModel) {
                 const uploadData = oUploadModel.getData();
                 oPayload.ResumeFile = uploadData.File || "";

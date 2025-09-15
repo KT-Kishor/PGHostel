@@ -35,11 +35,11 @@
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 				<Label text="State" />
-				<ComboBox items="{path: 'StateModel>/', length: 1000}" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" value="{setDataToForm>/State}" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}" change="">
+				<ComboBox items="{path: 'StateModel>/', length: 1000}" change="AC_onChangeState" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" value="{setDataToForm>/State}" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}" >
 					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 				</ComboBox>
 				<Label text="{i18n>city}" />
-				<ComboBox items="{path:'CityModel>/',length:1000}" editable="{viewModel>/isEditMode}" id="AN_Id_City" showSecondaryValues="true" value="{setDataToForm>/City}" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}" change="">
+				<ComboBox items="{path:'CityModel>/',length:1000}" change="AC_onChangeCity" editable="{viewModel>/isEditMode}" id="AN_Id_City" showSecondaryValues="true" value="{setDataToForm>/City}" selectedKey="{setDataToForm>/City}" valueStateText="{i18n>combovalueState}" >
 					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" />
 				</ComboBox>
 				<Label text="{i18n>address}" />
