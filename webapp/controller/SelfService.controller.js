@@ -2575,8 +2575,23 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         }
         this.SSRTE_oDialog.close();
         var oModel = this.getView().getModel("PDFData").getData();
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode });
-        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+         // --- Company Details Fetch ---
+        let filter = {
+            companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode 
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oCompanyDetailsModel = apiResponse.data[0];
+        if (!oCompanyDetailsModel) {
+            this.closeBusyDialog();
+            return;
+        }
         if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64) {
           try {
             const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
@@ -2644,11 +2659,24 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
 
     FSA_onPressSubmit: async function () {
       try {
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-          companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode,
-        });
+         // --- Company Details Fetch ---
+        let filter = {
+            companyCode: this.getView().getModel("sEmployeeModel").getData()[0].CompanyCode,
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oComapnyModel = apiResponse.data[0];
+        if (!oComapnyModel) {
+            this.closeBusyDialog();
+            return;
+        }
 
-        var oComapnyModel = this.getView().getModel("CompanyCodeDetailsModel").getData()[0];
         var coImg = await this._convertBLOBToImage(new Blob([new Uint8Array(oComapnyModel.companylogo?.data)], { type: "image/png" }));
 
         const oEmpModel = this.getView().getModel("sEmployeeModel").getData();
@@ -2850,9 +2878,23 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
       const { jsPDF } = window.jspdf;
       this.getBusyDialog(); // open BusyDialog immediately
       try {
-        await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode: employeeDetails.CompanyCode });
-        var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-
+         // --- Company Details Fetch ---
+        let filter = {
+           companyCode: employeeDetails.CompanyCode
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oCompanyDetailsModel = apiResponse.data[0];
+        if (!oCompanyDetailsModel) {
+            this.closeBusyDialog();
+            return;
+        }
         const compLogoBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.transparentComplogo?.data);
         const templateBase64 = this._convertBLOBtoBASE64(oCompanyDetailsModel.idCardTemplate?.data);
         const address = oCompanyDetailsModel.shortAddress;

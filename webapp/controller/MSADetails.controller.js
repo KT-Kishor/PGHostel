@@ -403,53 +403,52 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       }
     },
     async MsaE_onPressMerge() {
-      this.getBusyDialog();
-      var oModel = this.getView().getModel("msaModelWizart").getData();
-      var msa = "MSA",
-        nda = "NDA";
-      if (oModel.Type === "Recruitment") {
-        msa = "R-MSA";
-        nda = "R-NDA";
-      }
-      await this._fetchCommonData("PDFCondition", "PDFNDAModel", {
-        Type: nda,
-      });
-      await this._fetchCommonData("PDFCondition", "PDFMSAModel", {
-        Type: msa,
-      });
-      var oPDFModel = this.getView().getModel("PDFData");
-      oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
-      oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
-      oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
-      oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
-      oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
-      oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
-      oPDFModel.setProperty("/ClientCountry", oModel.Country);
-      oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
-      oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
-      oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);
-      oPDFModel.setProperty("/FirstHalfPerc", oModel.PaymentAdvance);
-      oPDFModel.setProperty("/SecondHalfPerc", oModel.PaymentBalance);
-      oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
-      oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
-      // var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
-
-      let filter = {
-        companyCode: oModel.CompanyCode,
-      };
-      const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
-      if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
-        this.closeBusyDialog();
-        return;
-      }
-
-      const oCompanyDetailsModel = apiResponse.data[0];
-
-      if (!oCompanyDetailsModel) {
-        this.closeBusyDialog();
-        return;
-      }
-
+        this.getBusyDialog();
+        var oModel = this.getView().getModel("msaModelWizart").getData();
+        var msa = "MSA",
+            nda = "NDA";
+        if (oModel.Type === "Recruitment") {
+            msa = "R-MSA";
+            nda = "R-NDA";
+        }
+        await this._fetchCommonData("PDFCondition", "PDFNDAModel", {
+            Type: nda,
+        });
+        await this._fetchCommonData("PDFCondition", "PDFMSAModel", {
+            Type: msa,
+        });
+        var oPDFModel = this.getView().getModel("PDFData");
+        oPDFModel.setProperty("/AgreementDate", Formatter.formatDate(oModel.CreateMSADate));
+        oPDFModel.setProperty("/AgreementEndDate", Formatter.formatDate(oModel.MsaContractPeriodEndDate));
+        oPDFModel.setProperty("/ClientCompanyName", oModel.CompanyName);
+        oPDFModel.setProperty("/ClientCompanyAddress", oModel.Address);
+        oPDFModel.setProperty("/ClientName", oModel.Salutation + " " + oModel.CompanyHeadName);
+        oPDFModel.setProperty("/ClientRole", oModel.CompanyHeadPosition);
+        oPDFModel.setProperty("/ClientCountry", oModel.Country);
+        oPDFModel.setProperty("/AgreementDuration", oModel.ContractPeriod);
+        oPDFModel.setProperty("/PaymentTerms", oModel.PaymentTerms);
+        oPDFModel.setProperty("/PaymentPerc", oModel.RateCharge);
+        oPDFModel.setProperty("/FirstHalfPerc", oModel.PaymentAdvance);
+        oPDFModel.setProperty("/SecondHalfPerc", oModel.PaymentBalance);
+        oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
+        oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
+        // --- Company Details Fetch ---
+        let filter = {
+            companyCode: oModel.CompanyCode
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oCompanyDetailsModel = apiResponse.data[0];
+        if (!oCompanyDetailsModel) {
+            this.closeBusyDialog();
+            return;
+        }
       var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
       var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();
       if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {

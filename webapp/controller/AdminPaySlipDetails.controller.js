@@ -325,8 +325,16 @@ sap.ui.define([
 
             APD_onPressGeneratePdf: async function () {
                 this.getBusyDialog();
-                await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", { companyCode : this.oModel.getProperty("/EmpData").CompanyCode });
-                var oCompanyDetailsModel = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
+                 let filter = { companyCode : this.oModel.getProperty("/EmpData").CompanyCode };
+                    let apiResponse;
+                    try {
+                        apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                    } catch (err) {
+                        sap.m.MessageToast.show(err.message || err.responseText);
+                        this.closeBusyDialog();
+                        return;
+                    }
+                const oCompanyDetailsModel = apiResponse.data[0];
                 if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.backgroundLogoBase64) {
                     try {
                         const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
@@ -339,7 +347,7 @@ sap.ui.define([
                         oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
                     } catch (err) {
                         this.closeBusyDialog();
-                        console.error(err);
+                        sap.m.MessageToast.show(err.message || err.responseText);
                         MessageBox.error(this.i18nModel.getText("errorGeneratingPdf"));
                     }
                 }

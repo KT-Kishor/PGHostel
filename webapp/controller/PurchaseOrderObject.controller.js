@@ -787,15 +787,23 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       oPDFModel.setProperty("/POAmountInWords", amountInWords);
       var htmlContent = oPOModel.Notes;
       this.getBusyDialog();
-      // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel", {
-      //   companyCode: oPOModel.companyCode,
-      // });
-     var Data = this.getOwnerComponent().getModel("CompanyCodeDetailsModel").getData();
-     var PoData=Data.find((item) => {
-      return item.companyCode ===  oPOModel.companyCode
-    
-    })
-      var oCompanyDetailsModel =PoData;
+       // --- Company Details Fetch ---
+        let filter = {
+            companyCode: oPOModel.companyCode
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oCompanyDetailsModel = apiResponse.data[0];
+        if (!oCompanyDetailsModel) {
+            this.closeBusyDialog();
+            return;
+        }
       if (!oCompanyDetailsModel.companylogo64 && !oCompanyDetailsModel.signature64 && !oCompanyDetailsModel.backgroundLogoBase64 && !oCompanyDetailsModel.emailLogoBase64) {
         try {
           const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], {

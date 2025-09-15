@@ -1151,21 +1151,23 @@ _applyCountryStateCityFilters: function () {
       oPDFModel.setProperty("/CandidateWorkingMonths", oModel.ReplacementMonth);
       oPDFModel.setProperty("/LatePaymentThreshold", oModel.ReplacementRefund);
 
-      let filter = {
-        companyCode: oModel.CompanyCode
-      };
-      const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
-      if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
-        this.closeBusyDialog();
-        return;
-      }
-
-      const oCompanyDetailsModel = apiResponse.data[0];
-
-      if (!oCompanyDetailsModel) {
-        this.closeBusyDialog();
-        return;
-      }
+       // --- Company Details Fetch ---
+        let filter = {
+            companyCode: oModel.CompanyCode
+        };
+        let apiResponse;
+        try {
+            apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+        } catch (err) {
+            MessageToast.show(err.message || err.responseText);
+            this.closeBusyDialog();
+            return;
+        }
+        const oCompanyDetailsModel = apiResponse.data[0];
+        if (!oCompanyDetailsModel) {
+            this.closeBusyDialog();
+            return;
+        }
 
       var oPDFNDAModel = this.getView().getModel("PDFNDAModel").getData();
       var oPDFMSAModel = this.getView().getModel("PDFMSAModel").getData();

@@ -1411,11 +1411,10 @@ sap.ui.define([
                 var data = this.getView().getModel("FilteredSOWModel").getData();
                 const oExpenseInvoiceItemModel = oView.getModel("ExpenseInvoiceItemModel").getData();
                 const oCompanyItemModel = oExpenseInvoiceItemModel.ExpenseInvoiceItem || [];
-                // const type = this.getView().byId("EID_id_Type").getText();
-                // const oCompanyDetailsModel = oView.getModel("CompanyCodeDetailsModel").getProperty("/0");
                  let filter = {
                     companyCode: oModel.CompanyCode
                 }
+                 try {
                 const oCompanyDetailsModel = await that.ajaxReadWithJQuery("CompanyCodeDetails", filter);
                const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].transparentComplogo?.data)], { type: "image/png" });
                 const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].signature?.data)], { type: "image/png" });
@@ -1702,8 +1701,11 @@ sap.ui.define([
                 }
 
                 doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
+             } catch (error) {
+                   that.closeBusyDialog();
+                   MessageToast.show(error.message || error.responseText);
+                }
             },
-
 
             addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
                 const compFooterAddress = oCompanyDetailsModel.longAddress || "";

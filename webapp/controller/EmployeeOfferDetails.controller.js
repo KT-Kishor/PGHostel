@@ -274,7 +274,7 @@ sap.ui.define([
                     });
                 } catch (error) {
                     this.closeBusyDialog();
-                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                     MessageToast.show(error.responseText);
                 }
             },
             //Read call
@@ -745,98 +745,114 @@ sap.ui.define([
                     }
                 };
 
-                var oEmpModel = oModel.getData();
-                await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
-                var oPDFModel = this.getView().getModel("PDFData");
-                oPDFModel.setProperty("/Type", "Employee Offer");
-                oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
-                oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
-                oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", " + oEmpModel.PinCode);
-                oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
-                oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
-                oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
+                try {
+                    var oEmpModel = oModel.getData();
+                    await this._fetchCommonData("PDFCondition", "PDFConditionModel", { Type: "EmployeeOffer" });
+                    var oPDFModel = this.getView().getModel("PDFData");
 
+                    // Employee details mapping
+                    oPDFModel.setProperty("/Type", "Employee Offer");
+                    oPDFModel.setProperty("/EmpName", oEmpModel.Salutation + " " + oEmpModel.ConsultantName);
+                    oPDFModel.setProperty("/EmpRole", oEmpModel.Designation);
+                    oPDFModel.setProperty("/EmpAddress", oEmpModel.ConsultantAddress + ", " + oEmpModel.PinCode);
+                    oPDFModel.setProperty("/CreateDate", Formatter.formatDate(oEmpModel.OfferReleaseDate));
+                    oPDFModel.setProperty("/JoiningDate", Formatter.formatDate(oEmpModel.JoiningDate));
+                    oPDFModel.setProperty("/EmpCTC", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.CostofCompany));
 
-                // Bond Condition
-                if (oEmpModel.EmploymentBond == "0" || !oEmpModel.EmploymentBond) {
-                    oPDFModel.setProperty("/BondCondition", "18 employment months");
-                    oPDFModel.setProperty("/BondCondition2", "");
-                } else {
-                    oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond year(s)");
-                    if (oEmpModel.EmploymentBond == "1") {
-                        oPDFModel.setProperty("/BondCondition2", "any training costs and during 18 employment months, ");
+                    // Bond Condition
+                    if (oEmpModel.EmploymentBond == "0" || !oEmpModel.EmploymentBond) {
+                        oPDFModel.setProperty("/BondCondition", "18 employment months");
+                        oPDFModel.setProperty("/BondCondition2", "");
                     } else {
-                        oPDFModel.setProperty("/BondCondition2", "any training costs and ");
+                        oPDFModel.setProperty("/BondCondition", oEmpModel.EmploymentBond + " employment bond year(s)");
+                        if (oEmpModel.EmploymentBond == "1") {
+                            oPDFModel.setProperty("/BondCondition2", "any training costs and during 18 employment months, ");
+                        } else {
+                            oPDFModel.setProperty("/BondCondition2", "any training costs and ");
+                        }
                     }
-                }
 
-                // Yearly Components
-                _setIfNotZero(oPDFModel, "/YearlyComponents/0/Text", oEmpModel.Total, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/YearlyComponents/1/Text", oEmpModel.BasicSalary, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/YearlyComponents/2/Text", oEmpModel.HRA, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/YearlyComponents/3/Text", oEmpModel.EmployerPF, oEmpModel.Currency); // Provident Fund (Employer)
-                _setIfNotZero(oPDFModel, "/YearlyComponents/4/Text", oEmpModel.MedicalInsurance, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/YearlyComponents/5/Text", oEmpModel.Gratuity, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/YearlyComponents/6/Text", oEmpModel.SpecailAllowance, oEmpModel.Currency);
-                // Deductions
-                _setIfNotZero(oPDFModel, "/Deductions/0/Text", oEmpModel.TotalDeduction, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/Deductions/1/Text", oEmpModel.IncomeTax, oEmpModel.Currency); // Income Tax (TDS)
-                _setIfNotZero(oPDFModel, "/Deductions/2/Text", oEmpModel.EmployeePF, oEmpModel.Currency); // Provident Fund (Employee)
-                _setIfNotZero(oPDFModel, "/Deductions/3/Text", oEmpModel.PT, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/VariableComponents/0/Text", oEmpModel.VariablePay, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/GrossPay/0/Text", oEmpModel.GrossPay, oEmpModel.Currency);
-                _setIfNotZero(oPDFModel, "/GrossPay/1/Text", oEmpModel.GrossPayMontly, oEmpModel.Currency);
-                if (oEmpModel.JoiningBonus == "0") {
-                    oPDFModel.setProperty("/Notes/0/Text", "0");
-                }
-                else {
-                    oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
-                }
+                    // Yearly Components / Deductions / Variable / GrossPay
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/0/Text", oEmpModel.Total, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/1/Text", oEmpModel.BasicSalary, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/2/Text", oEmpModel.HRA, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/3/Text", oEmpModel.EmployerPF, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/4/Text", oEmpModel.MedicalInsurance, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/5/Text", oEmpModel.Gratuity, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/YearlyComponents/6/Text", oEmpModel.SpecailAllowance, oEmpModel.Currency);
 
-                 let filter = {companyCode: oEmpModel.CompanyCode,};
-                const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
-                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
-                    this.closeBusyDialog();
-                    return;
-                }
-                const oCompanyDetailsModel = apiResponse.data[0];
-                if (!oCompanyDetailsModel) {
-                    this.closeBusyDialog();
-                    return;
-                }
-                oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
-                oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
-                var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                if (!oCompanyDetailsModel.companylogo64 &&
-                    !oCompanyDetailsModel.signature64 &&
-                    !oCompanyDetailsModel.backgroundLogoBase64 &&
-                    !oCompanyDetailsModel.emailLogoBase64) {
+                    _setIfNotZero(oPDFModel, "/Deductions/0/Text", oEmpModel.TotalDeduction, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/Deductions/1/Text", oEmpModel.IncomeTax, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/Deductions/2/Text", oEmpModel.EmployeePF, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/Deductions/3/Text", oEmpModel.PT, oEmpModel.Currency);
 
+                    _setIfNotZero(oPDFModel, "/VariableComponents/0/Text", oEmpModel.VariablePay, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/GrossPay/0/Text", oEmpModel.GrossPay, oEmpModel.Currency);
+                    _setIfNotZero(oPDFModel, "/GrossPay/1/Text", oEmpModel.GrossPayMontly, oEmpModel.Currency);
+
+                    if (oEmpModel.JoiningBonus == "0") {
+                        oPDFModel.setProperty("/Notes/0/Text", "0");
+                    } else {
+                        oPDFModel.setProperty("/Notes/0/Text", oEmpModel.Currency + " " + Formatter.fromatNumber(oEmpModel.JoiningBonus));
+                    }
+
+                    // --- Company Details Fetch ---
+                    let filter = { companyCode: oEmpModel.CompanyCode };
+                    let apiResponse;
                     try {
-                        const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
-                        const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
-                        const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
-                        const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
-
-                        const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
-                            this._convertBLOBToImage(logoBlob),
-                            this._convertBLOBToImage(signBlob),
-                            this._convertBLOBToImage(backgroundBlob),
-                            this._convertBLOBToImage(emailBlob)
-                        ]);
-
-                        oCompanyDetailsModel.companylogo64 = logoBase64;
-                        oCompanyDetailsModel.signature64 = signBase64;
-                        oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
-                        oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                        apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
                     } catch (err) {
-                        console.error("Image compression failed:", err);
+                        MessageToast.show(err.message || err.responseText);
+                        this.closeBusyDialog();
+                        return;
                     }
-                }
-                if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
-                    if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
-                        jsPDF._GeneratePDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+
+                    const oCompanyDetailsModel = apiResponse.data[0];
+                    oPDFModel.setProperty("/Headers/0/Text", oCompanyDetailsModel.companyName);
+                    oPDFModel.setProperty("/Headers/1/Text", oCompanyDetailsModel.branch);
+
+                    var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
+
+                    // --- Images ---
+                    if (!oCompanyDetailsModel.companylogo64 &&
+                        !oCompanyDetailsModel.signature64 &&
+                        !oCompanyDetailsModel.backgroundLogoBase64 &&
+                        !oCompanyDetailsModel.emailLogoBase64) {
+
+                        try {
+                            const logoBlob = new Blob([new Uint8Array(oCompanyDetailsModel.companylogo?.data)], { type: "image/png" });
+                            const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.signature?.data)], { type: "image/png" });
+                            const backgroundBlob = new Blob([new Uint8Array(oCompanyDetailsModel.backgroundLogo?.data)], { type: "image/png" });
+                            const emailBlob = new Blob([new Uint8Array(oCompanyDetailsModel.emailLogo?.data)], { type: "image/png" });
+
+                            const [logoBase64, signBase64, backgroundBase64, emailBase64] = await Promise.all([
+                                this._convertBLOBToImage(logoBlob),
+                                this._convertBLOBToImage(signBlob),
+                                this._convertBLOBToImage(backgroundBlob),
+                                this._convertBLOBToImage(emailBlob)
+                            ]);
+
+                            oCompanyDetailsModel.companylogo64 = logoBase64;
+                            oCompanyDetailsModel.signature64 = signBase64;
+                            oCompanyDetailsModel.backgroundLogoBase64 = backgroundBase64;
+                            oCompanyDetailsModel.emailLogoBase64 = emailBase64;
+                        } catch (err) {
+                            console.error("Image compression failed:", err);
+                        }
                     }
+
+                    // --- PDF Generation ---
+                    if (oCompanyDetailsModel.companylogo64 && oCompanyDetailsModel.signature64) {
+                        if (typeof jsPDF !== "undefined" && typeof jsPDF._GeneratePDF === "function") {
+                            jsPDF._GeneratePDF(this, oPDFModel.getData(), oCompanyDetailsModel, oPDFConditionModel);
+                        }
+                    }
+
+                } catch (outerErr) {
+                    MessageToast.show(err.message || err.responseText);
+                    this.closeBusyDialog();
+                } finally {
+                    this.closeBusyDialog();
                 }
             },
             onSalutationChange: function (oEvent) {

@@ -1288,12 +1288,16 @@ sap.ui.define([
                 oPDFModel.setProperty("/AgreementDuration", oEmpModel.ContractPeriod);
                 oPDFModel.setProperty("/ExpensesClaim", oEmpModel.ExpensesClaim);
                 var oPDFConditionModel = this.getView().getModel("PDFConditionModel").getData();
-                let filter = {companyCode: oEmpModel.CompanyCode,};
-                const apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
-                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
-                    this.closeBusyDialog();
-                    return;
-                }
+                 // --- Company Details Fetch ---
+                    let filter = {companyCode: oEmpModel.CompanyCode};
+                    let apiResponse;
+                    try {
+                        apiResponse = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                    } catch (err) {
+                        MessageToast.show(err.message || err.responseText);
+                        this.closeBusyDialog();
+                        return;
+                    }
                 const oCompanyDetailsModel = apiResponse.data[0];
                 if (!oCompanyDetailsModel) {
                     this.closeBusyDialog();
