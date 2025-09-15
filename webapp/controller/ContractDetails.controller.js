@@ -785,8 +785,9 @@ sap.ui.define([
                         utils._LCstrictValidationComboBox(this.byId("CD_id_Country"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_State"), "ID") &&
                         utils._LCstrictValidationComboBox(this.byId("CD_id_ConLocation"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") &&
-                        this.CD_validateMobileNo(this.getView().byId("CD_id_Mobile"))
+                         this.CD_validateMobileNo(this.getView().byId("CD_id_Mobile")) &&
+                        utils._LCvalidateMandatoryField(this.byId("CD_id_codeModel"), "ID") 
+                       
                     ) {
                         var formattedText;
                         switch (this.RadioButton) {

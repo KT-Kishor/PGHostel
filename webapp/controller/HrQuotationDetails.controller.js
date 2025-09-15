@@ -21,8 +21,8 @@ sap.ui.define(
         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
         var oVisiModel = new JSONModel();
         this._fetchCommonData("ManageCustomer", "CreateCustomerModel");
-        this._fetchCommonData("Country", "CountryModel");
-        this._fetchCommonData("State", "StateModel");
+        // await this._fetchCommonData("Country", "CountryModel");
+        // await this._fetchCommonData("State", "StateModel");
 
         if (sQuotationNo === "new") {
           // Create new mode
@@ -81,9 +81,9 @@ sap.ui.define(
           oVisiModel.setData({ editable: true });
           this.getView().setModel(oVisiModel, "visiablityPlay");
           this.UnitAmount = true;
+          this._applyCountryStateCityFilters();
         } else {
           // Edit Mode
-         
           this._fetchCommonData("EmailContent", "CCMailModel", { Type: "Quotation", Action: "CC" });
           this.UnitAmount = true;
           var aQuotations = this.getView().getModel("QuotationPDFModel").getData();
@@ -183,48 +183,57 @@ sap.ui.define(
                 const oCountryCB = this.byId("HQD_id_Country");
                 const oStateCB   = this.byId("HRQstate");
                 const oSourceCB  = this.byId("HQD_id_BranchCode");
-                // const oDestCB    = this.byId("Exp_id_Destination");
- 
-                const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
+
+                 const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
                 const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
-                const sSource    = oModel.getProperty("/Branch");      // e.g. "Bongaree"
-                // const sDest      = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
- 
-                // Reset all filters
-                oStateCB.getBinding("items")?.filter([]);
-                oSourceCB.getBinding("items")?.filter([]);
-                // oDestCB.getBinding("items")?.filter([]);
- 
+                const sSource    = oModel.getProperty("/Branch");  // e.g. "Bongaree"
+
+                // Get bindings safely
+                const oStateBinding  = oStateCB?.getBinding("items");
+                const oSourceBinding = oSourceCB?.getBinding("items");
+
+                // Reset filters if bindings exist
+                if (oStateBinding) {
+                    oStateBinding.filter([]);
+                }
+                if (oSourceBinding) {
+                    oSourceBinding.filter([]);
+                }
+
                 if (sCountry) {
-                    // Find countryCode by name
-                    const aCountryData = this.getView().getModel("CountryModel").getData();
+                    const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
                     const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
- 
+
                     if (oCountryObj) {
-                        const sCountryCode = oCountryObj.code;
- 
-                        // Filter States by Country
-                        oStateCB.getBinding("items")?.filter([
-                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                        ]);
- 
-                        if (sState) {
-                            // Filter Cities by State + Country
-                            const aFilters = [
+                        const sCountryCode = oCountryObj.code; 
+
+                        // Filter States by CountryCode
+                        if (oStateBinding) {
+                            oStateBinding.filter([
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+
+                        // Filter Cities by State + CountryCode
+                        if (sState && oSourceBinding) {
+                            oSourceBinding.filter([
                                 new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
                                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                            ];
-                            oSourceCB.getBinding("items")?.filter(aFilters);
-                            // oDestCB.getBinding("items")?.filter(aFilters);
+                            ]);
                         }
                     }
                 }
- 
-                // Ensure values are set back in UI
-                oCountryCB.setValue(sCountry || "");
-                oStateCB.setValue(sState || "");
-                oSourceCB.setValue(sSource || "");
-                // oDestCB.setValue(sDest || "");
+
+                // Restore selection back in UI
+                if (oCountryCB) {
+                    oCountryCB.setSelectedKey(sCountry || "");
+                }
+                if (oStateCB) {
+                    oStateCB.setSelectedKey(sState || "");
+                }
+                if (oSourceCB) {
+                    oSourceCB.setSelectedKey(sSource || "");
+                }
             },
 HQD_onCompanyCodeChange: function (oEvent) {
   utils._LCstrictValidationComboBox(oEvent);
