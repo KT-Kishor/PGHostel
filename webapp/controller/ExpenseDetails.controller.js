@@ -81,6 +81,7 @@ sap.ui.define([
                     var oTokenModel = new JSONModel({ tokens: [] });
                     this.getView().setModel(oTokenModel, "tokenModel");
                     this.CountryAndCity();
+                    this._applyCountryStateCityFilters();
                     this.closeBusyDialog();
                 } catch (error) {
                     this.closeBusyDialog();
@@ -89,6 +90,48 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }
                 
+            },
+
+             _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("FilteredExpenseModel");
+                const oCountryCB = this.byId("Exp_id_Country");
+                const oStateCB   = this.byId("Exp_id_State");
+                const oSourceCB  = this.byId("Exp_id_Source");
+                const oDestCB    = this.byId("Exp_id_Destination");
+
+                const sCountry   = oModel.getProperty("/0/Country");     // e.g. "Australia"
+                const sState     = oModel.getProperty("/0/State");       // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/0/Source");      // e.g. "Bongaree"
+                const sDest      = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
+
+                oStateCB.getBinding("items")?.filter([]);  // Reset all filters
+                oSourceCB.getBinding("items")?.filter([]);
+                oDestCB.getBinding("items")?.filter([]);
+
+                if (sCountry) {
+                    const aCountryData = this.getView().getModel("CountryModel").getData();  // Find countryCode by name
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code;
+                        oStateCB.getBinding("items")?.filter([  // Filter States by Country
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+
+                        if (sState) {
+                            const aFilters = [  // Filter Cities by State + Country
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ];
+                            oSourceCB.getBinding("items")?.filter(aFilters);
+                            oDestCB.getBinding("items")?.filter(aFilters);
+                        }
+                    }
+                }
+
+                oCountryCB.setValue(sCountry || "");  // Ensure values are set back in UI
+                oStateCB.setValue(sState || "");
+                oSourceCB.setValue(sSource || "");
+                oDestCB.setValue(sDest || "");
             },
 
             onLogout: function () {
@@ -333,6 +376,7 @@ sap.ui.define([
             LC_ExpComments: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
+
             //Source Validation
             Exp_Det_SourceChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent, "oEvent");
@@ -382,7 +426,7 @@ sap.ui.define([
             },
 
             Exp_Det_StateChange: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oStateCB   = this.byId("Exp_id_State");
                 const oSourceCB  = this.byId("Exp_id_Source");
                 const oDestCB    = this.byId("Exp_id_Destination");

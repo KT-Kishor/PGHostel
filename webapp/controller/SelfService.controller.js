@@ -287,7 +287,6 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         });
     },
 
-
     _onRouteMatched: async function (oEvent) {
       try {
         var LoginFUnction = await this.commonLoginFunction("SelfService");
@@ -442,6 +441,7 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
             }
             this.managerID = this.getView().getModel("sEmployeeModel").getProperty("/0/ManagerID");
           }
+          this._applyCountryStateCityFilters();
         }
         var oTextModel = new JSONModel({ name: "" });
         this.getView().setModel(oTextModel, "TextDisplay");
@@ -468,8 +468,8 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         this.byId("SS_id_FatherName").setValueState("None");
         this.byId("SS_id_Compmail").setValueState("None");
       } catch (error) {
-        MessageBox.error("An error occurred while loading the page. Please try again.");
-      } finally {
+        MessageToast.show(error.message || error.responseText);
+     }  finally {
         this.closeBusyDialog();
       }
       this.oModel = this.getView().getModel("PaySlip");
@@ -477,6 +477,64 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
       this.getView().getModel("CompanyCodeDetailsModel").getData()
 
     },
+     _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("sEmployeeModel");
+                const oCountryCB = this.byId("SS_id_Country");
+                const oStateCB   = this.byId("SS_id_State");
+                const oSourceCB  = this.byId("SS_id_BaseL");
+
+                const sCountry   = oModel.getProperty("/0/Country");      // e.g. "Australia"
+                const sState     = oModel.getProperty("/0/State");        // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/0/BaseLocation"); // e.g. "Bongaree"
+
+                // Get bindings safely
+                const oStateBinding  = oStateCB?.getBinding("items");
+                const oSourceBinding = oSourceCB?.getBinding("items");
+
+                // Reset filters if bindings exist
+                if (oStateBinding) {
+                    oStateBinding.filter([]);
+                }
+                if (oSourceBinding) {
+                    oSourceBinding.filter([]);
+                }
+
+                if (sCountry) {
+                    const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code; 
+
+                        // Filter States by CountryCode
+                        if (oStateBinding) {
+                            oStateBinding.filter([
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+
+                        // Filter Cities by State + CountryCode
+                        if (sState && oSourceBinding) {
+                            oSourceBinding.filter([
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+                    }
+                }
+
+                // Restore selection back in UI
+                if (oCountryCB) {
+                    oCountryCB.setSelectedKey(sCountry || "");
+                }
+                if (oStateCB) {
+                    oStateCB.setSelectedKey(sState || "");
+                }
+                if (oSourceCB) {
+                    oSourceCB.setSelectedKey(sSource || "");
+                }
+            },
+
     _setHeaderButtonIcon: function (sType) {
       var oPage = this.byId("SelfService_id_page");
       if (!oPage) return;

@@ -119,6 +119,64 @@ sap.ui.define([
                 }
             },
 
+            _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("employeeModel");
+                const oCountryCB = this.byId("EOUF_id_Country");
+                const oStateCB   = this.byId("EOUF_id_State");
+                const oSourceCB  = this.byId("EOUF_id_Location");
+
+                const sCountry   = oModel.getProperty("/Country");      // e.g. "Australia"
+                const sState     = oModel.getProperty("/State");        // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/BaseLocation"); // e.g. "Bongaree"
+
+                // Get bindings safely
+                const oStateBinding  = oStateCB?.getBinding("items");
+                const oSourceBinding = oSourceCB?.getBinding("items");
+
+                // Reset filters if bindings exist
+                if (oStateBinding) {
+                    oStateBinding.filter([]);
+                }
+                if (oSourceBinding) {
+                    oSourceBinding.filter([]);
+                }
+
+                if (sCountry) {
+                    const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code; 
+
+                        // Filter States by CountryCode
+                        if (oStateBinding) {
+                            oStateBinding.filter([
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+
+                        // Filter Cities by State + CountryCode
+                        if (sState && oSourceBinding) {
+                            oSourceBinding.filter([
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+                    }
+                }
+
+                // Restore selection back in UI
+                if (oCountryCB) {
+                    oCountryCB.setSelectedKey(sCountry || "");
+                }
+                if (oStateCB) {
+                    oStateCB.setSelectedKey(sState || "");
+                }
+                if (oSourceCB) {
+                    oSourceCB.setSelectedKey(sSource || "");
+                }
+            },
+
             onLogout: function () {
                 this.CommonLogoutFunction();
             },
@@ -231,6 +289,7 @@ sap.ui.define([
                     if (index === 1) this.getView().getModel("viewModel").setProperty("/pfVisiblity", true);
                     else this.getView().getModel("viewModel").setProperty("/pfVisiblity", false);
                     this.getView().setModel(new JSONModel(offerData[0]), "employeeModel");
+                    this._applyCountryStateCityFilters();
                     var oViewModel = this.getView().getModel("viewModel");
                     this.byId("EOUF_id_Joindate").setMinDate(new Date(offerData[0].OfferReleaseDate));
                     this._TDSslabCall(offerData[0].CountryCode);

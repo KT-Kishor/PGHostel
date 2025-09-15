@@ -51,7 +51,7 @@
 										<m:Label text="{i18n>employeeID}"/>
 										<m:Input  value="{FilteredExpenseModel>/0/EmployeeID}" editable="false" />
 										<!-- Employee Name -->
-										<m:Label text="{i18n>expExpenseName}"/>
+										<m:Label text="{i18n>employeeName}"/>
 										<m:Input  value="{FilteredExpenseModel>/0/EmployeeName}" editable="false" />
 										<!-- Total Amount -->
 										<m:Label text="{i18n>totalAmount}"/>

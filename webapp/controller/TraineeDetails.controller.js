@@ -73,6 +73,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 var traineeData = aFilteredData[0];
                 this.byId("TU_id_JoinDate").setMinDate(new Date(traineeData.ReleaseDate));
                 this.getView().setModel(new JSONModel(traineeData), "oTraineeDetails");
+                this._applyCountryStateCityFilters();
                 // Handle visibility and edit button based on trainee status
                 if (traineeData.Status === "Onboarded" || traineeData.Status === "Training Completed") {
                     this.viewModel.setProperty("/isVisiable", false);
@@ -95,6 +96,64 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                 this.closeBusyDialog();
             }
         },
+        // Common function to handle Country state and City change during edit case
+         _applyCountryStateCityFilters: function () {
+                const oModel     = this.getView().getModel("oTraineeDetails");
+                const oCountryCB = this.byId("TU_Id_Country");
+                const oStateCB   = this.byId("TU_id_State");
+                const oSourceCB  = this.byId("TU_id_Location");
+
+                const sCountry   = oModel.getProperty("/Country");      // e.g. "Australia"
+                const sState     = oModel.getProperty("/State");        // e.g. "Queensland"
+                const sSource    = oModel.getProperty("/BaseLocation"); // e.g. "Bongaree"
+
+                // Get bindings safely
+                const oStateBinding  = oStateCB?.getBinding("items");
+                const oSourceBinding = oSourceCB?.getBinding("items");
+
+                // Reset filters if bindings exist
+                if (oStateBinding) {
+                    oStateBinding.filter([]);
+                }
+                if (oSourceBinding) {
+                    oSourceBinding.filter([]);
+                }
+
+                if (sCountry) {
+                    const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
+                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                    if (oCountryObj) {
+                        const sCountryCode = oCountryObj.code; 
+
+                        // Filter States by CountryCode
+                        if (oStateBinding) {
+                            oStateBinding.filter([
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+
+                        // Filter Cities by State + CountryCode
+                        if (sState && oSourceBinding) {
+                            oSourceBinding.filter([
+                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            ]);
+                        }
+                    }
+                }
+
+                // Restore selection back in UI
+                if (oCountryCB) {
+                    oCountryCB.setSelectedKey(sCountry || "");
+                }
+                if (oStateCB) {
+                    oStateCB.setSelectedKey(sState || "");
+                }
+                if (oSourceCB) {
+                    oSourceCB.setSelectedKey(sSource || "");
+                }
+            },
         //navigation to trainee view
         TUF_onPressback: function() {
             var oViewModel = this.getView().getModel("viewModel");
