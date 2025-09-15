@@ -158,12 +158,14 @@ sap.ui.define(
             }),
             "MonthlyBar"
           );
+           // Create a view model for controlling UI elements based on role
+          const amModel = new JSONModel({
+            isAdmin: this.Type === "Admin"
+          });
+          this.getView().setModel(amModel, "viewData");
 
-          // Filter bar visibility
-          const oFilterBar = this.byId("CO_id_compoff_EmpID");
-          if (oFilterBar) {
-            oFilterBar.setVisible(this.Type === "Admin");
-          }
+
+          
           await this._fetchCommonData("ListOfSateData", "HolidayModel", {
             branchCode: this.branch,
           });

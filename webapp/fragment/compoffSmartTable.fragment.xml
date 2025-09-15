@@ -14,12 +14,12 @@
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>
-			<Column demandPopin="true">
+			<Column demandPopin="true" visible="{viewData>/isAdmin}">
 				<Text text="Employee" />
 			</Column>
 			<Column demandPopin="true">
 				<Text text="{i18n>fromDate}" />
-			</Column>
+			</Column>	
 			<Column demandPopin="true">
 				<Text text="{i18n>toDate}" />
 			</Column>
@@ -39,7 +39,7 @@
 		<items>
 			<ColumnListItem>
 				<cells>
-					<VBox>
+					<VBox visible="{viewData>/isAdmin}">
 						<Text text="{LeaveModel>EmpID}" class="bold"/>
 						<Label text="{LeaveModel>EmpName}" wrapping="true"/>
 					</VBox>
