@@ -268,13 +268,13 @@ sap.ui.define([
                             this.getView().getModel("employeeModel").refresh(true);
                             // this.getView().getModel("CompanyCodeDetailsModel")?.refresh(true);
                         }
-                    }).catch((error) => {
+                    }).catch((err) => {
                         this.closeBusyDialog();
-                        MessageToast.show(error.responseText);
+                        MessageToast.show(err.message || err.responseText);
                     });
                 } catch (error) {
                     this.closeBusyDialog();
-                     MessageToast.show(error.responseText);
+                    MessageToast.show(err.message || err.responseText);
                 }
             },
             //Read call
