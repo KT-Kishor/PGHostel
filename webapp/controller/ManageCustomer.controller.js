@@ -127,7 +127,7 @@ sap.ui.define([
 
                 const sCountry = oModel.getProperty("/country");     // e.g. "Australia"
                 const sState = oModel.getProperty("/state");       // e.g. "Queensland"
-                const sSource = oModel.getProperty("/cityName");      // e.g. "Bongaree"
+                const sSource = oModel.getProperty("/baseLocation");      // e.g. "Bongaree"
 
                 // Reset all filters
                 oStateCB.getBinding("items")?.filter([]);
