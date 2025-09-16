@@ -2,6 +2,7 @@
 	controllerName="sap.kt.com.minihrsolution.controller.Invoice_Solution_Demo"
 	xmlns:mvc="sap.ui.core.mvc"
   xmlns:m="sap.m"
+  xmlns="sap.m"
    xmlns:core="sap.ui.core"
 	displayBlock="true"
        xmlns:g="sap.f"
@@ -10,16 +11,13 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
-<m:HBox
-        justifyContent="End"
-        class="sapUiLargeMarginEnd"
-    >
-        <m:Button
-            text="Request Demo"
-            press="onOpenForm"
-            class="demoBtn"
-        />
-    </m:HBox>
+	<Page >
+    <headerContent>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
     
     <!-- MSA & NDA -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
@@ -39,7 +37,7 @@
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
             <m:Title text="{i18n>headerMSA}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Text text="{i18n>MSA_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -48,7 +46,7 @@
         content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
-<!-- createSow -->
+<!-- Sow -->
     </g:GridContainer>
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
@@ -73,11 +71,11 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>tilesgeneratePo}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Title text="{i18n>createSow}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>SOW_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
-    <!-- GenerateQtn -->
+    <!-- Manage Customer -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -94,8 +92,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>createSow }" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>QUOTATION}" class="jioParagraph" />
+            <m:Title text="{i18n>headerCustomer}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>ManageCust_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -105,7 +103,7 @@
                 />
         </m:VBox>
     </g:GridContainer>
-    <!-- Company Invoice -->
+    <!-- Po -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -129,11 +127,11 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>GenerateQtn}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>MSA}" class="jioParagraph" />
+            <m:Title text="{i18n>tilesgeneratePo}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>PO_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
-    <!-- LEAVE -->
+    <!-- CompanyInvoice -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -150,8 +148,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
-            <m:Title text="{i18n>headerCustomer}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>BAT}" class="jioParagraph" />
+            <m:Title text="{i18n>headerCompanyInvoice}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>CompanyInv_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -161,7 +159,7 @@
                 />
         </m:VBox>
     </g:GridContainer>
-    <!-- Contracto Invoice -->
+    <!-- ContractorInvoice -->
    <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -185,11 +183,11 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>headerCompanyInvoice}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>MSA}" class="jioParagraph" />
+            <m:Title text="{i18n>headerContractorInvoice}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>ContractorInvoice_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
-   
+   <!-- Quotation -->
      <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -206,8 +204,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
-            <m:Title text="{i18n>headerContractorInvoice}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>BAT}" class="jioParagraph" />
+            <m:Title text="{i18n>headerQuotation}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>QTN_par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -217,7 +215,12 @@
                 />
         </m:VBox>
     </g:GridContainer>
- 
+      <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+ 	</Page >
    <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
         <l:content>
             <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>

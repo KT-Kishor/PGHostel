@@ -1,8 +1,9 @@
 <mvc:View
 	controllerName="sap.kt.com.minihrsolution.controller.AutoMobile_Demo"
 	xmlns:mvc="sap.ui.core.mvc"
-  xmlns:m="sap.m"
-   xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
 	displayBlock="true"
        xmlns:g="sap.f"
            xmlns:f="sap.ui.layout.form"
@@ -10,17 +11,13 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
-<m:HBox
-        justifyContent="End"
-        class="sapUiLargeMarginEnd"
-    >
-        <m:Button
-            text="Request Demo"
-            press="onOpenForm"
-            class="demoBtn"
-        />
-    </m:HBox>
-    
+	<Page >
+    <headerContent>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
     <!-- upload scheme -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
@@ -39,7 +36,7 @@
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
             <m:Title text="{i18n>uploadscheme}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Text text="{i18n>uploadscheme_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -74,11 +71,15 @@
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
             <m:Title text="{i18n>createquotation}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Text text="{i18n>createquotation_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
-   
- 
+     <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+  </Page>
    <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
         <l:content>
             <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>

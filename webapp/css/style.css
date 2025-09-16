@@ -1990,3 +1990,14 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-weight: bold ;
 }
 
+.demoBtn{
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+  cursor: pointer;
+  z-index: 1000;
+ 
+  height: 40px;
+  width: 160px;
+  padding: 0;
+}

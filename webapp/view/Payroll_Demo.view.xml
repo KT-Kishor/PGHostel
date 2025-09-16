@@ -2,6 +2,7 @@
 	controllerName="sap.kt.com.minihrsolution.controller.Payroll_Demo"
 	xmlns:mvc="sap.ui.core.mvc"
   xmlns:m="sap.m"
+    xmlns="sap.m"
    xmlns:core="sap.ui.core"
 	displayBlock="true"
        xmlns:g="sap.f"
@@ -10,17 +11,13 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
-<m:HBox
-        justifyContent="End"
-        class="sapUiLargeMarginEnd"
-    >
-        <m:Button
-            text="Request Demo"
-            press="onOpenForm"
-            class="demoBtn"
-        />
-    </m:HBox>
-    
+	<Page >
+    	<headerContent>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
     <!-- Generate salary -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
@@ -38,8 +35,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
-            <m:Title text="{i18n>generatesalary}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Title text="{i18n>JobPosting}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>JobPosting_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -73,8 +70,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>HeaderPaySlip}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>EMPLOYEE}" class="jioParagraph" />
+            <m:Title text="{i18n>Applyjob}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Applyjob_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
     <!-- offer Letter -->
@@ -94,8 +91,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>headerofferletter}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>QUOTATION}" class="jioParagraph" />
+            <m:Title text="{i18n>Interviews}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Interviews_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
@@ -129,68 +126,17 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>headerSelfService}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>MSA}" class="jioParagraph" />
+            <m:Title text="{i18n>Backgroundver}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Backgroundver_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
     <!-- Employee Details -->
-    <g:GridContainer class="jioSection sapUiSmallMarginTop">
-        <g:layout>
-            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
-        </g:layout>
-        <g:layoutXS>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutXS>
-        <g:layoutS>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutS>
-        <g:layoutM>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutM>
-
-        <!-- Left Column -->
-        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
-            <m:Title text="{i18n>headerEmpDetails}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>BAT}" class="jioParagraph" />
-        </m:VBox>
-
-        <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox5" justifyContent="Center" class="sapUiMediumMarginTop">
-           <core:HTML id="videoFrameHtml5"
-                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
-                />
-        </m:VBox>
-    </g:GridContainer>
-    <!-- Manage Payroll -->
-   <g:GridContainer class="jioSection sapUiSmallMarginTop">
-        <g:layout>
-            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
-        </g:layout>
-        <g:layoutXS>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutXS>
-        <g:layoutS>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutS>
-        <g:layoutM>
-            <g:GridContainerSettings columnSize="100%" gap="10px" />
-        </g:layoutM>
-
-        <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox7" justifyContent="Center" class="sapUiMediumMarginTop">
-             <core:HTML id="videoFrameHtml7"
-                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
-                />
-        </m:VBox>
-
-        <!-- Left Column -->
-        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
-            <m:Title text="{i18n>headerManagePayroll}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>MSA}" class="jioParagraph" />
-        </m:VBox>
-    </g:GridContainer>
-   
- 
+     <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+ </Page>
  
    <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
         <l:content>

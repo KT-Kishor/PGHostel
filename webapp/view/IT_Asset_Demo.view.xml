@@ -2,6 +2,7 @@
 	controllerName="sap.kt.com.minihrsolution.controller.IT_Asset_Demo"
 	xmlns:mvc="sap.ui.core.mvc"
   xmlns:m="sap.m"
+   xmlns="sap.m"
    xmlns:core="sap.ui.core"
 	displayBlock="true"
        xmlns:g="sap.f"
@@ -10,17 +11,13 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
-<m:HBox
-        justifyContent="End"
-        class="sapUiLargeMarginEnd"
-    >
-        <m:Button
-            text="Request Demo"
-            press="onOpenForm"
-            class="demoBtn"
-        />
-    </m:HBox>
-    
+<Page >
+       <headerContent>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
     <!-- Company Asset -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
@@ -77,8 +74,12 @@
             <m:Text text="{i18n>AssetAssignment_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
-   
- 
+     <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+ </Page>
    <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
         <l:content>
             <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>
