@@ -1,0 +1,397 @@
+<mvc:View
+	controllerName="sap.kt.com.minihrsolution.controller.HRSolutions_Demo"
+	xmlns:mvc="sap.ui.core.mvc"
+  xmlns:m="sap.m"
+   xmlns:core="sap.ui.core"
+	displayBlock="true"
+       xmlns:g="sap.f"
+           xmlns:f="sap.ui.layout.form"
+             xmlns:l="sap.ui.layout"
+	height="100%"
+	busyIndicatorDelay="0"
+>
+<m:HBox
+        justifyContent="End"
+        class="sapUiLargeMarginEnd"
+    >
+        <m:Button
+            text="Request Demo"
+            press="onOpenForm"
+            class="demoBtn"
+        />
+    </m:HBox>
+    
+    <!-- Trainee -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>headerTrainee}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Trainee_Par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox id="videoBox1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml1"
+        content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
+
+</m:VBox>
+<!-- EmployeeOffer -->
+    </g:GridContainer>
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox2" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML id="videoFrameHtml2"
+                    content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerEmployeeOffer}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>employee_Par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- QUOTATION -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerContractDetails}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Contract_Par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox3" justifyContent="Center" class="sapUiMediumMarginTop">
+              <core:HTML id="videoFrameHtml3"
+                     content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- MSA -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox4" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml4"
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerListOfHolidays}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Listholiday_Par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- LEAVE -->
+    <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>headerLeave}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Leave_Par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox5" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml5"
+                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- Create Expense -->
+   <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox7" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml7"
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerExpense}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Expanse_par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+   
+   <!-- My Inbox -->
+   <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>headerInbox}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>MyInbox_par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox8" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml8"
+                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+<!-- Manage Assignment -->
+ <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox9" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml9"
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerAssignTask}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>ManageAssig_Par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+    <!-- My Timesheet -->
+  <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>headerTimesheet}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Mytimesheet_Par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox10" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml10"
+                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+<!-- Timesheet Approval -->
+     <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox11" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml11"
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerTimesheetApproval}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>TimeSheet_Par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+<!-- Generate Payslip -->
+      <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>HeaderPaySlip}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Payslip_Par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox12" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml12"
+                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+<!-- Self Service -->
+     <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox13" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml13"
+                    content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+            <m:Title text="{i18n>headerSelfService}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Self_par}" class="jioParagraph" />
+        </m:VBox>
+    </g:GridContainer>
+<!-- Employee Details -->
+      <g:GridContainer class="jioSection sapUiSmallMarginTop">
+        <g:layout>
+            <g:GridContainerSettings columnSize="49.5%" gap="10px" />
+        </g:layout>
+        <g:layoutXS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutXS>
+        <g:layoutS>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutS>
+        <g:layoutM>
+            <g:GridContainerSettings columnSize="100%" gap="10px" />
+        </g:layoutM>
+
+        <!-- Left Column -->
+        <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
+            <m:Title text="{i18n>headerEmpDetails}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>EmployeeDet_par}" class="jioParagraph" />
+        </m:VBox>
+
+        <!-- Right Column -->
+        <m:VBox alignItems="Center" id="videoBox14" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml14"
+                   content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                />
+        </m:VBox>
+    </g:GridContainer>
+
+   <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">
+        <l:content>
+            <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>
+         </l:content>
+     </l:Grid> -->
+   
+       
+</mvc:View>
