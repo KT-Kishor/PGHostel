@@ -12,7 +12,7 @@
             <Table
             sticky="ColumnHeaders"
                 items="{dialogData>/invoices}"
-                noDataText="{i18n>noPendingData}">
+                noDataText="{i18n>nomonthlydata}">
                 <columns>
                     <Column><Text text="{i18n>invoiceNo}" /></Column>
                     <Column><Text text="{i18n>invoiceDate}" /></Column>

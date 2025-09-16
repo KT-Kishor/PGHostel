@@ -10,6 +10,7 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
+<m:ScrollContainer horizontal="false" vertical="true" height="100%">
 <m:HBox
         justifyContent="End"
         class="sapUiLargeMarginEnd"
@@ -392,6 +393,6 @@
             <m:Carousel id="videoCarousel" showPageIndicator="false" loop="true" class="allvideo"/>
          </l:content>
      </l:Grid> -->
-   
+   </m:ScrollContainer>
        
 </mvc:View>

@@ -660,6 +660,9 @@ _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
         oHtml.setContent(sNormal);
     }
 },
+onHRSolutionPress:function(){
+   this.getRouter().navTo("HRSolutions_Demo");
+}
 
 
 

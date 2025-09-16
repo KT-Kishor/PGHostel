@@ -743,6 +743,11 @@
                    "name": "MaintainData",
                    "pattern": "MaintainData",
                    "target": ["TargetMaintainData"]
+                 },
+                    {
+                   "name": "HRSolutions_Demo",
+                   "pattern": "HRSolutions_Demo",
+                   "target": ["TargetHRSolution"]
                  }
             ],
             "targets": {
@@ -1153,7 +1158,16 @@
                 "viewId": "MaintainData",
                 "viewName": "MaintainData"
           
+        }, 
+        "TargetHRSolution":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "HRSolutions_Demo",
+                "viewName": "HRSolutions_Demo"
+          
         }
+    
             }
         },
         "rootView": {

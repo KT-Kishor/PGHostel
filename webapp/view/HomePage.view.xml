@@ -126,6 +126,7 @@
 					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 					</ScrollContainer>
+					
 					<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin">
 					<!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/> -->
 					<mvc:XMLView viewName="sap.kt.com.minihrsolution.view.HRSolutions_Demo"/>
@@ -135,6 +136,7 @@
 					<!-- <mvc:XMLView viewName="sap.kt.com.minihrsolution.view.Payroll_Demo"/> -->
 						<!-- <mvc:XMLView viewName="sap.kt.com.minihrsolution.view.IT_Asset_Demo"/> -->
                    </Page>
+				  
 					<ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Training" type="XML"/>
 					</ScrollContainer>
