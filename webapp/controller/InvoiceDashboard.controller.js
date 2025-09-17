@@ -595,57 +595,37 @@ sap.ui.define([
         },
 
 
-       onYearlyInvoiceSelect: function (oEvent) {
+     onYearlyInvoiceSelect: function (oEvent) {
     const aData = oEvent.getParameter("data");
     if (!aData || !aData[0] || !aData[0].data) return;
 
     const oSelectedData = aData[0].data;
     const sYearRaw = oSelectedData.Year || oSelectedData.year;
     const iYear = parseInt(String(sYearRaw), 10);
+
     if (isNaN(iYear)) {
         MessageToast.show(this.i18nModel.getText("noDataForSelectedYear"));
         return;
     }
 
-    // Determine Fiscal Year Label and Start Year
-    // If user clicks 2024, show FY 2023-2024 (Apr 2023 – Mar 2024)
-    const fyStartYear = (oSelectedData.year == 2023) ? 2023 : iYear - 1;
-    const fyLabel = `${fyStartYear}-${fyStartYear + 1}`;
+    // Determine FY from clicked year
+      const fyStartYear = iYear;
+    const fyEndYear = fyStartYear + 1;
+    const fyLabel = `${fyStartYear}-${fyEndYear}`;
 
-    // Gather full possible invoice set
     const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
 
-    // Partition invoices for this FY into:
-    //  - fyStartYear: Apr-Dec
-    //  - fyStartYear + 1: Jan-Mar
-    let aInvoices2023Part = [];
-    let aInvoices2024Part = [];
-    if (aAllInvoices && aAllInvoices.length > 0) {
-        // Invoices from Apr 1 to Dec 31 of starting year
-        aInvoices2023Part = aAllInvoices.filter(inv => {
-            if (!inv || !inv.InvoiceDate) return false;
-            const dInv = new Date(inv.InvoiceDate);
-            // 2023, months 3 (April) to 11 (December)
-            return (
-                dInv.getFullYear() === fyStartYear &&
-                dInv >= new Date(fyStartYear, 3, 1) && // April 1
-                dInv <= new Date(fyStartYear, 11, 31, 23, 59, 59) // December 31
-            );
-        });
-        // Invoices from Jan 1 to Mar 31 of next year
-        aInvoices2024Part = aAllInvoices.filter(inv => {
-            if (!inv || !inv.InvoiceDate) return false;
-            const dInv = new Date(inv.InvoiceDate);
-            // 2024, months 0 (Jan) to 2 (March)
-            return (
-                dInv.getFullYear() === fyStartYear + 1 &&
-                dInv >= new Date(fyStartYear + 1, 0, 1) && // Jan 1
-                dInv <= new Date(fyStartYear + 1, 2, 31, 23, 59, 59) // March 31
-            );
-        });
-    }
-    // Merge result to get full FY span
-    let aInvoices = [...aInvoices2023Part, ...aInvoices2024Part];
+    // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
+    const aInvoices = aAllInvoices.filter(inv => {
+        if (!inv || !inv.InvoiceDate) return false; 
+        const dInv = new Date(inv.InvoiceDate);
+        if (isNaN(dInv.getTime())) return false;
+
+        const fyStartDate = new Date(fyStartYear, 3, 1);  // Apr 1 of selected year
+        const fyEndDate = new Date(fyEndYear, 2, 31, 23, 59, 59); // Mar 31 of next year with time
+
+        return dInv >= fyStartDate && dInv <= fyEndDate;
+    });
 
     // Attach numeric INR value
     aInvoices.forEach(inv => {
@@ -671,7 +651,7 @@ sap.ui.define([
 
     this.pYearlyInvoicesDialog.then(oDialog => {
         oDialog.setModel(new JSONModel({
-            year: fyLabel,       // Show "2023-2024"
+            year: fyLabel,  
             invoices: aInvoices,
             totalValue: totalValue
         }), "dialogData");
@@ -680,6 +660,7 @@ sap.ui.define([
         oDialog.open();
     });
 }
+
 
 
 
