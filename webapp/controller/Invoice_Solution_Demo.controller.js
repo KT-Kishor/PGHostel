@@ -121,5 +121,32 @@ BaseController, utils, JSONModel, MessageToast, Formatter
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
+              onAfterRendering: function () {
+ this._applyResponsiveVideo("videoBox11", "videoFrameHtml1", "../Videos/MSA and SOW Application.mp4");
+ this._applyResponsiveVideo("videoBox21", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
+ this._applyResponsiveVideo("videoBox31", "videoFrameHtml3", "../Videos/Contract Offer Application.mp4");
+ this._applyResponsiveVideo("videoBox41", "videoFrameHtml4", "../Videos/Company Invoice.mp4");
+ this._applyResponsiveVideo("videoBox51", "videoFrameHtml5", "../Videos/Contractor Invoice Application.mp4");
+ this._applyResponsiveVideo("videoBox61", "videoFrameHtml6", "../Videos/Quotation Application.mp4");
+
+},
+_applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
+
+    var iWidth = window.innerWidth;
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+
+    var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+    var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+
+    if (bResponsive) {
+        oHtml.setContent(sMobile);
+
+    } else {
+        oHtml.setContent(sNormal);
+    }
+},
 	});
 });

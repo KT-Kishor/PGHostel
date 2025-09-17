@@ -42,8 +42,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml1"
+        <m:VBox id="videoBox11" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml11"
         content="&lt;iframe src='../Videos/MSA and SOW Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
@@ -64,8 +64,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox2" justifyContent="Center" class="sapUiMediumMarginTop">
-            <core:HTML id="videoFrameHtml2"
+        <m:VBox alignItems="Center" id="videoBox21" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML id="videoFrameHtml21"
                     content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -98,8 +98,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox3" justifyContent="Center" class="sapUiMediumMarginTop">
-              <core:HTML id="videoFrameHtml3"
+        <m:VBox alignItems="Center" id="videoBox31" justifyContent="Center" class="sapUiMediumMarginTop">
+              <core:HTML id="videoFrameHtml31"
                      content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -120,8 +120,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox4" justifyContent="Center" class="sapUiMediumMarginTop">
-             <core:HTML id="videoFrameHtml4"
+        <m:VBox alignItems="Center" id="videoBox41" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml41"
                     content="&lt;iframe src='../Videos/Company Invoice.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -154,8 +154,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox5" justifyContent="Center" class="sapUiMediumMarginTop">
-           <core:HTML id="videoFrameHtml5"
+        <m:VBox alignItems="Center" id="videoBox51" justifyContent="Center" class="sapUiMediumMarginTop">
+           <core:HTML id="videoFrameHtml51"
                    content="&lt;iframe src='../Videos/Contractor Invoice Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -176,8 +176,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox7" justifyContent="Center" class="sapUiMediumMarginTop">
-             <core:HTML id="videoFrameHtml7"
+        <m:VBox alignItems="Center" id="videoBox61" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml61"
                     content="&lt;iframe src='../Videos/Quotation Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>

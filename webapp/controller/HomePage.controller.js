@@ -635,27 +635,6 @@ _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
     if (bResponsive) {
         oHtml.setContent(sMobile);
 
-        // var bExpanded = false;
-        // var oToggleBtn = new sap.m.Link({
-        //     text: "Full Size",
-        //     press: function () {
-        //         if (bExpanded) {
-        //             oHtml.setContent(sMobile);
-        //             oToggleBtn.setText("Full Size");
-        //         } else {
-        //             oHtml.setContent(sNormal);
-        //             oToggleBtn.setText("Fit Mobile");
-        //         }
-        //         bExpanded = !bExpanded;
-        //         sap.ui.getCore().applyChanges();
-        //     }
-        // });
-
-        // Add toggle button if not already added
-    //  if (oVBox.getItems().length < 2) {
-    //         oVBox.addItem(oToggleBtn);
-    //     }
-        
     } else {
         oHtml.setContent(sNormal);
     }

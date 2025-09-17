@@ -121,6 +121,38 @@ BaseController, utils, JSONModel, MessageToast, Formatter
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
+        onAfterRendering: function () {
+ this._applyResponsiveVideo("videoBox1", "videoFrameHtml1", "../Videos/Employee Offer.mp4");
+ this._applyResponsiveVideo("videoBox2", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
+ this._applyResponsiveVideo("videoBox3", "videoFrameHtml3", "../Videos/Contract Offer Application.mp4");
+ this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "../Videos/Self Service.mp4");
+ this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
+ this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox7", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox8", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox9", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox610", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+
+
+},
+_applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
+
+    var iWidth = window.innerWidth;
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+
+    var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+    var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+
+    if (bResponsive) {
+        oHtml.setContent(sMobile);
+
+    } else {
+        oHtml.setContent(sNormal);
+    }
+},
 
 	});
 });
