@@ -128,10 +128,10 @@ BaseController, utils, JSONModel, MessageToast, Formatter
  this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "../Videos/Self Service.mp4");
  this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
  this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox7", "videoFrameHtml6", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox8", "videoFrameHtml6", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox9", "videoFrameHtml6", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox610", "videoFrameHtml6", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox7", "videoFrameHtml7", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox8", "videoFrameHtml8", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox9", "videoFrameHtml9", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox10", "videoFrameHtml10", "../Videos/Leave Application.mp4");
 
 
 },
