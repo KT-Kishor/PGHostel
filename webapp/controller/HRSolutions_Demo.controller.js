@@ -71,6 +71,7 @@ BaseController, utils, JSONModel, MessageToast, Formatter
           utils._LCvalidateMandatoryField(oEvent);
         },
 		 onDemoformSave: function () {
+      var that = this;
           var oModel = this.getView().getModel("formData");
           var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy to avoid reference issues
           var payload = [oData];
@@ -109,7 +110,10 @@ BaseController, utils, JSONModel, MessageToast, Formatter
 
                 oModel.setData(resetData);
                 oModel.refresh(true);
-                MessageToast.show("Data saved successfully!");
+             
+            that._oDemoFormDialog.close();
+          
+             MessageToast.show("Thanks For Submitting the form. Our team will get back to you soon!");
 
                 // AJAX Call to Send Email
               },

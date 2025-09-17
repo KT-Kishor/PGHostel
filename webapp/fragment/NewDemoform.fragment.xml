@@ -10,14 +10,7 @@
         title="{i18n>demoFormtitle}"
     >
         <m:VBox class="dialogContentBox">
-            <!-- Header -->
           
-                <m:Text
-                    text="Fill in your details below and our team will get back to you."
-                    class="dialogSubtitle"
-                />
-            
-            <!-- Form with modern look -->
             <m:VBox
                 class="formContainer"
                 renderType="Bare"
@@ -59,7 +52,6 @@
                      class="inputField"
                 />
 
-             
                 <m:DateTimePicker
                     value="{formData>/TimeSlot}"
                     placeholder="{i18n>placeholdertimeslote}"
@@ -71,7 +63,7 @@
                      class="inputField"
                 />
 
-           
+
                 <m:Input
                     value="{formData>/MobileNo}"
                     placeholder="{i18n>placeholderMobileNo}"
