@@ -49,8 +49,7 @@ BaseController, utils, JSONModel, MessageToast, Formatter
             this.getView().addDependent(this._oDemoFormDialog);
           }
           this._oDemoFormDialog.open();
-		}
-,
+		},
  onCloseDemoForm: function () {
           if (this._oDemoFormDialog) {
             this._oDemoFormDialog.close();

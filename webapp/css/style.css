@@ -1867,12 +1867,13 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .dialogTitle {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #0a3d62;
+  color: #02024b;
+  text-shadow: 1px 1px 20px rgba(243, 237, 237, 0.1) !important;
 }
 
 .dialogSubtitle {
-  font-size: 0.9rem;
-  color: #555;
+   font-size: 0.9rem;
+  color: #042740;
 }
 
 .formContainer .sapMLabel {
@@ -2015,6 +2016,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     gap: 1rem;
     background-image: url("../image/Newdemo.png");
     background-size: cover;
-  background-position: center;
+  background-position: Start;
   background-repeat: no-repeat;
 }
