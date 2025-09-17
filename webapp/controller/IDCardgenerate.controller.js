@@ -5,7 +5,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	return Controller.extend("sap.kt.com.minihrsolution.controller.Recuritment_Demo", {
+	return Controller.extend("sap.kt.com.minihrsolution.controller.IDCardgenerate", {
 
 		// onInit: function() {
 		// 	//   this.getRouter().getRoute("").attachMatched(this._onRouteMatched, this);

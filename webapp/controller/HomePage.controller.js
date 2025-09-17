@@ -671,6 +671,12 @@ onAssetPress:function(){
 },
 onrecruitmentPress:function(){
    this.getRouter().navTo("Recruitment_Demo");
+},
+onAutoMotivePress: function () {
+   this.getRouter().navTo("AutoMobile_Demo");
+},
+onIdCardPress: function () {
+   this.getRouter().navTo("IDCardgenerate");
 }
 
 

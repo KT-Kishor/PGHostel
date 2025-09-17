@@ -1,5 +1,5 @@
 <mvc:View
-	controllerName="sap.kt.com.minihrsolution.controller.Payroll_Demo"
+	controllerName="sap.kt.com.minihrsolution.controller.Recuritment_Demo"
 	xmlns:mvc="sap.ui.core.mvc"
   xmlns:m="sap.m"
     xmlns="sap.m"

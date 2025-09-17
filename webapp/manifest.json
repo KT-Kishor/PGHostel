@@ -763,6 +763,16 @@
                    "name": "Recruitment_Demo",
                    "pattern": "Recruitment_Demo",
                    "target": ["TargetRecuritment"]
+                 },
+                   {
+                   "name": "AutoMobile_Demo",
+                   "pattern": "AutoMobile_Demo",
+                   "target": ["TargetAutoMobile"]
+                 },
+                 {
+                   "name": "IDCardgenerate",
+                   "pattern": "IDCardgenerate",
+                   "target": ["TargetIDCardgenerate"]
                  }
             ],
             "targets": {
@@ -1202,10 +1212,24 @@
             "viewType": "XML",
                 "transition": "slide",
                 "clearControlAggregation": false,
-                "viewId": "Recruitment_Demo",
-                "viewName": "Recruitment_Demo"
+                "viewId": "Recuritment_Demo",
+                "viewName": "Recuritment_Demo"
+        },
+         "TargetAutoMobile":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "AutoMobile_Demo",
+                "viewName": "AutoMobile_Demo"
         }
-       
+       ,
+        "TargetIDCardgenerate":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "IDCardgenerate",
+                "viewName": "IDCardgenerate"
+        }
     
             }
         },

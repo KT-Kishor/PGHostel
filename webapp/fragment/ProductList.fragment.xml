@@ -10,7 +10,7 @@
             
             <!-- IMAGE OR ICON AT TOP -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/HR.webp" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/HR.webp" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="HR Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}"/>
@@ -27,7 +27,7 @@
             
             <!-- Invoice management -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Invoice .png" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/Invoice .png" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
           <Text class="hr-text sapUiSmallMargin" text="Invoice Manage" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}"/>
@@ -44,10 +44,10 @@
             
             <!-- Company Asset Management -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Asset.jpg" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/Asset.jpg" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Company Asset Management" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>companyassetmanagement}"/>
+            <Text class="description-text sapUiSmallMargin" text="{i18n>Companyassetmanage}"/>
               
             <!-- BUTTON BOTTOM-ALIGNED -->
              <HBox justifyContent="End" >
@@ -61,10 +61,10 @@
             
             <!--Recruitment  -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Interview.jpg" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/Interview.jpg" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Recruitment" />
-            <Text class="description-text sapUiSmallMargin " text="{i18n>recruitment}"/>
+            <Text class="description-text sapUiSmallMargin " text="{i18n>recruitmentmanage}"/>
               
             <!-- BUTTON BOTTOM-ALIGNED -->
              <HBox justifyContent="End" >
@@ -76,34 +76,33 @@
         </VBox>
                  <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
             
-            <!-- IMAGE OR ICON AT TOP -->
+            <!-- Automotive -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Automotive.jpg" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/Automotive.jpg" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Automotive Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}"/>
-              
-            <!-- BUTTON BOTTOM-ALIGNED -->
+           
            <HBox justifyContent="End" >
                 <Button text="Take a Product Tour"
-                        press="onUI5ress"
+                        press="onAutoMotivePress"
                      class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
           </HBox>
         </VBox>
           <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
             
-            <!-- IMAGE OR ICON AT TOP -->
+            <!-- ID card  -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/idcard.png" width="auto" height="300px" visible="true" class="section-image"/>
+                <Image src="../image/IDcard1.png" width="auto" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="ID Card Generation" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}"/>
               
-            <!-- BUTTON BOTTOM-ALIGNED -->
+         
           <HBox justifyContent="End" >
                 <Button text="Take a Product Tour"
-                        press="onUI5ress"
+                        press="onIdCardPress"
                      class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
           </HBox>
