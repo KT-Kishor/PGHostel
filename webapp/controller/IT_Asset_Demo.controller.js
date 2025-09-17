@@ -131,7 +131,7 @@ sap.ui.define([
         },
     onAfterRendering: function () {
       this._applyResponsiveVideo("videoBox101", "videoFrameHtml101", "../Videos/Employee Offer.mp4");
-      this._applyResponsiveVideo("videoBox201", "videoFrameHtml201", "https://www.youtube.com/embed/zk2GGsXRfuo");
+      this._applyResponsiveVideo("videoBox201", "videoFrameHtml201", "../video/Asset Assignment.mp4");
       this._applyResponsiveVideo("videoBox301", "videoFrameHtml301", "../Videos/Contract Offer Application.mp4");
     },
     _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
