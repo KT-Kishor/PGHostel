@@ -127,6 +127,29 @@ BaseController, utils, JSONModel, MessageToast, Formatter
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
+          onAfterRendering: function () {
+      this._applyResponsiveVideo("videoBox_ID", "videoFrameHtml_ID", "../Videos/ID Card Application.mp4");
+
+
+    },
+    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+      var oVBox = this.byId(vBoxId);
+      var oHtml = this.byId(htmlId);
+      if (!oVBox || !oHtml) return;
+
+      var iWidth = window.innerWidth;
+      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+
+      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+
+      if (bResponsive) {
+        oHtml.setContent(sMobile);
+
+      } else {
+        oHtml.setContent(sNormal);
+      }
+    },
 
 	});
 });

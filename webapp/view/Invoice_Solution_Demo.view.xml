@@ -66,7 +66,7 @@
         <!-- Right Column -->
         <m:VBox alignItems="Center" id="videoBox21" justifyContent="Center" class="sapUiMediumMarginTop">
             <core:HTML id="videoFrameHtml21"
-                    content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                    content="&lt;iframe src='../Videos/Manage Customer.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
 
@@ -100,7 +100,7 @@
         <!-- Right Column -->
         <m:VBox alignItems="Center" id="videoBox31" justifyContent="Center" class="sapUiMediumMarginTop">
               <core:HTML id="videoFrameHtml31"
-                     content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+                     content="&lt;iframe src='../Videos/Purchase Order.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
     </g:GridContainer>
@@ -162,7 +162,7 @@
     </g:GridContainer>
     <!-- ContractorInvoice -->
    <g:GridContainer class="jioSection sapUiSmallMarginTop">
-        <g:layout>
+        <g:layout> 
             <g:GridContainerSettings columnSize="49.5%" gap="10px" />
         </g:layout>
         <g:layoutXS>

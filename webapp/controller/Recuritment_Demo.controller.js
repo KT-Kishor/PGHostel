@@ -127,6 +127,30 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
+  onAfterRendering: function () {
+      this._applyResponsiveVideo("videoBox-1", "videoFrameHtml-1", "../Videos/Job Posting.mp4");
+      this._applyResponsiveVideo("videoBox-2", "videoFrameHtml-2", "../Videos/Apply Job.mp4");
+      this._applyResponsiveVideo("videoBox-3", "videoFrameHtml-3", "../Videos/Create Quotation Application.mp4");
+      this._applyResponsiveVideo("videoBox-4", "videoFrameHtml-4", "../Videos/Create Quotation Application.mp4");
 
+    },
+    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+      var oVBox = this.byId(vBoxId);
+      var oHtml = this.byId(htmlId);
+      if (!oVBox || !oHtml) return;
+
+      var iWidth = window.innerWidth;
+      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+
+      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+
+      if (bResponsive) {
+        oHtml.setContent(sMobile);
+
+      } else {
+        oHtml.setContent(sNormal);
+      }
+    },
 	});
 });

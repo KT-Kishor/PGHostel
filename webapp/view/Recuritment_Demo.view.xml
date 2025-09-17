@@ -40,9 +40,9 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml1"
-        content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
+        <m:VBox id="videoBox-1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml-1"
+        content="&lt;iframe src='../Videos/Job Posting.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
 <!-- Header PaySlip -->
@@ -62,9 +62,9 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox2" justifyContent="Center" class="sapUiMediumMarginTop">
-            <core:HTML id="videoFrameHtml2"
-                    content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
+        <m:VBox alignItems="Center" id="videoBox-2" justifyContent="Center" class="sapUiMediumMarginTop">
+            <core:HTML id="videoFrameHtml-2"
+                    content="&lt;iframe src='../Videos/Apply Job.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
 
@@ -96,8 +96,8 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox3" justifyContent="Center" class="sapUiMediumMarginTop">
-              <core:HTML id="videoFrameHtml3"
+        <m:VBox alignItems="Center" id="videoBox-3" justifyContent="Center" class="sapUiMediumMarginTop">
+              <core:HTML id="videoFrameHtml-3"
                      content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>
@@ -118,8 +118,8 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox4" justifyContent="Center" class="sapUiMediumMarginTop">
-             <core:HTML id="videoFrameHtml4"
+        <m:VBox alignItems="Center" id="videoBox-4" justifyContent="Center" class="sapUiMediumMarginTop">
+             <core:HTML id="videoFrameHtml-4"
                     content="&lt;iframe src='https://www.youtube.com/embed/-hU_lFn92-4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
                 />
         </m:VBox>

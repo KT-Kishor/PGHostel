@@ -125,19 +125,17 @@ BaseController, utils, JSONModel, MessageToast, Formatter
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
-        onAfterRendering: function () {
- this._applyResponsiveVideo("videoBox1", "videoFrameHtml1", "../Videos/Employee Offer.mp4");
- this._applyResponsiveVideo("videoBox2", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
- this._applyResponsiveVideo("videoBox3", "videoFrameHtml3", "../Videos/Contract Offer Application.mp4");
- this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "../Videos/Self Service.mp4");
- this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
- this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox7", "videoFrameHtml7", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox8", "videoFrameHtml8", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox9", "videoFrameHtml9", "../Videos/Leave Application.mp4");
- this._applyResponsiveVideo("videoBox10", "videoFrameHtml10", "../Videos/Leave Application.mp4");
-
-
+       onAfterRendering: function () {
+ this._applyResponsiveVideo("videoBox_A", "videoFrameHtml_A", "../Videos/Employee Offer.mp4");
+ this._applyResponsiveVideo("videoBox_B", "videoFrameHtml_B", "../Videos/Tarinee Application.mp4");
+ this._applyResponsiveVideo("videoBox_C", "videoFrameHtml_C", "../Videos/Contract Offer Application.mp4");
+ this._applyResponsiveVideo("videoBox_D", "videoFrameHtml_D", "../Videos/Self Service.mp4");
+ this._applyResponsiveVideo("videoBox_E", "videoFrameHtml_E", "../Videos/Employee Details.mp4");
+ this._applyResponsiveVideo("videoBox_F", "videoFrameHtml_F", "../Videos/Leave Application.mp4");
+ this._applyResponsiveVideo("videoBox_G", "videoFrameHtml_G", "../Videos/Expense Application.mp4");
+ this._applyResponsiveVideo("videoBox_H", "videoFrameHtml_H", "../Videos/Timesheet Application.mp4");
+ this._applyResponsiveVideo("videoBox_I", "videoFrameHtml_I", "../Videos/Generate Payslip.mp4");
+ this._applyResponsiveVideo("videoBox_J", "videoFrameHtml_J", "../Videos/My Inbox.mp4");
 },
 _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
     var oVBox = this.byId(vBoxId);
