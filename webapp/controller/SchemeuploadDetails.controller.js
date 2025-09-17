@@ -62,14 +62,14 @@ sap.ui.define(
             // Edit Mode: Fetch data for the selected ID
             this.getBusyDialog();
             $.ajax({
-              url: `https://www.rest.kalpavrikshatechnologies.com/SchemeUploade?ID=${sData}`,
+              url: `https://rest.kalpavrikshatechnologies.com/SchemeUploade?ID=${sData}`,
               type: "GET",
               headers: {
-                "Content-Type": "application/json",
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              },
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password:
+                "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              "Content-Type": "application/json",
+            },
               success: function (odata) {
                 that.closeBusyDialog();
                 if (odata && odata.data && odata.data.length > 0) {
@@ -177,7 +177,7 @@ sap.ui.define(
           var bIsUpdate = !!oData.ID;
           var sType = bIsUpdate ? "PUT" : "POST";
           var sEndpoint =
-            "https://www.rest.kalpavrikshatechnologies.com/SchemeUploade"; // Don't append ID to URL
+            "https://rest.kalpavrikshatechnologies.com/SchemeUploade"; // Don't append ID to URL
 
           var oPayload = {
             variant: oData.Variant,
@@ -214,11 +214,11 @@ sap.ui.define(
           $.ajax({
             url: sEndpoint,
             type: sType,
-            headers: {
-              "Content-Type": "application/json",
+             headers: {
               name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
               password:
                 "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+              "Content-Type": "application/json",
             },
             data: JSON.stringify(oRequestBody),
             success: function (response) {

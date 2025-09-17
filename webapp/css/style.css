@@ -1870,7 +1870,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .dialogTitle {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #0a3d62;
 }
@@ -1940,13 +1940,23 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .demoBtn .sapMBtnInner {
-  background-color: #156340 !important; /* Primary */
-  color: #fff !important;
+  background-color: #0057FF !important;  /* Exact blue from image */
+  color: #fff !important;                /* White text */
+  border-radius: 8px !important;         /* Rounded corners */
+  font-size: 16px !important;            /* Match text size */
+  font-weight: 600 !important;           /* Bold text */
+  padding: 10px 20px !important;         /* Adjust padding */
+  height: 48px !important;               /* Button height */
+}
+
+.demoBtn .sapMBtnContent {
+  color: #fff !important;                /* Ensure text stays white */
 }
 
 .demoBtn .sapMBtnInner:hover {
-  background-color: #228257 !important; /* Accent on hover */
+  background-color: #0057FF!important; /* Accent on hover */
 }
+
 .HRSolution{
   margin-top: 20px;
   border-radius: 10px;
