@@ -206,7 +206,7 @@
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
             <m:Title text="{i18n>headerQuotation}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>QTN_par}" class="jioParagraph" />
+            <m:Text text="{i18n>QTN_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->

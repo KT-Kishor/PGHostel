@@ -549,7 +549,7 @@ sap.ui.define([
                 if (this._checkValidation()) {
                     try {
                         if( this.oLoginModel.getProperty("/Role") === "Admin" || this.oLoginModel.getProperty("/Role") === "IT Manager"){
-                            utils._LCstrictValidationComboBox(oCore.byId("FAA_id_AssignedBy"), "ID")
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("FAA_id_AssignedBy"), "ID")
                         }
                         var oFormData = this.getView().getModel("myform").getProperty("/formData/data");
                         var oAssignedDate = new Date(sap.ui.getCore().byId("FAA_id_AssignedDate").getDateValue());

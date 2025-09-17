@@ -129,7 +129,7 @@
 					
 					<Page id="idBookfordemo" showHeader="false" class="sapUiContentPadding demo-form sapUiTinyMargin">
 					<!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Demoform" type="XML"/> -->
-					<!-- <mvc:XMLView viewName="sap.kt.com.minihrsolution.view.HRSolutions_Demo"/> -->
+					<mvc:XMLView viewName="sap.kt.com.minihrsolution.view.HRSolutions_Demo"/>
 					<!-- <mvc:XMLView viewName="sap.kt.com.minihrsolution.view.Invoice_Solution_Demo"/> -->
 				
 					<!-- <mvc:XMLView viewName="sap.kt.com.minihrsolution.view.AutoMobile_Demo"/> -->

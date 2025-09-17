@@ -35,8 +35,8 @@
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiSmallMarginTop">
-            <m:Title text="{i18n>uploadscheme}" level="H1" class="jioHeading" />
-            <m:Text text="{i18n>uploadscheme_Par}" class="jioParagraph" />
+            <m:Title text="{i18n>Generateid}" level="H1" class="jioHeading" />
+            <m:Text text="{i18n>Generateid_Par}" class="jioParagraph" />
         </m:VBox>
 
         <!-- Right Column -->
