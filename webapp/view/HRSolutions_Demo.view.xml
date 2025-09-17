@@ -45,7 +45,7 @@
         <!-- Right Column -->
         <m:VBox id="videoBox1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml1"
-        content="&lt;iframe src='https://www.youtube.com/embed/XFCJNqHHfQQ?si=1IxhnYYx_xS-Wk1M' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
+        content="&lt;iframe src='..Videos/Employee Offer.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
 <!-- EmployeeOffer -->
