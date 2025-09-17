@@ -1860,11 +1860,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     max-width: 500px;
 }
 
-.dialogContentBox {
-  padding: 2rem;
-  gap: 1rem;
-}
-
 .dialogHeader {
   margin-bottom: 1rem;
 }
@@ -1891,6 +1886,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border-radius: 8px;
   padding: 0.75rem;
 }
+
 
 .videoDialog .sapMDialogSection {
   padding: 0 !important;
@@ -2010,4 +2006,15 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   height: 40px;
   width: 160px;
   padding: 0;
+}
+.demoFormDialog{
+  background-color: #0057FF !important;
+}
+.dialogContentBox {
+    padding: 2rem;
+    gap: 1rem;
+    background-image: url("../image/Newdemo.png");
+    background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }

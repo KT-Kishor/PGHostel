@@ -7,7 +7,7 @@
         id="demoFormDialog"
         class="demoFormDialog"
         draggable="true"
-        title="Demo Form"
+        title="Request for Demo"
     >
         <m:VBox class="dialogContentBox">
             <!-- Header -->
@@ -31,8 +31,8 @@
                 class="formContainer"
                 renderType="Bare"
             >
-                <m:Label text="Company Name" />
-                <m:Input
+                <m:Label text="" />
+                <m:Input    
                     value="{formData>/CompanyName}"
                     id="idCompanyname"
                     liveChange="validateCompnayname"
@@ -42,7 +42,7 @@
                     valueStateText="{i18n>placeCompany}"
                 />
 
-                <m:Label text="Customer Name" />
+                <m:Label text="" />
                 <m:Input
                     value="{formData>/CustomerName}"
                     liveChange="validateName"
@@ -53,7 +53,7 @@
                     valueStateText="{i18n>placeholderCustName}"
                 />
 
-                <m:Label text="Email" />
+                <m:Label text="" />
                 <m:Input
                     value="{formData>/Email}"
                     placeholder="{i18n>placeEmailId}"
@@ -65,7 +65,7 @@
                     valueStateText="Enter Valid Email"
                 />
 
-                <m:Label text="Preferred Time Slot" />
+                <m:Label text="" />
                 <m:DateTimePicker
                     value="{formData>/TimeSlot}"
                     placeholder="{i18n>placeholdertimeslote}"
@@ -76,7 +76,7 @@
                     displayFormat="dd/MM/yyyy HH:mm"
                 />
 
-                <m:Label text="Mobile Number" />
+                <m:Label text="" />
                 <m:Input
                     value="{formData>/MobileNo}"
                     placeholder="{i18n>placeholderMobileNo}"
@@ -87,7 +87,7 @@
                     maxLength="10"
                 />
 
-                <m:Label text="Address" />
+                <m:Label text="" />
                 <m:TextArea
                     value="{formData>/Address}"
                     placeholder="{i18n>placeAddress}"
@@ -99,7 +99,7 @@
                     maxLength="120"
                 />
 
-                <m:Label text="Comments" />
+                <m:Label text="" />
                 <m:TextArea
                     value="{formData>/Comments}"
                     placeholder="{i18n>enterComments}"
