@@ -133,7 +133,7 @@
     <!-- Employee Details -->
      <m:Button
             text="Request Demo"
-            press="onOpenForm"
+            press="onOpenDemoForm"
             class="demoBtn"
         />
  </Page>
