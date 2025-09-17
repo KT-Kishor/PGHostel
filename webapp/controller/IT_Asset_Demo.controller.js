@@ -130,9 +130,9 @@ sap.ui.define([
           }
         },
     onAfterRendering: function () {
-      this._applyResponsiveVideo("videoBox101", "videoFrameHtml101", "../Videos/Employee Offer.mp4");
+      this._applyResponsiveVideo("videoBox101", "videoFrameHtml101", "'../video/Company Asset.mp4");
       this._applyResponsiveVideo("videoBox201", "videoFrameHtml201", "../video/Asset Assignment.mp4");
-      this._applyResponsiveVideo("videoBox301", "videoFrameHtml301", "../Videos/Contract Offer Application.mp4");
+      this._applyResponsiveVideo("videoBox301", "videoFrameHtml301", "../Videos/My Asset.mp4");
     },
     _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
       var oVBox = this.byId(vBoxId);

@@ -127,7 +127,7 @@ sap.ui.define([
         },
     onAfterRendering: function () {
       this._applyResponsiveVideo("videoBox11", "videoFrameHtml11", "../Videos/MSA and SOW Application.mp4");
-      this._applyResponsiveVideo("videoBox21", "videoFrameHtml21", "'../Videos/Manage Customer.mp4");
+      this._applyResponsiveVideo("videoBox21", "videoFrameHtml21", "../Videos/Manage Customer.mp4");
       this._applyResponsiveVideo("videoBox31", "videoFrameHtml31", "../Videos/Contract Offer Application.mp4");
       this._applyResponsiveVideo("videoBox41", "videoFrameHtml41", "../Videos/Company Invoice.mp4");
       this._applyResponsiveVideo("videoBox51", "videoFrameHtml51", "../Videos/Contractor Invoice Application.mp4");

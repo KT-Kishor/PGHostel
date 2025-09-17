@@ -127,7 +127,7 @@ BaseController, utils, JSONModel, MessageToast, Formatter
         },
        onAfterRendering: function () {
  this._applyResponsiveVideo("videoBox_A", "videoFrameHtml_A", "../Videos/Employee Offer.mp4");
- this._applyResponsiveVideo("videoBox_B", "videoFrameHtml_B", "../Videos/Tarinee Application.mp4");
+ this._applyResponsiveVideo("videoBox_B", "videoFrameHtml_B", "../Videos/Trainee Application.mp4");
  this._applyResponsiveVideo("videoBox_C", "videoFrameHtml_C", "../Videos/Contract Offer Application.mp4");
  this._applyResponsiveVideo("videoBox_D", "videoFrameHtml_D", "../Videos/Self Service.mp4");
  this._applyResponsiveVideo("videoBox_E", "videoFrameHtml_E", "../Videos/Employee Details.mp4");
