@@ -662,6 +662,15 @@ _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
 },
 onHRSolutionPress:function(){
    this.getRouter().navTo("HRSolutions_Demo");
+},
+onInvoiceManagePress:function(){
+   this.getRouter().navTo("Invoice_Solution_Demo");
+},
+onAssetPress:function(){
+ this.getRouter().navTo("IT_Asset_Demo");
+},
+onrecruitmentPress:function(){
+   this.getRouter().navTo("Recruitment_Demo");
 }
 
 

@@ -748,6 +748,21 @@
                    "name": "HRSolutions_Demo",
                    "pattern": "HRSolutions_Demo",
                    "target": ["TargetHRSolution"]
+                 },
+                  {
+                   "name": "Invoice_Solution_Demo",
+                   "pattern": "Invoice_Solution_Demo",
+                   "target": ["TargetInvoicemanage"]
+                 },
+                  {
+                   "name": "IT_Asset_Demo",
+                   "pattern": "IT_Asset_Demo",
+                   "target": ["TargetCompanyasset"]
+                 },
+                  {
+                   "name": "Recruitment_Demo",
+                   "pattern": "Recruitment_Demo",
+                   "target": ["TargetRecuritment"]
                  }
             ],
             "targets": {
@@ -1166,7 +1181,31 @@
                 "viewId": "HRSolutions_Demo",
                 "viewName": "HRSolutions_Demo"
           
+        },
+           "TargetInvoicemanage":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "Invoice_Solution_Demo",
+                "viewName": "Invoice_Solution_Demo"
+          
+        },
+         "TargetCompanyasset":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "IT_Asset_Demo",
+                "viewName": "IT_Asset_Demo"
+          
+        },
+         "TargetRecuritment":{
+            "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "Recruitment_Demo",
+                "viewName": "Recruitment_Demo"
         }
+       
     
             }
         },

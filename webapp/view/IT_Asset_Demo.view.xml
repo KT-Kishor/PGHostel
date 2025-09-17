@@ -11,6 +11,7 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
+
 <Page >
        <headerContent>
 			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
@@ -18,6 +19,7 @@
 			<ToolbarSpacer/>
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
+        <m:ScrollContainer horizontal="false" vertical="true" height="100%">
     <!-- Company Asset -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
@@ -74,6 +76,7 @@
             <m:Text text="{i18n>AssetAssignment_Par}" class="jioParagraph" />
         </m:VBox>
     </g:GridContainer>
+    </m:ScrollContainer>
      <m:Button
             text="Request Demo"
             press="onOpenForm"

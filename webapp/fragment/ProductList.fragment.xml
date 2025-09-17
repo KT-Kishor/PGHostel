@@ -25,24 +25,24 @@
         </VBox>
                 <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
             
-            <!-- IMAGE OR ICON AT TOP -->
+            <!-- Invoice management -->
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/Invoice .png" width="auto" height="300px" visible="true" class="section-image"/>
             </HBox>
           <Text class="hr-text sapUiSmallMargin" text="Invoice Manage" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}"/>
               
-            <!-- BUTTON BOTTOM-ALIGNED -->
+          
              <HBox justifyContent="End" >
                 <Button text="Take a Product Tour"
-                        press="onUI5ress"
+                        press="onInvoiceManagePress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
             </HBox>
         </VBox>
                  <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
             
-            <!-- IMAGE OR ICON AT TOP -->
+            <!-- Company Asset Management -->
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/Asset.jpg" width="auto" height="300px" visible="true" class="section-image"/>
             </HBox>
@@ -52,7 +52,7 @@
             <!-- BUTTON BOTTOM-ALIGNED -->
              <HBox justifyContent="End" >
                 <Button text="Take a Product Tour"
-                        press="onUI5ress"
+                        press="onAssetPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
          </HBox>
@@ -69,7 +69,7 @@
             <!-- BUTTON BOTTOM-ALIGNED -->
              <HBox justifyContent="End" >
                 <Button text="Take a Product Tour"
-                        press="onUI5ress"
+                        press="onrecruitmentPress"
                       class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
            </HBox>
