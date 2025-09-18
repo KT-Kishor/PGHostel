@@ -365,7 +365,7 @@
 .highlight-text {
   font-size: 16px;
   font-family: sans-serif;
-  color: #0057FF;
+  color: #000000;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
 }
@@ -2036,7 +2036,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .dialogContentBox {
     padding: 2rem;
     gap: 1rem;
-    background-image: url("../image/Newdemo.png");
+    background-image: url("../image/grow2.jpg");
     background-size: cover;
   background-position: Start;
   background-repeat: no-repeat;
@@ -2108,3 +2108,8 @@ font-size: 20px;
   z-index: 1000;
   }
 
+.lineSpace {
+    margin-bottom: 10px;  
+    font-size: 26px !important;      
+    line-height: 1.5;     
+}

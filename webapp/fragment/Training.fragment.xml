@@ -6,7 +6,7 @@
     <l:Grid defaultSpan="XL6 L6 M12 S12" class="grid-container">
         
                 <!-- SAP UI5 Section -->
-                <VBox class="HRSolution "  backgroundDesign="Solid" >
+                <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid" >
                 <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/SAPUI5 (1).png" width="auto" height="200px" visible="true" class="section-image"/>
                   </HBox>
@@ -28,7 +28,7 @@
                 <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
             </HBox> 
                 </VBox>
-                <VBox class="HRSolution "  backgroundDesign="Solid">
+                <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid">
                 <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/SAP CAPM.jpg" width="auto" height="200px" visible="true" class="section-image"/>
                   </HBox>

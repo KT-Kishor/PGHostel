@@ -16,7 +16,7 @@ sap.ui.define(
         onInit: function () {
 
           this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
-
+          this.getView().getModel("CountryModel")
           // Form Data
           var oFormData = new JSONModel({
             CustomerName: "",
@@ -24,6 +24,7 @@ sap.ui.define(
             Email: "",
             Address: "",
             TimeSlot: "",
+            stdCode: "+91",
             MobileNo: "",
             Comments: "",
           });
@@ -199,6 +200,7 @@ sap.ui.define(
 
         },
 
+
         onSapui5coursepress: function (oEvent) {
           this._openTopicsPopover(oEvent.getSource(), "ui5topics", "SAPUI5 Topics");
         },
@@ -373,6 +375,7 @@ sap.ui.define(
                   Email: "",
                   Address: "",
                   TimeSlot: "",
+                  stdCode:"",
                   MobileNo: "",
                   Comments: "",
                 };
@@ -712,7 +715,8 @@ sap.ui.define(
           this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "https://www.youtube.com/embed/EjnEOznAsHg");
           this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
           this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "https://www.youtube.com/embed/zk2GGsXRfuo");
-
+       
+          
         },
         _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
           var oVBox = this.byId(vBoxId);
@@ -749,9 +753,10 @@ sap.ui.define(
         },
         onIdCardPress: function () {
           this.getRouter().navTo("IDCardgenerate");
-        }
-
-
+        },
+onNavToHrSolution: function () {
+          this.getRouter().navTo("HRSolutions_Demo");
+        },
 
 
 

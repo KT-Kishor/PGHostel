@@ -4,17 +4,60 @@
 	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core">
 	<l:VerticalLayout  width="98%" class="sapUiTinyMargin Aboutus" >
-		<l:BlockLayout background="Light" >
+		<l:BlockLayout background="Dashboard" >
 			<l:BlockLayoutRow rowColorSet="ColorSet4">
 				<l:BlockLayoutCell titleLevel="H2"
-					title="{i18n>aboutUscontent1}"></l:BlockLayoutCell>
+					title="{i18n>aboutUscontent1}">
+					<!-- <Button text="View Products" press="onproductpress"></Button> -->
+					</l:BlockLayoutCell>
 			</l:BlockLayoutRow>
 			<l:BlockLayoutRow>
-				<l:BlockLayoutCell title="{i18n>services}" backgroundColorSet="ColorSet4" >
-					<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUscontent3}&lt;br&gt;&lt;br&gt;{i18n>aboutUscontent4}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent7}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent6}&lt;br&gt;&lt;br&gt;{i18n>aboutUscontent2}&lt;/a&gt;&lt;/div&gt;'></core:HTML>
-				</l:BlockLayoutCell>
+			<l:BlockLayoutCell title="Products" >
+				<VBox class="lineSpace">
+        <Link text="HR Solution" press=".onNavToHrSolution" />
+        <Text text="Automate employee offers, contracts, leave, payroll, timesheets, and expenses with a self-service portal. Empower your workforce with seamless, error-free HR operations anytime, anywhere." wrapping="true"/>
+    </VBox>
+     <VBox class="lineSpace">
+        <Link text="Invoice Solution" press=".onNavToInvoiceSolution" />
+        <Text text=" Simplify invoicing with automated MSA, NDA, SOW, quotations, PO, and contract invoices. Ensure accuracy, compliance, and faster payments with real-time tracking." wrapping="true"/>
+    </VBox>
+     <VBox class="lineSpace">
+        <Link text="Company Asset Management" press=".onNavToCompanySolution" />
+        <Text text="Track, assign, and manage all company assets in one place. Gain complete visibility and control over asset usage and lifecycle." wrapping="true"/>
+    </VBox>
+     <VBox class="lineSpace">
+        <Link text="Recruitment" press=".onNavToRecruitmentSolution" />
+        <Text text="Streamline hiring with easy job postings, applications, and interview scheduling. Attract and onboard the right talent quickly and efficiently." wrapping="true"/>
+    </VBox>
+     <VBox class="lineSpace">
+        <Link text="Automobile Solution" press=".onNavToAutomobileSolution" />
+        <Text text="Manage automobile schemes and quotations with automation and precision. Save time, reduce errors, and keep your business running smoothly.." wrapping="true"/>
+    </VBox>
+</l:BlockLayoutCell>
+
 				<l:BlockLayoutCell title="{i18n>recruitment}">
-					<core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUsSecondcontent5}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent9}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes1}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes2}&lt;/a&gt;&lt;/div&gt;'></core:HTML>
+				<VBox class="lineSpace">
+      
+        <Text text="We are efficient resource provider of SAP to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true"/>
+    </VBox>
+	<VBox class="lineSpace">
+      
+        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Salesforces with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true"/>
+    </VBox>
+	<VBox class="lineSpace">
+      
+        <Text text=" Executive Search: Finding top-level leaders and executives to drive growth." wrapping="true"/>
+    </VBox>
+	<VBox class="lineSpace">
+      
+        <Text text="Talent Mapping and Sourcing: Proactively identifying and engaging with high potential talent.
+" wrapping="true"/>
+    </VBox>
+	<VBox class="lineSpace">
+      
+        <Text text="Candidate Screening and Assessment: Rigorous vetting for skill and cultural fit, we screening the profile take one round of interview to make sure it a best fit." wrapping="true"/>
+    </VBox>
+					<!-- <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUsSecondcontent5}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent9}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes1}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes2}&lt;/a&gt;&lt;/div&gt;'></core:HTML> -->
 				</l:BlockLayoutCell>
 			</l:BlockLayoutRow>
 		</l:BlockLayout>

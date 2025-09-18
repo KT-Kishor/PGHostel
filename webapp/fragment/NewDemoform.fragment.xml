@@ -62,18 +62,35 @@
                     displayFormat="dd/MM/yyyy HH:mm"
                      class="inputField"
                 />
-
                 
-                <m:Input
-                    value="{formData>/MobileNo}"
-                    placeholder="{i18n>placeholderMobileNo}"
-                    liveChange="validateMobileNo"
-                    id="idmobilenumber"
-                    valueStateText="Enter Atleast 10 digit number"
-                    required="true"
-                    maxLength="10"
-                     class="inputField"
-                />
+             
+                  <m:HBox class="sapUiSmallMarginTop" alignItems="Center" justifyContent="Start" >
+    <!-- STD Code Input -->
+    <m:ComboBox 
+        id="idDemoSTD" 
+        width="70px"  
+        value="{formData>/STDCode}"
+        placeholder="STD"
+        items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"
+      
+    >
+    <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+    </m:ComboBox>
+    
+    <!-- Mobile Number Input -->
+    <m:Input
+        value="{formData>/MobileNo}"
+        placeholder="{i18n>placeholderMobileNo}"
+        liveChange="validateMobileNo"
+        id="idmobilenumber"
+        valueStateText="Enter At least 10 digit number"
+        required="true"
+        maxLength="10"
+        class="inputField"
+    />
+</m:HBox>
+
+              
                
 
                 <m:TextArea
