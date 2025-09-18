@@ -134,44 +134,44 @@ sap.ui.define([
       this._applyResponsiveVideo("videoBox61", "videoFrameHtml61", "../Videos/Quotation Application.mp4");
 
     },
-     _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-        var oVBox = this.byId(vBoxId);
-        var oHtml = this.byId(htmlId);
-        if (!oVBox || !oHtml) return;
+    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
 
-        var iWidth = window.innerWidth;
-        var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
+    var iWidth = window.innerWidth;
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
 
-        // check if first video (autoplay required only for videoBox101)
-        var bAutoplay = (vBoxId === "videoBox11");
+    // check if first video (autoplay required only for videoBox11)
+    var bAutoplay = (vBoxId === "videoBox11");
 
-        // common video tag (without sizing)
-        var sVideoTag = "<video controls " +
-            (bAutoplay ? "autoplay muted playsinline " : "") +
-            "style='border:none;border-radius:15px;overflow:hidden;width:100%;height:100%;object-fit:cover;'>" +
-            "<source src='" + videoUrl + "' type='video/mp4'>" +
-            "Your browser does not support the video tag." +
-            "</video>";
+    // common video tag (no border radius here)
+    var sVideoTag = "<video controls " +
+        (bAutoplay ? "autoplay muted playsinline " : "") +
+        "style='border:none;width:100%;height:100%;object-fit:cover;'>" +
+        "<source src='" + videoUrl + "' type='video/mp4'>" +
+        "Your browser does not support the video tag." +
+        "</video>";
 
-        // responsive wrapper (16:9 aspect ratio)
-        var sResponsiveWrapper =
-            "<div style='position:relative;width:100%;padding-top:56.25%;border-radius:15px;overflow:hidden;'>" +
+    // responsive wrapper (16:9 aspect ratio)
+    var sResponsiveWrapper =
+        "<div style='position:relative;width:100%;padding-top:56.25%;border-radius:15px;overflow:hidden;'>" +
             "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
-            sVideoTag +
+                sVideoTag +
             "</div>" +
-            "</div>";
+        "</div>";
 
-        // desktop fixed size version
-        var sDesktop =
-            "<div style='width:560px;height:315px;border-radius:15px;overflow:hidden;'>" +
+    // desktop fixed size version (560x315)
+    var sDesktop =
+        "<div style='width:560px;height:315px;border-radius:15px;overflow:hidden;'>" +
             sVideoTag +
-            "</div>";
+        "</div>";
 
-        if (bResponsive) {
-            oHtml.setContent(sResponsiveWrapper); // mobile fluid
-        } else {
-            oHtml.setContent(sDesktop); // desktop fixed
-        }
-    },
+    if (bResponsive) {
+        oHtml.setContent(sResponsiveWrapper); // mobile fluid
+    } else {
+        oHtml.setContent(sDesktop); // desktop fixed
+    }
+}
   });
 });
