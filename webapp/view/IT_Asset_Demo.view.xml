@@ -20,7 +20,7 @@
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
 
-        <Title level="H1" text="{i18n>AssetDemotitle}" class="JobPosting" wrapping="false"/>
+        <Title level="H1" text="{i18n>AssetDemotitle}" class="HeadDemoSection " wrapping="false"/>
 
         <m:ScrollContainer horizontal="false" vertical="true" height="100%">
     <!-- Company Asset -->

@@ -19,7 +19,7 @@
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
 
-			<Title level="H1" text="{i18n>Recruitment}" class="JobPosting" wrapping="false"/>
+			<Title level="H1" text="{i18n>Recruitment}" class="HeadDemoSection" wrapping="false"/>
 			
     <!-- Generate salary -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
@@ -43,9 +43,9 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox-1" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+        <m:VBox id="videoBox-1" alignItems="Center" justifyContent="Center" class="sapUiTinyMarginTop">
     <core:HTML id="videoFrameHtml-1"
-        content="&lt;iframe src='../video/Employee offer.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
+        content="&lt;iframe src='../Videos/Job Posting.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
 <!-- Header PaySlip -->
@@ -68,7 +68,7 @@
     <m:VBox alignItems="Center" id="videoBox-2" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml-2"
         content="&lt;video width='560' height='315' controls autoplay muted&gt;
-                   &lt;source src='../video/Employee offer.mp4' type='video/mp4'&gt;
+                   &lt;source src='../Videos/Apply Job.mp4' type='video/mp4'&gt;
                  &lt;/video&gt;" />
 </m:VBox>
 

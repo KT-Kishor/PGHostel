@@ -1854,14 +1854,15 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     font-size: 2rem;
     font-weight: 700;
     color: #ad7900;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    margin-top: 40px;  
 }
 
 .jioParagraph {
     font-size: 1rem;
     color:#015b6c;
     line-height: 1.6;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     max-width: 500px;
 }
 
@@ -1940,23 +1941,41 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border: none;
 }
 
+/* Style the inner button (your part) */
+/* Style the button */
+.demoBtn {
+  position: relative;
+  display: inline-block;
+}
+
 .demoBtn .sapMBtnInner {
-  background-color: #0057FF !important;  /* Exact blue from image */
-  color: #fff !important;                /* White text */
-  border-radius: 8px !important;         /* Rounded corners */
-  font-size: 16px !important;            /* Match text size */
-  font-weight: 600 !important;           /* Bold text */
-  padding: 10px 20px !important;         /* Adjust padding */
-  height: 48px !important;               /* Button height */
+  background-color: #0057FF !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  height: 48px !important;
 }
 
-.demoBtn .sapMBtnContent {
-  color: #fff !important;                /* Ensure text stays white */
+/* Cone / Triangle tail */
+
+
+.demoBtn::after {
+  content: "";
+  position: absolute;
+  top: 4px; 
+  right: -10.2px;             /* adjust further out */
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;   /* wider base */
+  border-right: 14px solid transparent;  /* wider base */
+  border-bottom: 20px solid #0057FF;     /* taller = longer cone */
+  transform: rotate(34deg);              /* keep tilt */
+  transform-origin: top right;           /* rotation around corner */
 }
 
-.demoBtn .sapMBtnInner:hover {
-  background-color: #0057FF!important; /* Accent on hover */
-}
+
 
 .HRSolution{
   margin-top: 20px;
@@ -2007,7 +2026,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   right: 100px;
   cursor: pointer;
   z-index: 1000;
- 
   height: 40px;
   width: 160px;
   padding: 0;
@@ -2068,4 +2086,25 @@ font-size: 20px;
   width: 100%;
   max-width: 100%;
 }
+
+
+.HeadDemoSection {
+  background-color: #fff;
+    border-radius: 16px;
+    width: 95%;
+    padding: 30px;
+    margin: 20px 40px;
+     font-size: 32px;
+    font-weight: 700;
+    color:#0057FF;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: capitalize;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      background-image: linear-gradient(to right,#F1AD53, #F1AD53);
+    background-repeat: no-repeat;
+    background-size: 100% 3px;     
+    background-position: right 100%; 
+    box-shadow: 4px 4px 40px rgba(0,0,0,0.1);
+  z-index: 1000;
+  }
 

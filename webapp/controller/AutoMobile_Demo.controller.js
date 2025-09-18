@@ -128,8 +128,8 @@ sap.ui.define([
           }
         },
     onAfterRendering: function () {
-      this._applyResponsiveVideo("videoBoxA", "videoFrameHtmlA", "../video/Scheme upload.mp4");
-      this._applyResponsiveVideo("videoBoxB", "videoFrameHtmlB", "../Videos/Create Quotation Application.mp4");
+      this._applyResponsiveVideo("videoBoxA", "videoFrameHtmlA", "../Videos/Scheme Upload.mp4");
+      this._applyResponsiveVideo("videoBoxB", "videoFrameHtmlB", "../Videos/Create Quotation.mp4");
     },
     _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
       var oVBox = this.byId(vBoxId);

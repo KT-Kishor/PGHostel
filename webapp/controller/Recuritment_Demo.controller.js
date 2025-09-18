@@ -129,7 +129,7 @@ sap.ui.define([
         },
   onAfterRendering: function () {
       this._applyResponsiveVideo("videoBox-1", "videoFrameHtml-1", "../Videos/Job Posting.mp4");
-      this._applyResponsiveVideo("videoBox-2", "videoFrameHtml-2", "../video/Employee offer.mp4");
+      this._applyResponsiveVideo("videoBox-2", "videoFrameHtml-2", "../Videos/Apply Job.mp4");
       // this._applyResponsiveVideo("videoBox-3", "videoFrameHtml-3", "../Videos/Create Quotation Application.mp4");
       // this._applyResponsiveVideo("videoBox-4", "videoFrameHtml-4", "../Videos/Create Quotation Application.mp4");
 
