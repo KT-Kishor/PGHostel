@@ -147,7 +147,7 @@ sap.ui.define([
     // Video tag (with id so we can detect resolution later)
     var sVideoTag = "<video id='" + htmlId + "_video' controls " +
         (bAutoplay ? "autoplay muted playsinline " : "") +
-        "style='border:none;width:100%;height:100%;border-radius:15px;background:#000;'>" +
+        "style='border:none;width:100%;height:100%;border-radius:15px;background:#fff;'>" +
         "<source src='" + videoUrl + "' type='video/mp4'>" +
         "</video>";
 
