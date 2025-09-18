@@ -110,7 +110,6 @@ sap.ui.define(
                 titleUrl: "",
                 icon: "./image/logo.jpg",
                 displayShape: "Circle",
-                description: "Cell Phone : +91 9686145959",
                 groups: [
                   {
                     heading: "Contact Details",

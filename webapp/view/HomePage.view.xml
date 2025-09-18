@@ -106,7 +106,7 @@
 							</Table>
 						</l:VerticalLayout>
 					</ScrollContainer>
-					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contact-background sapUiTinyMargin">
+					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="contact-background sapUiTinyMargin" >
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 					</ScrollContainer>
 					

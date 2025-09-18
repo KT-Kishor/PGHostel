@@ -1,36 +1,111 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" >
-<l:Grid defaultSpan="XL6 L6 M12 S12">
-<VBox class="contact-touch sapUiSmallMarginTop">
-    <Text class="custom-contact-title sapUiTinyMargin " text="{i18n>contactDes}"/>
-    <Text class="sapUiTinyMargin service-section-text" text="{i18n>contactDes1}" />
-</VBox>
-    
-</l:Grid>
-    <l:Grid defaultSpan="XL3 L3 M12 S12" >
-<VBox class="sapUiSmallMarginTop service-section-text">
-    <QuickViewCard id="quickViewCard" pages="{/pages}"  >
-            <QuickViewPage
-                pageId="{pageId}"
-                header="{header}"
-                title="{title}"
-                titleUrl="{titleUrl}"
-                description="{description}"
-                groups="{path: 'groups'}">
-                <avatar>
-                    <Avatar src="{icon}" displayShape="{displayShape}"  />
-                </avatar>
-                <QuickViewGroup elements="{ path: 'elements' }">
-                    <QuickViewGroupElement
-                        label="{label}"
-                        value="{value}"
-                        url="{url}"
-                        type="{elementType}"
-                        pageLinkId="{pageLinkId}"
-                        emailSubject="{emailSubject}"
-                        target="{target}" />                        
-                </QuickViewGroup>
-            </QuickViewPage>
-        </QuickViewCard>
-</VBox>
-</l:Grid>
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+>
+    <VBox
+        class="contact-hero"
+        width="100%"
+    >
+        <Title
+            text="Get in Touch"
+            class="contact-hero-title"
+        />
+    </VBox>
+
+    <l:Grid defaultSpan="L6 M6 S12">
+        <l:content>
+            <VBox class="contact-left sapUiMediumMargin">
+                <VBox class="contact-row">
+                    <HBox alignItems="Center">
+                        <core:Icon
+                            src="sap-icon://call"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Label
+                            text="Contact:"
+                            class="contact-label"
+                        />
+                    </HBox>
+                    <Link
+                        text="{/pages/0/groups/1/elements/0/value}"
+                        href="https://wa.me/919686145959"
+                        class="sapUiMediumMarginBegin contact-link"
+                    />
+                </VBox>
+
+                <VBox class="contact-row">
+                    <HBox alignItems="Center">
+                        <core:Icon
+                            src="sap-icon://email"
+                            color="#0a1f44"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Label
+                            text="Email:"
+                            class="contact-label"
+                        />
+                    </HBox>
+                    <Link
+                        text="{/pages/0/groups/1/elements/1/value}"
+                        href="mailto:accounts@kalpavrikshatechnologies.com"
+                        class="sapUiMediumMarginBegin contact-link"
+                    />
+                </VBox>
+                <HBox alignItems="Center">
+                    <core:Icon
+                        src="sap-icon://map"
+                        color="#0a1f44"
+                        class="sapUiSmallMarginEnd"
+                    />
+                    <Label
+                        text="Google Map:"
+                        class="contact-label"
+                    />
+                </HBox>
+                <Link
+                    text="{/pages/0/groups/1/elements/3/value}"
+                    href="{/pages/0/groups/1/elements/3/url}"
+                    class="sapUiMediumMarginBegin contact-link"
+                />
+            </VBox>
+            <VBox class="contact-right sapUiMediumMargin">
+                <VBox class="contact-row">
+                    <HBox alignItems="Center">
+                        <core:Icon
+                            src="sap-icon://address-book"
+                            color="#0a1f44"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Label
+                            text="Address:"
+                            class="contact-label"
+                        />
+                    </HBox>
+                    <Text
+                        text="{/pages/0/groups/1/elements/2/value}"
+                        class="sapUiMediumMarginBegin contact-value"
+                    />
+                </VBox>
+
+                <VBox class="contact-row">
+                    <HBox alignItems="Center">
+                        <core:Icon
+                            src="sap-icon://chain-link"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Label
+                            text="LinkedIn:"
+                            class="contact-label"
+                        />
+                    </HBox>
+                    <Link
+                        text="{/pages/0/groups/1/elements/4/value}"
+                        href="{/pages/0/groups/1/elements/4/url}"
+                        class=" sapUiMediumMarginBegin contact-link"
+                    />
+                </VBox>
+            </VBox>
+        </l:content>
+    </l:Grid>
 </core:FragmentDefinition>
