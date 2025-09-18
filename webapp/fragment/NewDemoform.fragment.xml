@@ -63,7 +63,7 @@
                      class="inputField"
                 />
 
-
+                
                 <m:Input
                     value="{formData>/MobileNo}"
                     placeholder="{i18n>placeholderMobileNo}"
@@ -74,8 +74,8 @@
                     maxLength="10"
                      class="inputField"
                 />
+               
 
-             
                 <m:TextArea
                     value="{formData>/Address}"
                     placeholder="{i18n>placeAddress}"

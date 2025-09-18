@@ -246,7 +246,7 @@
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
   font-size: 1.5rem;
-  color:#54AFE6;
+  color:#0057FF;
 }
 .formBorder {
   border: 1px solid #ccc;
@@ -363,7 +363,7 @@
 .highlight-text {
   font-size: 16px;
   font-family: sans-serif;
-  color: #2964d9;
+  color: #0057FF;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
 }
@@ -399,10 +399,13 @@
   margin-bottom: 10px;
 }
 .big-apply-button {
-  font-size: 2rem;
-  padding: 0.75rem 2rem;
-  height: 3rem;
-  width: fit-content !important;
+   height: 50px;
+  width: 160px;
+  padding: 0;
+  bottom: 50px;
+  margin-right: -100px;
+  cursor: pointer;
+  /* width: fit-content !important; */
 }
 .content-box {
   padding: 20px;
@@ -414,7 +417,7 @@
 .custom-trainee-title {
   font-size: 30px;
   font-family: Helvetica, sans-serif;
-  color: black;
+  color: #0057FF;
   line-height: 1.9;
   /* font-weight: bold; */
   max-width: 700px;
@@ -535,7 +538,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .custom-contact-title {
   font-size: 36px;
   font-family: Helvetica, sans-serif;
-  color: black;
+  color: #0057FF;
   max-width: 700px;
   line-height: 1.8;
 }
@@ -1990,7 +1993,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .hr-text{
  font-size: 26px;
   font-family: sans-serif;
-  color: #2964d9;
+  color: #0057FF;
   margin-bottom: 10px;
   line-height: 1.5rem !important;
   font-weight: bold ;
@@ -2025,14 +2028,27 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .JobPosting {
     font-size: 32px;
     font-weight: 700;
-    color:#54AFE6;
+    color:#0057FF;
     margin: 10px 0px;
-    margin-left: 30px;
+    margin-left: 35px;
     padding-left: 10px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-transform: capitalize;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    background-image: linear-gradient(to right,#54AFE6, #81ccf8);
+    background-image: linear-gradient(to right,#0057FF, #81ccf8);
+    background-repeat: no-repeat;
+    background-size: 98% 3px;     
+    background-position: right 100%; 
+}
+.CourseTitle{
+ font-size: 32px;
+    font-weight: 700;
+    color:#0057FF;
+   
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: capitalize;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background-image: linear-gradient(to right,#0057FF, #81ccf8);
     background-repeat: no-repeat;
     background-size: 98% 3px;     
     background-position: right 100%; 
@@ -2067,4 +2083,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .videoBoxTransparent {
   background-color: transparent !important;
   box-shadow: none !important;
+}
+.training_Course{
+text-decoration:none;
+cursor:pointer;
+font-size: 20px;
 }

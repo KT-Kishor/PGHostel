@@ -43,7 +43,7 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBoxA" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+        <m:VBox id="videoBoxA" alignItems="Center" justifyContent="Center" class=" video sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtmlA"
         content="&lt;iframe src='../video/Scheme Upload.mp4' allowfullscreen style='width:560px;height:315px;border:none;border-radius:15px;'&gt;&lt;/iframe&gt;" />
 
@@ -65,7 +65,7 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox id="videoBoxB" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+        <m:VBox id="videoBoxB" alignItems="Center" justifyContent="Center" class="  sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtmlB"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../video/Create Quotation.mp4' type='video/mp4'&gt;

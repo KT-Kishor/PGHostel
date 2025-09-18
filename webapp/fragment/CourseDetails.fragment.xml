@@ -1,0 +1,21 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core" >
+
+    <Popover
+        id="idTopicPopover"
+        title="Topics"
+        placement="Auto"
+        showHeader="true">
+
+        <List id="idTopicList" class="CourseTitle">
+            <items>
+                <StandardListItem
+                    title="{topicsModel>title}"
+                    description="{topicsModel>description}"
+                    icon="sap-icon://hint" />
+            </items>
+        </List>
+
+    </Popover>
+</core:FragmentDefinition>

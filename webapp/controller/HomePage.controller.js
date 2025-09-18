@@ -14,7 +14,7 @@ sap.ui.define(
       {
         Formatter: Formatter,
         onInit: function () {
-            
+
           this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
 
           // Form Data
@@ -34,7 +34,7 @@ sap.ui.define(
         },
 
         _onRouteMatched: function () {
-           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
           const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
           const oTabHeader = this.byId("mainTabHeader");
           if (oTabHeader) {
@@ -51,7 +51,8 @@ sap.ui.define(
 
           sessionStorage.removeItem("homePageReturnTab");
           this.API = "https://rest.kalpavrikshatechnologies.com";
-          
+
+
           // var oCarousel = this.byId("videoCarousel");
 
           // var videoUrls = [
@@ -153,6 +154,34 @@ sap.ui.define(
               },
             ],
           };
+          var aModel = new JSONModel({
+            ui5topics: [
+              { title: "SAPUI5 Overview", description: "Introduction, Features, MVC" },
+              { title: "Core Concepts", description: "Models, Data Binding, Modules" },
+              { title: "Controls", description: "sap.m, sap.f, Layouts, Tables" },
+              { title: "Fragments & Dialogs", description: "Reusable UI Parts" },
+              { title: "Routing & Navigation", description: "Hash-based routing,Parameter" },
+              { title: "OData & JSON Models", description: "Data handling in SAPUI5" },
+              { title: "UI5 Flexibility", description: "Adaptation, i18n, Themes" },
+              { title: "Events & Lifecycle", description: "onInit, onAfterRendering" },
+              { title: "SAP Fiori Elements", description: "Annotations-driven UI" },
+              { title: "Deployment", description: "SAP BTP, Launchpad, CAPM Repo" }
+            ],
+            CAPMtopics: [
+              { title: "CAPM Overview", description: "Core Data Services, Node.js/Java runtimes" },
+              { title: "Domain Modeling", description: "Entities, Associations, Compositions" },
+              { title: "Service Layer", description: "Exposing services, annotations" },
+              { title: "Persistence", description: "HANA, SQLite, PostgreSQL" },
+              { title: "Authentication & Authorization", description: "XSUAA, Roles, Scopes" },
+              { title: "Events & Messaging", description: "Asynchronous communication" },
+              { title: "CAP with Fiori/UI5", description: "Annotations, UI5 consumption" },
+              { title: "Extensibility", description: "Custom Handlers, Extensions" },
+              { title: "Testing in CAP", description: "Mocha, Jest, Integration tests" },
+              { title: "Deployment", description: "SAP BTP, Multi-Target Apps (MTA)" }
+
+            ]
+          });
+          this.getView().setModel(aModel, "topicsModel");
           // TraineeData Model for Training Form
           const oTData = new JSONModel({
             Name: "",
@@ -166,7 +195,55 @@ sap.ui.define(
 
           var oModel = new JSONModel(oData);
           this.getView().setModel(oModel);
+
+
         },
+
+        onSapui5coursepress: function (oEvent) {
+          this._openTopicsPopover(oEvent.getSource(), "ui5topics", "SAPUI5 Topics");
+        },
+
+        onCapmCoursepress: function (oEvent) {
+          this._openTopicsPopover(oEvent.getSource(), "CAPMtopics", "SAP CAPM Topics");
+        },
+
+        _openTopicsPopover: function (oButton, sPath, sTitle) {
+          var that = this;
+          if (!this._pPopover) {
+            this._pPopover = sap.ui.core.Fragment.load({
+              id: this.getView().getId(),
+              name: "sap.kt.com.minihrsolution.fragment.CourseDetails", // your fragment name
+              controller: this
+            }).then(function (oPopover) {
+              that.getView().addDependent(oPopover);
+              that._bindTopicList(oPopover, sPath, sTitle);
+              oPopover.openBy(oButton);
+              return oPopover;
+            });
+          } else {
+            this._pPopover.then(function (oPopover) {
+              that._bindTopicList(oPopover, sPath, sTitle);
+              oPopover.openBy(oButton);
+            });
+          }
+        },
+
+        _bindTopicList: function (oPopover, sPath, sTitle) {
+          var oList = sap.ui.core.Fragment.byId(this.getView().getId(), "idTopicList");
+          oPopover.setTitle(sTitle);
+
+          // Rebind items dynamically
+          oList.bindItems({
+            path: "topicsModel>/" + sPath,
+            template: new sap.m.StandardListItem({
+              title: "{topicsModel>title}",
+              description: "{topicsModel>description}",
+              icon: "sap-icon://hint"
+            })
+          });
+        },
+
+
 
         onTabSelect: function (oEvent) {
           var oItem = oEvent.getParameter("item");
@@ -189,7 +266,7 @@ sap.ui.define(
           });
           this.getOwnerComponent().setModel(oAppConfigModel, "AppConfigModel");
 
-          
+
 
           const oExpYears = new JSONModel();
           oExpYears.loadData("model/ExpYears.json", null, false);
@@ -628,56 +705,56 @@ sap.ui.define(
             this._oDemoFormDialog.close();
           }
         },
-onAfterRendering: function () {
- this._applyResponsiveVideo("videoBox1", "videoFrameHtml1", "https://www.youtube.com/embed/zk2GGsXRfuo");
- this._applyResponsiveVideo("videoBox2", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
- this._applyResponsiveVideo("videoBox3", "videoFrameHtml3", "https://www.youtube.com/embed/AY8uG5826fo");
- this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "https://www.youtube.com/embed/EjnEOznAsHg");
- this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
- this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "https://www.youtube.com/embed/zk2GGsXRfuo");
+        onAfterRendering: function () {
+          this._applyResponsiveVideo("videoBox1", "videoFrameHtml1", "https://www.youtube.com/embed/zk2GGsXRfuo");
+          this._applyResponsiveVideo("videoBox2", "videoFrameHtml2", "https://www.youtube.com/embed/zk2GGsXRfuo");
+          this._applyResponsiveVideo("videoBox3", "videoFrameHtml3", "https://www.youtube.com/embed/AY8uG5826fo");
+          this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "https://www.youtube.com/embed/EjnEOznAsHg");
+          this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
+          this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "https://www.youtube.com/embed/zk2GGsXRfuo");
 
-},
-_applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-    var oVBox = this.byId(vBoxId);
-    var oHtml = this.byId(htmlId);
-    if (!oVBox || !oHtml) return;
+        },
+        _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+          var oVBox = this.byId(vBoxId);
+          var oHtml = this.byId(htmlId);
+          if (!oVBox || !oHtml) return;
 
-    var iWidth = window.innerWidth;
-    var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+          var iWidth = window.innerWidth;
+          var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
 
-    var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
-    var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+          var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+          var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
 
-    if (bResponsive) {
-        oHtml.setContent(sMobile);
+          if (bResponsive) {
+            oHtml.setContent(sMobile);
 
-    } else {
-        oHtml.setContent(sNormal);
-    }
-},
-onHRSolutionPress:function(){
-   this.getRouter().navTo("HRSolutions_Demo");
-},
-onInvoiceManagePress:function(){
-   this.getRouter().navTo("Invoice_Solution_Demo");
-},
-onAssetPress:function(){
- this.getRouter().navTo("IT_Asset_Demo");
-},
-onrecruitmentPress:function(){
-   this.getRouter().navTo("Recruitment_Demo");
-},
-onAutoMotivePress: function () {
-   this.getRouter().navTo("AutoMobile_Demo");
-},
-onIdCardPress: function () {
-   this.getRouter().navTo("IDCardgenerate");
-}
-
-
+          } else {
+            oHtml.setContent(sNormal);
+          }
+        },
+        onHRSolutionPress: function () {
+          this.getRouter().navTo("HRSolutions_Demo");
+        },
+        onInvoiceManagePress: function () {
+          this.getRouter().navTo("Invoice_Solution_Demo");
+        },
+        onAssetPress: function () {
+          this.getRouter().navTo("IT_Asset_Demo");
+        },
+        onrecruitmentPress: function () {
+          this.getRouter().navTo("Recruitment_Demo");
+        },
+        onAutoMotivePress: function () {
+          this.getRouter().navTo("AutoMobile_Demo");
+        },
+        onIdCardPress: function () {
+          this.getRouter().navTo("IDCardgenerate");
+        }
 
 
-       
+
+
+
       }
     );
   }
