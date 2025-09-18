@@ -18,10 +18,10 @@
                     value="{formData>/CompanyName}"
                     id="idCompanyname"
                     liveChange="validateCompnayname"
-                    placeholder="{i18n>placeCompany}"
+                    placeholder="{i18n>demoCompanyName}"
                     required="true"
                     maxLength="50"
-                    valueStateText="{i18n>placeCompany}"
+                    valueStateText="{i18n>demoCompanyName}"
                         class="inputField"
                 />
 				<m:Input
