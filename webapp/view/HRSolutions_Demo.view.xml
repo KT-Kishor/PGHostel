@@ -44,10 +44,19 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox_A" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+        <!-- <m:VBox id="videoBox_A" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_A"
         content="&lt;iframe src='../Videos/Employee Offer.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
 
+</m:VBox> -->
+
+   <m:VBox id="videoBox_A" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_A"
+        content="&lt;video width='560' height='315' controls autoplay muted playsinline 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Employee Offer.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
 </m:VBox>
 <!-- Trainee -->
     </g:GridContainer>
@@ -66,13 +75,22 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox id="videoBox_B" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+        <!-- <m:VBox id="videoBox_B" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_B"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Trainee Application' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
-       </m:VBox>
+       </m:VBox> -->
+
+         <m:VBox id="videoBox_B" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_B"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Trainee Application' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
@@ -102,9 +120,18 @@
         </m:VBox>
 
         <!-- Right Column -->
-          <m:VBox id="videoBox_C" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+          <!-- <m:VBox id="videoBox_C" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_C"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
+                    &lt;source src='../Videos/Contract Offer Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox> -->
+
+   <m:VBox id="videoBox_C" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_C"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Contract Offer Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -128,14 +155,22 @@
         <!-- Right Column -->
      
 
-         <m:VBox id="videoBox_D" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+         <!-- <m:VBox id="videoBox_D" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_D"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Self Service.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
-</m:VBox>
+</m:VBox> -->
 
+  <m:VBox id="videoBox_D" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_D"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Self Service.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
         
 
         <!-- Left Column -->
@@ -167,10 +202,19 @@
 
         <!-- Right Column -->
       
-          <m:VBox id="videoBox_E" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+          <!-- <m:VBox id="videoBox_E" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_E"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Employee Details.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox> -->
+
+ <m:VBox id="videoBox_E" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_E"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Self Service.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
 </m:VBox>
@@ -192,14 +236,22 @@
 
         <!-- Right Column -->
        
-         <m:VBox id="videoBox_F" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+         <!-- <m:VBox id="videoBox_F" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_F"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Leave Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
-</m:VBox>
+</m:VBox> -->
 
+ <m:VBox id="videoBox_F" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_F"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Leave Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
             <m:Title text="{i18n>headerLeave}" level="H1" class="jioHeading" />
@@ -230,9 +282,18 @@
 
         <!-- Right Column -->
       
-          <m:VBox id="videoBox_G" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+          <!-- <m:VBox id="videoBox_G" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_G"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
+                    &lt;source src='../Videos/Expense Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox> -->
+
+ <m:VBox id="videoBox_G" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_G"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Expense Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -256,14 +317,22 @@
         <!-- Right Column -->
       
 
-         <m:VBox id="videoBox_H" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+         <!-- <m:VBox id="videoBox_H" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_H"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Timesheet Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
-</m:VBox>
+</m:VBox> -->
 
+<m:VBox id="videoBox_H" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_H"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Timesheet Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
             <m:Title text="{i18n>headerTimesheet}" level="H1" class="jioHeading" />
@@ -295,14 +364,22 @@
 
         <!-- Right Column -->
       
-           <m:VBox id="videoBox_I" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+           <!-- <m:VBox id="videoBox_I" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_I"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
                     &lt;source src='../Videos/Generate Payslip.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
-</m:VBox>
+</m:VBox> -->
 
+<m:VBox id="videoBox_I" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_I"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/Generate Payslip.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
     </g:GridContainer>
 <!-- Inbox -->
      <g:GridContainer class="jioSection sapUiSmallMarginTop">
@@ -320,9 +397,18 @@
         </g:layoutM>
 
         <!-- Right Column -->
-         <m:VBox id="videoBox_J" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+         <!-- <m:VBox id="videoBox_J" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml_J"
         content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
+                    &lt;source src='../Videos/My Inbox.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox> -->
+
+<m:VBox id="videoBox_J" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_J"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/My Inbox.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
