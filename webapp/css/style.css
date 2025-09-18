@@ -2054,36 +2054,6 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     background-position: right 100%; 
 }
 
-.video-player {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 20px;   /* curved corners */
-}
-
-.video-frame {
-  width: 90%;
-  aspect-ratio: 16/9;
-  overflow: hidden;
-  border-radius: 20px;   /* curve for the container */
-  box-shadow: 0 6px 16px rgba(0,0,0,0.25); /* nice shadow */
-  margin: auto;
-}
-
-.video-player {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: inherit; /* inherit same curve as frame */
-}
-
-/* Remove VBox background */
-.videoBoxTransparent {
-  background-color: transparent !important;
-  box-shadow: none !important;
-}
 .training_Course{
 text-decoration:none;
 cursor:pointer;
