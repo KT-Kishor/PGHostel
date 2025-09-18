@@ -134,23 +134,31 @@ sap.ui.define([
       this._applyResponsiveVideo("videoBox61", "videoFrameHtml61", "../Videos/Quotation Application.mp4");
 
     },
-  _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-      var oVBox = this.byId(vBoxId);
-      var oHtml = this.byId(htmlId);
-      if (!oVBox || !oHtml) return;
+    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
 
-      var iWidth = window.innerWidth;
-      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+    // autoplay only for first video
+    var bAutoplay = (vBoxId === "videoBox11");
 
-      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
-      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+    // video element
+    var sVideoTag = "<video controls preload='auto' " +
+        (bAutoplay ? "autoplay muted playsinline " : "") +
+        "style='border:none;border-radius:15px;width:100%;height:100%;object-fit:cover;'>" +
+        "<source src='" + videoUrl + "' type='video/mp4'>" +
+        "Your browser does not support the video tag." +
+        "</video>";
 
-      if (bResponsive) {
-        oHtml.setContent(sMobile);
+    // responsive wrapper (16:9 ratio)
+    var sResponsiveWrapper =
+        "<div style='position:relative;width:100%;padding-top:56.25%;border-radius:15px;overflow:hidden;'>" +
+            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+                sVideoTag +
+            "</div>" +
+        "</div>";
 
-      } else {
-        oHtml.setContent(sNormal);
-      }
-    },
+    oHtml.setContent(sResponsiveWrapper);
+}
   });
 });
