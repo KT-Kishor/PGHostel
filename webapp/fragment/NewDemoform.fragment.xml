@@ -1,22 +1,20 @@
 <core:FragmentDefinition
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:m="sap.m"
-    xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:m="sap.m"
+	xmlns:core="sap.ui.core"
 >
-    <m:Dialog
+	<m:Dialog
         id="demoFormDialog"
         class="demoFormDialog"
         draggable="true"
         title="{i18n>demoFormtitle}"
     >
-        <m:VBox class="dialogContentBox">
-          
-            <m:VBox
+		<m:VBox class="dialogContentBox">
+			<m:VBox
                 class="formContainer"
                 renderType="Bare"
             >
-           
-                <m:Input    
+				<m:Input    
                     value="{formData>/CompanyName}"
                     id="idCompanyname"
                     liveChange="validateCompnayname"
@@ -26,9 +24,7 @@
                     valueStateText="{i18n>placeCompany}"
                         class="inputField"
                 />
-
-            
-                <m:Input
+				<m:Input
                     value="{formData>/CustomerName}"
                     liveChange="validateName"
                     id="idcustomername"
@@ -38,9 +34,7 @@
                     valueStateText="{i18n>placeholderCustName}"
                      class="inputField"
                 />
-
-            
-                <m:Input
+				<m:Input
                     value="{formData>/Email}"
                     placeholder="{i18n>placeEmailId}"
                     type="Email"
@@ -51,8 +45,7 @@
                     valueStateText="Enter Valid Email"
                      class="inputField"
                 />
-
-                <m:DateTimePicker
+				<m:DateTimePicker
                     value="{formData>/TimeSlot}"
                     placeholder="{i18n>placeholdertimeslote}"
                     required="true"
@@ -62,38 +55,31 @@
                     displayFormat="dd/MM/yyyy HH:mm"
                      class="inputField"
                 />
-                
-             
-                  <m:HBox class="sapUiSmallMarginTop" alignItems="Center" justifyContent="Start" >
-    <!-- STD Code Input -->
-    <m:ComboBox 
-        id="idDemoSTD" 
-        width="70px"  
-        value="{formData>/STDCode}"
-        placeholder="STD"
-        items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"
-      
-    >
-    <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
-    </m:ComboBox>
-    
-    <!-- Mobile Number Input -->
-    <m:Input
-        value="{formData>/MobileNo}"
-        placeholder="{i18n>placeholderMobileNo}"
-        liveChange="validateMobileNo"
-        id="idmobilenumber"
-        valueStateText="Enter At least 10 digit number"
-        required="true"
-        maxLength="10"
-        class="inputField"
-    />
-</m:HBox>
-
-              
-               
-
-                <m:TextArea
+				<m:HBox width="100%" justifyContent="Start" alignItems="Center" class="inputField">
+					<m:VBox width="30%">
+						<m:ComboBox 
+            id="idDemoSTD" 
+            width="70px"  
+            value="{formData>/STDCode}"
+            placeholder="STD"   showSecondaryValues="true"  filterSecondaryValues="true"
+            items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"
+        >
+							<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+						</m:ComboBox>
+					</m:VBox>
+					<m:VBox width="70%" class="inputMargin">
+						<m:Input
+            value="{formData>/MobileNo}"
+            placeholder="{i18n>placeholderMobileNo}"
+            liveChange="validateMobileNo"
+            id="idmobilenumber"
+            valueStateText="Enter At least 10 digit number"
+            required="true"
+            maxLength="10"
+        />
+					</m:VBox>
+				</m:HBox>
+				<m:TextArea
                     value="{formData>/Address}"
                     placeholder="{i18n>placeAddress}"
                     rows="2"
@@ -104,9 +90,7 @@
                     maxLength="120"
                      class="inputField"
                 />
-
-           
-                <m:TextArea
+				<m:TextArea
                     value="{formData>/Comments}"
                     placeholder="{i18n>enterComments}"
                     rows="2"
@@ -116,21 +100,20 @@
                     liveChange="ValidateCommonFields"
                      class="inputField"
                 />
-            </m:VBox>
-        </m:VBox>
-
-        <m:beginButton>
-            <m:Button
+			</m:VBox>
+		</m:VBox>
+		<m:beginButton>
+			<m:Button
                 text="Submit"
                 class="FOOTER"
                 press="onDemoformSave"
             />
-        </m:beginButton>
-        <m:endButton>
-            <m:Button
+		</m:beginButton>
+		<m:endButton>
+			<m:Button
                 text="Cancel"
                 press="onCloseDemoForm"
             />
-        </m:endButton>
-    </m:Dialog>
+		</m:endButton>
+	</m:Dialog>
 </core:FragmentDefinition>

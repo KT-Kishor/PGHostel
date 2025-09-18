@@ -2044,6 +2044,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .inputField{
   margin-top: 15px !important;
 }
+
 /* Style for main headings */
 .JobPosting {
     font-size: 32px;
@@ -2133,3 +2134,8 @@ font-size: 20px;
   padding: 5px 12px !important;
   height: 33px !important;
 }
+
+.inputMargin {
+    margin-left: 10px; /* Adjust the space between ComboBox and Input */
+}
+
