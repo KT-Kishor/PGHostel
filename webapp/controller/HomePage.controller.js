@@ -754,12 +754,49 @@ sap.ui.define(
         onIdCardPress: function () {
           this.getRouter().navTo("IDCardgenerate");
         },
-onNavToHrSolution: function () {
+        onNavToHrSolution: function () {
           this.getRouter().navTo("HRSolutions_Demo");
         },
-
-
-
+         onPressOfficeTour: function () {
+            if (!this._oDialog) {
+                this._oDialog = new sap.m.Dialog({
+                    title: "Office Tour",
+                    contentWidth: "90%",
+                    contentHeight: "90%",
+                    resizable: true,
+                    draggable: true,
+                    stretch: sap.ui.Device.system.phone, // fullscreen on mobile
+                    content: [
+                        new sap.ui.core.HTML({
+                            content: `
+                                <div style="position:relative;width:100%;padding-top:56.25%;">
+                                    <video id="officeTourVideo" 
+                                          src="../Videos/Office Tour.mp4" 
+                                          controls autoplay
+                                          style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                                    </video>
+                                </div>
+                            `
+                        })
+                    ],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            this._oDialog.close();
+                        }.bind(this)
+                    }),
+                    afterClose: function () {
+                        // Stop & reset video
+                        var oVideo = document.getElementById("officeTourVideo");
+                        if (oVideo) {
+                            oVideo.pause();
+                            oVideo.currentTime = 0;
+                        }
+                    }
+                });
+            }
+            this._oDialog.open();
+        }
       }
     );
   }

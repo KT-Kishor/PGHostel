@@ -2113,3 +2113,23 @@ font-size: 20px;
     font-size: 26px !important;      
     line-height: 1.5;     
 }
+
+    /* Container to stick it fixed top-right */
+.officetourContainer {
+  position: fixed !important;  /* fixed to viewport */
+  top: 58px;
+  right: 75px;
+  z-index: 9999;               /* make sure it’s above SAPUI5 controls */
+  pointer-events: auto;        /* ensure clicks work */
+}
+
+/* Button styling */
+.officetourBtn .sapMBtnInner {
+  background-color: #0057FF !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  padding: 5px 12px !important;
+  height: 33px !important;
+}
