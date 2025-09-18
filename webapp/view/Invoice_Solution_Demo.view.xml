@@ -19,6 +19,8 @@
 			<ToolbarSpacer/>
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
+			<Title level="H1" text="{i18n>InvoiceManage}" class="JobPosting" wrapping="false"/>
+
     <m:ScrollContainer horizontal="false" vertical="true" height="100%">
     <!-- MSA & NDA -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">

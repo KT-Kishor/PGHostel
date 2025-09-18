@@ -246,7 +246,7 @@
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
   font-size: 1.5rem;
-  color: #000103;
+  color: #54AFE6;
 }
 .formBorder {
   border: 1px solid #ccc;
@@ -2021,3 +2021,23 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .inputField{
   margin-top: 15px !important;
 }
+/* Style for main headings */
+.JobPosting {
+    font-size: 32px;
+    font-weight: 700;
+    color:#54AFE6;
+    margin: 10px 0px;
+    margin-left: 30px;
+    padding-left: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: capitalize;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background-image: linear-gradient(to right,#54AFE6, #81ccf8);
+    background-repeat: no-repeat;
+    background-size: 98% 3px;     
+    background-position: right 100%; 
+}
+
+
+
+

@@ -18,6 +18,7 @@
 			<ToolbarSpacer/>
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
+			<Title level="H1" text="{i18n>minihrsolution}" class="JobPosting" wrapping="false"/>
 
 
     
@@ -65,11 +66,13 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox_B" justifyContent="Center" class="sapUiMediumMarginTop">
-            <core:HTML id="videoFrameHtml_B"
-                    content="&lt;iframe src='../Videos/Trainee Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
-                />
-        </m:VBox>
+        <m:VBox id="videoBox_B" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_B"
+        content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
+                    &lt;source src='../Videos/Trainee Application' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+       </m:VBox>
 
         <!-- Left Column -->
         <m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
@@ -99,11 +102,13 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox alignItems="Center" id="videoBox_C" justifyContent="Center" class="sapUiMediumMarginTop">
-              <core:HTML id="videoFrameHtml_C"
-                     content="&lt;iframe src='../Videos/Contract Offer Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;"
-                />
-        </m:VBox>
+          <m:VBox id="videoBox_C" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtml_C"
+        content="&lt;video width='560' height='315' controls autoplay='false' allowfullscreen style='border:none;'&gt;
+                    &lt;source src='../Videos/Contract Offer Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
+</m:VBox>
     </g:GridContainer>
     <!-- SelfService -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">

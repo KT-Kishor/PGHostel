@@ -18,6 +18,9 @@
 			<ToolbarSpacer/>
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
+
+        			<Title level="H1" text="{i18n>IDcard}" class="JobPosting" wrapping="false"/>
+
     <!-- upload scheme -->
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
         <g:layout>
