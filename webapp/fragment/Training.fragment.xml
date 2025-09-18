@@ -8,8 +8,8 @@
                 <!-- SAP UI5 Section -->
                 <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid" >
                 <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/SAPUI5 (1).png" width="auto" height="200px" visible="true" class="section-image"/>
-                  </HBox>
+                <Image src="../image/SAPUI5 (1).png" width="auto" height="250px" visible="true" class="section-image"/>
+                  </HBox> 
 
                     <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineesapui5}"/>
                     <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeDes1}"/>
@@ -30,7 +30,7 @@
                 </VBox>
                 <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid">
                 <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/SAP CAPM.jpg" width="auto" height="200px" visible="true" class="section-image"/>
+                <Image src="../image/Sap CAPM.jpg" width="auto" height="250px" visible="true" class="section-image"/>
                   </HBox>
                     <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineeCapmtitle}"/>
                     <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight}"/>

@@ -7,55 +7,55 @@
 		<l:BlockLayout background="Dashboard" >
 			<l:BlockLayoutRow rowColorSet="ColorSet4">
 				<l:BlockLayoutCell titleLevel="H2"
-					title="{i18n>aboutUscontent1}">
+					title="{i18n>aboutUscontent1}" class="cell-bgcolor">
 					<!-- <Button text="View Products" press="onproductpress"></Button> -->
 					</l:BlockLayoutCell>
 			</l:BlockLayoutRow>
 			<l:BlockLayoutRow>
-			<l:BlockLayoutCell title="Products" >
-				<VBox class="lineSpace">
-        <Link text="HR Solution" press=".onNavToHrSolution" />
-        <Text text="Automate employee offers, contracts, leave, payroll, timesheets, and expenses with a self-service portal. Empower your workforce with seamless, error-free HR operations anytime, anywhere." wrapping="true"/>
+			<l:BlockLayoutCell title="Products"  class="cell-bgcolor">
+				<VBox >
+        <Link text="HR Solution" press=".onNavToHrSolution"  class="aboutTitle"/>
+        <Text text="Automate employee offers, contracts, leave, payroll, timesheets, and expenses with a self-service portal. Empower your workforce with seamless, error-free HR operations anytime, anywhere." wrapping="true" class="Recuritmentclass"/>
     </VBox>
-     <VBox class="lineSpace">
-        <Link text="Invoice Solution" press=".onNavToInvoiceSolution" />
-        <Text text=" Simplify invoicing with automated MSA, NDA, SOW, quotations, PO, and contract invoices. Ensure accuracy, compliance, and faster payments with real-time tracking." wrapping="true"/>
+     <VBox >
+        <Link text="Invoice Solution" press=".onNavToInvoiceSolution"  class="aboutTitle"/>
+        <Text text=" Simplify invoicing with automated MSA, NDA, SOW, quotations, PO, and contract invoices. Ensure accuracy, compliance, and faster payments with real-time tracking." wrapping="true" class="Recuritmentclass"/>
     </VBox>
-     <VBox class="lineSpace">
-        <Link text="Company Asset Management" press=".onNavToCompanySolution" />
-        <Text text="Track, assign, and manage all company assets in one place. Gain complete visibility and control over asset usage and lifecycle." wrapping="true"/>
+     <VBox >
+        <Link text="Company Asset Management" press=".onNavToCompanySolution" class="aboutTitle"/>
+        <Text text="Track, assign, and manage all company assets in one place. Gain complete visibility and control over asset usage and lifecycle." class="Recuritmentclass" wrapping="true"/>
     </VBox>
-     <VBox class="lineSpace">
-        <Link text="Recruitment" press=".onNavToRecruitmentSolution" />
-        <Text text="Streamline hiring with easy job postings, applications, and interview scheduling. Attract and onboard the right talent quickly and efficiently." wrapping="true"/>
+     <VBox >
+        <Link text="Recruitment" press=".onNavToRecruitmentSolution"  class="aboutTitle"/>
+        <Text text="Streamline hiring with easy job postings, applications, and interview scheduling. Attract and onboard the right talent quickly and efficiently." class="Recuritmentclass" wrapping="true"/>
     </VBox>
-     <VBox class="lineSpace">
-        <Link text="Automobile Solution" press=".onNavToAutomobileSolution" />
-        <Text text="Manage automobile schemes and quotations with automation and precision. Save time, reduce errors, and keep your business running smoothly.." wrapping="true"/>
+     <VBox >
+        <Link text="Automobile Solution" press=".onNavToAutomobileSolution"  class="aboutTitle"/>
+        <Text text="Manage automobile schemes and quotations with automation and precision. Save time, reduce errors, and keep your business running smoothly." class="Recuritmentclass" wrapping="true"/>
     </VBox>
 </l:BlockLayoutCell>
 
 				<l:BlockLayoutCell title="{i18n>recruitment}">
-				<VBox class="lineSpace">
-      
-        <Text text="We are efficient resource provider of SAP to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true"/>
+				<VBox >
+       <Link text="Building Strong and Capable Teams" press=".onNavToHrSolution" class="aboutTitle" />
+        <Text text="We are efficient resource provider of SAP to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true" class="Recuritmentclass"/>
     </VBox>
-	<VBox class="lineSpace">
-      
-        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Salesforces with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true"/>
+	<VBox >
+       <Link text="Leading Recruitment Service Provider" press=".onNavToHrSolution" class="aboutTitle" />
+        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Salesforces with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
     </VBox>
-	<VBox class="lineSpace">
-      
-        <Text text=" Executive Search: Finding top-level leaders and executives to drive growth." wrapping="true"/>
+	<VBox >
+     <Link text="Executive Search" press=".onNavToHrSolution" class="aboutTitle" />
+        <Text text=" Finding top-level leaders and executives to drive growth." wrapping="true" class="Recuritmentclass"/>
     </VBox>
-	<VBox class="lineSpace">
-      
-        <Text text="Talent Mapping and Sourcing: Proactively identifying and engaging with high potential talent.
-" wrapping="true"/>
+	<VBox >
+      <Link text="Talent Mapping and Sourcing" press=".onNavToHrSolution" class="aboutTitle" />
+        <Text text=" Proactively identifying and engaging with high potential talent. 
+" wrapping="true" class="Recuritmentclass"/>
     </VBox>
-	<VBox class="lineSpace">
-      
-        <Text text="Candidate Screening and Assessment: Rigorous vetting for skill and cultural fit, we screening the profile take one round of interview to make sure it a best fit." wrapping="true"/>
+	<VBox >
+      <Link text="Candidate Screening and Assessment" press=".onNavToHrSolution" class="aboutTitle" />
+        <Text text=" Rigorous vetting for skill and cultural fit, we screening the profile take one round of interview to make sure it a best fit." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 					<!-- <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUsSecondcontent5}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent9}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes1}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes2}&lt;/a&gt;&lt;/div&gt;'></core:HTML> -->
 				</l:BlockLayoutCell>

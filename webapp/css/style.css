@@ -231,24 +231,25 @@
   background-repeat: no-repeat;
 }
 
-.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+/* .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:first-of-type
   .sapUiBlockCellContent {
   margin-top: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   color:#0057FF !important;
-}
-.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+} */
+/* .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:last-of-type
   .sapUiBlockCellContent {
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
   line-height: 1.5;
   color:#0057FF !important;
-}
+} */
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
-  font-size: 1.5rem;
+  font-size: 26px;
   color:#0057FF !important;
+  font-weight: bold;
 }
 .formBorder {
   border: 1px solid #ccc;
@@ -423,6 +424,7 @@
   line-height: 1.9;
   /* font-weight: bold; */
   max-width: 700px;
+  font-weight: bold;
 }
 .section-title {
   font-size: 16px;
@@ -2109,11 +2111,12 @@ font-size: 20px;
   z-index: 1000;
   }
 
-.lineSpace {
+/* .lineSpace {
     margin-bottom: 10px;  
     font-size: 26px !important;      
     line-height: 1.5;     
-}
+    text-decoration: underline !important;
+} */
 
     /* Container to stick it fixed top-right */
 .officetourContainer {
@@ -2134,7 +2137,17 @@ font-size: 20px;
   padding: 5px 12px !important;
   height: 33px !important;
 }
-
+.Recuritmentclass{
+  font-size: 16px;
+}
+.aboutTitle{
+  color: #F1AD53 !important;
+}
+/* .cell-bgcolor{
+  font-size: 10px !important;
+  font-weight: bold ;
+  color: #0057FF !important;
+} */
 .inputMargin {
     margin-left: 10px; /* Adjust the space between ComboBox and Input */
 }

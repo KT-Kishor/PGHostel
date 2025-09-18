@@ -757,6 +757,18 @@ sap.ui.define(
         onNavToHrSolution: function () {
           this.getRouter().navTo("HRSolutions_Demo");
         },
+         onNavToInvoiceSolution: function () {
+          this.getRouter().navTo("Invoice_Solution_Demo");
+        },
+         onNavToCompanySolution: function () {
+          this.getRouter().navTo("IT_Asset_Demo");
+        },
+         onNavToRecruitmentSolution: function () {
+          this.getRouter().navTo("Recruitment_Demo");
+        },
+         onNavToAutomobileSolution: function () {
+          this.getRouter().navTo("AutoMobile_Demo");
+        },
          onPressOfficeTour: function () {
             if (!this._oDialog) {
                 this._oDialog = new sap.m.Dialog({
