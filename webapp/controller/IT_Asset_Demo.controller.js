@@ -129,28 +129,49 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("mandetoryFields"));
           }
         },
-    onAfterRendering: function () {
-      this._applyResponsiveVideo("videoBox101", "videoFrameHtml101", "../Videos/Company Asset.mp4");
-      this._applyResponsiveVideo("videoBox201", "videoFrameHtml201", "../Videos/Asset Assignment.mp4");
-      this._applyResponsiveVideo("videoBox301", "videoFrameHtml301", "../Videos/My Asset.mp4");
-    },
-    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-      var oVBox = this.byId(vBoxId);
-      var oHtml = this.byId(htmlId);
-      if (!oVBox || !oHtml) return;
+        onAfterRendering: function () {
+          this._applyResponsiveVideo("videoBox101", "videoFrameHtml101", "../Videos/Company Asset.mp4");
+          this._applyResponsiveVideo("videoBox201", "videoFrameHtml201", "../Videos/Asset Assignment.mp4");
+          this._applyResponsiveVideo("videoBox301", "videoFrameHtml301", "../Videos/My Asset.mp4");
+        },
+        _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+        var oVBox = this.byId(vBoxId);
+        var oHtml = this.byId(htmlId);
+        if (!oVBox || !oHtml) return;
 
-      var iWidth = window.innerWidth;
-      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+        var iWidth = window.innerWidth;
+        var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
 
-      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
-      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+        // check if first video (autoplay required only for videoBox101)
+        var bAutoplay = (vBoxId === "videoBox101");
 
-      if (bResponsive) {
-        oHtml.setContent(sMobile);
+        // common video tag (without sizing)
+        var sVideoTag = "<video controls " +
+            (bAutoplay ? "autoplay muted playsinline " : "") +
+            "style='border:none;border-radius:15px;overflow:hidden;width:100%;height:100%;object-fit:cover;'>" +
+            "<source src='" + videoUrl + "' type='video/mp4'>" +
+            "Your browser does not support the video tag." +
+            "</video>";
 
-      } else {
-        oHtml.setContent(sNormal);
-      }
-    },
+        // responsive wrapper (16:9 aspect ratio)
+        var sResponsiveWrapper =
+            "<div style='position:relative;width:100%;padding-top:56.25%;border-radius:15px;overflow:hidden;'>" +
+            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+            sVideoTag +
+            "</div>" +
+            "</div>";
+
+        // desktop fixed size version
+        var sDesktop =
+            "<div style='width:560px;height:315px;border-radius:15px;overflow:hidden;'>" +
+            sVideoTag +
+            "</div>";
+
+        if (bResponsive) {
+            oHtml.setContent(sResponsiveWrapper); // mobile fluid
+        } else {
+            oHtml.setContent(sDesktop); // desktop fixed
+        }
+    }
   });
 });
