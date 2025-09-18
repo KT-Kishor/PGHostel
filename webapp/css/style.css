@@ -236,6 +236,7 @@
   .sapUiBlockCellContent {
   margin-top: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  color:#0057FF !important;
 }
 .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:last-of-type
@@ -243,10 +244,11 @@
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
   line-height: 1.5;
+  color:#0057FF !important;
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
   font-size: 1.5rem;
-  color:#0057FF;
+  color:#0057FF !important;
 }
 .formBorder {
   border: 1px solid #ccc;
@@ -2059,3 +2061,11 @@ text-decoration:none;
 cursor:pointer;
 font-size: 20px;
 }
+
+/* Keep video area 16:9 ratio */
+.responsiveVideoBox {
+  aspect-ratio: 16/9;
+  width: 100%;
+  max-width: 100%;
+}
+

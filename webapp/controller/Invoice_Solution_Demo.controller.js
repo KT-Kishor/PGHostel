@@ -134,34 +134,23 @@ sap.ui.define([
       this._applyResponsiveVideo("videoBox61", "videoFrameHtml61", "../Videos/Quotation Application.mp4");
 
     },
-   _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-  var oVBox = this.byId(vBoxId);
-  var oHtml = this.byId(htmlId);
-  if (!oVBox || !oHtml) return;
+  _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+      var oVBox = this.byId(vBoxId);
+      var oHtml = this.byId(htmlId);
+      if (!oVBox || !oHtml) return;
 
-  var iWidth = window.innerWidth;
-  var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+      var iWidth = window.innerWidth;
+      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
 
-  // Styles for consistent look
-  var sStyleNormal = "width:560px;height:315px;border:none;border-radius:15px;object-fit:cover;background-color:transparent;";
-  var sStyleMobile = "width:100vw;max-width:100%;height:200px;border:none;border-radius:15px;object-fit:cover;background-color:transparent;";
+      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
+      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
 
-  // Build iframe (YouTube-style) OR video tag
-  var sNormal = "<video controls style='" + sStyleNormal + "'>" +
-                  "<source src='" + videoUrl + "' type='video/mp4'>" +
-                  "Your browser does not support the video tag." +
-                "</video>";
+      if (bResponsive) {
+        oHtml.setContent(sMobile);
 
-  var sMobile = "<video controls style='" + sStyleMobile + "'>" +
-                  "<source src='" + videoUrl + "' type='video/mp4'>" +
-                  "Your browser does not support the video tag." +
-                "</video>";
-
-  if (bResponsive) {
-    oHtml.setContent(sMobile);
-  } else {
-    oHtml.setContent(sNormal);
-  }
-}
+      } else {
+        oHtml.setContent(sNormal);
+      }
+    },
   });
 });
