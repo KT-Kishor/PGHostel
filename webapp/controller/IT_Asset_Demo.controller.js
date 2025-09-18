@@ -140,7 +140,7 @@ sap.ui.define([
         if (!oVBox || !oHtml) return;
 
         var iWidth = window.innerWidth;
-        var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
+        var bResponsive = sap.ui.Device.system.phone || iWidth < 400; // treat <768px as mobile
 
         // check if first video (autoplay required only for videoBox101)
         var bAutoplay = (vBoxId === "videoBox101");

@@ -45,11 +45,12 @@
 
           <!-- Right Column -->
        <m:VBox id="videoBox11" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml11"
-        content="&lt;iframe src='../Videos/MSA and SOW Application.mp4' 
-                         allowfullscreen 
-                         style='width:100%;height:auto;border-radius:15px;overflow:hidden;object-fit:cover;'&gt;
-                 &lt;/iframe&gt;" />
+                  <core:HTML id="videoFrameHtml11"
+        content="&lt;video width='560' height='315' controls autoplay muted playsinline 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                    &lt;source src='../Videos/MSA and SOW Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
 </m:VBox>
 <!-- Sow -->
     </g:GridContainer>
@@ -69,9 +70,9 @@
 
         <!-- Right Column -->
          <m:VBox id="videoBox21" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml21"
-        content="&lt;video controls autoplay muted playsinline
-                         style='width:100%;height:auto;border-radius:15px;object-fit:cover;'&gt;
+          <core:HTML id="videoFrameHtml21"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Manage Customer.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -108,9 +109,9 @@
        
 
          <m:VBox id="videoBox31" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml31"
-        content="&lt;video controls 
-                         style='width:100%;height:auto;border-radius:15px;object-fit:cover;'&gt;
+                  <core:HTML id="videoFrameHtml31"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Purchase Order.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -135,9 +136,9 @@
         <!-- Right Column -->
 
         <m:VBox id="videoBox41" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml41"
-        content="&lt;video controls 
-                         style='width:100%;height:auto;border-radius:15px;object-fit:cover;'&gt;
+                  <core:HTML id="videoFrameHtml41"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Company Invoice.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -181,9 +182,9 @@
         <!-- Right Column -->
      
         <m:VBox id="videoBox51" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml51"
-        content="&lt;video controls 
-                         style='width:100%;height:auto;border-radius:15px;object-fit:cover;'&gt;
+                  <core:HTML id="videoFrameHtml51"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Contractor Invoice Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -208,9 +209,9 @@
        
 
   <m:VBox id="videoBox61" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml61"
-        content="&lt;video controls 
-                         style='width:100%;height:auto;border-radius:15px;object-fit:cover;'&gt;
+                  <core:HTML id="videoFrameHtml61"
+        content="&lt;video width='560' height='315' controls 
+                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
                     &lt;source src='../Videos/Quotation Application.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
