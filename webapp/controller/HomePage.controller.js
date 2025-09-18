@@ -528,55 +528,71 @@ sap.ui.define(
           this.getView().setModel(oSuggestModel, "skillModel");
         },
 
+        onSearch: function (oEvent) {
+            var sQuery = oEvent.getParameter("query") || oEvent.getSource().getValue();
+            var oTable = this.byId("V1_ID_Table");
+            var oBinding = oTable.getBinding("items");
 
-        V1_onSearch: function () {
-          const oSkillInput = this.byId("V1_ID_SkillsInput")
-            ?.getValue()
-            ?.trim();
-          const oLocationKey = this.byId("V1_ID_LocationComboBox")?.getValue();
-          const oExpCombo = this.byId("V1_ID_ExpComboBox")
-            ?.getSelectedItem()
-            ?.getText();
-
-          // --- Build payload ---
-          const oFilterPayload = {
-            PrimarySkills: oSkillInput || "",
-            Location: oLocationKey || "",
-            Experience: oExpCombo || "",
-          };
-
-          // --- Send POST to backend ---
-          this.getBusyDialog();
-          $.ajax({
-            url: "https://rest.kalpavrikshatechnologies.com/JobOpenings" + "?" + $.param(oFilterPayload),
-
-            method: "GET",
-            contentType: "application/json",
-            dataType: "json",
-            headers: {
-              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            },
-            success: function (response) {
-              const aData = response?.data || [];
-              const aFilteredData = aData.filter((job) => job?.Status === "true");
-              const oFilteredModel = new sap.ui.model.json.JSONModel({
-                Candidates: aFilteredData,
-              });
-              this.getView().setModel(oFilteredModel, "JobApplicationModel");
-
-              this.closeBusyDialog();
-            }.bind(this),
-            error: function (err) {
-              this.closeBusyDialog();
-              if (err?.responseJSON?.message) {
-                MessageToast.show("Error: " + err.responseJSON.message);
-              } else {
-                MessageToast.show("Failed to load filtered data.");
-              }
-            }.bind(this),
-          });
+            if (sQuery && sQuery.length > 0) {
+                var oFilter = new sap.ui.model.Filter({
+                    path: "PrimarySkills",
+                    operator: sap.ui.model.FilterOperator.Contains,
+                    value1: sQuery
+                });
+                oBinding.filter([oFilter]);
+            } else {
+                oBinding.filter([]); // clear filters if empty
+            }
         },
+
+        // V1_onSearch: function () {
+        //   const oSkillInput = this.byId("V1_ID_SkillsInput")
+        //     ?.getValue()
+        //     ?.trim();
+        //   const oLocationKey = this.byId("V1_ID_LocationComboBox")?.getValue();
+        //   const oExpCombo = this.byId("V1_ID_ExpComboBox")
+        //     ?.getSelectedItem()
+        //     ?.getText();
+
+        //   // --- Build payload ---
+        //   const oFilterPayload = {
+        //     PrimarySkills: oSkillInput || "",
+        //     Location: oLocationKey || "",
+        //     Experience: oExpCombo || "",
+        //   };
+
+        //   // --- Send POST to backend ---
+        //   this.getBusyDialog();
+        //   $.ajax({
+        //     url: "https://rest.kalpavrikshatechnologies.com/JobOpenings" + "?" + $.param(oFilterPayload),
+
+        //     method: "GET",
+        //     contentType: "application/json",
+        //     dataType: "json",
+        //     headers: {
+        //       name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+        //       password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+        //     },
+        //     success: function (response) {
+        //       const aData = response?.data || [];
+        //       const aFilteredData = aData.filter((job) => job?.Status === "true");
+        //       const oFilteredModel = new sap.ui.model.json.JSONModel({
+        //         Candidates: aFilteredData,
+        //       });
+        //       this.getView().setModel(oFilteredModel, "JobApplicationModel");
+
+        //       this.closeBusyDialog();
+        //     }.bind(this),
+        //     error: function (err) {
+        //       this.closeBusyDialog();
+        //       if (err?.responseJSON?.message) {
+        //         MessageToast.show("Error: " + err.responseJSON.message);
+        //       } else {
+        //         MessageToast.show("Failed to load filtered data.");
+        //       }
+        //     }.bind(this),
+        //   });
+        // },
         v1_onViewItem: function (oEvent) {
           const oSelectedData = oEvent
             .getSource()

@@ -64,7 +64,7 @@
 								</l:BlockLayoutRow>
 							</l:BlockLayout>
 							<VBox height="1rem"/>
-							<fb:FilterBar id="V1_ID_filterbar" class="sapUiSmallMargin myCustomFilterBar myRoundedTable" clear="v1_filClear" search="V1_onSearch" showClearOnFB="true" showAllFilters="true" showFilterConfiguration="false" filtersDialogCancel="false" persistencyKey="myPersKey" useToolbar="false" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
+							<!-- <fb:FilterBar id="V1_ID_filterbar" class="sapUiSmallMargin myCustomFilterBar myRoundedTable" clear="v1_filClear" search="V1_onSearch" showClearOnFB="true" showAllFilters="true" showFilterConfiguration="false" filtersDialogCancel="false" persistencyKey="myPersKey" useToolbar="false" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
 								<fb:filterGroupItems>
 									<fb:FilterGroupItem name="Skills" label="{i18n>V1_L_Skills}" groupName="Group1" visibleInFilterBar="true">
 										<fb:control>
@@ -88,8 +88,14 @@
 										</fb:control>
 									</fb:FilterGroupItem>
 								</fb:filterGroupItems>
-							</fb:FilterBar>
+							</fb:FilterBar> -->
 							<Table id="V1_ID_Table" sticky="ColumnHeaders" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
+								<headerToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer/>
+									<SearchField search="onSearch" placeholder="Type a skill" width="17.5rem"/>
+								</OverflowToolbar>
+							</headerToolbar>
 								<columns>
 									<Column demandPopin="true">
 										<Text text="{i18n>v1_jobTitle}" />
