@@ -45,7 +45,7 @@
         <!-- Right Column -->
         <m:VBox id="videoBoxA" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtmlA"
-        content="&lt;iframe src='../video/Scheme Upload.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
+        content="&lt;iframe src='../video/Scheme Upload.mp4' allowfullscreen style='width:560px;height:315px;border:none;border-radius:15px;'&gt;&lt;/iframe&gt;" />
 
 </m:VBox>
 <!-- Acreate Quotation -->
