@@ -8,7 +8,7 @@
                 <!-- SAP UI5 Section -->
                 <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid" >
                 <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/SAPUI5 (1).png" width="auto" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/SAPUI.png" width="800px" height="250px" visible="true" class="section-image"/>
                   </HBox> 
 
                     <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineesapui5}"/>
@@ -30,7 +30,7 @@
                 </VBox>
                 <VBox class="HRSolution sapUiSmallMargin"  backgroundDesign="Solid">
                 <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Sap CAPM.jpg" width="auto" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/CpamDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
                   </HBox>
                     <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineeCapmtitle}"/>
                     <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight}"/>

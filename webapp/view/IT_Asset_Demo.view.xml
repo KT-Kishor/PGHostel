@@ -132,7 +132,7 @@
        <Image
         src="../image/Request_Demo.png"
         class="floatingButton"
-        press="onOpenDemoForm"
+        press="onOpenForm"
       />
  </Page>
    <!-- <l:Grid defaultSpan="L12 M12 S12"  vSpacing="2" hSpacing="2" class="sapUiTinyMargin">

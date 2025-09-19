@@ -27,7 +27,7 @@
             
             <!-- Invoice management -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Demo1.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/InvoiceProduct.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
           <Text class="hr-text sapUiSmallMargin" text="Invoice Manage" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}"/>
@@ -78,7 +78,7 @@
             
             <!-- Automotive -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/AutomobileDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/Automobile.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Automotive Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}"/>
