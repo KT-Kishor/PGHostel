@@ -442,7 +442,7 @@
           <Image
         src="../image/Request_Demo.png"
         class="floatingButton"
-        press="onOpenForm"
+        press="onOpenDemoForm"
       />
 
 	</Page>
