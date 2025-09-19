@@ -44,9 +44,12 @@
 
         <!-- Right Column -->
         <m:VBox id="videoBox_ID" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
-    <core:HTML id="videoFrameHtml_ID"
-        content="&lt;iframe src='../Videos/ID Card Application.mp4' allowfullscreen style='width:560px;height:315px;border:none;'&gt;&lt;/iframe&gt;" />
-
+         <core:HTML id="videoFrameHtml_ID"
+        content="&lt;video width='560' height='315' controls autoplay muted playsinline 
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
+                    &lt;source src='../Videos/ID Card Application.mp4' type='video/mp4'&gt;
+                    Your browser does not support the video tag.
+                 &lt;/video&gt;" />
 </m:VBox>
 
     </g:GridContainer>

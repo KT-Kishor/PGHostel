@@ -132,24 +132,56 @@ BaseController, utils, JSONModel, MessageToast, Formatter
 
 
     },
-    _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-      var oVBox = this.byId(vBoxId);
-      var oHtml = this.byId(htmlId);
-      if (!oVBox || !oHtml) return;
+     _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+        var oVBox = this.byId(vBoxId);
+        var oHtml = this.byId(htmlId);
+        if (!oVBox || !oHtml) return;
 
-      var iWidth = window.innerWidth;
-      var bResponsive = sap.ui.Device.system.phone || iWidth < 400;
+        var iWidth = window.innerWidth;
+        var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
 
-      var sNormal = "<iframe src='" + videoUrl + "' allowfullscreen style='width:560px;height:315px;border:none;'></iframe>";
-      var sMobile = "<iframe src='" + videoUrl + "' allowfullscreen style='width:100vw;max-width:100%;height:200px;border:none;'></iframe>";
+        var bAutoplay = (vBoxId === "videoBox_ID");
 
-      if (bResponsive) {
-        oHtml.setContent(sMobile);
+        // Video tag (no background here)
+        var sVideoTag = "<video id='" + htmlId + "_video' controls " +
+            (bAutoplay ? "autoplay muted playsinline " : "") +
+            "style='width:100%;height:100%;border:none;border-radius:15px;object-fit:contain;'>" +
+            "<source src='" + videoUrl + "' type='video/mp4'>" +
+            "</video>";
 
-      } else {
-        oHtml.setContent(sNormal);
-      }
-    },
+        // Wrapper with BACKGROUND on all 4 sides
+        var sWrapper = bResponsive
+            ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
+                  "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+                      sVideoTag +
+                  "</div>" +
+              "</div>"
+            : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
+                  sVideoTag +
+              "</div>";
 
+        oHtml.setContent(sWrapper);
+
+        // Adjust fit after metadata is loaded
+        setTimeout(function () {
+            var videoEl = document.getElementById(htmlId + "_video");
+            if (videoEl) {
+                videoEl.addEventListener("loadedmetadata", function () {
+                    var vidRatio = videoEl.videoWidth / videoEl.videoHeight;
+                    var boxRatio = 560 / 315; // desktop ratio (16:9)
+
+                    if (bResponsive) {
+                        videoEl.style.objectFit = "cover";
+                    } else {
+                        if (Math.abs(vidRatio - boxRatio) < 0.1) {
+                            videoEl.style.objectFit = "cover";
+                        } else {
+                            videoEl.style.objectFit = "contain"; // keep background visible on all 4 sides
+                        }
+                    }
+                });
+            }
+        }, 200);
+    }
 	});
 });
