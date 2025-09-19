@@ -43,14 +43,16 @@
         </m:VBox>
 
         <!-- Right Column -->
-        <m:VBox id="videoBoxA" alignItems="Center" justifyContent="Center" class=" video sapUiMediumMarginTop">
-         <core:HTML id="videoFrameHtmlA"
-        content="&lt;video width='560' height='315' controls autoplay muted playsinline 
-                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
-                    &lt;source src='../Videos/Scheme Upload.mp4' type='video/mp4'&gt;
-                    Your browser does not support the video tag.
-                 &lt;/video&gt;" />
+         <m:VBox id="videoBoxA" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtmlA"
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'&gt;
+                    &lt;iframe src='../Videos/Scheme Upload.mp4' 
+                             allowfullscreen 
+                             style='width:100%;height:100%;border:none;'&gt;
+                    &lt;/iframe&gt;
+                 &lt;/div&gt;" />
 </m:VBox>
+
 <!-- Acreate Quotation -->
     </g:GridContainer>
     <g:GridContainer class="jioSection sapUiSmallMarginTop">
@@ -68,13 +70,14 @@
         </g:layoutM>
 
         <!-- Right Column -->
-        <m:VBox id="videoBoxB" alignItems="Center" justifyContent="Center" class="  sapUiMediumMarginTop">
-        <core:HTML id="videoFrameHtmlB"
-        content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
-                    &lt;source src='../Videos/Create Quotation.mp4' type='video/mp4'&gt;
-                    Your browser does not support the video tag.
-                 &lt;/video&gt;" />
+         <m:VBox id="videoBoxB" class="sapUiMediumMarginTop">
+    <core:HTML id="videoFrameHtmlB"
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'&gt;
+                    &lt;iframe src='../Videos/Create Quotation.mp4' 
+                             allowfullscreen 
+                             style='width:100%;height:100%;border:none;'&gt;
+                    &lt;/iframe&gt;
+                 &lt;/div&gt;" />
 </m:VBox>
 
         <!-- Left Column -->
