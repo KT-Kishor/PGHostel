@@ -422,11 +422,16 @@
     </g:GridContainer>
 
 
-        <m:Button
+        <!-- <m:Button
             text="Request Demo"
             press="onOpenDemoForm"
             class="demoBtn"
-        />
+        /> -->
+         <Image
+        src="../image/Demo.png"
+        class="floatingButton"
+        press="onOpenDemoForm"
+      />
 
 	</Page>
 

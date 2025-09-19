@@ -247,7 +247,7 @@
   color:#0057FF !important;
 } */
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
-  font-size: 26px;
+  font-size: 25px;
   color:#0057FF !important;
   font-weight: bold;
 }
@@ -821,8 +821,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   cursor: pointer;
   z-index: 1000;
   border-radius: 50%;
-  height: 80px;
-  width: 110px;
+  height: 150px;
+  width: 200px;
   padding: 0;
 }
 .responsiveCard {
@@ -2164,15 +2164,17 @@ font-size: 20px;
 }
 .Recuritmentclass{
   font-size: 16px;
+  line-height: 25px;
 }
 .aboutTitle{
   color: #F1AD53 !important;
+  margin-top: 20px;
 }
-/* .cell-bgcolor{
-  font-size: 10px !important;
+.cell_Title{
+  font-size: 2px !important;
   font-weight: bold ;
   color: #0057FF !important;
-} */
+}
 .inputMargin {
     margin-left: 10px; /* Adjust the space between ComboBox and Input */
 }

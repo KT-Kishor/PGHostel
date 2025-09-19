@@ -7,12 +7,12 @@
 		<l:BlockLayout background="Dashboard" >
 			<l:BlockLayoutRow rowColorSet="ColorSet4">
 				<l:BlockLayoutCell titleLevel="H2"
-					title="{i18n>aboutUscontent1}" class="cell-bgcolor">
+					title="{i18n>aboutUscontent1}" class="cell_Title">
 					<!-- <Button text="View Products" press="onproductpress"></Button> -->
 					</l:BlockLayoutCell>
 			</l:BlockLayoutRow>
 			<l:BlockLayoutRow>
-			<l:BlockLayoutCell title="Products"  class="cell-bgcolor">
+			<l:BlockLayoutCell title="Products"  >
 				<VBox >
         <Link text="HR Solution" press=".onNavToHrSolution"  class="aboutTitle"/>
         <Text text="Automate employee offers, contracts, leave, payroll, timesheets, and expenses with a self-service portal. Empower your workforce with seamless, error-free HR operations anytime, anywhere." wrapping="true" class="Recuritmentclass"/>
