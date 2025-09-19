@@ -22,6 +22,7 @@ sap.ui.define([
         Email: "",
         Address: "",
         TimeSlot: "",
+          stdCode: "+91",
         MobileNo: "",
         Comments: "",
       });
@@ -72,6 +73,9 @@ sap.ui.define([
     ValidateCommonFields: function (oEvent) {
       utils._LCvalidateMandatoryField(oEvent);
     },
+     ValidateSTDFields: function (oEvent) {
+          utils._LCstrictValidationComboBox(oEvent); 
+        },
     onDemoformSave: function () {
       var that = this;
           var oModel = this.getView().getModel("formData");
@@ -84,6 +88,7 @@ sap.ui.define([
             utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
             utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&
+                 utils._LCstrictValidationComboBox(this.byId("idDemoSTD"), "ID") &&
             utils._LCvalidateMobileNumber(this.byId("idmobilenumber"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idcomment"), "ID")

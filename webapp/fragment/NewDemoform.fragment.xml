@@ -60,7 +60,9 @@
 						<m:ComboBox 
             id="idDemoSTD" 
             width="70px"  
-            value="{formData>/STDCode}"
+            valueStateText="Select STD Code"
+            change="ValidateSTDFields"
+            value="{formData>/stdCode}"
             placeholder="STD"   showSecondaryValues="true"  filterSecondaryValues="true"
             items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"
         >

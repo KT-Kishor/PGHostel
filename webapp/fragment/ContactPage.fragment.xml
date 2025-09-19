@@ -104,6 +104,7 @@
                         href="{/pages/0/groups/1/elements/4/url}"
                         class=" sapUiMediumMarginBegin contact-link"
                     />
+                    
                 </VBox>
             </VBox>
         </l:content>

@@ -37,24 +37,24 @@
 
 				<l:BlockLayoutCell title="{i18n>recruitment}">
 				<VBox >
-       <Link text="Building Strong and Capable Teams" press=".onNavToHrSolution" class="aboutTitle" />
+       <Link text="Building Strong and Capable Teams"  class="aboutTitle" />
         <Text text="We are efficient resource provider of SAP to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-       <Link text="Leading Recruitment Service Provider" press=".onNavToHrSolution" class="aboutTitle" />
+       <Link text="Leading Recruitment Service Provider"  class="aboutTitle" />
         <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Salesforces with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-     <Link text="Executive Search" press=".onNavToHrSolution" class="aboutTitle" />
+     <Link text="Executive Search"  class="aboutTitle" />
         <Text text=" Finding top-level leaders and executives to drive growth." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-      <Link text="Talent Mapping and Sourcing" press=".onNavToHrSolution" class="aboutTitle" />
+      <Link text="Talent Mapping and Sourcing"  class="aboutTitle" />
         <Text text=" Proactively identifying and engaging with high potential talent. 
 " wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-      <Link text="Candidate Screening and Assessment" press=".onNavToHrSolution" class="aboutTitle" />
+      <Link text="Candidate Screening and Assessment"  class="aboutTitle" />
         <Text text=" Rigorous vetting for skill and cultural fit, we screening the profile take one round of interview to make sure it a best fit." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 					<!-- <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUsSecondcontent5}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent9}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes1}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes2}&lt;/a&gt;&lt;/div&gt;'></core:HTML> -->
