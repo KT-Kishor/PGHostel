@@ -6,7 +6,7 @@
     
     <Dialog title="{i18n>traineeFormtile}" stretch="false" >
         <content>
-            <f:SimpleForm layout="ResponsiveGridLayout" editable="true">
+            <f:SimpleForm layout="ResponsiveGridLayout" editable="true" class="dialogContentBox" >
                 <Label text=""/>
                 <Input class="custom-input-height" id="FTF_idName" liveChange="FTF_onlivename" value="{TraineeData>/Name}" placeholder="{i18n>placeName}" valueStateText="{i18n>placeName}" maxLength="40"/>
 
