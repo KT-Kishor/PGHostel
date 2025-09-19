@@ -1,112 +1,105 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout"
->
-    <VBox
-        class="contact-hero"
-        width="100%"
-    >
-        <Title
-            text="Get in Touch"
-            class="contact-hero-title"
-        />
-    </VBox>
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:grid="sap.ui.layout.cssgrid"
+    xmlns:card="sap.f.cards"
+    xmlns:f="sap.f"
+	xmlns:core="sap.ui.core">
+    <VBox class="contact-hero" width="100%">
+   <Title text="{i18n>Get in Touch}" class="contact-hero-title"/>
+ </VBox>
 
-    <l:Grid defaultSpan="L6 M6 S12">
-        <l:content>
-            <VBox class="contact-left sapUiMediumMargin">
-                <VBox class="contact-row">
-                    <HBox alignItems="Center">
-                        <core:Icon
-                            src="sap-icon://call"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Label
-                            text="Contact:"
-                            class="contact-label"
-                        />
-                    </HBox>
-                    <Link
-                        text="{/pages/0/groups/1/elements/0/value}"
-                        href="https://wa.me/919686145959"
-                        class="sapUiMediumMarginBegin contact-link"
-                    />
-                </VBox>
+<grid:CSSGrid
+    id="gridCards"
+    gridTemplateColumns="1fr 1fr"
+    gridGap="1rem">
 
-                <VBox class="contact-row">
-                    <HBox alignItems="Center">
-                        <core:Icon
-                            src="sap-icon://email"
-                            color="#0a1f44"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Label
-                            text="Email:"
-                            class="contact-label"
-                        />
-                    </HBox>
-                    <Link
-                        text="{/pages/0/groups/1/elements/1/value}"
-                        href="mailto:accounts@kalpavrikshatechnologies.com"
-                        class="sapUiMediumMarginBegin contact-link"
-                    />
-                </VBox>
-                <HBox alignItems="Center">
-                    <core:Icon
-                        src="sap-icon://map"
-                        color="#0a1f44"
-                        class="sapUiSmallMarginEnd"
-                    />
-                    <Label
-                        text="Google Map:"
-                        class="contact-label"
-                    />
+    
+<VBox class="sapUiSmallMargin">
+
+            <!-- Contact + Email Row -->
+         <HBox width="100%" justifyContent="SpaceBetween">
+  <!-- Contact -->
+            <VBox class="ContactBox sapUiSmallMargin" width="48%" alignItems="Center">
+                <HBox alignItems="Center" justifyContent="Center">
+                <Image src="../image/call.webp" class="contact-icon"/>
                 </HBox>
-                <Link
-                    text="{/pages/0/groups/1/elements/3/value}"
-                    href="{/pages/0/groups/1/elements/3/url}"
-                    class="sapUiMediumMarginBegin contact-link"
-                />
+                <Link text="{/pages/0/groups/1/elements/0/value}"
+                    href="https://wa.me/919686145959"
+                    class="contact-link sapUiTinyMarginTop"/>
             </VBox>
-            <VBox class="contact-right sapUiMediumMargin">
-                <VBox class="contact-row">
-                    <HBox alignItems="Center">
-                        <core:Icon
-                            src="sap-icon://address-book"
-                            color="#0a1f44"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Label
-                            text="Address:"
-                            class="contact-label"
-                        />
-                    </HBox>
-                    <Text
-                        text="{/pages/0/groups/1/elements/2/value}"
-                        class="sapUiMediumMarginBegin contact-value"
-                    />
-                </VBox>
 
-                <VBox class="contact-row">
-                    <HBox alignItems="Center">
-                        <core:Icon
-                            src="sap-icon://chain-link"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Label
-                            text="LinkedIn:"
-                            class="contact-label"
-                        />
-                    </HBox>
-                    <Link
-                        text="{/pages/0/groups/1/elements/4/value}"
-                        href="{/pages/0/groups/1/elements/4/url}"
-                        class=" sapUiMediumMarginBegin contact-link"
-                    />
-                    
-                </VBox>
+            <!-- Email -->
+            <VBox class="EmailBox sapUiSmallMargin" width="50%" alignItems="Center">
+                <HBox alignItems="Center" justifyContent="Center">
+                <Image src="../image/Email.png" class="contact-icon"/>
+                </HBox>
+                <Link text="{/pages/0/groups/1/elements/1/value}" wrapping="true" 
+                    href="mailto:accounts@kalpavrikshatechnologies.com"
+                    class="email-link sapUiTinyMarginTop"/>
             </VBox>
-        </l:content>
-    </l:Grid>
+
+            </HBox>
+
+
+
+            <!-- Follow Us Row -->
+            <HBox width="100%" alignItems="Center" justifyContent="SpaceBetween"
+      class="sapUiSmallMargin social-icons-row" renderType="Bare">
+
+  <!-- YouTube -->
+  <VBox class="FollowusSolution">
+    <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
+                          &lt;i class='fab fa-youtube social-icon' style='color:#FF0000'&gt;&lt;/i&gt;
+                        &lt;/a&gt;"/>
+  </VBox>
+
+  <!-- LinkedIn -->
+  <VBox class="FollowusSolution">
+    <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
+                          &lt;i class='fab fa-linkedin social-icon' style='color:#0A66C2'&gt;&lt;/i&gt;
+                        &lt;/a&gt;"/>
+  </VBox>
+
+  <!-- Instagram -->
+  <VBox class="FollowusSolution">
+    <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/?igsh=emEzMDAxNTdvN3Bx&amp;&amp;utm_source=qr#' target='_blank'&gt;
+                          &lt;i class='fab fa-instagram social-icon' style='color:#E4405F'&gt;&lt;/i&gt;
+                        &lt;/a&gt;"/>
+  </VBox>
+
+</HBox>
+
+
+          </VBox>
+     
+    <!-- Card 2 -->
+    <f:Card class="sapUiMediumMarginTop">
+        <f:header>
+            <!-- <f:CardHeader
+                title="Card Two"
+                subtitle="Second card side by side"/> -->
+        </f:header>
+      <f:content>
+  <VBox class="contact-right sapUiSmallMargin" width="100%">
+    <core:HTML
+      content="
+        &lt;div class='map-responsive'&gt;
+          &lt;iframe 
+            src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3809.334926964189!2d76.84617247493257!3d17.29938198357291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c122d9181afd%3A0x6af9e90eb1f5fc8f!2sKalpavriksha%20Technologies!5e0!3m2!1sen!2sin!4v1758262861044!5m2!1sen!2sin'
+            style='border:0;' 
+            allowfullscreen='true' 
+            loading='lazy'
+            referrerpolicy='no-referrer-when-downgrade'&gt;
+          &lt;/iframe&gt;
+        &lt;/div&gt;
+      "/>
+  </VBox>
+</f:content>
+
+    </f:Card>
+
+</grid:CSSGrid>
+
+
 </core:FragmentDefinition>

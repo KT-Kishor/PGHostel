@@ -1986,14 +1986,32 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   transform-origin: top right;           /* rotation around corner */
 }
 
-
-
-.HRSolution{
-  margin-top: 20px;
-  border-radius: 10px;
-   text-align: left;
-   box-shadow:0 2px 6px rgba(0,0,0,0.3); ;
+.HRSolution {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;  /* center align everything */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  max-width: 500px;    /* keep limit */
+  font-size: 0.95rem;
+  word-wrap: break-word; /* allow wrapping */
+  overflow-wrap: anywhere;
 }
+
+
+.FollowusSolution {
+  width: 120px;
+  height: 120px;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 6px; 
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0.8, 0.8, 0.8, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .Takeatour{
   font-size: 2rem;
   padding: 20px !important;
@@ -2302,9 +2320,76 @@ font-size: 20px;
   font-size: 0.95rem;
   word-break: break-word;
 }
-.contact-link {
- font-size: 1rem;
+/* Shared styling */
+.contact-icon {
+  width: 4rem !important;
+  height: 4rem !important;
+  display: block;
+  margin: 0 auto;
 }
+
+/* Contact Card */
+.ContactBox {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0.8, 0.8, 0.8, 0.8);
+  max-width: 500px;
+  font-size: 0.95rem;
+}
+.contact-link {
+  font-size: 1.4rem;
+  text-align: center;
+  display: block;
+}
+
+/* Email Card */
+.EmailBox {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0.8, 0.8, 0.8, 0.8);
+  max-width: 500px;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.email-link {
+  font-size: 1.4rem;
+  text-align: center;
+  display: inline-block;     /* make it behave like a block */
+  white-space: normal !important;  /* force wrapping */
+  word-break: break-word !important;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  line-break: anywhere;      /* extra safety for some browsers */
+}
+
+
+.map-responsive {
+  position: relative;
+  width: 100%;              /* take full width of parent */
+  padding-bottom: 56.25%;   /* maintain 16:9 aspect ratio */
+  height: 0;
+  /* overflow: hidden; */
+  border-radius: 12px;      /* rounded corners */
+}
+
+.map-responsive iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;   /* ensure full width */
+  height: 100%;  /* ensure full height */
+  border: 0;
+}
+
+
+
+
 
 /* responsive breakpoints */
 @media (max-width: 900px) {
@@ -2330,17 +2415,36 @@ font-size: 20px;
   }
 }
 
+.contact-main-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #0a1f44;
+    margin-bottom: 5px;
+}
+
+.contact-subtitle {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+
 .social-icon-wrapper {
     display: flex;
-    gap: 15px; /* Spacing between social icons */
-    margin-top: 15px;
-    flex-wrap: wrap; /* Allow icons to wrap on smaller screens */
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* default */
+    padding-left: 30px;          /* soft push right */
 }
 
 .social-icon {
-    font-size: 2em; /* Size of the icon */
-    color: #1877F2; /* Example color for Facebook */
-    /* You'd style each icon or use a generic style then specific overrides */
+  font-size: 2.5em;
+  transition: transform 0.2s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.2);
 }
 
 .social-text {
@@ -2352,7 +2456,7 @@ font-size: 20px;
 .we-are-here-text {
     font-size: 1.2em;
     font-weight: bold;
-    color: #0a1f44;
+     color: #0064d9 !important;
     margin-top: 20px;
 }
 .floatingButton {
@@ -2376,3 +2480,4 @@ font-size: 20px;
     white-space: normal;    /* ensures wrapping if long words */
     word-break: break-word; /* breaks long words if needed */
 }
+
