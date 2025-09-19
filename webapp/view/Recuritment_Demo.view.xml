@@ -46,7 +46,7 @@
         <m:VBox id="videoBox-1" alignItems="Center" justifyContent="Center" class="sapUiTinyMarginTop">
          <core:HTML id="videoFrameHtml-1"
         content="&lt;video width='560' height='315' controls autoplay muted playsinline 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Job Posting.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -71,7 +71,7 @@
     <m:VBox alignItems="Center" id="videoBox-2" justifyContent="Center" class="sapUiMediumMarginTop">
      <core:HTML id="videoFrameHtml-2"
         content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Apply Job.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />

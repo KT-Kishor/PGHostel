@@ -137,45 +137,60 @@ BaseController, utils, JSONModel, MessageToast, Formatter
  this._applyResponsiveVideo("videoBox_I", "videoFrameHtml_I", "../Videos/Generate Payslip.mp4");
  this._applyResponsiveVideo("videoBox_J", "videoFrameHtml_J", "../Videos/My Inbox.mp4");
 },
-  _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
-        var oVBox = this.byId(vBoxId);
-        var oHtml = this.byId(htmlId);
-        if (!oVBox || !oHtml) return;
+_applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
 
-        var iWidth = window.innerWidth;
-        var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
+    var iWidth = window.innerWidth;
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
 
-        // check if first video (autoplay required only for videoBox101)
-        var bAutoplay = (vBoxId === "videoBox_A");
+    var bAutoplay = (vBoxId === "videoBox_A");
 
-        // common video tag (without sizing)
-        var sVideoTag = "<video controls " +
-            (bAutoplay ? "autoplay muted playsinline " : "") +
-            "style='border:none;border-radius:15px;overflow:hidden;width:100%;height:100%;object-fit:cover;'>" +
-            "<source src='" + videoUrl + "' type='video/mp4'>" +
-            "Your browser does not support the video tag." +
-            "</video>";
+    // Video tag (no background here, only border-radius + sizing)
+    var sVideoTag = "<video id='" + htmlId + "_video' controls " +
+        (bAutoplay ? "autoplay muted playsinline " : "") +
+        "style='border:none;width:100%;height:100%;border-radius:15px;'>" +
+        "<source src='" + videoUrl + "' type='video/mp4'>" +
+        "</video>";
 
-        // responsive wrapper (16:9 aspect ratio)
-        var sResponsiveWrapper =
-            "<div style='position:relative;width:100%;padding-top:56.25%;border-radius:15px;overflow:hidden;'>" +
-            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
-            sVideoTag +
-            "</div>" +
-            "</div>";
+    // Wrapper with WHITE background and rounded corners
+    var sWrapper = bResponsive
+        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
+              "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+                  sVideoTag +
+              "</div>" +
+          "</div>"
+        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
+              sVideoTag +
+          "</div>";
 
-        // desktop fixed size version
-        var sDesktop =
-            "<div style='width:560px;height:315px;border-radius:15px;overflow:hidden;'>" +
-            sVideoTag +
-            "</div>";
+    oHtml.setContent(sWrapper);
 
-        if (bResponsive) {
-            oHtml.setContent(sResponsiveWrapper); // mobile fluid
-        } else {
-            oHtml.setContent(sDesktop); // desktop fixed
+    // After rendering, adjust fit based on actual resolution
+    setTimeout(function () {
+        var videoEl = document.getElementById(htmlId + "_video");
+        if (videoEl) {
+            videoEl.addEventListener("loadedmetadata", function () {
+                var vidRatio = videoEl.videoWidth / videoEl.videoHeight;
+                var boxRatio = 560 / 315; // desktop ratio (16:9)
+
+                if (bResponsive) {
+                    // On mobile, force 16:9 ratio container → use cover
+                    videoEl.style.objectFit = "cover";
+                } else {
+                    // On desktop, decide dynamically
+                    if (Math.abs(vidRatio - boxRatio) < 0.1) {
+                        // Almost same aspect ratio → fill
+                        videoEl.style.objectFit = "cover";
+                    } else {
+                        // Different ratio → show whole video with gaps (background visible)
+                        videoEl.style.objectFit = "contain";
+                    }
+                }
+            });
         }
-    }
-
+    }, 200);
+},
 	});
 });

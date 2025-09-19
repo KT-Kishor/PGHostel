@@ -46,7 +46,7 @@
         <m:VBox id="videoBoxA" alignItems="Center" justifyContent="Center" class=" video sapUiMediumMarginTop">
          <core:HTML id="videoFrameHtmlA"
         content="&lt;video width='560' height='315' controls autoplay muted playsinline 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Scheme Upload.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -71,7 +71,7 @@
         <m:VBox id="videoBoxB" alignItems="Center" justifyContent="Center" class="  sapUiMediumMarginTop">
         <core:HTML id="videoFrameHtmlB"
         content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Create Quotation.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />

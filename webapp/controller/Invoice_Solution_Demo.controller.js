@@ -153,12 +153,12 @@ sap.ui.define([
 
     // Wrapper with WHITE background and rounded corners
     var sWrapper = bResponsive
-        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#ffffff;'>" +
+        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
               "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
                   sVideoTag +
               "</div>" +
           "</div>"
-        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:ffffff#;'>" +
+        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" +
               sVideoTag +
           "</div>";
 

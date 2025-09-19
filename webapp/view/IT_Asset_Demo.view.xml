@@ -48,7 +48,7 @@
       <m:VBox id="videoBox101" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml101"
         content="&lt;video width='560' height='315' controls autoplay muted playsinline 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Company Asset.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -73,7 +73,7 @@
           <m:VBox id="videoBox201" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml201"
         content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='../Videos/Asset Assignment.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -111,7 +111,7 @@
  <m:VBox id="videoBox301" alignItems="Center" justifyContent="Center" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml301"
         content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#f3f3f3'&gt;
                     &lt;source src='./Videos/My Asset.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
