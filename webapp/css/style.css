@@ -231,21 +231,19 @@
   background-repeat: no-repeat;
 }
 
-/* .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:first-of-type
   .sapUiBlockCellContent {
-  margin-top: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+ font-size: 25px;
   color:#0057FF !important;
-} */
-/* .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
+ 
+}
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:last-of-type
   .sapUiBlockCellContent {
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-  line-height: 1.5;
+ font-size: 25px;
   color:#0057FF !important;
-} */
+}
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
   font-size: 25px;
   color:#0057FF !important;
