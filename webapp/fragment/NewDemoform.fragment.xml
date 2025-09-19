@@ -59,7 +59,7 @@
 					<m:VBox width="30%">
 						<m:ComboBox 
             id="idDemoSTD" 
-            width="70px"  
+            width="80px"  
             valueStateText="Select STD Code"
             change="ValidateSTDFields"
             value="{formData>/stdCode}"
