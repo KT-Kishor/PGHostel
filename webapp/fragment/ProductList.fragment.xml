@@ -94,7 +94,7 @@
             
             <!-- ID card  -->
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/IDcard.png" width="auto" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/IDDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="ID Card Generation" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}"/>
