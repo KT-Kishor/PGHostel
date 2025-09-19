@@ -418,7 +418,7 @@
 }
 
 .custom-trainee-title {
-  font-size: 30px;
+  font-size: 26px;
   font-family: Helvetica, sans-serif;
   color: #0057FF;
   line-height: 1.9;
@@ -820,9 +820,8 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   right: 100px;
   cursor: pointer;
   z-index: 1000;
-  border-radius: 50%;
-  height: 150px;
-  width: 200px;
+  height: 120px;
+  width: 300px;
   padding: 0;
 }
 .responsiveCard {

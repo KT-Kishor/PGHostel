@@ -59,7 +59,7 @@
             class="demoBtn"
         /> -->
          <Image
-        src="../image/Demo.png"
+        src="../image/Request_Demo.png"
         class="floatingButton"
         press="onOpenDemoForm"
       />
