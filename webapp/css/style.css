@@ -2093,24 +2093,48 @@ font-size: 20px;
 
 .HeadDemoSection {
   background-color: #fff;
-    border-radius: 16px;
-    width: 95%;
-    padding: 30px;
-    margin: 20px 40px;
-     font-size: 32px;
-    font-weight: 700;
-    color:#0057FF;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-transform: capitalize;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-      background-image: linear-gradient(to right,#F1AD53, #F1AD53);
-    background-repeat: no-repeat;
-    background-size: 100% 3px;     
-    background-position: right 100%; 
-    box-shadow: 4px 4px 40px rgba(0,0,0,0.1);
-    z-index: 1000;
-  }
+  border-radius: 16px;
+  width: 95%;
+  max-width: 1600px;
+  padding: clamp(16px, 3vw, 30px);
+  margin: 20px 0 20px 40px;   /* top right bottom left */
+  font-size: clamp(18px, 3vw, 32px);
+  font-weight: 700;
+  color: #0057FF;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-transform: capitalize;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 
+  background-image: linear-gradient(to right, #F1AD53, #F1AD53);
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  background-position: right 100%;
+
+  box-shadow: 4px 4px 40px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .HeadDemoSection {
+    width: 92%;
+      padding: 20px;
+    margin: 10px 15px;  /* keep left margin smaller */
+    font-size: clamp(16px, 5vw, 24px);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .HeadDemoSection {
+    width: 95%;
+       padding: 20px;
+    margin: 10px 15px;  /* even smaller left margin */
+    font-size: clamp(14px, 6vw, 20px);
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+}
 /* .lineSpace {
     margin-bottom: 10px;  
     font-size: 26px !important;      
