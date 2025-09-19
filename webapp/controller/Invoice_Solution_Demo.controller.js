@@ -134,7 +134,7 @@ sap.ui.define([
       this._applyResponsiveVideo("videoBox61", "videoFrameHtml61", "../Videos/Quotation Application.mp4");
 
     },
-   _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+ _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
     var oVBox = this.byId(vBoxId);
     var oHtml = this.byId(htmlId);
     if (!oVBox || !oHtml) return;
@@ -151,14 +151,14 @@ sap.ui.define([
         "<source src='" + videoUrl + "' type='video/mp4'>" +
         "</video>";
 
-    // Wrapper with background color and rounded corners
+    // Wrapper with WHITE background and rounded corners
     var sWrapper = bResponsive
-        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#fff;'>" +
+        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#ffffff;'>" +
               "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
                   sVideoTag +
               "</div>" +
           "</div>"
-        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#E4CE94;'>" +
+        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:ffffff#;'>" +
               sVideoTag +
           "</div>";
 
