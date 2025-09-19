@@ -18,17 +18,17 @@ sap.ui.define(
           this.getRouter().getRoute("RouteHomePage").attachMatched(this._onRouteMatched, this);
           this.getView().getModel("CountryModel")
           // Form Data
-          var oFormData = new JSONModel({
-            CustomerName: "",
-            CompanyName: "",
-            Email: "",
-            Address: "",
-            TimeSlot: "",
-            stdCode: "+91",
-            MobileNo: "",
-            Comments: "",
-          });
-          this.getView().setModel(oFormData, "formData");
+          // var oFormData = new JSONModel({
+          //   CustomerName: "",
+          //   CompanyName: "",
+          //   Email: "",
+          //   Address: "",
+          //   TimeSlot: "",
+          //   stdCode: "+91",
+          //   MobileNo: "",
+          //   Comments: "",
+          // });
+          // this.getView().setModel(oFormData, "formData");
 
           // Load carousel videos etc. when route matches
           this._careerDataLoaded = false; // flag to avoid repeated fetch
@@ -347,59 +347,59 @@ sap.ui.define(
           utils._LCstrictValidationComboBox(oEvent); 
         },
 
-        onDemoformSave: function () {
-          var oModel = this.getView().getModel("formData");
-          var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy to avoid reference issues
-          var payload = [oData];
+        // onDemoformSave: function () {
+        //   var oModel = this.getView().getModel("formData");
+        //   var oData = JSON.parse(JSON.stringify(oModel.getData())); // Deep copy to avoid reference issues
+        //   var payload = [oData];
 
-          // Form Validation
-          if (
-            utils._LCvalidateMandatoryField(this.byId("idCompanyname"), "ID") &&
-            utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
-            utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&
-            utils._LCstrictValidationComboBox(this.byId("idDemoSTD"), "ID") &&
-            utils._LCvalidateMobileNumber(this.byId("idmobilenumber"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
-            utils._LCvalidateMandatoryField(this.byId("idcomment"), "ID")
-          ) {
-            // AJAX Call to Save Data
-            $.ajax({
-              url: this.API + "/CustomerDemo",
-              type: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                password:
-                  "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-              },
-              data: JSON.stringify(payload),
-              success: function (response) {
-                var resetData = {
-                  CustomerName: "",
-                  CompanyName: "",
-                  Email: "",
-                  Address: "",
-                  TimeSlot: "",
-                  stdCode:"",
-                  MobileNo: "",
-                  Comments: "",
-                };
+        //   // Form Validation
+        //   if (
+        //     utils._LCvalidateMandatoryField(this.byId("idCompanyname"), "ID") &&
+        //     utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
+        //     utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
+        //     utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&
+        //     utils._LCstrictValidationComboBox(this.byId("idDemoSTD"), "ID") &&
+        //     utils._LCvalidateMobileNumber(this.byId("idmobilenumber"), "ID") &&
+        //     utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
+        //     utils._LCvalidateMandatoryField(this.byId("idcomment"), "ID")
+        //   ) {
+        //     // AJAX Call to Save Data
+        //     $.ajax({
+        //       url: this.API + "/CustomerDemo",
+        //       type: "POST",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+        //         password:
+        //           "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+        //       },
+        //       data: JSON.stringify(payload),
+        //       success: function (response) {
+        //         var resetData = {
+        //           CustomerName: "",
+        //           CompanyName: "",
+        //           Email: "",
+        //           Address: "",
+        //           TimeSlot: "",
+        //           stdCode:"",
+        //           MobileNo: "",
+        //           Comments: "",
+        //         };
 
-                oModel.setData(resetData);
-                oModel.refresh(true);
-                MessageToast.show("Data saved successfully!");
+        //         oModel.setData(resetData);
+        //         oModel.refresh(true);
+        //         MessageToast.show("Data saved successfully!");
 
-                // AJAX Call to Send Email
-              },
-              error: function (xhr, status, error) {
-                MessageToast.show("Error saving data. Please try again.");
-              },
-            });
-          } else {
-            MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-          }
-        },
+        //         // AJAX Call to Send Email
+        //       },
+        //       error: function (xhr, status, error) {
+        //         MessageToast.show("Error saving data. Please try again.");
+        //       },
+        //     });
+        //   } else {
+        //     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        //   }
+        // },
 
         onUI5ress: function () {
           this.selectedCourse = "SAP UI5"; // Set selected course

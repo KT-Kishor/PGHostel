@@ -6,43 +6,43 @@
 	<l:VerticalLayout  width="98%" class="sapUiTinyMargin Aboutus" >
 		<l:BlockLayout background="Dashboard" >
 			<l:BlockLayoutRow rowColorSet="ColorSet4">
-				<l:BlockLayoutCell titleLevel="H2"
-					title="{i18n>aboutUscontent1}" class="cell_Title">
-					<!-- <Button text="View Products" press="onproductpress"></Button> -->
+				<l:BlockLayoutCell title="We At Kalpavriksha Technologies" colspan="2"
+					>
+			<Text text="{i18n>aboutUscontent1}"  class="cell_Title"></Text>
 					</l:BlockLayoutCell>
 			</l:BlockLayoutRow>
 			<l:BlockLayoutRow>
-			<l:BlockLayoutCell title="Products"  >
+			<l:BlockLayoutCell title="Products">
 				<VBox >
         <Link text="HR Solution" press=".onNavToHrSolution"  class="aboutTitle"/>
-        <Text text="Automate employee offers, contracts, leave, payroll, timesheets, and expenses with a self-service portal. Empower your workforce with seamless, error-free HR operations anytime, anywhere." wrapping="true" class="Recuritmentclass"/>
+        <Text text="Automate HR  from offers to expenses  with a self-service portal that empowers employees and ensures seamless, error-free operations anytime, anywhere." wrapping="true" class="Recuritmentclass"/>
     </VBox>
      <VBox >
         <Link text="Invoice Solution" press=".onNavToInvoiceSolution"  class="aboutTitle"/>
-        <Text text=" Simplify invoicing with automated MSA, NDA, SOW, quotations, PO, and contract invoices. Ensure accuracy, compliance, and faster payments with real-time tracking." wrapping="true" class="Recuritmentclass"/>
+        <Text text="Streamline invoicing with automated agreements and real-time tracking for accuracy, compliance, and faster payments with Remiders" wrapping="true" class="Recuritmentclass"/>
     </VBox>
      <VBox >
         <Link text="Company Asset Management" press=".onNavToCompanySolution" class="aboutTitle"/>
-        <Text text="Track, assign, and manage all company assets in one place. Gain complete visibility and control over asset usage and lifecycle." class="Recuritmentclass" wrapping="true"/>
+        <Text text="Manage and track all assets in one place with complete lifecycle visibility, including seamless employee assignments" class="Recuritmentclass" wrapping="true"/>
     </VBox>
      <VBox >
         <Link text="Recruitment" press=".onNavToRecruitmentSolution"  class="aboutTitle"/>
-        <Text text="Streamline hiring with easy job postings, applications, and interview scheduling. Attract and onboard the right talent quickly and efficiently." class="Recuritmentclass" wrapping="true"/>
+        <Text text="Simplify hiring with smart job postings, effortless applications, and fast onboarding to attract the right talent." class="Recuritmentclass" wrapping="true"/>
     </VBox>
      <VBox >
         <Link text="Automobile Solution" press=".onNavToAutomobileSolution"  class="aboutTitle"/>
-        <Text text="Manage automobile schemes and quotations with automation and precision. Save time, reduce errors, and keep your business running smoothly." class="Recuritmentclass" wrapping="true"/>
+        <Text text="Easily manage and share car and bike quotations with customers through a fast, automated, and error-free solution." class="Recuritmentclass" wrapping="true"/>
     </VBox>
 </l:BlockLayoutCell>
 
 				<l:BlockLayoutCell title="{i18n>recruitment}">
 				<VBox >
        <Link text="Building Strong and Capable Teams"  class="aboutTitle" />
-        <Text text="We are efficient resource provider of SAP to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true" class="Recuritmentclass"/>
+        <Text text="We are efficient resource provider to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
        <Link text="Leading Recruitment Service Provider"  class="aboutTitle" />
-        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Salesforces with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
+        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP , Java , Nodejs,  C++ , SQL , JavaScript Salesforces and other Technologies with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
      <Link text="Executive Search"  class="aboutTitle" />

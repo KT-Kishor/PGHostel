@@ -58,7 +58,7 @@
 							<l:BlockLayout background="Dashboard">
 								<l:BlockLayoutRow>
 									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
-										<Text text="{i18n>careersDes}"/>
+										<Text text="{i18n>careersDes}" class="cell_Title"/>
 									</l:BlockLayoutCell>
 								</l:BlockLayoutRow>
 							</l:BlockLayout>

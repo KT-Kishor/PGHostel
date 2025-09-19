@@ -235,20 +235,30 @@
   .sapUiBlockLayoutRow:first-of-type
   .sapUiBlockCellContent {
  font-size: 25px;
-  color:#0057FF !important;
+  color:#0057FF ;
  
 }
 .sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS)
   .sapUiBlockLayoutRow:last-of-type
   .sapUiBlockCellContent {
  font-size: 25px;
-  color:#0057FF !important;
+  color:#0057FF ;
 }
 .sapUiBlockLayoutSizeL:not(.sapUiBlockLayoutKeepFontSize) .sapUiBlockCellTitle {
-  font-size: 25px;
-  color:#0057FF !important;
+  font-size: 26px !important;
+  color:#0057FF ;
   font-weight: bold;
 }
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:first-of-type .sapUiBlockCellContent {
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+}
+.sapUiBlockLayoutBackgroundDashboard:not(.sapUiBlockLayoutSizeS) .sapUiBlockLayoutRow:last-of-type .sapUiBlockCellContent {
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+}
+
+
 .formBorder {
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -863,6 +873,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 }
 
 .myRoundedTable {
+  margin-top:-5px !important;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.764), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -1854,7 +1865,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   font-weight: 700;
   color: #ad7900;
   margin-bottom: 14px;
-  margin-top: 40px;
+  margin-top: 25px;
 }
 
 
@@ -2164,13 +2175,16 @@ font-size: 20px;
   line-height: 25px;
 }
 .aboutTitle{
-  color: #F1AD53 !important;
+  color: #000000 !important;
   margin-top: 20px;
+  font-size:19px ;
+  font-weight: bold !important;
+  
 }
 .cell_Title{
-  font-size: 2px !important;
-  font-weight: bold ;
-  color: #0057FF !important;
+  font-size: 19px !important;
+  color: #000000 !important;
+  /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; */
 }
 .inputMargin {
     margin-left: 10px; /* Adjust the space between ComboBox and Input */
