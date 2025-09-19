@@ -46,7 +46,7 @@
           <!-- Right Column -->
      <m:VBox id="videoBox11" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml11"
-        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'&gt;
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#fff;'&gt;
                     &lt;iframe src='../Videos/MSA and SOW Application.mp4' 
                              allowfullscreen 
                              style='width:100%;height:100%;border:none;'&gt;
@@ -72,7 +72,7 @@
         <!-- Right Column -->
          <m:VBox id="videoBox21" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml21"
-        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'&gt;
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#fff;'&gt;
                     &lt;video controls autoplay muted playsinline 
                            style='width:100%;height:100%;display:block;object-fit:cover;'&gt;
                         &lt;source src='../Videos/Manage Customer.mp4' type='video/mp4'&gt;
@@ -114,7 +114,7 @@
          <m:VBox id="videoBox31" class="sapUiMediumMarginTop">
                   <core:HTML id="videoFrameHtml31"
         content="&lt;video width='560' height='315' controls 
-                     style='border:none;border-radius:15px;overflow:hidden;'&gt;
+                     style='border:none;border-radius:15px;overflow:hidden;background:#fff;'&gt;
                     &lt;source src='../Videos/Purchase Order.mp4' type='video/mp4'&gt;
                     Your browser does not support the video tag.
                  &lt;/video&gt;" />
@@ -140,7 +140,7 @@
 
         <m:VBox id="videoBox41" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml41"
-        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'&gt;
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#fff;'&gt;
                     &lt;video controls 
                            style='width:100%;height:100%;display:block;object-fit:cover;'&gt;
                         &lt;source src='../Videos/Company Invoice.mp4' type='video/mp4'&gt;
@@ -190,7 +190,7 @@
     <core:HTML id="videoFrameHtml51"
         content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'&gt;
                     &lt;video controls 
-                           style='width:100%;height:100%;display:block;object-fit:cover;'&gt;
+                           style='width:100%;height:100%;display:block;object-fit:cover;background:#fff;'&gt;
                         &lt;source src='../Videos/Contractor Invoice Application.mp4' type='video/mp4'&gt;
                         Your browser does not support the video tag.
                     &lt;/video&gt;
@@ -217,7 +217,7 @@
 
   <m:VBox id="videoBox61" class="sapUiMediumMarginTop">
     <core:HTML id="videoFrameHtml61"
-        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'&gt;
+        content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#fff;'&gt;
                     &lt;video controls 
                            style='width:100%;height:100%;display:block;object-fit:cover;'&gt;
                         &lt;source src='../Videos/Quotation Application.mp4' type='video/mp4'&gt;

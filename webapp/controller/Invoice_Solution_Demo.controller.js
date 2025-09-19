@@ -144,21 +144,22 @@ sap.ui.define([
 
     var bAutoplay = (vBoxId === "videoBox11");
 
-    // Video tag (with id so we can detect resolution later)
+    // Video tag (no background here, only border-radius + sizing)
     var sVideoTag = "<video id='" + htmlId + "_video' controls " +
         (bAutoplay ? "autoplay muted playsinline " : "") +
-        "style='border:none;width:100%;height:100%;border-radius:15px;background:#fff;'>" +
+        "style='border:none;width:100%;height:100%;border-radius:15px;'>" +
         "<source src='" + videoUrl + "' type='video/mp4'>" +
         "</video>";
 
+    // Wrapper with background color and rounded corners
     var sWrapper = bResponsive
-        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;'>" +
-            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
-                sVideoTag +
-            "</div>" +
+        ? "<div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#fff;'>" +
+              "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+                  sVideoTag +
+              "</div>" +
           "</div>"
-        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;'>" +
-            sVideoTag +
+        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#E4CE94;'>" +
+              sVideoTag +
           "</div>";
 
     oHtml.setContent(sWrapper);
@@ -170,7 +171,7 @@ sap.ui.define([
             videoEl.addEventListener("loadedmetadata", function () {
                 var vidRatio = videoEl.videoWidth / videoEl.videoHeight;
                 var boxRatio = 560 / 315; // desktop ratio (16:9)
-                
+
                 if (bResponsive) {
                     // On mobile, force 16:9 ratio container → use cover
                     videoEl.style.objectFit = "cover";
@@ -180,7 +181,7 @@ sap.ui.define([
                         // Almost same aspect ratio → fill
                         videoEl.style.objectFit = "cover";
                     } else {
-                        // Different ratio → show whole video
+                        // Different ratio → show whole video with gaps (background visible)
                         videoEl.style.objectFit = "contain";
                     }
                 }
