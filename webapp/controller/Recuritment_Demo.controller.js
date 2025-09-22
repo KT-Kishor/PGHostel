@@ -24,7 +24,7 @@ sap.ui.define([
             TimeSlot: "",
               stdCode: "+91",
             MobileNo: "",
-            Comments: "",
+            Comments: ""
           });
           this.getView().setModel(oFormData, "formData");
 
@@ -49,14 +49,26 @@ sap.ui.define([
               this.getOwnerComponent().getRouter().navTo("RouteHomePage");
 		},
 			onOpenDemoForm: function() {
-			  if (!this._oDemoFormDialog) {
-            this._oDemoFormDialog = sap.ui.xmlfragment(
-              this.getView().getId(), "sap.kt.com.minihrsolution.fragment.NewDemoform",
-              this
-            );
-            this.getView().addDependent(this._oDemoFormDialog);
-          }
-          this._oDemoFormDialog.open();
+        if (!this._oDemoFormDialog) {
+        this._oDemoFormDialog = sap.ui.xmlfragment(
+          this.getView().getId(), "sap.kt.com.minihrsolution.fragment.NewDemoform",
+          this
+        );
+        this.getView().addDependent(this._oDemoFormDialog);
+      }
+           this.byId("idCompanyname").setValueState("None");
+            this.byId("idcustomername").setValueState("None");
+            this.byId("idCustmailid").setValueState("None");
+            this.byId("idtimeslot").setValueState("None");
+            this.byId("idDemoSTD").setValueState("None");
+            this.byId("idmobilenumber").setValueState("None");
+            this.byId("idCustaddress").setValueState("None");
+            this.byId("idcomment").setValueState("None");
+      this._oDemoFormDialog.open();
+        
+		
+
+
 		}
 ,
  onCloseDemoForm: function () {
@@ -94,7 +106,7 @@ sap.ui.define([
             utils._LCvalidateName(this.byId("idcustomername"), "ID") &&
             utils._LCvalidateEmail(this.byId("idCustmailid"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idtimeslot"), "ID") &&
-            utils._LCstrictValidationComboBox(this.byId("idDemoSTD"), "ID") &&
+                 utils._LCstrictValidationComboBox(this.byId("idDemoSTD"), "ID") &&
             utils._LCvalidateMobileNumber(this.byId("idmobilenumber"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idCustaddress"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("idcomment"), "ID")

@@ -49,7 +49,7 @@ sap.ui.define([
 
             sessionStorage.setItem("homePageReturnTab", sTabKey);
     },
-    onOpenForm: function () {
+   onOpenForm: function () {
       if (!this._oDemoFormDialog) {
         this._oDemoFormDialog = sap.ui.xmlfragment(
           this.getView().getId(), "sap.kt.com.minihrsolution.fragment.NewDemoform",
@@ -57,6 +57,14 @@ sap.ui.define([
         );
         this.getView().addDependent(this._oDemoFormDialog);
       }
+           this.byId("idCompanyname").setValueState("None");
+            this.byId("idcustomername").setValueState("None");
+            this.byId("idCustmailid").setValueState("None");
+            this.byId("idtimeslot").setValueState("None");
+            this.byId("idDemoSTD").setValueState("None");
+            this.byId("idmobilenumber").setValueState("None");
+            this.byId("idCustaddress").setValueState("None");
+            this.byId("idcomment").setValueState("None");
       this._oDemoFormDialog.open();
     },
     onCloseDemoForm: function () {
