@@ -40,7 +40,12 @@ BaseController, utils, JSONModel, MessageToast, Formatter
           this.API = "https://rest.kalpavrikshatechnologies.com";
 		},
 		onpresshome: function(){
+               const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
+            const sTabKey = oAppStateModel?.getProperty("/previousTab") || "idHome";
+
               this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
 		},
 			onOpenDemoForm: function() {
 			  if (!this._oDemoFormDialog) {

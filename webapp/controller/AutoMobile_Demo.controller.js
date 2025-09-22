@@ -40,7 +40,12 @@ sap.ui.define([
       this.API = "https://rest.kalpavrikshatechnologies.com";
     },
     onpresshome: function () {
-      this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+         const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
+            const sTabKey = oAppStateModel?.getProperty("/previousTab") || "idHome";
+
+              this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
     },
     onOpenDemoForm: function () {
       if (!this._oDemoFormDialog) {

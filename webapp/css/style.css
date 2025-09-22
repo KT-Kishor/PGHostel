@@ -2118,7 +2118,7 @@ font-size: 20px;
   width: 95%;
   max-width: 1600px;
   padding: clamp(16px, 3vw, 30px);
-  margin: 20px 0 20px 40px;   /* top right bottom left */
+  margin: 20px 30px;   
   font-size: clamp(18px, 3vw, 32px);
   font-weight: 700;
   color: #0057FF;
@@ -2138,24 +2138,23 @@ font-size: 20px;
 /* Tablet */
 @media (max-width: 768px) {
   .HeadDemoSection {
-    width: 92%;
+    width: 93%;
       padding: 20px;
-    margin: 10px 15px;  /* keep left margin smaller */
+    margin: 10px 23px;  
     font-size: clamp(16px, 5vw, 24px);
   }
 }
-
 /* Mobile */
 @media (max-width: 480px) {
   .HeadDemoSection {
-    width: 95%;
-       padding: 20px;
-    margin: 10px 20px;  /* even smaller left margin */
-    font-size: clamp(14px, 6vw, 20px);
+    width: 89%;          /* width less than 100% */
     padding: 12px 16px;
+    margin: 10px 22px;   /* top/bottom 10px, left/right auto for centering */
+    font-size: clamp(14px, 6vw, 20px);
     border-radius: 12px;
   }
 }
+
 /* .lineSpace {
     margin-bottom: 10px;  
     font-size: 26px !important;      

@@ -691,7 +691,8 @@ sap.ui.define(
             this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idCareer");
-          }
+            // oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           // Navigate using the jobId
           this.getRouter().navTo("RouteJobView", {
             jobId: sJobId,
@@ -743,21 +744,49 @@ sap.ui.define(
           }
         },
         onHRSolutionPress: function () {
+
+          // Set global tab info
+          const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
+          // Navigate using the jobId
+         
           this.getRouter().navTo("HRSolutions_Demo");
         },
         onInvoiceManagePress: function () {
+           const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           this.getRouter().navTo("Invoice_Solution_Demo");
         },
         onAssetPress: function () {
+                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           this.getRouter().navTo("IT_Asset_Demo");
         },
         onrecruitmentPress: function () {
+                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           this.getRouter().navTo("Recruitment_Demo");
         },
         onAutoMotivePress: function () {
+                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           this.getRouter().navTo("AutoMobile_Demo");
         },
         onIdCardPress: function () {
+                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          if (oAppStateModel) {
+            oAppStateModel.setProperty("/previousTab", "idProducts");
+            }
           this.getRouter().navTo("IDCardgenerate");
         },
         onNavToHrSolution: function () {
@@ -814,7 +843,8 @@ sap.ui.define(
                 });
             }
             this._oDialog.open();
-        }
+        },
+        
       }
     );
   }
