@@ -19,8 +19,12 @@
                     <Text text="#111, Kalpavriksha Karekal layout,"/>
                     <Text text="Near, Railway Bridge, Kalaburagi,"/>
                     <Text text="Karnataka 585102"/>
-                    <Text text="+91 9686145959" />
-                    <Text text="accounts@kalpavrikshatechnologies.com"/>
+                    <Text text="Mobile No : +91 9686145959" />
+                    <Link text="Email: accounts@kalpavrikshatechnologies.com" href="mailto:accounts@kalpavrikshatechnologies.com" class="sapUiLargeMarginBottom" wrapping="true"/>
+
+                    <Text text="We are also a part of Kvriksha Technologies Private Limited." class="sapUiSmallMarginBottom oldCompName"/>
+                    <Text text="For more details, visit our website." class="sapUiSmallMarginBottom newcompName"/>
+                    <Link text="Website: Kvriksha Technologies" href="https://kvrikshatechnologies.com/" target="_blank" />
             </VBox>
 
                 <!-- Right: Google Map -->
@@ -29,7 +33,7 @@
                         content="
                             &lt;div class='map-responsive'&gt;
                             &lt;iframe
-                                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3809.334926964189!2d76.84617247493257!3d17.29938198357291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c122d9181afd%3A0x6af9e90eb1f5fc8f!2sKalpavriksha%20Technologies!5e0!3m2!1sen!2sin!4v1758262861044!5m2!1sen!2sin'
+                                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3809.3348209072196!2d76.84617247462505!3d17.299387105335363!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c122d9181afd%3A0x6af9e90eb1f5fc8f!2sKalpavriksha%20Technologies!5e0!3m2!1sen!2sin!4v1758549339340!5m2!1sen!2sin'
                                 width='100%'
                                 style='border:0;'
                                 allowfullscreen=''
@@ -37,7 +41,7 @@
                                 referrerpolicy='no-referrer-when-downgrade'&gt;
                             &lt;/iframe&gt;
                             &lt;/div&gt;
-                        " />
+                        " />      
             </VBox>
         </HBox>
 

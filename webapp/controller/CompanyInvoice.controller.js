@@ -190,18 +190,22 @@ sap.ui.define(
               ...item,
               InvoiceDate: Formatter.formatDate(item.InvoiceDate),
               PayByDate: Formatter.formatDate(item.PayByDate),
-              TotalAmountCurrency: item.TotalAmount + " " + item.Currency 
+              TotalAmountCurrency: item.TotalAmount + " " + item.Currency
               
             };
           });
           const aCols = [
-            { label: this.i18nModel.getText("invoiceNo"), property: "JobTitle", type: "string" },
+            { label: this.i18nModel.getText("invoiceNo"), property: "InvNo", type: "string" },
             { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
             { label: this.i18nModel.getText("invoiceDate"), property: "InvoiceDate", type: "string" },
             { label: this.i18nModel.getText("invoiceDescription"), property: "InvoiceDescription", type: "string" },
             { label: this.i18nModel.getText("totalAmount"), property: "TotalAmountCurrency", type: "string" },
             { label: this.i18nModel.getText("PayByDate"), property: "PayByDate", type: "string " },
             { label: this.i18nModel.getText("status"), property: "Status", type: "string" },
+            { label: this.i18nModel.getText("cgs"), property: "CGST", type: "string" },
+            { label: this.i18nModel.getText("sgst"), property: "SGST", type: "string" },
+            { label: this.i18nModel.getText("igst"), property: "IGST", type: "string " },
+            { label: this.i18nModel.getText("amountInINR"), property: "AmountInINR", type: "string" },
           ];
           const oSettings = {
             workbook: {

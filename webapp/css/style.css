@@ -293,6 +293,11 @@
 }
 .Products_list {
   border-radius: 0.6rem;
+  background-color: #eafdf9;
+  background-image: url("../image/Home.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .allvideo {
   border-radius: 0.8rem !important;
@@ -2445,8 +2450,18 @@ font-size: 20px;
     font-weight: bold;
 }
 
+.newcompName{
+    font-weight: bold;
+    line-height: 1.8;  
+}
+
+.oldCompName{
+   font-size: 1.2rem !important;
+    font-weight: bold; 
+}
+
 .compName{
-   font-size: 1.6rem !important;
+   font-size: 1.3rem !important;
     font-weight: bold;
 }
 
@@ -2479,7 +2494,7 @@ font-size: 20px;
   flex-grow: 1; /* take remaining space */
   flex-shrink: 1;
   flex-basis: auto;
-  border-radius: 0 8px 8px 0;
+  border-radius:  8px 0 0 8px;
 }
 
 /* Map */
@@ -2497,7 +2512,7 @@ font-size: 20px;
   top: 0; left: 0;
   width: 100%; height: 100%;
   border: 0;
-   border-radius: 0 8px 8px 0;
+   border-radius: 8px 0 0 8px;
 }
 
 /* Responsive for mobile */
@@ -2509,9 +2524,13 @@ font-size: 20px;
   }
 }
 
-.contact-address-box .sapMText {
-  color: #fff !important;
-  font-size: 14px;
+
+.contact-address-box a,
+.contact-address-box .sapMText,
+.contact-address-box .sapMLnk {
+    color: #fff !important;
+    font-size: 14px;
+    text-decoration: none; /* optional, removes underline */
 }
 
 
