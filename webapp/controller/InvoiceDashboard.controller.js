@@ -185,141 +185,54 @@ sap.ui.define([
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
             //  fiscal start year from a date Apr-Mar FY
-            const getFiscalStartYearFromDate = (date) => {
-                const m = date.getMonth(); // 0..11
-                const y = date.getFullYear();
-                return (m >= 3) ? y : (y - 1);
-            };
-
-            //  selected FY start year 
-            let fyStartYear;
-            try {
-                const oYearFilter = this.byId("yearFilter");
-                const sYearValue = (oYearFilter && oYearFilter.getValue) ? (oYearFilter.getValue() || "").trim() : "";
-
-                // support formats: "2024-2025", "2023-24", "2024"
-                const mRange = sYearValue.match(/^(\d{4})\s*[-–—]\s*(\d{2}|\d{4})$/);
-                const mSingle = sYearValue.match(/^(\d{4})$/);
-
-                if (mRange) {
-                    const start = parseInt(mRange[1], 10);
-                    const endPart = mRange[2];
-                    let end;
-                    if (endPart.length === 2) {
-                        // "2023-24" -> convert to 2024
-                        end = Math.floor(start / 100) * 100 + parseInt(endPart, 10);
-                    } else {
-                        end = parseInt(endPart, 10);
-                    }
-                    // If end looks invalid, fallback to start
-                    fyStartYear = isNaN(start) ? undefined : start;
-                } else if (mSingle) {
-                    fyStartYear = parseInt(mSingle[1], 10);
-                }
-            } catch (e) {
-                fyStartYear = undefined;
-            }
-
-            // --- fallback: derive FY from earliest invoice (in aFilteredData) or from today ---
-            if (typeof fyStartYear === "undefined" || isNaN(fyStartYear)) {
-                if (aFilteredData && aFilteredData.length > 0) {
-                    let minDate = null;
-                    for (let i = 0; i < aFilteredData.length; i++) {
-                        const d = new Date(aFilteredData[i].InvoiceDate);
-                        if (isNaN(d.getTime())) continue;
-                        if (!minDate || d < minDate) minDate = d;
-                    }
-                    fyStartYear = minDate ? getFiscalStartYearFromDate(minDate) : getFiscalStartYearFromDate(new Date());
-                } else {
-                    fyStartYear = getFiscalStartYearFromDate(new Date());
-                }
-            }
-
-            // --- FY window ---
-            const fyStart = new Date(fyStartYear, 3, 1); // Apr 1
-            const fyEnd = new Date(fyStartYear + 1, 2, 31, 23, 59, 59); // Mar 31 next year
-
-            // make sure arrays exist
-            aFilteredData = Array.isArray(aFilteredData) ? aFilteredData : [];
-            aYearlyTrendData = Array.isArray(aYearlyTrendData) ? aYearlyTrendData : [];
-
-            // --- 2) Monthly aggregation: only invoices inside chosen FY ---
-            const monthlyValue = aFilteredData.reduce((acc, item) => {
+          const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
                 if (isNaN(d.getTime())) return acc;
-                if (d < fyStart || d > fyEnd) return acc; // restrict to FY
-                const month = d.getMonth(); // 0..11
+                const month = d.getMonth(); // 0 to 11
                 acc[month] = (acc[month] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
 
-            // --- 3) Company totals inside FY ---
             const companyTotals = aFilteredData.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime()) || d < fyStart || d > fyEnd) return acc;
                 acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
 
-            //  Yearly aggregation: produce per-calendar-year totals but only for FY window ---
-            const yearlyAgg = aYearlyTrendData.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime())) return acc;
-                if (d < fyStart || d > fyEnd) return acc;
-                const yr = d.getFullYear();
-                if (!acc[yr]) acc[yr] = { totalAmountInINR: 0, count: 0 };
-                acc[yr].totalAmountInINR += this._getInrValue(item);
-                acc[yr].count++;
-                return acc;
-            }, {});
+          const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
+    const d = new Date(item.InvoiceDate);
+    if (isNaN(d.getTime())) return acc;
+    // Calculate fiscal start year (Apr–Mar)
+    const year = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+    const fyLabel = `${year}-${year + 1}`; //  '2024-2025'
+    if (!acc[fyLabel]) { acc[fyLabel] = { totalAmountInINR: 0, count: 0 }; }
+    acc[fyLabel].totalAmountInINR += this._getInrValue(item);
+    acc[fyLabel].count++;
+    return acc;
+}, {});
 
-            // Ensure both years (start and start+1) are represented — zero if missing
-            const y1 = fyStartYear;
-            const y2 = fyStartYear + 1;
-            const formattedYearlyTrend = [
-                {
-                    year: String(y1),
-                    totalAmountInINR: (yearlyAgg[y1] && yearlyAgg[y1].totalAmountInINR) || 0,
-                    count: (yearlyAgg[y1] && yearlyAgg[y1].count) || 0
-                },
-                {
-                    year: String(y2),
-                    totalAmountInINR: (yearlyAgg[y2] && yearlyAgg[y2].totalAmountInINR) || 0,
-                    count: (yearlyAgg[y2] && yearlyAgg[y2].count) || 0
-                }
-            ];
 
-            // Pending by company (FY only) 
             const pendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
             const pendingByCompany = aFilteredData
-                .filter(item => {
-                    const d = new Date(item.InvoiceDate);
-                    if (isNaN(d.getTime())) return false;
-                    return d >= fyStart && d <= fyEnd && pendingStatuses.includes(item.Status);
-                })
+                .filter(item => pendingStatuses.includes(item.Status))
                 .reduce((acc, item) => {
                     acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
                     return acc;
                 }, {});
 
-            //  Status counts & grouped invoices (FY only) 
             this._oGroupedInvoices = {};
             const statusCounts = aFilteredData.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime()) || d < fyStart || d > fyEnd) return acc;
                 const status = item.Status || "Unknown";
-                if (!this._oGroupedInvoices[status]) this._oGroupedInvoices[status] = [];
+                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
                 this._oGroupedInvoices[status].push(item);
                 acc[status] = (acc[status] || 0) + 1;
                 return acc;
             }, {});
 
-            // Payment breakdown (FY only)
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime()) || d < fyStart || d > fyEnd) return acc;
                 const company = item.CustomerName;
-                if (!acc[company]) acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0 };
+                if (!acc[company]) {
+                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0 };
+                }
                 const totalGst = this._convertToInr(item.CGST, item) + this._convertToInr(item.SGST, item) + this._convertToInr(item.IGST, item);
                 acc[company].taxableAmount += this._convertToInr(item.SubTotalInGST, item);
                 acc[company].gstAmount += totalGst;
@@ -327,10 +240,33 @@ sap.ui.define([
                 return acc;
             }, {});
 
-            //monthly (Apr -> Mar) labels and values
+            // --- Determine Fiscal Year Start based on filtered data ---
+            const getFiscalStartYearFromDate = (date) => {
+                const m = date.getMonth(); // 0 to 11
+                const y = date.getFullYear();
+                return (m >= 3) ? y : (y - 1); // Apr(3)..Dec => same year; Jan(0)..Mar(2) => prev year
+            };
+
+            let fyStartYear;
+            if (aFilteredData && aFilteredData.length > 0) {
+                // find the earliest invoice date in the filtered set
+                let minDate = null;
+                for (let i = 0; i < aFilteredData.length; i++) {
+                    const d = new Date(aFilteredData[i].InvoiceDate);
+                    if (isNaN(d.getTime())) continue;
+                    if (!minDate || d < minDate) minDate = d;
+                }
+                fyStartYear = minDate ? getFiscalStartYearFromDate(minDate) : getFiscalStartYearFromDate(new Date());
+            } else {
+                // no data: derive from today
+                fyStartYear = getFiscalStartYearFromDate(new Date());
+            }
+
+            // --- Financial Year Monthly Aggregation (Apr → Mar with Year) ---
             const monthNames = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+
             const formattedMonthly = monthNames.map((monthName, idx) => {
-                const realMonth = (idx + 3) % 12; // Apr idx 0 -> month 3
+                const realMonth = (idx + 3) % 12; // map Apr idx 0 -> realMonth 3
                 const displayYear = (realMonth >= 3) ? fyStartYear : (fyStartYear + 1);
                 return {
                     month: `${monthName}-${displayYear}`,
@@ -338,10 +274,13 @@ sap.ui.define([
                 };
             });
 
-            // Format other outputs
             const formattedCompanyTotals = Object.entries(companyTotals)
                 .map(([name, total]) => ({ companyName: name, totalAmountInINR: total }))
                 .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
+
+            const formattedYearlyTrend = Object.entries(yearlyTrend)
+           .map(([fyLabel, data]) => ({ year: fyLabel, ...data }))
+           .sort((a, b) => a.year.localeCompare(b.year)); 
 
             const formattedPending = Object.entries(pendingByCompany)
                 .map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount }))
@@ -356,16 +295,16 @@ sap.ui.define([
                 company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0
             );
 
-            //  Set model data 
+            // ------ Set model data ------
             this.getView().getModel("chartData").setData({
                 statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
                 companyTotals: formattedCompanyTotals,
-                yearlyTrend: formattedYearlyTrend, // now shows selected FY as two years
+                yearlyTrend: formattedYearlyTrend,
                 paymentBreakdown: formattedPaymentBreakdown,
                 pendingByCompany: formattedPending
             });
-        }
+        } 
         ,
 
         // --- EVENT HANDLERS FOR CHART SELECTIONS ---
