@@ -1986,18 +1986,12 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   transform-origin: top right;           /* rotation around corner */
 }
 
-.HRSolution {
-  margin-top: 10px;
-  padding: 10px 15px;
-  border-radius: 8px;
-  text-align: center;  /* center align everything */
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  max-width: 500px;    /* keep limit */
-  font-size: 0.95rem;
-  word-wrap: break-word; /* allow wrapping */
-  overflow-wrap: anywhere;
+.HRSolution{
+  margin-top: 20px;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
-
 
 .FollowusSolution {
   width: 120px;
