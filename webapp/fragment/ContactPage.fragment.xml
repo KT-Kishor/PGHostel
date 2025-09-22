@@ -1,105 +1,68 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:grid="sap.ui.layout.cssgrid"
-    xmlns:card="sap.f.cards"
-    xmlns:f="sap.f"
-	xmlns:core="sap.ui.core">
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:grid="sap.ui.layout.cssgrid"
+    xmlns:core="sap.ui.core">
+
     <VBox class="contact-hero" width="100%">
-   <Title text="{i18n>Get in Touch}" class="contact-hero-title"/>
- </VBox>
-
-<grid:CSSGrid
-    id="gridCards"
-    gridTemplateColumns="1fr 1fr"
-    gridGap="1rem">
-
+        <Title text="Get in Touch" class="contact-hero-title"/>
+    </VBox>
+    <!-- Section Title -->
     
-<VBox class="sapUiSmallMargin">
-
-            <!-- Contact + Email Row -->
-         <HBox width="100%" justifyContent="SpaceBetween">
-  <!-- Contact -->
-            <VBox class="ContactBox sapUiSmallMargin" width="48%" alignItems="Center">
-                <HBox alignItems="Center" justifyContent="Center">
-                <Image src="../image/call.webp" class="contact-icon"/>
-                </HBox>
-                <Link text="{/pages/0/groups/1/elements/0/value}"
-                    href="https://wa.me/919686145959"
-                    class="contact-link sapUiTinyMarginTop"/>
+        <HBox class="contact-flex" justifyContent="Start" alignItems="Stretch" wrap="Wrap">
+            <VBox class="contact-subtitle" width="100%">
+                    <Title text="Corporate Office Address"  class="contact-text"/>
+            </VBox>
+                <!-- Left: Address -->
+            <VBox class="contact-address-box">
+                    <Text text="Kalpavriksha Technologies" class="sapUiSmallMarginBottom compName"/>
+                    <Text text="#111, Kalpavriksha Karekal layout,"/>
+                    <Text text="Near, Railway Bridge, Kalaburagi,"/>
+                    <Text text="Karnataka 585102"/>
+                    <Text text="+91 9686145959" />
+                    <Text text="accounts@kalpavrikshatechnologies.com"/>
             </VBox>
 
-            <!-- Email -->
-            <VBox class="EmailBox sapUiSmallMargin" width="50%" alignItems="Center">
-                <HBox alignItems="Center" justifyContent="Center">
-                <Image src="../image/Email.png" class="contact-icon"/>
-                </HBox>
-                <Link text="{/pages/0/groups/1/elements/1/value}" wrapping="true" 
-                    href="mailto:accounts@kalpavrikshatechnologies.com"
-                    class="email-link sapUiTinyMarginTop"/>
+                <!-- Right: Google Map -->
+            <VBox class="contact-map-box">
+                    <core:HTML
+                        content="
+                            &lt;div class='map-responsive'&gt;
+                            &lt;iframe
+                                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3809.334926964189!2d76.84617247493257!3d17.29938198357291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c122d9181afd%3A0x6af9e90eb1f5fc8f!2sKalpavriksha%20Technologies!5e0!3m2!1sen!2sin!4v1758262861044!5m2!1sen!2sin'
+                                width='100%'
+                                style='border:0;'
+                                allowfullscreen=''
+                                loading='lazy'
+                                referrerpolicy='no-referrer-when-downgrade'&gt;
+                            &lt;/iframe&gt;
+                            &lt;/div&gt;
+                        " />
             </VBox>
+        </HBox>
 
-            </HBox>
+    <!-- Footer -->
+    <HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" width="100%" >
+        <!-- Left: Copyright -->
+        <Text text="© 2025 Kalpavriksha Technologies" class="footer-text"/>
+        <!-- Middle: Links -->
+        <!-- <HBox class="footer-links" justifyContent="Center">
+            <Link text="Disclaimer" href="#" target="_blank" class="footer-link"/>
+            <Link text="Privacy" href="#" target="_blank" class="footer-link"/>
+            <Link text="Modern Slavery Statement" href="#" target="_blank" class="footer-link"/>
+        </HBox> -->
 
-
-
-            <!-- Follow Us Row -->
-            <HBox width="100%" alignItems="Center" justifyContent="SpaceBetween"
-      class="sapUiSmallMargin social-icons-row" renderType="Bare">
-
-  <!-- YouTube -->
-  <VBox class="FollowusSolution">
-    <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
-                          &lt;i class='fab fa-youtube social-icon' style='color:#FF0000'&gt;&lt;/i&gt;
-                        &lt;/a&gt;"/>
-  </VBox>
-
-  <!-- LinkedIn -->
-  <VBox class="FollowusSolution">
-    <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
-                          &lt;i class='fab fa-linkedin social-icon' style='color:#0A66C2'&gt;&lt;/i&gt;
-                        &lt;/a&gt;"/>
-  </VBox>
-
-  <!-- Instagram -->
-  <VBox class="FollowusSolution">
-    <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/?igsh=emEzMDAxNTdvN3Bx&amp;&amp;utm_source=qr#' target='_blank'&gt;
-                          &lt;i class='fab fa-instagram social-icon' style='color:#E4405F'&gt;&lt;/i&gt;
-                        &lt;/a&gt;"/>
-  </VBox>
-
-</HBox>
-
-
-          </VBox>
-     
-    <!-- Card 2 -->
-    <f:Card class="sapUiMediumMarginTop">
-        <f:header>
-            <!-- <f:CardHeader
-                title="Card Two"
-                subtitle="Second card side by side"/> -->
-        </f:header>
-      <f:content>
-  <VBox class="contact-right sapUiSmallMargin" width="100%">
-    <core:HTML
-      content="
-        &lt;div class='map-responsive'&gt;
-          &lt;iframe 
-            src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3809.334926964189!2d76.84617247493257!3d17.29938198357291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc8c122d9181afd%3A0x6af9e90eb1f5fc8f!2sKalpavriksha%20Technologies!5e0!3m2!1sen!2sin!4v1758262861044!5m2!1sen!2sin'
-            style='border:0;' 
-            allowfullscreen='true' 
-            loading='lazy'
-            referrerpolicy='no-referrer-when-downgrade'&gt;
-          &lt;/iframe&gt;
-        &lt;/div&gt;
-      "/>
-  </VBox>
-</f:content>
-
-    </f:Card>
-
-</grid:CSSGrid>
-
-
+        <!-- Right: Social Icons -->
+        <HBox class="footer-social" justifyContent="End">
+            <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/' target='_blank'&gt;
+                                  &lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+            <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
+                                  &lt;i class='fab fa-linkedin-in social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+            <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
+                                  &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+        </HBox>
+    </HBox>
 </core:FragmentDefinition>
