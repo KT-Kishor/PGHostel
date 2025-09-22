@@ -150,7 +150,11 @@ sap.ui.define([
         _getInrValue: function (item) {
             let amount = 0;
             if (item.Status === "Submitted" || item.Status === "Invoice Sent" || item.Status === "Payment Received") {
-                amount = parseFloat(item.TotalAmount || 0);
+                if(item.Currency === "INR"){
+                  amount = parseFloat(item.TotalAmount || 0);
+                }else{
+                    amount = parseFloat(item.AmountInINR || 0);
+                }
             } else if (item.Status === "Payment Partially") {
                 amount = parseFloat(item.DueAmount || 0);
             } else {

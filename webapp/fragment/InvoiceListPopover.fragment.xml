@@ -20,24 +20,30 @@
                 
                 <columns>
                     <Column><Text text="{i18n>invoiceNo}" /></Column>
+                      <Column><Text text="{i18n>date}" /></Column>
                     <Column><Text text="{i18n>customerName}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>amount}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>amountInINR}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>totalAmount}" /></Column>
                     <!-- <Column><Text text="{i18n>currency}" /></Column> -->
-                    <Column><Text text="{i18n>date}" /></Column>
-                    <Column><Text text="{i18n>status}" /></Column>
+                  
+                    <!-- <Column><Text text="{i18n>status}" /></Column> -->
                 </columns>
                 
                 <items>
                     <ColumnListItem type="Navigation" press="onInvoiceNumberPress">
                         <cells>
-                            <Link text="{popoverData>InvNo}" press="onInvoiceNumberPress" />
-                            <Text text="{popoverData>CustomerName}" />
-                            <ObjectNumber number="{path:'popoverData>TotalAmount',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
-                            <!-- <Text text="{popoverData>Currency}" /> -->
-                            <Text text="{
+                            <Text text="{popoverData>InvNo}" />
+                             <Text text="{
                                 path: 'popoverData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
-                            <Text text="{popoverData>Status}" />
+                            <Text text="{popoverData>CustomerName}" />
+                            <ObjectNumber number="{path:'popoverData>ConversionRate',formatter: '.Formatter.fromatNumber'}"  />
+                            <ObjectNumber number="{path:'popoverData>AmountInINR',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+                            <ObjectNumber number="{path:'popoverData>TotalAmount',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+                            <!-- <Text text="{popoverData>Currency}" /> -->
+                           
+                            <!-- <Text text="{popoverData>Status}" /> -->
                         </cells>
                     </ColumnListItem>
                 </items>
@@ -45,7 +51,7 @@
         </content>
         
         <endButton>
-            <Button text="{i18n>close}" type="Reject" press="onCloseDialog" />
+            <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

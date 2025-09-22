@@ -419,10 +419,12 @@
   /* width: fit-content !important; */
 }
 
+
 @media  only Screen and (max-width: 450px) {
   .big-apply-button {
-    width: 100% !important;
-    margin-right: 0 !important;
+    /* width: 100% !important; */
+    margin-right: 5rem !important;
+    margin-top: 44%;
   }
  
 }
