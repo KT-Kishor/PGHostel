@@ -10,7 +10,7 @@
             <Text class="hr-text sapUiSmallMargin" text="HR Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onHRSolutionPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
@@ -25,7 +25,7 @@
             <Text class="hr-text sapUiSmallMargin" text="Invoice Management" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onInvoiceManagePress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
@@ -40,7 +40,7 @@
             <Text class="hr-text sapUiSmallMargin" text="Company Asset Management" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>Companyassetmanage}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onAssetPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
@@ -55,7 +55,7 @@
             <Text class="hr-text sapUiSmallMargin" text="Recruitment" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>recruitmentmanage}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onrecruitmentPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
@@ -70,7 +70,7 @@
             <Text class="hr-text sapUiSmallMargin" text="Automotive Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onAutoMotivePress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
@@ -85,7 +85,7 @@
             <Text class="hr-text sapUiSmallMargin" text="ID Card Generation" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}" />
             <HBox justifyContent="End">
-                <Button text="Take a Product Tour"
+                <Button text="{i18n>takeaproducttour}"
                         press="onIdCardPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>

@@ -3,11 +3,21 @@
     xmlns:core="sap.ui.core">
     <Dialog
         id="YearlyInvoiceDialog"
-        title="{i18n>yearlyinvoicefor} {dialogData>/year}"
         contentWidth="800px"
         contentHeight="400px"
         resizable="true"
         draggable="true">
+           <customHeader >
+        <Bar class="Coursetitle" >
+        <contentLeft>
+          <Title text="{i18n>yearlyinvoicefor} {dialogData>/year}"   />
+        </contentLeft>
+           
+            <contentRight>
+                <Button icon="sap-icon://decline" press="onCloseDialog" tooltip="Close"/>
+            </contentRight>
+        </Bar>
+    </customHeader>
         <content>
             <Table
             sticky="ColumnHeaders"
@@ -17,9 +27,9 @@
                  <Column><Text text="{i18n>invoiceNo}" /></Column>
                     <Column><Text text="{i18n>invoiceDate}" /></Column>
                      <Column><Text text="{i18n>customerName}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
-                    <!-- <Column hAlign="End"><Text text="{i18n>totalAmount}" /></Column> -->
-                    <!-- <Column><Text text="{i18n>status}" /></Column> -->
+                        <Column><Text text="{i18n>currency}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>exchRate}" /></Column>
+         
                     <Column hAlign="End"><Text text="{i18n>yearlyinvoice}" /></Column>
                 </columns>
                 <items>
@@ -27,14 +37,24 @@
                         <cells>
                             <!-- <Text text="{dialogData>year}" /> -->
                             <Text text="{dialogData>InvNo}" />
-                              <!-- <Text text="{popoverData>InvNo}" /> -->
+                           
                              <Text text="{
                                 path: 'dialogData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
                             <Text text="{dialogData>CustomerName}" />
+                            <ObjectNumber
+    number="{
+        parts: [
+          
+            { path: 'dialogData>TotalAmount' }
+        
+        ], 
+        formatter: '.Formatter.fromatNumber'
+    }"
+    unit="{dialogData>Currency}" />
                            <ObjectIdentifier 
   title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
-  text="{= ${dialogData>Currency} !== 'INR' ? ${dialogData>TotalAmount} : '' }" />
+  />
 
 
                            <ObjectNumber
@@ -46,15 +66,15 @@
         ], 
         formatter: '.Formatter.fromatNumber'
     }"
-    unit="{dialogData>Currency}" />
+    unit="INR" />
 
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
-        <endButton>
+        <!-- <endButton>
             <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
-        </endButton>
+        </endButton> -->
     </Dialog>
 </core:FragmentDefinition>

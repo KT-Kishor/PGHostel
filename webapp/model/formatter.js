@@ -212,7 +212,7 @@ sap.ui.define([
     }
     
     if (avalue === "0" || avalue === 0) {
-        return "0.00";
+        return "- -";
     }
     var numericValue = parseFloat(avalue);
     if (isNaN(numericValue)) {
@@ -354,5 +354,13 @@ sap.ui.define([
             }
             return sValue;
         },
+        
+      combineTitle: function(invoiceForText, status) {
+    if (!invoiceForText) invoiceForText = "";
+    if (!status) status = "";
+    return invoiceForText + " '" + status + "'";
+}
+
+
     }
 });
