@@ -391,7 +391,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
         oQuotationModel.refresh();
       },
       HQD_onPercentageChange: function (oEvent) {
-        utils._LCvalidateAmount(oEvent);
+        utils._LCvalidateAmountZeroTaking(oEvent);
         this.updateTotalAmount();
       },
       onSelectCGST: function (oEvent) {
@@ -1072,7 +1072,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
         this.updateTotalAmount();
       },
       HQD_onInputChange: function (oEvent) {
-        this.UnitAmount = utils._LCvalidateAmount(oEvent);
+        this.UnitAmount = utils._LCvalidateAmountZeroTaking(oEvent);
         var oBindingContext = oEvent.getSource().getBindingContext("QuotationModel");
         var oItemContext = oBindingContext.getObject();
         var days = parseFloat(oItemContext.Days) || 0;
