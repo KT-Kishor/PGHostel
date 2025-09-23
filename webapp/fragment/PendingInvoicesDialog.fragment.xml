@@ -16,8 +16,10 @@
                 <columns>
                     <Column><Text text="{i18n>invoiceNo}" /></Column>
                     <Column><Text text="{i18n>invoiceDate}" /></Column>
-                    <Column><Text text="{i18n>status}" /></Column>
+                    <Column><Text text="{i18n>customerName}" /></Column>
+                        <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>pendingAmountInr}" /></Column>
+                     <Column><Text text="{i18n>status}" /></Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="onPendingInvoicePress">
@@ -26,18 +28,25 @@
                             <Text text="{
                                 path: 'dialogData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
-                            <Text text="{dialogData>Status}" />
+                             <Text text="{dialogData>CustomerName}" />
+                             <ObjectIdentifier 
+  title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
+  text="{= ${dialogData>Currency} !== 'INR' ? ${dialogData>TotalAmount} : '' }" />
                              <ObjectNumber number="{
                                 path: 'dialogData>pendingAmountInINR',
                                formatter: '.Formatter.fromatNumber'
-                            }" unit="INR" />
+                            }" unit="{dialogData>Currency}" />
+                             <!-- <ObjectNumber
+    number="{= ${dialogData>Currency} === 'INR' ? ${dialogData>TotalAmount} : ${dialogData>AmountInINR}}"
+    unit="{dialogData>Currency}" /> -->
+                             <Text text="{dialogData>Status}" />
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <endButton>
-            <Button text="{i18n>close}" type="Reject" press="onCloseDialog" />
+            <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

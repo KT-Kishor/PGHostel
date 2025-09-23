@@ -14,8 +14,12 @@
                 items="{dialogData>/invoices}"
                 noDataText="{i18n>noyearlydata}">
                 <columns>
-                    <Column><Text text="{i18n>invoiceNo}" /></Column>
-               <Column><Text text="{i18n>invoiceDate}" /></Column>
+                 <Column><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column><Text text="{i18n>invoiceDate}" /></Column>
+                     <Column><Text text="{i18n>customerName}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
+                    <!-- <Column hAlign="End"><Text text="{i18n>totalAmount}" /></Column> -->
+                    <!-- <Column><Text text="{i18n>status}" /></Column> -->
                     <Column hAlign="End"><Text text="{i18n>yearlyinvoice}" /></Column>
                 </columns>
                 <items>
@@ -23,21 +27,34 @@
                         <cells>
                             <!-- <Text text="{dialogData>year}" /> -->
                             <Text text="{dialogData>InvNo}" />
-                            <Text text="{
+                              <!-- <Text text="{popoverData>InvNo}" /> -->
+                             <Text text="{
                                 path: 'dialogData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
-                            
-                             <ObjectNumber number="{
-                                path: 'dialogData>totalAmountInINR',
-                               formatter: '.Formatter.fromatNumber'
-                            }" unit="INR" />
+                            <Text text="{dialogData>CustomerName}" />
+                           <ObjectIdentifier 
+  title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
+  text="{= ${dialogData>Currency} !== 'INR' ? ${dialogData>TotalAmount} : '' }" />
+
+
+                           <ObjectNumber
+    number="{
+        parts: [
+            { path: 'dialogData>Currency' },
+            { path: 'dialogData>TotalAmount' },
+            { path: 'dialogData>AmountInINR' }
+        ], 
+        formatter: '.Formatter.fromatNumber'
+    }"
+    unit="{dialogData>Currency}" />
+
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <endButton>
-            <Button text="{i18n>close}" type="Reject" press="onCloseDialog" />
+            <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

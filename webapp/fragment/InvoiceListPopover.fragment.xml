@@ -19,15 +19,15 @@
                 noDataText="{i18n>noInvoiceStatus}">
                 
                 <columns>
-                    <Column><Text text="{i18n>invoiceNo}" /></Column>
-                      <Column><Text text="{i18n>date}" /></Column>
-                    <Column><Text text="{i18n>customerName}" /></Column>
+                      <Column><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column><Text text="{i18n>invoiceDate}" /></Column>
+                     <Column><Text text="{i18n>customerName}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>amountInINR}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>totalAmount}" /></Column>
-                    <!-- <Column><Text text="{i18n>currency}" /></Column> -->
-                  
                     <!-- <Column><Text text="{i18n>status}" /></Column> -->
+               
+                  
+                
                 </columns>
                 
                 <items>
@@ -38,12 +38,22 @@
                                 path: 'popoverData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
                             <Text text="{popoverData>CustomerName}" />
-                            <ObjectNumber number="{path:'popoverData>ConversionRate',formatter: '.Formatter.fromatNumber'}"  />
-                            <ObjectNumber number="{path:'popoverData>AmountInINR',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
-                            <ObjectNumber number="{path:'popoverData>TotalAmount',formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
-                            <!-- <Text text="{popoverData>Currency}" /> -->
-                           
-                            <!-- <Text text="{popoverData>Status}" /> -->
+                           <ObjectIdentifier 
+  title="{path:'popoverData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
+  text="{= ${popoverData>Currency} !== 'INR' ? ${popoverData>TotalAmount} : '' }" />
+
+                          <ObjectNumber
+    number="{
+        parts: [
+            { path: 'popoverData>Currency' },
+            { path: 'popoverData>TotalAmount' },
+            { path: 'popoverData>AmountInINR' }
+        ], 
+        formatter: '.Formatter.fromatNumber'
+    }"
+    unit="{popoverData>Currency}" />
+
+                         
                         </cells>
                     </ColumnListItem>
                 </items>

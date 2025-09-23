@@ -14,12 +14,10 @@
                 items="{dialogData>/invoices}"
                 noDataText="{i18n>nomonthlydata}">
                 <columns>
-                    <Column><Text text="{i18n>invoiceNo}" /></Column>
+                  <Column><Text text="{i18n>invoiceNo}" /></Column>
                     <Column><Text text="{i18n>invoiceDate}" /></Column>
-                    <!-- <Column><Text text="{i18n>status}" /></Column> -->
                      <Column><Text text="{i18n>customerName}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>expConversionRate}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>amountInINR}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>totalAmount}" /></Column>
                     <Column><Text text="{i18n>status}" /></Column>
                 </columns>
@@ -27,14 +25,25 @@
                     <ColumnListItem type="Navigation" press="onPendingInvoicePress">
                         <cells>
                             <Text text="{dialogData>InvNo}" />
-                            <Text text="{
+                              <!-- <Text text="{popoverData>InvNo}" /> -->
+                             <Text text="{
                                 path: 'dialogData>InvoiceDate',
                              formatter:'.Formatter.formatDate'}" />
-                            <!-- <Text text="{dialogData>Status}" /> -->
                             <Text text="{dialogData>CustomerName}" />
-                            <ObjectNumber number="{path:'dialogData>ConversionRate',formatter: '.Formatter.fromatNumber'}"  />
-                            <ObjectNumber number="{path:'dialogData>AmountInINR',formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
-                            <ObjectNumber number="{path:'dialogData>TotalAmount',formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
+                           <ObjectIdentifier 
+  title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
+  text="{= ${dialogData>Currency} !== 'INR' ? ${dialogData>TotalAmount} : '' }" />
+    
+                          <ObjectNumber
+    number="{
+        parts: [
+            { path: 'dialogData>Currency' },
+            { path: 'dialogData>TotalAmount' },
+            { path: 'dialogData>AmountInINR' }
+        ], 
+        formatter: '.Formatter.fromatNumber'
+    }"
+    unit="{dialogData>Currency}" />
                             <Text text="{dialogData>Status}" />
                         </cells>
                     </ColumnListItem>

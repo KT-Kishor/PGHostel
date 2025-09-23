@@ -17,7 +17,7 @@
                     <Column><Text text="{i18n>invoiceNo}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>taxableAmount}" /></Column>
                     <Column hAlign="End"><Text text="{i18n>gstAmount}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>tdsAmount}" /></Column>
+                    <!-- <Column hAlign="End"><Text text="{i18n>tdsAmount}" /></Column> -->
                     <Column hAlign="End"><Text text="{i18n>colTotalAmount}" /></Column>
                 </columns>
                 <items>
@@ -32,21 +32,21 @@
                                 path: 'dialogData>gstAmount',
                        formatter: '.Formatter.fromatNumber'
                             }" unit="INR" />
-                             <ObjectNumber number="{
+                             <!-- <ObjectNumber number="{
                                 path: 'dialogData>IncomeTax',
                          formatter: '.Formatter.fromatNumber'
-                            }" unit="INR" />
+                            }" unit="INR" /> -->
                              <ObjectNumber number="{
                                 path: 'dialogData>totalAmountInINR',
                            formatter: '.Formatter.fromatNumber'
-                            }" unit="INR" />
+                            }" unit="{dialogData>Currency}"/>
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <endButton>
-            <Button text="{i18n>close}" press="onCloseDialog" type="Reject" />
+            <Button text="{i18n>close}" press="onCloseDialog" type="Ghost" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

@@ -240,17 +240,21 @@
                                                         <viz:dataset>
                                                             <vizData:FlattenedDataset data="{chartData>/paymentBreakdown}">
                                                                 <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
-                                                                <vizData:measures>
-                                                                    <vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
-                                                                    <vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
-                                                                    <vizData:MeasureDefinition name="TDS Amount" value="{chartData>tdsAmount}" />
-                                                                </vizData:measures>
+                                                              <vizData:measures>
+    <vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
+    <vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
+    <vizData:MeasureDefinition name="TDS Amount" value="{chartData>tdsAmount}" />
+    <vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" /> 
+</vizData:measures>
+
                                                             </vizData:FlattenedDataset>
                                                         </viz:dataset>
                                                         <viz:feeds>
-                                                            <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Taxable Amount,GST Amount,TDS Amount" />
-                                                            <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
-                                                        </viz:feeds>
+    <vizFeeds:FeedItem uid="valueAxis" type="Measure" 
+        values="Taxable Amount,GST Amount,TDS Amount,Total Amount" />
+    <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
+</viz:feeds>
+
                                                     </viz:VizFrame>
                                               
                                             </com:content>

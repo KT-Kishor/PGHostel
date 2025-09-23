@@ -150,9 +150,9 @@ sap.ui.define([
         _getInrValue: function (item) {
             let amount = 0;
             if (item.Status === "Submitted" || item.Status === "Invoice Sent" || item.Status === "Payment Received") {
-                if(item.Currency === "INR"){
-                  amount = parseFloat(item.TotalAmount || 0);
-                }else{
+                if (item.Currency === "INR") {
+                    amount = parseFloat(item.TotalAmount || 0);
+                } else {
                     amount = parseFloat(item.AmountInINR || 0);
                 }
             } else if (item.Status === "Payment Partially") {
@@ -189,7 +189,7 @@ sap.ui.define([
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
             //  fiscal start year from a date Apr-Mar FY
-          const monthlyValue = aFilteredData.reduce((acc, item) => {
+            const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
                 if (isNaN(d.getTime())) return acc;
                 const month = d.getMonth(); // 0 to 11
@@ -202,17 +202,17 @@ sap.ui.define([
                 return acc;
             }, {});
 
-          const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
-    const d = new Date(item.InvoiceDate);
-    if (isNaN(d.getTime())) return acc;
-    // Calculate fiscal start year (Apr–Mar)
-    const year = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
-    const fyLabel = `${year}-${year + 1}`; //  '2024-2025'
-    if (!acc[fyLabel]) { acc[fyLabel] = { totalAmountInINR: 0, count: 0 }; }
-    acc[fyLabel].totalAmountInINR += this._getInrValue(item);
-    acc[fyLabel].count++;
-    return acc;
-}, {});
+            const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
+                const d = new Date(item.InvoiceDate);
+                if (isNaN(d.getTime())) return acc;
+                // Calculate fiscal start year (Apr–Mar)
+                const year = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+                const fyLabel = `${year}-${year + 1}`; //  '2024-2025'
+                if (!acc[fyLabel]) { acc[fyLabel] = { totalAmountInINR: 0, count: 0 }; }
+                acc[fyLabel].totalAmountInINR += this._getInrValue(item);
+                acc[fyLabel].count++;
+                return acc;
+            }, {});
 
 
             const pendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
@@ -234,15 +234,31 @@ sap.ui.define([
 
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const company = item.CustomerName;
+
                 if (!acc[company]) {
-                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0 };
+                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0, invoices: [] };
                 }
-                const totalGst = this._convertToInr(item.CGST, item) + this._convertToInr(item.SGST, item) + this._convertToInr(item.IGST, item);
+
+                const totalGst = this._convertToInr(item.CGST, item) +
+                    this._convertToInr(item.SGST, item) +
+                    this._convertToInr(item.IGST, item);
+
                 acc[company].taxableAmount += this._convertToInr(item.SubTotalInGST, item);
                 acc[company].gstAmount += totalGst;
                 acc[company].tdsAmount += this._convertToInr(item.IncomeTax, item);
+
+                //  Always push invoice details
+                acc[company].invoices.push({
+                    InvNo: item.InvNo,
+                    SubTotalInGST: this._convertToInr(item.SubTotalInGST, item),
+                    gstAmount: totalGst,
+                    IncomeTax: this._convertToInr(item.IncomeTax, item),
+                    totalAmountInINR: this._getInrValue(item)
+                });
+
                 return acc;
             }, {});
+
 
             // --- Determine Fiscal Year Start based on filtered data ---
             const getFiscalStartYearFromDate = (date) => {
@@ -283,8 +299,8 @@ sap.ui.define([
                 .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
 
             const formattedYearlyTrend = Object.entries(yearlyTrend)
-           .map(([fyLabel, data]) => ({ year: fyLabel, ...data }))
-           .sort((a, b) => a.year.localeCompare(b.year)); 
+                .map(([fyLabel, data]) => ({ year: fyLabel, ...data }))
+                .sort((a, b) => a.year.localeCompare(b.year));
 
             const formattedPending = Object.entries(pendingByCompany)
                 .map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount }))
@@ -293,11 +309,33 @@ sap.ui.define([
 
             const formattedStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
-            let formattedPaymentBreakdown = Object.entries(paymentBreakdown)
-                .map(([name, values]) => ({ companyName: name, ...values }));
-            formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company =>
-                company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0
-            );
+            let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => {
+                const totalAmountInINR = values.invoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
+
+                // if all values are 0 → fall back to total
+                if (values.taxableAmount === 0 && values.gstAmount === 0 && values.tdsAmount === 0) {
+                    return {
+                        companyName: name,
+                        taxableAmount: totalAmountInINR,
+                        gstAmount: 0,
+                        tdsAmount: 0,
+                        invoices: values.invoices
+                    };
+                }
+
+                return {
+                    companyName: name,
+                    taxableAmount: values.taxableAmount,
+                    gstAmount: values.gstAmount,
+                    tdsAmount: values.tdsAmount,
+                    invoices: values.invoices
+                };
+            });
+
+
+            // formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company =>
+            //     company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0
+            // );
 
             // ------ Set model data ------
             this.getView().getModel("chartData").setData({
@@ -308,7 +346,8 @@ sap.ui.define([
                 paymentBreakdown: formattedPaymentBreakdown,
                 pendingByCompany: formattedPending
             });
-        } 
+            this._formattedPaymentBreakdown = formattedPaymentBreakdown;
+        }
         ,
 
         // --- EVENT HANDLERS FOR CHART SELECTIONS ---
@@ -348,21 +387,39 @@ sap.ui.define([
         onPaymentBreakdownSelect: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
+
             const sCompanyName = oSelectedData.Company;
-            const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && inv.Currency === "INR");
-            aInvoices.forEach(inv => {
-                inv.gstAmount = parseFloat(inv.CGST || 0) + parseFloat(inv.SGST || 0) + parseFloat(inv.IGST || 0);
-                inv.totalAmountInINR = this._getInrValue(inv);
-            });
-            if (!this.pPaymentDetailsDialog) {
-                this.pPaymentDetailsDialog = Fragment.load({ id: this.getView().getId(), name: "sap.kt.com.minihrsolution.fragment.PaymentBreakdownDetails", controller: this });
+
+            // Find the company data from the formatted payment breakdown
+            const oCompanyData = this._formattedPaymentBreakdown.find(item =>
+                item.companyName === sCompanyName
+            );
+
+            if (!oCompanyData || !oCompanyData.invoices) {
+                console.warn(`No invoice data found for company: ${sCompanyName}`);
+                return;
             }
+
+            const aInvoices = oCompanyData.invoices;
+
+            if (!this.pPaymentDetailsDialog) {
+                this.pPaymentDetailsDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.PaymentBreakdownDetails",
+                    controller: this
+                });
+            }
+
             this.pPaymentDetailsDialog.then(oDialog => {
-                oDialog.setModel(new JSONModel({ companyName: sCompanyName, invoices: aInvoices }), "dialogData");
+                oDialog.setModel(new JSONModel({
+                    companyName: sCompanyName,
+                    invoices: aInvoices
+                }), "dialogData");
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
         },
+
 
         onPendingCompanySelect: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
@@ -538,71 +595,71 @@ sap.ui.define([
         },
 
 
-     onYearlyInvoiceSelect: function (oEvent) {
-    const aData = oEvent.getParameter("data");
-    if (!aData || !aData[0] || !aData[0].data) return;
+        onYearlyInvoiceSelect: function (oEvent) {
+            const aData = oEvent.getParameter("data");
+            if (!aData || !aData[0] || !aData[0].data) return;
 
-    const oSelectedData = aData[0].data;
-    const sYearRaw = oSelectedData.Year || oSelectedData.year;
-    const iYear = parseInt(String(sYearRaw), 10);
+            const oSelectedData = aData[0].data;
+            const sYearRaw = oSelectedData.Year || oSelectedData.year;
+            const iYear = parseInt(String(sYearRaw), 10);
 
-    if (isNaN(iYear)) {
-        MessageToast.show(this.i18nModel.getText("noDataForSelectedYear"));
-        return;
-    }
+            if (isNaN(iYear)) {
+                MessageToast.show(this.i18nModel.getText("noDataForSelectedYear"));
+                return;
+            }
 
-    // Determine FY from clicked year
-      const fyStartYear = iYear;
-    const fyEndYear = fyStartYear + 1;
-    const fyLabel = `${fyStartYear}-${fyEndYear}`;
+            // Determine FY from clicked year
+            const fyStartYear = iYear;
+            const fyEndYear = fyStartYear + 1;
+            const fyLabel = `${fyStartYear}-${fyEndYear}`;
 
-    const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
+            const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
 
-    // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
-    const aInvoices = aAllInvoices.filter(inv => {
-        if (!inv || !inv.InvoiceDate) return false; 
-        const dInv = new Date(inv.InvoiceDate);
-        if (isNaN(dInv.getTime())) return false;
+            // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
+            const aInvoices = aAllInvoices.filter(inv => {
+                if (!inv || !inv.InvoiceDate) return false;
+                const dInv = new Date(inv.InvoiceDate);
+                if (isNaN(dInv.getTime())) return false;
 
-        const fyStartDate = new Date(fyStartYear, 3, 1);  // Apr 1 of selected year
-        const fyEndDate = new Date(fyEndYear, 2, 31, 23, 59, 59); // Mar 31 of next year with time
+                const fyStartDate = new Date(fyStartYear, 3, 1);  // Apr 1 of selected year
+                const fyEndDate = new Date(fyEndYear, 2, 31, 23, 59, 59); // Mar 31 of next year with time
 
-        return dInv >= fyStartDate && dInv <= fyEndDate;
-    });
+                return dInv >= fyStartDate && dInv <= fyEndDate;
+            });
 
-    // Attach numeric INR value
-    aInvoices.forEach(inv => {
-        const raw = this._getInrValue(inv);
-        const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
-        inv.totalAmountInINR = isNaN(num) ? 0 : num;
-    });
+            // Attach numeric INR value
+            aInvoices.forEach(inv => {
+                const raw = this._getInrValue(inv);
+                const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
+                inv.totalAmountInINR = isNaN(num) ? 0 : num;
+            });
 
-    // Sort latest first
-    aInvoices.sort((a, b) => new Date(b.InvoiceDate) - new Date(a.InvoiceDate));
+            // Sort latest first
+            aInvoices.sort((a, b) => new Date(b.InvoiceDate) - new Date(a.InvoiceDate));
 
-    // Compute FY total
-    const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
+            // Compute FY total
+            const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
 
-    // Lazy load dialog
-    if (!this.pYearlyInvoicesDialog) {
-        this.pYearlyInvoicesDialog = Fragment.load({
-            id: this.getView().getId(),
-            name: "sap.kt.com.minihrsolution.fragment.YearlyInvoice",
-            controller: this
-        });
-    }
+            // Lazy load dialog
+            if (!this.pYearlyInvoicesDialog) {
+                this.pYearlyInvoicesDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.YearlyInvoice",
+                    controller: this
+                });
+            }
 
-    this.pYearlyInvoicesDialog.then(oDialog => {
-        oDialog.setModel(new JSONModel({
-            year: fyLabel,  
-            invoices: aInvoices,
-            totalValue: totalValue
-        }), "dialogData");
+            this.pYearlyInvoicesDialog.then(oDialog => {
+                oDialog.setModel(new JSONModel({
+                    year: fyLabel,
+                    invoices: aInvoices,
+                    totalValue: totalValue
+                }), "dialogData");
 
-        this.getView().addDependent(oDialog);
-        oDialog.open();
-    });
-}
+                this.getView().addDependent(oDialog);
+                oDialog.open();
+            });
+        }
 
 
 
