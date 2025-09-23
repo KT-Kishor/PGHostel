@@ -8,23 +8,23 @@
         <Title text="Get in Touch" class="contact-hero-title"/>
     </VBox>
     <!-- Section Title -->
-    
         <HBox class="contact-flex" justifyContent="Start" alignItems="Stretch" wrap="Wrap">
-            <VBox class="contact-subtitle" width="100%">
-                    <Title text="Corporate Office Address"  class="contact-text"/>
+          <VBox class="contact-subtitle" width="100%">
+                <Title text="{i18n>corporateOfficeAddress}" class="contact-text"/>
             </VBox>
-                <!-- Left: Address -->
-            <VBox class="contact-address-box">
-                    <Text text="Kalpavriksha Technologies" class="sapUiSmallMarginBottom compName"/>
-                    <Text text="#111, Kalpavriksha Karekal layout,"/>
-                    <Text text="Near, Railway Bridge, Kalaburagi,"/>
-                    <Text text="Karnataka 585102"/>
-                    <Text text="Mobile No : +91 9686145959" />
-                    <Link text="Email: accounts@kalpavrikshatechnologies.com" href="mailto:accounts@kalpavrikshatechnologies.com" class="sapUiLargeMarginBottom" wrapping="true"/>
 
-                    <Text text="We are also a part of Kvriksha Technologies Private Limited." class="sapUiSmallMarginBottom oldCompName"/>
-                    <Text text="For more details, visit our website." class="sapUiSmallMarginBottom newcompName"/>
-                    <Link text="Website: Kvriksha Technologies" href="https://kvrikshatechnologies.com/" target="_blank" />
+            <!-- Left: Address -->
+            <VBox class="contact-address-box">
+                <Text text="{i18n>companynameKT}" class="sapUiSmallMarginBottom compName"/>
+                <Text text="{i18n>addressLine1}"/>
+                <Text text="{i18n>addressLine2}"/>
+                <Text text="{i18n>addressLine3}"/>
+                <Text text="{i18n>mobile}"/>
+                <Link text="{i18n>compemail}" href="mailto:accounts@kalpavrikshatechnologies.com"
+                      class="sapUiLargeMarginBottom" wrapping="true"/>
+                <Text text="{i18n>oldCompany}" class="sapUiSmallMarginBottom oldCompName"/>
+                <Text text="{i18n>newCompany}" class="sapUiSmallMarginBottom newcompName"/>
+                <Link text="{i18n>compwebsite}" href="https://kvrikshatechnologies.com/" target="_blank"/>
             </VBox>
 
                 <!-- Right: Google Map -->
