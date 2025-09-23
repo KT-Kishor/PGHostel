@@ -2185,6 +2185,25 @@ font-size: 20px;
   z-index: 9999;               /* make sure it’s above SAPUI5 controls */
   pointer-events: auto;        /* ensure clicks work */
 }
+@media (max-width: 480px) {
+  .officetourContainer {
+  position: fixed !important;  /* fixed to viewport */
+  top: 458px;
+  right: 45px;
+  z-index: 9999;               /* make sure it’s above SAPUI5 controls */
+  pointer-events: auto;        /* ensure clicks work */
+}
+}
+
+@media(min-width: 480px) and (max-width: 780px)  {
+  .officetourContainer {
+  position: fixed !important;  /* fixed to viewport */
+  top: 310px;
+  right: 40px;
+  z-index: 9999;               /* make sure it’s above SAPUI5 controls */
+  pointer-events: auto;        /* ensure clicks work */
+}
+}
 
 /* Button styling */
 .officetourBtn .sapMBtnInner {
