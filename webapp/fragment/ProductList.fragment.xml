@@ -11,7 +11,7 @@
             <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}" />
             <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
-                        press="onProductSoluctionPress"
+                        press="onHRSolutionPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
             </HBox>
