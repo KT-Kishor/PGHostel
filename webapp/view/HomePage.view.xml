@@ -54,64 +54,11 @@
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ProductList" type="XML"/>
 					</Page>
 					<ScrollContainer id="idCareer" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding career-background sapUiTinyMargin">
-						<l:VerticalLayout width="100%">
-							<l:BlockLayout background="Dashboard">
-								<l:BlockLayoutRow>
-									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
-										<Text text="{i18n>careersDes}" class="cell_Title"/>
-									</l:BlockLayoutCell>
-								</l:BlockLayoutRow>
-							</l:BlockLayout>
-							<VBox height="1rem"/>
-							<FlexBox class="officetourContainer" justifyContent="End">
-								<Button text="Office Tour" press="onPressOfficeTour" class="officetourBtn"/>
-							</FlexBox>
-							<Table id="V1_ID_Table" sticky="ColumnHeaders" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
-								<headerToolbar>
-								<OverflowToolbar>
-									<!-- <ToolbarSpacer/> -->
-									<SearchField search="onSearch" placeholder="Type a skill" width="17.5rem"/>
-								</OverflowToolbar>
-							</headerToolbar>
-								<columns>
-									<Column demandPopin="true">
-										<Text text="{i18n>v1_jobTitle}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>v1_PriSkills}" />
-									</Column>
-									<Column demandPopin="true">
-										<Text text="{i18n>v1_s_postDate}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>V1_L_Location}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>v1_s_Exp}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true"></Column>
-								</columns>
-								<items>
-									<ColumnListItem>
-										<cells>
-											<Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
-											<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
-											<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
-											<Text text="{JobApplicationModel>Location}" />
-											<Text text="{JobApplicationModel>Experience}" />
-											<Button text="{i18n>v1_s_ViewJob}" icon="sap-icon://opportunities" press="v1_onViewItem" type="Emphasized" />
-										</cells>
-									</ColumnListItem>
-								</items>
-							</Table>
-						</l:VerticalLayout>
+						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.CareerPage" type="XML"/>
 					</ScrollContainer>
 					<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="contact-background sapUiTinyMargin" >
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.ContactPage" type="XML"/>
 					</ScrollContainer>
-					
-					
-				  
 					<ScrollContainer id="idTraning" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding Training-background sapUiTinyMargin">
 						<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Training" type="XML"/>
 					</ScrollContainer>

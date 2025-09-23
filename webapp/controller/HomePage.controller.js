@@ -309,15 +309,24 @@ sap.ui.define(
         onCloseDialog: function () {
           this._pDialog.close();
         },
-        onTabSelect: function (oEvent) {
-          var oItem = oEvent.getParameter("item");
-          const sKey = oItem.getKey();
+       onTabSelect: function (oEvent) {
+            var oItem = oEvent.getParameter("item");
+            const sKey = oItem.getKey();
 
-          this.byId("pageContainer").to(this.byId(sKey));
-          if (sKey === "idCareer" && !this._careerDataLoaded) {
-            this._careerDataLoaded = true;
-            this._loadCareerSectionData();
-          }
+            // Switch page
+            this.byId("pageContainer").to(this.byId(sKey));
+
+            // Always scroll to top (first section or top of page)
+            var page = this.byId(sKey);
+            if (page && page.scrollTo) {
+                page.scrollTo(0, 0); // Scroll to very top
+            }
+
+            // Career section lazy loading
+            if (sKey === "idCareer" && !this._careerDataLoaded) {
+                this._careerDataLoaded = true;
+                this._loadCareerSectionData();
+            }
         },
 
         _loadCareerSectionData: function () {
