@@ -2006,6 +2006,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   border-radius: 10px;
   text-align: left;
   box-shadow:0 2px 6px rgba(0,0,0,0.3);
+  padding: 10px;
 }
 
 .FollowusSolution {

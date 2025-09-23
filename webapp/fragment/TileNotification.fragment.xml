@@ -208,6 +208,12 @@
                             >
                                 <Text text="{i18n>PayByDate}" />
                             </Column>
+                              <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>totalAmount}" />
+                            </Column>
                         </columns>
                         <items>
                             <ColumnListItem
@@ -230,6 +236,12 @@
                                         inverted="false"
                                         state="{ parts: [{path: 'CompanyInvoiceModelData>PayByDate'},{path: 'CompanyInvoiceModelData>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}"
                                     />
+                                 <Text text="{parts: [
+                                                        { path: 'CompanyInvoiceModelData>Currency' },
+                                                        { path: 'CompanyInvoiceModelData>TotalAmount' },
+                                                        { path: 'CompanyInvoiceModelData>AmountInINR' }
+                                                    ],
+                                                    formatter: '.Formatter.fromatNumber'}" textAlign="End"/>
                                 </cells>
                             </ColumnListItem>
                         </items>
@@ -285,6 +297,12 @@
                             >
                                 <Text text="{i18n>PayByDate}" />
                             </Column>
+                             <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="{i18n>totalAmount}" />
+                            </Column>
                         </columns>
                         <items>
                             <ColumnListItem
@@ -307,6 +325,13 @@
                                         inverted="false"
                                         state="{ parts: [{path: 'CompanyInvoiceModelData>PayByDate'},{path: 'CompanyInvoiceModelData>Status'}], formatter: '.Formatter.companyInvoicePayByDate'}"
                                     />
+                                 <Text text="{parts: [
+                                                        { path: 'CompanyInvoiceModelData>Currency' },
+                                                        { path: 'CompanyInvoiceModelData>TotalAmount' },
+                                                        { path: 'CompanyInvoiceModelData>AmountInINR' }
+                                                    ],
+                                                    formatter: '.Formatter.fromatNumber'}" textAlign="End"/>
+
                                 </cells>
                             </ColumnListItem>
                         </items>
