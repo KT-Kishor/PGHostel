@@ -1,111 +1,96 @@
-<core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout">
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
     
-    <l:Grid defaultSpan="XL6 L6 M12 S12" class="grid-container">
+    <l:Grid defaultSpan="XL6 L6 M6 S12" class="grid-container">
         
-                <!-- HR solution -->
-              <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!-- IMAGE OR ICON AT TOP -->
+        <!-- HR solution -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/HRSolDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="HR Solution" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}"/>
-              
-            <!-- BUTTON BOTTOM-ALIGNED -->
-                 <HBox justifyContent="End" >
+            <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
-                        press="onHRSolutionPress"
+                        press="onProductSoluctionPress"
                         class="Takeatour sapUi-Std-PaddingS"
-                        type="Emphasized" width="200px" />
-          </HBox>
+                        type="Emphasized" width="200px"/>
+            </HBox>
         </VBox>
-                <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!-- Invoice management -->
+
+        <!-- Invoice management -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/InvoiceProduct.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
-          <Text class="hr-text sapUiSmallMargin" text="Invoice Manage" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}"/>
-              
-          
-             <HBox justifyContent="End" >
+            <Text class="hr-text sapUiSmallMargin" text="Invoice Management" />
+            <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
                         press="onInvoiceManagePress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
             </HBox>
         </VBox>
-                 <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!-- Company Asset Management -->
+
+        <!-- Company Asset Management -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/AssetDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Company Asset Management" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>Companyassetmanage}"/>
-              
-            <!-- BUTTON BOTTOM-ALIGNED -->
-             <HBox justifyContent="End" >
+            <Text class="description-text sapUiSmallMargin" text="{i18n>Companyassetmanage}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
                         press="onAssetPress"
                         class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
-         </HBox>
+            </HBox>
         </VBox>
-                 <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!--Recruitment  -->
+
+        <!-- Recruitment -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/RecruimentDemo.png" width="800PX" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/RecruimentDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Recruitment" />
-            <Text class="description-text sapUiSmallMargin " text="{i18n>recruitmentmanage}"/>
-              
-            <!-- BUTTON BOTTOM-ALIGNED -->
-             <HBox justifyContent="End" >
+            <Text class="description-text sapUiSmallMargin" text="{i18n>recruitmentmanage}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
                         press="onrecruitmentPress"
-                      class="Takeatour sapUi-Std-PaddingS"
+                        class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
-           </HBox>
+            </HBox>
         </VBox>
-                 <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!-- Automotive -->
+
+        <!-- Automotive Solution -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/Automobile.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Automotive Solution" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}"/>
-           
-           <HBox justifyContent="End" >
+            <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
                         press="onAutoMotivePress"
-                     class="Takeatour sapUi-Std-PaddingS"
+                        class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
-          </HBox>
+            </HBox>
         </VBox>
-          <VBox class="HRSolution sapUiSmallMargin" backgroundDesign="Solid" >
-            
-            <!-- ID card  -->
+
+        <!-- ID Card Generation -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/IDDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="ID Card Generation" />
-            <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}"/>
-              
-         
-          <HBox justifyContent="End" >
+            <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}" />
+            <HBox justifyContent="End">
                 <Button text="Take a Product Tour"
                         press="onIdCardPress"
-                     class="Takeatour sapUi-Std-PaddingS"
+                        class="Takeatour sapUi-Std-PaddingS"
                         type="Emphasized" width="200px"/>
-          </HBox>
+            </HBox>
         </VBox>
-             </l:Grid>
+        
+    </l:Grid>
 </core:FragmentDefinition>
