@@ -2678,3 +2678,7 @@ font-size: 20px;
   padding: 0 !important;
   background: transparent !important;  
 }
+
+.underlineLink {
+   text-decoration: underline !important;
+}
