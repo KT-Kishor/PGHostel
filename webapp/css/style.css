@@ -2653,19 +2653,12 @@ font-size: 20px;
   display: flex;
   justify-content: center;
   background-color:  #87b3d0 !important;
-  background-image: url("../image/SAPUI.png");
+  background-image: url("../image/grow2.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-.tileFlexBoxBg1 {
-  display: flex;
-  justify-content: center;
-  background-image: url("../image/CpamDemo.png");
-  background-size: cover;
-  background-position: top;
-  background-repeat: no-repeat;
-}
+
 .Coursetitle{
  background-color:  #ebeef4!important; 
   color: white

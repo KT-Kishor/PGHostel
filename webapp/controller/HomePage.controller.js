@@ -303,11 +303,7 @@ sap.ui.define(
               return oTile;
             })
           });
-          if(sPath === "ui5topics"){
           oTileFlexBox.addStyleClass("tileFlexBoxBg");
-          }else{
-          oTileFlexBox.addStyleClass("tileFlexBoxBg1");
-         }
           oVBox.addItem(oTileFlexBox);
         },
         onCloseDialog: function () {
