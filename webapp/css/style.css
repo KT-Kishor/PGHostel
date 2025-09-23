@@ -2626,3 +2626,35 @@ font-size: 20px;
         font-size: 22px;
     }
 }
+.tileMargin {
+    margin: 8px;
+}
+.tileFlexBoxBg {
+  display: flex;
+  justify-content: center;
+  background-color:  #87b3d0 !important;
+  background-image: url("../image/SAPUI.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tileFlexBoxBg1 {
+  display: flex;
+  justify-content: center;
+  background-image: url("../image/CpamDemo.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+}
+.Coursetitle{
+ background-color:  #ebeef4!important; 
+  color: white
+}
+.coursetitle{
+  color: rgb(19, 2, 2) !important;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.courseDialog .sapMDialogSection {
+  padding: 0 !important;
+  background: transparent !important;  
+}

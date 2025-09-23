@@ -200,52 +200,119 @@ sap.ui.define(
         },
 
 
+        // onSapui5coursepress: function (oEvent) {
+        //   this._openTopicsPopover(oEvent.getSource(), "ui5topics", "SAPUI5 Topics");
+        // },
+
+        // onCapmCoursepress: function (oEvent) {
+        //   this._openTopicsPopover(oEvent.getSource(), "CAPMtopics", "SAP CAPM Topics");
+        // },
+
+        // _openTopicsPopover: function (oButton, sPath, sTitle) {
+        //   var that = this;
+        //   if (!this._pPopover) {
+        //     this._pPopover = sap.ui.core.Fragment.load({
+        //       id: this.getView().getId(),
+        //       name: "sap.kt.com.minihrsolution.fragment.CourseDetails", // your fragment name
+        //       controller: this
+        //     }).then(function (oPopover) {
+        //       that.getView().addDependent(oPopover);
+        //       that._bindTopicList(oPopover, sPath, sTitle);
+        //       oPopover.openBy(oButton);
+        //       return oPopover;
+        //     });
+        //   } else {
+        //     this._pPopover.then(function (oPopover) {
+        //       that._bindTopicList(oPopover, sPath, sTitle);
+        //       oPopover.openBy(oButton);
+        //     });
+        //   }
+        // },
+
+        // _bindTopicList: function (oPopover, sPath, sTitle) {
+        //   var oList = sap.ui.core.Fragment.byId(this.getView().getId(), "idTopicList");
+        //   oPopover.setTitle(sTitle);
+
+        //   // Rebind items dynamically
+        //   oList.bindItems({
+        //     path: "topicsModel>/" + sPath,
+        //     template: new sap.m.StandardListItem({
+        //       title: "{topicsModel>title}",
+        //       description: "{topicsModel>description}",
+        //       icon: "sap-icon://hint"
+        //     })
+        //   });
+        // },
+
         onSapui5coursepress: function (oEvent) {
-          this._openTopicsPopover(oEvent.getSource(), "ui5topics", "SAPUI5 Topics");
+
+          this._openCourseDialog("ui5topics", "SAPUI5 Topics");
         },
 
         onCapmCoursepress: function (oEvent) {
-          this._openTopicsPopover(oEvent.getSource(), "CAPMtopics", "SAP CAPM Topics");
+          this._openCourseDialog("CAPMtopics", "SAP CAPM Topics");
         },
 
-        _openTopicsPopover: function (oButton, sPath, sTitle) {
+        _openCourseDialog: function (sPath, sTitle) {
           var that = this;
-          if (!this._pPopover) {
-            this._pPopover = sap.ui.core.Fragment.load({
+
+          if (!this._pDialog) {
+            sap.ui.core.Fragment.load({
               id: this.getView().getId(),
-              name: "sap.kt.com.minihrsolution.fragment.CourseDetails", // your fragment name
+              name: "sap.kt.com.minihrsolution.fragment.CourseDetails",
               controller: this
-            }).then(function (oPopover) {
-              that.getView().addDependent(oPopover);
-              that._bindTopicList(oPopover, sPath, sTitle);
-              oPopover.openBy(oButton);
-              return oPopover;
+            }).then(function (oDialog) {
+              that.getView().addDependent(oDialog);
+              that._bindTopicsToDialog(oDialog, sPath, sTitle);
+              oDialog.open();
+              that._pDialog = oDialog;
             });
           } else {
-            this._pPopover.then(function (oPopover) {
-              that._bindTopicList(oPopover, sPath, sTitle);
-              oPopover.openBy(oButton);
-            });
+            this._bindTopicsToDialog(this._pDialog, sPath, sTitle);
+            this._pDialog.open();
           }
         },
 
-        _bindTopicList: function (oPopover, sPath, sTitle) {
-          var oList = sap.ui.core.Fragment.byId(this.getView().getId(), "idTopicList");
-          oPopover.setTitle(sTitle);
+        _bindTopicsToDialog: function (oDialog, sPath, sTitle) {
+          var oTitle = oDialog.getCustomHeader().getContentMiddle()[0];
+          oTitle.setText(sTitle);
+          oDialog.setTitle(sTitle);
 
-          // Rebind items dynamically
-          oList.bindItems({
-            path: "topicsModel>/" + sPath,
-            template: new sap.m.StandardListItem({
-              title: "{topicsModel>title}",
-              description: "{topicsModel>description}",
-              icon: "sap-icon://hint"
+          var oVBox = sap.ui.core.Fragment.byId(this.getView().getId(), "idVBox");
+          oVBox.removeAllItems();
+
+          var aTopics = this.getView().getModel("topicsModel").getProperty("/" + sPath);
+
+          var oTileFlexBox = new sap.m.FlexBox({
+            justifyContent: "Start",
+            alignItems: "Start",
+            wrap: "Wrap",
+            items: aTopics.map(function (oTopic) {
+              var oTile = new sap.m.GenericTile({
+                header: oTopic.title,
+                frameType: "TwoByHalf",
+                size: "Auto",
+                tileContent: [
+                  new sap.m.TileContent({
+                    content: new sap.m.Text({ text: oTopic.description })
+                  })
+                ]
+              });
+
+              oTile.addStyleClass("tileMargin customTileBg");
+              return oTile;
             })
           });
+          if(sPath === "ui5topics"){
+          oTileFlexBox.addStyleClass("tileFlexBoxBg");
+          }else{
+          oTileFlexBox.addStyleClass("tileFlexBoxBg1");
+         }
+          oVBox.addItem(oTileFlexBox);
         },
-
-
-
+        onCloseDialog: function () {
+          this._pDialog.close();
+        },
         onTabSelect: function (oEvent) {
           var oItem = oEvent.getParameter("item");
           const sKey = oItem.getKey();
@@ -340,11 +407,11 @@ sap.ui.define(
         ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
-         ValidateCommonFields: function (oEvent) {
+        ValidateCommonFields: function (oEvent) {
           utils._LCvalidateMandatoryField(oEvent);
         },
         ValidateSTDFields: function (oEvent) {
-          utils._LCstrictValidationComboBox(oEvent); 
+          utils._LCstrictValidationComboBox(oEvent);
         },
 
         // onDemoformSave: function () {
@@ -615,20 +682,20 @@ sap.ui.define(
         },
 
         onSearch: function (oEvent) {
-            var sQuery = oEvent.getParameter("query") || oEvent.getSource().getValue();
-            var oTable = this.byId("V1_ID_Table");
-            var oBinding = oTable.getBinding("items");
+          var sQuery = oEvent.getParameter("query") || oEvent.getSource().getValue();
+          var oTable = this.byId("V1_ID_Table");
+          var oBinding = oTable.getBinding("items");
 
-            if (sQuery && sQuery.length > 0) {
-                var oFilter = new sap.ui.model.Filter({
-                    path: "PrimarySkills",
-                    operator: sap.ui.model.FilterOperator.Contains,
-                    value1: sQuery
-                });
-                oBinding.filter([oFilter]);
-            } else {
-                oBinding.filter([]); // clear filters if empty
-            }
+          if (sQuery && sQuery.length > 0) {
+            var oFilter = new sap.ui.model.Filter({
+              path: "PrimarySkills",
+              operator: sap.ui.model.FilterOperator.Contains,
+              value1: sQuery
+            });
+            oBinding.filter([oFilter]);
+          } else {
+            oBinding.filter([]); // clear filters if empty
+          }
         },
 
         // V1_onSearch: function () {
@@ -692,7 +759,7 @@ sap.ui.define(
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idCareer");
             // oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           // Navigate using the jobId
           this.getRouter().navTo("RouteJobView", {
             jobId: sJobId,
@@ -722,8 +789,8 @@ sap.ui.define(
           this._applyResponsiveVideo("videoBox4", "videoFrameHtml4", "https://www.youtube.com/embed/EjnEOznAsHg");
           this._applyResponsiveVideo("videoBox5", "videoFrameHtml5", "https://www.youtube.com/embed/aYaWP-U6yFE");
           this._applyResponsiveVideo("videoBox6", "videoFrameHtml6", "https://www.youtube.com/embed/zk2GGsXRfuo");
-       
-          
+
+
         },
         _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
           var oVBox = this.byId(vBoxId);
@@ -746,76 +813,76 @@ sap.ui.define(
         onHRSolutionPress: function () {
 
           // Set global tab info
-          const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           // Navigate using the jobId
-         
+
           this.getRouter().navTo("HRSolutions_Demo");
         },
         onInvoiceManagePress: function () {
-           const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           this.getRouter().navTo("Invoice_Solution_Demo");
         },
         onAssetPress: function () {
-                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           this.getRouter().navTo("IT_Asset_Demo");
         },
         onrecruitmentPress: function () {
-                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           this.getRouter().navTo("Recruitment_Demo");
         },
         onAutoMotivePress: function () {
-                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           this.getRouter().navTo("AutoMobile_Demo");
         },
         onIdCardPress: function () {
-                const oAppStateModel =this.getOwnerComponent().getModel("AppStateModel");
+          const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
           if (oAppStateModel) {
             oAppStateModel.setProperty("/previousTab", "idProducts");
-            }
+          }
           this.getRouter().navTo("IDCardgenerate");
         },
         onNavToHrSolution: function () {
           this.getRouter().navTo("HRSolutions_Demo");
         },
-         onNavToInvoiceSolution: function () {
+        onNavToInvoiceSolution: function () {
           this.getRouter().navTo("Invoice_Solution_Demo");
         },
-         onNavToCompanySolution: function () {
+        onNavToCompanySolution: function () {
           this.getRouter().navTo("IT_Asset_Demo");
         },
-         onNavToRecruitmentSolution: function () {
+        onNavToRecruitmentSolution: function () {
           this.getRouter().navTo("Recruitment_Demo");
         },
-         onNavToAutomobileSolution: function () {
+        onNavToAutomobileSolution: function () {
           this.getRouter().navTo("AutoMobile_Demo");
         },
-         onPressOfficeTour: function () {
-            if (!this._oDialog) {
-                this._oDialog = new sap.m.Dialog({
-                    title: "Office Tour",
-                    contentWidth: "90%",
-                    contentHeight: "90%",
-                    resizable: true,
-                    draggable: true,
-                    stretch: sap.ui.Device.system.phone, // fullscreen on mobile
-                    content: [
-                        new sap.ui.core.HTML({
-                            content: `
+        onPressOfficeTour: function () {
+          if (!this._oDialog) {
+            this._oDialog = new sap.m.Dialog({
+              title: "Office Tour",
+              contentWidth: "90%",
+              contentHeight: "90%",
+              resizable: true,
+              draggable: true,
+              stretch: sap.ui.Device.system.phone, // fullscreen on mobile
+              content: [
+                new sap.ui.core.HTML({
+                  content: `
                                 <div style="position:relative;width:100%;padding-top:56.25%;">
                                     <video id="officeTourVideo" 
                                           src="../Videos/Office Tour.mp4" 
@@ -824,27 +891,27 @@ sap.ui.define(
                                     </video>
                                 </div>
                             `
-                        })
-                    ],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            this._oDialog.close();
-                        }.bind(this)
-                    }),
-                    afterClose: function () {
-                        // Stop & reset video
-                        var oVideo = document.getElementById("officeTourVideo");
-                        if (oVideo) {
-                            oVideo.pause();
-                            oVideo.currentTime = 0;
-                        }
-                    }
-                });
-            }
-            this._oDialog.open();
+                })
+              ],
+              beginButton: new sap.m.Button({
+                text: "Close",
+                press: function () {
+                  this._oDialog.close();
+                }.bind(this)
+              }),
+              afterClose: function () {
+                // Stop & reset video
+                var oVideo = document.getElementById("officeTourVideo");
+                if (oVideo) {
+                  oVideo.pause();
+                  oVideo.currentTime = 0;
+                }
+              }
+            });
+          }
+          this._oDialog.open();
         },
-        
+
       }
     );
   }
