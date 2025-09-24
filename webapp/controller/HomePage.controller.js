@@ -284,11 +284,12 @@ sap.ui.define(
           var aTopics = this.getView().getModel("topicsModel").getProperty("/" + sPath);
 
           var oTileFlexBox = new sap.m.FlexBox({
-            justifyContent: "Start",
+            justifyContent: "Center",
             alignItems: "Start",
             wrap: "Wrap",
+            fitContainer: true,  // important for responsiveness
             items: aTopics.map(function (oTopic) {
-              var oTile = new sap.m.GenericTile({
+              return new sap.m.GenericTile({
                 header: oTopic.title,
                 frameType: "TwoByHalf",
                 size: "Auto",
@@ -297,10 +298,7 @@ sap.ui.define(
                     content: new sap.m.Text({ text: oTopic.description })
                   })
                 ]
-              });
-
-              oTile.addStyleClass("tileMargin customTileBg");
-              return oTile;
+              }).addStyleClass("tileMargin customTileBg");
             })
           });
           oTileFlexBox.addStyleClass("tileFlexBoxBg");
@@ -876,46 +874,56 @@ sap.ui.define(
         onNavToAutomobileSolution: function () {
           this.getRouter().navTo("AutoMobile_Demo");
         },
-        onPressOfficeTour: function () {
-          if (!this._oDialog) {
-            this._oDialog = new sap.m.Dialog({
-              title: "Office Tour",
-              contentWidth: "90%",
-              contentHeight: "90%",
-              resizable: true,
-              draggable: true,
-              stretch: sap.ui.Device.system.phone, // fullscreen on mobile
-              content: [
-                new sap.ui.core.HTML({
-                  content: `
-                                <div style="position:relative;width:100%;padding-top:56.25%;">
-                                    <video id="officeTourVideo" 
-                                          src="../Videos/Office Tour.mp4" 
-                                          controls autoplay
-                                          style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:8px;">
-                                    </video>
-                                </div>
-                            `
-                })
-              ],
-              beginButton: new sap.m.Button({
-                text: "Close",
-                press: function () {
-                  this._oDialog.close();
-                }.bind(this)
-              }),
-              afterClose: function () {
-                // Stop & reset video
-                var oVideo = document.getElementById("officeTourVideo");
-                if (oVideo) {
-                  oVideo.pause();
-                  oVideo.currentTime = 0;
-                }
-              }
-            });
-          }
-          this._oDialog.open();
+        onAfterRendering: function () {
+          this._applyResponsiveVideo("videoBoxoffice", "videoFrametour", "../Videos/Office Tour.mp4");
         },
+       _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+    var oVBox = this.byId(vBoxId);
+    var oHtml = this.byId(htmlId);
+    if (!oVBox || !oHtml) return;
+    var iWidth = window.innerWidth;
+    var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
+    var bAutoplay = (vBoxId === "videoBoxoffice");
+    
+    // Video tag (no background here)
+    var sVideoTag = "<video id='" + htmlId + "_video' controls " +
+        (bAutoplay ? "autoplay muted playsinline " : "") +
+        "style='width:100%;height:100%;border:none;border-radius:15px;object-fit:contain;'>" +
+        "<source src='" + videoUrl + "' type='video/mp4'>" +
+        "</video>";
+    
+    // Wrapper with BACKGROUND on all 4 sides (responsive version)
+    var sWrapper = bResponsive ?
+        "<div class='responsive-video-wrapper'>" +
+            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
+                sVideoTag +
+            "</div>" +
+        "</div>"
+        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" + sVideoTag + "</div>";
+
+    oHtml.setContent(sWrapper);
+
+    // Adjust fit after metadata is loaded
+    setTimeout(function () {
+        var videoEl = document.getElementById(htmlId + "_video");
+        if (videoEl) {
+            videoEl.addEventListener("loadedmetadata", function () {
+                var vidRatio = videoEl.videoWidth / videoEl.videoHeight;
+                var boxRatio = 560 / 315; // desktop ratio (16:9)
+
+                if (bResponsive) {
+                    videoEl.style.objectFit = "cover"; // fill container on smaller screens
+                } else {
+                    if (Math.abs(vidRatio - boxRatio) < 0.1) {
+                        videoEl.style.objectFit = "cover"; // fill container on desktop
+                    } else {
+                        videoEl.style.objectFit = "contain"; // keep background visible on all 4 sides
+                    }
+                }
+            });
+        }
+    }, 200);
+},
 
       }
     );

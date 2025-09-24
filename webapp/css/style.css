@@ -2647,9 +2647,26 @@ font-size: 20px;
         font-size: 22px;
     }
 }
+/* Keep margin */
 .tileMargin {
-    margin: 8px;
+  margin: 8px;
 }
+
+/* Base tiles (desktop/tablet) */
+.customTileBg {
+  flex: 1 1 200px;   /* responsive min width */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* On very small screens (<400px) → full width */
+@media (max-width: 400px) {
+  .customTileBg {
+    flex: 1 1 1 !important;
+    max-width: 100% !important;
+  }
+}
+
 .tileFlexBoxBg {
   display: flex;
   justify-content: center;
@@ -2767,5 +2784,41 @@ body, html, .sapUiBody {
   overflow-x: hidden;
 }
 
+.carrer-office-tour {
+  margin-left: 20px;  /* shift left */
+  margin-right: 40px;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  color: #2a5d66;
+}
 
+@media (max-width: 768px) {
+  .carrer-office-tour {
+    margin-left: 5px;
+    margin-right: 15px;
+    width: calc(100% - 20px);
+    padding: 20px;
+  }
+}
+
+.carrer-Heading {
+  font-size: clamp(1.2rem, 4vw, 2rem); /* min, preferred, max */
+  font-weight: 700;
+  color: #ad7900;
+  margin-bottom: 14px;
+  margin-top: 25px;
+}
+
+.carrer-Paragraph {
+    font-size: 1rem;
+    color: #015b6c;
+    line-height: 1.8;       /* more readable line height */
+    margin-bottom: 16px;
+    max-width: 600px;       /* wider for readability */
+    display: block;         /* make span behave like block/paragraph */
+    text-align: justify;    /* optional: neat paragraph alignment */
+    white-space: normal;    /* ensures wrapping if long words */
+    word-break: break-word; /* breaks long words if needed */
+}
 
