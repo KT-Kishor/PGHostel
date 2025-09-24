@@ -1406,6 +1406,7 @@ sap.ui.define([
             CID_onPressGeneratePdf: async function () {
                 const { jsPDF } = window.jspdf;
                 var that = this
+                this.getBusyDialog();
                 const oView = this.getView();
                 const oModel = oView.getModel("SelectedCustomerModel").getData();
                 var data = this.getView().getModel("FilteredSOWModel").getData();
@@ -1730,6 +1731,9 @@ sap.ui.define([
              } catch (error) {
                    that.closeBusyDialog();
                    MessageToast.show(error.message || error.responseText);
+            }
+            finally {
+                    this.closeBusyDialog();
                 }
             },
 

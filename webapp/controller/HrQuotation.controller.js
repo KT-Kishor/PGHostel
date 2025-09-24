@@ -13,7 +13,8 @@ sap.ui.define(
                 this.getRouter().getRoute("RouteHrQuotation").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function() {
+           _onRouteMatched: async function() {
+            try {
                 var LoginFunction = await this.commonLoginFunction("HrQuotation");
                 if (!LoginFunction) return;
                 this.getBusyDialog();
@@ -60,7 +61,13 @@ sap.ui.define(
                 }
                 this.closeBusyDialog();
                 this.initializeBirthdayCarousel();
-            },
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
 
             onTableUpdateFinished: function(oEvent) {
                 // Update the count in the header when table updates

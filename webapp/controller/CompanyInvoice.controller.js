@@ -20,32 +20,39 @@ sap.ui.define(
             .attachMatched(this._onRouteMatched, this);
         },
 
-         _onRouteMatched: async function () {
-          var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
-          if (!LoginFUnction) return;
-          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-          this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceapp"));
-          this._isClearPressed = false; // ensure full data is not requested'
-          const currentYear = new Date().getFullYear();
-          let fyStart, fyEnd;
+         _onRouteMatched: async function() {
+            try {
+                var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
+                if (!LoginFUnction) return;
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceapp"));
+                this._isClearPressed = false; // ensure full data is not requested'
+                const currentYear = new Date().getFullYear();
+                let fyStart, fyEnd;
 
-          if (new Date().getMonth() >= 3) {
-              fyStart = new Date(currentYear, 3, 1);  // April 1
-              fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
-            } else {
-                  fyStart = new Date(currentYear - 1, 3, 1);  // April 1 last year
-                  fyEnd = new Date(currentYear, 2, 31); // March 31 this year
-          }
-            // Set the date range UI (override user-selected values)
-            const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
-            if (dateRangeControl) {
-                  dateRangeControl.setDateValue(fyStart);
-                  dateRangeControl.setSecondDateValue(fyEnd);
+                if (new Date().getMonth() >= 3) {
+                    fyStart = new Date(currentYear, 3, 1); // April 1
+                    fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1); // April 1 last year
+                    fyEnd = new Date(currentYear, 2, 31); // March 31 this year
+                }
+                // Set the date range UI (override user-selected values)
+                const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
+                if (dateRangeControl) {
+                    dateRangeControl.setDateValue(fyStart);
+                    dateRangeControl.setSecondDateValue(fyEnd);
+                }
+                await this.CompanyInvoice_onSearch();
+                this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
+                this.getView().getModel("LoginModel").setProperty("/RichText", false);
+                this.initializeBirthdayCarousel();
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
             }
-          await this.CompanyInvoice_onSearch();
-          this._fetchCommonData("ManageCustomer", "ManageCustomerModel");
-          this.getView().getModel("LoginModel").setProperty("/RichText", false);
-          this.initializeBirthdayCarousel();
         },
 
         CompanyInvoice_onSearch: async function () {

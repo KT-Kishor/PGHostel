@@ -1556,8 +1556,10 @@ sap.ui.define(
                 },
 
                 CI_onPressGeneratePdf: async function () {
+                    try {
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
+                    this.getBusyDialog();
                     const oModel = oView.getModel("ConsultantInvoiceModel").getData();
                     const oConsultantItemModel = oModel.ConsultantInvoiceItem || [];
 
@@ -1817,6 +1819,12 @@ sap.ui.define(
                     doc.text("Thank you for your business!", margin - 2, currentY);
 
                     doc.save(`${oModel.ConsultantName}-${oModel.InvoiceNo}-Invoice.pdf`);
+                    } catch (error) {
+                        this.closeBusyDialog();
+                        MessageToast.show(error.message || error.responseText);
+                    } finally {
+                        this.closeBusyDialog();
+                    }
                 }
             }
         );

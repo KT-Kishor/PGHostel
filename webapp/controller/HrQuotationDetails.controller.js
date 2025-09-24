@@ -819,6 +819,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
       },
       HQD_onPressMerge: async function () {
         const oView = this.getView();
+        this.getBusyDialog();
         // Force model bindings to update so latest data is reflected
         oView.getModel("SingleCompanyModel").updateBindings(true);
         oView.getModel("QuotationModel").updateBindings(true);
@@ -1040,7 +1041,9 @@ HQD_onCompanyCodeChange: function (oEvent) {
       }catch (error) {
           this.closeBusyDialog();
           MessageToast.show(error.message || error.responseText);
-        }
+      } finally {
+                    this.closeBusyDialog();
+      }
       },
       HQD_onPressAddQuotationItem: function () {
         var oView = this.getView();

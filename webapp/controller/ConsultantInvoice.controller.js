@@ -15,6 +15,7 @@ sap.ui.define(
                 this.getRouter().getRoute("RouteConsultantInvoiceApplication").attachMatched(this._onRouteMatched, this);
             },
             _onRouteMatched: async function() {
+            try {
                 var LoginFUnction = await this.commonLoginFunction("ConsultantInvoice");
                 if (!LoginFUnction) return;
                 // Get i18n resource bundle
@@ -27,7 +28,13 @@ sap.ui.define(
                 this.ContractReadCall();
                 this.bDateRangeTriggered = false;
                 this.initializeBirthdayCarousel();
-            },
+            } catch (error) {
+                this.closeBusyDialog();
+                MessageToast.show(error.message || error.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
 
             ContractReadCall: async function() {
                 try {
