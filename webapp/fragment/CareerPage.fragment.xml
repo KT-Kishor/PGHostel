@@ -1,72 +1,87 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:l="sap.ui.layout"
-	xmlns:core="sap.ui.core">
-	<l:VerticalLayout width="100%">
-							<l:BlockLayout background="Dashboard">
-								<l:BlockLayoutRow>
-									<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
-										<Text text="{i18n>careersDes}" class="cell_Title"/>
-									</l:BlockLayoutCell>
-								</l:BlockLayoutRow>
-							</l:BlockLayout>
-							<VBox height="1rem"/>
-							<FlexBox class="officetourContainer" justifyContent="End">
-								<Button text="Office Tour" press="onPressOfficeTour" class="officetourBtn"/>
-							</FlexBox>
-							<Table id="V1_ID_Table" sticky="ColumnHeaders" items="{JobApplicationModel>/Candidates}" mode="SingleSelectMaster" alternateRowColors="true" class="sapUiSmallMargin myRoundedTable" width="auto">
-								<headerToolbar>
-								<OverflowToolbar>
-									<!-- <ToolbarSpacer/> -->
-									<SearchField search="onSearch" placeholder="Type a skill" width="17.5rem"/>
-								</OverflowToolbar>
-							</headerToolbar>
-								<columns>
-									<Column demandPopin="true">
-										<Text text="{i18n>v1_jobTitle}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>v1_PriSkills}" />
-									</Column>
-									<Column demandPopin="true">
-										<Text text="{i18n>v1_s_postDate}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>V1_L_Location}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true">
-										<Text text="{i18n>v1_s_Exp}" />
-									</Column>
-									<Column minScreenWidth="Desktop" demandPopin="true"></Column>
-								</columns>
-								<items>
-									<ColumnListItem>
-										<cells>
-											<Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
-											<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
-											<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
-											<Text text="{JobApplicationModel>Location}" />
-											<Text text="{JobApplicationModel>Experience}" />
-											<Button text="{i18n>v1_s_ViewJob}" icon="sap-icon://opportunities" press="v1_onViewItem" type="Emphasized" />
-										</cells>
-									</ColumnListItem>
-								</items>
-							</Table>
-                              
-    <!-- <HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" >
-        <Text text="{i18n>footerCompName}" class="footer-text"/>
-        <HBox class="footer-social" justifyContent="End">
-            <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/' target='_blank'&gt;
-                                  &lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;
-                                &lt;/a&gt;"/>
-            <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
-                                  &lt;i class='fab fa-linkedin-in social-icon'&gt;&lt;/i&gt;
-                                &lt;/a&gt;"/>
-            <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
-                                  &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;
-                                &lt;/a&gt;"/>
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    height="100%">
+    <FlexBox direction="Column" fitContainer="true" height="100%">
+        <!-- Scrollable Main Content -->
+        <ScrollContainer horizontal="false" vertical="true" class="career-content">
+            <l:VerticalLayout width="100%">
+                <!-- BlockLayout + Table as before -->
+                <l:BlockLayout background="Dashboard">
+                    <l:BlockLayoutRow>
+                        <l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
+                            <Text text="{i18n>careersDes}" class="cell_Title"/>
+                        </l:BlockLayoutCell>
+                    </l:BlockLayoutRow>
+                </l:BlockLayout>
+
+                <VBox height="1rem"/>
+                <FlexBox class="officetourContainer" justifyContent="End">
+                    <Button text="Office Tour" press="onPressOfficeTour" class="officetourBtn"/>
+                </FlexBox>
+
+                <Table id="V1_ID_Table"
+                       sticky="ColumnHeaders"
+                       items="{JobApplicationModel>/Candidates}"
+                       mode="SingleSelectMaster"
+                       alternateRowColors="true"
+                       class="sapUiSmallMargin myRoundedTable"
+                       width="auto">
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <SearchField search="onSearch" placeholder="Type a skill" width="17.5rem"/>
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column demandPopin="true">
+                            <Text text="{i18n>v1_jobTitle}" />
+                        </Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true">
+                            <Text text="{i18n>v1_PriSkills}" />
+                        </Column>
+                        <Column demandPopin="true">
+                            <Text text="{i18n>v1_s_postDate}" />
+                        </Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true">
+                            <Text text="{i18n>V1_L_Location}" />
+                        </Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true">
+                            <Text text="{i18n>v1_s_Exp}" />
+                        </Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true"></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
+                                <ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
+                                <Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
+                                <Text text="{JobApplicationModel>Location}" />
+                                <Text text="{JobApplicationModel>Experience}" />
+                                <Button text="{i18n>v1_s_ViewJob}"
+                                        icon="sap-icon://opportunities"
+                                        press="v1_onViewItem"
+                                        type="Emphasized" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </l:VerticalLayout>
+        </ScrollContainer>
+
+        <!-- Fixed Footer -->
+        <HBox class="career-footer-bar" alignItems="Center" justifyContent="SpaceBetween">
+            <Text text="{i18n>footerCompName}" class="career-footer-text"/>
+            <HBox class="career-footer-social" justifyContent="End">
+                <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/' target='_blank'&gt;
+                                    &lt;i class='fab fa-instagram career-social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"/>
+                <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
+                                    &lt;i class='fab fa-linkedin-in career-social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"/>
+                <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
+                                    &lt;i class='fab fa-youtube career-social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"/>
+            </HBox>
         </HBox>
-    </HBox> -->
-						</l:VerticalLayout>
+    </FlexBox>
 </mvc:View>

@@ -2688,3 +2688,84 @@ font-size: 20px;
         gap: 0.5rem;   
     }
 }
+
+/* Footer stays fixed at bottom */
+.career-footer-bar {
+  background-color: #0064d9;
+  padding: 15px 40px;
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 8px 8px 0 0;
+
+  position: fixed; 
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;  /* prevent overflow */
+  margin: 0 auto;    /* center */
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+
+/* Footer Text */
+.career-footer-text {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Footer Links (if needed) */
+.career-footer-links {
+  gap: 30px;
+  flex: 1;
+  justify-content: center;
+}
+.career-footer-link {
+  color: #fff !important;
+  text-decoration: none;
+  font-size: 14px;
+}
+.career-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Social Icons */
+.career-footer-social {
+  gap: 20px;
+}
+.career-social-icon {
+  color: #fff;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+.career-social-icon:hover {
+  transform: scale(1.3);
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .career-footer-bar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .career-footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .career-footer-social {
+    justify-content: center;
+  }
+}
+
+/* Full height for layout */
+body, html, .sapUiBody {
+  overflow-x: hidden;
+}
+
+
+
