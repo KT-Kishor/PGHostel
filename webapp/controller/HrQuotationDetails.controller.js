@@ -173,7 +173,7 @@ sap.ui.define(
         }
         this.getView().setModel(oVisiModel, "visiablityPlay");
         this.closeBusyDialog();
-        this.HQD_onCompanyCodeChange()
+        // this.HQD_onCompanyCodeChange()
       },
       onLogout: function () {
         this.CommonLogoutFunction();
@@ -512,7 +512,9 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/SGSTVisible", true);
           oQuotationModel.setProperty("/IGSTVisible", false);
           oSingleCompanyModel.setProperty("/Percentage", 9);
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", "29ABAFK9719M1ZN");
           oQuotationModel.setProperty("/ShowSACAndGSTCalculation", true);
+           this.getView().byId("HQD_id_CompGSTNO").setEnabled(true);
           // Calculate Total with GST
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
@@ -531,8 +533,11 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/IGSTVisible", false);
           oQuotationModel.setProperty("/ShowGSTFields", false);
           oQuotationModel.setProperty("/CGSTSelected", false);
-          oQuotationModel.setProperty("/IGSTSelected", true);
-          oSingleCompanyModel.setProperty("/Percentage", 18);
+          oSingleCompanyModel.setProperty("/gstEditable", false);
+          oQuotationModel.setProperty("/IGSTSelected", false);
+          oSingleCompanyModel.setProperty("/Percentage", "");
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
+           this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
           //  Mark all items as non-taxable (GSTCalculation = "No")
           var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
           aItems.forEach(function (item) {
@@ -1409,6 +1414,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           if (!isINR) {
             oRadiobtn.setProperty("/gstEditable", false);
             this.byId("HQD_id_Percentage").setEditable(false);
+             this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
             // Optionally hide/show tax fields as needed
             const oQuotationModel = oView.getModel("QuotationModel");
             oQuotationModel.setProperty("/CGSTVisible", false);
@@ -1648,6 +1654,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/IGSTVisible", false);
           oSingleCompanyModel.setProperty("/Percentage", 9);
           oSingleCompanyModel.setProperty("/gstEditable", true);
+           oSingleCompanyModel.setProperty("/CompanyGSTNO", "29ABAFK9719M1ZN");
           // Setting Mobile number
           var sMobileNo = oRawData.mobileNo || "";
           var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
@@ -1658,7 +1665,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/ShowSACAndGSTCalculation", false);
           var oRawData = this.getView().getModel("CompanyCodeDetailsModel").getProperty("/0");
           oSingleCompanyModel.setProperty("/Branch", " ");
-          oSingleCompanyModel.setProperty("/gstEditable", true);
+          oSingleCompanyModel.setProperty("/gstEditable", false);
           oSingleCompanyModel.setProperty("/CompanyName", oRawData.companyName);
           oSingleCompanyModel.setProperty("/CompanyGSTNO", oRawData.gstin);
           oSingleCompanyModel.setProperty("/CompanyEmailID", oRawData.carrerEmail);
@@ -1668,11 +1675,12 @@ HQD_onCompanyCodeChange: function (oEvent) {
           // Hide GST fields and update percentage
           oQuotationModel.setProperty("/ShowGSTFields", false);
           oQuotationModel.setProperty("/CGSTSelected", false);
-          oQuotationModel.setProperty("/IGSTSelected", true);
+          oQuotationModel.setProperty("/IGSTSelected", false);
           oQuotationModel.setProperty("/CGSTVisible", false);
           oQuotationModel.setProperty("/SGSTVisible", false);
           oQuotationModel.setProperty("/IGSTVisible", false);
-          oSingleCompanyModel.setProperty("/Percentage", 18);
+          oSingleCompanyModel.setProperty("/Percentage", "");
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
         }
 
         // Reset tax-related values

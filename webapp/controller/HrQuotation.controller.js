@@ -5,7 +5,7 @@ sap.ui.define(
         "sap/ui/model/json/JSONModel",
         'sap/ui/export/Spreadsheet',
     ],
-    function(BaseController, Formatter, JSONModel,Spreadsheet) {
+    function(BaseController, Formatter, JSONModel, Spreadsheet) {
         "use strict";
         return BaseController.extend("sap.kt.com.minihrsolution.controller.HrQuotation", {
             Formatter: Formatter,
@@ -13,61 +13,61 @@ sap.ui.define(
                 this.getRouter().getRoute("RouteHrQuotation").attachMatched(this._onRouteMatched, this);
             },
 
-           _onRouteMatched: async function() {
-            try {
-                var LoginFunction = await this.commonLoginFunction("HrQuotation");
-                if (!LoginFunction) return;
-                this.getBusyDialog();
-                this._isClearPressed = false;
-                // Initialize filters model if it doesn't exist
-                if (!this.getView().getModel("/filters")) {
-                    this.getView().setModel(new JSONModel({
-                        QuotationNo: "",
-                        CustomerName: "",
-                        DateFrom: null,
-                        DateTo: null
-                    }), "filters");
+            _onRouteMatched: async function() {
+                try {
+                    var LoginFunction = await this.commonLoginFunction("HrQuotation");
+                    if (!LoginFunction) return;
+                    this.getBusyDialog();
+                    this._isClearPressed = false;
+                    // Initialize filters model if it doesn't exist
+                    if (!this.getView().getModel("/filters")) {
+                        this.getView().setModel(new JSONModel({
+                            QuotationNo: "",
+                            CustomerName: "",
+                            DateFrom: null,
+                            DateTo: null
+                        }), "filters");
+                    }
+
+                    // Set financial year dates
+                    var fyDates = this._getFinancialYearDates();
+                    var sDateFrom = this._formatDateForBackend(fyDates.start);
+                    var sDateTo = this._formatDateForBackend(fyDates.end);
+
+                    // Update UI controls
+                    this.byId("HQ_id_Quotaiondate").setDateValue(fyDates.start);
+                    this.byId("HQ_id_Quotaiondate").setSecondDateValue(fyDates.end);
+
+                    // Update filters model
+                    this.getView().getModel("filters").setProperty("/DateFrom", sDateFrom);
+                    this.getView().getModel("filters").setProperty("/DateTo", sDateTo);
+                    this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
+                    // SECOND: Apply the FY filter to the table immediately
+                    var oTable = this.byId("HQ_id_QuotationItemTable");
+                    var oBinding = oTable.getBinding("items");
+                    if (oBinding) {
+                        var fyFilter = new sap.ui.model.Filter("Date", "BT", sDateFrom, sDateTo);
+                        oBinding.filter([fyFilter]);
+                    }
+                    this._refreshFilterBarDropdowns();
+                    this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
+
+                    if (this.oValue === "HrQuotation") {
+                        this.HQ_onSearch();
+                    } else {
+                        // Ensure search is called even if not HrQuotation
+                        this.HQ_onSearch();
+                    }
+                    this.closeBusyDialog();
+                    this.initializeBirthdayCarousel();
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(error.message || error.responseText);
+                } finally {
+                    this.closeBusyDialog();
                 }
-
-                // Set financial year dates
-                var fyDates = this._getFinancialYearDates();
-                var sDateFrom = this._formatDateForBackend(fyDates.start);
-                var sDateTo = this._formatDateForBackend(fyDates.end);
-
-                // Update UI controls
-                this.byId("HQ_id_Quotaiondate").setDateValue(fyDates.start);
-                this.byId("HQ_id_Quotaiondate").setSecondDateValue(fyDates.end);
-
-                // Update filters model
-                this.getView().getModel("filters").setProperty("/DateFrom", sDateFrom);
-                this.getView().getModel("filters").setProperty("/DateTo", sDateTo);
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-                // SECOND: Apply the FY filter to the table immediately
-                var oTable = this.byId("HQ_id_QuotationItemTable");
-                var oBinding = oTable.getBinding("items");
-                if (oBinding) {
-                    var fyFilter = new sap.ui.model.Filter("Date", "BT", sDateFrom, sDateTo);
-                    oBinding.filter([fyFilter]);
-                }
-                this._refreshFilterBarDropdowns();
-                this.getView().getModel("LoginModel").setProperty("/HeaderName", "Manage Quotation");
-
-                if (this.oValue === "HrQuotation") {
-                    this.HQ_onSearch();
-                } else {
-                    // Ensure search is called even if not HrQuotation
-                    this.HQ_onSearch();
-                }
-                this.closeBusyDialog();
-                this.initializeBirthdayCarousel();
-            } catch (error) {
-                this.closeBusyDialog();
-                MessageToast.show(error.message || error.responseText);
-            } finally {
-                this.closeBusyDialog();
-            }
-        },
+            },
 
             onTableUpdateFinished: function(oEvent) {
                 // Update the count in the header when table updates
@@ -363,46 +363,109 @@ sap.ui.define(
                 });
             },
 
-            HQ_DownloadTableData:function(){
-                 var table = this.byId("HQ_id_QuotationItemTable");
-                        var oBinding = table.getBinding("items");
-            var aFilteredData = oBinding.getCurrentContexts().map(function (oContext) {
-                return oContext.getObject();
-            });
+            HQ_DownloadTableData: function() {
+                var table = this.byId("HQ_id_QuotationItemTable");
+                var oBinding = table.getBinding("items");
+                var aFilteredData = oBinding.getCurrentContexts().map(function(oContext) {
+                    return oContext.getObject();
+                });
 
-             const aFormattedData = aFilteredData.map(item => {
-            return {
-              ...item,
-              Date: Formatter.formatDate(item.Date),   
-            };
-          });
-          const aCols = [
-            { label: this.i18nModel.getText("quotationNo"), property: "QuotationNo", type: "string" },
-            { label: this.i18nModel.getText("quotaiodate"), property: "Date", type: "string" },
-            { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
-            { label: this.i18nModel.getText("customerGSTNO"), property: "CustomerGSTNO", type: "string" },
-            { label: this.i18nModel.getText("email"), property: "CustomerEmailID", type: "string" },
-            { label: this.i18nModel.getText("mobileNo"), property: "CustomerMobileNo", type: "string " },
-            { label: this.i18nModel.getText("pdfTotal"), property: "TotalSum", type: "string" },
-          ];
-          const oSettings = {
-            workbook: {
-              columns: aCols,
-              context: {
-                sheetName: this.i18nModel.getText("invoiceapp")
-              }
+                const aFormattedData = aFilteredData.map(item => {
+                    return {
+                        ...item,
+                        Date: Formatter.formatDate(item.Date),
+                    };
+                });
+                const aCols = [{
+                        label: this.i18nModel.getText("quotationNo"),
+                        property: "QuotationNo",
+                        type: "string"
+                    },
+                    {
+                        label: this.i18nModel.getText("quotaiodate"),
+                        property: "Date",
+                        type: "string"
+                    },
+                    {
+                        label: this.i18nModel.getText("customerName"),
+                        property: "CustomerName",
+                        type: "string"
+                    },
+                    {
+                        label: this.i18nModel.getText("customerGSTNO"),
+                        property: "CustomerGSTNO",
+                        type: "string"
+                    },
+                    {
+                        label: this.i18nModel.getText("email"),
+                        property: "CustomerEmailID",
+                        type: "string"
+                    },
+                    {
+                        label: this.i18nModel.getText("mobileNo"),
+                        property: "CustomerMobileNo",
+                        type: "string "
+                    },
+                    {
+                        label: this.i18nModel.getText("pdfTotal"),
+                        property: "TotalSum",
+                        type: "string"
+                    },
+                ];
+                const oSettings = {
+                    workbook: {
+                        columns: aCols,
+                        context: {
+                            sheetName: this.i18nModel.getText("invoiceapp")
+                        }
+                    },
+                    dataSource: aFormattedData,
+                    fileName: "Quatation.xlsx"
+                };
+                const oSheet = new Spreadsheet(oSettings);
+                oSheet.build().then(function() {
+                        MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+                    }.bind(this))
+                    .finally(function() {
+                        oSheet.destroy();
+                    });
+
             },
-            dataSource: aFormattedData,
-            fileName: "Quatation.xlsx"
-          };
-          const oSheet = new Spreadsheet(oSettings);
-          oSheet.build().then(function () {
-            MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-          }.bind(this))
-            .finally(function () {
-              oSheet.destroy();
-            });
 
-            }
+            // Delete the Quotation and Quotation Item
+            HQD_onPressDeleteQuotation: async function(oEvent) {
+                var oTable = this.byId("HQ_id_QuotationItemTable");
+                var oSelectedItem = oTable.getSelectedItem();
+                if (!oSelectedItem) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("selectQuotationToDelete"));
+                    return;
+                }
+                var sQuotationNo = oSelectedItem.getBindingContext("CompanyQuotationModel").getProperty("QuotationNo");
+                var that = this;
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("msgBoxConfirm"),
+                    this.i18nModel.getText("commonMesBoxConfirmDeleteQuotation"),
+                    async function() {
+                            that.getBusyDialog();
+                            try {
+                                await that.ajaxDeleteWithJQuery("/Quotation", {
+                                    filters: {
+                                        QuotationNo: sQuotationNo
+                                    }
+                                });
+                                sap.m.MessageToast.show(that.i18nModel.getText("QuotationDeleteMess"));
+                                that.HQ_onSearch();
+                                oTable.removeSelections(true);
+                            } catch (error) {
+                                sap.m.MessageToast.show(error.responseText || "Error deleting Quotation.");
+                            } finally {
+                                that.closeBusyDialog();
+                            }
+                        },
+                        function() {
+                            that.closeBusyDialog();
+                            oTable.removeSelections(true);
+                        })
+            },
         });
     });

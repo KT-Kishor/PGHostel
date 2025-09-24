@@ -42,7 +42,7 @@
     </VBox>
 	<VBox >
        <Link text="Leading Recruitment Service Provider"  class="aboutTitle" />
-        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP , Java , Nodejs,  C++ , SQL , JavaScript Salesforces and other Technologies with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
+        <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Nodejs, C++, SQL, JavaScript Salesforces and other Technologies with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
      <Link text="Executive Search"  class="aboutTitle" />

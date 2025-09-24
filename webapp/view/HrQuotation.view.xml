@@ -82,6 +82,7 @@
                 items="{path: 'CompanyQuotationModel>/'}"
                 alternateRowColors="true"
                 busyIndicatorDelay="0"
+                mode="SingleSelectLeft"
                 id="HQ_id_QuotationItemTable"
                 class="sapUiResponsiveMargin" sticky="ColumnHeaders,HeaderToolbar"
                 width="auto">
@@ -91,6 +92,7 @@
                         <ToolbarSpacer/>
                         <Button text="{i18n>headerQuotation}" tooltip="{i18n>addQuotation}" press="HQ_onPressAddQuotation" type="Transparent"/>
                         <Button text="{i18n>download}" press="HQ_DownloadTableData"/>
+                        <Button  type="Transparent" tooltip="{i18n>deleteQuotation}"  id="HQD_id_DeleteBtn" text="{i18n>deleteQuotation}" press="HQD_onPressDeleteQuotation" />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
