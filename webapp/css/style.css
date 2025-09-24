@@ -2694,19 +2694,18 @@ font-size: 20px;
 .career-footer-bar {
   background-color: #0064d9;
   padding: 15px 40px;
-  color: #fff;
+  color: #fff;  
   display: flex;
   flex-wrap: wrap;
   border-radius: 8px 8px 0 0;
-
   position: fixed; 
   bottom: 0;
   left: 0;
-  width: 100%;
-  max-width: 100vw;  /* prevent overflow */
-  margin: 0 auto;    /* center */
+  right: 0;
+  width: auto;
   z-index: 100;
   box-sizing: border-box;
+ 
 }
 
 
