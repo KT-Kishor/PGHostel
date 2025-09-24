@@ -2219,13 +2219,14 @@ font-size: 20px;
 .Recuritmentclass{
   font-size: 16px;
   line-height: 25px;
+  text-align: justify !important;
 }
 .aboutTitle{
   color: #000000 !important;
   margin-top: 20px;
   font-size:19px ;
   font-weight: bold !important;
-  
+  background-color: transparent !important;
 }
 .cell_Title{
   font-size: 19px !important;
@@ -2562,7 +2563,7 @@ font-size: 20px;
   display: flex;
   flex-wrap: wrap;
   border-radius: 8px 8px 0 0;
-  margin-top: 3rem;
+ 
 }
 
 /* Footer Text */

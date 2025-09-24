@@ -94,7 +94,7 @@
     </l:Grid>
 
      <!-- Footer -->
-    <HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" >
+ <HBox class="footer-bar sapUiSmallMargin" alignItems="Center" justifyContent="SpaceBetween" >
         <!-- Left: Copyright -->
         <Text text="{i18n>footerCompName}" class="footer-text"/>
         <!-- Middle: Links -->

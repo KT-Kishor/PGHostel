@@ -210,7 +210,7 @@
 								</com:ChartContainer>
                             </f:content>
                         </f:Card>
-                        <VBox fitContainer="true"  class="parentContainer" >
+                        <VBox fitContainer="true" class="parentContainer" >
                         <!-- 5. Payment Breakdown (Stacked Bar Chart) (WITH SCROLL CONTAINER) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
