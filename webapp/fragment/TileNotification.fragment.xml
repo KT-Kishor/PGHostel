@@ -241,7 +241,7 @@
                                                         { path: 'CompanyInvoiceModelData>TotalAmount' },
                                                         { path: 'CompanyInvoiceModelData>AmountInINR' }
                                                     ],
-                                                    formatter: '.Formatter.fromatNumber'}" textAlign="End"/>
+                                                    formatter: '.Formatter.NotificationNumber'}" textAlign="End"/>
                                 </cells>
                             </ColumnListItem>
                         </items>
@@ -330,7 +330,7 @@
                                                         { path: 'CompanyInvoiceModelData>TotalAmount' },
                                                         { path: 'CompanyInvoiceModelData>AmountInINR' }
                                                     ],
-                                                    formatter: '.Formatter.fromatNumber'}" textAlign="End"/>
+                                                    formatter: '.Formatter.NotificationNumber'}" textAlign="End"/>
 
                                 </cells>
                             </ColumnListItem>

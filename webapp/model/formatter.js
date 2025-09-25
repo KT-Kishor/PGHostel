@@ -231,6 +231,37 @@ sap.ui.define([
     return oFloatFormat.format(numericValue);
 },
 
+ NotificationNumber: function(currencyOrValue, totalAmount, amountInINR) {
+    var avalue;
+
+    // If only one argument passed, treat it as value to format
+    if (totalAmount === undefined && amountInINR === undefined) {
+        avalue = currencyOrValue;
+    } else {
+        // Multiparameter call from multi-part binding
+        avalue = currencyOrValue === "INR" ? totalAmount : amountInINR;
+    }
+    
+    if (avalue === "0" || avalue === 0) {
+        return "- -";
+    }
+    var numericValue = parseFloat(avalue);
+    if (isNaN(numericValue)) {
+        return "";
+    }
+
+    var oFormatOptions = {
+        groupingBaseSize: 3,
+        groupingSize: 2,
+        minIntegerDigits: 1,
+        minFractionDigits: 2,
+        maxFractionDigits: 4
+    };
+    
+    var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+    return oFloatFormat.format(numericValue) + " INR";
+},
+
 
         bytesToMB: function (bytes) {
             if (!bytes || isNaN(bytes)) {
