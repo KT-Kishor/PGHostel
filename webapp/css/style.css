@@ -1875,6 +1875,12 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
   }
 }
 
+.jioSection .sapMFlexBox,
+.jioSection .sapMFlexItem {
+  padding: 0 12px;  /* adds left/right space inside each column */
+  box-sizing: border-box;
+}
+
 .jioHeading {
   font-size: clamp(1.2rem, 4vw, 2rem); /* min, preferred, max */
   font-weight: 700;
