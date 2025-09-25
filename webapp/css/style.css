@@ -1287,7 +1287,7 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
     * Background and header styles
     */
 .career-background {
-  background-image: url("../image/career1.jpg");
+  background-image: url("../image/Home.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -2676,12 +2676,30 @@ font-size: 20px;
 .tileFlexBoxBg {
   display: flex;
   justify-content: center;
-  background-color:  #87b3d0 !important;
+  background-color: #87b3d0 !important;
   background-image: url("../image/grow2.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
+  /* default (tablet/desktop) */
+  padding: 40px 0; 
 }
+
+/* Medium screens (≤ 768px) */
+@media (max-width: 768px) {
+  .tileFlexBoxBg {
+    padding: 25px 0; /* reduce padding */
+  }
+}
+
+/* Small screens (≤ 480px) */
+@media (max-width: 480px) {
+  .tileFlexBoxBg {
+    padding: 15px 0; /* even smaller */
+  }
+}
+
 
 .Coursetitle{
  background-color:  #ebeef4!important; 
@@ -2699,6 +2717,11 @@ font-size: 20px;
 .underlineLink {
    text-decoration: underline !important;
 }
+
+.sapMLnk:not(.sapMLnkDsbl) {
+    text-shadow: none !important;
+}
+
 .parentContainer {
     display:flex;
     flex-direction: column; 
@@ -2816,16 +2839,31 @@ body, html, .sapUiBody {
 }
 
 .carrer-Paragraph {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem); /* responsive font size */
     color: #015b6c;
-    line-height: 1.8;       /* more readable line height */
-    margin-bottom: 16px;
-    max-width: 600px;       /* wider for readability */
-    display: block;         /* make span behave like block/paragraph */
-    text-align: justify;    /* optional: neat paragraph alignment */
-    white-space: normal;    /* ensures wrapping if long words */
-    word-break: break-word; /* breaks long words if needed */
+    line-height: 1.6;            /* readable line height */
+   margin: 0;  
+    max-width: 100%;             /* allow full width on smaller screens */
+    display: block;
+    text-align: justify;          /* optional neat alignment */
+    white-space: normal;
+    word-break: break-word;
 }
+
+@media (max-width: 768px) {
+  .carrer-office-tour {
+    padding: 20px;  /* less vertical padding */
+  }
+}
+
+
+/* Reduce margin on smaller screens */
+@media (max-width: 768px) {
+    .carrer-Paragraph {
+        font-size: clamp(0.85rem, 3vw, 1rem);
+    }
+}
+
 
 .video-responsive {
   position: relative;

@@ -24,7 +24,7 @@
                       class="sapUiLargeMarginBottom" wrapping="true"/>
                 <Text text="{i18n>oldCompany}" class="sapUiSmallMarginBottom oldCompName"/>
                 <Text text="{i18n>newCompany}" class="sapUiSmallMarginBottom newcompName"/>
-                <Link text="{i18n>compwebsite}" href="https://kvrikshatechnologies.com/" target="_blank" class="underlineLink"/>
+                <Link text="{i18n>compwebsite}" href="https://kvrikshatechnologies.com/" wrapping="true" target="_blank" class="underlineLink"/>
             </VBox>
 
                 <!-- Right: Google Map -->
