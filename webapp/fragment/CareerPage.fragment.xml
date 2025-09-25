@@ -28,6 +28,7 @@
                         mode="SingleSelectMaster"
                         alternateRowColors="true"
                         class="sapUiSmallMargin myRoundedTable"
+						busyIndicatorDelay="0"
                         width="auto">
 					<headerToolbar>
 						<OverflowToolbar>
