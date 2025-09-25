@@ -5,7 +5,7 @@
         <!-- HR solution -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/HRSolDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/HRSolDemo.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="HR Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>HRsolution}" />
@@ -20,7 +20,7 @@
         <!-- Invoice management -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/InvoiceProduct.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/InvoiceProduct.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Invoice Management" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>invoicemanage}" />
@@ -35,7 +35,7 @@
         <!-- Company Asset Management -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/AssetDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/AssetDemo.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Company Asset Management" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>Companyassetmanage}" />
@@ -50,7 +50,7 @@
         <!-- Recruitment -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/RecruimentDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/RecruimentDemo.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Recruitment" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>recruitmentmanage}" />
@@ -65,7 +65,7 @@
         <!-- Automotive Solution -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/Automobile.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/Automobile.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="Automotive Solution" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>AutomobileSolution}" />
@@ -80,7 +80,7 @@
         <!-- ID Card Generation -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
-                <Image src="../image/IDDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
+                <Image src="../image/IDDemo.png" width="750px" height="250px" visible="true" class="section-image"/>
             </HBox>
             <Text class="hr-text sapUiSmallMargin" text="ID Card Generation" />
             <Text class="description-text sapUiSmallMargin" text="{i18n>idcardgeneration}" />
