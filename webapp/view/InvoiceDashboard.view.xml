@@ -210,8 +210,13 @@
 								</com:ChartContainer>
                             </f:content>
                         </f:Card>
-                        <VBox fitContainer="true" class="parentContainer" >
-                        <!-- 5. Payment Breakdown (Stacked Bar Chart) (WITH SCROLL CONTAINER) -->
+                    </layout:content>
+                </layout:Grid>
+                
+                 <!-- Grid for Charts -->
+                <layout:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiResponsiveMargin">
+                    <layout:content>
+                                               <!-- 5. Payment Breakdown (Stacked Bar Chart) (WITH SCROLL CONTAINER) -->
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
@@ -306,7 +311,6 @@
 								</com:ChartContainer>
                             </f:content>
                         </f:Card>
-                        </VBox>
                     </layout:content>
                 </layout:Grid>
             </VBox>
