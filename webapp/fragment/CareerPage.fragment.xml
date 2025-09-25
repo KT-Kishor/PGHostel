@@ -83,7 +83,7 @@
 						</g:layoutM>
 						<!-- Left Column -->
 						<VBox alignItems="Start" justifyContent="Center">
-							<Title text="{i18n>companynameKT}" level="H1" class="carrer-Heading" />
+							<Title text="{i18n>officeTour}" level="H1" class="carrer-Heading" />
 							<Text text="{i18n>aboutCompany}" class="carrer-Paragraph" />
 						</VBox>
 						<!-- Right Column -->
