@@ -877,53 +877,43 @@ sap.ui.define(
         onAfterRendering: function () {
           this._applyResponsiveVideo("videoBoxoffice", "videoFrametour", "../Videos/Office Tour.mp4");
         },
-       _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
+      _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
     var oVBox = this.byId(vBoxId);
     var oHtml = this.byId(htmlId);
     if (!oVBox || !oHtml) return;
-    var iWidth = window.innerWidth;
-    var bResponsive = sap.ui.Device.system.phone || iWidth < 768; // treat <768px as mobile
+
     var bAutoplay = (vBoxId === "videoBoxoffice");
-    
-    // Video tag (no background here)
+
+    // Video tag
     var sVideoTag = "<video id='" + htmlId + "_video' controls " +
         (bAutoplay ? "autoplay muted playsinline " : "") +
-        "style='width:100%;height:100%;border:none;border-radius:15px;object-fit:contain;'>" +
+        ">" +
         "<source src='" + videoUrl + "' type='video/mp4'>" +
         "</video>";
-    
-    // Wrapper with BACKGROUND on all 4 sides (responsive version)
-    var sWrapper = bResponsive ?
-        "<div class='responsive-video-wrapper'>" +
-            "<div style='position:absolute;top:0;left:0;width:100%;height:100%;'>" +
-                sVideoTag +
-            "</div>" +
-        "</div>"
-        : "<div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'>" + sVideoTag + "</div>";
+
+    // Always wrap in responsive container
+    var sWrapper = "<div class='video-responsive'>" + sVideoTag + "</div>";
 
     oHtml.setContent(sWrapper);
 
-    // Adjust fit after metadata is loaded
+    // Adjust object-fit dynamically if needed
     setTimeout(function () {
         var videoEl = document.getElementById(htmlId + "_video");
         if (videoEl) {
             videoEl.addEventListener("loadedmetadata", function () {
                 var vidRatio = videoEl.videoWidth / videoEl.videoHeight;
-                var boxRatio = 560 / 315; // desktop ratio (16:9)
+                var boxRatio = 16 / 9;
 
-                if (bResponsive) {
-                    videoEl.style.objectFit = "cover"; // fill container on smaller screens
+                if (Math.abs(vidRatio - boxRatio) < 0.1) {
+                    videoEl.style.objectFit = "cover"; // typical 16:9 video
                 } else {
-                    if (Math.abs(vidRatio - boxRatio) < 0.1) {
-                        videoEl.style.objectFit = "cover"; // fill container on desktop
-                    } else {
-                        videoEl.style.objectFit = "contain"; // keep background visible on all 4 sides
-                    }
+                    videoEl.style.objectFit = "contain"; // show full video with background
                 }
             });
         }
     }, 200);
-},
+}
+
 
       }
     );
