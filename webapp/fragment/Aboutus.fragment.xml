@@ -22,7 +22,7 @@
         <Text text="Streamline invoicing with automated agreements and real-time tracking for accuracy, compliance, and faster payments with Remiders" wrapping="true" class="Recuritmentclass"/>
     </VBox>
      <VBox >
-        <Link text="Company Asset Management" press=".onNavToCompanySolution" class="aboutTitle"/>
+        <Link text="Company Asset Management" wrapping="true" press=".onNavToCompanySolution" class="aboutTitle"/>
         <Text text="Manage and track all assets in one place with complete lifecycle visibility, including seamless employee assignments" class="Recuritmentclass" wrapping="true"/>
     </VBox>
      <VBox >
@@ -37,24 +37,24 @@
 
 				<l:BlockLayoutCell title="{i18n>recruitment}">
 				<VBox >
-       <Link text="Building Strong and Capable Teams"  class="aboutTitle" />
+       <Link text="Building Strong and Capable Teams"  wrapping="true" class="aboutTitle" />
         <Text text="We are efficient resource provider to deliver exceptional recruitment, services providing end-to-end hiring solutions that align with our clients goals,   enabling them to build strong and capable teams" wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-       <Link text="Leading Recruitment Service Provider"  class="aboutTitle" />
+       <Link text="Leading Recruitment Service Provider"  wrapping="true" class="aboutTitle" />
         <Text text="Kalpavriksha Technologies is a leading recruitment service provider, We specialize in extensive experience in SAP, Java, Nodejs, C++, SQL, JavaScript Salesforces and other Technologies with a proven track record of delivering high-quality recruitment solutions, we help businesses thrive by sourcing the right talent." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-     <Link text="Executive Search"  class="aboutTitle" />
+     <Link text="Executive Search" wrapping="true"  class="aboutTitle" />
         <Text text=" Finding top-level leaders and executives to drive growth." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-      <Link text="Talent Mapping and Sourcing"  class="aboutTitle" />
+      <Link text="Talent Mapping and Sourcing" wrapping="true" class="aboutTitle" />
         <Text text=" Proactively identifying and engaging with high potential talent. 
 " wrapping="true" class="Recuritmentclass"/>
     </VBox>
 	<VBox >
-      <Link text="Candidate Screening and Assessment"  class="aboutTitle" />
+      <Link text="Candidate Screening and Assessment" wrapping="true"  class="aboutTitle" />
         <Text text=" Rigorous vetting for skill and cultural fit, we screening the profile take one round of interview to make sure it a best fit." wrapping="true" class="Recuritmentclass"/>
     </VBox>
 					<!-- <core:HTML content='&lt;div class=&quot;content&quot;&gt;&lt;gt;&lt;div&gt;{i18n>aboutUsSecondcontent5}&lt;br&gt;&lt;br&gt;{i18n>aboutUsSecondcontent9}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes1}&lt;br&gt;&lt;br&gt;{i18n>aboutSecondDes2}&lt;/a&gt;&lt;/div&gt;'></core:HTML> -->
