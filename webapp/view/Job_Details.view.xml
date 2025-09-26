@@ -1,0 +1,82 @@
+<mvc:View
+	controllerName="sap.kt.com.minihrsolution.controller.Job_Details"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+    xmlns:core="sap.ui.core"
+     xmlns:fb="sap.ui.comp.filterbar"
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0"
+>
+ <Page >
+ <headerContent>
+			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
+			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
+			<ToolbarSpacer/>
+			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
+		</headerContent>
+        <content>
+	<VBox height="3rem"/>
+          <Table id="V1_ID_Table"
+                        sticky="ColumnHeaders"
+                        items="{JobApplicationModel>/Candidates}"
+                        mode="SingleSelectMaster"
+                        alternateRowColors="true"
+                        class="sapUiSmallMargin myRoundedTable"
+						busyIndicatorDelay="0"
+                        width="auto">
+					<headerToolbar>
+						<OverflowToolbar>
+							<SearchField liveChange="onSearch" placeholder="Type a skill" width="17.5rem"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column demandPopin="true">
+							<Text text="{i18n>v1_jobTitle}" />
+						</Column>
+						<Column minScreenWidth="Desktop" demandPopin="true">
+							<Text text="{i18n>v1_PriSkills}" />
+						</Column>
+						<Column demandPopin="true">
+							<Text text="{i18n>v1_s_postDate}" />
+						</Column>
+						<Column minScreenWidth="Desktop" demandPopin="true">
+							<Text text="{i18n>V1_L_Location}" />
+						</Column>
+						<Column minScreenWidth="Desktop" demandPopin="true">
+							<Text text="{i18n>v1_s_Exp}" />
+						</Column>
+						<Column minScreenWidth="Desktop" demandPopin="true"></Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Link text="{JobApplicationModel>JobTitle}" wrapping="true" press="v1_onViewItem" />
+								<ExpandableText text="{JobApplicationModel>PrimarySkills}" maxCharacters="25"/>
+								<Text text="{path: 'JobApplicationModel>PostDate', formatter:'.Formatter.formatDate'}" />
+								<Text text="{JobApplicationModel>Location}" />
+								<Text text="{JobApplicationModel>Experience}" />
+								<Button text="{i18n>v1_s_ViewJob}"
+                                        icon="sap-icon://opportunities"
+                                        press="v1_onViewItem"
+                                        type="Emphasized" />
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+            
+        </content>
+        <footer>
+            <Bar>
+                <contentLeft>
+                    <core:Fragment
+                        fragmentName="sap.kt.com.minihrsolution.fragment.Footer"
+                        type="XML"
+                    />
+                </contentLeft>
+                <contentRight />
+            </Bar>
+        </footer>
+    </Page>
+</mvc:View>
