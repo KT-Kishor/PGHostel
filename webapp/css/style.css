@@ -1863,9 +1863,9 @@ h2.sapUxAPObjectPageHeaderIdentifierTitleForce {
 .jioSection {
     background-color: #fff;
     border-radius: 16px;
-    padding: 40px;
+    padding: 10px;
     color: #2a5d66;
-    margin: 20px 40px;
+    margin: 10px 40px;
 }
 /* Responsive padding/margin on small screens */
 @media (max-width: 768px) {
@@ -2238,6 +2238,12 @@ font-size: 20px;
   font-size: 19px !important;
   color: #000000 !important;
   /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; */
+}
+.cell_Title1{
+  font-size: 20px !important;
+  color: #5334eb !important;
+  font-weight: bold !important;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .inputMargin {
     margin-left: 10px; /* Adjust the space between ComboBox and Input */

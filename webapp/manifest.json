@@ -773,12 +773,24 @@
                    "name": "IDCardgenerate",
                    "pattern": "IDCardgenerate",
                    "target": ["TargetIDCardgenerate"]
+                 },
+                   {
+                   "name": "Job_Details",
+                   "pattern": "Job_Details",
+                   "target": ["TargetJob_Details"]
                  }
             ],
             "targets": {
               "TargetView1": {
                 "id": "View1",
                 "name": "View1"
+              },
+              "TargetJob_Details":{
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "Job_Details",
+                "viewName": "Job_Details"
               },
               "TargetAssetObjectPage": {
                 "id": "AssetObjectPage",

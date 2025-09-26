@@ -225,7 +225,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
             const oAppStateModel = this.getOwnerComponent().getModel("AppStateModel");
             const sTabKey = oAppStateModel?.getProperty("/previousTab") || "idHome";
 
-            this.getOwnerComponent().getRouter().navTo("RouteHomePage");
+            this.getOwnerComponent().getRouter().navTo("Job_Details");
 
             sessionStorage.setItem("homePageReturnTab", sTabKey);
         },

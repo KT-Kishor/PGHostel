@@ -874,19 +874,23 @@ sap.ui.define(
         onNavToAutomobileSolution: function () {
           this.getRouter().navTo("AutoMobile_Demo");
         },
+        onOpenjob: function () {
+          this.getRouter().navTo("Job_Details");
+        },
         onAfterRendering: function () {
           this._applyResponsiveVideo("videoBoxoffice", "videoFrametour", "../Videos/Office Tour.mp4");
         },
       _applyResponsiveVideo: function (vBoxId, htmlId, videoUrl) {
     var oVBox = this.byId(vBoxId);
     var oHtml = this.byId(htmlId);
-    if (!oVBox || !oHtml) return;
+    if (!oVBox || !oHtml) return; 
+
 
     var bAutoplay = (vBoxId === "videoBoxoffice");
 
     // Video tag
     var sVideoTag = "<video id='" + htmlId + "_video' controls " +
-        (bAutoplay ? "autoplay muted playsinline " : "") +
+        (bAutoplay ? "autoplay muted playsinline" : "") +
         ">" +
         "<source src='" + videoUrl + "' type='video/mp4'>" +
         "</video>";

@@ -6,7 +6,7 @@
     <Dialog 
     id="idCourseDialog"
     class="courseDialog"
-    contentWidth="770px"
+    contentWidth="840px"
     resizable="true"
     draggable="true"
     >

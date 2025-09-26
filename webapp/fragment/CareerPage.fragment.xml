@@ -14,15 +14,24 @@
 		<ScrollContainer horizontal="false" vertical="true">
 			<l:VerticalLayout width="100%">
 				<!-- BlockLayout -->
-				<l:BlockLayout background="Dashboard">
-					<l:BlockLayoutRow>
-						<l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
-							<Text text="{i18n>careersDes}" class="cell_Title"/>
-						</l:BlockLayoutCell>
-					</l:BlockLayoutRow>
-				</l:BlockLayout>
+			<l:BlockLayout background="Dashboard">
+    <l:BlockLayoutRow>
+        <l:BlockLayoutCell width="2" title="{i18n>careersJointeam}" class="cell-bgcolor">
+            <VBox> <Text text="{i18n>careersDes}" class="cell_Title"/>
+			<!-- <Link text="Explore Current Openings"  class="sapUiTinyMarginTop cell_Title1" press="onOpenjob" /> -->
+			  <Button 
+                    text="Explore Current Openings" 
+                    press="onOpenjob" 
+                    icon="sap-icon://locate-me" 
+                    type="Emphasized" 
+                    class="sapUiTinyMarginTop" 
+                />
+                </VBox>
+        </l:BlockLayoutCell>
+    </l:BlockLayoutRow>
+</l:BlockLayout>
 				<VBox height="1rem"/>
-				<Table id="V1_ID_Table"
+				<!-- <Table id="V1_ID_Table"
                         sticky="ColumnHeaders"
                         items="{JobApplicationModel>/Candidates}"
                         mode="SingleSelectMaster"
@@ -68,7 +77,9 @@
 							</cells>
 						</ColumnListItem>
 					</items>
-				</Table>
+				</Table> -->
+
+
                 <g:GridContainer class="carrer-office-tour sapUiSmallMargin">
 						<g:layout>
 							<g:GridContainerSettings columnSize="49.5%" gap="10px" />
@@ -116,5 +127,14 @@
     </HBox>
 			</l:VerticalLayout>
 		</ScrollContainer>
+		<!-- <Image
+		text="{i18n>requestDemo}"
+        class="floatingButton"
+        press="onOpenForm"
+      /> -->
+	  <!-- <Button 
+	  text="View job"
+	   class="demoBtn"
+        press="onOpenjob"/> -->
 	</FlexBox>
 </core:FragmentDefinition>
