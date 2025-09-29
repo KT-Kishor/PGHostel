@@ -2576,6 +2576,7 @@ font-size: 20px;
   flex-wrap: wrap;
   border-radius: 8px 8px 0 0;
   margin-top: 3rem;
+   width: 100%;
 }
 
 /* Footer Text */
@@ -2757,7 +2758,6 @@ font-size: 20px;
   width: auto;
   z-index: 100;
   box-sizing: border-box;
- 
 }
 
 
@@ -2847,7 +2847,7 @@ body, html, .sapUiBody {
 
 .carrer-Paragraph {
     font-size: clamp(0.9rem, 2.5vw, 1.2rem); /* responsive font size */
-    color: #015b6c;
+    color: #000000;
     line-height: 1.6;            /* readable line height */
    margin: 0;  
     max-width: 100%;             /* allow full width on smaller screens */
