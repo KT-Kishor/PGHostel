@@ -9,7 +9,7 @@
 	height="100%"
 	busyIndicatorDelay="0"
 >
- <Page >
+ <Page class="career-background">
  <headerContent>
 			<Avatar src="./image/logo.jpg" displaySize="XS" press="onAvatarPressed" tooltip="Company Logo"/>
 			<Title level="H1" text="{i18n>companynameKT}" class="custom-text" wrapping="false"/>
@@ -17,7 +17,33 @@
 			<Button icon="sap-icon://home" press="onpresshome" class="sapUiTinyMarginEnd" tooltip="{i18n>toolHome}"/>
 		</headerContent>
         <content>
-	<VBox height="3rem"/>
+		<VBox height="3rem"/>
+		<fb:FilterBar id="V1_ID_filterbar" class="sapUiSmallMargin myCustomFilterBar myRoundedTable" clear="v1_filClear" search="V1_onSearch" showClearOnFB="true" showAllFilters="true" showFilterConfiguration="false" filtersDialogCancel="false" persistencyKey="myPersKey" useToolbar="false" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad">
+								<fb:filterGroupItems>
+									<fb:FilterGroupItem name="Skills" label="{i18n>V1_L_Skills}" groupName="Group1" visibleInFilterBar="true">
+										<fb:control>
+											<Input id="V1_ID_SkillsInput" placeholder="Type a skill" showSuggestion="true" showClearIcon="true" suggest="onSuggestSkills" suggestionItems="{skillModel>/skills}">
+												<core:Item key="{skillModel>skill}" text="{skillModel>skill}" />
+											</Input>
+										</fb:control>
+									</fb:FilterGroupItem>
+									<fb:FilterGroupItem name="Location" label="{i18n>V1_L_Location}" groupName="Group1" visibleInFilterBar="true">
+										<fb:control>
+											<ComboBox id="V1_ID_LocationComboBox" placeholder="Select Location" items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true">
+												<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+											</ComboBox>
+										</fb:control>
+									</fb:FilterGroupItem>
+									<fb:FilterGroupItem name="ExpYears" label="{i18n>v1_L_EXP}" groupName="Group1" visibleInFilterBar="true">
+										<fb:control>
+											<ComboBox id="V1_ID_ExpComboBox" items="{ExpYears>/}" selectedKey="" placeholder="Select Experience" showClearIcon="true">
+												<core:Item key="{ExpYears>key}" text="{ExpYears>text}" />
+											</ComboBox>
+										</fb:control>
+									</fb:FilterGroupItem>
+								</fb:filterGroupItems>
+							</fb:FilterBar>
+							<VBox height="1rem"/>
           <Table id="V1_ID_Table"
                         sticky="ColumnHeaders"
                         items="{JobApplicationModel>/Candidates}"
@@ -26,11 +52,6 @@
                         class="sapUiSmallMargin myRoundedTable"
 						busyIndicatorDelay="0"
                         width="auto">
-					<headerToolbar>
-						<OverflowToolbar>
-							<SearchField liveChange="onSearch" placeholder="Type a skill" width="17.5rem"/>
-						</OverflowToolbar>
-					</headerToolbar>
 					<columns>
 						<Column demandPopin="true">
 							<Text text="{i18n>v1_jobTitle}" />

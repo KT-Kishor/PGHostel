@@ -96,7 +96,7 @@
      <!-- Footer -->
  <HBox class="footer-bar sapUiSmallMargin" alignItems="Center" justifyContent="SpaceBetween" >
         <!-- Left: Copyright -->
-        <Text text="{i18n>footerCompName}" class="footer-text"/>
+        <Text text="{i18n>developedBy}" class="footer-text"/>
         <!-- Middle: Links -->
         <!-- <HBox class="footer-links" justifyContent="Center">
             <Link text="Disclaimer" href="#" target="_blank" class="footer-link"/>
