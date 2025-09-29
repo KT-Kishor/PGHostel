@@ -24,7 +24,7 @@
                     press="onOpenjob" 
                     icon="sap-icon://locate-me" 
                     type="Emphasized" 
-                    class="sapUiTinyMarginTop" 
+                    class="openingbutton sapUiTinyMarginTop" 
                 />
                 </VBox>
         </l:BlockLayoutCell>

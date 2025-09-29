@@ -2840,7 +2840,7 @@ body, html, .sapUiBody {
 .carrer-Heading {
   font-size: clamp(1.2rem, 4vw, 2rem); /* min, preferred, max */
   font-weight: 700;
-  color: #ad7900;
+  color: #0057FF;
   margin-bottom: 14px;
   margin-top: 25px;
 }
@@ -2893,4 +2893,10 @@ body, html, .sapUiBody {
   object-fit: cover; /* change to 'contain' if you don’t want cropping */
 }
 
-
+.openingbutton{
+  width: 100%;
+  height: 2rem;
+display: flex;
+justify-content: end;
+align-items: center;
+}

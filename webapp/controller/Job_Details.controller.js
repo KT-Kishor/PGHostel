@@ -29,6 +29,25 @@ sap.ui.define(
             sessionStorage.setItem("homePageReturnTab", sTabKey);
         },
           _loadCareerSectionData: function () {
+  const oAppConfigModel = new JSONModel({
+            url: "https://rest.kalpavrikshatechnologies.com/",
+            headers: {
+              name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+              password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            },
+          });
+          this.getOwnerComponent().setModel(oAppConfigModel, "AppConfigModel");
+
+
+
+          const oExpYears = new JSONModel();
+          oExpYears.loadData("model/ExpYears.json", null, false);
+          this.getView().setModel(oExpYears, "ExpYears");
+
+          // this.byId("V1_ID_Table").setBusy(true);
+
+
+
           const oView = this.getView();
             this.getBusyDialog();
 
