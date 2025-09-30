@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+ <Title level="H1" text="{i18n>ourPartnerProducts}" class="ProductDemoSection" wrapping="true"/>
     
     <l:Grid defaultSpan="XL6 L6 M6 S12" class="grid-container">
-        
         <!-- HR solution -->
         <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
             <HBox justifyContent="Center" class="section-image">
@@ -97,12 +97,6 @@
  <HBox class="footer-bar sapUiSmallMargin" alignItems="Center" justifyContent="SpaceBetween" >
         <!-- Left: Copyright -->
         <Text text="{i18n>companynameKT}" class="footer-text"/>
-        <!-- Middle: Links -->
-        <!-- <HBox class="footer-links" justifyContent="Center">
-            <Link text="Disclaimer" href="#" target="_blank" class="footer-link"/>
-            <Link text="Privacy" href="#" target="_blank" class="footer-link"/>
-            <Link text="Modern Slavery Statement" href="#" target="_blank" class="footer-link"/>
-        </HBox> -->
 
         <!-- Right: Social Icons -->
         <HBox class="footer-social" justifyContent="End">

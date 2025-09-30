@@ -1,0 +1,97 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+
+<Title level="H1" text="{i18n>ourProducts}" class="ProductDemoSection" wrapping="true"/>
+    
+    <l:Grid defaultSpan="XL6 L6 M6 S12" class="grid-container">
+        <!-- Workzone -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
+            <VBox justifyContent="Center" id="videoFrametour_WorkZone">
+                <core:HTML id="videoFrameHtml_WorkZone"
+                    content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                &lt; 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                    &lt;source src='../Videos/Workzone.mp4' type='video/mp4'&gt;
+                                    Your browser does not support the video tag.
+                                &lt;/video&gt;
+                            &lt;/div&gt;" />
+            </VBox>
+            <Text class="hr-text sapUiSmallMargin" text="Advance Workzone (Casestudy)" />
+            <Text class="description-text sapUiSmallMargin" text="{i18n>workZone}" />
+        </VBox>
+
+         <!-- ChandraShilp Automotive LLP -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
+            <VBox justifyContent="Center" id="videoFrametourl_Shah">
+                <core:HTML id="videoFrameHtml_Shah"
+                    content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                    &lt;source src='../Videos/Shah H.mp4' type='video/mp4'&gt;
+                                    Your browser does not support the video tag.
+                                &lt;/video&gt;
+                            &lt;/div&gt;" />
+            </VBox>
+            <Text class="hr-text sapUiSmallMargin" text="ChandraShilp Automotive LLP (Project)" />
+            <Text class="description-text sapUiSmallMargin" text="{i18n>shahHyundai}" />
+        </VBox>
+
+        <!-- Customer Portal -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
+            <VBox justifyContent="Center" id="videoFrametour_Customer">
+                <core:HTML id="videoFrameHtml_Customer"
+                    content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                    &lt;source src='../Videos/Kvriksha Customer.mp4' type='video/mp4'&gt;
+                                    Your browser does not support the video tag.
+                                &lt;/video&gt;
+                            &lt;/div&gt;" />
+            </VBox>
+            <Text class="hr-text sapUiSmallMargin" text="Customer Portal (Project)" />
+            <Text class="description-text sapUiSmallMargin" text="{i18n>customerPortal}" />
+        </VBox>
+
+        <!-- Supplier Portal -->
+        <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
+            <VBox justifyContent="Center" id="videoFrametourl_Supplier">
+                <core:HTML id="videoFrameHtml_Supplier"
+                    content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;background:#f3f3f3;'&gt;
+                                &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                    &lt;source src='../Videos/Kvriksha Supplier.mp4' type='video/mp4'&gt;
+                                    Your browser does not support the video tag.
+                                &lt;/video&gt;
+                            &lt;/div&gt;" />
+            </VBox>
+            <Text class="hr-text sapUiSmallMargin" text="Supplier Portal (Project)" />
+            <Text class="description-text sapUiSmallMargin" text="{i18n>supplierPortal}" />
+        </VBox>
+
+         <!-- S/4 Hana -->
+        <!-- <VBox class="ProductSoluction sapUiSmallMargin" backgroundDesign="Solid">
+            <HBox justifyContent="Center" class="section-image">
+                <Image src="../image/S4 Hana.png" width="750px" height="250px" visible="true" class="section-image"/>
+            </HBox>
+              <Text class="hr-text sapUiSmallMargin" text="SAP S/4 HANA Public Cloud (Project)" wrapping="true"/>
+            <Text class="description-text sapUiSmallMargin" text="{i18n>S4Hana}" />
+        </VBox> -->
+    </l:Grid>
+
+     <!-- Footer -->
+ <HBox class="footer-bar sapUiSmallMargin" alignItems="Center" justifyContent="SpaceBetween" >
+        <!-- Left: Copyright -->
+        <Text text="{i18n>companynameKT}" class="footer-text"/>
+        <!-- Right: Social Icons -->
+        <HBox class="footer-social" justifyContent="End">
+            <core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/' target='_blank'&gt;
+                                  &lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+            <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank'&gt;
+                                  &lt;i class='fab fa-linkedin-in social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+            <core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank'&gt;
+                                  &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;
+                                &lt;/a&gt;"/>
+        </HBox>
+    </HBox>
+</core:FragmentDefinition>
