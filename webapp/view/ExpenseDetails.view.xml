@@ -151,10 +151,13 @@
 													<m:Text
 														text="{ItemExpenseModel>ItemType}"
 														visible="{= ${ItemExpenseModel>ItemType} === 'Peridiem' }" />
-
+													<m:Text
+														text="{ItemExpenseModel>ItemType}"
+														visible="{= ${ItemExpenseModel>ItemType} === 'Night Allowance' }" />
 													<m:Link
 														text="{ItemExpenseModel>ItemType}"
-														visible="{= ${ItemExpenseModel>ItemType} !== 'Peridiem' }"
+														visible="{= ${ItemExpenseModel>ItemType} !== 'Peridiem' 
+																&amp;&amp; ${ItemExpenseModel>ItemType} !== 'Night Allowance'}"
 														press="OnPressAttachment" />
 												</m:HBox>
 

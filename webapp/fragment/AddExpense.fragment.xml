@@ -42,6 +42,7 @@
 				<ComboBox id="exp-Id-TravelAllowance" valueStateText="{i18n>selecttravelallownce}" change="exp_validateTravelAllownce" showSecondaryValues="true"  selectedKey="{CreateExpenseModel>/TravelAllowance}">
 					<core:Item key="{i18n>no}" text="{i18n>no}" />
 					<core:Item key="{i18n>yes}" text="{i18n>yes}" />
+					<core:Item key="{i18n>nightallowance}" text="{i18n>nightallowance}" />
 				</ComboBox>
 				<!-- Country -->
 				<Label text="{i18n>expCountry}" required="true"/>

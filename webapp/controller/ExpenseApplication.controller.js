@@ -162,6 +162,7 @@ sap.ui.define([
             core.byId("exp-Id-StartDate").setValueState("None");
             core.byId("exp-Id-EndDate").setValueState("None");
             core.byId("exp-Id-Country").setValueState("None");
+            core.byId("exp-Id-State").setValueState("None");
             core.byId("exp-Id-Source").setValueState("None");
             core.byId("exp-Id-Destination").setValueState("None");
             core.byId("exp-Id-EmployeeRemark").setValueState("None");
