@@ -299,19 +299,19 @@ sap.ui.define([
                 });
                 if (oResponse) {
                     that.Expense.close();
-                    await that.Exp_onPressClear();
+                    that.Exp_onPressClear();
                     await that._fetchCommonData("AllowanceTotalCalculation", "", {
-                        AllowanceID: oResponse.AllowanceID
+                        AllowanceID: oResponse.AllowanceID, EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
                     });
                     this.closeBusyDialog();
                     that.onChangeEmployeeID();
                     await that.Exp_onSearch();
-                    MessageToast.show(that.i18nModel.getText("expenseCreatedMess"));
+                    MessageToast.show(that.i18nModel.getText("allowanceCreatedMess"));
                 } else {
-                    MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
+                    MessageToast.show(that.i18nModel.getText("allowanceCreatedMessFailed"));
                 }
             } catch (oError) {
-                MessageToast.show(that.i18nModel.getText("expenseCreatedMessFailed"));
+                MessageToast.show(that.i18nModel.getText("allowanceCreatedMessFailed"));
             } finally {
                 this.closeBusyDialog();
             }
