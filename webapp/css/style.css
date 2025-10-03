@@ -2889,7 +2889,7 @@ body, html, .sapUiBody {
   height: 100%;
   border: none;
   border-radius: 15px;
-  object-fit: cover; /* change to 'contain' if you don’t want cropping */
+  object-fit: contain; /* change to 'contain' if you don’t want cropping */
 }
 
 .openingbutton{

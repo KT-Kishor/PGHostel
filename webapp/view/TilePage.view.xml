@@ -220,6 +220,11 @@
 															<ImageContent src="sap-icon://business-objects-experience" />
 														</TileContent>
 													</GenericTile>
+													<GenericTile visible="{= ${AppVisibilityModel>/AllowanceApp} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>allowance}" press="TileV_onpressAllowanceApp">
+														<TileContent unit="{i18n>subhead}">
+															<ImageContent src="sap-icon://payment-approval" />
+														</TileContent>
+													</GenericTile>
 												</layout:HorizontalLayout>
 											</ux:blocks>
 										</ux:ObjectPageSubSection>

@@ -778,7 +778,17 @@
                    "name": "Job_Details",
                    "pattern": "Job_Details",
                    "target": ["TargetJob_Details"]
-                 }
+                 },
+                 {
+                    "name": "RouteAllowancePage",
+                    "pattern": "Allowance",
+                    "target": "TargetAllowance"
+                },
+                {
+                    "name": "RouteAllowanceDetails",
+                    "pattern": "AllowanceDetails/{sPath}",
+                    "target": "TargetAllowanceDetails"
+                }
             ],
             "targets": {
               "TargetView1": {
@@ -1175,74 +1185,84 @@
                 "viewName": "HP_View"
               },
               "TargetExpenseInvoice": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "ExpenseInvoice",
-          "viewName": "ExpenseInvoice"
-        },
-         "TargetExpenseInvoiceDetails":{
-           "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "ExpenseInvoiceDetail",
-          "viewName": "ExpenseInvoiceDetail"
-        },
-          "TargetMaintainData":{
-            "viewType": "XML",
+              "viewType": "XML",
+              "transition": "slide",
+              "clearControlAggregation": false,
+              "viewId": "ExpenseInvoice",
+              "viewName": "ExpenseInvoice"
+            },
+            "TargetExpenseInvoiceDetails":{
+              "viewType": "XML",
+              "transition": "slide",
+              "clearControlAggregation": false,
+              "viewId": "ExpenseInvoiceDetail",
+              "viewName": "ExpenseInvoiceDetail"
+            },
+              "TargetMaintainData":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "MaintainData",
+                    "viewName": "MaintainData"
+              
+            }, 
+            "TargetHRSolution":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "HRSolutions_Demo",
+                    "viewName": "HRSolutions_Demo"
+              
+            },
+              "TargetInvoicemanage":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Invoice_Solution_Demo",
+                    "viewName": "Invoice_Solution_Demo"
+              
+            },
+            "TargetCompanyasset":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "IT_Asset_Demo",
+                    "viewName": "IT_Asset_Demo"
+              
+            },
+            "TargetRecuritment":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Recuritment_Demo",
+                    "viewName": "Recuritment_Demo"
+            },
+            "TargetAutoMobile":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "AutoMobile_Demo",
+                    "viewName": "AutoMobile_Demo"
+            },
+            "TargetIDCardgenerate":{
+                "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "IDCardgenerate",
+                    "viewName": "IDCardgenerate"
+            },
+            "TargetAllowance": {
+                "viewType": "XML",
                 "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "MaintainData",
-                "viewName": "MaintainData"
-          
-        }, 
-        "TargetHRSolution":{
-            "viewType": "XML",
+                "viewId": "Allowance",
+                "viewName": "AllowanceApplication"
+              },
+              "TargetAllowanceDetails": {
+                "viewType": "XML",
                 "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "HRSolutions_Demo",
-                "viewName": "HRSolutions_Demo"
-          
-        },
-           "TargetInvoicemanage":{
-            "viewType": "XML",
-                "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "Invoice_Solution_Demo",
-                "viewName": "Invoice_Solution_Demo"
-          
-        },
-         "TargetCompanyasset":{
-            "viewType": "XML",
-                "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "IT_Asset_Demo",
-                "viewName": "IT_Asset_Demo"
-          
-        },
-         "TargetRecuritment":{
-            "viewType": "XML",
-                "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "Recuritment_Demo",
-                "viewName": "Recuritment_Demo"
-        },
-         "TargetAutoMobile":{
-            "viewType": "XML",
-                "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "AutoMobile_Demo",
-                "viewName": "AutoMobile_Demo"
-        }
-       ,
-        "TargetIDCardgenerate":{
-            "viewType": "XML",
-                "transition": "slide",
-                "clearControlAggregation": false,
-                "viewId": "IDCardgenerate",
-                "viewName": "IDCardgenerate"
-        }
-    
+                "viewId": "AllowanceDetails",
+                "viewName": "AllowanceDetails"
+              }
             }
         },
         "rootView": {

@@ -422,12 +422,14 @@ sap.ui.define(
         TileV_JobPosting: function () {
           this.getRouter().navTo("RouteHP_View");
         },
-
         TileV_onpressInvoiceDashboard: function () {
           this.getRouter().navTo("RouteInvoiceDashboard");
         },
         TileV_onpressExpenseInvoiceDashboard:function(){
           this.getRouter().navTo("ExpenseInvoice");
+        },
+        TileV_onpressAllowanceApp:function(){
+          this.getRouter().navTo("RouteAllowancePage");
         },
 onTileRefresh: async function () {
     this.getBusyDialog();
