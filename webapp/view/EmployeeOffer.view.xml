@@ -20,15 +20,11 @@
 						</ComboBox>
 					</fb:control>
 				</fb:FilterGroupItem>
-				<fb:FilterGroupItem name="BaseLocation" label="{i18n>companyBranch}" groupName="Group1" visibleInFilterBar="true">
+				<fb:FilterGroupItem name="BaseLocation" label="{i18n>baseLocation}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox items="{CompanyCodeDetailsModel>/}" showClearIcon="true" showSecondaryValues="true" id="EO_id_DesiFilter">
-								 <core:ListItem
-                                key="{CompanyCodeDetailsModel>city}"
-                                text="{CompanyCodeDetailsModel>city}"
-                                additionalText="{CompanyCodeDetailsModel>companyCode}"
-                            />
-							</ComboBox>
+						<ComboBox items="{path:'BaseLocationModel>/', sorter: {path:'BaseLocation', descending:false }}" showClearIcon="true">
+						<core:Item key="{BaseLocationModel>BaseLocation}" text="{BaseLocationModel>BaseLocation}" />
+						</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="JoiningDate" label="{i18n>joiningDate}" groupName="Group1" visibleInFilterBar="true">

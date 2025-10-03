@@ -38,7 +38,7 @@ sap.ui.define(
                         this.getBusyDialog()
                         // if (!this.getView().getModel("CurrencyModel")) this._fetchCommonData("Currency", "CurrencyModel");
                         // await this._fetchCommonData("CompanyCodeDetails", "CompanyCodeDetailsModel")
-                        if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice", Action: "CC" });
+                        this._fetchCommonData("EmailContent", "CCMailModel", { Type: "ConsultantInvoice", Action: "CC" });
 
                         var oInvoiceModel = new JSONModel({
                             EmployeeID: "", ConsultantName: "", InvoiceTo: "", InvoiceAddress: "",

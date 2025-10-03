@@ -61,6 +61,18 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/m/MessageToast", 
             }
           });
           oInitialModel.setData(uniqueConsultants);
+          const uniqueLocations = [];
+          const seenLocations = new Set();
+          aInitialData.forEach((item) => {
+            if (item.BaseLocation && !seenLocations.has(item.BaseLocation)) {
+              seenLocations.add(item.BaseLocation);
+              uniqueLocations.push({
+                BaseLocation: item.BaseLocation,
+              });
+            }
+          });
+          const oBaseLocModel = new sap.ui.model.json.JSONModel(uniqueLocations);
+          this.getView().setModel(oBaseLocModel, "BaseLocationModel");
           await this._fetchCommonData("EmployeeOffer", "EmployeeOfferModel", params);
         } else {
           this.EO_onSearch();
