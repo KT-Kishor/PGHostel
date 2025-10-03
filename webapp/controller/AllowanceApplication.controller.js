@@ -235,6 +235,11 @@ sap.ui.define([
                 }).then(function(Expense) {
                     this.Expense = Expense;
                     oView.addDependent(this.Expense);
+                    // Always clear dates first time as well
+                    var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+                    if (oDateMultiBox) {
+                        oDateMultiBox.removeAllSelectedItems();
+                    }
                     var today = new Date();
                     var iMonth = today.getMonth(); // 0–11
                     var iYear = today.getFullYear();
@@ -245,6 +250,10 @@ sap.ui.define([
                     this.Expense.open();
                 }.bind(this));
             } else {
+                var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+                if (oDateMultiBox) {
+                    oDateMultiBox.removeAllSelectedItems();
+                }
                 var today = new Date();
                 var iMonth = today.getMonth(); // 0–11
                 var iYear = today.getFullYear();
@@ -260,6 +269,10 @@ sap.ui.define([
         Exp_Frg_onPressClose: function() {
             this.Expense.close();
             var core = sap.ui.getCore();
+            var oDateMultiBox = core.byId("dateMultiBox"); // Clear dates on close
+            if (oDateMultiBox) {
+                oDateMultiBox.removeAllSelectedItems();
+            }
             core.byId("All_id_AllowanceName").setValueState("None");
             core.byId("monthSelect").setValueState("None");
             core.byId("yearSelect").setValueState("None");
@@ -277,6 +290,7 @@ sap.ui.define([
             try {
                 const isValid =
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("All_id_AllowanceName"), "ID") &&
+                    this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBox")) &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("All_id_TravelAllowance"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("All_id_Country"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("All_id_State"), "ID") &&
@@ -326,6 +340,29 @@ sap.ui.define([
 
         Exp_onLiveExpenseName: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent, "oEvent");
+        },
+
+        onSelectdate: function(oEvent) {
+            var oMultiComboBox = oEvent.getSource();
+            var sNewValue = oEvent.getParameter("newValue");
+            if (sNewValue) {
+                oMultiComboBox.setValueState("None");
+            } else {
+                oMultiComboBox.setValueState("Error");
+                oMultiComboBox.setValueStateText(this.i18nModel.getText("selectDate"));
+            }
+        },
+
+         _LCvalidateMultiComboBox: function(oMultiComboBox) {
+            if (!oMultiComboBox) return false;
+            var aSelectedKeys = oMultiComboBox.getSelectedKeys();
+            if (!aSelectedKeys || aSelectedKeys.length === 0) {
+                oMultiComboBox.setValueState("Error");
+                oMultiComboBox.setValueStateText(this.i18nModel.getText("selectDate")); // from i18n
+                return false;
+            }
+            oMultiComboBox.setValueState("None");
+            return true;
         },
 
         Exp_onChangeCountry: function(oEvent) {
