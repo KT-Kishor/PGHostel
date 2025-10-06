@@ -153,6 +153,42 @@ sap.ui.define([
             oDateMultiBox.setModel(oModel);
         },
 
+        _initCurrentMonthData: function() {
+            var today = new Date();
+            var iMonth = today.getMonth(); // 0–11
+            var iYear = today.getFullYear();
+
+            var core = sap.ui.getCore();
+            var oMonthSelect = core.byId("monthSelect");
+            var oYearSelect = core.byId("yearSelect");
+            var oDateMultiBox = core.byId("dateMultiBox");
+
+            // Preselect current month & year
+            if (oMonthSelect) oMonthSelect.setSelectedKey(iMonth.toString());
+            if (oYearSelect) oYearSelect.setSelectedKey(iYear.toString());
+
+            // Set start & end date in model
+            this._setAllowanceDates(iMonth, iYear);
+            var iLastDay = new Date(iYear, iMonth + 1, 0).getDate(); 
+            var aDates = [];
+            for (var d = 1; d <= iLastDay; d++) {
+                var sDay = String(d).padStart(2, "0");
+                var sMonth = String(iMonth + 1).padStart(2, "0");
+                var sYear = iYear;
+                var sFormatted = `${sDay}/${sMonth}/${sYear}`;
+                aDates.push({ key: sFormatted, day: sFormatted });
+            }
+
+            if (oDateMultiBox) {
+                var oModel = new sap.ui.model.json.JSONModel({ dates: aDates });
+                oDateMultiBox.setModel(oModel);
+                oDateMultiBox.bindItems({
+                    path: "/dates",
+                    template: new sap.ui.core.Item({ key: "{key}", text: "{day}" })
+                });
+            }
+        },
+
         onTableSelectionChange: function(oEvent) {
             var Status = oEvent.getSource().getSelectedItem().getBindingContext("AllowanceModel").getObject().Status;
             this.DeleteAllowanceID = oEvent.getSource().getSelectedItem().getBindingContext("AllowanceModel").getObject().AllowanceID;
@@ -221,10 +257,10 @@ sap.ui.define([
 
         // Open the "Add Expense" fragment
         Exp_onPressAddExpense: function() {
-            this.CommonModel(); // resets the CreateAllowanceModel
+            this.CommonModel();
             var oView = this.getView();
             var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
-            if (oDateMultiBox) {  // Clear previously selected dates in MultiComboBox
+            if (oDateMultiBox) {
                 oDateMultiBox.removeAllSelectedItems();
             }
             var oView = this.getView();
@@ -235,32 +271,11 @@ sap.ui.define([
                 }).then(function(Expense) {
                     this.Expense = Expense;
                     oView.addDependent(this.Expense);
-                    // Always clear dates first time as well
-                    var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
-                    if (oDateMultiBox) {
-                        oDateMultiBox.removeAllSelectedItems();
-                    }
-                    var today = new Date();
-                    var iMonth = today.getMonth(); // 0–11
-                    var iYear = today.getFullYear();
-                    sap.ui.getCore().byId("monthSelect").setSelectedKey(iMonth.toString()); // Preselect month & year
-                    sap.ui.getCore().byId("yearSelect").setSelectedKey(iYear.toString());
-                    this._setAllowanceDates(iMonth, iYear);
-                    this._updateDateList(iMonth, iYear); // Populate dates
+                    this._initCurrentMonthData(); 
                     this.Expense.open();
                 }.bind(this));
             } else {
-                var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
-                if (oDateMultiBox) {
-                    oDateMultiBox.removeAllSelectedItems();
-                }
-                var today = new Date();
-                var iMonth = today.getMonth(); // 0–11
-                var iYear = today.getFullYear();
-                sap.ui.getCore().byId("monthSelect").setSelectedKey(iMonth.toString()); // Preselect month & year
-                sap.ui.getCore().byId("yearSelect").setSelectedKey(iYear.toString());
-                this._setAllowanceDates(iMonth, iYear);
-                this._updateDateList(iMonth, iYear); // Populate dates
+                this._initCurrentMonthData(); 
                 this.Expense.open();
             }
         },

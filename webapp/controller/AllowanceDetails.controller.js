@@ -323,6 +323,15 @@ sap.ui.define([
             LC_ExpComments: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
+
+            LC_ValidateDate: function (oEvent) {
+                const oToDatePicker = oEvent.getSource(); // DatePicker control
+                const oToDate = oToDatePicker.getDateValue(); // Date object
+                if (oToDate) {
+                        oToDatePicker.setValueState("None"); // Clear error state
+                }
+            },
+
             //Source Validation
             Exp_Det_SourceChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent, "oEvent");
@@ -471,18 +480,7 @@ sap.ui.define([
 
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_modeofPayment"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) {
-
-                //      var oModel = this.getView().getModel("AllowanceCreateModel").getData();
-                //     // Step 1: Get existing dates from FilterModel
-                //    var existingDates = oModel.AllowanceDate
-                //     var newDate = oModel.AllowanceDate; // date being submitted
-
-                //     // Step 2: Check if new date already exists
-                //     if (existingDates.includes(newDate)) {
-                //         MessageToast.show("Allowance already exists for this date!");
-                //         return; // stop further execution
-                //     }
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_modeofPayment"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("item_id_AllowanceDate"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
 
                     var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
@@ -527,12 +525,7 @@ sap.ui.define([
             async Exp_Det_onPressSaveExpense() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
                 var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
-                // var existingDates = oModel.AllowanceDate ? FilterModel.Dates.split(",") : [];
-                // if (existingDates.includes(oModel.AllowanceDate)) {
-                //     MessageToast.show("Allowance already exists for this date!");
-                //     return;
-                // }
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") &&
+                if (utils._LCvalidateDate(sap.ui.getCore().byId("item_id_AllowanceDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") &&
                     (
                         oModel.ItemType === "Perdiem Declaration"
                             ? true

@@ -217,10 +217,12 @@ sap.ui.define([
       const { Status, Type } = this.oModelData;
       const isSubmitted = Status === "Submitted";
       const isExpense = Type === "Expense";
-      this.byId("MI_id_ButApprove").setVisible(isSubmitted);
-      this.byId("MI_id_ButReject").setVisible(isSubmitted);
-      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account"));
-      this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account");
+      const isAllowance = Type === "Allowance";  
+      
+      this.byId("MI_id_ButApprove").setVisible(isSubmitted || isAllowance); 
+      this.byId("MI_id_ButReject").setVisible(isSubmitted || isAllowance);  
+      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account") || isAllowance); 
+      this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account" || isAllowance);
     },
 
     MI_onPressColNavigation:async function(oEvent) {

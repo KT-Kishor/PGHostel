@@ -19,8 +19,8 @@
 						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
 					</ComboBox>
 					<!-- Expense Date -->
-					<Label text="{i18n>expDetExpenseDate}" required="true" />
-					<DatePicker minDate="{viewModel>/MinDate}" id="item_id_AllowanceDate" maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{AllowanceCreateModel>/AllowanceDate}"/>
+					<Label text="{i18n>allowancedate}" required="true" />
+					<DatePicker minDate="{viewModel>/MinDate}" id="item_id_AllowanceDate" maxDate="{viewModel>/MaxDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{AllowanceCreateModel>/AllowanceDate}" change="LC_ValidateDate"/>
 					<!-- Expense Amount -->
 					<Label text="{i18n>allowanceAmount}" required="true"/>
 					<HBox width="100%" justifyContent="SpaceBetween">

@@ -119,7 +119,7 @@
 											<m:Label text="{i18n>expDetForeignAmount}" />
 										</m:Column>
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
-											<m:Label text="{i18n>expDetExpenseAmount}" />
+											<m:Label text="{i18n>allowanceAmount}" />
 										</m:Column>
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Label text="{i18n>expModeOfPayment}" />
@@ -144,7 +144,7 @@
 														<m:Text text="{i18n>expConversionRate} : {path:'ItemAllowanceModel>ConversionRate',formatter:'.Formatter.fromatNumber'}" visible="{= ${ItemAllowanceModel>Currency} !== 'INR'}" />
 													</m:HBox>
 												</m:VBox>
-												<m:Text text="INR {path:'ItemAllowanceModel>ExpenseAmount', formatter: '.Formatter.fromatNumber'}" />
+												<m:Text text="INR {path:'ItemAllowanceModel>AllowanceAmount', formatter: '.Formatter.fromatNumber'}" />
 												<m:ObjectStatus inverted="true" text="{ItemAllowanceModel>ModeOfPayment}" state="{path: 'ItemAllowanceModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
 												<!-- <m:Text text="{ItemAllowanceModel>Comments}" />													 -->
 												<m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
