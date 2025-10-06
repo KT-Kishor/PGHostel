@@ -1253,7 +1253,7 @@ sap.ui.define(
                     const sPayByDate = oDateFormat.format(this.byId("CI_id_PaybyInv").getDateValue());
 
                     var isMandatoryValid = (
-                        utils._LCstrictValidationComboBox(this.byId("CI_id_CompanyCode"), "ID") &&
+                        // utils._LCstrictValidationComboBox(this.byId("CI_id_CompanyCode"), "ID") &&
                         utils._LCvalidateDate(this.byId("CI_id_InDate"), "ID") &&
                         utils._LCvalidateDate(this.byId("CI_id_PaybyInv"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CI_id_InputInvoiceTo"), "ID") &&

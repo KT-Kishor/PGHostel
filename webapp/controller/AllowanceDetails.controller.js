@@ -13,7 +13,7 @@ sap.ui.define([
         return Controller.extend("sap.kt.com.minihrsolution.controller.AllowanceDetails", {
             Formatter: Formatter,
             onInit: function () {
-                // Attach route matched event for "RouteExpensDetails"
+                // Attach route matched event for "RouteAllowanceDetails"
                 this.getRouter().getRoute("RouteAllowanceDetails").attachMatched(this._onRouteMatched, this);
             },
 
