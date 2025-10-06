@@ -222,7 +222,7 @@ sap.ui.define([
       this.byId("MI_id_ButApprove").setVisible(isSubmitted || isAllowance); 
       this.byId("MI_id_ButReject").setVisible(isSubmitted || isAllowance);  
       this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account") || isAllowance); 
-      this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account" || isAllowance);
+      this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account");
     },
 
     MI_onPressColNavigation:async function(oEvent) {
