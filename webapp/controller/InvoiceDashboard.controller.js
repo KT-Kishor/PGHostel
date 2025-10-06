@@ -225,13 +225,16 @@ sap.ui.define([
                 }, {});
 
             this._oGroupedInvoices = {};
-            const statusCounts = aFilteredData.reduce((acc, item) => {
-                const status = item.Status || "Unknown";
-                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
+           const statusAmounts = aFilteredData.reduce((acc, item) => {
+            const status = item.Status || "Unknown";
+          if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
                 this._oGroupedInvoices[status].push(item);
-                acc[status] = (acc[status] || 0) + 1;
+
+                const totalAmount = this._getInrValue(item);
+                acc[status] = (acc[status] || 0) + totalAmount;
                 return acc;
             }, {});
+
 
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const company = item.CustomerName;
@@ -308,7 +311,12 @@ sap.ui.define([
                 .sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR)
                 .slice(0, 5);
 
-            const formattedStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
+            const formattedStatus = Object.entries(statusAmounts)
+    .map(([status, totalAmount]) => ({
+        status,
+        totalAmountInINR: totalAmount
+    }));
+
 
             let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => {
                 const totalAmountInINR = values.invoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);

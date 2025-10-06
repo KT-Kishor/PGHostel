@@ -63,11 +63,11 @@
                                                     <viz:dataset>
                                                         <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
                                                             <vizData:dimensions> <vizData:DimensionDefinition name="Status" value="{chartData>status}" /> </vizData:dimensions>
-                                                            <vizData:measures> <vizData:MeasureDefinition name="Count" value="{chartData>count}" /> </vizData:measures>
+                                                            <vizData:measures> <vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" /> </vizData:measures>
                                                         </vizData:FlattenedDataset>
                                                     </viz:dataset>
                                                     <viz:feeds>
-                                                        <vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
+                                                        <vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
                                                         <vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
                                                     </viz:feeds>
                                                 </viz:VizFrame>
