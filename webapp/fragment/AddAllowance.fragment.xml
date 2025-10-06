@@ -31,6 +31,19 @@
 				<!-- Expense Name -->
 				<Label text="{i18n>allowanceName}" required="true"/>
 				<Input value="{CreateAllowanceModel>/AllowanceName}" valueStateText="{i18n>expenseNamePlaceholder}" id="All_id_AllowanceName" liveChange="Exp_onLiveExpenseName" placeholder="{i18n>expenseNamePlaceholder}" change="onInputChange" maxLength="50" />
+				  <!-- Year -->
+                <Label text="Select Year" required="true"/>
+                <Select id="yearSelect" change=".onMonthChange">
+                    <items>
+					    <core:Item key="2024" text="2024"/>
+                        <core:Item key="2025" text="2025"/>
+                        <core:Item key="2026" text="2026"/>
+						<core:Item key="2027" text="2027"/>
+                        <core:Item key="2028" text="2028"/>
+						<core:Item key="2029" text="2029"/>
+                        <core:Item key="2030" text="2030"/>
+                    </items>
+                </Select>
 				  <!-- Month -->
                 <Label text="Select Month" required="true"/>
                 <Select id="monthSelect" change=".onMonthChange">
@@ -50,19 +63,6 @@
                     </items>
                 </Select>
 
-                <!-- Year -->
-                <Label text="Select Year" required="true"/>
-                <Select id="yearSelect" change=".onMonthChange">
-                    <items>
-					    <core:Item key="2024" text="2024"/>
-                        <core:Item key="2025" text="2025"/>
-                        <core:Item key="2026" text="2026"/>
-						<core:Item key="2027" text="2027"/>
-                        <core:Item key="2028" text="2028"/>
-						<core:Item key="2029" text="2029"/>
-                        <core:Item key="2030" text="2030"/>
-                    </items>
-                </Select>
 
                 <!-- Multi Date Picker via MultiComboBox -->
                 <Label text="Select Dates" required="true"/>

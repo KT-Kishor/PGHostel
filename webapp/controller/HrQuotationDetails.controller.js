@@ -46,9 +46,9 @@ sap.ui.define(
             CompanyCode: oRawData.companyCode,
             STDCode: "+91",
             CustomerSTDCode: "+91",
-            Country:oRawData.country ,
-            State: oRawData.state ,
-            Branch:oRawData.branch ,
+            Country: oRawData.country,
+            State: oRawData.state,
+            Branch: oRawData.branch,
             Currency: "INR",
             gstEditable: true,
             IGSTSelected: false,
@@ -116,7 +116,6 @@ sap.ui.define(
             // Check currency and set visibility accordingly
             var sCurrency = oSelectedQuotation.Currency || "INR";
             var bShowGSTFields = sCurrency === "INR";
-            // oSelectedModel.setProperty("/Percentage", " ")
             // Convert Notes from HTML to plain text for display
             var sNotes = oSelectedModel.getProperty("/Notes");
             if (sNotes) {
@@ -149,7 +148,7 @@ sap.ui.define(
                 this.getView().setModel(oQuotationModel, "QuotationModel");
                 this.updateTotalAmount();
               }
-               this._applyCountryStateCityFilters();
+              this._applyCountryStateCityFilters();
             } catch (e) {
               MessageToast.show("Error loading items", e);
             }
@@ -179,90 +178,90 @@ sap.ui.define(
         this.CommonLogoutFunction();
       },
       _applyCountryStateCityFilters: function () {
-                const oModel     = this.getView().getModel("SingleCompanyModel");
-                const oCountryCB = this.byId("HQD_id_Country");
-                const oStateCB   = this.byId("HRQstate");
-                const oSourceCB  = this.byId("HQD_id_BranchCode");
+        const oModel = this.getView().getModel("SingleCompanyModel");
+        const oCountryCB = this.byId("HQD_id_Country");
+        const oStateCB = this.byId("HRQstate");
+        const oSourceCB = this.byId("HQD_id_BranchCode");
 
-                 const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
-                const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
-                const sSource    = oModel.getProperty("/Branch");  // e.g. "Bongaree"
+        const sCountry = oModel.getProperty("/Country");     //  "Australia"
+        const sState = oModel.getProperty("/State");       //  "Queensland"
+        const sSource = oModel.getProperty("/Branch");  //  "Bongaree"
 
-                // Get bindings safely
-                const oStateBinding  = oStateCB?.getBinding("items");
-                const oSourceBinding = oSourceCB?.getBinding("items");
+        // Get bindings safely
+        const oStateBinding = oStateCB?.getBinding("items");
+        const oSourceBinding = oSourceCB?.getBinding("items");
 
-                // Reset filters if bindings exist
-                if (oStateBinding) {
-                    oStateBinding.filter([]);
-                }
-                if (oSourceBinding) {
-                    oSourceBinding.filter([]);
-                }
+        // Reset filters if bindings exist
+        if (oStateBinding) {
+          oStateBinding.filter([]);
+        }
+        if (oSourceBinding) {
+          oSourceBinding.filter([]);
+        }
 
-                if (sCountry) {
-                    const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
-                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+        if (sCountry) {
+          const aCountryData = this.getView().getModel("CountryModel")?.getData() || [];
+          const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
 
-                    if (oCountryObj) {
-                        const sCountryCode = oCountryObj.code; 
+          if (oCountryObj) {
+            const sCountryCode = oCountryObj.code;
 
-                        // Filter States by CountryCode
-                        if (oStateBinding) {
-                            oStateBinding.filter([
-                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                            ]);
-                        }
+            // Filter States by CountryCode
+            if (oStateBinding) {
+              oStateBinding.filter([
+                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+              ]);
+            }
 
-                        // Filter Cities by State + CountryCode
-                        if (sState && oSourceBinding) {
-                            oSourceBinding.filter([
-                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
-                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                            ]);
-                        }
-                    }
-                }
+            // Filter Cities by State + CountryCode
+            if (sState && oSourceBinding) {
+              oSourceBinding.filter([
+                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+              ]);
+            }
+          }
+        }
 
-                // Restore selection back in UI
-                if (oCountryCB) {
-                    oCountryCB.setSelectedKey(sCountry || "");
-                }
-                if (oStateCB) {
-                    oStateCB.setSelectedKey(sState || "");
-                }
-                if (oSourceCB) {
-                    oSourceCB.setSelectedKey(sSource || "");
-                }
-            },
-HQD_onCompanyCodeChange: function (oEvent) {
-  utils._LCstrictValidationComboBox(oEvent);
-    var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
-    var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
-    var oSelectedCompany = aCompanyData.find(function (item) {
-        return item.companyCode === sSelectedCompanyCode;
-    });
-    if (oSelectedCompany) {
-        var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
-        if (!oSingleCompanyModel) return;
-        var sMobileNo = oSelectedCompany.mobileNo || "";
-        var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
+        // Restore selection back in UI
+        if (oCountryCB) {
+          oCountryCB.setSelectedKey(sCountry || "");
+        }
+        if (oStateCB) {
+          oStateCB.setSelectedKey(sState || "");
+        }
+        if (oSourceCB) {
+          oSourceCB.setSelectedKey(sSource || "");
+        }
+      },
+      HQD_onCompanyCodeChange: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
+        var sSelectedCompanyCode = oEvent.getSource().getSelectedKey();
+        var aCompanyData = this.getView().getModel("CompanyCodeDetailsModel").getData() || [];
+        var oSelectedCompany = aCompanyData.find(function (item) {
+          return item.companyCode === sSelectedCompanyCode;
+        });
+        if (oSelectedCompany) {
+          var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
+          if (!oSingleCompanyModel) return;
+          var sMobileNo = oSelectedCompany.mobileNo || "";
+          var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;
 
-        oSingleCompanyModel.setProperty("/CompanyCode", oSelectedCompany.companyCode);
-        oSingleCompanyModel.setProperty("/CompanyName", oSelectedCompany.companyName);
-        oSingleCompanyModel.setProperty("/CompanyAddress", oSelectedCompany.longAddress);
-        oSingleCompanyModel.setProperty("/CompanyGSTNO", oSelectedCompany.gstin);
-        oSingleCompanyModel.setProperty("/CompanyEmailID", oSelectedCompany.carrerEmail);
-        oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
-        oSingleCompanyModel.setProperty("/Country", oSelectedCompany.country);
-        oSingleCompanyModel.setProperty("/State", oSelectedCompany.state);
-        oSingleCompanyModel.setProperty("/Branch", oSelectedCompany.branch);
-        oSingleCompanyModel.setProperty("/STDCode", "+91");
-        oSingleCompanyModel.setProperty("/Percentage", 9);
-        oSingleCompanyModel.setProperty("/Currency", "INR");
-        // Customer fields remain untouched
-    }
-},
+          oSingleCompanyModel.setProperty("/CompanyCode", oSelectedCompany.companyCode);
+          oSingleCompanyModel.setProperty("/CompanyName", oSelectedCompany.companyName);
+          oSingleCompanyModel.setProperty("/CompanyAddress", oSelectedCompany.longAddress);
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", oSelectedCompany.gstin);
+          oSingleCompanyModel.setProperty("/CompanyEmailID", oSelectedCompany.carrerEmail);
+          oSingleCompanyModel.setProperty("/CompanyMobileNo", sActualMobileNo);
+          oSingleCompanyModel.setProperty("/Country", oSelectedCompany.country);
+          oSingleCompanyModel.setProperty("/State", oSelectedCompany.state);
+          oSingleCompanyModel.setProperty("/Branch", oSelectedCompany.branch);
+          oSingleCompanyModel.setProperty("/STDCode", "+91");
+          oSingleCompanyModel.setProperty("/Percentage", 9);
+          oSingleCompanyModel.setProperty("/Currency", "INR");
+          // Customer fields remain untouched
+        }
+      },
 
 
 
@@ -514,7 +513,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oSingleCompanyModel.setProperty("/Percentage", 9);
           oSingleCompanyModel.setProperty("/CompanyGSTNO", "29ABAFK9719M1ZN");
           oQuotationModel.setProperty("/ShowSACAndGSTCalculation", true);
-           this.getView().byId("HQD_id_CompGSTNO").setEnabled(true);
+          this.getView().byId("HQD_id_CompGSTNO").setEnabled(true);
           // Calculate Total with GST
           var fNewTotal = fTotal + fCGST + fSGST + fIGST;
           oModelDataPro.setProperty("/TotalSum", fNewTotal.toFixed(2));
@@ -537,7 +536,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/IGSTSelected", false);
           oSingleCompanyModel.setProperty("/Percentage", "");
           oSingleCompanyModel.setProperty("/CompanyGSTNO", "");
-           this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
+          this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
           //  Mark all items as non-taxable (GSTCalculation = "No")
           var aItems = oQuotationModel.getProperty("/QuotationItemModel") || [];
           aItems.forEach(function (item) {
@@ -695,26 +694,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
           return;
         }
-        // Validate ValueState of Days, UnitPrice, and Discount fields in table
-        // const oTable = this.byId("HQD_id_SmartTableQuotationItem"); // Replace with your actual table ID
-        // const aItems = oTable.getItems();
-        // for (let i = 0; i < aItems.length; i++) {
-        //   const oItem = aItems[i];
-        //   const aCells = oItem.getCells();
-        //   // Access actual input controls (even if wrapped inside layout containers)
-        //   const oDaysInput = aCells[1].getContent ? aCells[1].getContent()[0] : aCells[1];
-        //   const oUnitPriceInput = aCells[2].getContent ? aCells[2].getContent()[0] : aCells[2];
-        //   const oDiscountInput = aCells[3].getContent ? aCells[3].getContent()[0] : aCells[3];
-        //   // Check if inputs are valid UI5 Input fields and check value state
-        //   if (
-        //     oDaysInput instanceof sap.m.Input && oDaysInput.getValueState() !== sap.ui.core.ValueState.None ||
-        //     oUnitPriceInput instanceof sap.m.Input && oUnitPriceInput.getValueState() !== sap.ui.core.ValueState.None ||
-        //     oDiscountInput instanceof sap.m.Input && oDiscountInput.getValueState() !== sap.ui.core.ValueState.None
-        //   ) {
-        //     MessageToast.show(`Please correct errors in item row ${i + 1} before submission.`);
-        //     return;
-        //   }
-        // }
+       
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
         const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
@@ -833,222 +813,222 @@ HQD_onCompanyCodeChange: function (oEvent) {
         const oData = oView.getModel("SingleCompanyModel").getData();
         const oQuotaionItem = oView.getModel("QuotationModel").getData();
         const aItems = oView.getModel("QuotationModel").getProperty("/QuotationItemModel") || [];
-        let filter = {   companyCode: oData.CompanyCode}
-         try {
-        const oCompanyDetailsModel = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-        });
-        let y = 10; // Starting Y position
-        const pageHeight = doc.internal.pageSize.getHeight();
-        // Logo
-        const imgblob = new Blob([new Uint8Array( oCompanyDetailsModel.data[0].companylogo?.data)], { type: "image/png" });
-        const img = await this._convertBLOBToImage(imgblob);
-        doc.addImage(img, "PNG", 13, y, 45, 45);
-        y += 50;
-        // Header Title
-        doc.setFontSize(25);
-        doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("quotation"), 158, 40);
-        // Company Info
-        doc.setFontSize(12);
-        doc.setFont("times", "bold");
-        doc.text(oData.CompanyName, 13, y);
-        y += 5;
-        doc.setFont("times", "normal");
-        const splitAddress1 = doc.splitTextToSize(oData.CompanyAddress || "", 80);
-        doc.text(splitAddress1, 13, y);
-        y += splitAddress1.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
-        doc.text(this.i18nModel.getText("pdfmobile") + oData.STDCode + " " + oData.CompanyMobileNo, 13, y);
-        y += 5;
-        doc.text(this.i18nModel.getText("pdfemail") + " " + oData.CompanyEmailID, 13, y);
-        y += 5;
-        if (oData.CompanyGSTNO) {
-          const oCompanygst = this.i18nModel.getText("pdfCustomerGst") + " " + oData.CompanyGSTNO;
-          doc.text(oCompanygst, 13, y);
-        }
-        y += 10;
-        // Quotation Metas
-        doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 36, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfDate"), 168, y - 31, { align: "right" });
-        doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 26, { align: "right" });
-        doc.setFont("times", "normal");
-        doc.text(oData.QuotationNo, 169, y - 36);
-        doc.text(Formatter.formatDate(oData.Date), 169, y - 31);
-        doc.text(Formatter.formatDate(oData.ValidUntil), 169, y - 26);
-        // Customer Info
-        doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("pdfto"), 13, y);
-        y += 5;
-        doc.text(oData.CustomerName, 13, y);
-        y += 5;
-        doc.setFont("times", "normal");
-        //  Properly wrap address and calculate height
-        const splitAddress = doc.splitTextToSize(oData.CustomerAddress || "", 80);
-        doc.text(splitAddress, 13, y);
-        y += splitAddress.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
-        const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.CustomerSTDCode + " " + oData.CustomerMobileNo;
-        doc.text(customerMobileText, 13, y);
-        y += 5;
-        //  Adjust Y for email
-        const customerEmailText = this.i18nModel.getText("pdfemail") + " " + oData.CustomerEmailID;
-        doc.text(customerEmailText, 13, y);
-        y += 5;
-        if (oData.CustomerGSTNO) {
-          const customerGSTNo = this.i18nModel.getText("pdfCustomerGst") + oData.CustomerGSTNO;
-          doc.text(customerGSTNo, 13, y);
-          y += 5; // only add space if GSTIN exists
-        }
-        y += 5; // space before the next section
-        // Build table body dynamically
-        const body = aItems.map((item, index) => {
-          const formattedDiscount = item.Discount ? Formatter.fromatNumber(item.Discount) : "0.00";
-          return [index + 1, item.Description, item.Days, Formatter.fromatNumber(item.UnitPrice), formattedDiscount, item.GSTCalculation, Formatter.fromatNumber(item.Total)];
-        });
-        // Build table head dynamically
-        const head = [["Sl.No.", "Description", "Days", "Unit Price", "Discount", "Tax", "Total"]];
-        doc.autoTable({
-          startY: y,
-          head: head,
-          body: body,
-          theme: "grid",
-          headStyles: {
-            fillColor: [41, 128, 185],
-            font: "times",
-            fontSize: 10,
-          },
-          styles: {
-            font: "times",
-            fontSize: 10,
-            cellPadding: 3,
-            lineWidth: 0.5,
-            lineColor: [30, 30, 30],
-            halign: "center",
-          },
-          columnStyles: {
-            0: { halign: "center" }, // Sl.No.
-            1: { halign: "left" }, //Description
-            2: { halign: "center" }, //Days
-            3: { halign: "right" }, //Unit Price
-            4: { halign: "right" }, //Discount
-            5: { halign: "center" }, //Tax
-            6: { halign: "right" }, //Total
-          },
-        });
-        y = doc.lastAutoTable.finalY;
-        // Check for page overflow
-        if (y + 40 > pageHeight) {
-          doc.addPage();
-          y = 20;
-        }
-        doc.setFont("times", "bold");
-        doc.setFontSize(12);
-        const summaryBody = [];
-        // SubTotal Without GST
-        summaryBody.push([`${this.i18nModel.getText("subTotalNotGST")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.SubTotalNotGST)]);
-        // SubTotal With GST
-        summaryBody.push([`${this.i18nModel.getText("subTotalInGST")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.SubTotal)]);
-        // GST Breakdown
-        if (oData.Currency !== "USD") {
-          const cgstValue = parseFloat(oQuotaionItem.CGST) || 0;
-          const sgstValue = parseFloat(oQuotaionItem.SGST) || 0;
-          const igstValue = parseFloat(oQuotaionItem.IGST) || 0;
-          const percentage = oData.Percentage || 0;
-          if (cgstValue > 0 || sgstValue > 0) {
-            summaryBody.push([`CGST (${percentage}%)`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-            summaryBody.push([`SGST (${percentage}%)`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-          } else if (igstValue > 0 && oData.Currency === "INR") {
-            summaryBody.push([`IGST (${percentage}%)`, Formatter.fromatNumber(igstValue.toFixed(2))]);
-          }
-        }
-        summaryBody.push([`${this.i18nModel.getText("pdfTotal")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.TotalSum)]);
-        // Add ":" to labels
-        summaryBody.forEach((row) => (row[0] = `${row[0]} :`));
-        doc.autoTable({
-          startY: y,
-          head: [],
-          body: summaryBody,
-          theme: "plain",
-          styles: {
-            font: "times",
-            fontSize: 10,
-            halign: "right",
-            cellPadding: { top: 1, right: 3, bottom: 1, left: 3 },
-          },
-          columnStyles: {
-            0: { halign: "right", cellWidth: 60 },
-            1: { halign: "right", cellWidth: 40 },
-          },
-          margin: { left: 96 },
-          didParseCell: function (data) {
-            const lastRowIndex = summaryBody.length - 1;
-            if (data.row.index === lastRowIndex) {
-              data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
-              data.cell.styles.lineColor = [0, 0, 0];
-              data.cell.styles.fontStyle = "bold";
-            }
-          },
-        });
-        // Update Y position
-        y = doc.lastAutoTable.finalY + 5;
-        // Amount in Words
-        oData.AmountInWords = await this.convertNumberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
-        doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
-        y += 5;
-        doc.setFont("times", "normal");
-        const amountHeight = doc.getTextDimensions(oData.AmountInWords || "").h;
-        doc.text(oData.AmountInWords || "", 13, y, { maxWidth: 180 });
-        y += amountHeight + 10;
-        // Terms & Conditions with page break support
-        doc.setFont("times", "bold");
-        doc.text(this.i18nModel.getText("pdftermconditaion"), 13, y);
-        y += 5;
-        doc.setFont("times", "normal");
-        const convertHtmlToTextLines = (html, maxWidth) => {
-          const div = document.createElement("div");
-          div.innerHTML = html;
-          div.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
-          div.querySelectorAll("p").forEach((p) => p.appendChild(document.createTextNode("\n")));
-          div.querySelectorAll("li").forEach((li) => {
-            const bullet = document.createTextNode(`• ${li.textContent}\n`);
-            li.replaceWith(bullet);
+        let filter = { companyCode: oData.CompanyCode }
+        try {
+          const oCompanyDetailsModel = await this.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
           });
-          const text = div.innerText || div.textContent || "";
-          return doc.splitTextToSize(text.trim(), maxWidth);
-        };
-        const htmlNotes = oData.Notes || "";
-        const noteLines = convertHtmlToTextLines(htmlNotes, 180);
-        const lineHeight = 5;
-        const availableHeight = pageHeight - y;
-        let linesPerPage = Math.floor(availableHeight / lineHeight);
-        let currentLine = 0;
-        while (currentLine < noteLines.length) {
-          if (y + lineHeight > pageHeight) {
+          let y = 10; // Starting Y position
+          const pageHeight = doc.internal.pageSize.getHeight();
+          // Logo
+          const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].companylogo?.data)], { type: "image/png" });
+          const img = await this._convertBLOBToImage(imgblob);
+          doc.addImage(img, "PNG", 13, y, 45, 45);
+          y += 50;
+          // Header Title
+          doc.setFontSize(25);
+          doc.setFont("times", "bold");
+          doc.text(this.i18nModel.getText("quotation"), 158, 40);
+          // Company Info
+          doc.setFontSize(12);
+          doc.setFont("times", "bold");
+          doc.text(oData.CompanyName, 13, y);
+          y += 5;
+          doc.setFont("times", "normal");
+          const splitAddress1 = doc.splitTextToSize(oData.CompanyAddress || "", 80);
+          doc.text(splitAddress1, 13, y);
+          y += splitAddress1.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
+          doc.text(this.i18nModel.getText("pdfmobile") + oData.STDCode + " " + oData.CompanyMobileNo, 13, y);
+          y += 5;
+          doc.text(this.i18nModel.getText("pdfemail") + " " + oData.CompanyEmailID, 13, y);
+          y += 5;
+          if (oData.CompanyGSTNO) {
+            const oCompanygst = this.i18nModel.getText("pdfCustomerGst") + " " + oData.CompanyGSTNO;
+            doc.text(oCompanygst, 13, y);
+          }
+          y += 10;
+          // Quotation Metas
+          doc.setFont("times", "bold");
+          doc.text(this.i18nModel.getText("pdfquotationNo"), 168, y - 36, { align: "right" });
+          doc.text(this.i18nModel.getText("pdfDate"), 168, y - 31, { align: "right" });
+          doc.text(this.i18nModel.getText("pdfValiduntil"), 168, y - 26, { align: "right" });
+          doc.setFont("times", "normal");
+          doc.text(oData.QuotationNo, 169, y - 36);
+          doc.text(Formatter.formatDate(oData.Date), 169, y - 31);
+          doc.text(Formatter.formatDate(oData.ValidUntil), 169, y - 26);
+          // Customer Info
+          doc.setFont("times", "bold");
+          doc.text(this.i18nModel.getText("pdfto"), 13, y);
+          y += 5;
+          doc.text(oData.CustomerName, 13, y);
+          y += 5;
+          doc.setFont("times", "normal");
+          //  Properly wrap address and calculate height
+          const splitAddress = doc.splitTextToSize(oData.CustomerAddress || "", 80);
+          doc.text(splitAddress, 13, y);
+          y += splitAddress.length * 5; // estimate 5mm per line        //  Adjust Y for mobile number
+          const customerMobileText = this.i18nModel.getText("pdfmobile") + oData.CustomerSTDCode + " " + oData.CustomerMobileNo;
+          doc.text(customerMobileText, 13, y);
+          y += 5;
+          //  Adjust Y for email
+          const customerEmailText = this.i18nModel.getText("pdfemail") + " " + oData.CustomerEmailID;
+          doc.text(customerEmailText, 13, y);
+          y += 5;
+          if (oData.CustomerGSTNO) {
+            const customerGSTNo = this.i18nModel.getText("pdfCustomerGst") + oData.CustomerGSTNO;
+            doc.text(customerGSTNo, 13, y);
+            y += 5; // only add space if GSTIN exists
+          }
+          y += 5; // space before the next section
+          // Build table body dynamically
+          const body = aItems.map((item, index) => {
+            const formattedDiscount = item.Discount ? Formatter.fromatNumber(item.Discount) : "0.00";
+            return [index + 1, item.Description, item.Days, Formatter.fromatNumber(item.UnitPrice), formattedDiscount, item.GSTCalculation, Formatter.fromatNumber(item.Total)];
+          });
+          // Build table head dynamically
+          const head = [["Sl.No.", "Description", "Days", "Unit Price", "Discount", "Tax", "Total"]];
+          doc.autoTable({
+            startY: y,
+            head: head,
+            body: body,
+            theme: "grid",
+            headStyles: {
+              fillColor: [41, 128, 185],
+              font: "times",
+              fontSize: 10,
+            },
+            styles: {
+              font: "times",
+              fontSize: 10,
+              cellPadding: 3,
+              lineWidth: 0.5,
+              lineColor: [30, 30, 30],
+              halign: "center",
+            },
+            columnStyles: {
+              0: { halign: "center" }, // Sl.No.
+              1: { halign: "left" }, //Description
+              2: { halign: "center" }, //Days
+              3: { halign: "right" }, //Unit Price
+              4: { halign: "right" }, //Discount
+              5: { halign: "center" }, //Tax
+              6: { halign: "right" }, //Total
+            },
+          });
+          y = doc.lastAutoTable.finalY;
+          // Check for page overflow
+          if (y + 40 > pageHeight) {
             doc.addPage();
             y = 20;
           }
-          const remainingLines = noteLines.length - currentLine;
-          const linesToWrite = Math.min(linesPerPage, remainingLines);
-          const linesChunk = noteLines.slice(currentLine, currentLine + linesToWrite);
-          doc.text(linesChunk, 13, y);
-          y += linesChunk.length * lineHeight;
-          currentLine += linesToWrite;
-          // Reset linesPerPage for next page if needed
-          linesPerPage = Math.floor((pageHeight - 20) / lineHeight);
-        }
-        // Save PDF
-        doc.save(`${oData.CustomerName}_Quotation.pdf`);
-      }catch (error) {
+          doc.setFont("times", "bold");
+          doc.setFontSize(12);
+          const summaryBody = [];
+          // SubTotal Without GST
+          summaryBody.push([`${this.i18nModel.getText("subTotalNotGST")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.SubTotalNotGST)]);
+          // SubTotal With GST
+          summaryBody.push([`${this.i18nModel.getText("subTotalInGST")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.SubTotal)]);
+          // GST Breakdown
+          if (oData.Currency !== "USD") {
+            const cgstValue = parseFloat(oQuotaionItem.CGST) || 0;
+            const sgstValue = parseFloat(oQuotaionItem.SGST) || 0;
+            const igstValue = parseFloat(oQuotaionItem.IGST) || 0;
+            const percentage = oData.Percentage || 0;
+            if (cgstValue > 0 || sgstValue > 0) {
+              summaryBody.push([`CGST (${percentage}%)`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+              summaryBody.push([`SGST (${percentage}%)`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+            } else if (igstValue > 0 && oData.Currency === "INR") {
+              summaryBody.push([`IGST (${percentage}%)`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+            }
+          }
+          summaryBody.push([`${this.i18nModel.getText("pdfTotal")} (${oData.Currency})`, Formatter.fromatNumber(oQuotaionItem.TotalSum)]);
+          // Add ":" to labels
+          summaryBody.forEach((row) => (row[0] = `${row[0]} :`));
+          doc.autoTable({
+            startY: y,
+            head: [],
+            body: summaryBody,
+            theme: "plain",
+            styles: {
+              font: "times",
+              fontSize: 10,
+              halign: "right",
+              cellPadding: { top: 1, right: 3, bottom: 1, left: 3 },
+            },
+            columnStyles: {
+              0: { halign: "right", cellWidth: 60 },
+              1: { halign: "right", cellWidth: 40 },
+            },
+            margin: { left: 96 },
+            didParseCell: function (data) {
+              const lastRowIndex = summaryBody.length - 1;
+              if (data.row.index === lastRowIndex) {
+                data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                data.cell.styles.lineColor = [0, 0, 0];
+                data.cell.styles.fontStyle = "bold";
+              }
+            },
+          });
+          // Update Y position
+          y = doc.lastAutoTable.finalY + 5;
+          // Amount in Words
+          oData.AmountInWords = await this.convertNumberToWords(parseFloat(oQuotaionItem.TotalSum || 0), oData.Currency);
+          doc.setFont("times", "bold");
+          doc.text(this.i18nModel.getText("pdfaAmount"), 13, y);
+          y += 5;
+          doc.setFont("times", "normal");
+          const amountHeight = doc.getTextDimensions(oData.AmountInWords || "").h;
+          doc.text(oData.AmountInWords || "", 13, y, { maxWidth: 180 });
+          y += amountHeight + 10;
+          // Terms & Conditions with page break support
+          doc.setFont("times", "bold");
+          doc.text(this.i18nModel.getText("pdftermconditaion"), 13, y);
+          y += 5;
+          doc.setFont("times", "normal");
+          const convertHtmlToTextLines = (html, maxWidth) => {
+            const div = document.createElement("div");
+            div.innerHTML = html;
+            div.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
+            div.querySelectorAll("p").forEach((p) => p.appendChild(document.createTextNode("\n")));
+            div.querySelectorAll("li").forEach((li) => {
+              const bullet = document.createTextNode(`• ${li.textContent}\n`);
+              li.replaceWith(bullet);
+            });
+            const text = div.innerText || div.textContent || "";
+            return doc.splitTextToSize(text.trim(), maxWidth);
+          };
+          const htmlNotes = oData.Notes || "";
+          const noteLines = convertHtmlToTextLines(htmlNotes, 180);
+          const lineHeight = 5;
+          const availableHeight = pageHeight - y;
+          let linesPerPage = Math.floor(availableHeight / lineHeight);
+          let currentLine = 0;
+          while (currentLine < noteLines.length) {
+            if (y + lineHeight > pageHeight) {
+              doc.addPage();
+              y = 20;
+            }
+            const remainingLines = noteLines.length - currentLine;
+            const linesToWrite = Math.min(linesPerPage, remainingLines);
+            const linesChunk = noteLines.slice(currentLine, currentLine + linesToWrite);
+            doc.text(linesChunk, 13, y);
+            y += linesChunk.length * lineHeight;
+            currentLine += linesToWrite;
+            // Reset linesPerPage for next page if needed
+            linesPerPage = Math.floor((pageHeight - 20) / lineHeight);
+          }
+          // Save PDF
+          doc.save(`${oData.CustomerName}_Quotation.pdf`);
+        } catch (error) {
           this.closeBusyDialog();
           MessageToast.show(error.message || error.responseText);
-      } finally {
-                    this.closeBusyDialog();
-      }
+        } finally {
+          this.closeBusyDialog();
+        }
       },
       HQD_onPressAddQuotationItem: function () {
         var oView = this.getView();
@@ -1414,7 +1394,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           if (!isINR) {
             oRadiobtn.setProperty("/gstEditable", false);
             this.byId("HQD_id_Percentage").setEditable(false);
-             this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
+            this.getView().byId("HQD_id_CompGSTNO").setEnabled(false);
             // Optionally hide/show tax fields as needed
             const oQuotationModel = oView.getModel("QuotationModel");
             oQuotationModel.setProperty("/CGSTVisible", false);
@@ -1654,7 +1634,7 @@ HQD_onCompanyCodeChange: function (oEvent) {
           oQuotationModel.setProperty("/IGSTVisible", false);
           oSingleCompanyModel.setProperty("/Percentage", 9);
           oSingleCompanyModel.setProperty("/gstEditable", true);
-           oSingleCompanyModel.setProperty("/CompanyGSTNO", "29ABAFK9719M1ZN");
+          oSingleCompanyModel.setProperty("/CompanyGSTNO", "29ABAFK9719M1ZN");
           // Setting Mobile number
           var sMobileNo = oRawData.mobileNo || "";
           var sActualMobileNo = sMobileNo.startsWith("+91") ? sMobileNo.slice(3) : sMobileNo;

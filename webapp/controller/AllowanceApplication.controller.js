@@ -281,6 +281,7 @@ sap.ui.define([
             core.byId("All_id_State").setValueState("None");
             core.byId("All_id_Source").setValueState("None");
             core.byId("All_id_Destination").setValueState("None");
+            core.byId("All_id_ExpenseType").setValueState("None");
             core.byId("All_id_EmployeeRemark").setValueState("None");
         },
 
