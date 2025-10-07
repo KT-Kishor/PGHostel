@@ -45,6 +45,8 @@ sap.ui.define([
                         required: true,
                         SubmitBtn: false,
                         SaveBtn: false,
+                        DateVisible : false,
+                        MutiDateVis : false
                     });
 
                     this.getView().setModel(viewModel, "viewModel");
@@ -132,7 +134,31 @@ sap.ui.define([
             onLogout: function () {
                 this.CommonLogoutFunction();
             },
+            onAddItemAllowance :function(){
+            var year = new Date(this.FilteredAllowanceModel[0]?.AllowanceStartDate).getFullYear();
+            var month = new Date(this.FilteredAllowanceModel[0].AllowanceStartDate).getMonth();
+            let date = new Date(year, month, 1); // month is 0-based (0 = Jan)
+            let dates = [];
 
+            while (date.getMonth() === month) {
+                // Format date as dd/mm/yyyy
+                let day = String(date.getDate()).padStart(2, '0');
+                let mon = String(date.getMonth() + 1).padStart(2, '0');
+                let yr = date.getFullYear();
+
+                let formattedDate = `${day}/${mon}/${yr}`;
+                dates.push({
+                    key: formattedDate,
+                    day: formattedDate
+                });
+                //dates.push(formattedDate);
+
+                // Move to next day
+                date.setDate(date.getDate() + 1);
+            }
+            var oModel = new sap.ui.model.json.JSONModel({ dates: dates });
+            this.getView().setModel(oModel);
+            },
             // Allowance Item Index increment and ItemAllowance Read call
             IndexNoIncreent: function () {
                 var that = this;
@@ -203,7 +229,10 @@ sap.ui.define([
             Exp_Det_onPressAddExpenseItem: function () {
                 this.ViewModel.setProperty("/SubmitBtn", true);
                 this.ViewModel.setProperty("/enable", true);
+                this.ViewModel.setProperty("/MutiDateVis", true);
+                this.ViewModel.setProperty("/DateVisible", false);
                 this.ViewModel.setProperty("/SaveBtn", false);
+                this.onAddItemAllowance();
                 var jsonAllowance = {
                     EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
                     EmployeeName: this.LoginModel.getProperty("/EmployeeName"),
@@ -222,6 +251,7 @@ sap.ui.define([
                 var oAllowanceCreateModel = new JSONModel(jsonAllowance);
                 this.getView().setModel(oAllowanceCreateModel, "AllowanceCreateModel");
                 this.openFragment();
+                sap.ui.getCore().byId("dateMultiBoxFrag").setSelectedKeys([]);
             },
 
             onChangeCurrency:function(oEvent){
@@ -235,6 +265,8 @@ sap.ui.define([
                 }
                 this.ViewModel.setProperty("/SubmitBtn", false);
                 this.ViewModel.setProperty("/SaveBtn", true);
+                this.ViewModel.setProperty("/MutiDateVis", false);
+                this.ViewModel.setProperty("/DateVisible", true);
                 this.openFragment();
                 if (this.SelectedData.ItemType === "Perdiem Declaration") {
                     this.ViewModel.setProperty("/enable", false);
@@ -477,12 +509,25 @@ sap.ui.define([
                     this.ViewModel.setProperty("/enable", true);
                 }
             },
+            _LCvalidateMultiComboBox: function(oMultiComboBox) {
+                if (!oMultiComboBox) return false;
+                var aSelectedKeys = oMultiComboBox.getSelectedKeys();
+                if (!aSelectedKeys || aSelectedKeys.length === 0) {
+                    oMultiComboBox.setValueState("Error");
+                    oMultiComboBox.setValueStateText(this.i18nModel.getText("selectDate")); // from i18n
+                    return false;
+                }
+                oMultiComboBox.setValueState("None");
+                return true;
+            },
 
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_modeofPayment"), "ID") && utils._LCvalidateDate(sap.ui.getCore().byId("item_id_AllowanceDate"), "ID") && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag")) && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
 
                     var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
+                    var aSelectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // array of YYYY-MM-DD
+                   // oModel.Dates = aSelectedDates;
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
                         data: {
@@ -490,9 +535,11 @@ sap.ui.define([
                             AllowanceID: FilterModel.AllowanceID,
                             ConversionRate: oModel.Currency !== "INR" ? oModel.ConversionRate : "1",
                             Currency: oModel.Currency,
+                            Country: FilterModel.Country,
+                            EmployeeName: FilterModel.EmployeeName,
                             EmployeeID: FilterModel.EmployeeID,
                             AllowanceAmount: oModel.Currency !== "INR" ? oModel.TotalAmount : oModel.AllowanceAmount,
-                            AllowanceDate: oModel.AllowanceDate,
+                            Dates: aSelectedDates,
                             ForeignAmount: oModel.AllowanceAmount,
                             ItemType: oModel.ItemType,
                             ModeOfPayment: oModel.ModeOfPayment
