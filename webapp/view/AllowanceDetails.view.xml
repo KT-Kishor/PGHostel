@@ -121,12 +121,12 @@
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Label text="{i18n>allowanceAmount}" />
 										</m:Column>
-										<m:Column minScreenWidth="Desktop" demandPopin="true">
+										<!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Label text="{i18n>expModeOfPayment}" />
 										</m:Column>
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Label text="{i18n>comments}" />
-										</m:Column>
+										</m:Column> -->
 									</m:columns>
 									<m:items>
 										<m:ColumnListItem press="onCheckExpenseDetails">
@@ -145,9 +145,9 @@
 													</m:HBox>
 												</m:VBox>
 												<m:Text text="INR {path:'ItemAllowanceModel>AllowanceAmount', formatter: '.Formatter.fromatNumber'}" />
-												<m:ObjectStatus inverted="true" text="{ItemAllowanceModel>ModeOfPayment}" state="{path: 'ItemAllowanceModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" />
+												<!-- <m:ObjectStatus inverted="true" text="{ItemAllowanceModel>ModeOfPayment}" state="{path: 'ItemAllowanceModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" /> -->
 												<!-- <m:Text text="{ItemAllowanceModel>Comments}" />													 -->
-												<m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" />
+												<!-- <m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" /> -->
 											</m:cells>
 										</m:ColumnListItem>
 									</m:items>

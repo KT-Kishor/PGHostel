@@ -145,11 +145,13 @@ sap.ui.define([
                 let day = String(date.getDate()).padStart(2, '0');
                 let mon = String(date.getMonth() + 1).padStart(2, '0');
                 let yr = date.getFullYear();
+                let sWeekday = date.toLocaleDateString('en-US', { weekday: 'long' });
 
                 let formattedDate = `${day}/${mon}/${yr}`;
                 dates.push({
                     key: formattedDate,
-                    day: formattedDate
+                    day: formattedDate,
+                    weekday: sWeekday
                 });
                 //dates.push(formattedDate);
 
@@ -175,6 +177,19 @@ sap.ui.define([
                             that.IndexNo = 0;
                             return;
                         }
+
+                        // Sort by AllowanceDate (ascending)
+                        modelData.sort(function (a, b) {
+                            const parseDate = (dateStr) => {
+                                if (!dateStr) return new Date(0);
+                                if (dateStr.includes("/")) {
+                                    const [day, month, year] = dateStr.split("/");
+                                    return new Date(`${year}-${month}-${day}`);
+                                }
+                                return new Date(dateStr);
+                            };
+                            return parseDate(a.AllowanceDate) - parseDate(b.AllowanceDate);
+                        });
 
                         modelData.forEach((item, index) => {
                             item.IndexNo = index + 1;
@@ -251,7 +266,10 @@ sap.ui.define([
                 var oAllowanceCreateModel = new JSONModel(jsonAllowance);
                 this.getView().setModel(oAllowanceCreateModel, "AllowanceCreateModel");
                 this.openFragment();
-                sap.ui.getCore().byId("dateMultiBoxFrag").setSelectedKeys([]);
+                var oDateMultiBox = sap.ui.getCore().byId("dateMultiBoxFrag");
+                if (oDateMultiBox) {
+                    oDateMultiBox.removeAllSelectedItems();
+                }
             },
 
             onChangeCurrency:function(oEvent){
@@ -294,15 +312,27 @@ sap.ui.define([
 
             // close Fragment
             Exp_Det_onPressClose: function () {
-                sap.ui.getCore().byId("item_id_Amount").setValueState("None");
-                sap.ui.getCore().byId("item_id_ConvertionRate").setValueState("None");
-                sap.ui.getCore().byId("item_id_Comments").setValueState("None");
+                // sap.ui.getCore().byId("item_id_Amount").setValueState("None");
+                // sap.ui.getCore().byId("item_id_ConvertionRate").setValueState("None");
+                // sap.ui.getCore().byId("item_id_Comments").setValueState("None");
                 sap.ui.getCore().byId("item_id_ItemType").setValueState("None");
+                sap.ui.getCore().byId("dateMultiBoxFrag").setValueState("None");
                 this.byId("AllItem_id_ItemTable").removeSelections();
                 this.ViewModel.setProperty("/enable", true);
                 this.AllowanceItem.close();
             },
-            
+
+             onSelectdate: function(oEvent) {
+                var oMultiComboBox = oEvent.getSource();
+                var sNewValue = oEvent.getParameter("newValue");
+                if (sNewValue) {
+                    oMultiComboBox.setValueState("None");
+                } else {
+                    oMultiComboBox.setValueState("Error");
+                    oMultiComboBox.setValueStateText(this.i18nModel.getText("selectDate"));
+                }
+            },
+    
             Exp_Det_onPressBackBtn: function () {
                 if (this.MyInBox) {
                     this.getRouter().navTo("RouteMyInbox", { sMyInBox: "AllowanceDetails" });
@@ -525,7 +555,7 @@ sap.ui.define([
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
                 var oItemModel =this.getView().getModel("ItemAllowanceModel").getData(); // Existing saved items
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag")) && (oModel.ItemType !== "NIGHT ALLOWANCE" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag"))) { 
 
                     var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                     var aSelectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // array of YYYY-MM-DD
@@ -533,20 +563,16 @@ sap.ui.define([
 
                    let selectedDates = [];
                     if (sap.ui.getCore().byId("dateMultiBoxFrag").getVisible()) {
-                        // Multi-date mode
-                        selectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // ["2025-10-01", "2025-10-02", ...]
+                        selectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); 
                     } else {
-                        // Single-date mode
                         selectedDates = [oModel.AllowanceDate];
                     }
 
-                    // Convert existing model dates to comparable format
                     const existingDates = oItemModel.map(item =>
                         new Date(item.AllowanceDate).toDateString()
                     );
-
-                    // Find duplicates
-                    const duplicateDates = selectedDates.filter(date =>
+                   
+                    const duplicateDates = selectedDates.filter(date =>  // Find duplicates
                         existingDates.includes(new Date(date).toDateString())
                     );
 

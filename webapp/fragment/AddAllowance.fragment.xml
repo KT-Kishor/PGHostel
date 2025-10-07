@@ -66,8 +66,8 @@
 
                 <!-- Multi Date Picker via MultiComboBox -->
                 <Label text="Select Dates" required="true"/>
-                <MultiComboBox id="dateMultiBox" items="{/dates}" valueStateText="{i18n>selectDate}" change="onSelectdate">
-                    <core:Item key="{key}" text="{day}" />
+                <MultiComboBox id="dateMultiBox" items="{/dates}" valueStateText="{i18n>selectDate}" change="onSelectdate" showSecondaryValues="true" showSelectAll="true">
+                    <core:ListItem key="{key}" text="{day}" additionalText="{weekday}"/>
                 </MultiComboBox>
 
 				<!-- Travel Allowance -->

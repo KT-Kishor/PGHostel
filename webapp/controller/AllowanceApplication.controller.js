@@ -64,6 +64,11 @@ sap.ui.define([
             this.initializeBirthdayCarousel();
         },
 
+        _getDayName: function(oDate) {
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            return days[oDate.getDay()];
+        },
+
         _updateDateList: function(iMonth, iYear) {
             var iLastDay = new Date(iYear, iMonth + 1, 0).getDate();
             var aDates = [];
@@ -73,15 +78,17 @@ sap.ui.define([
                 var sMonth = String(oDate.getMonth() + 1).padStart(2, "0");
                 var sYear = oDate.getFullYear();
                 var sFormatted = `${sDay}/${sMonth}/${sYear}`;
+                var sWeekday = this._getDayName(oDate); // 🟢 added line
+
                 aDates.push({
                     key: sFormatted, // unique key
-                    day: sFormatted // display text
+                    day: sFormatted, // display text
+                    weekday: sWeekday // 🟢 added field
                 });
             }
             this.getView().getModel().setProperty("/dates", aDates);
         },
 
-        // function to always set start & end dates
         _setAllowanceDates: function(iMonth, iYear) {
             var oStartDate = new Date(iYear, iMonth, 1);  
             var sStartDay = String(oStartDate.getDate()).padStart(2, "0");
@@ -139,13 +146,16 @@ sap.ui.define([
             var daysInMonth = oEndDate.getDate();
             var aDates = [];
             for (var day = 1; day <= daysInMonth; day++) {
+                let oDate = new Date(iYear, iMonth, day); // 🟢 added for weekday
                 let dayStr = day.toString().padStart(2, "0"); 
                 let monthStr = (iMonth + 1).toString().padStart(2, "0");
                 let fullDate = `${dayStr}/${monthStr}/${iYear}`; // dd/MM/yyyy
+                let sWeekday = this._getDayName(oDate); // 🟢 added
 
                 aDates.push({
                     key: fullDate,
-                    day: fullDate
+                    day: fullDate,
+                    weekday: sWeekday // 🟢 added
                 });
             }
 
@@ -172,11 +182,14 @@ sap.ui.define([
             var iLastDay = new Date(iYear, iMonth + 1, 0).getDate(); 
             var aDates = [];
             for (var d = 1; d <= iLastDay; d++) {
+                var oDate = new Date(iYear, iMonth, d); // 🟢 added
                 var sDay = String(d).padStart(2, "0");
                 var sMonth = String(iMonth + 1).padStart(2, "0");
                 var sYear = iYear;
                 var sFormatted = `${sDay}/${sMonth}/${sYear}`;
-                aDates.push({ key: sFormatted, day: sFormatted });
+                var sWeekday = this._getDayName(oDate); // 🟢 added
+
+                aDates.push({ key: sFormatted, day: sFormatted, weekday: sWeekday }); // 🟢 added weekday
             }
 
             if (oDateMultiBox) {
@@ -184,7 +197,11 @@ sap.ui.define([
                 oDateMultiBox.setModel(oModel);
                 oDateMultiBox.bindItems({
                     path: "/dates",
-                    template: new sap.ui.core.Item({ key: "{key}", text: "{day}" })
+                    template: new sap.ui.core.ListItem({
+                        key: "{key}",
+                        text: "{day}",
+                        additionalText: "{weekday}" // 🟢 added
+                    })
                 });
             }
         },
@@ -475,6 +492,7 @@ sap.ui.define([
         // Delete the Expenase and Expense Item
         Exp_onPressDeleteExpense: async function(oEvent) {
             var that = this;
+            var oTable = that.byId("All_id_Expense");
             this.showConfirmationDialog(
                 this.i18nModel.getText("msgBoxConfirm"),
                 this.i18nModel.getText("commonMesBoxConfirmDeleteAllowance"),
@@ -490,14 +508,21 @@ sap.ui.define([
                             that.onChangeEmployeeID();
                             that.Exp_onSearch();
                             that.byId("All_id_DeleteBtn").setEnabled(false);
+                            oTable.removeSelections(true);
                         } catch (error) {
                             MessageToast.show(error.responseText || "Error deleting allowance");
+                            that.byId("All_id_DeleteBtn").setEnabled(false);
+                             oTable.removeSelections(true);
                         } finally {
                             that.closeBusyDialog();
+                            that.byId("All_id_DeleteBtn").setEnabled(false);
+                             oTable.removeSelections(true);
                         }
                     },
                     function() {
                         that.closeBusyDialog();
+                        that.byId("All_id_DeleteBtn").setEnabled(false);
+                         oTable.removeSelections(true);
                     })
         },
 
@@ -547,7 +572,7 @@ sap.ui.define([
                 }
                 const formatDate = (date) => date.toISOString().split("T")[0];
                 if (this._isClearPressed) { // Handle clear button pressed
-                    delete params.AllowanceStartDate	;
+                    delete params.AllowanceStartDate;
                     delete params.AllowanceEndDate;
                     delete params.FinancialYear;
                     this._isClearPressed = false;

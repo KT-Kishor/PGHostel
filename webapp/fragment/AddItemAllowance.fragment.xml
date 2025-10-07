@@ -13,10 +13,10 @@
 					<core:Item key="{i18n>nightallowance}" text="{i18n>nightallowance}" />
 				    </ComboBox>
 					<!-- Mode Of Payment -->
-					<Label text="{i18n>expModeOfPayment}" required="true"/>
+					<!-- <Label text="{i18n>expModeOfPayment}" required="true"/>
 					<ComboBox id="item_id_modeofPayment" valueStateText="{i18n>selectmodeofpayment}" items="{ModeOfPayment>/}" selectedKey="{AllowanceCreateModel>/ModeOfPayment}" change="EXP_FRG_validatepaymentMode" enabled="{viewModel>/enable}">
 						<core:Item key="{ModeOfPayment>Code}" text="{ModeOfPayment>Code}" />
-					</ComboBox>
+					</ComboBox> -->
 					<!-- Expense Date -->
 					<Label text="{i18n>allowancedate}" required="true" />
 					<VBox width="100%" height="3rem">
@@ -34,12 +34,13 @@
 							items="{/dates}"
 							visible="{viewModel>/MutiDateVis}"
 							valueStateText="{i18n>selectDate}"
-							change="onSelectdate">
-							<core:Item key="{key}" text="{day}" />
+							showSelectAll="true"
+							change="onSelectdate" showSecondaryValues="true">
+							<core:ListItem key="{key}" text="{day}" additionalText="{weekday}"/>
 						</MultiComboBox>
 					</VBox>
 					<!-- Expense Amount -->
-					<Label text="{i18n>allowanceAmount}" required="true"/>
+					<!-- <Label text="{i18n>allowanceAmount}" required="true"/>
 					<HBox width="100%" justifyContent="SpaceBetween">
 						<VBox width="calc(70% - 5px)">
 							<Input id="item_id_Amount" valueStateText="{i18n>ExpExpenseAmountMess}" value="{AllowanceCreateModel>/AllowanceAmount}" liveChange="LC_ExpAmount" placeholder="{i18n>placeAmount}" enabled="{viewModel>/enable}" maxLength="15"/>
@@ -49,9 +50,9 @@
 								<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 							</ComboBox>
 						</VBox>
-					</HBox>
+					</HBox> -->
 					<!-- Conversion Rate -->
-					<Label text="{i18n>expConversionRate}" visible="{= ${AllowanceCreateModel>/Currency} !== 'INR' }" required="true" />
+					<!-- <Label text="{i18n>expConversionRate}" visible="{= ${AllowanceCreateModel>/Currency} !== 'INR' }" required="true" />
 					<HBox width="100%" justifyContent="SpaceBetween">
 						<VBox width="calc(50% - 5px)">
 							<Input id="item_id_ConvertionRate" valueStateText="{i18n>ExpExpenseAmountMess}" value="{AllowanceCreateModel>/ConversionRate}" liveChange="LC_ExpConversionRate" placeholder="{i18n>expenseConversionRatePlaceholder}" visible="{= ${AllowanceCreateModel>/Currency} !== 'INR' }" maxLength="15 " change="Exp_Frg_onChangeConverstionRate"/>
@@ -59,10 +60,10 @@
 						<VBox width="calc(50% - 5px)">
 							<Input value="{AllowanceCreateModel>/TotalAmount}" visible="{= ${AllowanceCreateModel>/Currency} !== 'INR' }" editable="false"></Input>
 						</VBox>
-					</HBox>
+					</HBox> -->
 				
-					<Label text="{i18n>comments}" required="true"></Label>
-					<TextArea id="item_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{AllowanceCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" />
+					<!-- <Label text="{i18n>comments}" required="true"></Label>
+					<TextArea id="item_id_Comments" valueStateText="{i18n>enterComments}" liveChange="LC_ExpComments" value="{AllowanceCreateModel>/Comments}" maxLength="120" rows="2" placeholder="{i18n>enterComments}" /> -->
 				</f:content>
 			</f:SimpleForm>
 		<footer>
