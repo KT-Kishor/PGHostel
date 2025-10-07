@@ -219,9 +219,9 @@ sap.ui.define([
       const isExpense = Type === "Expense";
       const isAllowance = Type === "Allowance";  
       
-      this.byId("MI_id_ButApprove").setVisible(isSubmitted); 
-      this.byId("MI_id_ButReject").setVisible(isSubmitted);  
-      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account") || isAllowance); 
+      this.byId("MI_id_ButApprove").setVisible(isSubmitted) || isAllowance; 
+      this.byId("MI_id_ButReject").setVisible(isSubmitted) || isAllowance;  
+      this.byId("MI_id_ButReSend").setVisible((isExpense && isSubmitted) || (this._isAccountant && Status === "Send to account")); 
       this.byId("MI_id_ButPaid").setVisible(this._isAccountant && Status === "Send to account");
     },
 
@@ -300,7 +300,7 @@ sap.ui.define([
       const i18n = this.getView().getModel("i18n").getResourceBundle();
 
       const mapStatus = {
-        "Approve":  this.oModelData.Type === "Expense" ? "Send to account" : this.oModelData.Type === "Allowance" ? "Send to account": "Approved",
+        "Approve": this.oModelData.Type === "Expense" ? "Send to account" : "Approved",
         "Reject": "Rejected",
         "Send Back": this._isAccountant && this.oModelData.Status !== "Submitted" ? "Send back by account" : "Send back by manager",
         "Paid": "Paid"
