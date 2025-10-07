@@ -268,7 +268,7 @@ sap.ui.define([
                 this.ViewModel.setProperty("/MutiDateVis", false);
                 this.ViewModel.setProperty("/DateVisible", true);
                 this.openFragment();
-                if (this.SelectedData.ItemType === "Perdiem Declaration") {
+                if (this.SelectedData.ItemType === "NIGHT ALLOWANCE") {
                     this.ViewModel.setProperty("/enable", false);
                 } else {
                     this.ViewModel.setProperty("/enableDelete", true);
@@ -501,14 +501,15 @@ sap.ui.define([
             Exp_Frg_onItemTypeChange: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 var oText = oEvent.getSource().getSelectedItem().getText();
-                if (oText === "Perdiem Declaration") {
+                if (oText === "NIGHT ALLOWANCE") {
                     this.ViewModel.setProperty("/enable", false);
                     this.getView().getModel("AllowanceCreateModel").getData().AllowanceAmount = 0;
-                    this.getView().getModel("AllowanceCreateModel").getData().ModeOfPayment = "Company";
+                    this.getView().getModel("AllowanceCreateModel").getData().ModeOfPayment = "Employee";
                 } else {
                     this.ViewModel.setProperty("/enable", true);
                 }
             },
+            
             _LCvalidateMultiComboBox: function(oMultiComboBox) {
                 if (!oMultiComboBox) return false;
                 var aSelectedKeys = oMultiComboBox.getSelectedKeys();
@@ -523,11 +524,37 @@ sap.ui.define([
 
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag")) && (oModel.ItemType !== "Perdiem Declaration" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
+                var oItemModel =this.getView().getModel("ItemAllowanceModel").getData(); // Existing saved items
+                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag")) && (oModel.ItemType !== "NIGHT ALLOWANCE" ? utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") : true) && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && (oModel.Currency !== "INR" ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") : true)) { 
 
                     var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                     var aSelectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // array of YYYY-MM-DD
                    // oModel.Dates = aSelectedDates;
+
+                   let selectedDates = [];
+                    if (sap.ui.getCore().byId("dateMultiBoxFrag").getVisible()) {
+                        // Multi-date mode
+                        selectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // ["2025-10-01", "2025-10-02", ...]
+                    } else {
+                        // Single-date mode
+                        selectedDates = [oModel.AllowanceDate];
+                    }
+
+                    // Convert existing model dates to comparable format
+                    const existingDates = oItemModel.map(item =>
+                        new Date(item.AllowanceDate).toDateString()
+                    );
+
+                    // Find duplicates
+                    const duplicateDates = selectedDates.filter(date =>
+                        existingDates.includes(new Date(date).toDateString())
+                    );
+
+                    if (duplicateDates.length > 0) {
+                        MessageToast.show(`Allowance already exists for: ${duplicateDates.join(", ")}`);
+                        return;
+                    }
+                    
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
                         data: {
@@ -574,7 +601,7 @@ sap.ui.define([
                 var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("item_id_AllowanceDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") &&
                     (
-                        oModel.ItemType === "Perdiem Declaration"
+                        oModel.ItemType === "NIGHT ALLOWANCE"
                             ? true
                             : (
                                 utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") &&
