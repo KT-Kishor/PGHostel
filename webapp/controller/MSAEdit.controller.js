@@ -437,7 +437,7 @@ _applyCountryStateCityFilters: function () {
         utils._LCvalidateMandatoryField(get("MSA_Nav_Id_City"), "ID") &&
         utils._LCvalidateMandatoryField(get("Msa_LC_odeModel"), "ID") &&
         this.MSA_validateMobile(get("Msa_LC_Mobile")) &&
-        utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") &&
+        // utils._LCvalidateMandatoryField(get("MsaE_Id_Branch"), "ID") &&
         this.GST &&
         (!isRecruitment || (utils._LCvalidateTraineeAmount(get("Ms_Id_RateCharge"), "ID") && utils._LCvalidateTraineeAmount(get("Ms_Id_Refund"), "ID") && this.AdvanceBalance));
 

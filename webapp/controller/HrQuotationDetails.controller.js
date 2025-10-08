@@ -1415,7 +1415,7 @@ sap.ui.define(
           const bIsValid =
             utils._LCvalidateDate(this.byId("HQD_id_Quotation"), "ID") &&
             utils._LCvalidateDate(this.byId("HQD_id_QuotationValid"), "ID") &&
-            utils._LCstrictValidationComboBox(this.byId("HQD_id_CompanyCode"), "ID") &&
+            // utils._LCstrictValidationComboBox(this.byId("HQD_id_CompanyCode"), "ID") &&
             utils._LCvalidateMandatoryField(this.byId("HQD_id_InputCompanyName"), "ID") &&
             mobileUtils.validateMobile(this.byId("HQD_id_InputCompanyMobileNo"), "ID") &&
             utils._LCvalidateEmail(this.byId("HQD_id_CompanyEmailID"), "ID") &&

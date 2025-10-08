@@ -533,7 +533,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
       const purchaseOrderModel = this.getView().getModel("PurchaseOrderModel");
 
       var oModel = this.getView().getModel("PurchaseOrderModel").getData();
-      if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_BranchCode"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_Currency"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") && this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0) {
+      if (utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_CustomerName"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_Date"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_StartDate"), "ID") && utils._LCvalidateDate(this.getView().byId("FPO_id_EndDate"), "ID") && utils._LCstrictValidationComboBox(this.getView().byId("FPO_id_Currency"), "ID") && utils._LCvalidateMandatoryField(this.getView().byId("FPO_id_CustDescription"), "ID") && this.getView().getModel("PurchaseOrderModel").getProperty("/PurchaseOrders").length > 0) {
         var isValid = this.getView()
           .getModel("PurchaseOrderModel")
           .getProperty("/PurchaseOrders")
