@@ -80,6 +80,9 @@
 						<Label text="{i18n>employeeName}" />
 					</Column>
 					<Column demandPopin="true">
+						<Label text="{i18n>allowanceType}" />
+					</Column>
+					<Column demandPopin="true">
 						<Label text="{i18n>allowanceName}" />
 					</Column>
 					<Column  minScreenWidth="Desktop" demandPopin="true">
@@ -102,6 +105,7 @@
 					<ColumnListItem type="Navigation" press="Exp_onCheckExpenseDetails">
 						<cells>
 							<ObjectIdentifier title="{AllowanceModel>EmployeeID}" text="{AllowanceModel>EmployeeName}"/>
+							<Text text="{AllowanceModel>AllowanceType}" />
 							<Text text="{AllowanceModel>AllowanceName}" />
 							<Text text="{path:'AllowanceModel>AllowanceStartDate',formatter: '.Formatter.formatDate'}" />
 							<Text text="{path:'AllowanceModel>AllowanceEndDate',formatter: '.Formatter.formatDate'}" />
