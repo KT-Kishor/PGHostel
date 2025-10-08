@@ -575,27 +575,31 @@ sap.ui.define([
                   let oDateBox = sap.ui.getCore().byId("dateMultiBoxFrag");
                     let selectedDates = [];
                     if (oDateBox.getVisible()) {
-                        selectedDates = oDateBox.getSelectedKeys();
+                        selectedDates = oDateBox.getSelectedKeys(); // ["01/10/2025", ...]
                     } else {
                         selectedDates = [oModel.AllowanceDate];
                     }
-                    const existingDates = oItemModel.map(item =>
-                        new Date(item.AllowanceDate).toDateString()
-                    );
-                    const duplicateDates = selectedDates.filter(date => // Find duplicates
-                        existingDates.includes(new Date(date).toDateString())
-                    );
-                    if (duplicateDates.length > 0) { //  Show message for duplicates
+
+                    // Convert existing item dates to the same format as selectedDates
+                    const existingDates = oItemModel.map(item => item.AllowanceDate); // ["01/10/2025", ...]
+
+                    // Find duplicates
+                    const duplicateDates = selectedDates.filter(date => existingDates.includes(date));
+
+                    if (duplicateDates.length > 0) {
                         MessageToast.show(`Allowance already exists for: ${duplicateDates.join(", ")}`);
-                        const newSelectedDates = selectedDates.filter(date => // Remove duplicate dates
-                            !duplicateDates.includes(date)
-                        );
-                        oDateBox.setSelectedKeys(newSelectedDates);    //  Visually update MultiComboBox selection
-                        if (newSelectedDates.length === 0) { // Stop further creation if no new dates left
-                            return;
-                        }
-                        aSelectedDates = newSelectedDates; // Continue only with non-duplicate dates
+                        
+                        // Remove duplicates from selection
+                        const newSelectedDates = selectedDates.filter(date => !duplicateDates.includes(date));
+                        oDateBox.setSelectedKeys(newSelectedDates); // update MultiComboBox visually
+                        
+                        if (newSelectedDates.length === 0) return; // stop if no new dates
+                        
+                        selectedDates = newSelectedDates; // continue with non-duplicate dates
                     }
+
+                    // Now selectedDates only contains valid, non-duplicate dates
+                    aSelectedDates = selectedDates;
 
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
@@ -627,6 +631,10 @@ sap.ui.define([
                             this.AllowanceItem.close();
                             this.AllowanceTotalCalculation();
                             this.closeBusyDialog();
+                            var oDateMultiBox = sap.ui.getCore().byId("dateMultiBoxFrag");
+                            if (oDateMultiBox) {
+                                oDateMultiBox.removeAllSelectedItems();
+                            }
                         } else {
                             MessageToast.show(this.i18nModel.getText("allowanceCreatedMessFailed"));
                             this.closeBusyDialog();

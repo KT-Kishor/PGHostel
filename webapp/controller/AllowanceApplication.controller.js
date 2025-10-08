@@ -276,10 +276,6 @@ sap.ui.define([
         Exp_onPressAddExpense: function() {
             this.CommonModel();
             var oView = this.getView();
-            var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
-            if (oDateMultiBox) {
-                oDateMultiBox.removeAllSelectedItems();
-            }
             var oView = this.getView();
             if (!this.Expense) {
                 this.Expense = sap.ui.core.Fragment.load({
@@ -289,11 +285,19 @@ sap.ui.define([
                     this.Expense = Expense;
                     oView.addDependent(this.Expense);
                     this._initCurrentMonthData(); 
+                    var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+                    if (oDateMultiBox) {
+                        oDateMultiBox.removeAllSelectedItems();
+                    }
                     this.Expense.open();
                 }.bind(this));
             } else {
                 this._initCurrentMonthData(); 
                 this.Expense.open();
+                var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+                if (oDateMultiBox) {
+                    oDateMultiBox.removeAllSelectedItems();
+                }
             }
         },
 
@@ -353,6 +357,10 @@ sap.ui.define([
                     this.closeBusyDialog();
                     that.onChangeEmployeeID();
                     await that.Exp_onSearch();
+                    var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+                    if (oDateMultiBox) {
+                        oDateMultiBox.removeAllSelectedItems();
+                    }
                     MessageToast.show(that.i18nModel.getText("allowanceCreatedMess"));
                 } else {
                     MessageToast.show(that.i18nModel.getText("allowanceCreatedMessFailed"));
