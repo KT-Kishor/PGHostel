@@ -1,23 +1,23 @@
 sap.ui.define([
-    "./BaseController",
-    "sap/ui/model/json/JSONModel",
-    "../utils/validation",
-    "sap/m/MessageToast",
-    "../model/formatter",
-     "sap/m/MessageBox",
-    "sap/suite/ui/commons/Timeline",
-    "sap/suite/ui/commons/TimelineItem",
-],
-    function (Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
+        "./BaseController",
+        "sap/ui/model/json/JSONModel",
+        "../utils/validation",
+        "sap/m/MessageToast",
+        "../model/formatter",
+        "sap/m/MessageBox",
+        "sap/suite/ui/commons/Timeline",
+        "sap/suite/ui/commons/TimelineItem",
+    ],
+    function(Controller, JSONModel, utils, MessageToast, Formatter, MessageBox, Timeline, TimelineItem) {
         "use strict";
         return Controller.extend("sap.kt.com.minihrsolution.controller.AllowanceDetails", {
             Formatter: Formatter,
-            onInit: function () {
+            onInit: function() {
                 // Attach route matched event for "RouteAllowanceDetails"
                 this.getRouter().getRoute("RouteAllowanceDetails").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function (oEvent) {
+            _onRouteMatched: async function(oEvent) {
                 var LoginFUnction = await this.commonLoginFunction("Allowance");
                 if (!LoginFUnction) return;
                 this.getBusyDialog();
@@ -45,15 +45,19 @@ sap.ui.define([
                         required: true,
                         SubmitBtn: false,
                         SaveBtn: false,
-                        DateVisible : false,
-                        MutiDateVis : false
+                        DateVisible: false,
+                        MutiDateVis: false
                     });
 
                     this.getView().setModel(viewModel, "viewModel");
                     this.LoginModel = this.getView().getModel("LoginModel");
                     this.ViewModel = this.getView().getModel("viewModel");
 
-                    var oUploadModel = new sap.ui.model.json.JSONModel({ File: "", FileName: "", FileType: "" });
+                    var oUploadModel = new sap.ui.model.json.JSONModel({
+                        File: "",
+                        FileName: "",
+                        FileType: ""
+                    });
                     this.getView().setModel(oUploadModel, "UploadModel");
                     this.FilteredAllowanceModel = this.getView().getModel("FilteredAllowanceModel").getData();
                     this.IndexNoIncreent();
@@ -76,7 +80,9 @@ sap.ui.define([
                     if (this.FilteredAllowanceModel[0].TripType !== "Customer Facing") {
                         this.ViewModel.setProperty("/required", false);
                     }
-                    var oTokenModel = new JSONModel({ tokens: [] });
+                    var oTokenModel = new JSONModel({
+                        tokens: []
+                    });
                     this.getView().setModel(oTokenModel, "tokenModel");
                     this.CountryAndCity();
                     this._applyCountryStateCityFilters();
@@ -89,33 +95,33 @@ sap.ui.define([
                 }
             },
 
-             _applyCountryStateCityFilters: function () {
-                const oModel     = this.getView().getModel("FilteredAllowanceModel");
+            _applyCountryStateCityFilters: function() {
+                const oModel = this.getView().getModel("FilteredAllowanceModel");
                 const oCountryCB = this.byId("AllItem_id_Country");
-                const oStateCB   = this.byId("AllItem_id_State");
-                const oSourceCB  = this.byId("AllItem_id_Source");
-                const oDestCB    = this.byId("AllItem_id_Destination");
+                const oStateCB = this.byId("AllItem_id_State");
+                const oSourceCB = this.byId("AllItem_id_Source");
+                const oDestCB = this.byId("AllItem_id_Destination");
 
-                const sCountry   = oModel.getProperty("/0/Country");     // e.g. "Australia"
-                const sState     = oModel.getProperty("/0/State");       // e.g. "Queensland"
-                const sSource    = oModel.getProperty("/0/Source");      // e.g. "Bongaree"
-                const sDest      = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
+                const sCountry = oModel.getProperty("/0/Country"); // e.g. "Australia"
+                const sState = oModel.getProperty("/0/State"); // e.g. "Queensland"
+                const sSource = oModel.getProperty("/0/Source"); // e.g. "Bongaree"
+                const sDest = oModel.getProperty("/0/Destination"); // e.g. "Bongaree"
 
-                oStateCB.getBinding("items")?.filter([]);  // Reset all filters
+                oStateCB.getBinding("items")?.filter([]); // Reset all filters
                 oSourceCB.getBinding("items")?.filter([]);
                 oDestCB.getBinding("items")?.filter([]);
 
                 if (sCountry) {
-                    const aCountryData = this.getView().getModel("CountryModel").getData();  // Find countryCode by name
+                    const aCountryData = this.getView().getModel("CountryModel").getData(); // Find countryCode by name
                     const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
                     if (oCountryObj) {
                         const sCountryCode = oCountryObj.code;
-                        oStateCB.getBinding("items")?.filter([  // Filter States by Country
+                        oStateCB.getBinding("items")?.filter([ // Filter States by Country
                             new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                         ]);
 
                         if (sState) {
-                            const aFilters = [  // Filter Cities by State + Country
+                            const aFilters = [ // Filter Cities by State + Country
                                 new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
                                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                             ];
@@ -125,52 +131,56 @@ sap.ui.define([
                     }
                 }
 
-                oCountryCB.setValue(sCountry || "");  // Ensure values are set back in UI
+                oCountryCB.setValue(sCountry || ""); // Ensure values are set back in UI
                 oStateCB.setValue(sState || "");
                 oSourceCB.setValue(sSource || "");
                 oDestCB.setValue(sDest || "");
             },
 
-            onLogout: function () {
+            onLogout: function() {
                 this.CommonLogoutFunction();
             },
-            onAddItemAllowance :function(){
-            var year = new Date(this.FilteredAllowanceModel[0]?.AllowanceStartDate).getFullYear();
-            var month = new Date(this.FilteredAllowanceModel[0].AllowanceStartDate).getMonth();
-            let date = new Date(year, month, 1); // month is 0-based (0 = Jan)
-            let dates = [];
+            onAddItemAllowance: function() {
+                var year = new Date(this.FilteredAllowanceModel[0]?.AllowanceStartDate).getFullYear();
+                var month = new Date(this.FilteredAllowanceModel[0].AllowanceStartDate).getMonth();
+                let date = new Date(year, month, 1); // month is 0-based (0 = Jan)
+                let dates = [];
 
-            while (date.getMonth() === month) {
-                // Format date as dd/mm/yyyy
-                let day = String(date.getDate()).padStart(2, '0');
-                let mon = String(date.getMonth() + 1).padStart(2, '0');
-                let yr = date.getFullYear();
-                let sWeekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+                while (date.getMonth() === month) {
+                    // Format date as dd/mm/yyyy
+                    let day = String(date.getDate()).padStart(2, '0');
+                    let mon = String(date.getMonth() + 1).padStart(2, '0');
+                    let yr = date.getFullYear();
+                    let sWeekday = date.toLocaleDateString('en-US', {
+                        weekday: 'long'
+                    });
 
-                let formattedDate = `${day}/${mon}/${yr}`;
-                dates.push({
-                    key: formattedDate,
-                    day: formattedDate,
-                    weekday: sWeekday
+                    let formattedDate = `${day}/${mon}/${yr}`;
+                    dates.push({
+                        key: formattedDate,
+                        day: formattedDate,
+                        weekday: sWeekday
+                    });
+                    //dates.push(formattedDate);
+
+                    // Move to next day
+                    date.setDate(date.getDate() + 1);
+                }
+                var oModel = new sap.ui.model.json.JSONModel({
+                    dates: dates
                 });
-                //dates.push(formattedDate);
-
-                // Move to next day
-                date.setDate(date.getDate() + 1);
-            }
-            var oModel = new sap.ui.model.json.JSONModel({ dates: dates });
-            this.getView().setModel(oModel);
+                this.getView().setModel(oModel);
             },
             // Allowance Item Index increment and ItemAllowance Read call
-            IndexNoIncreent: function () {
+            IndexNoIncreent: function() {
                 var that = this;
                 var oView = this.getView();
                 this.getBusyDialog();
                 this._fetchCommonData("ItemAllowance", "ItemAllowanceModel", {
-                    EmployeeID: that.FilteredAllowanceModel[0].EmployeeID,
-                    AllowanceID: that.AllowanceID
-                })
-                    .then(function () {
+                        EmployeeID: that.FilteredAllowanceModel[0].EmployeeID,
+                        AllowanceID: that.AllowanceID
+                    })
+                    .then(function() {
                         let modelData = oView.getModel("ItemAllowanceModel").getData();
 
                         if (!Array.isArray(modelData) || modelData.length === 0) {
@@ -179,7 +189,7 @@ sap.ui.define([
                         }
 
                         // Sort by AllowanceDate (ascending)
-                        modelData.sort(function (a, b) {
+                        modelData.sort(function(a, b) {
                             const parseDate = (dateStr) => {
                                 if (!dateStr) return new Date(0);
                                 if (dateStr.includes("/")) {
@@ -198,17 +208,17 @@ sap.ui.define([
 
                         oView.getModel("ItemAllowanceModel").setData(modelData);
                     })
-                    .catch(function (error) {
+                    .catch(function(error) {
                         that.IndexNo = 0;
                     })
-                    .finally(function () {
+                    .finally(function() {
                         that.closeBusyDialog();
                     });
             },
 
             //Open Fragment in Expeanse Item Create and Update 
-            openFragment: function () {
-                 var oView = this.getView();
+            openFragment: function() {
+                var oView = this.getView();
                 var oModel = oView.getModel("FilteredAllowanceModel").getData()[0];
                 this.ViewModel.setProperty("/MinDate", new Date(oModel.AllowanceStartDate.split("/").reverse().join("-")));
                 this.ViewModel.setProperty("/MaxDate", new Date(oModel.AllowanceEndDate.split("/").reverse().join("-")));
@@ -218,7 +228,7 @@ sap.ui.define([
                         name: "sap.kt.com.minihrsolution.fragment.AddItemAllowance",
                         controller: this,
                     }).then(
-                        function (AllowanceItem) {
+                        function(AllowanceItem) {
                             this.AllowanceItem = AllowanceItem;
                             oView.addDependent(this.AllowanceItem);
                             this.AllowanceItem.open();
@@ -229,7 +239,7 @@ sap.ui.define([
                 }
             },
 
-            Exp_Det_onChangeExpanesItem: function (oEvent) {
+            Exp_Det_onChangeExpanesItem: function(oEvent) {
                 this.SelectedData = oEvent.getSource().getSelectedItem().getBindingContext("ItemAllowanceModel").getObject();
                 if (this.SelectedData.ItemType === "Peridiem") {
                     this.ViewModel.setProperty("/enable", true);
@@ -241,7 +251,7 @@ sap.ui.define([
             },
 
             //  Create Allowance Item
-            Exp_Det_onPressAddExpenseItem: function () {
+            Exp_Det_onPressAddExpenseItem: function() {
                 this.ViewModel.setProperty("/SubmitBtn", true);
                 this.ViewModel.setProperty("/enable", true);
                 this.ViewModel.setProperty("/MutiDateVis", true);
@@ -272,12 +282,12 @@ sap.ui.define([
                 }
             },
 
-            onChangeCurrency:function(oEvent){
+            onChangeCurrency: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
             },
-            
+
             //Update Allowance Items
-            Exp_Det_onPressExpenseItemEdit: function () {
+            Exp_Det_onPressExpenseItemEdit: function() {
                 if (this.byId("AllItem_id_ItemTable").getSelectedItem() === null) {
                     return MessageToast.show(this.i18nModel.getText("allowanceEditSelectRowMess"));
                 }
@@ -311,18 +321,18 @@ sap.ui.define([
             },
 
             // close Fragment
-            Exp_Det_onPressClose: function () {
+            Exp_Det_onPressClose: function() {
                 // sap.ui.getCore().byId("item_id_Amount").setValueState("None");
                 // sap.ui.getCore().byId("item_id_ConvertionRate").setValueState("None");
                 // sap.ui.getCore().byId("item_id_Comments").setValueState("None");
-                sap.ui.getCore().byId("item_id_ItemType").setValueState("None");
+                // sap.ui.getCore().byId("item_id_ItemType").setValueState("None");
                 sap.ui.getCore().byId("dateMultiBoxFrag").setValueState("None");
                 this.byId("AllItem_id_ItemTable").removeSelections();
                 this.ViewModel.setProperty("/enable", true);
                 this.AllowanceItem.close();
             },
 
-             onSelectdate: function(oEvent) {
+            onSelectdate: function(oEvent) {
                 var oMultiComboBox = oEvent.getSource();
                 var sNewValue = oEvent.getParameter("newValue");
                 if (sNewValue) {
@@ -332,16 +342,18 @@ sap.ui.define([
                     oMultiComboBox.setValueStateText(this.i18nModel.getText("selectDate"));
                 }
             },
-    
-            Exp_Det_onPressBackBtn: function () {
+
+            Exp_Det_onPressBackBtn: function() {
                 if (this.MyInBox) {
-                    this.getRouter().navTo("RouteMyInbox", { sMyInBox: "AllowanceDetails" });
+                    this.getRouter().navTo("RouteMyInbox", {
+                        sMyInBox: "AllowanceDetails"
+                    });
                 } else {
                     if (this.ViewModel.getProperty("/isEditMode")) {
                         this.showConfirmationDialog(
                             this.i18nModel.getText("ConfirmActionTitle"),
                             this.i18nModel.getText("backConfirmation"),
-                            function () {
+                            function() {
                                 this.getRouter().navTo("RouteAllowancePage");
                             }.bind(this),
                         );
@@ -354,7 +366,7 @@ sap.ui.define([
                 }
             },
 
-            Exp_Det_onEditOrSavePress: function () {
+            Exp_Det_onEditOrSavePress: function() {
                 var isEditMode = this.ViewModel.getProperty("/isEditMode");
                 this.byId("AllItem_id_ItemTable").removeSelections();
                 if (isEditMode) {
@@ -364,7 +376,7 @@ sap.ui.define([
                 }
             },
 
-            onMyButtonPressEdit: function () {
+            onMyButtonPressEdit: function() {
                 this.ViewModel.setProperty("/editable", true);
                 this.ViewModel.setProperty("/isEditMode", true);
                 this.ViewModel.setProperty("/enable", false);
@@ -372,50 +384,50 @@ sap.ui.define([
             },
 
             //Amount Validation
-            LC_ExpAmount: function (oEvent) {
+            LC_ExpAmount: function(oEvent) {
                 utils._LCvalidateAmount(oEvent);
                 this.Exp_Frg_onChangeConverstionRate();
             },
             // Conversion Rate validation
-            LC_ExpConversionRate: function (oEvent) {
+            LC_ExpConversionRate: function(oEvent) {
                 utils._LCvalidateMultipleDecimal(oEvent);
                 this.Exp_Frg_onChangeConverstionRate();
             },
             //Comments Validation
-            LC_ExpComments: function (oEvent) {
+            LC_ExpComments: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            LC_ValidateDate: function (oEvent) {
+            LC_ValidateDate: function(oEvent) {
                 const oToDatePicker = oEvent.getSource(); // DatePicker control
                 const oToDate = oToDatePicker.getDateValue(); // Date object
                 if (oToDate) {
-                        oToDatePicker.setValueState("None"); // Clear error state
+                    oToDatePicker.setValueState("None"); // Clear error state
                 }
             },
 
             //Source Validation
-            Exp_Det_SourceChange: function (oEvent) {
+            Exp_Det_SourceChange: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent, "oEvent");
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
             },
             // Destination Validation
-            Exp_Det_DestinationChange: function (oEvent) {
+            Exp_Det_DestinationChange: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent, "oEvent");
                 if (oEvent.getSource().getValue() === '') {
                     oEvent.getSource().setValueState("None")
                 }
             },
 
-            Exp_Det_CountryChange: function (oEvent) {
+            Exp_Det_CountryChange: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oCountryCB = this.byId("AllItem_id_Country");
-                const oStateCB   = this.byId("AllItem_id_State");
-                const oSourceCB  = this.byId("AllItem_id_Source");
-                const oDestCB    = this.byId("AllItem_id_Destination");
-                const oModel     = this.getView().getModel("FilteredAllowanceModel");
+                const oStateCB = this.byId("AllItem_id_State");
+                const oSourceCB = this.byId("AllItem_id_Source");
+                const oDestCB = this.byId("AllItem_id_Destination");
+                const oModel = this.getView().getModel("FilteredAllowanceModel");
                 oStateCB.setValue("");
                 oStateCB.getBinding("items")?.filter([]);
                 oSourceCB.setValue("");
@@ -425,14 +437,14 @@ sap.ui.define([
 
                 const oSelectedItem = oCountryCB.getSelectedItem();
                 if (!oSelectedItem) {
-                    oModel.setProperty("/0/Country", "");  // reset model
+                    oModel.setProperty("/0/Country", ""); // reset model
                     oModel.setProperty("/0/State", "");
                     oModel.setProperty("/0/Source", "");
                     oModel.setProperty("/0/Destination", "");
                     return;
                 }
 
-                const sCountryCode = oSelectedItem.getAdditionalText();   // --- Filter States by Country ---
+                const sCountryCode = oSelectedItem.getAdditionalText(); // --- Filter States by Country ---
                 oStateCB.getBinding("items")?.filter([
                     new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                 ]);
@@ -442,15 +454,15 @@ sap.ui.define([
                 this.CountryAndCity();
             },
 
-            Exp_Det_StateChange: function (oEvent) {
-                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
-                const oStateCB   = this.byId("AllItem_id_State");
-                const oSourceCB  = this.byId("AllItem_id_Source");
-                const oDestCB    = this.byId("AllItem_id_Destination");
+            Exp_Det_StateChange: function(oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+                const oStateCB = this.byId("AllItem_id_State");
+                const oSourceCB = this.byId("AllItem_id_Source");
+                const oDestCB = this.byId("AllItem_id_Destination");
                 const oCountryCB = this.byId("AllItem_id_Country");
-                const oModel     = this.getView().getModel("FilteredAllowanceModel");
+                const oModel = this.getView().getModel("FilteredAllowanceModel");
 
-                oSourceCB.setValue("");  // Reset cities
+                oSourceCB.setValue(""); // Reset cities
                 oSourceCB.getBinding("items")?.filter([]);
                 oDestCB.setValue("");
                 oDestCB.getBinding("items")?.filter([]);
@@ -463,7 +475,7 @@ sap.ui.define([
                     return;
                 }
 
-                const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
+                const sStateName = oSelectedItem.getKey() || oSelectedItem.getText();
                 let sCountryCode = "";
                 const oCountryItem = oCountryCB.getSelectedItem();
                 if (oCountryItem) {
@@ -477,7 +489,7 @@ sap.ui.define([
                     }
                 }
                 const aFilters = [
-                    new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                    new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                     new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                 ];
 
@@ -486,16 +498,16 @@ sap.ui.define([
                 oModel.setProperty("/0/State", sStateName);
             },
 
-            CountryAndCity: function () {
+            CountryAndCity: function() {
                 var Code = this.getView().getModel("CountryModel").getData().filter((item) => item.countryName === this.byId("AllItem_id_Country").getValue());
                 var oFilter = new sap.ui.model.Filter("CountryCode", sap.ui.model.FilterOperator.EQ, Code[0].code);
                 this.byId("AllItem_id_Source").getBinding("items").filter(oFilter);
                 this.byId("AllItem_id_Destination").getBinding("items").filter(oFilter);
             },
 
-            onPressSave: async function () {
-            if (utils._LCvalidateMandatoryField(this.byId("AllItem_id_Source"), "ID") &&(this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("AllItem_id_Destination"), "ID"): true) && utils._LCstrictValidationComboBox(this.byId("AllItem_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.byId("AllItem_id_State"), "ID")) {
-             var oModel = this.getView().getModel("FilteredAllowanceModel");
+            onPressSave: async function() {
+                if (utils._LCvalidateMandatoryField(this.byId("AllItem_id_Source"), "ID") && (this.ViewModel.getProperty("/required") === true ? utils._LCvalidateMandatoryField(this.byId("AllItem_id_Destination"), "ID") : true) && utils._LCstrictValidationComboBox(this.byId("AllItem_id_Country"), "ID") && utils._LCstrictValidationComboBox(this.byId("AllItem_id_State"), "ID")) {
+                    var oModel = this.getView().getModel("FilteredAllowanceModel");
                     delete oModel.getData()[0].Comments;
                     oModel.getData()[0].Visible = false;
                     var oData = {
@@ -528,7 +540,7 @@ sap.ui.define([
                 }
             },
 
-            Exp_Frg_onItemTypeChange: function (oEvent) {
+            Exp_Frg_onItemTypeChange: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent);
                 var oText = oEvent.getSource().getSelectedItem().getText();
                 if (oText === "NIGHT ALLOWANCE") {
@@ -539,7 +551,7 @@ sap.ui.define([
                     this.ViewModel.setProperty("/enable", true);
                 }
             },
-            
+
             _LCvalidateMultiComboBox: function(oMultiComboBox) {
                 if (!oMultiComboBox) return false;
                 var aSelectedKeys = oMultiComboBox.getSelectedKeys();
@@ -554,33 +566,37 @@ sap.ui.define([
 
             async Exp_Det_onPressSubmit() {
                 var oModel = this.getView().getModel("AllowanceCreateModel").getData();
-                var oItemModel =this.getView().getModel("ItemAllowanceModel").getData(); // Existing saved items
-                if (utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") && this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag"))) { 
-
+                var oItemModel = this.getView().getModel("ItemAllowanceModel").getData(); // Existing saved items
+                if (this._LCvalidateMultiComboBox(sap.ui.getCore().byId("dateMultiBoxFrag"))) {
                     var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                     var aSelectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); // array of YYYY-MM-DD
                    // oModel.Dates = aSelectedDates;
 
-                   let selectedDates = [];
-                    if (sap.ui.getCore().byId("dateMultiBoxFrag").getVisible()) {
-                        selectedDates = sap.ui.getCore().byId("dateMultiBoxFrag").getSelectedKeys(); 
+                  let oDateBox = sap.ui.getCore().byId("dateMultiBoxFrag");
+                    let selectedDates = [];
+                    if (oDateBox.getVisible()) {
+                        selectedDates = oDateBox.getSelectedKeys();
                     } else {
                         selectedDates = [oModel.AllowanceDate];
                     }
-
                     const existingDates = oItemModel.map(item =>
                         new Date(item.AllowanceDate).toDateString()
                     );
-                   
-                    const duplicateDates = selectedDates.filter(date =>  // Find duplicates
+                    const duplicateDates = selectedDates.filter(date => // Find duplicates
                         existingDates.includes(new Date(date).toDateString())
                     );
-
-                    if (duplicateDates.length > 0) {
+                    if (duplicateDates.length > 0) { //  Show message for duplicates
                         MessageToast.show(`Allowance already exists for: ${duplicateDates.join(", ")}`);
-                        return;
+                        const newSelectedDates = selectedDates.filter(date => // Remove duplicate dates
+                            !duplicateDates.includes(date)
+                        );
+                        oDateBox.setSelectedKeys(newSelectedDates);    //  Visually update MultiComboBox selection
+                        if (newSelectedDates.length === 0) { // Stop further creation if no new dates left
+                            return;
+                        }
+                        aSelectedDates = newSelectedDates; // Continue only with non-duplicate dates
                     }
-                    
+
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
                         data: {
@@ -594,7 +610,7 @@ sap.ui.define([
                             AllowanceAmount: oModel.Currency !== "INR" ? oModel.TotalAmount : oModel.AllowanceAmount,
                             Dates: aSelectedDates,
                             ForeignAmount: oModel.AllowanceAmount,
-                            ItemType: oModel.ItemType,
+                            ItemType: oItemModel[0]?.ItemType,
                             ModeOfPayment: oModel.ModeOfPayment
                         },
                     };
@@ -603,7 +619,9 @@ sap.ui.define([
                         const oCreateResponse = await this.ajaxCreateWithJQuery("ItemAllowance", oData);
                         if (oCreateResponse) {
                             MessageToast.show(this.i18nModel.getText("allowanceCreatedMess"));
-                            this._fetchCommonData("Allowance", "FilteredAllowanceModel", {AllowanceID: this.AllowanceID,});
+                            this._fetchCommonData("Allowance", "FilteredAllowanceModel", {
+                                AllowanceID: this.AllowanceID,
+                            });
                             this.IndexNoIncreent();
                             this.ViewModel.setProperty("/enable", true);
                             this.AllowanceItem.close();
@@ -627,17 +645,17 @@ sap.ui.define([
                 var FilterModel = this.getView().getModel("FilteredAllowanceModel").getData()[0];
                 if (utils._LCvalidateDate(sap.ui.getCore().byId("item_id_AllowanceDate"), "ID") && utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") && utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_ItemType"), "ID") &&
                     (
-                        oModel.ItemType === "NIGHT ALLOWANCE"
-                            ? true
-                            : (
-                                utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") &&
-                                utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") &&
-                                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") &&
-                                (
-                                    oModel.Currency !== "INR"
-                                        ? utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID")
-                                        : true
-                                )))) {
+                        oModel.ItemType === "NIGHT ALLOWANCE" ?
+                        true :
+                        (
+                            utils._LCvalidateAmount(sap.ui.getCore().byId("item_id_Amount"), "ID") &&
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("item_id_Currency"), "ID") &&
+                            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("item_id_Comments"), "ID") &&
+                            (
+                                oModel.Currency !== "INR" ?
+                                utils._LCvalidateMultipleDecimal(sap.ui.getCore().byId("item_id_ConvertionRate"), "ID") :
+                                true
+                            )))) {
 
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
@@ -661,7 +679,9 @@ sap.ui.define([
                     await this.ajaxUpdateWithJQuery("ItemAllowance", oData)
                         .then((oData) => {
                             if (oData) {
-                                 this._fetchCommonData("Allowance", "FilteredAllowanceModel", {AllowanceID: this.AllowanceID,});
+                                this._fetchCommonData("Allowance", "FilteredAllowanceModel", {
+                                    AllowanceID: this.AllowanceID,
+                                });
                                 this.IndexNoIncreent();
                                 this.AllowanceTotalCalculation();
                                 this.AllowanceItem.close();
@@ -683,7 +703,7 @@ sap.ui.define([
                 }
             },
 
-            Exp_Det_onPressExpenseItemDelete: async function () {
+            Exp_Det_onPressExpenseItemDelete: async function() {
                 const that = this;
                 const selectedItem = this.byId("AllItem_id_ItemTable").getSelectedItem();
                 if (!selectedItem) {
@@ -692,31 +712,31 @@ sap.ui.define([
                 this.showConfirmationDialog(
                     this.i18nModel.getText("msgBoxConfirm"),
                     this.i18nModel.getText("commonMesBoxConfirmDeleteAllowance"),
-                    async function () {
-                        that.getBusyDialog();
-                        try {
-                            const itemID = selectedItem.getBindingContext("ItemAllowanceModel").getObject().ItemID;
-                            await that.ajaxDeleteWithJQuery("/ItemAllowance", {
-                                filters: {
-                                    ItemID: itemID
-                                }
-                            });
+                    async function() {
+                            that.getBusyDialog();
+                            try {
+                                const itemID = selectedItem.getBindingContext("ItemAllowanceModel").getObject().ItemID;
+                                await that.ajaxDeleteWithJQuery("/ItemAllowance", {
+                                    filters: {
+                                        ItemID: itemID
+                                    }
+                                });
 
-                            MessageToast.show(that.i18nModel.getText("allowanceItemDeleteMess"));
-                            await that.AllowanceTotalCalculation();
-                            await that.IndexNoIncreent();
-                        } catch (error) {
-                            MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
-                        } finally {
+                                MessageToast.show(that.i18nModel.getText("allowanceItemDeleteMess"));
+                                await that.AllowanceTotalCalculation();
+                                await that.IndexNoIncreent();
+                            } catch (error) {
+                                MessageToast.show(that.i18nModel.getText("commonErrorMessage"));
+                            } finally {
+                                that.closeBusyDialog();
+                            }
+                        },
+                        function() {
                             that.closeBusyDialog();
-                        }
-                    },
-                    function () {
-                        that.closeBusyDialog();
-                    });
+                        });
             },
 
-            AllowanceTotalCalculation: async function () {
+            AllowanceTotalCalculation: async function() {
                 await this._fetchCommonData("AllowanceTotalCalculation", "", {
                     AllowanceID: this.AllowanceID
                 });
@@ -725,7 +745,7 @@ sap.ui.define([
                 });
             },
 
-            Exp_Det_onPressSubmitExpenseItems: function () {
+            Exp_Det_onPressSubmitExpenseItems: function() {
                 var that = this;
                 var oModelData = that.getView().getModel("FilteredAllowanceModel").getData()[0];
 
@@ -736,7 +756,7 @@ sap.ui.define([
                 var itemAllowances = that.getView().getModel("ItemAllowanceModel").getData();
 
                 if (oModelData.TravelAllowance === "YES") {
-                    var hasPerDiemDeclaration = itemAllowances.some(function (item) {
+                    var hasPerDiemDeclaration = itemAllowances.some(function(item) {
                         return item.ItemType === "Perdiem Declaration";
                     });
 
@@ -767,7 +787,7 @@ sap.ui.define([
                     beginButton: new sap.m.Button({
                         text: "OK",
                         type: "Accept",
-                        press: function () {
+                        press: function() {
                             if (checkbox.getSelected()) {
                                 //  Validate if comment is required and empty
                                 if (commentTextArea.getVisible() && !commentTextArea.getValue().trim()) {
@@ -805,7 +825,9 @@ sap.ui.define([
                                 that.getBusyDialog();
                                 that.ajaxUpdateWithJQuery("Allowance", inboxData).then((oData) => {
                                     if (oData) {
-                                        that._fetchCommonData("Allowance", "FilteredAllowanceModel", { AllowanceID: that.AllowanceID, });
+                                        that._fetchCommonData("Allowance", "FilteredAllowanceModel", {
+                                            AllowanceID: that.AllowanceID,
+                                        });
                                         that.ViewModel.setProperty("/status", false);
                                         that.byId("AllItem_id_ItemTable").setMode(sap.m.ListMode.None);
                                         dialog.close();
@@ -828,11 +850,11 @@ sap.ui.define([
                     endButton: new sap.m.Button({
                         text: "Cancel",
                         type: "Reject",
-                        press: function () {
+                        press: function() {
                             dialog.close();
                         }
                     }),
-                    afterClose: function () {
+                    afterClose: function() {
                         dialog.destroy();
                     }
                 });
@@ -840,7 +862,7 @@ sap.ui.define([
                 dialog.open();
             },
 
-            Exp_Frg_onChangeConverstionRate: function (oEvent) {
+            Exp_Frg_onChangeConverstionRate: function(oEvent) {
                 var oModel = this.getView().getModel("AllowanceCreateModel");
                 var oModelAllowanceCreate = oModel.getData();
                 if (oModelAllowanceCreate.Currency !== "INR") {
@@ -849,7 +871,7 @@ sap.ui.define([
                 }
             },
 
-            onShowMore: function (oEvent) {
+            onShowMore: function(oEvent) {
                 var oContext = oEvent.getSource().getBindingContext("ItemAllowanceModel");
                 var oData = oContext.getObject();
                 var oComment = oData.Comments || {}; // Assuming single comment object
@@ -882,7 +904,7 @@ sap.ui.define([
                     endButton: new sap.m.Button({
                         text: "Close",
                         type: "Reject",
-                        press: function () {
+                        press: function() {
                             oDialog.close();
                             oDialog.destroy();
                         }
@@ -891,20 +913,20 @@ sap.ui.define([
                 oDialog.open();
             },
 
-            onSectionChange: function (oEvent) {
+            onSectionChange: function(oEvent) {
                 var oSection = oEvent.getParameter("section");
                 if (oSection.getTitle() === 'Comments') {
                     this.AL_onShowEmployeeComments(oEvent);
                 }
             },
 
-            AL_onShowEmployeeComments: function (oEvent) {
+            AL_onShowEmployeeComments: function(oEvent) {
                 var oView = this.getView();
                 var aData = oView.getModel("FilteredAllowanceModel").getData();
                 var oData = Array.isArray(aData) && aData.length > 0 ? aData[0] : {};
                 var aComments = oData.comments || [];
 
-                var aTimelineItems = aComments.reverse().map(function (oComment) {
+                var aTimelineItems = aComments.reverse().map(function(oComment) {
                     return new sap.suite.ui.commons.TimelineItem({
                         dateTime: new Date(oComment.CommentDateTime).toLocaleString(),
                         title: oComment.CommentedBy || "Anonymous",
@@ -926,8 +948,9 @@ sap.ui.define([
                 oVBox.removeAllItems();
                 oVBox.addItem(oTimeline);
             },
-            EXP_FRG_validatepaymentMode:function(oEvent){
-            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
+            EXP_FRG_validatepaymentMode: function(oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             }
         });
     });

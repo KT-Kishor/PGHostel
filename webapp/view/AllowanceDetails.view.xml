@@ -133,8 +133,7 @@
 											<m:cells>
 												<m:Text text="{ItemAllowanceModel>IndexNo}" />
 												<m:Text
-														text="{ItemAllowanceModel>ItemType}"
-														visible="{= ${ItemAllowanceModel>ItemType} === 'NIGHT ALLOWANCE' }" />
+														text="{ItemAllowanceModel>ItemType}" />
 												<m:Text text="{path:'ItemAllowanceModel>AllowanceDate'}" />
 												<m:VBox>
 													<m:HBox >
