@@ -205,7 +205,7 @@
 										</ux:ObjectPageSubSection>
 									</ux:subSections>
 								</ux:ObjectPageSection>
-								<ux:ObjectPageSection titleUppercase="false" title="Expense" visible="{= ${TileAccessModel>/Expense} === '1' ? true : false}">
+								<ux:ObjectPageSection titleUppercase="false" title="Expense and Allowance" visible="{= ${TileAccessModel>/Expense} === '1' ? true : false}">
 									<ux:subSections>
 										<ux:ObjectPageSubSection titleUppercase="false">
 											<ux:blocks>

@@ -50,9 +50,9 @@
 									<!-- Status -->
 									<m:Label text="{i18n>status}"/>
 									<m:Input  value="{FilteredAllowanceModel>/0/Status}"  editable="false" />
-									<!-- Trip Type -->
-									<m:Label text="{i18n>expExpenseType}"/>
-									<m:Input value="{FilteredAllowanceModel>/0/TripType}" editable="false"></m:Input>
+									<!-- Allowance Data -->
+									<m:Label text="{i18n>workingfor}"/>
+									<m:Input value="{FilteredAllowanceModel>/0/AllowanceData}" editable="false"></m:Input>
 									<!-- Travel Allowance -->
 									<m:Label text="{i18n>allowanceType}"/>
 									<m:Input value="{FilteredAllowanceModel>/0/AllowanceType}" editable="false"></m:Input>

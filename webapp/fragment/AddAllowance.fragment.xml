@@ -85,10 +85,10 @@
 				<Select items="{Costcenter>/Costcenter}" id="All_id_CostCenter" selectedKey="{CreateAllowanceModel>/CostCenter}" >
 					<core:Item key="{Costcenter>Value}" text="{Costcenter>Value}" />
 				</Select>
-				<!-- Trip Type -->
-				<Label text="{i18n>expExpenseType}" required="true"/>
-				<ComboBox items="{TripType>/}" id="All_id_ExpenseType" valueStateText="{i18n>selectexpensetype}" selectedKey="{CreateAllowanceModel>/TripType}" change="Exp_onChangeExpenseType">
-					<core:Item key="{TripType>Name}" text="{TripType>Name}" />
+				<!-- AllowanceData -->
+				<Label text="{i18n>workingfor}" required="true"/>
+				<ComboBox items="{AllowanceData>/}" id="All_id_ExpenseType" valueStateText="{i18n>selectexpensetype}" selectedKey="{CreateAllowanceModel>/AllowanceData}" change="Exp_onChangeExpenseType">
+					<core:Item key="{AllowanceData>Name}" text="{AllowanceData>Name}" />
 				</ComboBox>
 				<Label text="{i18n>expEmployeeRemark}" required="true"/>
 				<TextArea liveChange="Exp_onChangeEmployeeRemark" valueStateText="{i18n>expValStaEmployeeRemark}" id="All_id_EmployeeRemark" rows="2" value="{CreateAllowanceModel>/Comments}" placeholder="{i18n>expValStaEmployeeRemark}" maxLength="1000" />

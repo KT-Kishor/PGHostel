@@ -128,6 +128,11 @@
             "uri": "model/TripType.json",
             "preload": true
           },
+          "AllowanceData": {
+            "type": "sap.ui.model.json.JSONModel",
+            "uri": "model/AllowanceData.json",
+            "preload": true
+          },
           "Salutation": {
             "type": "sap.ui.model.json.JSONModel",
             "uri": "model/Salutation.json",

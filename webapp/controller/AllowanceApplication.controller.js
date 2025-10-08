@@ -254,7 +254,7 @@ sap.ui.define([
                 Source: "",
                 Destination: "",
                 CostCenter: "Kvriksha Technologies Private Limited Kalaburagi",
-                TripType: "",
+                AllowanceData: "",
                 Comments: "",
                 Status: "Draft",
                 AllowanceStartDate:"",
