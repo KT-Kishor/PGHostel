@@ -446,10 +446,21 @@ sap.ui.define([
                     return;
                 }
 
-                const sStateName   = oSelectedItem.getKey() || oSelectedItem.getText();
-                const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+                const sStateName = oSelectedItem.getKey() || oSelectedItem.getText();
+                let sCountryCode = "";
+                const oCountryItem = oCountryCB.getSelectedItem();
+                if (oCountryItem) {
+                    sCountryCode = oCountryItem.getAdditionalText(); // Use selected item
+                } else {
+                    const sCountryValue = oCountryCB.getValue();
+                    const aCountries = this.getView().getModel("CountryModel").getData();
+                    const oMatch = aCountries.find(item => item.countryName === sCountryValue);
+                    if (oMatch) {
+                        sCountryCode = oMatch.code || oMatch.CountryCode; // Match actual property
+                    }
+                }
                 const aFilters = [
-                    new sap.ui.model.Filter("stateName",   sap.ui.model.FilterOperator.EQ, sStateName),
+                    new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                     new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                 ];
 

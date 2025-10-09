@@ -78,12 +78,11 @@ sap.ui.define([
                 var sMonth = String(oDate.getMonth() + 1).padStart(2, "0");
                 var sYear = oDate.getFullYear();
                 var sFormatted = `${sDay}/${sMonth}/${sYear}`;
-                var sWeekday = this._getDayName(oDate); // 🟢 added line
-
+                var sWeekday = this._getDayName(oDate); 
                 aDates.push({
                     key: sFormatted, // unique key
                     day: sFormatted, // display text
-                    weekday: sWeekday // 🟢 added field
+                    weekday: sWeekday //  added field
                 });
             }
             this.getView().getModel().setProperty("/dates", aDates);
@@ -146,16 +145,15 @@ sap.ui.define([
             var daysInMonth = oEndDate.getDate();
             var aDates = [];
             for (var day = 1; day <= daysInMonth; day++) {
-                let oDate = new Date(iYear, iMonth, day); // 🟢 added for weekday
+                let oDate = new Date(iYear, iMonth, day); //  added for weekday
                 let dayStr = day.toString().padStart(2, "0"); 
                 let monthStr = (iMonth + 1).toString().padStart(2, "0");
                 let fullDate = `${dayStr}/${monthStr}/${iYear}`; // dd/MM/yyyy
-                let sWeekday = this._getDayName(oDate); // 🟢 added
-
+                let sWeekday = this._getDayName(oDate); 
                 aDates.push({
                     key: fullDate,
                     day: fullDate,
-                    weekday: sWeekday // 🟢 added
+                    weekday: sWeekday 
                 });
             }
 
@@ -182,14 +180,13 @@ sap.ui.define([
             var iLastDay = new Date(iYear, iMonth + 1, 0).getDate(); 
             var aDates = [];
             for (var d = 1; d <= iLastDay; d++) {
-                var oDate = new Date(iYear, iMonth, d); // 🟢 added
+                var oDate = new Date(iYear, iMonth, d); 
                 var sDay = String(d).padStart(2, "0");
                 var sMonth = String(iMonth + 1).padStart(2, "0");
                 var sYear = iYear;
                 var sFormatted = `${sDay}/${sMonth}/${sYear}`;
-                var sWeekday = this._getDayName(oDate); // 🟢 added
-
-                aDates.push({ key: sFormatted, day: sFormatted, weekday: sWeekday }); // 🟢 added weekday
+                var sWeekday = this._getDayName(oDate); 
+                aDates.push({ key: sFormatted, day: sFormatted, weekday: sWeekday })
             }
 
             if (oDateMultiBox) {
@@ -200,7 +197,7 @@ sap.ui.define([
                     template: new sap.ui.core.ListItem({
                         key: "{key}",
                         text: "{day}",
-                        additionalText: "{weekday}" // 🟢 added
+                        additionalText: "{weekday}" 
                     })
                 });
             }
@@ -394,7 +391,7 @@ sap.ui.define([
             }
         },
 
-         _LCvalidateMultiComboBox: function(oMultiComboBox) {
+        _LCvalidateMultiComboBox: function(oMultiComboBox) {
             if (!oMultiComboBox) return false;
             var aSelectedKeys = oMultiComboBox.getSelectedKeys();
             if (!aSelectedKeys || aSelectedKeys.length === 0) {
