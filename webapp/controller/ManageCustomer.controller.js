@@ -100,6 +100,10 @@ sap.ui.define([
                     oModel = new JSONModel(oData);
                 }
                 this.getView().setModel(oModel, "CustomerModel");
+                if (this.oManageCustomerDialog){
+                        this.oManageCustomerDialog.destroy();
+                        this.oManageCustomerDialog = null;
+                }
                 if (!this.oManageCustomerDialog) {
                     sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.CreateCustomer",

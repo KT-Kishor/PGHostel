@@ -68,7 +68,7 @@
 									<!-- Country -->
 									<m:Label text="{i18n>expCountry}" required="true"/>
 									<m:ComboBox id="AllItem_id_Country" valueStateText="{i18n>expValStaCountry}" change="Exp_Det_CountryChange" items="{path:'CountryModel>/',length:1000}" value="{FilteredAllowanceModel>/0/Country}" editable="{viewModel>/editable}">
-										<core:ListItem key="{CountryModel>id}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+										<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 									</m:ComboBox>
 									<!-- State -->
 									<m:Label text="{i18n>state}" required="true"/>

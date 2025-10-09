@@ -138,6 +138,10 @@ sap.ui.define([
         Exp_onPressAddExpense: function() {
             this.CommonModel();
             var oView = this.getView();
+             if (this.Expense) {
+                 this.Expense.destroy();
+                  this.Expense = null;
+            }
             if (!this.Expense) {
                 this.Expense = sap.ui.core.Fragment.load({
                     name: "sap.kt.com.minihrsolution.fragment.AddExpense",

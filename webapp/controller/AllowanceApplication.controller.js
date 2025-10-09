@@ -272,7 +272,10 @@ sap.ui.define([
         // Open the "Add Expense" fragment
         Exp_onPressAddExpense: function() {
             this.CommonModel();
-            var oView = this.getView();
+             if (this.Expense) {
+                        this.Expense.destroy();
+                        this.Expense = null;
+                    }
             var oView = this.getView();
             if (!this.Expense) {
                 this.Expense = sap.ui.core.Fragment.load({
@@ -305,6 +308,10 @@ sap.ui.define([
             var oDateMultiBox = core.byId("dateMultiBox"); // Clear dates on close
             if (oDateMultiBox) {
                 oDateMultiBox.removeAllSelectedItems();
+            }
+             if (this.Expense) {
+                this.Expense.destroy();
+                this.Expense = null;
             }
             core.byId("All_id_AllowanceName").setValueState("None");
             core.byId("monthSelect").setValueState("None");
@@ -357,6 +364,10 @@ sap.ui.define([
                     var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
                     if (oDateMultiBox) {
                         oDateMultiBox.removeAllSelectedItems();
+                    }
+                     if (this.Expense) {
+                        this.Expense.destroy();
+                        this.Expense = null;
                     }
                     MessageToast.show(that.i18nModel.getText("allowanceCreatedMess"));
                 } else {
