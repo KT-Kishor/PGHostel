@@ -604,7 +604,7 @@ sap.ui.define([
                     if (oModel.Currency !== "INR") this.Exp_Frg_onChangeConverstionRate();
                     var oData = {
                         data: {
-                            Comments: oModel.Comments,
+                            // Comments: oModel.Comments,
                             AllowanceID: FilterModel.AllowanceID,
                             ConversionRate: oModel.Currency !== "INR" ? oModel.ConversionRate : "1",
                             Currency: oModel.Currency,

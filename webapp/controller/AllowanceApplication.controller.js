@@ -256,6 +256,7 @@ sap.ui.define([
                 Status: "Draft",
                 AllowanceStartDate:"",
                 AllowanceEndDate:"",
+                paymentStatus: "Unpaid"
             });
             this.getOwnerComponent().setModel(oModel, "CreateAllowanceModel");
         },
