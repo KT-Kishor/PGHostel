@@ -23,11 +23,17 @@
 					<!-- Location -->
 					<fb:FilterGroupItem name="Location" label="Location" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="filterLocation" placeholder="Choose Location" showClearIcon="true" showSecondaryValues="true" selectedKey="{filtersModel>/SelectedLocation}" items="{BaseLocationModel>/}">
-								<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+							<ComboBox 
+								id="HP_id_LocationFilter" 
+								placeholder="Choose Location" 
+								showClearIcon="true" 
+								showSecondaryValues="true"
+								items="{path:'FilterJobModel>/LocationSet', length:1000}">
+								<core:ListItem key="{FilterJobModel>Location}" text="{FilterJobModel>Location}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+
 					<!-- Experience -->
 					<fb:FilterGroupItem name="Experience" label="Experience" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>

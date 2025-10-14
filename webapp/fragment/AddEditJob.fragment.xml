@@ -19,10 +19,24 @@
 			<f:SimpleForm id="addJobForm24" editable="true" layout="ResponsiveGridLayout">
 				<f:content>
 					<Title text="Administrative Details" level="H4" class="sapUiSmallMargin" />
-					<Label text="Location" required="true" class="sapUiSmallMarginTop" />
-					<ComboBox id="idlocationcombo" placeholder="Select Location" required="true" class="sapUiSmallMarginTop" showClearIcon="true" showSecondaryValues="true" items="{BaseLocationModel>/}" change="onLocationChange" valueStateText="{i18n>jpLocationValueState}" value="{temporaryModel>/SelectedJobLocation}">
-						<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
+					<Label text="{i18n>expCountry}" required="true" class="sapUiSmallMarginTop"/>
+					<ComboBox id="HP_id_Country" change="MC_onChangeCountry" valueStateText="{i18n>expValStaCountry}" class="sapUiSmallMarginTop"
+					items="{path:'CountryModel>/',length:1000}" selectedKey="{temporaryModel>/country}" showSecondaryValues="true" value="{temporaryModel>/country}">
+					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 					</ComboBox>
+
+					<Label text="{i18n>state}" required="true" class="sapUiSmallMarginTop"/>
+					<ComboBox id="HP_id_State" change="MC_onChangeState" valueStateText="{i18n>expValStaState}" class="sapUiSmallMarginTop"
+					items="{path:'StateModel>/',length:1000}" selectedKey="{temporaryModel>/state}" showSecondaryValues="true" value="{temporaryModel>/state}">
+					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}"/>
+					</ComboBox>
+
+					<Label text="{i18n>contractLocation}" required="true" class="sapUiSmallMarginTop"/>
+					<ComboBox id="HP_id_City" change="MC_onChangeCity" valueStateText="{i18n>combovalueState}" items="{path:'CityModel>/',length:1000}" selectedKey="{temporaryModel>/Location}" value="{temporaryModel>/Location}" 
+					showSecondaryValues="true" class="sapUiSmallMarginTop">
+					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
+					</ComboBox>
+
 					<Label text="Work Mode" required="true" class="sapUiSmallMarginTop" />
 					<ComboBox id="workModeCombo" placeholder="Select Work Mode" required="true" class="sapUiSmallMarginTop" items="{WorkingMode>/location}" selectedKey="{temporaryModel>/SelectedWorkMode}" showClearIcon="true" change="onWorkModeChange" valueStateText="{i18n>jpWorkMode}">
 						<core:ListItem key="{WorkingMode>ID}" text="{WorkingMode>Location}" />
