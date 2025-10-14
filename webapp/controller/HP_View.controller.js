@@ -307,7 +307,7 @@ sap.ui.define(
                     });
                 },
 
-                MC_onChangeCountry: function(oEvent) {
+                HP_onChangeCountry: function(oEvent) {
                     validation._LCstrictValidationComboBox(oEvent, "oEvent");
                     const oSelectedItem = oEvent.getSource().getSelectedItem();
                     const oStateCombo = this.byId("HP_id_State");
@@ -340,7 +340,7 @@ sap.ui.define(
                     }
                 },
 
-                MC_onChangeState: function(oEvent) {
+                HP_onChangeState: function(oEvent) {
                     validation._LCstrictValidationComboBox(oEvent, "oEvent");
                     const oSelectedItem = oEvent.getSource().getSelectedItem();
 
@@ -354,7 +354,7 @@ sap.ui.define(
 
                     if (!oSelectedItem) {
                         oModel.setProperty("/state", "");
-                        oModel.setProperty("/baseLocation", "");
+                        oModel.setProperty("/Location", "");
                     } else {
                         const sStateName = oSelectedItem.getKey() || oSelectedItem.getText();
                         const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
@@ -369,7 +369,7 @@ sap.ui.define(
                     }
                 },
 
-                MC_onChangeCity: function(oEvent) {
+                HP_onChangeCity: function(oEvent) {
                     validation._LCstrictValidationComboBox(oEvent, "oEvent");
 
                     const oSelectedItem = oEvent.getSource().getSelectedItem();

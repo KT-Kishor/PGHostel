@@ -338,7 +338,6 @@ sap.ui.define(
                     this.getView().setModel(oExpYears, "ExpYears");
 
                     const oView = this.getView();
-                    this.byId("V1_ID_Table").setBusy(true);
 
                     $.ajax({
                         url: "https://rest.kalpavrikshatechnologies.com/JobOpenings",
@@ -357,14 +356,12 @@ sap.ui.define(
                             });
                             oView.setModel(oModel, "JobApplicationModel");
                             this._loadComboBoxModels(activeCandidates, oView);
-                            this.byId("V1_ID_Table").setBusy(false);
                         }.bind(this),
                         error: function(error) {
                             const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
                             const fallbackMessage = oResourceBundle.getText("V1_m_errFetchD");
                             const errorMessage = error?.responseJSON?.message || fallbackMessage;
                             MessageToast.show("Error: " + errorMessage);
-                            this.byId("V1_ID_Table").setBusy(false);
                         }.bind(this),
                     });
                 },
