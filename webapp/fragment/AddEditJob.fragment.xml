@@ -21,13 +21,13 @@
 					<Title text="Administrative Details" level="H4" class="sapUiSmallMargin" />
 					<Label text="{i18n>expCountry}" required="true" class="sapUiSmallMarginTop"/>
 					<ComboBox id="HP_id_Country" change="HP_onChangeCountry" valueStateText="{i18n>expValStaCountry}" class="sapUiSmallMarginTop"
-					items="{path:'CountryModel>/',length:1000}" selectedKey="{temporaryModel>/country}" showSecondaryValues="true" value="{temporaryModel>/country}">
+					items="{path:'CountryModel>/',length:1000}" selectedKey="{temporaryModel>/country}" showSecondaryValues="true" >
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 					</ComboBox>
 
 					<Label text="{i18n>state}" required="true" class="sapUiSmallMarginTop"/>
 					<ComboBox id="HP_id_State" change="HP_onChangeState" valueStateText="{i18n>expValStaState}" class="sapUiSmallMarginTop"
-					items="{path:'StateModel>/',length:1000}" selectedKey="{temporaryModel>/state}" showSecondaryValues="true" value="{temporaryModel>/state}">
+					items="{path:'StateModel>/',length:1000}" selectedKey="{temporaryModel>/state}" showSecondaryValues="true">
 					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}"/>
 					</ComboBox>
 

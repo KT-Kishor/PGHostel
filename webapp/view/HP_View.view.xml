@@ -15,7 +15,7 @@
 					<!-- Primary Skills -->
 					<fb:FilterGroupItem name="Skills" label="Primary Skills" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<Input id="filterPrimarySkills" placeholder="Type a skill" showClearIcon="true" showSuggestion="true" suggest="onSuggestSkills" suggestionItems="{    path: 'skillModel>/skills'  }">
+							<Input id="filterPrimarySkills" placeholder="Type a skill" showClearIcon="true" showSuggestion="true" suggest="onSuggestSkills" suggestionItems="{path: 'skillModel>/skills'}">
 								<core:Item key="{skillModel>skill}" text="{skillModel>skill}" />
 							</Input>
 						</fb:control>
