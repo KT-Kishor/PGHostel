@@ -636,18 +636,14 @@ sap.ui.define(
                         PostDate: (oData.PostDate || "").split("T")[0] || "",
                         Status: oData.Status || "false",
                         isEdit: true,
-                        country: oData.Country || "",
-                        state: oData.State || "",
+                        country: oData.country || "",
+                        state: oData.state || "",
                         Location: oData.Location || "",
                     });
 
-                    // ✅ Set model before opening
                     oView.setModel(oTempModel, "temporaryModel");
-
-                    // ✅ Open dialog, THEN apply filters
                     this._openJobDialog(oTempModel)
                         .then(() => {
-                            // 🔹 Now fragment is loaded — controls exist
                             this._applyCountryStateCityFilters(oData);
                         })
                         .catch(() => {})
@@ -659,22 +655,14 @@ sap.ui.define(
 
                 _applyCountryStateCityFilters: function(oData) {
                     if (!oData) return;
-
                     const sCountry = oData.country || "";
                     const sState = oData.state || "";
                     const sCity = oData.Location || "";
 
                     const oView = this.getView();
-
-                    // ✅ Get ComboBoxes from fragment (using view ID)
                     const oCountryCB = sap.ui.core.Fragment.byId(oView.getId(), "HP_id_Country");
                     const oStateCB = sap.ui.core.Fragment.byId(oView.getId(), "HP_id_State");
                     const oCityCB = sap.ui.core.Fragment.byId(oView.getId(), "HP_id_City");
-
-                    if (!oCountryCB || !oStateCB || !oCityCB) {
-                        console.warn("ComboBoxes not found yet (fragment may not be loaded).");
-                        return;
-                    }
 
                     // Reset filters
                     oStateCB.getBinding("items")?.filter([]);
