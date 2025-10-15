@@ -161,8 +161,7 @@ sap.ui.define([
                         day: formattedDate,
                         weekday: sWeekday
                     });
-                    //dates.push(formattedDate);
-
+                    
                     // Move to next day
                     date.setDate(date.getDate() + 1);
                 }
@@ -176,44 +175,58 @@ sap.ui.define([
                 var that = this;
                 var oView = this.getView();
                 this.getBusyDialog();
-                this._fetchCommonData("ItemAllowance", "ItemAllowanceModel", {
-                        EmployeeID: that.FilteredAllowanceModel[0].EmployeeID,
-                        AllowanceID: that.AllowanceID
-                    })
-                    .then(function() {
-                        let modelData = oView.getModel("ItemAllowanceModel").getData();
 
-                        if (!Array.isArray(modelData) || modelData.length === 0) {
-                            that.IndexNo = 0;
-                            return;
-                        }
+                this._fetchCommonData("Allowance", "ItemAllowanceModel", {
+                    EmployeeID: that.FilteredAllowanceModel[0].EmployeeID,
+                    AllowanceID: that.AllowanceID
+                })
+                .then(function() {
+                    let modelData = oView.getModel("ItemAllowanceModel").getData();
 
-                        // Sort by AllowanceDate (ascending)
-                        modelData.sort(function(a, b) {
-                            const parseDate = (dateStr) => {
-                                if (!dateStr) return new Date(0);
-                                if (dateStr.includes("/")) {
-                                    const [day, month, year] = dateStr.split("/");
-                                    return new Date(`${year}-${month}-${day}`);
-                                }
-                                return new Date(dateStr);
-                            };
-                            return parseDate(a.AllowanceDate) - parseDate(b.AllowanceDate);
-                        });
-
-                        modelData.forEach((item, index) => {
-                            item.IndexNo = index + 1;
-                            that.IndexNo = index + 1;
-                        });
-
-                        oView.getModel("ItemAllowanceModel").setData(modelData);
-                    })
-                    .catch(function(error) {
+                    if (!Array.isArray(modelData) || modelData.length === 0) {
                         that.IndexNo = 0;
-                    })
-                    .finally(function() {
-                        that.closeBusyDialog();
+                        return;
+                    }
+
+                    let expandedData = [];
+                    modelData.forEach(item => {
+                        if (item.Dates) {
+                            let dates = item.Dates.split(","); // Split by comma
+                            dates.forEach(date => {
+                                expandedData.push({
+                                    ...item,
+                                    Dates: date.trim()
+                                });
+                            });
+                        } else {
+                            expandedData.push(item);
+                        }
                     });
+
+                    // Sort by Dates
+                    expandedData.sort((a, b) => {
+                        const parseDate = (dateStr) => {
+                            const [day, month, year] = dateStr.split("/");
+                            return new Date(`${year}-${month}-${day}`);
+                        };
+                        return parseDate(a.Dates) - parseDate(b.Dates);
+                    });
+
+                    // Add IndexNo
+                    expandedData.forEach((item, index) => {
+                        item.IndexNo = index + 1;
+                        that.IndexNo = index + 1;
+                    });
+
+                    oView.getModel("ItemAllowanceModel").setData(expandedData);
+
+                })
+                .catch(function(error) {
+                    that.IndexNo = 0;
+                })
+                .finally(function() {
+                    that.closeBusyDialog();
+                });
             },
 
             //Open Fragment in Expeanse Item Create and Update 
@@ -262,11 +275,9 @@ sap.ui.define([
                     EmployeeID: this.LoginModel.getProperty("/EmployeeID"),
                     EmployeeName: this.LoginModel.getProperty("/EmployeeName"),
                     IndexNo: this.IndexNo + 1,
-                    ItemType: "",
                     AllowanceAmount: "0",
                     Currency: "INR",
-                    ModeOfPayment: "",
-                    AllowanceDate: (this.getView().getModel("FilteredAllowanceModel").getData()[0].AllowanceDate),
+                    Dates: (this.getView().getModel("FilteredAllowanceModel").getData()[0].Dates),
                     Comments: "",
                     Submit: true,
                     Save: false,
@@ -611,16 +622,14 @@ sap.ui.define([
                             Country: FilterModel.Country,
                             EmployeeName: FilterModel.EmployeeName,
                             EmployeeID: FilterModel.EmployeeID,
-                            AllowanceAmount: oModel.Currency !== "INR" ? oModel.TotalAmount : oModel.AllowanceAmount,
+                            AllowanceAmount: oItemModel[0].AllowanceAmount,
                             Dates: aSelectedDates,
-                            ForeignAmount: oModel.AllowanceAmount,
-                            ItemType: oItemModel[0]?.ItemType,
-                            ModeOfPayment: oModel.ModeOfPayment
+                            ForeignAmount: oItemModel[0].ForeignAmount,
                         },
                     };
                     this.getBusyDialog();
                     try {
-                        const oCreateResponse = await this.ajaxCreateWithJQuery("ItemAllowance", oData);
+                        const oCreateResponse = await this.ajaxUpdateWithJQuery("AllowanceDetail", oData);
                         if (oCreateResponse) {
                             MessageToast.show(this.i18nModel.getText("allowanceCreatedMess"));
                             this._fetchCommonData("Allowance", "FilteredAllowanceModel", {
@@ -723,10 +732,10 @@ sap.ui.define([
                     async function() {
                             that.getBusyDialog();
                             try {
-                                const itemID = selectedItem.getBindingContext("ItemAllowanceModel").getObject().ItemID;
-                                await that.ajaxDeleteWithJQuery("/ItemAllowance", {
-                                    filters: {
-                                        ItemID: itemID
+                                await that.ajaxUpdateWithJQuery("/AllowanceDelete", {
+                                    data: {
+                                        Dates: selectedItem.getBindingContext("ItemAllowanceModel").getObject().Dates,
+                                        AllowanceID: selectedItem.getBindingContext("ItemAllowanceModel").getObject().AllowanceID,
                                     }
                                 });
 
@@ -814,15 +823,13 @@ sap.ui.define([
                                         EmployeeID: oModelData.EmployeeID,
                                         EmployeeName: oModelData.EmployeeName,
                                         Type: "Allowance",
-                                        TripType: oModelData.TripType,
+                                        AllowanceType: oModelData.AllowanceType,
                                         AllowanceStartDate: oModelData.AllowanceStartDate.split("T")[0],
                                         AllowanceEndDate: oModelData.AllowanceEndDate.split("T")[0],
                                         SubmittedDate: that.Formatter.formatDate(new Date()),
                                         Comments: userComment || (oModelData.comments?.[0]?.Comment || ""),
                                         TotalAmount: oModelData.TotalAmount,
                                         Status: oModelData.Status === "Send back by account" ? "Send to account" : "Submitted",
-                                        ManagerRemark: oModelData.ManagerRemark,
-                                        AccountingRemark: oModelData.AccountingRemark,
                                         Visible: commentTextArea.getVisible()
                                     },
                                     filters: {

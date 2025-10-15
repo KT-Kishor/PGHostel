@@ -101,7 +101,6 @@
 											<m:ToolbarSpacer />
 											<m:ToolbarSeparator />
 											<m:Button type="Transparent"  text="{i18n>add}" tooltip="{i18n>allowanceAddTooltipItem}" press="Exp_Det_onPressAddExpenseItem" visible="{viewModel>/status}" id="AllItem_id_AddExpBtn" enabled="{viewModel>/enable}" />
-											<!-- <m:Button type="Transparent"  text="{i18n>edit}" tooltip="{i18n>allowanceEditTooltipItem}" press="Exp_Det_onPressExpenseItemEdit" id="AllItem_id_ExpenseItemEdit"  visible="{viewModel>/status}" enabled="{viewModel>/enableDelete}" /> -->
 											<m:Button type="Transparent"  text="{i18n>delete}" tooltip="{i18n>allowanceDeleteTooltipItem}" press="Exp_Det_onPressExpenseItemDelete" visible="{viewModel>/status}"  id="AllItem_id_ExpDeleteBtn" enabled="{viewModel>/enable}" />
 										</m:OverflowToolbar>
 									</m:headerToolbar>
@@ -121,20 +120,13 @@
 										<m:Column minScreenWidth="Desktop" demandPopin="true">
 											<m:Label text="{i18n>allowanceAmount}" />
 										</m:Column>
-										<!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-											<m:Label text="{i18n>expModeOfPayment}" />
-										</m:Column>
-										<m:Column minScreenWidth="Desktop" demandPopin="true">
-											<m:Label text="{i18n>comments}" />
-										</m:Column> -->
 									</m:columns>
 									<m:items>
 										<m:ColumnListItem press="onCheckExpenseDetails">
 											<m:cells>
 												<m:Text text="{ItemAllowanceModel>IndexNo}" />
-												<m:Text
-														text="{ItemAllowanceModel>ItemType}" />
-												<m:Text text="{path:'ItemAllowanceModel>AllowanceDate'}" />
+												<m:Text text="{ItemAllowanceModel>AllowanceType}" />
+												<m:Text text="{path:'ItemAllowanceModel>Dates'}" />
 												<m:VBox>
 													<m:HBox >
 														<m:Text text="{ItemAllowanceModel>Currency} {path:'ItemAllowanceModel>ForeignAmount',formatter:'.Formatter.fromatNumber'}" />
@@ -144,9 +136,6 @@
 													</m:HBox>
 												</m:VBox>
 												<m:Text text="INR {path:'ItemAllowanceModel>AllowanceAmount', formatter: '.Formatter.fromatNumber'}" />
-												<!-- <m:ObjectStatus inverted="true" text="{ItemAllowanceModel>ModeOfPayment}" state="{path: 'ItemAllowanceModel>ModeOfPayment', formatter: '.Formatter.formatObjectStatus'}" /> -->
-												<!-- <m:Text text="{ItemAllowanceModel>Comments}" />													 -->
-												<!-- <m:Button icon="sap-icon://display-more" text="{i18n>View}" press=".onShowMore" /> -->
 											</m:cells>
 										</m:ColumnListItem>
 									</m:items>
