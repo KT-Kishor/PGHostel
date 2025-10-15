@@ -6,18 +6,8 @@
 	xmlns:f="sap.ui.layout.form">
 	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="CID_onPressback" id="CID_id_MyPageId">
 	<m:headerContent>
-	<m:Button
-                press="Tile_NotifictionBTN"
-                icon="sap-icon://bell"
-                type="Transparent"
-                tooltip="Notifications"
-            />
-	<m:Button
-        press="onLogout"
-        icon="sap-icon://log"
-        tooltip="{i18n>logoutTooltip}"
-        type="Transparent"
-    />
+	<m:Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications"/>
+	<m:Button press="onLogout" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}" type="Transparent"/>
 	</m:headerContent>
 		<!-- <m:ScrollContainer > -->
 		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout" useIconTabBar="false" class="sapUiSmallmarginResponsive">
@@ -32,9 +22,6 @@
 									<f:content>
 									<m:Label text="{i18n>coCode}" required="true" />
 										<m:Input id="CID_id_CompanyCode" editable="false"  value="{SelectedCustomerModel>/CompanyCode}" />
-											<!-- <m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{SelectedCustomerModel>/CompanyCode}" id="CID_id_CompanyCode" valueStateText="{i18n>selectBase}"  change="CID_validateCombobox">
-						                        <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}" />			
-				                            </m:ComboBox> -->
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
 										<m:ComboBox change="onChangeAddCustomer" showClearIcon="true" id="CID_id_AddCustComboBox" showButton="true" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" valueStateText="{i18n>selectCustomer}" showSecondaryValues="true">
 											<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}" />
@@ -50,7 +37,6 @@
 
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>PayByDate}" required="true" />
 										<m:DatePicker valueStateText="{i18n>dateValueState}" visible="{visiablityPlay>/createVisi}" id="CID_id_Payby" value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}" change="onPayByDateDatePickerChange"/>
-
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>invoiceDate}" required="true" />
 										<m:DatePicker valueStateText="{i18n>dateValueState}" minDate="{visiablityPlay>/minDate}" visible="{visiablityPlay>/editVisi}" id="CID_id_NavInvoice" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" value="{SelectedCustomerModel>/InvoiceDate}" editable="{visiablityPlay>/editable}" change="CID_ValidateDate"/>
 
@@ -134,7 +120,8 @@
 												<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
 												<m:ToolbarSpacer />
 												<m:Button type="Transparent" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
-												<m:Button visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Transparent" press="CID_onPressAddInvoiceItems" />
+												<m:Button id="CreditNote" visible="{visiablityPlay>/CreditNote}" text="{i18n>CreditNote}" type="Transparent" press="CID_onPressAddInvoiceItems" />
+												<m:Button id="AddItem" visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Transparent" press="CID_onPressAddInvoiceItems" />
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>
@@ -199,7 +186,7 @@
 													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}"  enabled="{= ${CompanyInvoiceItemModel>Status} === 'Active' ? true : false}" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
@@ -238,6 +225,10 @@
 											<m:HBox justifyContent="SpaceBetween">
 												<m:Label text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{FilteredSOWModel>/RoundOf}" textAlign="End" />
+											</m:HBox>
+											<m:HBox justifyContent="SpaceBetween">
+												<m:Label text="{i18n>CreditNote} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditNote}" textAlign="End" />
 											</m:HBox>
 											<!-- Total Amount -->
 											<m:HBox justifyContent="SpaceBetween">

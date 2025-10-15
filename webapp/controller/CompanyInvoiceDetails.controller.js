@@ -54,7 +54,7 @@ sap.ui.define([
                 oView.setModel(new JSONModel({
                     CustomerName: "", InvNo: "", InvoiceDate: "", Name: "", PAN: "", GST: "", Address: "", MailID: "", MobileNo: "",
                     SOWDetails: "", Type: "", InvoiceDescription: "", Currency: "INR", PayByDate: "", POSOW: "", Status: "Submitted",
-                    SubTotalNotGST: "0", SubTotalInGST: "0", LUT: "", IncomePerc: "10", CompanyCode: ""
+                    SubTotalNotGST: "0", SubTotalInGST: "0", CreditNote: "0", LUT: "", IncomePerc: "10", CompanyCode: ""
                 }), "SelectedCustomerModel");
 
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
@@ -66,7 +66,7 @@ sap.ui.define([
 
                 oView.setModel(new JSONModel({
                     createVisi: true, editVisi: false, editable: true, igstVisi: false, gstVisiable: false,
-                    flexVisiable: false, CInvoice: false, addInvBtn: true, merge: false, GST: true, payByDate: false,
+                    flexVisiable: false, CInvoice: false, addInvBtn: true, CreditNote: false, merge: false, GST: true, payByDate: false,
                     Form: true, Table: false, MultiEmail: true, Edit: true, IncomeTax: true, minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
@@ -78,7 +78,8 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "CompanyInvoiceItemModel");
                 this.byId("CID_id_TableInvoiceItem").setMode("Delete");
-                
+
+                this.byId("CreditNote").setEnabled(true);
                 this.Update = false;
                 if (sArg === "X") return;
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -87,6 +88,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/editVisi", true);
                 this.visiablityPlay.setProperty("/editable", false);
                 this.visiablityPlay.setProperty("/addInvBtn", false);
+                this.visiablityPlay.setProperty("/CreditNote", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
@@ -346,14 +348,16 @@ sap.ui.define([
                 }
             },
 
-            CID_onPressAddInvoiceItems: function () {
+            CID_onPressAddInvoiceItems: function (oEvent) {
+                var ButtonID = oEvent.getParameter("id").split("-").pop();
                 const oView = this.getView();
                 const oItemModel = oView.getModel("CompanyInvoiceItemModel");
                 let oData = oItemModel.getProperty("/CompanyInvoiceItem") || [];
                 // Generate new invoice item
                 const currency = this.byId("CID_id_CurrencySelect").getValue();
+                this.IndexNo = oData.length ? oData[oData.length - 1].IndexNo + 1 : 1;
                 const newItem = {
-                    IndexNo: oData.length ? oData[oData.length - 1].IndexNo + 1 : 1,
+                    IndexNo: this.IndexNo,
                     Particulars: "",
                     SAC: "998314",
                     GSTCalculation: (currency === "INR") ? "YES" : "",
@@ -363,6 +367,7 @@ sap.ui.define([
                     Currency: currency,
                     Discount: "",
                     Total: "",
+                    Status: ButtonID === "CreditNote" ? "Net" : "Active"
                 };
                 if (this.Update) {
                     newItem.flag = "create";
@@ -370,6 +375,9 @@ sap.ui.define([
                 // Add and update model
                 oData.push(newItem);
                 oItemModel.setProperty("/CompanyInvoiceItem", oData);
+                if (ButtonID === "CreditNote") {
+                    this.byId("CreditNote").setEnabled(false);
+                }
             },
 
             CI_On_ChangeRateType: function (oEvent) {
@@ -404,6 +412,7 @@ sap.ui.define([
                 let aSOWDetails = oInvoiceModel.getProperty("/CompanyInvoiceItem") || [];
                 let totalWithGST = 0;
                 let totalWithoutGST = 0;
+                let NetAmount = 0;
 
                 aSOWDetails.forEach((item) => {
                     if (oSOWModel.getProperty("/Currency") === "INR" && !oCustomerModel.getProperty("/GST")) {
@@ -438,7 +447,9 @@ sap.ui.define([
 
                     const isGSTApplicable = item.GSTCalculation === "YES" && oSOWModel.getProperty("/Currency") === "INR";
                     item.SAC = isGSTApplicable ? "998314" : "-";
-
+                    if (item.Status === "Net") {
+                        NetAmount += finalAmount;
+                    }
                     if (isGSTApplicable) {
                         totalWithGST += finalAmount;
                     } else {
@@ -451,6 +462,7 @@ sap.ui.define([
                 const subtotal = (totalWithGST + totalWithoutGST).toFixed(2);
 
                 oCustomerModel.setProperty("/SubTotalInGST", subTotalGST);
+                oCustomerModel.setProperty("/CreditNote", NetAmount.toFixed(2));
                 oCustomerModel.setProperty("/SubTotalNotGST", subTotalNoGST);
                 oCustomerModel.setProperty("/AmountInINR", subTotalGST);
                 oSOWModel.setProperty("/subTotal", subtotal);
@@ -473,6 +485,7 @@ sap.ui.define([
                 let roundedAmount = Math.round(finalAmount);
                 let difference = (roundedAmount - finalAmount).toFixed(2);
                 let RoundOf = difference > 0 ? `+${difference}` : difference;
+                roundedAmount = roundedAmount - NetAmount;
 
                 oSOWModel.setProperty("/RoundOf", RoundOf);
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
@@ -667,7 +680,8 @@ sap.ui.define([
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: String(oSelectedCustomerModel.LUT),
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
-                    CompanyCode: oSelectedCustomerModel.CompanyCode
+                    CompanyCode: oSelectedCustomerModel.CompanyCode,
+                    CreditNote: (parseFloat(oSelectedCustomerModel.CreditNote) || 0),
                 };
                 const aItemsRaw = oCompanyInvoiceItemModel.CompanyInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -694,7 +708,8 @@ sap.ui.define([
                         Total: item.Total,
                         Currency: item.Currency,
                         GSTCalculation: item.GSTCalculation,
-                        Discount: item.Discount
+                        Discount: item.Discount,
+                        Status: item.Status || "Active"
                     };
                     if (sMode === "update") {
                         let filters;
@@ -731,7 +746,7 @@ sap.ui.define([
                     var that = this;
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bMandatoryValid =
-                    //  utils._LCvalidateMandatoryField(this.byId("CID_id_CompanyCode"), "ID") &&
+                        //  utils._LCvalidateMandatoryField(this.byId("CID_id_CompanyCode"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
@@ -805,6 +820,7 @@ sap.ui.define([
                     this.visiablityPlay.setProperty("/CInvoice", true);
                     this.byId("CID_id_TableInvoiceItem").setMode("Delete");
                     this.visiablityPlay.setProperty("/addInvBtn", true);
+                    this.visiablityPlay.setProperty("/CreditNote", true);
                     this.visiablityPlay.setProperty("/merge", false);
                     this.visiablityPlay.setProperty("/MultiEmail", false);
                     this.visiablityPlay.setProperty("/payByDate", false);
@@ -845,6 +861,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.byId("CID_id_TableInvoiceItem").setMode("None");
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/CreditNote", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/MultiEmail", true);
                         if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
@@ -853,6 +870,7 @@ sap.ui.define([
                             this.visiablityPlay.setProperty("/Edit", false);
                         }
                         MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
+                        this.byId("CreditNote").setEnabled(true);
                         this.closeBusyDialog();
                     } catch (error) {
                         this.closeBusyDialog();
@@ -1125,6 +1143,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/CreditNote", false);
                         this.byId("CID_id_TableInvoiceItem").setMode("None");
                         MessageToast.show(this.i18nModel.getText("paymentMessage"));
                     }
@@ -1181,7 +1200,9 @@ sap.ui.define([
                 var oModel = this.getView().getModel("CompanyInvoiceItemModel");
                 var oContext = oEvent.getParameter("listItem").getBindingContext("CompanyInvoiceItemModel");
                 var sIndex = oContext.getPath().split("/")[2];
-
+                if (oContext.getObject().IndexNo === this.IndexNo) {
+                    this.byId("CreditNote").setEnabled(true);
+                }
                 var aData = oModel.getData();
 
                 if (oContext.getObject().ItemID) {
@@ -1417,322 +1438,322 @@ sap.ui.define([
                     companyCode: oModel.CompanyCode
                 }
                 try {
-                const oCompanyDetailsModel = await that.ajaxReadWithJQuery("CompanyCodeDetails", filter);
+                    const oCompanyDetailsModel = await that.ajaxReadWithJQuery("CompanyCodeDetails", filter);
 
-                const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].transparentComplogo?.data)], { type: "image/png" });
-                const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].signature?.data)], { type: "image/png" });
-                const img = await this._convertBLOBToImage(imgblob);
-                const signature = await this._convertBLOBToImage(signBlob);
+                    const imgblob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].transparentComplogo?.data)], { type: "image/png" });
+                    const signBlob = new Blob([new Uint8Array(oCompanyDetailsModel.data[0].signature?.data)], { type: "image/png" });
+                    const img = await this._convertBLOBToImage(imgblob);
+                    const signature = await this._convertBLOBToImage(signBlob);
 
-                let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
-                const showSAC = oModel.GST !== undefined && oModel.GST !== "";
+                    let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
+                    const showSAC = oModel.GST !== undefined && oModel.GST !== "";
 
-                const margin = 15;
-                const doc = new jsPDF({
-                    orientation: "portrait",
-                    unit: "mm",
-                    format: "a4"
-                });
+                    const margin = 15;
+                    const doc = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    });
 
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const usableWidth = pageWidth - 2 * margin;
-                const footerHeight = 18;
-                let currentY = 0;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const usableWidth = pageWidth - 2 * margin;
+                    const footerHeight = 18;
+                    let currentY = 0;
 
-                const checkPageSpace = (requiredSpace = 40) => {
-                    if (currentY + requiredSpace > pageHeight - footerHeight) {
-                        doc.addPage();
-                        currentY = 20;
-                    }
-                };
+                    const checkPageSpace = (requiredSpace = 40) => {
+                        if (currentY + requiredSpace > pageHeight - footerHeight) {
+                            doc.addPage();
+                            currentY = 20;
+                        }
+                    };
 
-                const headerMargin = 25.4;
-                doc.setFontSize(14).setFont("times", "bold");
-                doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, { align: "right" });
-                doc.addImage(img, 'PNG', margin, 15, 40, 40);
+                    const headerMargin = 25.4;
+                    doc.setFontSize(14).setFont("times", "bold");
+                    doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                    doc.addImage(img, 'PNG', margin, 15, 40, 40);
 
-                const detailsStartY = 35;
-                const rowHeight = 6.5;
-                const columnWidths = [30, 30];
-                const rightAlignX = pageWidth - 18 - columnWidths[0] - columnWidths[1];
-                doc.setFontSize(12).setFont("times", "bold");
+                    const detailsStartY = 35;
+                    const rowHeight = 6.5;
+                    const columnWidths = [30, 30];
+                    const rightAlignX = pageWidth - 18 - columnWidths[0] - columnWidths[1];
+                    doc.setFontSize(12).setFont("times", "bold");
 
-                const detailsTable = [
-                    { label: 'Invoice No. :', value: oModel.InvNo },
-                    { label: 'Date :', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate) },
-                    { label: 'PO/SOW :', value: oModel.POSOW.toString() },
-                ];
-
-                currentY = detailsStartY;
-
-                detailsTable.forEach(row => {
-                    doc.setFont("times", "bold");
-                    doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
-                    doc.setFont("times", "bold");
-                    doc.text(row.value, rightAlignX + columnWidths[0] + 5, currentY + 5);
-                    currentY += rowHeight;
-                });
-
-                currentY += 15;
-                doc.setFont("times", "bold").setFontSize(11);
-                doc.text("To,", margin, currentY);
-                currentY += 5;
-
-                doc.setFont("times", "normal").setFontSize(11);
-                const maxLength = 30;
-                const customerName = oModel.CustomerName || "";
-                const lines = [];
-
-                for (let i = 0; i < customerName.length; i += maxLength) {
-                    lines.push(customerName.substring(i, i + maxLength));
-                }
-
-                lines.forEach(line => {
-                    doc.text(line, margin, currentY);
-                    currentY += 5;
-                });
-
-
-                const customerAddressLines = doc.splitTextToSize(oModel.Address, usableWidth / 2 - 10);
-                doc.text(customerAddressLines, margin, currentY);
-                currentY += customerAddressLines.length * 5;
-
-                if (oModel.GST !== undefined && oModel.GST !== "") {
-                    doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
-                    currentY += 5;
-                }
-
-                currentY += 5;
-
-                const body = oCompanyItemModel.map((item, index) => {
-                    const row = [
-                        index + 1,
-                        item.Particulars,
-                        item.Unit || "-",
-                        Formatter.fromatNumber(item.Rate) || '0.00',
-                        Formatter.fromatNumber(item.Discount) || '0.00',
-                        Formatter.fromatNumber(item.Total) || '0.00'
+                    const detailsTable = [
+                        { label: 'Invoice No. :', value: oModel.InvNo },
+                        { label: 'Date :', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate) },
+                        { label: 'PO/SOW :', value: oModel.POSOW.toString() },
                     ];
-                    if (showSAC) row.splice(2, 0, item.SAC);
-                    return row;
-                });
 
-                const head = showSAC
-                    ? [['Sl.No.', 'Particulars', 'SAC', 'Unit', 'Rate', 'Discount', 'Total']]
-                    : [['Sl.No.', 'Particulars', 'Unit', 'Rate', 'Discount', 'Total']];
+                    currentY = detailsStartY;
 
-                doc.autoTable({
-                    startY: currentY,
-                    head: head,
-                    body: body,
-                    theme: 'grid',
-                    headStyles: { fillColor: [41, 128, 185] },
-                    styles: {
-                        font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
-                        halign: "center"
-                    },
-                    columnStyles: {
-                        0: { halign: 'center' },
-                        1: { halign: 'left' },
-                        ...(showSAC ? {
-                            2: { halign: 'center' },
-                            3: { halign: 'right' },
-                            4: { halign: 'right' },
-                            5: { halign: 'right' },
-                            6: { halign: 'right' }
-                        } : {
-                            2: { halign: 'center' },
-                            3: { halign: 'right' },
-                            4: { halign: 'right' },
-                            5: { halign: 'right' }
-                        })
-                    },
-                });
+                    detailsTable.forEach(row => {
+                        doc.setFont("times", "bold");
+                        doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                        doc.setFont("times", "bold");
+                        doc.text(row.value, rightAlignX + columnWidths[0] + 5, currentY + 5);
+                        currentY += rowHeight;
+                    });
 
-                currentY = doc.lastAutoTable.finalY;
-                checkPageSpace(50);
-
-                const summaryBody = [];
-
-                if (parseFloat(oModel.SubTotalNotGST) > 0) {
-                    summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
-                    Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
-                    ]);
-                }
-
-                if (parseFloat(oModel.SubTotalInGST) > 0) {
-                    summaryBody.push([
-                        `Sub-Total ( Taxable ) (${data.Currency}) :`,
-                        Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
-                    ]);
-                }
-
-                const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
-                const cgstPercentage = percentageText;
-                const sgstPercentage = percentageText;
-                const igstPercentage = percentageText;
-
-                if (data.Currency !== "USD") {
-                    const cgstValue = parseFloat(oModel.CGST) || 0;
-                    const sgstValue = parseFloat(oModel.SGST) || 0;
-                    const igstValue = parseFloat(oModel.IGST) || 0;
-
-                    if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
-                        summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-                        summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                    } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") &&
-                        igstValue > 0) {
-                        summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
-                    }
-                }
-
-                if (data.RoundOf && data.RoundOf !== "0") {
-                    summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                }
-
-                const totalRowIndex = summaryBody.length;
-                summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
-
-                doc.autoTable({
-                    startY: currentY,
-                    head: [],
-                    body: summaryBody,
-                    theme: 'plain',
-                    styles: {
-                        font: "times",
-                        fontSize: 10,
-                        halign: "right",
-                        cellPadding: 2,
-                        overflow: "ellipsize"
-                    },
-                    columnStyles: {
-                        0: { halign: "right", cellWidth: 60 },
-                        1: { halign: "right", cellWidth: 40 }
-                    },
-                    margin: { left: 95 },
-                    didParseCell: function (data) {
-                        if (data.row.index === totalRowIndex) {
-                            data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
-                            data.cell.styles.lineColor = [0, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
-                    }
-                });
-
-                currentY = doc.lastAutoTable.finalY + 10;
-                checkPageSpace(25);
-
-                oModel.AmountInWords = totalInWords;
-                doc.setFont("times", "bold");
-                doc.text("Amount in Words:", 13, currentY);
-                currentY += 5;
-                doc.setFont("times", "normal");
-                const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
-                doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
-                currentY += amountHeight + 10;
-
-                checkPageSpace(40);
-                doc.setFont("times", "bold").setFontSize(11);
-                doc.text("PAYMENT METHOD :", margin - 2, currentY);
-                currentY += 5;
-
-                const paymentDetails = [
-                    { label: "Bank Name", value: oCompanyDetailsModel.data[0].bankName },
-                    { label: "Account Name", value: oCompanyDetailsModel.data[0].accountName },
-                    { label: "Account No", value: oCompanyDetailsModel.data[0].accountNo },
-                    { label: "IFSC Code", value: oCompanyDetailsModel.data[0].ifscCode },
-                    { label: "Swift Code", value: oCompanyDetailsModel.data[0].swiftCode },
-                    { label: 'Pay By', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.PayByDate : Formatter.formatDate(oModel.PayByDate) },
-                ];
-
-                paymentDetails.forEach(detail => {
-                    doc.setFont("times", "bold");
-                    const label = `${detail.label} :`;
-                    const labelWidth = doc.getTextWidth(label);
-                    doc.text(label, margin - 2, currentY);
-                    doc.setFont("times", "normal");
-                    doc.text(detail.value, margin + labelWidth, currentY);
+                    currentY += 15;
+                    doc.setFont("times", "bold").setFontSize(11);
+                    doc.text("To,", margin, currentY);
                     currentY += 5;
-                });
 
-                checkPageSpace(35);
-                const rightEdgeX = pageWidth - margin;
-                const lineSpacing = 5;
-                const maxLineLength = 45;
-                const forText = "For: " + oCompanyDetailsModel.data[0].companyName;
+                    doc.setFont("times", "normal").setFontSize(11);
+                    const maxLength = 30;
+                    const customerName = oModel.CustomerName || "";
+                    const lines = [];
 
-                // Split text if more than 45 characters
-                let forTextLines = [];
-                if (forText.length > maxLineLength) {
-                    const words = forText.split(" ");
-                    let currentLine = "";
-                    for (const word of words) {
-                        if ((currentLine + " " + word).trim().length <= maxLineLength) {
-                            currentLine += " " + word;
-                        } else {
-                            forTextLines.push(currentLine.trim());
-                            currentLine = word;
+                    for (let i = 0; i < customerName.length; i += maxLength) {
+                        lines.push(customerName.substring(i, i + maxLength));
+                    }
+
+                    lines.forEach(line => {
+                        doc.text(line, margin, currentY);
+                        currentY += 5;
+                    });
+
+
+                    const customerAddressLines = doc.splitTextToSize(oModel.Address, usableWidth / 2 - 10);
+                    doc.text(customerAddressLines, margin, currentY);
+                    currentY += customerAddressLines.length * 5;
+
+                    if (oModel.GST !== undefined && oModel.GST !== "") {
+                        doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    currentY += 5;
+
+                    const body = oCompanyItemModel.map((item, index) => {
+                        const row = [
+                            index + 1,
+                            item.Particulars,
+                            item.Unit || "-",
+                            Formatter.fromatNumber(item.Rate) || '0.00',
+                            Formatter.fromatNumber(item.Discount) || '0.00',
+                            Formatter.fromatNumber(item.Total) || '0.00'
+                        ];
+                        if (showSAC) row.splice(2, 0, item.SAC);
+                        return row;
+                    });
+
+                    const head = showSAC
+                        ? [['Sl.No.', 'Particulars', 'SAC', 'Unit', 'Rate', 'Discount', 'Total']]
+                        : [['Sl.No.', 'Particulars', 'Unit', 'Rate', 'Discount', 'Total']];
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: head,
+                        body: body,
+                        theme: 'grid',
+                        headStyles: { fillColor: [41, 128, 185] },
+                        styles: {
+                            font: "times", fontSize: 10, cellPadding: 3, lineWidth: 0.5, lineColor: [30, 30, 30],
+                            halign: "center"
+                        },
+                        columnStyles: {
+                            0: { halign: 'center' },
+                            1: { halign: 'left' },
+                            ...(showSAC ? {
+                                2: { halign: 'center' },
+                                3: { halign: 'right' },
+                                4: { halign: 'right' },
+                                5: { halign: 'right' },
+                                6: { halign: 'right' }
+                            } : {
+                                2: { halign: 'center' },
+                                3: { halign: 'right' },
+                                4: { halign: 'right' },
+                                5: { halign: 'right' }
+                            })
+                        },
+                    });
+
+                    currentY = doc.lastAutoTable.finalY;
+                    checkPageSpace(50);
+
+                    const summaryBody = [];
+
+                    if (parseFloat(oModel.SubTotalNotGST) > 0) {
+                        summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
+                        Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
+                        ]);
+                    }
+
+                    if (parseFloat(oModel.SubTotalInGST) > 0) {
+                        summaryBody.push([
+                            `Sub-Total ( Taxable ) (${data.Currency}) :`,
+                            Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
+                        ]);
+                    }
+
+                    const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
+                    const cgstPercentage = percentageText;
+                    const sgstPercentage = percentageText;
+                    const igstPercentage = percentageText;
+
+                    if (data.Currency !== "USD") {
+                        const cgstValue = parseFloat(oModel.CGST) || 0;
+                        const sgstValue = parseFloat(oModel.SGST) || 0;
+                        const igstValue = parseFloat(oModel.IGST) || 0;
+
+                        if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
+                            summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+                            summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+                        } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") &&
+                            igstValue > 0) {
+                            summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
                     }
-                    if (currentLine) {
-                        forTextLines.push(currentLine.trim());
+
+                    if (data.RoundOf && data.RoundOf !== "0") {
+                        summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
-                } else {
-                    forTextLines = [forText];
-                }
 
-                // Draw wrapped "For: Company Name" right-aligned
-                doc.setFont("helvetica", "bold").setFontSize(11);
-                let forLabelY = currentY;
-                for (let i = 0; i < forTextLines.length; i++) {
-                    const line = forTextLines[i];
-                    const lineWidth = doc.getTextWidth(line);
-                    doc.text(line, rightEdgeX - lineWidth, forLabelY);
-                    const isLastLine = i === forTextLines.length - 1;
-                    const isWrapped = forText.length > maxLineLength;
+                    const totalRowIndex = summaryBody.length;
+                    summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
-                    if (!isLastLine || isWrapped) {
-                        forLabelY += lineSpacing;
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [],
+                        body: summaryBody,
+                        theme: 'plain',
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            halign: "right",
+                            cellPadding: 2,
+                            overflow: "ellipsize"
+                        },
+                        columnStyles: {
+                            0: { halign: "right", cellWidth: 60 },
+                            1: { halign: "right", cellWidth: 40 }
+                        },
+                        margin: { left: 95 },
+                        didParseCell: function (data) {
+                            if (data.row.index === totalRowIndex) {
+                                data.cell.styles.lineWidth = { top: 0.5, right: 0, bottom: 0, left: 0 };
+                                data.cell.styles.lineColor = [0, 0, 0];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 10;
+                    checkPageSpace(25);
+
+                    oModel.AmountInWords = totalInWords;
+                    doc.setFont("times", "bold");
+                    doc.text("Amount in Words:", 13, currentY);
+                    currentY += 5;
+                    doc.setFont("times", "normal");
+                    const amountHeight = doc.getTextDimensions(oModel.AmountInWords || "").h;
+                    doc.text(oModel.AmountInWords || "", 13, currentY, { maxWidth: 180 });
+                    currentY += amountHeight + 10;
+
+                    checkPageSpace(40);
+                    doc.setFont("times", "bold").setFontSize(11);
+                    doc.text("PAYMENT METHOD :", margin - 2, currentY);
+                    currentY += 5;
+
+                    const paymentDetails = [
+                        { label: "Bank Name", value: oCompanyDetailsModel.data[0].bankName },
+                        { label: "Account Name", value: oCompanyDetailsModel.data[0].accountName },
+                        { label: "Account No", value: oCompanyDetailsModel.data[0].accountNo },
+                        { label: "IFSC Code", value: oCompanyDetailsModel.data[0].ifscCode },
+                        { label: "Swift Code", value: oCompanyDetailsModel.data[0].swiftCode },
+                        { label: 'Pay By', value: typeof (oModel.InvoiceDate) === 'string' ? oModel.PayByDate : Formatter.formatDate(oModel.PayByDate) },
+                    ];
+
+                    paymentDetails.forEach(detail => {
+                        doc.setFont("times", "bold");
+                        const label = `${detail.label} :`;
+                        const labelWidth = doc.getTextWidth(label);
+                        doc.text(label, margin - 2, currentY);
+                        doc.setFont("times", "normal");
+                        doc.text(detail.value, margin + labelWidth, currentY);
+                        currentY += 5;
+                    });
+
+                    checkPageSpace(35);
+                    const rightEdgeX = pageWidth - margin;
+                    const lineSpacing = 5;
+                    const maxLineLength = 45;
+                    const forText = "For: " + oCompanyDetailsModel.data[0].companyName;
+
+                    // Split text if more than 45 characters
+                    let forTextLines = [];
+                    if (forText.length > maxLineLength) {
+                        const words = forText.split(" ");
+                        let currentLine = "";
+                        for (const word of words) {
+                            if ((currentLine + " " + word).trim().length <= maxLineLength) {
+                                currentLine += " " + word;
+                            } else {
+                                forTextLines.push(currentLine.trim());
+                                currentLine = word;
+                            }
+                        }
+                        if (currentLine) {
+                            forTextLines.push(currentLine.trim());
+                        }
+                    } else {
+                        forTextLines = [forText];
                     }
+
+                    // Draw wrapped "For: Company Name" right-aligned
+                    doc.setFont("helvetica", "bold").setFontSize(11);
+                    let forLabelY = currentY;
+                    for (let i = 0; i < forTextLines.length; i++) {
+                        const line = forTextLines[i];
+                        const lineWidth = doc.getTextWidth(line);
+                        doc.text(line, rightEdgeX - lineWidth, forLabelY);
+                        const isLastLine = i === forTextLines.length - 1;
+                        const isWrapped = forText.length > maxLineLength;
+
+                        if (!isLastLine || isWrapped) {
+                            forLabelY += lineSpacing;
+                        }
+                    }
+
+                    // Signature (Right-aligned under company name)
+                    const signatureWidth = 57;
+                    const signatureHeight = 13;
+                    const logoXPosition = rightEdgeX - signatureWidth + 16; // align to rightEdge
+                    const logoYPosition = forLabelY + 2;
+
+                    doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, signatureWidth, signatureHeight);
+
+                    // Head of Company (Right-aligned)
+                    const headName = oCompanyDetailsModel.data[0].headOfCompany || "";
+                    const headWidth = doc.getTextWidth(headName);
+                    const partnersYPosition = logoYPosition + signatureHeight + 2;
+
+                    doc.setFont("helvetica", "bold").setFontSize(11);
+                    doc.text(headName, rightEdgeX - headWidth, partnersYPosition);
+
+                    // Designation (Right-aligned)
+                    const designation = oCompanyDetailsModel.data[0].designation || "";
+                    const designationWidth = doc.getTextWidth(designation);
+                    doc.text(designation, rightEdgeX - designationWidth, partnersYPosition + lineSpacing);
+
+                    doc.setFont("times", "normal").setFontSize(11);
+                    doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);
+
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
+                } catch (error) {
+                    that.closeBusyDialog();
+                    MessageToast.show(error.message || error.responseText);
                 }
-
-                // Signature (Right-aligned under company name)
-                const signatureWidth = 57;
-                const signatureHeight = 13;
-                const logoXPosition = rightEdgeX - signatureWidth + 16; // align to rightEdge
-                const logoYPosition = forLabelY + 2;
-
-                doc.addImage(signature, 'JPEG', logoXPosition, logoYPosition, signatureWidth, signatureHeight);
-
-                // Head of Company (Right-aligned)
-                const headName = oCompanyDetailsModel.data[0].headOfCompany || "";
-                const headWidth = doc.getTextWidth(headName);
-                const partnersYPosition = logoYPosition + signatureHeight + 2;
-
-                doc.setFont("helvetica", "bold").setFontSize(11);
-                doc.text(headName, rightEdgeX - headWidth, partnersYPosition);
-
-                // Designation (Right-aligned)
-                const designation = oCompanyDetailsModel.data[0].designation || "";
-                const designationWidth = doc.getTextWidth(designation);
-                doc.text(designation, rightEdgeX - designationWidth, partnersYPosition + lineSpacing);
-
-                doc.setFont("times", "normal").setFontSize(11);
-                doc.text("Thank you for your business!", margin - 2, partnersYPosition + 10);
-
-                const totalPages = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i);
-                    this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
-                }
-
-                doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
-             } catch (error) {
-                   that.closeBusyDialog();
-                   MessageToast.show(error.message || error.responseText);
-            }
-            finally {
+                finally {
                     this.closeBusyDialog();
                 }
             },
