@@ -1612,6 +1612,10 @@ sap.ui.define([
                         summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
 
+                    if (oModel.CreditNote && oModel.CreditNote > "0.00") {
+                        summaryBody.push([`Credit Note (${oModel.Currency}) :`, oModel.CreditNote]);
+                    }
+
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
