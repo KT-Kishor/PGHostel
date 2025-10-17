@@ -60,6 +60,12 @@
 															<ImageContent src="sap-icon://general-leave-request" />
 														</TileContent>
 													</GenericTile>
+
+													<GenericTile visible="{= ${AppVisibilityModel>/GreetingApp} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>sendGreetingsTitle}" press="TileV_onpressSendGreetings">
+														<TileContent unit="{i18n>sendGreetingsTitle}">
+															<ImageContent src="sap-icon://decision" />
+														</TileContent>
+													</GenericTile>
 												</layout:HorizontalLayout>
 											</ux:blocks>
 										</ux:ObjectPageSubSection>

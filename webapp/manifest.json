@@ -793,6 +793,13 @@
                     "name": "RouteAllowanceDetails",
                     "pattern": "AllowanceDetails/{sPath}",
                     "target": "TargetAllowanceDetails"
+                },
+                {
+                    "name": "RouteSendGreetings",
+                    "pattern": "SendGreetings",
+                    "target": [
+                        "TargetSendGreetings"
+                    ]
                 }
             ],
             "targets": {
@@ -1204,57 +1211,56 @@
               "viewName": "ExpenseInvoiceDetail"
             },
               "TargetMaintainData":{
-                "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "MaintainData",
-                    "viewName": "MaintainData"
+               "viewType": "XML",
+               "transition": "slide",
+               "clearControlAggregation": false,
+               "viewId": "MaintainData",
+               "viewName": "MaintainData"
               
             }, 
             "TargetHRSolution":{
-                "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "HRSolutions_Demo",
-                    "viewName": "HRSolutions_Demo"
-              
+              "viewType": "XML",
+              "transition": "slide",
+              "clearControlAggregation": false,
+              "viewId": "HRSolutions_Demo",
+              "viewName": "HRSolutions_Demo"
             },
               "TargetInvoicemanage":{
                 "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "Invoice_Solution_Demo",
-                    "viewName": "Invoice_Solution_Demo"
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "Invoice_Solution_Demo",
+                "viewName": "Invoice_Solution_Demo"
               
             },
             "TargetCompanyasset":{
                 "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "IT_Asset_Demo",
-                    "viewName": "IT_Asset_Demo"
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "IT_Asset_Demo",
+                "viewName": "IT_Asset_Demo"
               
             },
             "TargetRecuritment":{
                 "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "Recuritment_Demo",
-                    "viewName": "Recuritment_Demo"
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "Recuritment_Demo",
+                "viewName": "Recuritment_Demo"
             },
             "TargetAutoMobile":{
                 "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "AutoMobile_Demo",
-                    "viewName": "AutoMobile_Demo"
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "AutoMobile_Demo",
+                "viewName": "AutoMobile_Demo"
             },
             "TargetIDCardgenerate":{
                 "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "IDCardgenerate",
-                    "viewName": "IDCardgenerate"
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "IDCardgenerate",
+                "viewName": "IDCardgenerate"
             },
             "TargetAllowance": {
                 "viewType": "XML",
@@ -1267,6 +1273,13 @@
                 "transition": "slide",
                 "viewId": "AllowanceDetails",
                 "viewName": "AllowanceDetails"
+              },
+              "TargetSendGreetings": {
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "SendGreetings",
+                "viewName": "SendGreetings"
               }
             }
         },

@@ -779,10 +779,14 @@
                     <subSections>
                         <ObjectPageSubSection titleUppercase="false">
                             <m:VBox>
-                                <m:Label
-                                    text="{i18n>notes}"
-                                    required="true"
-                                />
+                               <m:Toolbar>
+                                        <m:ToolbarSpacer />
+                                        <m:Button
+                                            text="Clear"
+                                            press="onClearNotesPress"
+                                             visible="{visiablityPlay>/editable}"
+                                        />  
+                                    </m:Toolbar>
                                 <rich:RichTextEditor
                                     value="{SingleCompanyModel>/Notes}"
                                     editable="{visiablityPlay>/editable}"

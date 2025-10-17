@@ -1,0 +1,220 @@
+<mvc:View
+    controllerName="sap.kt.com.minihrsolution.controller.SendGreetings"
+	xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true"
+	xmlns:f="sap.ui.layout.form"
+	xmlns="sap.uxap"
+	xmlns:core="sap.ui.core"
+	xmlns:m="sap.m"
+	xmlns:u="sap.ui.unified"
+	xmlns:rte="sap.ui.richtexteditor"
+	xmlns:l="sap.ui.layout"
+>
+	<m:Page id="Wish_id_SendGreetings">
+		<m:headerContent>
+			<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Header" type="XML" />
+		</m:headerContent>
+		<ObjectPageLayout id="Wish_id_NavSendGreetingsPage">
+			<sections>
+				<!-- Section 1: Email Configuration -->
+				<ObjectPageSection id="Wish_id_EmailConfigSection" title="Email Configuration">
+					<subSections>
+						<ObjectPageSubSection>
+							<blocks>
+								<m:VBox class="sapUiLargeMargin sapUiSmallMarginBeginEnd" width="100%">
+									<!-- Email Type -->
+									<!-- Responsive Row for Email Type + To Email -->
+									<l:Grid
+	defaultSpan="L6 M6 S12"  
+	width="100%"
+	hSpacing="1"
+	vSpacing="1"
+>
+										<!-- Column 1: Send Greetings To -->
+										<l:content>
+											<l:Grid
+			defaultSpan="L12 M12 S12"
+			width="100%"
+			hSpacing="1"
+			vSpacing="1"
+		>
+												<l:content>
+													<m:Label 
+					text="Send Greetings To :" 
+					required="true" 
+					layoutData="{l:GridData: {span: 'L2 M3 S12'}}" 
+				/>
+													<m:RadioButtonGroup
+					id="Wish_id_RadioGroup"
+					columns="4"
+					select="onRadioButtonSelect"
+					selectedIndex="0"
+					width="100%"
+					layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
+				>
+														<m:RadioButton text="{i18n>employeeOffer}" />
+														<m:RadioButton text="{i18n>contractOffer}" />
+														<m:RadioButton text="{i18n>traineeOffer}" />
+														<m:RadioButton text="{i18n>customer}" />
+													</m:RadioButtonGroup>
+												</l:content>
+											</l:Grid>
+										</l:content>
+										<!-- Column 2: To Email ID -->
+										<l:content>
+											<l:Grid
+			defaultSpan="L12 M12 S12"
+			width="100%"
+			hSpacing="1"
+			vSpacing="1"
+		>
+												<l:content>
+													<m:Label 
+					id="Wish_id_EmailLabel"
+					text="{i18n>toMailText} :" 
+					required="true" 
+					layoutData="{l:GridData: {span: 'L2 M3 S12'}}" 
+				/>
+													<m:MultiComboBox 
+					id="Wish_id_EmployeeEmail"
+					showClearIcon="true"
+					showSecondaryValues="true"
+					showSelectAll="true"
+					width="150%"
+					layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
+					placeholder="Select Recipient"
+					change="onEmailSelectionChange"
+				>
+														<core:ListItem
+						key="{key}"
+						text="{text}"
+						additionalText="{additionalText}"
+					/>
+													</m:MultiComboBox>
+												</l:content>
+											</l:Grid>
+										</l:content>
+									</l:Grid>
+									<!-- Subject -->
+									<l:Grid
+										defaultSpan="L12 M12 S12"
+										width="100%"
+										hSpacing="1"
+										vSpacing="1"
+									>
+										<l:content>
+											<m:Label text="Subject :" required="true" layoutData="{l:GridData: {span: 'L2 M3 S12'}}" />
+											<m:TextArea
+												id="Wish_id_EmailSubject"
+												placeholder="Enter Subject"
+												change="onLiveChangeSubject"
+												value="{SendWishEmailModel>/Subject}"
+												rows="2"
+												width="100%"
+												valueStateText="Invalid Subject"
+												layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
+											/>
+										</l:content>
+									</l:Grid>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<!-- Section 2: Email Content -->
+				<ObjectPageSection id="Wish_id_EmailContentSection" title="Email Content">
+					<subSections>
+						<ObjectPageSubSection>
+							<blocks>
+								<m:VBox class="sapUiSmallMargin">
+									<m:Label text="Email Body :" required="true" class="sapUiSmallMarginBottom" />
+									<rte:RichTextEditor
+										id="Wish_id_EmailBody"
+										width="98%"
+										height="400px"
+										class="sapUiSmallMargin"
+										editorType="TinyMCE4"
+										value="{SendWishEmailModel>/body}"
+										change="onRTEChange"
+										showGroupFont="true"
+										showGroupTextAlign="true"
+										showGroupLink="true"
+										showGroupInsert="true"
+									/>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<!-- Section 3: Attachments -->
+				<ObjectPageSection id="Wish_id_AttachmentSection" title="Attachments">
+					<subSections>
+						<ObjectPageSubSection>
+							<blocks>
+								<m:VBox class="uploaderSection noBottomSpace">
+									<m:Title class="sapUiSmallMargin" text="Attachment" level="H3" />
+									<m:HBox
+										alignItems="Center"
+										justifyContent="Start"
+										class="sapUiSmallMarginBegin sapUiTinyMarginTop"
+									>
+										<!-- File Uploader -->
+										<u:FileUploader
+											id="Wish_id_jobFileUploader"
+											fileSizeExceed="onFileSizeExceeds"
+											maximumFileSize="5"
+											typeMissmatch="onFileTypeMissmatch"
+											fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt,ppt"
+											change="onFileSelected"
+											buttonOnly="true"
+											sameFilenameAllowed="true"
+											iconFirst="true"
+											buttonText="Upload Attachment"
+											icon="sap-icon://attachment"
+											class="sapUiTinyMarginEnd"
+										/>
+										<m:Tokenizer
+											id="Wish_id_tokenizer"
+											width="auto"
+											tokenDelete="onTokenDelete"
+											tokens="{tokenModel>/tokens}"
+										>
+											<m:Token
+												key="{tokenModel>key}"
+												text="{tokenModel>text}"
+												class="sapUiTinyMarginBegin"
+											/>
+										</m:Tokenizer>
+									</m:HBox>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<!-- Footer -->
+		<m:footer>
+			<m:Bar>
+				<m:contentLeft>
+					<core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.Footer" type="XML" />
+				</m:contentLeft>
+				<m:contentRight>
+					<m:Button
+						id="Wish_id_SendMail"
+						text="Send Mail"
+						class="sapUiSmallMarginEnd"
+						type="Accept"
+						press="onSendWishMail"
+					/>
+					<m:Button
+						id="Wish_id_CancelMail"
+						text="Cancel"
+						type="Reject"
+						press="onCancelWishMail"
+					/>
+				</m:contentRight>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
+</mvc:View>

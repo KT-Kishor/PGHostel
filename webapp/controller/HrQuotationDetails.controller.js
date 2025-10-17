@@ -1761,6 +1761,9 @@ sap.ui.define(
           });
         }
       },
+      onClearNotesPress: function () {
+      this.getView().getModel("SingleCompanyModel").setProperty("/Notes", "");
+    },
     });
   }
 );

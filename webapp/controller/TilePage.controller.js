@@ -431,6 +431,9 @@ sap.ui.define(
         TileV_onpressAllowanceApp:function(){
           this.getRouter().navTo("RouteAllowancePage");
         },
+        TileV_onpressSendGreetings:function(){
+          this.getRouter().navTo("RouteSendGreetings");
+        },
 onTileRefresh: async function () {
     this.getBusyDialog();
     const backendModels = {

@@ -101,7 +101,8 @@ sap.ui.define([
             "AppliedCandidates": "/AppliedCandidates",
             "JobPosting": "/JobPosting",
             "MaintainData": "/MaintainData",
-            "Allowance":"/AllowanceApp"
+            "Allowance":"/AllowanceApp",
+            "Greeting": "/GreetingApp"
           };
 
           const modelPath = tileMap[value];
