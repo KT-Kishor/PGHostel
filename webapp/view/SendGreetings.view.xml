@@ -21,110 +21,58 @@
 					<subSections>
 						<ObjectPageSubSection>
 							<blocks>
-								<m:VBox class="sapUiLargeMargin sapUiSmallMarginBeginEnd" width="100%">
-									<!-- Email Type -->
-									<!-- Responsive Row for Email Type + To Email -->
-									<l:Grid
-	defaultSpan="L6 M6 S12"  
-	width="100%"
-	hSpacing="1"
-	vSpacing="1"
->
-										<!-- Column 1: Send Greetings To -->
-										<l:content>
-											<l:Grid
-			defaultSpan="L12 M12 S12"
-			width="100%"
-			hSpacing="1"
-			vSpacing="1"
-		>
-												<l:content>
-													<m:Label 
-					text="Send Greetings To :" 
-					required="true" 
-					layoutData="{l:GridData: {span: 'L2 M3 S12'}}" 
-				/>
-													<m:RadioButtonGroup
-					id="Wish_id_RadioGroup"
-					columns="4"
-					select="onRadioButtonSelect"
-					selectedIndex="0"
-					width="100%"
-					layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
-				>
-														<m:RadioButton text="{i18n>employeeOffer}" />
-														<m:RadioButton text="{i18n>contractOffer}" />
-														<m:RadioButton text="{i18n>traineeOffer}" />
-														<m:RadioButton text="{i18n>customer}" />
-													</m:RadioButtonGroup>
-												</l:content>
-											</l:Grid>
-										</l:content>
-										<!-- Column 2: To Email ID -->
-										<l:content>
-											<l:Grid
-			defaultSpan="L12 M12 S12"
-			width="100%"
-			hSpacing="1"
-			vSpacing="1"
-		>
-												<l:content>
-													<m:Label 
-					id="Wish_id_EmailLabel"
-					text="{i18n>toMailText} :" 
-					required="true" 
-					layoutData="{l:GridData: {span: 'L2 M3 S12'}}" 
-				/>
-													<m:MultiComboBox 
-					id="Wish_id_EmployeeEmail"
-					showClearIcon="true"
-					showSecondaryValues="true"
-					showSelectAll="true"
-					width="150%"
-					layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
-					placeholder="Select Recipient"
-					change="onEmailSelectionChange"
-				>
-														<core:ListItem
-						key="{key}"
-						text="{text}"
-						additionalText="{additionalText}"
-					/>
-													</m:MultiComboBox>
-												</l:content>
-											</l:Grid>
-										</l:content>
-									</l:Grid>
-									<!-- Subject -->
-									<l:Grid
-										defaultSpan="L12 M12 S12"
-										width="100%"
-										hSpacing="1"
-										vSpacing="1"
-									>
-										<l:content>
-											<m:Label text="Subject :" required="true" layoutData="{l:GridData: {span: 'L2 M3 S12'}}" />
-											<m:TextArea
-												id="Wish_id_EmailSubject"
-												placeholder="Enter Subject"
-												change="onLiveChangeSubject"
-												value="{SendWishEmailModel>/Subject}"
-												rows="2"
-												width="100%"
-												valueStateText="Invalid Subject"
-												layoutData="{l:GridData: {span: 'L10 M9 S12'}}"
-											/>
-										</l:content>
-									</l:Grid>
-								</m:VBox>
+								<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+									<f:content>
+										<m:Label
+				text="Send Greetings To"
+				required="true"
+			/>
+										<m:RadioButtonGroup
+				id="Wish_id_RadioGroup"
+				columns="4"
+				select="onRadioButtonSelect"
+				selectedIndex="0"
+				width="auto"
+			>
+											<m:RadioButton text="{i18n>employeeOffer}" />
+											<m:RadioButton text="{i18n>contractOffer}" />
+											<m:RadioButton text="{i18n>traineeOffer}" />
+											<m:RadioButton text="{i18n>customer}" />
+										</m:RadioButtonGroup>
+										<m:Label
+				text="To Email ID"
+				required="true"
+			/>
+										<m:MultiComboBox
+				id="Wish_id_EmployeeEmail"
+				showClearIcon="true"
+				showSecondaryValues="true"
+				showSelectAll="true"
+				placeholder="Select Recipient"
+				change="onEmailSelectionChange"
+				width="50%"
+			>
+											<core:ListItem key="{key}" text="{text}" additionalText="{additionalText}" />
+										</m:MultiComboBox>
+										<m:Label
+				text="Subject"
+				required="true"
+			/>
+										<m:Input
+				id="Wish_id_EmailSubject"
+				placeholder="Enter Subject"
+				value="{SendWishEmailModel>/Subject}" width="50%"
+			/>
+									</f:content>
+								</f:SimpleForm>
 							</blocks>
 						</ObjectPageSubSection>
 					</subSections>
 				</ObjectPageSection>
 				<!-- Section 2: Email Content -->
-				<ObjectPageSection id="Wish_id_EmailContentSection" title="Email Content">
+				<ObjectPageSection id="Wish_id_EmailContentSection" title="Email Content" titleUppercase="false">
 					<subSections>
-						<ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false">
 							<blocks>
 								<m:VBox class="sapUiSmallMargin">
 									<m:Label text="Email Body :" required="true" class="sapUiSmallMarginBottom" />
@@ -147,45 +95,57 @@
 					</subSections>
 				</ObjectPageSection>
 				<!-- Section 3: Attachments -->
-				<ObjectPageSection id="Wish_id_AttachmentSection" title="Attachments">
+				<ObjectPageSection id="Wish_id_AttachmentSection" title="Attachments" titleUppercase="false">
 					<subSections>
-						<ObjectPageSubSection>
+						<ObjectPageSubSection titleUppercase="false">
 							<blocks>
-								<m:VBox class="uploaderSection noBottomSpace">
-									<m:Title class="sapUiSmallMargin" text="Attachment" level="H3" />
-									<m:HBox
-										alignItems="Center"
-										justifyContent="Start"
-										class="sapUiSmallMarginBegin sapUiTinyMarginTop"
-									>
-										<!-- File Uploader -->
-										<u:FileUploader
-											id="Wish_id_jobFileUploader"
-											fileSizeExceed="onFileSizeExceeds"
-											maximumFileSize="5"
-											typeMissmatch="onFileTypeMissmatch"
-											fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt,ppt"
-											change="onFileSelected"
-											buttonOnly="true"
-											sameFilenameAllowed="true"
-											iconFirst="true"
-											buttonText="Upload Attachment"
-											icon="sap-icon://attachment"
-											class="sapUiTinyMarginEnd"
-										/>
-										<m:Tokenizer
-											id="Wish_id_tokenizer"
-											width="auto"
-											tokenDelete="onTokenDelete"
-											tokens="{tokenModel>/tokens}"
-										>
-											<m:Token
-												key="{tokenModel>key}"
-												text="{tokenModel>text}"
-												class="sapUiTinyMarginBegin"
-											/>
-										</m:Tokenizer>
-									</m:HBox>
+								<m:VBox class="sapUiResponsiveMargin">
+									<m:Table
+        id="Wish_id_AttachmentsTable"
+        sticky="ColumnHeaders,HeaderToolbar"
+        items="{UploaderData>/attachments}"
+        inset="false"
+        mode="Delete"
+        delete="onAttachmentsTableDelete"
+        popinLayout="Block"
+        busyIndicatorDelay="0"
+        width="100%">
+										<m:headerToolbar>
+											<m:OverflowToolbar>
+												<m:ToolbarSpacer />
+												<u:FileUploader
+                    id="Wish_id_FileUploader"
+                    fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt"
+                    name="myFileUpload"
+                    multiple="true"
+                    uploadUrl=""
+                    tooltip="{i18n>toolTipMsgSM}"
+                    change="onFileSelected"
+                    buttonOnly="true"
+                    buttonText="{i18n>uploadAttachment}" />
+											</m:OverflowToolbar>
+										</m:headerToolbar>
+										<m:columns>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+												<m:Text text="{i18n>filename}" />
+											</m:Column>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" popinDisplay="Inline">
+												<m:Text text="{i18n>FileType}" />
+											</m:Column>
+											<m:Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" popinDisplay="Inline">
+												<m:Text text="{i18n>FileSize}" />
+											</m:Column>
+										</m:columns>
+										<m:items>
+											<m:ColumnListItem>
+												<m:cells>
+													<m:Text text="{UploaderData>filename}" />
+													<m:Text text="{UploaderData>fileType}" />
+													<m:Text text="{path:'UploaderData>size', formatter: '.Formatter.bytesToMB'}" />
+												</m:cells>
+											</m:ColumnListItem>
+										</m:items>
+									</m:Table>
 								</m:VBox>
 							</blocks>
 						</ObjectPageSubSection>

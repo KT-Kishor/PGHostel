@@ -1,27 +1,24 @@
 sap.ui.define(
     [
         "./BaseController", // Import BaseController 
+        "sap/ui/model/json/JSONModel",
         "../model/formatter", // Import formatter utility
         "sap/m/MessageToast", // Import MessageToast for notifications
     ],
-    function(BaseController, Formatter, MessageToast) {
+    function(BaseController, JSONModel, Formatter, MessageToast) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.SendGreetings", {
                 Formatter: Formatter,
                 onInit: function() {
-                    const oUploadModel = new sap.ui.model.json.JSONModel({
-                        File: "",
-                        FileName: "",
-                        FileType: ""
+                    const oUploaderDataModel = new JSONModel({
+                        attachments: [], // holds uploaded files
+                        isFileUploaded: false,
+                        name: "",
+                        mimeType: "",
+                        content: ""
                     });
-                    this.getView().setModel(oUploadModel, "UploadModel");
-
-                    // Token model - only once
-                    const oTokenModel = new sap.ui.model.json.JSONModel({
-                        tokens: []
-                    });
-                    this.getView().setModel(oTokenModel, "tokenModel");
+                    this.getView().setModel(oUploaderDataModel, "UploaderData");
                     this.getRouter().getRoute("RouteSendGreetings").attachMatched(this._onRouteMatched, this);
                 },
 
@@ -138,7 +135,6 @@ sap.ui.define(
                     }
                 },
 
-                // Send email logic
                 onSendWishMail: function() {
                     const oView = this.getView();
                     const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
@@ -160,27 +156,27 @@ sap.ui.define(
 
                     let toEmails = [];
 
-                    if (sSelectedText.includes(this.i18nModel.getText("employeeOffer")) ||
+                    // Employee/Contract/Trainee
+                    if (
+                        sSelectedText.includes(this.i18nModel.getText("employeeOffer")) ||
                         sSelectedText.includes(this.i18nModel.getText("contractOffer")) ||
-                        sSelectedText.includes(this.i18nModel.getText("traineeOffer"))) {
-
+                        sSelectedText.includes(this.i18nModel.getText("traineeOffer"))
+                    ) {
                         const empData = this.getOwnerComponent().getModel("AllEmployeedataModel").getData() || [];
 
                         aSelectedItems.forEach(item => {
-                            const selectedKey = item.getKey();
-                            const emp = empData.find(e => e.EmployeeID === selectedKey);
+                            const emp = empData.find(e => e.EmployeeID === item.getKey());
                             if (emp && emp.CompanyEmailID) {
                                 toEmails.push(emp.CompanyEmailID);
                             }
                         });
-
-                    } else if (sSelectedText.includes(this.i18nModel.getText("customer"))) {
-
+                    }
+                    // Customer
+                    else if (sSelectedText.includes(this.i18nModel.getText("customer"))) {
                         const custData = this.getOwnerComponent().getModel("AllCustDataModelModel").getData() || [];
 
                         aSelectedItems.forEach(item => {
-                            const selectedKey = item.getKey();
-                            const cust = custData.find(c => c.name === selectedKey);
+                            const cust = custData.find(c => c.name === item.getKey());
                             if (cust) {
                                 if (cust.customerEmail) toEmails.push(cust.customerEmail);
                                 if (cust.mailID) toEmails.push(cust.mailID);
@@ -193,10 +189,10 @@ sap.ui.define(
                         return;
                     }
 
-                    const subjectValue = oSubject.getValue() || "";
-                    const bodyValue = oRTE.getValue() || "";
+                    // Subject and Body Validation
+                    const subjectValue = oSubject.getValue().trim();
+                    const bodyValue = oRTE.getValue().trim();
 
-                    // Validations
                     if (subjectValue.length < 10) {
                         sap.m.MessageToast.show("Subject must be at least 10 characters long.");
                         oSubject.setValueState("Error").focus();
@@ -210,53 +206,59 @@ sap.ui.define(
                         return;
                     }
 
-                    const oUploadModel = this.getView().getModel("UploadModel");
-                    const uploadData = oUploadModel ? oUploadModel.getData() : {};
-
+                    // Build payload
                     const payload = {
-                        toEmailID: toEmails.join(","), // multiple emails
-                        subject: subjectValue,
-                        body: bodyValue,
-                        AttachmentFile: uploadData.File || "",
-                        AttachmentName: uploadData.FileName || "",
-                        AttachmentType: uploadData.FileType || ""
+                        "toEmailID": toEmails.join(","), // multiple emails
+                        "subject": subjectValue,
+                        "body": bodyValue,
+                        "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
                     };
 
+                    // Send email via AJAX
                     this.getBusyDialog();
                     this.ajaxCreateWithJQuery("SendWishesEmail", payload).then(() => {
                             this.closeBusyDialog();
                             this.clearWishesAttachment();
                             sap.m.MessageToast.show("Email sent successfully!");
                             this.onCancelWishMail();
-                        })
-                        .catch((oError) => {
+                        }).catch((oError) => {
                             this.closeBusyDialog();
                             sap.m.MessageToast.show(oError.responseText);
                         });
                 },
 
+
                 onCancelWishMail: function() {
                     const oView = this.getView();
                     oView.byId("Wish_id_EmailSubject").setValue("");
                     oView.byId("Wish_id_EmailBody").setValue("");
-                    var oDateMultiBox = this.getView().byId("Wish_id_EmployeeEmail");
-                    if (oDateMultiBox) {
-                        oDateMultiBox.removeAllSelectedItems();
+
+                    const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
+                    if (oMultiComboBox) {
+                        oMultiComboBox.removeAllSelectedItems();
                     }
+
+                    // Clear all uploaded attachments
                     this.clearWishesAttachment();
                 },
 
-               clearWishesAttachment: function() {
-                    const oFileUploader = this.getView().byId("Wish_id_jobFileUploader");
-                    const oTokenizer = this.getView().byId("Wish_id_tokenizer");
-                    const oTokenModel = this.getView().getModel("tokenModel");
-                    const oUploadModel = this.getView().getModel("UploadModel");
+
+                clearWishesAttachment: function() {
+                    const oFileUploader = this.getView().byId("Wish_id_FileUploader");
+                    const oUploaderData = this.getView().getModel("UploaderData");
 
                     if (oFileUploader) oFileUploader.clear();
-                    if (oTokenizer) oTokenizer.removeAllTokens();
-                    if (oTokenModel) oTokenModel.setProperty("/tokens", []);
-                    if (oUploadModel) oUploadModel.setData({ File: "", FileName: "", FileType: "" });
+
+                    if (oUploaderData) {
+                        oUploaderData.setProperty("/attachments", []);
+                        oUploaderData.setProperty("/isFileUploaded", false);
+                        oUploaderData.setProperty("/name", "");
+                    }
+
+                    const oTable = this.getView().byId("Wish_id_AttachmentsTable");
+                    if (oTable) oTable.removeSelections();
                 },
+
 
                 onRTEChange: function(oEvent) {
                     const oRTE = oEvent.getSource();
@@ -280,78 +282,18 @@ sap.ui.define(
                 },
 
                 onFileSelected: function(oEvent) {
-                    const oFile = oEvent.getParameter("files")[0];
-                    if (!oFile) return;
-
-                    const oTokenModel = this.getView().getModel("tokenModel");
-                    let aTokens = oTokenModel.getProperty("/tokens") || [];
-
-                    // Only one file allowed
-                    if (aTokens.length >= 1) {
-                        sap.m.MessageBox.error("Only one file can be uploaded at a time.");
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    const that = this;
-
-                    reader.onload = function(e) {
-                        const base64 = e.target.result.split(',')[1];
-                        const oUploadModel = that.getView().getModel("UploadModel");
-
-                        // Save file in model
-                        oUploadModel.setData({
-                            File: base64,
-                            FileName: oFile.name,
-                            FileType: oFile.type
-                        });
-
-                        const newTokens = aTokens.concat({ key: oFile.name, text: oFile.name });
-
-                        // Update Tokenizer visually
-                        const oTokenizer = that.getView().byId("Wish_id_tokenizer");
-                        oTokenizer.removeAllTokens();
-                        newTokens.forEach(t => {
-                            oTokenizer.addToken(new sap.m.Token({ key: t.key, text: t.text }));
-                        });
-
-                        // Keep token model in sync
-                        oTokenModel.setProperty("/tokens", newTokens);
-
-                        sap.m.MessageToast.show("File uploaded successfully: " + oFile.name);
-                    };
-
-                    reader.readAsDataURL(oFile);
-
-                    // Reset FileUploader input to allow same file re-upload
-                    setTimeout(() => {
-                        const oFileUploader = that.getView().byId("Wish_id_jobFileUploader");
-                        if (oFileUploader && oFileUploader.oFileUpload) {
-                            oFileUploader.oFileUpload.value = "";
-                        }
-                    }, 100);
-                },
-
-                onTokenDelete: function(oEvent) {
-                    const oTokenModel = this.getView().getModel("tokenModel");
-                    let aTokens = oTokenModel.getProperty("/tokens") || [];
-                    const aTokensToDelete = oEvent.getParameter("tokens");
-
-                    aTokensToDelete.forEach(function(oDeletedToken) {
-                        const sKey = oDeletedToken.getKey();
-                        aTokens = aTokens.filter(token => token.key !== sKey);
-                    });
-
-                    oTokenModel.setProperty("/tokens", aTokens);
-
-                    if (aTokens.length === 0) {
-                        const oUploadModel = this.getView().getModel("UploadModel");
-                        oUploadModel.setData({
-                            File: "",
-                            FileName: "",
-                            FileType: ""
-                        });
-                    }
+                    this.handleFileUpload(
+                        oEvent,
+                        this, // context
+                        "UploaderData", // model name
+                        "/attachments", // path to attachment array
+                        "/name", // path to comma-separated file names
+                        "/isFileUploaded", // boolean flag path
+                        "uploadSuccessfull", // i18n success key
+                        "fileAlreadyUploaded", // i18n duplicate key
+                        "noFileSelected", // i18n no file selected
+                        "fileReadError" // i18n file read error
+                    );
                 },
 
                 onLiveChangeSubject: function(oEvent) {
