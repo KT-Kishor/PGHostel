@@ -228,11 +228,16 @@ sap.ui.define(
                         return;
                     }
 
+                    const sWarmRegards = this.i18nModel.getText("warmRegards");
+                    const sFooter = this.i18nModel.getText("sendGreetingsFooter");
+
+                    const finalBody = `${bodyValue}<p>${sWarmRegards}<br>${sFooter}</p>`;
+
                     // Build payload
                     const payload = {
-                        toEmailID: toEmails.join(","), // combine both sources
+                        toEmailID: toEmails.join(","),
                         subject: subjectValue,
-                        body: bodyValue,
+                        body: finalBody,
                         attachments: this.getView().getModel("UploaderData").getProperty("/attachments"),
                     };
 
