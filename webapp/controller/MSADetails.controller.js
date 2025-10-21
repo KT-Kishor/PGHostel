@@ -378,7 +378,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
             }),
             endButton: new sap.m.Button({
               text: "Generate PDF",
-              type: "Attention",
+              type: "Transparent",
               press: function () {
                 oDialog.close();
                 that.MsaE_onPressMerge();

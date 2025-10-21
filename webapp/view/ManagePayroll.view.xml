@@ -23,7 +23,7 @@
                         sameFilenameAllowed="true"
                         buttonOnly="true"
                         fileType="XLSX,xlsx,XLS,xls"
-                        style="Attention"
+                        style="Transparent"
                         change=".MP_onPressSalUpdate"
                         visible="{Payroll>/isSELVisible}"
                     />

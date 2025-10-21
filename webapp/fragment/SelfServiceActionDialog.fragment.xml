@@ -9,7 +9,7 @@
 >
     <Button
         text="{i18n>headerIdCard}"
-        type="Ghost"
+        type="Transparent"
         visible="{viewModel>/RelievingLetter}"
         id="IC_id_Idcard"
         press="CC_onPressIdCardDetails"
@@ -19,7 +19,7 @@
         text="{i18n>visit}"
         press="onDownloadVisitCard"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
-        type="Attention"
+        type="Transparent"
         visible="{viewModel>/isVisitMode}"
     />
     <Button
@@ -55,7 +55,7 @@
     />
     <Button
         text="{i18n>salaryCertificate}"
-        type="Ghost"
+        type="Transparent"
         visible="{viewModel>/Letter}"
         id="SS_idSalarybtn"
         press="SS_onDownloadSalLetter"
@@ -63,7 +63,7 @@
     />
        <Button
         text="{i18n>spotAward}"
-        type="Ghost"
+        type="Transparent"
         visible="{viewModel>/RelievingLetter}"
         id="SS_idAwardbtn"
         press="SS_onDownloadSpotAward"

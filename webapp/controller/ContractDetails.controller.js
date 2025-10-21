@@ -868,7 +868,7 @@ sap.ui.define([
                                 }),
                                 endButton: new sap.m.Button({
                                     text: "Generate PDF",
-                                    type: "Attention",
+                                    type: "Transparent",
                                     press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);

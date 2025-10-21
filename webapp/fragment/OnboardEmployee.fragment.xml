@@ -80,7 +80,7 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button text="{i18n>onboardEmp}" type="Ghost" press="OEF_onPressOnBoard"  />
+			<Button text="{i18n>onboardEmp}" type="Transparent" press="OEF_onPressOnBoard"  />
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>close}" press="OEF_onPressClose" type="Transparent"/>

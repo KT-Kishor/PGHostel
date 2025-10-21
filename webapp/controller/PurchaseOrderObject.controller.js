@@ -506,7 +506,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
           }),
           endButton: new sap.m.Button({
             text: "Generate PDF",
-            type: "Attention",
+            type: "Transparent",
             press: function () {
               this.PoNumber;
               this.POO_onPDFButtonPress();

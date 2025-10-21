@@ -536,7 +536,7 @@ sap.ui.define([
                         content: [],
                         beginButton: new sap.m.Button({
                             text: "Download",
-                            type: "Ghost",
+                            type: "Transparent",
                             press: this.Exp_Det_onPressDownloadAttachment.bind(this)
                         }),
                         endButton: new sap.m.Button({

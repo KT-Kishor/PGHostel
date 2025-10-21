@@ -344,7 +344,7 @@ _applyCountryStateCityFilters: function () {
                 ],
                 beginButton: new sap.m.Button({
                     text: "Download",
-                    type: "Ghost",
+                    type: "Transparent",
                     press: function() {
                         const downloadLink = document.createElement("a");
                         downloadLink.href = blobUrl;
