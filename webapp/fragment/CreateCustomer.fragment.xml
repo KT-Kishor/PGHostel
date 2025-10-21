@@ -9,7 +9,7 @@
 				<Label text="{i18n>companyName}" />
 				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields" value="{CustomerModel>/companyName}" editable="{ViewModel>/update}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
 				<Label text="{i18n>coCode}"/>
-				<ComboBox id="MC_id_ComapnyCode"  editable="{ViewModel>/update}" change="CID_validateCombobox"  valueStateText="{i18n>expValStaCountry}"
+				<ComboBox id="MC_id_ComapnyCode"  editable="{ViewModel>/update}" change="MC_validateCombobox"  valueStateText="{i18n>selectBranch}"
 				items="{path:'CompanyCodeDetailsModel>/',length:1000}" selectedKey="{CustomerModel>/CompanyCode}" showSecondaryValues="true">
 				<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}"/>
 				</ComboBox> 

@@ -38,7 +38,6 @@ sap.ui.define([
                     this.closeBusyDialog(); // Hide in all cases
                 }
                 this.initializeBirthdayCarousel();
-
             },
 
             //common Dialog Function
@@ -112,6 +111,7 @@ sap.ui.define([
                         function (oManageCustomerDialog) {
                             this.oManageCustomerDialog = oManageCustomerDialog;
                             this.getView().addDependent(this.oManageCustomerDialog);
+                            this._resetDialogFields(bIsEdit);
                             this._applyCountryStateCityFilters()
                             this.oManageCustomerDialog.open(); // Open the dialog
                         }.bind(this)
@@ -123,6 +123,7 @@ sap.ui.define([
                     this.oManageCustomerDialog.open(); // Open the dialog
                 }
             },
+
             _applyCountryStateCityFilters: function () {
                 const oModel = this.getView().getModel("CustomerModel");
                 const oCountryCB = sap.ui.getCore().byId("MC_id_Country");
@@ -166,6 +167,7 @@ sap.ui.define([
                 oStateCB.setValue(sState || "");
                 oSourceCB.setValue(sSource || "");
             },
+
             _resetDialogFields: function (bIsEdit) {
                 // Clear all ValueStates
                 sap.ui.getCore().byId("MC_id_CustCompanyName").setValueState("None");
@@ -287,7 +289,6 @@ sap.ui.define([
                         dataModel.setProperty("/value", "18");
                         dataModel.setProperty("/type", "IGST");
                     }
-
                     oInput.setValueState("None");
                 } else if (!sInputValue) {
                     // Empty input
@@ -357,6 +358,10 @@ sap.ui.define([
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
 
+            MC_validateCombobox: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent, "oEvent");
+            },
+
             MC_onChangeCountry: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
@@ -412,11 +417,9 @@ sap.ui.define([
 
             MC_onChangeState: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
-
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
 
-                // Controls
-                const oCityCombo = sap.ui.getCore().byId("MC_id_City");
+                const oCityCombo = sap.ui.getCore().byId("MC_id_City");  // Controls
                 const oCountryCB = sap.ui.getCore().byId("MC_id_Country");
                 const oModel = this.getView().getModel("CustomerModel");
 
@@ -436,14 +439,12 @@ sap.ui.define([
                         new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
                     ]);
-
                     oModel.setProperty("/state", sStateName || "");
                 }
             },
 
             MC_onChangeCity: function (oEvent) {
                 utils._LCstrictValidationComboBox(oEvent, "oEvent");
-
                 const oSelectedItem = oEvent.getSource().getSelectedItem();
                 const oModel = this.getView().getModel("CustomerModel");
 
@@ -466,7 +467,7 @@ sap.ui.define([
                     // Validate Mandatory Fields
                     var isMandatoryValid = (
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
-                        utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_ComapnyCode"), "ID") &&
+                        // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_ComapnyCode"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCustomerName"), "ID") &&
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_HeadPosition"), "ID") &&
                         utils._LCvalidateEmail(sap.ui.getCore().byId("MC_id_CustMail"), "ID") &&
@@ -522,7 +523,6 @@ sap.ui.define([
             MC_onPressSave: async function () {
                 var that = this;
                 try {
-                    const STDCode = sap.ui.getCore().byId("MC_id_codeModel").getValue();
                     // Validate Mandatory Fields
                     var isMandatoryValid = (
                         utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MC_id_CustCompanyName"), "ID") &&
@@ -759,9 +759,6 @@ sap.ui.define([
                 }.bind(this)).finally(function () {
                     oSheet.destroy();
                 });
-            },
-            CID_validateCombobox: function (oEvent) {
-                utils._LCstrictValidationComboBox(oEvent, "oEvent");
             }
         });
     }
