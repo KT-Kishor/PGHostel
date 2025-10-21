@@ -135,53 +135,75 @@ sap.ui.define(
                     }
                 },
 
-                onSendWishMail: function() {
+                onSendWishMail: function () {
                     const oView = this.getView();
                     const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
+                    const oToEmailInput = oView.byId("Wish_id_ToEmail");
                     const oSubject = oView.byId("Wish_id_EmailSubject");
                     const oRTE = oView.byId("Wish_id_EmailBody");
 
                     const aSelectedItems = oMultiComboBox.getSelectedItems();
-                    if (aSelectedItems.length === 0) {
-                        sap.m.MessageToast.show("Please select at least one recipient.");
-                        oMultiComboBox.setValueState("Error").focus();
-                        return;
-                    } else {
-                        oMultiComboBox.setValueState("None");
-                    }
-
-                    // Determine selected radio button type
-                    const oSelectedBtn = oView.byId("Wish_id_RadioGroup").getSelectedButton();
-                    const sSelectedText = oSelectedBtn ? oSelectedBtn.getText() : "";
+                    const sManualEmail = oToEmailInput.getValue().trim();
 
                     let toEmails = [];
 
-                    // Employee/Contract/Trainee
-                    if (
-                        sSelectedText.includes(this.i18nModel.getText("employeeOffer")) ||
-                        sSelectedText.includes(this.i18nModel.getText("contractOffer")) ||
-                        sSelectedText.includes(this.i18nModel.getText("traineeOffer"))
-                    ) {
-                        const empData = this.getOwnerComponent().getModel("AllEmployeedataModel").getData() || [];
-
-                        aSelectedItems.forEach(item => {
-                            const emp = empData.find(e => e.EmployeeID === item.getKey());
-                            if (emp && emp.CompanyEmailID) {
-                                toEmails.push(emp.CompanyEmailID);
-                            }
-                        });
+                    // Validate that at least one recipient is provided
+                    if (aSelectedItems.length === 0 && !sManualEmail) {
+                        sap.m.MessageToast.show("Please provide at least one recipient — select from list or enter an email ID.");
+                        oMultiComboBox.setValueState("Error");
+                        oToEmailInput.setValueState("Error");
+                        return;
+                    } else {
+                        oMultiComboBox.setValueState("None");
+                        oToEmailInput.setValueState("None");
                     }
-                    // Customer
-                    else if (sSelectedText.includes(this.i18nModel.getText("customer"))) {
-                        const custData = this.getOwnerComponent().getModel("AllCustDataModelModel").getData() || [];
 
-                        aSelectedItems.forEach(item => {
-                            const cust = custData.find(c => c.name === item.getKey());
-                            if (cust) {
-                                if (cust.customerEmail) toEmails.push(cust.customerEmail);
-                                if (cust.mailID) toEmails.push(cust.mailID);
-                            }
-                        });
+                    // Get selected radio button
+                    const oSelectedBtn = oView.byId("Wish_id_RadioGroup").getSelectedButton();
+                    const sSelectedText = oSelectedBtn ? oSelectedBtn.getText() : "";
+
+                    // Collect MultiComboBox emails
+                    if (aSelectedItems.length > 0) {
+                        if (
+                            sSelectedText.includes(this.i18nModel.getText("employeeOffer")) ||
+                            sSelectedText.includes(this.i18nModel.getText("contractOffer")) ||
+                            sSelectedText.includes(this.i18nModel.getText("traineeOffer"))
+                        ) {
+                            const empData = this.getOwnerComponent().getModel("AllEmployeedataModel").getData() || [];
+
+                            aSelectedItems.forEach(item => {
+                                const emp = empData.find(e => e.EmployeeID === item.getKey());
+                                if (emp && emp.CompanyEmailID) {
+                                    toEmails.push(emp.CompanyEmailID);
+                                }
+                            });
+                        } else if (sSelectedText.includes(this.i18nModel.getText("customer"))) {
+                            const custData = this.getOwnerComponent().getModel("AllCustDataModelModel").getData() || [];
+
+                            aSelectedItems.forEach(item => {
+                                const cust = custData.find(c => c.name === item.getKey());
+                                if (cust) {
+                                    if (cust.customerEmail) toEmails.push(cust.customerEmail);
+                                    if (cust.mailID) toEmails.push(cust.mailID);
+                                }
+                            });
+                        }
+                    }
+
+                    // Validate manual email if entered
+                    if (sManualEmail) {
+                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        const manualEmails = sManualEmail.split(/[;,]+/).map(e => e.trim()).filter(e => e);
+                        const invalidEmails = manualEmails.filter(e => !emailPattern.test(e));
+
+                        if (invalidEmails.length > 0) {
+                            oToEmailInput.setValueState("Error");
+                            sap.m.MessageToast.show("Please enter valid email ID(s).");
+                            return;
+                        } else {
+                            oToEmailInput.setValueState("None");
+                            toEmails = toEmails.concat(manualEmails);
+                        }
                     }
 
                     if (toEmails.length === 0) {
@@ -189,7 +211,7 @@ sap.ui.define(
                         return;
                     }
 
-                    // Subject and Body Validation
+                    // Validate subject and body
                     const subjectValue = oSubject.getValue().trim();
                     const bodyValue = oRTE.getValue().trim();
 
@@ -208,10 +230,10 @@ sap.ui.define(
 
                     // Build payload
                     const payload = {
-                        "toEmailID": toEmails.join(","), // multiple emails
-                        "subject": subjectValue,
-                        "body": bodyValue,
-                        "attachments": this.getView().getModel("UploaderData").getProperty("/attachments"),
+                        toEmailID: toEmails.join(","), // combine both sources
+                        subject: subjectValue,
+                        body: bodyValue,
+                        attachments: this.getView().getModel("UploaderData").getProperty("/attachments"),
                     };
 
                     // Send email via AJAX
@@ -227,11 +249,11 @@ sap.ui.define(
                         });
                 },
 
-
                 onCancelWishMail: function() {
                     const oView = this.getView();
                     oView.byId("Wish_id_EmailSubject").setValue("");
                     oView.byId("Wish_id_EmailBody").setValue("");
+                    oView.byId("Wish_id_ToEmail").setValue("");
 
                     const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
                     if (oMultiComboBox) {

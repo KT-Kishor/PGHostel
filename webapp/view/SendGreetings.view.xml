@@ -21,7 +21,7 @@
 					<subSections>
 						<ObjectPageSubSection>
 							<blocks>
-								<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+								<f:SimpleForm editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
 									<f:content>
 										<m:Label
 				text="Send Greetings To"
@@ -50,10 +50,18 @@
 				showSelectAll="true"
 				placeholder="Select Recipient"
 				change="onEmailSelectionChange"
-				width="50%"
 			>
 											<core:ListItem key="{key}" text="{text}" additionalText="{additionalText}" />
 										</m:MultiComboBox>
+										<m:Label
+				text="Recipient Email ID"
+				required="true"
+			/>
+										<m:Input
+				id="Wish_id_ToEmail"
+				placeholder="Enter Email ID"
+				value="{SendWishEmailModel>/RecipientEmail}" 
+			/>
 										<m:Label
 				text="Subject"
 				required="true"
@@ -61,7 +69,7 @@
 										<m:Input
 				id="Wish_id_EmailSubject"
 				placeholder="Enter Subject"
-				value="{SendWishEmailModel>/Subject}" width="50%"
+				value="{SendWishEmailModel>/Subject}"
 			/>
 									</f:content>
 								</f:SimpleForm>
@@ -75,7 +83,6 @@
 						<ObjectPageSubSection titleUppercase="false">
 							<blocks>
 								<m:VBox class="sapUiSmallMargin">
-									<m:Label text="Email Body :" required="true" class="sapUiSmallMarginBottom" />
 									<rte:RichTextEditor
 										id="Wish_id_EmailBody"
 										width="98%"
