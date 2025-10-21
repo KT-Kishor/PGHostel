@@ -203,6 +203,16 @@ sap.ui.define([
             }
         },
 
+        onSelectDatesWithoutWeekends: function () {
+            var oDateMultiBox = sap.ui.getCore().byId("dateMultiBox");
+            var oModel = oDateMultiBox.getModel();
+            var aDates = oModel ? oModel.getProperty("/dates") : [];
+            var aWeekdayKeys = aDates
+                .filter(d => d.weekday !== "Saturday" && d.weekday !== "Sunday")
+                .map(d => d.key);
+            oDateMultiBox.setSelectedKeys(aWeekdayKeys);
+        },
+
         onTableSelectionChange: function(oEvent) {
             var Status = oEvent.getSource().getSelectedItem().getBindingContext("AllowanceModel").getObject().Status;
             this.DeleteAllowanceID = oEvent.getSource().getSelectedItem().getBindingContext("AllowanceModel").getObject().AllowanceID;

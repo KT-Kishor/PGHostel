@@ -229,27 +229,39 @@ sap.ui.define([
                 });
             },
 
-            //Open Fragment in Expeanse Item Create and Update 
-            openFragment: function() {
-                var oView = this.getView();
-                var oModel = oView.getModel("FilteredAllowanceModel").getData()[0];
-                this.ViewModel.setProperty("/MinDate", new Date(oModel.AllowanceStartDate.split("/").reverse().join("-")));
-                this.ViewModel.setProperty("/MaxDate", new Date(oModel.AllowanceEndDate.split("/").reverse().join("-")));
-                var oView = this.getView();
+           openFragment: async function() {
+                const oView = this.getView();
+                const oFilteredModel = oView.getModel("FilteredAllowanceModel").getData()[0];
+                this.ViewModel.setProperty("/MinDate", new Date(oFilteredModel.AllowanceStartDate.split("/").reverse().join("-"))); // Set min/max date range in ViewModel
+                this.ViewModel.setProperty("/MaxDate", new Date(oFilteredModel.AllowanceEndDate.split("/").reverse().join("-"))); // Set min/max date range in ViewModel
+                const aExistingDates = oView.getModel("ItemAllowanceModel").getData().map(item => item.Dates); // Get existing dates to filter out
                 if (!this.AllowanceItem) {
-                    this.AllowanceItem = sap.ui.core.Fragment.load({
+                    this.AllowanceItem = await sap.ui.core.Fragment.load({
                         name: "sap.kt.com.minihrsolution.fragment.AddItemAllowance",
-                        controller: this,
-                    }).then(
-                        function(AllowanceItem) {
-                            this.AllowanceItem = AllowanceItem;
-                            oView.addDependent(this.AllowanceItem);
-                            this.AllowanceItem.open();
-                        }.bind(this)
-                    );
-                } else {
-                    this.AllowanceItem.open();
+                        controller: this
+                    });
+                    oView.addDependent(this.AllowanceItem);
                 }
+                const oDateBox = sap.ui.getCore().byId("dateMultiBoxFrag");
+                if (oDateBox) {
+                    oDateBox.setSelectedKeys([]);  // Clear previous selections
+                    const oBinding = oDateBox.getBinding("items");
+                    if (oBinding) {
+                        const aFilters = [];
+                        if (aExistingDates.length > 0) {
+                            const aExcludeFilters = aExistingDates.map(date =>
+                                new sap.ui.model.Filter("key", sap.ui.model.FilterOperator.NE, date)
+                            );
+                            const oCombinedFilter = new sap.ui.model.Filter({
+                                filters: aExcludeFilters,
+                                and: true 
+                            });
+                            aFilters.push(oCombinedFilter);
+                        }
+                        oBinding.filter(aFilters);
+                    }
+                }
+                this.AllowanceItem.open();
             },
 
             Exp_Det_onChangeExpanesItem: function(oEvent) {
