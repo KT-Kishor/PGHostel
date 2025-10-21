@@ -2942,3 +2942,20 @@ body, html, .sapUiBody {
     border-radius: 12px;
   }
 }
+.sapUiRespGridMedia-Std-Phone.sapUiRespGridHSpace1>.sapUiRespGridSpanS12 {
+    width: 95%;
+    width: -webkit-calc(100% - 1rem);
+    width: calc(100% - 1rem);
+    margin-left: -0.5px;
+}
+
+.Dashboardtitle{
+  /* font-size: 12px !important; */
+  margin: 0;
+  padding: 0;
+}
+@media (max-width: 400px) {
+  .Dashboardtitle{
+    font-size: 12px !important;
+  }
+}

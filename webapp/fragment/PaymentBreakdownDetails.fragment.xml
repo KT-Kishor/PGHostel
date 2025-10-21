@@ -24,10 +24,10 @@
                 sticky="ColumnHeaders"
                 noDataText="{i18n>noBData}">
                 <columns>
-                    <Column><Text text="{i18n>invoiceNo}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>taxableAmount}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>gstAmount}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>colTotalAmount}" /></Column>
+                    <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column hAlign="End" demandPopin="true"><Text text="{i18n>taxableAmount}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>gstAmount}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colTotalAmount}" /></Column>
                   
                 </columns>
                 <items>

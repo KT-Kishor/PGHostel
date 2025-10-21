@@ -47,7 +47,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true"/>
+                                    <Title text="{i18n>invoiceStatusDash}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChartTooltip}"/>
@@ -82,7 +82,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true"/>
+                                    <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalchartTooltip}"/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
@@ -125,7 +125,7 @@
                             <f:Card class="sapUiTinyMargin">
         <f:header>
             <Toolbar class="customdashboard">
-                <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true"/>
+                <Title text="{i18n>companytotalinvoice}" level="H5" wrapping="true" class="Dashboardtitle"/>
                 <ToolbarSpacer/>
                 <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCompanyPie" tooltip="{i18n>verticalchartTooltip}"/>
                 <Button icon="sap-icon://bar-chart" press="IN_onPressCompanyBar" tooltip="{i18n>barChartTooltip}"/>
@@ -172,7 +172,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>yearlyInvoiceTrend}" level="H5" wrapping="true"/>
+                                    <Title text="{i18n>yearlyInvoiceTrend}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChartTooltip}"/>
                                     <Button icon="sap-icon://line-chart" press="IN_onPressYearlyLine" tooltip="{i18n>lineChartTooltip}"/>
@@ -220,7 +220,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true"/>
+                                    <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedHorizontalTooltip}"/>
                                     <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="{i18n>groupedHorizontalTooltip}"/>
@@ -273,7 +273,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>pendingPaymentsByCompany}" level="H5" wrapping="true"/>
+                                    <Title text="{i18n>pendingPaymentsByCompany}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="{i18n>columnChartTooltip}"/>
                                     <Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="{i18n>barChartTooltip}"/>

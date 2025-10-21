@@ -24,13 +24,13 @@
                 items="{dialogData>/invoices}"
                 noDataText="{i18n>noyearlydata}">
                 <columns>
-                 <Column><Text text="{i18n>invoiceNo}" /></Column>
-                    <Column><Text text="{i18n>invoiceDate}" /></Column>
-                     <Column><Text text="{i18n>customerName}" /></Column>
-                        <Column><Text text="{i18n>transactionAmount}" /></Column>
-                    <Column hAlign="End"><Text text="{i18n>exchRate}" /></Column>
+                 <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
+                    <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceDate}" /></Column>
+                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>customerName}" /></Column>
+                        <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>transactionAmount}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>exchRate}" /></Column>
          
-                    <Column hAlign="End"><Text text="{i18n>yearlyinvoice}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>yearlyinvoice}" /></Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="onPendingInvoicePress">
