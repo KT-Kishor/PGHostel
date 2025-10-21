@@ -44,8 +44,8 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Status" id="All_id_StatusFilter" showClearIcon="true" items="{MyInbox>/}">
-								<core:Item key="{MyInbox>StatusName}" text="{MyInbox>StatusName}"/>
+							<ComboBox name="Status" id="All_id_StatusFilter" showClearIcon="true" items="{Allowance>/}">
+								<core:Item key="{Allowance>StatusName}" text="{Allowance>StatusName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

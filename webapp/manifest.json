@@ -133,6 +133,11 @@
             "uri": "model/AllowanceData.json",
             "preload": true
           },
+           "Allowance": {
+            "type": "sap.ui.model.json.JSONModel",
+            "uri": "model/Allowance.json",
+            "preload": true
+          },
           "Salutation": {
             "type": "sap.ui.model.json.JSONModel",
             "uri": "model/Salutation.json",
