@@ -584,7 +584,7 @@ sap.ui.define([
         content: new sap.m.Text({ text: sMessage }),
         beginButton: new sap.m.Button({
           text: sOkText || oResourceBundle.getText("OkButton"),
-          type: "Accept",
+          type: "Transparent",
           press: function () {
             dialog.close();
 
@@ -602,7 +602,7 @@ sap.ui.define([
         }),
         endButton: new sap.m.Button({
           text: sCancelText || oResourceBundle.getText("CancelButton"),
-          type: "Reject",
+          type: "Transparent",
           press: function () {
             dialog.close();
 

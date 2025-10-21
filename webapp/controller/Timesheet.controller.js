@@ -302,7 +302,7 @@ sap.ui.define([
                 content: [oTimeline],
                 endButton: new sap.m.Button({
                     text: this.i18nModel.getText("close"),
-                    type: "Reject",
+                    type: "Transparent",
                     press: function () {
                         oDialog.close();
                         oDialog.destroy();

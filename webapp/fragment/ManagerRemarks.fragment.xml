@@ -26,10 +26,10 @@
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>
-			<Button type="Emphasized" id="MIF_id_OkBtn" press="MTF_onPressOk" text=""/>
+			<Button type="Transparent" id="MIF_id_OkBtn" press="MTF_onPressOk" text=""/>
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>close}" type="Reject" press="MIF_onPressClose" />
+			<Button text="{i18n>close}" type="Transparent" press="MIF_onPressClose" />
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

@@ -541,7 +541,7 @@ sap.ui.define([
                         }),
                         endButton: new sap.m.Button({
                             text: "Close",
-                            type: "Reject",
+                            type: "Transparent",
                             press: function () {
                                 if (this._pdfBlobUrl) {
                                     URL.revokeObjectURL(this._pdfBlobUrl);
@@ -921,10 +921,10 @@ sap.ui.define([
                     content: [checkbox, commentTextArea],
                     beginButton: new sap.m.Button({
                         text: "OK",
-                        type: "Accept",
+                        type: "Transparent",
                         press: function () {
                             if (checkbox.getSelected()) {
-                                // 🔴 Validate if comment is required and empty
+                                //  Validate if comment is required and empty
                                 if (commentTextArea.getVisible() && !commentTextArea.getValue().trim()) {
                                     commentTextArea.setValueState(sap.ui.core.ValueState.Error);
                                     commentTextArea.setValueStateText(that.i18nModel.getText("commentsValueState"));
@@ -982,7 +982,7 @@ sap.ui.define([
                     }),
                     endButton: new sap.m.Button({
                         text: "Cancel",
-                        type: "Reject",
+                        type: "Transparent",
                         press: function () {
                             dialog.close();
                         }
@@ -1036,7 +1036,7 @@ sap.ui.define([
                     content: [oTimeline],
                     endButton: new sap.m.Button({
                         text: "Close",
-                        type: "Reject",
+                        type: "Transparent",
                         press: function () {
                             oDialog.close();
                             oDialog.destroy();

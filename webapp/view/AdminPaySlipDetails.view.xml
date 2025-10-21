@@ -250,7 +250,7 @@
                                                                 />
                                                                 <m:Button
                                                                     text="{i18n>add}"
-                                                                    type="Accept"
+                                                                    type="Transparent"
                                                                     press="APD_onPressSalAdd"
                                                                     enabled="{PaySlip>/isIdSelected}"
                                                                     visible="{PaySlip>/isCreate}"
@@ -363,7 +363,7 @@
                                                                 />
                                                                 <m:Button
                                                                     text="{i18n>add}"
-                                                                    type="Accept"
+                                                                    type="Transparent"
                                                                     press="APD_onPressDedAdd"
                                                                     enabled="{PaySlip>/isIdSelected}"
                                                                     visible="{PaySlip>/isCreate}"

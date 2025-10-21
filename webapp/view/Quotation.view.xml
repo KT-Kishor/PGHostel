@@ -165,13 +165,13 @@
                         />
                         <ToolbarSpacer />
                         <Button
-                            type="Emphasized"
+                            type="Transparent"
                             press="Q_onPressDashboard"
                             text="{i18n>dashboard}"
                         />
                         <Button
                             text="Create"
-                            type="Accept"
+                            type="Transparent"
                             press="Q_onPressCreate"
                             tooltip="{i18n>create}"
                         />

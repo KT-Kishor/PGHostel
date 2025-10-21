@@ -16,7 +16,7 @@
         <endButton>
             <Button
                 text="Close"
-                type="Reject"
+                type="Transparent"
                 press="VSF_onCloseDialog"
             />
         </endButton>

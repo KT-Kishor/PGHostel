@@ -171,13 +171,13 @@
 						id="Wish_id_SendMail"
 						text="Send Mail"
 						class="sapUiSmallMarginEnd"
-						type="Accept"
+						type="Transparent"
 						press="onSendWishMail"
 					/>
 					<m:Button
 						id="Wish_id_CancelMail"
 						text="Cancel"
-						type="Reject"
+						type="Transparent"
 						press="onCancelWishMail"
 					/>
 				</m:contentRight>

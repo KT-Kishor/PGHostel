@@ -96,14 +96,14 @@
 		<beginButton>
 			<Button
                 text="{i18n>save}"
-                type="Accept"
+                type="Transparent"
                 press="FAU_onSaveReturn"
             />
 		</beginButton>
 		<endButton>
 			<Button
                 text="{i18n>assestAssignCancel}"
-                type="Reject"
+                type="Transparent"
                 press="FAU_onCancelReturn"
             />
 		</endButton>

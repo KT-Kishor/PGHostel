@@ -858,7 +858,7 @@ sap.ui.define([
                                 }),
                                 beginButton: new sap.m.Button({
                                     text: "OK",
-                                    type: "Accept",
+                                    type: "Transparent",
                                     press: function () {
                                         oDialog.close();
                                         this.getView().byId("CD_id_StepTwo").getParent().setShowNextButton(true);

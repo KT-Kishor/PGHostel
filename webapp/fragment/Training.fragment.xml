@@ -25,7 +25,7 @@
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeInclude3}"/>
                     <Link class="training_Course sapUiSmallMarginBegin" text="View Course Details!" press="onSapui5coursepress"/>
                     <HBox justifyContent="End" >
-                <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
+                <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Transparent"/>
             </HBox> 
                 </VBox>
 
@@ -47,7 +47,7 @@
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeCapminclude3}"/>
                      <Link class="training_Course sapUiSmallMarginBegin" text="View Course Details!" press="onCapmCoursepress"/>
                      <HBox justifyContent="End">
-                <Button text="{i18n>careersapply}"  press="onCapmpress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
+                <Button text="{i18n>careersapply}"  press="onCapmpress" class="big-apply-button sapUiLargeMarginEnd" type="Transparent"/>
             </HBox>
                 </VBox>
              </l:Grid>

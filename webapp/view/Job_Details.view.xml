@@ -81,7 +81,7 @@
 								<Button text="{i18n>v1_s_ViewJob}"
                                         icon="sap-icon://opportunities"
                                         press="v1_onViewItem"
-                                        type="Emphasized" />
+                                        type="Transparent" />
 							</cells>
 						</ColumnListItem>
 					</items>

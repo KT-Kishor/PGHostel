@@ -517,7 +517,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "../utils/vali
           }),
           beginButton: new sap.m.Button({
             text: "OK",
-            type: "Accept",
+            type: "Transparent",
             press: function () {
               this._oDialog.close();
               this.getRouter().navTo("PurchaseOrder");

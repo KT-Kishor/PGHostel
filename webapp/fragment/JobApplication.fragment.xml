@@ -124,10 +124,10 @@
 			</HBox>
 		</VBox>
 		<beginButton>
-			<Button text="Submit" type="Accept" press=".onSubmit"/>
+			<Button text="Submit" type="Transparent" press=".onSubmit"/>
 		</beginButton>
 		<endButton>
-			<Button text="Close" type="Reject" press="onClose"/>
+			<Button text="Close" type="Transparent" press="onClose"/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

@@ -47,7 +47,7 @@
         <beginButton>
             <Button
                 text="{i18n>close}"
-                type="Reject"
+                type="Transparent"
                 press="FDP_onVHDClose"
             />
         </beginButton>

@@ -665,7 +665,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
                 sap.ui.getCore().byId("FM_Id_SubmitBTN").setVisible(bIsCreate);
                 sap.ui.getCore().byId("FM_Id_EditBTN").setVisible(!bIsCreate);
                 if (!bIsCreate) {
-                    sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Emphasized");
+                    sap.ui.getCore().byId("FM_Id_EditBTN").setText("Edit").setType("Transparent");
                 }
                 oDialog.open();
             });
@@ -691,7 +691,7 @@ sap.ui.define(["./BaseController", "sap/ui/model/json/JSONModel", "sap/ui/model/
             const oEditButton = sap.ui.getCore().byId("FM_Id_EditBTN");
             if (oEditButton.getText() === "Edit") {
                 this.getView().getModel("EditableModeltruefalse").setProperty("/Editable", true);
-                oEditButton.setText("Save").setType("Accept");
+                oEditButton.setText("Save").setType("Transparent");
             } else {
                 this.onUpdateCandidate();
             }

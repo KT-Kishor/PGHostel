@@ -18,14 +18,14 @@
         <beginButton>
             <Button
                 text="{i18n>sendbutton}"
-                type="Accept"
+                type="Transparent"
                 press="Tile_sendMail"
             />
         </beginButton>
         <endButton>
             <Button
                 text="{i18n>btnCancel}"
-                type="Reject"
+                type="Transparent"
                 press="NT_BirtdayDialogCancel"
             />
         </endButton>

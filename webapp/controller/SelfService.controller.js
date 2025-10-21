@@ -1588,7 +1588,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
           content: [],
           endButton: new sap.m.Button({
             text: "Close",
-            type: "Reject",
+            type: "Transparent",
             press: function () {
               if (this._pdfBlobUrl) {
                 URL.revokeObjectURL(this._pdfBlobUrl);
@@ -2169,7 +2169,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         }),
         beginButton: new sap.m.Button({
           text: that.i18nModel.getText("close"),
-          type: "Reject",
+          type: "Transparent",
           press: function () {
             oDialog.close();
             oTable.removeSelections(true);
@@ -2225,7 +2225,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         if (salaryDetailsArray.length > 1 && oEffectiveDate > oToday && this.sPath !== "SelfService") {
           var oDeleteButton = new sap.m.Button({
             text: this.i18nModel.getText("delete"),
-            type: "Reject",
+            type: "Transparent",
             press: function () {
               this.onDeleteSalary(offerData);
             }.bind(this),
@@ -2236,7 +2236,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         if (index === 0 && oEffectiveDate < oToday && this.sPath !== "SelfService") {
           var oAppraisalButton = new sap.m.Button({
             text: this.i18nModel.getText("appraisal"),
-            type: "Emphasized",
+            type: "Transparent",
             //visible: this.ViewModel.getProperty("/RelievingLetter"),
             press: function () {
               this._fetchCommonData("TaxCalculation", "TDSModel", { Country: this.getView().getModel("sEmployeeModel").getData()[0].CountryCode });
@@ -3411,7 +3411,7 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
         content: [oContent],
         endButton: new sap.m.Button({
           text: "Close",
-          type: "Reject",
+          type: "Transparent",
           press: function () {
             oDialog.close();
             oDialog.destroy();

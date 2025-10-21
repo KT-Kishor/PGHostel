@@ -768,7 +768,7 @@ sap.ui.define(
               }),
               beginButton: new sap.m.Button({
                 text: "OK",
-                type: "Accept",
+                type: "Transparent",
                 press: function () {
                   oDialog.close();
                   that.resetHQDForm();

@@ -48,7 +48,7 @@
         <Toolbar>
             <Title text="{i18n>ConsultantHeaderDetails}" id="SOW_id_SowDetails" />
             <ToolbarSpacer />
-        <Button text="{i18n>addConsultant}" type="Accept" visible="{simpleForm>/addSowBtn}" press="SOW_onAddConsultant" />
+        <Button text="{i18n>addConsultant}" type="Transparent" visible="{simpleForm>/addSowBtn}" press="SOW_onAddConsultant" />
            <!-- <ToolbarSeparator /> -->
             <Button icon="sap-icon://delete" press="SOW_onDeleteExtendItem" visible="{simpleForm>/ExpendBtn}" />
         </Toolbar>
@@ -107,11 +107,11 @@
 
         </VBox>
         <FlexBox justifyContent="End" width="100%">
-       <Button text="{i18n>submit}" type="Accept" press="SOW_onSaveFrag" class="sendMail" visible="{simpleForm>/save}"/>
-       <Button text="{i18n>save}" type="Accept" press="SOW_onSubmitFrag" class="sendMail" visible="{simpleForm>/submitBtn}"/>
-       <Button text="{i18n>ExpendBtn}" type="Emphasized" press="SOW_onExpendFrag" class="sendMail" visible="{simpleForm>/ExpendBtn}"/>
-       <Button text="{i18n>ReleaseBtn}" type="Emphasized" press="SOW_onReleaseFrag" class="sendMail" visible="{simpleForm>/RelesedBtn}"/>
-       <Button text="{i18n>close}" press="SOW_onCloseFrag" class="sendMail" type="Reject"/>
+       <Button text="{i18n>submit}" type="Transparent" press="SOW_onSaveFrag" class="sendMail" visible="{simpleForm>/save}"/>
+       <Button text="{i18n>save}" type="Transparent" press="SOW_onSubmitFrag" class="sendMail" visible="{simpleForm>/submitBtn}"/>
+       <Button text="{i18n>ExpendBtn}" type="Transparent" press="SOW_onExpendFrag" class="sendMail" visible="{simpleForm>/ExpendBtn}"/>
+       <Button text="{i18n>ReleaseBtn}" type="Transparent" press="SOW_onReleaseFrag" class="sendMail" visible="{simpleForm>/RelesedBtn}"/>
+       <Button text="{i18n>close}" press="SOW_onCloseFrag" class="sendMail" type="Transparent"/>
        </FlexBox>
     </Dialog>
 </core:FragmentDefinition>

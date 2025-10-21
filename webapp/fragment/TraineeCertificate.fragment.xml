@@ -103,7 +103,7 @@
         <beginButton>
             <Button
                 text="{= ${PDFData>/PreviewFlag} ? ${i18n>downloadcCertificate} : ${i18n>preview} }"
-                type="{= ${PDFData>/PreviewFlag} ? 'Accept' : 'Emphasized' }"
+                type="{= ${PDFData>/PreviewFlag} ? 'Transparent' : 'Transparent' }"
                 press="TCF_onPressHandlePreview"
             />
         </beginButton>
@@ -111,7 +111,7 @@
             <Button
                 text="{i18n>close}"
                 press="TCF_onPressCloseDialog"
-                type="Reject"
+                type="Transparent"
             />
         </endButton>
     </Dialog>

@@ -139,14 +139,14 @@
 			<Button
                 text="{i18n>assetAssignmentSave}"
                 press="FAA_onPressSave"
-                type="Accept"
+                type="Transparent"
             />
 		</beginButton>
 		<endButton>
 			<Button
                 text="{i18n>close}"
                 press="FAA_onPressClose"
-                type="Reject"
+                type="Transparent"
             />
 		</endButton>
 	</Dialog>

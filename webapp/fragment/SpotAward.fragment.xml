@@ -52,7 +52,7 @@
                 <ToolbarSpacer />
                 <Button
                     text="{i18n>submit}"
-                    type="Accept"
+                    type="Transparent"
                     press="FSA_onPressSubmit"
                     class="sendMail"
                     visible="{IdCardModel>/Submit}"
@@ -61,7 +61,7 @@
                     text="{i18n>close}"
                     class="sendMail"
                     press="FSA_onPressClose"
-                    type="Reject"
+                    type="Transparent"
                 />
             </Toolbar>
         </footer>

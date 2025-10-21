@@ -22,7 +22,7 @@
         <beginButton>
             <Button
                 text="{i18n>GeneratePDF}"
-                type="Accept"
+                type="Transparent"
                 press=".FCR_onDownloadPDF"
                 class="submit"
             />
@@ -30,7 +30,7 @@
         <endButton>
             <Button
                 text="{i18n>close}"
-                type="Reject"
+                type="Transparent"
                 press=".FCR_onCloseDialog"
                 class="sendMail"
             />

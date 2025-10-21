@@ -83,7 +83,7 @@
 			<Button text="{i18n>onboardEmp}" type="Ghost" press="OEF_onPressOnBoard"  />
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>close}" press="OEF_onPressClose" type="Reject"/>
+			<Button text="{i18n>close}" press="OEF_onPressClose" type="Transparent"/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

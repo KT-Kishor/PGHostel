@@ -21,13 +21,13 @@
                 <Button
                     text="{i18n>Capture}"
                     press="IC_onCapturePress"
-                    type="Accept"
+                    type="Transparent"
                     width="8rem"
                 />
                 <Button
                     text="{i18n>Close}"
                     press="IC_onPressCloseCameraDialog"
-                    type="Reject"
+                    type="Transparent"
                     width="8rem"
                 />
             </FlexBox>

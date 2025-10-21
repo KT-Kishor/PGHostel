@@ -201,7 +201,7 @@ sap.ui.define(
             buttons: [
               new sap.m.Button({
                 text: that.i18nModel.getText("OkButton"),
-                type: "Accept",
+                type: "Transparent",
                 press: async function () {
                   that.getBusyDialog();
                   that._oWarningDialog.close();

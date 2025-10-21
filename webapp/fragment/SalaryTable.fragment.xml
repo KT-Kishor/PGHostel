@@ -75,7 +75,7 @@
                         sameFilenameAllowed="true"
                         buttonOnly="true"
                         fileType="XLSX,xlsx,XLS,xls"
-                        style="Emphasized"
+                        style="Transparent"
                         icon="sap-icon://sys-next-page"
                         change="FST_onUpload"
                     />
@@ -91,7 +91,7 @@
                     <Button
                         id="MP_id_GoBtn"
                         class="salUploadBtn"
-                        type="Emphasized"
+                        type="Transparent"
                         text="Go"
                         press="MP_onPressGo"
                     />

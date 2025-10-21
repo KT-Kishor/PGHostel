@@ -803,7 +803,7 @@ sap.ui.define([
                     content: [checkbox, commentTextArea],
                     beginButton: new sap.m.Button({
                         text: "OK",
-                        type: "Accept",
+                        type: "Transparent",
                         press: function() {
                             if (checkbox.getSelected()) {
                                 //  Validate if comment is required and empty
@@ -864,7 +864,7 @@ sap.ui.define([
                     }),
                     endButton: new sap.m.Button({
                         text: "Cancel",
-                        type: "Reject",
+                        type: "Transparent",
                         press: function() {
                             dialog.close();
                         }
@@ -918,7 +918,7 @@ sap.ui.define([
                     content: [oTimeline],
                     endButton: new sap.m.Button({
                         text: "Close",
-                        type: "Reject",
+                        type: "Transparent",
                         press: function() {
                             oDialog.close();
                             oDialog.destroy();

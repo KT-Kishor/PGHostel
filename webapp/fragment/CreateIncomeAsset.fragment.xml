@@ -217,20 +217,20 @@
 
             <Button text="Save" 
              press="FCIA_onsavebuttonpress"
-             type="Accept"
+             type="Transparent"
              id="FCIA_id_saveButton"
              class="marginRight"
              />
                <Button text="Submit" 
              press="FCIA_onsavebuttonpress"
-             type="Accept"
+             type="Transparent"
              id="FCIA_id_submitButton"
              class="marginRight"
              />
             <Button
                 text="{i18n>Transfer}"
                 press="FCIA_onTransferbuttonpress"
-                type="Accept"
+                type="Transparent"
                 id="FCIA_id_transferButton"
 
 
@@ -239,14 +239,14 @@
          <Button
                 text="Picked"
                 press="FCIA_onpickButtonPress"
-                type="Accept"
+                type="Transparent"
                 id="FCIA_id_pickButton"
                 visible="false"
             />
             <Button
                 text="{i18n>btnCancel}"
                 press="FCIA_onCancelButtonPress"
-                type="Reject"
+                type="Transparent"
                 id="FCIA_id_CancelButton"
              class="marginRight"
 

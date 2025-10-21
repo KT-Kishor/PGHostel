@@ -36,7 +36,7 @@
 			<Title id="positionInput" level="H6" titleStyle="H6" />
 		</layout:SimpleForm>
 		<beginButton>
-			<Button text="Submit" type="Emphasized" press="onSubmitReferrer"/>
+			<Button text="Submit" type="Transparent" press="onSubmitReferrer"/>
 		</beginButton>
 		<endButton>
 			<Button text="Close" press="onCloseReferrerDialog"/>

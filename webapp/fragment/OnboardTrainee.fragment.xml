@@ -29,7 +29,7 @@
 			<Button text="{i18n>onboard}" type="Ghost" press="OTF_onPressOnboard"  />
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>close}" press="OTF_onPressClose" type="Reject"/>
+			<Button text="{i18n>close}" press="OTF_onPressClose" type="Transparent"/>
 		</endButton>
 
 	</Dialog>

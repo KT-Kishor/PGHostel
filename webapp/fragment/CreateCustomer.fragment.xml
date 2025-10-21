@@ -87,9 +87,9 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button text="{i18n>save}" type="Accept" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
-				<Button text="{i18n>submit}" type="Accept" press="MC_onPressSubmit" class="submit" visible="{visiblePlay>/submit}"/>
-				<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail" type="Reject"/>
+				<Button text="{i18n>save}" type="Transparent" press="MC_onPressSave" class="submit" visible="{visiblePlay>/save}"/>
+				<Button text="{i18n>submit}" type="Transparent" press="MC_onPressSubmit" class="submit" visible="{visiblePlay>/submit}"/>
+				<Button text="{i18n>close}" press="MC_onPressClose" class="sendMail" type="Transparent"/>
 			</Toolbar>
 		</footer>
 	</Dialog>

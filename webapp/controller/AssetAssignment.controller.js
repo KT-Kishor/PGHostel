@@ -263,7 +263,7 @@ sap.ui.define([
                     }),
                     beginButton: new sap.m.Button({
                         text: this.getView().getModel("i18n").getProperty("close"),
-                        type: "Reject",
+                        type: "Transparent",
                         press: function() {
                             oDialog.close();
                         }

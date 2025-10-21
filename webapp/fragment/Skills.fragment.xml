@@ -10,7 +10,7 @@
         <beginButton>
             <Button
                 text="{i18n>close}"
-                type="Reject"
+                type="Transparent"
                 press="onCloseSkillsDialog"/>
         </beginButton>
     </Dialog>

@@ -492,7 +492,7 @@ sap.ui.define([
                                     content: new sap.m.Text({ text: this.i18nModel.getText("offerSuccess") }),
                                     beginButton: new sap.m.Button({
                                         text: "OK",
-                                        type: "Accept",
+                                        type: "Transparent",
                                         press: function () {
                                             oDialog.close();
                                             this.byId("EDO_id_WizardStepT").getParent().setShowNextButton(true);

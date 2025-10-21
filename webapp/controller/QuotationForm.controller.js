@@ -278,7 +278,7 @@ sap.ui.define([
                     buttons: [
                         new sap.m.Button({
                             text: that.i18nModel.getText("OkButton"),
-                            type: "Accept",
+                            type: "Transparent",
                             press: function () {
                                 BusyIndicator.show(0);
                                 that.QF_oSuccessDialog.close();
@@ -287,7 +287,7 @@ sap.ui.define([
                         }),
                         new sap.m.Button({
                             text: that.i18nModel.getText("tileUnit"),
-                            type: "Reject",
+                            type: "Transparent",
                             press: function () {
                                 BusyIndicator.show(0);
                                 that.QF_oSuccessDialog.close();

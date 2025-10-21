@@ -744,21 +744,21 @@
                         iconFirst="true"
                         text="{i18n>tileUnit}"
                         id="QF_id_PDFBtn"
-                        type="Reject"
+                        type="Transparent"
                         press="QF_onDownloadPDF"
                         visible="{Quotation>/ShowCase}"
                     />
                     <m:Button
                         text="{= ${Quotation>/MasterEdit} ? ${i18n>save} : ${i18n>edit}}"
                         press="QF_onPressEdit"
-                        type="{= ${Quotation>/MasterEdit} ? 'Accept' : 'Neutral'}"
+                        type="{= ${Quotation>/MasterEdit} ? 'Transparent' : 'Transparent'}"
                         visible="{Quotation>/ShowCase}"
                     />
 
                     <m:Button
                         text="{i18n>submit}"
                         press="QF_onPressSubmit"
-                        type="Accept"
+                        type="Transparent"
                         visible="{Quotation>/AddCase}"
                         enabled="{Quotation>/EnableSubmit}"
                     />

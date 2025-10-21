@@ -356,7 +356,7 @@ _applyCountryStateCityFilters: function () {
                 }),
                 endButton: new sap.m.Button({
                     text: "Close",
-                    type: "Reject",
+                    type: "Transparent",
                     press: function() {
                         if (this._pdfBlobUrl) {
                             URL.revokeObjectURL(this._pdfBlobUrl);

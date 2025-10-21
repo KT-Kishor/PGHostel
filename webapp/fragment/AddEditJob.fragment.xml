@@ -83,8 +83,8 @@
 			</f:SimpleForm>
 		</content>
 		<buttons>
-			<Button text="{= ${temporaryModel>/isEdit} ? 'Save' : 'Submit' }" id="IDbutton" type="Accept" press="onSubmitJob" />
-			<Button text="Close" type="Reject" press="onCloseDialog" />
+			<Button text="{= ${temporaryModel>/isEdit} ? 'Save' : 'Submit' }" id="IDbutton" type="Transparent" press="onSubmitJob" />
+			<Button text="Close" type="Transparent" press="onCloseDialog" />
 		</buttons>
 	</Dialog>
 </core:FragmentDefinition>

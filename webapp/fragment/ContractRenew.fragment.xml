@@ -71,8 +71,8 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer />
-				<Button text="{i18n>submit}" type="Accept" press="CR_onPressSubmit" class="submit" />
-				<Button text="{i18n>close}" press="CR_onPressClose" class="sendMail" type="Reject" />
+				<Button text="{i18n>submit}" type="Transparent" press="CR_onPressSubmit" class="submit" />
+				<Button text="{i18n>close}" press="CR_onPressClose" class="sendMail" type="Transparent" />
 			</Toolbar>
 		</footer>
 	</Dialog>

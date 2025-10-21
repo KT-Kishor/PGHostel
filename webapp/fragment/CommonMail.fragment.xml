@@ -60,7 +60,7 @@
             <Button id="SendMail_Button" text="{i18n>tileFooter}" type="Ghost" press="Mail_onSendEmail" enabled="false" />
         </beginButton>
         <endButton>
-            <Button text="{i18n>close}" width="80px" press="Mail_onPressClose" type="Reject" />
+            <Button text="{i18n>close}" width="80px" press="Mail_onPressClose" type="Transparent" />
         </endButton>
 
     </Dialog>

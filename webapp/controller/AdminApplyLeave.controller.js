@@ -405,7 +405,7 @@ sap.ui.define(
                         content: [oTimeline],
                         endButton: new sap.m.Button({
                             text: "Close",
-                            type: "Reject",
+                            type: "Transparent",
                             press: function () {
                                 oDialog.close();
                                 oDialog.destroy();

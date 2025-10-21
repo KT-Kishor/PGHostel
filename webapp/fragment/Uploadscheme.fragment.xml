@@ -46,10 +46,10 @@
         </f:SimpleForm>
      </VBox>
         <beginButton>
-            <Button text="{i18n>submit}" type="Accept" press="FUS_onCreateDialogSubmit" enabled="{/isFileValid}"/>
+            <Button text="{i18n>submit}" type="Transparent" press="FUS_onCreateDialogSubmit" enabled="{/isFileValid}"/>
         </beginButton>
         <endButton>
-            <Button text="{i18n>btnCancel}" type="Reject" press="FUS_onCreateDialogCancel"/>
+            <Button text="{i18n>btnCancel}" type="Transparent" press="FUS_onCreateDialogCancel"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

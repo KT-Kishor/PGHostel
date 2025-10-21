@@ -910,7 +910,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
                                 }),
                                 beginButton: new sap.m.Button({
                                     text: "OK",
-                                    type: "Accept",
+                                    type: "Transparent",
                                     press: function() {
                                         oDialog.close();
                                         this.getView().byId("TD_id_StepTwo").getParent().setShowNextButton(true);

@@ -80,8 +80,8 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button text="{i18n>submit}" type="Accept" press="CC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
-				<Button text="{i18n>close}" class="sendMail" press="CC_onPressClose" type="Reject" />
+				<Button text="{i18n>submit}" type="Transparent" press="CC_onPressSubmit" class="sendMail" visible="{IdCardModel>/Submit}"/>
+				<Button text="{i18n>close}" class="sendMail" press="CC_onPressClose" type="Transparent" />
 			</Toolbar>
 		</footer>
 	</Dialog>

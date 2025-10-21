@@ -129,13 +129,13 @@
                             id="SU_id_Add"
                             text="{i18n>create}"
                             press="SU_onCreateform"
-                            type="Accept"
+                            type="Transparent"
                         />
                         <Button
                             id="SU_id_Delete"
                             text="{i18n>delete}"
                             press="SU_onDeletepress"
-                            type="Reject"
+                            type="Transparent"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

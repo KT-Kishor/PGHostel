@@ -77,8 +77,8 @@
 						</f:SimpleForm>
 						<!-- Footer Buttons -->
 						<FlexBox justifyContent="End" width="100%">
-							<Button text="{i18n>save}" id="idSaveBtn" press="onPressAppraisalSave" class="sendMail" type="Accept"/>
-							<Button text="{i18n>close}" id="idCloseBtn" press="onPressAppraisalClose" type="Reject" class="sendMail" />
+							<Button text="{i18n>save}" id="idSaveBtn" press="onPressAppraisalSave" class="sendMail" type="Transparent"/>
+							<Button text="{i18n>close}" id="idCloseBtn" press="onPressAppraisalClose" type="Transparent" class="sendMail" />
 						</FlexBox>
 					</l:BlockLayoutCell>
 				</l:BlockLayoutRow>

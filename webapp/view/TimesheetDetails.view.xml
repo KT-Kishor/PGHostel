@@ -115,7 +115,7 @@
                 <contentRight>
                     <Button
                         text="{= ${viewModel>/isEditing} ? 'Save' : 'Edit' }"
-                        type="{= ${viewModel>/isEditing} ? 'Accept' : 'Emphasized' }"
+                        type="{= ${viewModel>/isEditing} ? 'Transparent' : 'Transparent' }"
                         press="TSD_onToggleEdit"
                         id="TSD_id_EditDetail"
                         visible="{= ${viewModel>/isUpdate} }"
@@ -123,7 +123,7 @@
                     <Button
                         text="{i18n>save}"
                         press="TSD_onSubmit"
-                        type="Accept"
+                        type="Transparent"
                         visible="{= ${viewModel>/isCreate} }"
                     />
                 </contentRight>

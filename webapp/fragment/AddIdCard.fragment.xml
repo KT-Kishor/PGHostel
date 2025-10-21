@@ -61,8 +61,8 @@
         <footer> 
             <Toolbar>
                 <ToolbarSpacer/>
-                <Button text="{i18n>save}" type="Accept" press="IC_onPressSave" class="submit" visible="{viewModel>/PhotoSave}"/>
-                <Button text="{i18n>close}" type="Reject" class="submit" press="IC_onPressClose" />
+                <Button text="{i18n>save}" type="Transparent" press="IC_onPressSave" class="submit" visible="{viewModel>/PhotoSave}"/>
+                <Button text="{i18n>close}" type="Transparent" class="submit" press="IC_onPressClose" />
             </Toolbar>
         </footer>
 		<!-- <FlexBox justifyContent="End">			

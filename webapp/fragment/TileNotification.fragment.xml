@@ -72,7 +72,7 @@
                                 >
                                     <Button
                                         text="Send Wishes"
-                                        type="Emphasized"
+                                        type="Transparent"
                                         press="onPressCC"
                                     />
                                 </HBox>

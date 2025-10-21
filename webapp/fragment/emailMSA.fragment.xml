@@ -21,8 +21,8 @@
 			</l:VerticalLayout>
 		</content>
 		<buttons>
-        	<Button id="idSendMail" text="{i18n>sendMail}" class="sapUiSmallMarginEnd" type="Accept" press="onSendMail"/>
-			<Button id="idCancelMail" text="{i18n>cancel}" type="Reject" press="onCancelMail"/>
+        	<Button id="idSendMail" text="{i18n>sendMail}" class="sapUiSmallMarginEnd" type="Transparent" press="onSendMail"/>
+			<Button id="idCancelMail" text="{i18n>cancel}" type="Transparent" press="onCancelMail"/>
 		</buttons>
 	</Dialog>
 </core:FragmentDefinition>

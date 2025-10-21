@@ -25,13 +25,13 @@
     <Button
         text="{i18n>resignationletter}"
         press="onApplyResignation"
-        type="Reject"
+        type="Transparent"
         visible="{viewModel>/ResignationVisible}"
         enabled="{= ${viewModel>/isEditMode} === true ? false : true}"
     />
     <Button
         text="{i18n>terminateLetter}"
-        type="Reject"
+        type="Transparent"
         visible="{viewModel>/Letter}"
         id="SS_idTermination"
         press="SS_onDownloadTerminateLetter"
@@ -39,7 +39,7 @@
     />
     <Button
         text="{i18n>relievingletter}"
-        type="Accept"
+        type="Transparent"
         visible="{viewModel>/WorkCompletedVisible}"
         id="SS_idExperience"
         press="SS_onDownloadExperienceLetter"

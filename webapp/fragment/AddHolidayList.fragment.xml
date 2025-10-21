@@ -55,10 +55,10 @@
 		</f:SimpleForm>
 
 	<beginButton>
-      <Button text="{i18n>submit}" id="ALH_id_SubmitButton" type="Accept" press="LOH_onPressSubmit" enabled="{/isFileValid}"/>
+      <Button text="{i18n>submit}" id="ALH_id_SubmitButton" type="Transparent" press="LOH_onPressSubmit" enabled="{/isFileValid}"/>
     </beginButton>
     <endButton>
-      <Button text="{i18n>btnCancel}" type="Reject" press="LOH_onPressClose"/>
+      <Button text="{i18n>btnCancel}" type="Transparent" press="LOH_onPressClose"/>
     </endButton>
 	</Dialog>
 </core:FragmentDefinition>
