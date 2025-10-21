@@ -24,7 +24,7 @@ sap.ui.define([
         },
 
         _onObjectMatched: async function () {
-
+            var oVizFrame = this.getView().byId("donutChartStatus");
             var LoginFunction = await this.commonLoginFunction("InvoiceDashboard");
             if (!LoginFunction) return;
             this.getView().getModel("invoiceChartTypeModel").setData(JSON.parse(JSON.stringify(INITIAL_CHART_TYPES)));
@@ -32,8 +32,8 @@ sap.ui.define([
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
             this.byId("donutChartStatus").vizSelection([], { clearSelection: true });
             if (this._pPopover) { this._pPopover.then(oPopover => oPopover.close()); }
-            var oVizFrame = this.getView().byId("donutChartStatus");
-            var legendPosition = sap.ui.Device.system.phone ? "right" : "left";
+            
+            var legendPosition = sap.ui.Device.system.phone ? "left" : "right";
             oVizFrame.setVizProperties({
                 legend: {
                     position: legendPosition
