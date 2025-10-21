@@ -73,9 +73,12 @@
 			</f:content>
 		</f:SimpleForm>
 		<!-- Buttons for Submit and Close actions -->
-		<FlexBox justifyContent="End" width="100%">
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
 			<Button text="{i18n>save}" type="Transparent" press="MSA_Frg_Update" class="sendMail" />
 			<Button text="{i18n>close}" type="Transparent" class="sendMail" press="MSA_Frg_Close" />
-		</FlexBox>
+			</Toolbar>
+		</footer>
 	</Dialog>
 </core:FragmentDefinition>

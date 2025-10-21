@@ -200,7 +200,7 @@
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
-                                                tooltip="{i18n>editDetails}"
+                                                tooltip="{i18n>edit}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
                                         </m:Toolbar>
@@ -829,7 +829,7 @@
                                                 text="{= ${viewModel>/isEditMode} ? 'Save' : 'Edit' }"
                                                 press="SS_onEditPress"
                                                 type="{= ${viewModel>/isEditMode} ? 'Transparent' : 'Transparent' }"
-                                                tooltip="{i18n>editDetails}"
+                                                tooltip="{i18n>edit}"
                                                 visible="{parts: [{ path: 'viewModel>/SelfServiceBtn' },{ path: 'LoginModel>/Role' },{ path: 'sEmployeeModel>/0/Type' } ],formatter: '.Formatter.visibilityFormatter' }"
                                             />
                                         </m:Toolbar>

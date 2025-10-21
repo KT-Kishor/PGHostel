@@ -55,10 +55,13 @@
 				</HBox>
 			</f:content>
 		</f:SimpleForm>
-		<HBox justifyContent="End" >
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
 			<Button text="{i18n>Submit}" type="Transparent" id="AddEd_id_Submit" press="AddEd_onSubmitEdDetails" class="submit"  visible="{viewModel>/fragmentSubmit}" />
 			<Button text="{i18n>save}" type="Transparent" press="AddEd_onUpdateEdDetails" class="submit" id="AddEd_id_Save" visible="{viewModel>/fragmentSave}"/>
 			<Button text="{i18n>close}" press="AddEd_onCloseDial" class="submit" type="Transparent"/>
-		</HBox>
+			</Toolbar>
+		</footer>
 	</Dialog>
 </core:FragmentDefinition>

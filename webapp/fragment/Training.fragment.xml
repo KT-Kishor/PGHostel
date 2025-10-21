@@ -10,14 +10,12 @@
                 <HBox justifyContent="Center" class="section-image">
                 <Image src="../image/SAPUI.png" width="800px" height="250px" visible="true" class="section-image"/>
                   </HBox> 
-
-                    <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineesapui5}"/>
-                    <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeDes1}"/>
-                    <Text class="highlight-text sapUiSmallMarginBegin" text="{i18n>traineeDes2}"/>
-                    
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeUi5highlight}"/>
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeUi5highlight2}"/>
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeUi5highlight3}"/>
+                  <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineesapui5}"/>
+                  <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeDes1}"/>
+                  <Text class="highlight-text sapUiSmallMarginBegin" text="{i18n>traineeDes2}"/>      
+                  <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeUi5highlight}"/>
+                  <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeUi5highlight2}"/>
+                  <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeUi5highlight3}"/>
                     
                     <Text class="section-title sapUiSmallMarginBegin" text="{i18n>traineeInclude}"/>
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeInclude1}"/>
@@ -25,7 +23,7 @@
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeInclude3}"/>
                     <Link class="training_Course sapUiSmallMarginBegin" text="View Course Details!" press="onSapui5coursepress"/>
                     <HBox justifyContent="End" >
-                <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Transparent"/>
+                <Button text="{i18n>careersapply}"  press="onUI5ress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
             </HBox> 
                 </VBox>
 
@@ -37,9 +35,9 @@
                     <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight}"/>
                     <Text class="highlight-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight2}"/>
                     
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeCapmDes1}"/>
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeCapmDes2}"/>
-                    <Text class="checkmark-text sapUiSmallMarginBegin" text="✅ {i18n>traineeCapmDes3}"/>
+                    <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmDes1}"/>
+                    <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmDes2}"/>
+                    <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmDes3}"/>
 
                     <Text class="section-title sapUiSmallMarginBegin" text="{i18n>traineeInclude}"/>
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeCapminclude}"/>
@@ -47,7 +45,7 @@
                     <Text class="training-text sapUiSmallMarginBegin" text="▪ {i18n>traineeCapminclude3}"/>
                      <Link class="training_Course sapUiSmallMarginBegin" text="View Course Details!" press="onCapmCoursepress"/>
                      <HBox justifyContent="End">
-                <Button text="{i18n>careersapply}"  press="onCapmpress" class="big-apply-button sapUiLargeMarginEnd" type="Transparent"/>
+                <Button text="{i18n>careersapply}"  press="onCapmpress" class="big-apply-button sapUiLargeMarginEnd" type="Emphasized"/>
             </HBox>
                 </VBox>
              </l:Grid>
