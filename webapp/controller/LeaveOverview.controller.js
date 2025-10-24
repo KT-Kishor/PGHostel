@@ -157,15 +157,9 @@ sap.ui.define([
                     emphasizedAction: "Dashboard",
                     onClose: function(sAction) {
                         if (sAction === "Dashboard" && sLeaveID && (isManager || isAdmin)) {
-                            this.getOwnerComponent().setModel(
-                                new sap.ui.model.json.JSONModel({
-                                    from: "LeaveOverview"
-                                }),
-                                "NavSource"
-                            );
-                            this.getRouter().navTo("RouteDetailLeave", {
-                                sLeaveID: sLeaveID
-                            });
+                            this.getOwnerComponent().setModel(new JSONModel({ from: "LeaveOverview"
+                            }), "NavSource" );
+                            this.getRouter().navTo("RouteDetailLeave", {sLeaveID: sLeaveID});
                         }
                     }.bind(this)
                 }
@@ -179,11 +173,6 @@ sap.ui.define([
                 default:
                     return "#2C3587"; // Custom color
             }
-        },
-
-        onViewChange: function(oEvent) {
-            const sViewKey = oEvent.getParameter("selectedItem").getKey();
-            this.getView().getModel("viewModel").setProperty("/viewKey", sViewKey);
         },
 
         onPressback: function() {
