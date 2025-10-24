@@ -45,6 +45,17 @@
                 valueFormat="dd/MM/yyyy" change="AL_ValidateToDate" valueStateText="{i18n>dateValueState}"  liveChange="onLiveChange" legend="legend" afterValueHelpOpen="onInitializeLegend"/>
 					<!-- Half Day CheckBox -->
 					<CheckBox text="{i18n>halfDay}" select="onHalfDaySelect" selected="{LeaveTempModel>/halfDay}"/>
+					<RadioButtonGroup
+					id="AL_id_leasveSessionType"
+					columns="2"
+					selectedIndex="{= ${LeaveTempModel>/leaveSessionType} === 'Morning' ? 0 : (${LeaveTempModel>/leaveSessionType} === 'Afternoon' ? 1 : -1) }"
+					select="onChangeleasveSessionType"
+					visible="{LeaveTempModel>/halfDay}">
+					<buttons>
+						<RadioButton text="Morning" />
+						<RadioButton text="Afternoon" />
+					</buttons>
+				</RadioButtonGroup>
 				</VBox>
 				<!-- Number of Days -->
 				<Label text="{i18n>noOfDays}"/>

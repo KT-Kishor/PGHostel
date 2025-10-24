@@ -19,7 +19,7 @@
 				appointmentsVisualization="Filled"
 				appointmentSelect="handleAppointmentSelect"
 				showEmptyIntervalHeaders="false"
-				showWeekNumbers="true"
+				showWeekNumbers="true" 
 				viewKey="{viewModel>/viewKey}">
 					<rows>
 						<PlanningCalendarRow

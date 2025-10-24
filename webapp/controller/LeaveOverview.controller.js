@@ -15,7 +15,7 @@ sap.ui.define([
                 const loginSuccess = await this.commonLoginFunction("LeaveOverview");
                 if (!loginSuccess) return;
                 const oViewModel = new JSONModel({
-                    startDate: new Date(),
+                    startDate: new Date(new Date().setHours(9, 0, 0, 0)), // Start at 9 AM
                     viewKey: "Week"
                 });
                 this.getView().setModel(oViewModel, "viewModel");
@@ -82,15 +82,15 @@ sap.ui.define([
         },
 
         _preparePlanningCalendarData: function(employees, leaves) {
-            const planningData = { people: []  };
+            const planningData = { people: [] };
 
             employees.forEach(employee => {
                 const employeeLeaves = leaves.filter(l => l.employeeID === employee.EmployeeID);
 
                 const initials = (employee.EmployeeName || "").split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase(); // Generate initials if no photo
 
-                const pic = employee.ProfilePhoto ? "data:image/png;base64," + employee.ProfilePhoto :
-                    this._generateInitialsAvatar(initials); // Use profile photo or avatar image
+                const pic = employee.ProfilePhoto ? "data:image/png;base64," + employee.ProfilePhoto
+                : this._generateInitialsAvatar(initials); // Use profile photo or avatar image
 
                 const employeeRow = {
                     pic: pic,
@@ -101,14 +101,28 @@ sap.ui.define([
                 };
 
                 employeeLeaves.forEach(leave => {
-                    const startDate = new Date(leave.fromDate);
-                    const endDate = new Date(leave.toDate);
-                    endDate.setHours(23, 59, 59, 999);
+                    let startDate = new Date(leave.fromDate);
+                    let endDate = new Date(leave.toDate);
+
+                    // Handle half-day logic
+                    if (leave.halfDay === 'true' && leave.leaveSessionType) {
+                        if (leave.leaveSessionType === "Morning") {
+                            startDate.setHours(9, 0, 0, 0);
+                            endDate.setHours(14, 0, 0, 0);
+                        } else if (leave.leaveSessionType === "Afternoon") {
+                            startDate.setHours(14, 0, 0, 0); // 2:00 PM start
+                            endDate.setHours(19, 0, 0, 0);   // 7:00 PM end 
+                        }
+                    } else {
+                        startDate.setHours(9, 0, 0, 0);
+                        endDate.setHours(14, 0, 0, 0);
+                    }
+
                     const appointment = {
                         start: startDate,
                         end: endDate,
                         title: "Leave",
-                        info: `Days: ${leave.NoofDays}${leave.halfDay === 'true' ? ' (Half Day)' : ''}`,
+                        info: `Days: ${leave.NoofDays}${leave.halfDay === 'true' ? ` (${leave.leaveSessionType || 'Morning'})` : ''}`,
                         color: this._getAppointmentColor(leave.status),
                         tentative: leave.status === 'Approved',
                         ID: leave.ID,

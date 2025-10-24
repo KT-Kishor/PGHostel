@@ -541,6 +541,7 @@ sap.ui.define(
                         Submit: true,
                         Save: false,
                         halfDay: false,
+                        leaveSessionType: "",
                         MinToDate: null,
                         managerRemark: "",
                         maxDate: new Date(currentYear, 11, 31),
@@ -586,6 +587,7 @@ sap.ui.define(
                         Submit: false,
                         Save: true,
                         halfDay: oModelData.halfDay === 'false' ? false : true,
+                        leaveSessionType: oModelData.leaveSessionType || "",
                         managerRemark: oModelData.ManagerRemark,
                         maxDate: new Date(this.currentYear, 11, 31),
                         minDate: new Date(this.JoiningDate[2], this.JoiningDate[1] - 1, this.JoiningDate[0]),
@@ -700,12 +702,27 @@ sap.ui.define(
                     return businessDays;
                 },
 
-
                 onHalfDaySelect: function (oEvent) {
-                    var bSelected = oEvent.getParameter("selected"); // Always reliable
+                    var bSelected = oEvent.getParameter("selected");
                     var oLeaveModel = this.getView().getModel("LeaveTempModel");
-                    oLeaveModel.setProperty("/halfDay", bSelected); // Set updated value explicitly
-                    this.onLiveChange(); // Recalculate
+                    oLeaveModel.setProperty("/halfDay", bSelected);
+
+                    if (!bSelected) {
+                        oLeaveModel.setProperty("/leaveSessionType", "");
+                    }
+                    this.onLiveChange(); // Recalculate No of Days
+                },
+
+               onChangeleasveSessionType: function (oEvent) {
+                    var selectedIndex = oEvent.getParameter("selectedIndex");
+                    var oLeaveModel = this.getView().getModel("LeaveTempModel");
+                    var selectedSession = selectedIndex === 0 ? "Morning" : selectedIndex === 1 ? "Afternoon" : "";
+                    oLeaveModel.setProperty("/leaveSessionType", selectedSession); // Set selected session in model
+                    // Clear value state if a session is selected
+                    var oRadioGroup = sap.ui.getCore().byId("AL_id_leasveSessionType");
+                    if (selectedSession !== "") {
+                        oRadioGroup.setValueState("None");
+                    }
                 },
 
                 // Check if leave is already applied for given dates
@@ -797,6 +814,14 @@ sap.ui.define(
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
                         ) {
                             var oData = this.getView().getModel("LeaveTempModel").getData();
+                            var oRadioGroup = sap.ui.getCore().byId("AL_id_leasveSessionType");
+                            if (oData.halfDay && (!oData.leaveSessionType || oData.leaveSessionType === "")) {
+                                oRadioGroup.setValueState("Error");
+                                oRadioGroup.setValueStateText("Please select Morning or Afternoon for Half Day leave.");
+                                return; // stop submit
+                            } else {
+                                oRadioGroup.setValueState("None");
+                            }
 
                             // Parse dates
                             var fromDateParts = oData.fromDate.split("/").map(Number);
@@ -994,6 +1019,15 @@ sap.ui.define(
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
                         ) {
                             var oData = this.getView().getModel("LeaveTempModel").getData();
+
+                            var oRadioGroup = sap.ui.getCore().byId("AL_id_leasveSessionType");
+                            if (oData.halfDay && (!oData.leaveSessionType || oData.leaveSessionType === "")) {
+                                oRadioGroup.setValueState("Error");
+                                oRadioGroup.setValueStateText("Please select Morning or Afternoon for Half Day leave.");
+                                return; // stop save
+                            } else {
+                                oRadioGroup.setValueState("None");
+                            }
 
                             // Parse dates
                             var fromDateParts = oData.fromDate.split("/").map(Number);
@@ -1288,12 +1322,15 @@ sap.ui.define(
                 onLogout: function () {
                     this.CommonLogoutFunction(); // Navigate to login page
                 },
+
                 getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },
+
                 AL_ValidateLeavetype:function(oEvent){
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 },
+
                 AL_DownalodTableData:function(){
                 var table = this.byId("AL_id_LeaveTableStandard");
                 const oModelData = table.getModel("LeaveModel").getData();
