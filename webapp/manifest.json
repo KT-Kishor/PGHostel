@@ -805,6 +805,13 @@
                     "target": [
                         "TargetSendGreetings"
                     ]
+                },
+                {
+                    "name": "RouteLeaveOverview",
+                    "pattern": "LeaveOverview",
+                    "target": [
+                        "TargetLeaveOverview"
+                    ]
                 }
             ],
             "targets": {
@@ -1285,6 +1292,13 @@
                 "clearControlAggregation": false,
                 "viewId": "SendGreetings",
                 "viewName": "SendGreetings"
+              },
+              "TargetLeaveOverview": {
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "LeaveOverview",
+                "viewName": "LeaveOverview"
               }
             }
         },

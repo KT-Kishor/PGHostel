@@ -55,6 +55,11 @@
 															<ImageContent src="sap-icon://customer-history" />
 														</TileContent>
 													</GenericTile>
+													<GenericTile visible="{= ${AppVisibilityModel>/LeaveOverview} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>leaveOverview}" press="TileV_onpressLeaveOverview">
+														<TileContent unit="{i18n>subhead}">
+															<ImageContent src="sap-icon://time-off" />
+														</TileContent>
+													</GenericTile>
 													<GenericTile visible="{= ${AppVisibilityModel>/ListOfHolidays} === '1' ? true : false}" class="sapUiMediumMargin" header="{i18n>headerListOfHolidays}" press="TileV_onpresslistofholidays">
 														<TileContent unit="{i18n>tileLeaveFooter}">
 															<ImageContent src="sap-icon://general-leave-request" />

@@ -74,10 +74,16 @@ sap.ui.define([
             this.YearlyBarDisplayFunction(that.userId);
             this.MonthBarDisplayFunction(oType, this.year, that.userId);
         },
-        DL_onBack: function() {
-            this.getRouter().navTo("RouteMyInbox", {
-                sMyInBox: "DetailLeave"
-            });
+       DL_onBack: function () {
+            const oNavSourceModel = this.getOwnerComponent().getModel("NavSource");
+            const from = oNavSourceModel ? oNavSourceModel.getProperty("/from") : "";
+            if (from === "LeaveOverview") {
+                this.getRouter().navTo("RouteLeaveOverview");
+            } else {
+                this.getRouter().navTo("RouteMyInbox", {
+                    sMyInBox: "DetailLeave"
+                });
+            }
         },
         onLogout: function() {
             this.getRouter().navTo("RouteLoginPage");
