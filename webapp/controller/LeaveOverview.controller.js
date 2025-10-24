@@ -12,15 +12,15 @@ sap.ui.define([
         _onRouteMatched: async function() {
             try {
                 this.getBusyDialog();
-                var LoginFUnction = await this.commonLoginFunction("LeaveOverview");
-                if (!LoginFUnction) return;
-
+                const loginSuccess = await this.commonLoginFunction("LeaveOverview");
+                if (!loginSuccess) return;
                 const oViewModel = new JSONModel({
                     startDate: new Date(),
                     viewKey: "Week"
                 });
                 this.getView().setModel(oViewModel, "viewModel");
 
+                // User and role info
                 const loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.userId = loginModel.getProperty("/EmployeeID");
                 this.Type = loginModel.getProperty("/Role");
@@ -29,49 +29,49 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 loginModel.setProperty("/HeaderName", this.i18nModel.getText("leaveOverview"));
 
-                let params = {
-                    EmployeeStatus: "Active"
-                };
-                if (["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type)) {
-                    params.ManagerID = this.userId;
-                }
-
+                // Fetch all active employees (no manager filter)
+                const params = {  EmployeeStatus: "Active" };
                 await this._fetchCommonData("EmployeeDetails", "sEmployeeDetails", params);
                 await this._fetchCommonData("Leaves", "LeaveModel");
 
+                // Get data from models
+                let employees = this.getView().getModel("sEmployeeDetails").getData();
                 const allLeaves = this.getView().getModel("LeaveModel").getData();
-                let oEmpModel = this.getView().getModel("sEmployeeDetails");
-                let employees = oEmpModel.getData();
-                employees = employees.filter(e => e.Role !== "Contractor"); // exclude contractors
-                oEmpModel.setData(employees);
 
+                // Exclude contractors
+                employees = employees.filter(e => e.Role !== "Contractor");
+                this.getView().getModel("sEmployeeDetails").setData(employees);
+
+                // Filter employees based on role
                 let filteredEmployees = [];
                 if (this.Type === "Admin") {
-                    filteredEmployees = employees.filter(e => e.EmployeeStatus === "Active");
+                    // Admin sees all active employees
+                    filteredEmployees = employees;
                 } else if (["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type)) {
-                    filteredEmployees = employees.filter(e => e.ManagerID === this.userId && e.EmployeeStatus === "Active");
+                    // Manager sees themselves and their team
+                    filteredEmployees = employees.filter(e =>
+                        e.EmployeeID === this.userId || e.ManagerID === this.userId
+                    );
                 } else if (["Employee", "Account Consultant", "IT Consultant", "HR", "Trainee"].includes(this.Type)) {
+                    // Employee sees themselves, team under same manager, their manager
                     const currentEmp = employees.find(e => e.EmployeeID === this.userId);
                     const currentManagerID = currentEmp ? currentEmp.ManagerID : null;
                     const currentBranch = currentEmp ? currentEmp.BranchCode : null;
-                    if (currentManagerID) {
-                        filteredEmployees = employees.filter(e =>
-                            e.ManagerID === currentManagerID &&
-                            e.EmployeeStatus === "Active" &&
-                            e.BranchCode === currentBranch
-                        );
-                    } else {
-                        filteredEmployees = employees.filter(e => e.EmployeeID === this.userId);
-                    }
+
+                    filteredEmployees = employees.filter(e =>
+                        (
+                            e.EmployeeID === this.userId || // self
+                            (e.ManagerID === currentManagerID && e.BranchCode === currentBranch) || 
+                            e.EmployeeID === currentManagerID // manager
+                        )
+                    );
                 }
-                //  Filter leaves by only those filtered employees
+                // Filter leaves for relevant employees
                 const filteredEmpIDs = filteredEmployees.map(e => e.EmployeeID);
-                const filteredLeaves = allLeaves.filter(l =>
-                    filteredEmpIDs.includes(l.employeeID)
-                );
+                const filteredLeaves = allLeaves.filter(l => filteredEmpIDs.includes(l.employeeID));
                 const approvedLeaves = filteredLeaves.filter(l => l.status === "Approved");
                 await this._preparePlanningCalendarData(filteredEmployees, approvedLeaves);
-                this.initializeBirthdayCarousel();
+                this.initializeBirthdayCarousel(); // Initialize birthday carousel
                 this.closeBusyDialog();
             } catch (error) {
                 this.closeBusyDialog();
@@ -82,11 +82,18 @@ sap.ui.define([
         },
 
         _preparePlanningCalendarData: function(employees, leaves) {
-            const planningData = { people: [] };
+            const planningData = { people: []  };
+
             employees.forEach(employee => {
                 const employeeLeaves = leaves.filter(l => l.employeeID === employee.EmployeeID);
+
+                const initials = (employee.EmployeeName || "").split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase(); // Generate initials if no photo
+
+                const pic = employee.ProfilePhoto ? "data:image/png;base64," + employee.ProfilePhoto :
+                    this._generateInitialsAvatar(initials); // Use profile photo or avatar image
+
                 const employeeRow = {
-                    pic: employee.ProfilePhoto ? "data:image/png;base64," + employee.ProfilePhoto : "",
+                    pic: pic,
                     name: employee.EmployeeID,
                     role: employee.EmployeeName || "",
                     appointments: [],
@@ -104,7 +111,6 @@ sap.ui.define([
                         info: `Days: ${leave.NoofDays}${leave.halfDay === 'true' ? ' (Half Day)' : ''}`,
                         color: this._getAppointmentColor(leave.status),
                         tentative: leave.status === 'Approved',
-                        pic: employee.ProfilePhoto ? "data:image/png;base64," + employee.ProfilePhoto : "",
                         ID: leave.ID,
                         typeOfLeave: leave.typeOfLeave,
                         status: leave.status,
@@ -115,6 +121,23 @@ sap.ui.define([
                 planningData.people.push(employeeRow);
             });
             this.getView().setModel(new JSONModel(planningData), "PlanningModel");
+        },
+
+        _generateInitialsAvatar: function(initials) {
+            const canvas = document.createElement("canvas");
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#6A6AF4"; // Circle background
+            ctx.beginPath();
+            ctx.arc(32, 32, 32, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = "bold 24px Arial"; // Initials
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(initials, 32, 35);
+            return canvas.toDataURL("image/png");
         },
 
         handleAppointmentSelect: function(oEvent) {

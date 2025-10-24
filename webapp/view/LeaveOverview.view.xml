@@ -45,7 +45,6 @@
 								<unified:CalendarAppointment
 									startDate="{PlanningModel>start}"
 									endDate="{PlanningModel>end}"
-									icon="{PlanningModel>pic}"
 									title="{PlanningModel>title}"
 									color="{PlanningModel>color}"></unified:CalendarAppointment>
 							</intervalHeaders>
