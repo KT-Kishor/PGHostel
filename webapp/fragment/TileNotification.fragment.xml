@@ -252,7 +252,7 @@
             <f:Card
                 width="auto"
                 class="sapUiSmallMargin"
-                visible="{= ${CompanyInvoiceModelData>/Before} &amp;&amp; ${CompanyInvoiceModelData>/Before}.length > 0 &amp;&amp; (
+                visible="{= ${CompanyInvoiceModelData>/BeforeData} &amp;&amp; ${CompanyInvoiceModelData>/BeforeData}.length > 0 &amp;&amp; (
     ${LoginModel>/Role} === 'Admin' ||
     ${LoginModel>/Role} === 'Demo' ||
     ${LoginModel>/Role} === 'Account Manager'
