@@ -118,7 +118,7 @@ sap.ui.define([
                     } else {
                         startDate.setHours(9, 0, 0, 0);
                         endDate = new Date(startDate);
-                        endDate.setHours(18, 0, 0, 0); // Full day
+                        endDate.setHours(19, 0, 0, 0); // Full day
                     }
 
                     const appointment = {

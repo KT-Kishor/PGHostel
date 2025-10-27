@@ -50,6 +50,7 @@
 				showSelectAll="true"
 				placeholder="Select Recipient"
 				change="onEmailSelectionChange"
+				valueStateText="{i18n>selectRecipient}"
 			>
 											<core:ListItem key="{key}" text="{text}" additionalText="{additionalText}" />
 										</m:MultiComboBox>
@@ -61,6 +62,8 @@
 				id="Wish_id_ToEmail"
 				placeholder="Enter Email ID"
 				value="{SendWishEmailModel>/RecipientEmail}" 
+				liveChange="onChangeRecipientEmail"
+				valueStateText="{i18n>enterRecipient}"
 			/>
 										<m:Label
 				text="Subject"
@@ -70,6 +73,8 @@
 				id="Wish_id_EmailSubject"
 				placeholder="Enter Subject"
 				value="{SendWishEmailModel>/Subject}"
+				liveChange="onLiveChangeSubject"
+				valueStateText="{i18n>enterSubject}"
 			/>
 									</f:content>
 								</f:SimpleForm>
@@ -176,7 +181,7 @@
 					/>
 					<m:Button
 						id="Wish_id_CancelMail"
-						text="Cancel"
+						text="Clear"
 						type="Transparent"
 						press="onCancelWishMail"
 					/>

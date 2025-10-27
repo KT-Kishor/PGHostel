@@ -29,6 +29,7 @@ sap.ui.define(
                         // i18n Resource
                         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                         this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("sendGreetingsTitle"));
+                        this.onCancelWishMail()
 
                         // Fetch data
                         await this._fetchCommonData("EmployeeDetails", "EmpDetails");
@@ -37,7 +38,7 @@ sap.ui.define(
                         // Create Models
                         this.CreateallEmployeeModel();
                         this.ManageCustomerModel();
-
+ 
                         // Load default Email Type = Employee Offer (index 0)
                         this._loadEmailTypeData("employeeOffer");
                         this.initializeBirthdayCarousel();
@@ -124,17 +125,6 @@ sap.ui.define(
                     oMultiComboBox.setValueState("None");
                 },
 
-                onEmailSelectionChange: function(oEvent) {
-                    var oMultiComboBox = oEvent.getSource();
-                    var sNewValue = oEvent.getParameter("newValue");
-                    if (sNewValue) {
-                        oMultiComboBox.setValueState("None");
-                    } else {
-                        oMultiComboBox.setValueState("Error");
-                        oMultiComboBox.setValueStateText(this.i18nModel.getText("selectAtLeastOneRecipient"));
-                    }
-                },
-
                 onSendWishMail: function () {
                     const oView = this.getView();
                     const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
@@ -215,16 +205,17 @@ sap.ui.define(
                     const subjectValue = oSubject.getValue().trim();
                     const bodyValue = oRTE.getValue().trim();
 
-                    if (subjectValue.length < 10) {
-                        sap.m.MessageToast.show("Subject must be at least 10 characters long.");
+                    if (subjectValue.length === 0) {
+                        sap.m.MessageToast.show("Subject cannot be empty.");
                         oSubject.setValueState("Error").focus();
                         return;
                     } else {
                         oSubject.setValueState("None");
                     }
 
-                    if (bodyValue.replace(/<[^>]*>/g, "").trim().length < 20) {
-                        sap.m.MessageToast.show("Email body must be at least 20 characters long.");
+                    if (bodyValue.replace(/<[^>]*>/g, "").trim().length === 0) {
+                        sap.m.MessageToast.show("Email body cannot be empty.");
+                        oRTE.addStyleClass("sapUiRTEErrorBorder");
                         return;
                     }
 
@@ -269,7 +260,6 @@ sap.ui.define(
                     this.clearWishesAttachment();
                 },
 
-
                 clearWishesAttachment: function() {
                     const oFileUploader = this.getView().byId("Wish_id_FileUploader");
                     const oUploaderData = this.getView().getModel("UploaderData");
@@ -286,7 +276,6 @@ sap.ui.define(
                     if (oTable) oTable.removeSelections();
                 },
 
-
                 onRTEChange: function(oEvent) {
                     const oRTE = oEvent.getSource();
                     this._validateRTE(oRTE);
@@ -295,7 +284,7 @@ sap.ui.define(
                 _validateRTE: function(oRTE) {
                     const sRTEValue = oRTE.getValue();
                     const iRTELength = sRTEValue.replace(/<[^>]*>/g, "").trim().length;
-                    if (iRTELength < 8) {
+                    if (iRTELength === 0) {
                         oRTE.addStyleClass("sapUiRTEErrorBorder");
                         return false;
                     } else {
@@ -323,11 +312,41 @@ sap.ui.define(
                     );
                 },
 
-                onLiveChangeSubject: function(oEvent) {
+                onLiveChangeSubject: function (oEvent) {
                     const oInput = oEvent.getSource();
-                    const sValue = oInput.getValue();
-                    if (sValue.length >= 10) {
+                    const sValue = oInput.getValue().trim();
+                    if (sValue.length === 0) {
+                        oInput.setValueState("Error");
+                        oInput.setValueStateText("Subject cannot be empty.");
+                    } else {
                         oInput.setValueState("None");
+                        oInput.setValueStateText("");
+                    }
+                },
+
+                onEmailSelectionChange: function(oEvent) {
+                    var oMultiComboBox = oEvent.getSource();
+                    var sNewValue = oEvent.getParameter("newValue");
+                    var oToEmailInput = this.getView().byId("Wish_id_ToEmail");
+                    if (sNewValue) {
+                        oMultiComboBox.setValueState("None");
+                         oToEmailInput.setValueState("None");
+                    } else {
+                        oMultiComboBox.setValueState("Error");
+                        oMultiComboBox.setValueStateText(this.i18nModel.getText("selectAtLeastOneRecipient"));
+                    }
+                },
+
+                onChangeRecipientEmail: function (oEvent) {
+                    const oView = this.getView();
+                    const oToEmailInput = oView.byId("Wish_id_ToEmail");
+                    const oMultiComboBox = oView.byId("Wish_id_EmployeeEmail");
+                    const sValue = oEvent.getParameter("value").trim();
+
+                    if (sValue) {
+                        // Clear error on both fields when manual email entered
+                        oToEmailInput.setValueState("None");
+                        oMultiComboBox.setValueState("None");
                     }
                 },
 
