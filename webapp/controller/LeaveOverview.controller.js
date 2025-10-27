@@ -2,9 +2,11 @@ sap.ui.define([
     "./BaseController", // Import BaseController 
     "sap/ui/model/json/JSONModel", // JSON model for data handling
     "sap/m/MessageToast", // Import MessageToast for notifications
-], function(BaseController, JSONModel, MessageToast) {
+     "../model/formatter", // Custom formatter functions
+], function(BaseController, JSONModel, MessageToast, Formatter) {
     "use strict";
     return BaseController.extend("sap.kt.com.minihrsolution.controller.LeaveOverview", {
+        Formatter: Formatter,
         onInit: function() { // attach route matched
             this.getRouter().getRoute("RouteLeaveOverview").attachMatched(this._onRouteMatched, this);
         },
@@ -44,20 +46,19 @@ sap.ui.define([
 
                 // Filter employees based on role
                 let filteredEmployees = [];
-                if (this.Type === "Admin") {
+                if (this.Type === "Admin" || this.Type === "Account Manager" || this.Type === "Account Consultant") {
                     // Admin sees all active employees
                     filteredEmployees = employees;
-                } else if (["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type)) {
+                } else if (["Manager", "HR Manager", "IT Manager"].includes(this.Type)) {
                     // Manager sees themselves and their team
                     filteredEmployees = employees.filter(e =>
                         e.EmployeeID === this.userId || e.ManagerID === this.userId
                     );
-                } else if (["Employee", "Account Consultant", "IT Consultant", "HR", "Trainee"].includes(this.Type)) {
+                } else if (["Employee", "IT Consultant", "HR", "Trainee"].includes(this.Type)) {
                     // Employee sees themselves, team under same manager, their manager
                     const currentEmp = employees.find(e => e.EmployeeID === this.userId);
                     const currentManagerID = currentEmp ? currentEmp.ManagerID : null;
                     const currentBranch = currentEmp ? currentEmp.BranchCode : null;
-
                     filteredEmployees = employees.filter(e =>
                         (
                             e.EmployeeID === this.userId || // self
@@ -104,31 +105,35 @@ sap.ui.define([
                     let startDate = new Date(leave.fromDate);
                     let endDate = new Date(leave.toDate);
 
-                    // Handle half-day logic
-                    if (leave.halfDay === 'true' && leave.leaveSessionType) {
+                    if (leave.halfDay === "true" && leave.leaveSessionType) {
                         if (leave.leaveSessionType === "Morning") {
                             startDate.setHours(9, 0, 0, 0);
-                            endDate.setHours(14, 0, 0, 0);
+                            endDate = new Date(startDate);
+                            endDate.setHours(13, 0, 0, 0); // 9 AM – 1 PM
                         } else if (leave.leaveSessionType === "Afternoon") {
-                            startDate.setHours(14, 0, 0, 0); // 2:00 PM start
-                            endDate.setHours(19, 0, 0, 0);   // 7:00 PM end 
+                            startDate.setHours(14, 0, 0, 0);
+                            endDate = new Date(startDate);
+                            endDate.setHours(19, 0, 0, 0); // 2 PM – 7 PM
                         }
                     } else {
                         startDate.setHours(9, 0, 0, 0);
-                        endDate.setHours(14, 0, 0, 0);
+                        endDate = new Date(startDate);
+                        endDate.setHours(18, 0, 0, 0); // Full day
                     }
 
                     const appointment = {
                         start: startDate,
                         end: endDate,
                         title: "Leave",
-                        info: `Days: ${leave.NoofDays}${leave.halfDay === 'true' ? ` (${leave.leaveSessionType || 'Morning'})` : ''}`,
-                        color: this._getAppointmentColor(leave.status),
+                        info: `Days: ${leave.NoofDays}${leave.halfDay === "true" ? ` (${leave.leaveSessionType || 'Morning'})` : ''}`,
+                        color: this._getAppointmentColor(leave.status, leave.typeOfLeave),
                         tentative: leave.status === 'Approved',
                         ID: leave.ID,
                         typeOfLeave: leave.typeOfLeave,
                         status: leave.status,
-                        employeeID: employee.EmployeeID
+                        employeeID: employee.EmployeeID,
+                        fromDate: this.Formatter.formatDate(leave.fromDate),
+                        toDate: this.Formatter.formatDate(leave.toDate)
                     };
                     employeeRow.appointments.push(appointment);
                 });
@@ -159,34 +164,41 @@ sap.ui.define([
             if (!oAppointment) return;
             const oAppData = oAppointment.getBindingContext("PlanningModel").getObject();
             const sLeaveID = oAppData.ID;
-            const sTitle = `${oAppData.typeOfLeave} - ${oAppData.status}`;
+            const sTitle = `${oAppData.typeOfLeave}`;
             const sInfo = oAppData.info;
+            const sFrom = (oAppData.fromDate);
+            const sTo = (oAppData.toDate);
             const isManager = ["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type);
             const isAdmin = this.Type === "Admin";
             const aActions = isManager || isAdmin ? ["Dashboard", sap.m.MessageBox.Action.CLOSE] : [sap.m.MessageBox.Action.CLOSE];
             sap.m.MessageBox.success(
-                `Leave Details: ${sTitle}\n${sInfo}`, {
-                    title: "Leave Details",
-                    actions: aActions,
-                    emphasizedAction: "Dashboard",
-                    onClose: function(sAction) {
-                        if (sAction === "Dashboard" && sLeaveID && (isManager || isAdmin)) {
-                            this.getOwnerComponent().setModel(new JSONModel({ from: "LeaveOverview"
-                            }), "NavSource" );
-                            this.getRouter().navTo("RouteDetailLeave", {sLeaveID: sLeaveID});
-                        }
-                    }.bind(this)
-                }
-            );
+            `Type: ${sTitle}\nFrom: ${sFrom} - ${sTo}\n${sInfo}`, {
+                title: "Leave Details",
+                actions: aActions,
+                emphasizedAction: "Dashboard",
+                onClose: function(sAction) {
+                    if (sAction === "Dashboard" && sLeaveID && (isManager || isAdmin)) {
+                        this.getOwnerComponent().setModel(new JSONModel({ from: "LeaveOverview" }), "NavSource");
+                        this.getRouter().navTo("RouteDetailLeave", { sLeaveID: sLeaveID });
+                    }
+                }.bind(this)
+            }
+        );
         },
 
-        _getAppointmentColor: function(status) {
-            switch (status) {
-                case 'Approved':
-                    return "#54AFE6";
-                default:
-                    return "#2C3587"; // Custom color
-            }
+        _getAppointmentColor: function(status, typeOfLeave) {
+            if (status === "Approved") {
+                switch (typeOfLeave) {
+                    case "LOP":
+                        return "#F14C28"; // Red
+                    case "CompOff":
+                        return "#8480BB"; // Violet
+                    case "All In One Leave":
+                        return "#54AFE6"; // Blue
+                    default:
+                        return "#2C3587"; // Default blue
+                }
+            } 
         },
 
         onPressback: function() {
