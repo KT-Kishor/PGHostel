@@ -16,6 +16,7 @@
     <Button
         press="Tile_NotifictionBTN"
         icon="sap-icon://bell"
+        visible="{= ${LoginModel>/Role} !== 'Contractor' }"
     />
     <Button
         press="onLogout"

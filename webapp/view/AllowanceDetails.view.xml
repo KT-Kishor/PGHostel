@@ -7,7 +7,7 @@
 	xmlns:m="sap.m"	>
 	<m:Page id="AllItem_id_Details" title="{i18n>allowanceDetails}" navButtonPress="Exp_Det_onPressBackBtn" showNavButton="true">
 		<m:headerContent>
-			<m:Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications"/>
+			<m:Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications" visible="{= ${LoginModel>/Role} !== 'Contractor' }"/>
 			<m:Button press="onLogout" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}" type="Transparent"/>
 		</m:headerContent>
 		<ObjectPageLayout enableLazyLoading="true" navigate="onSectionChange" beforeNavigate="onBeforeNavigate" useIconTabBar="true" showTitleInHeaderContent="true" upperCaseAnchorBar="false" headerContentPinnable="true" sectionChange="onSectionChange" id="AllItem_id_objectPageLayoutExpence" class="sapUiSmallmarginResponsive">

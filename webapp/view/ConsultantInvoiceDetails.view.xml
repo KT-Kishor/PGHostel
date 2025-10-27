@@ -12,6 +12,7 @@
                 icon="sap-icon://bell"
                 type="Transparent"
                 tooltip="Notifications"
+				visible="{= ${LoginModel>/Role} !== 'Contractor' }"
             />
 	<m:Button
         press="onLogout"

@@ -6,7 +6,7 @@
 	xmlns:u="sap.ui.unified">
 	<Page title="{i18n>TableHeader}" navButtonPress="onPageNavButtonPress" showNavButton="true">
 		<headerContent>
-			<Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications" />
+			<Button press="Tile_NotifictionBTN" icon="sap-icon://bell" type="Transparent" tooltip="Notifications" visible="{= ${LoginModel>/Role} !== 'Contractor' }"/>
 			<Button press="onLogout" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}" type="Transparent" />
 		</headerContent>
 		<f:SimpleForm layout="ColumnLayout" labelSpanXL="12" labelSpanL="12" labelSpanM="12" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="3" columnsL="3" columnsM="1" singleContainerFullSize="false">
