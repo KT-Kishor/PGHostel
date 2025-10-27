@@ -150,6 +150,7 @@ sap.ui.define([
             this._applyResponsiveVideo("videoBox_H", "videoFrameHtml_H", "../Videos/Timesheet Application.mp4");
             this._applyResponsiveVideo("videoBox_I", "videoFrameHtml_I", "../Videos/Generate Payslip.mp4");
             this._applyResponsiveVideo("videoBox_J", "videoFrameHtml_J", "../Videos/My Inbox.mp4");
+            this._applyResponsiveVideo("videoBox_K", "videoFrameHtml_K", "../Videos/Leave Overview.mp4");
         },
 
         _applyResponsiveVideo: function(vBoxId, htmlId, videoUrl) {

@@ -314,7 +314,6 @@
 				<g:GridContainerSettings columnSize="100%" gap="10px" />
 			</g:layoutM>
 			<!-- Right Column -->
-			<!-- Right Column -->
 			<m:VBox id="videoBox_J" class="sapUiMediumMarginTop">
 				<core:HTML id="videoFrameHtml_J"
             content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#f3f3f3;'&gt;
@@ -331,6 +330,39 @@
 				<m:Text text="{i18n>MyInbox_par}" class="jioParagraph" />
 			</m:VBox>
 		</g:GridContainer>
+
+		<!-- Leave Overview -->
+		<g:GridContainer class="jioSection sapUiSmallMarginTop">
+			<g:layout>
+				<g:GridContainerSettings columnSize="49.5%" gap="10px" />
+			</g:layout>
+			<g:layoutXS>
+				<g:GridContainerSettings columnSize="100%" gap="10px" />
+			</g:layoutXS>
+			<g:layoutS>
+				<g:GridContainerSettings columnSize="100%" gap="10px" />
+			</g:layoutS>
+			<g:layoutM>
+				<g:GridContainerSettings columnSize="100%" gap="10px" />
+			</g:layoutM>
+			<!-- Left Column -->
+			<m:VBox alignItems="Start" justifyContent="Center" class="sapUiMediumMarginTop">
+				<m:Title text="{i18n>leaveOverview}" level="H1" class="jioHeading" />
+				<m:Text text="{i18n>headerLeaveOverview_par}" class="jioParagraph" />
+			</m:VBox>
+			<!-- Right Column -->
+			<m:VBox id="videoBox_K" class="sapUiMediumMarginTop">
+				<core:HTML id="videoFrameHtml_K"
+            content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:15px;background:#f3f3f3;'&gt;
+                        &lt;video controls muted playsinline
+                               style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:15px;'&gt;
+                            &lt;source src='../Videos/Leave Overview.mp4' type='video/mp4'&gt;
+                            Your browser does not support the video tag.
+                        &lt;/video&gt;
+                     &lt;/div&gt;" />
+			</m:VBox>
+		</g:GridContainer>
+
 		<!-- <m:Button
             text="Request Demo"
             press="onOpenDemoForm"
