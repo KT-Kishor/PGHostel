@@ -104,16 +104,15 @@ sap.ui.define([
                 employeeLeaves.forEach(leave => {
                     let startDate = new Date(leave.fromDate);
                     let endDate = new Date(leave.toDate);
+                    leave.leaveSessionType= leave.leaveSessionType || "Morning"
 
                     if (leave.halfDay === "true" && leave.leaveSessionType) {
                         if (leave.leaveSessionType === "Morning") {
                             startDate.setHours(9, 0, 0, 0);
-                            endDate = new Date(startDate);
-                            endDate.setHours(13, 0, 0, 0); // 9 AM – 1 PM
+                            endDate.setHours(14, 0, 0, 0);
                         } else if (leave.leaveSessionType === "Afternoon") {
-                            startDate.setHours(14, 0, 0, 0);
-                            endDate = new Date(startDate);
-                            endDate.setHours(19, 0, 0, 0); // 2 PM – 7 PM
+                            startDate.setHours(14, 0, 0, 0); // 2:00 PM start
+                            endDate.setHours(19, 0, 0, 0);   // 7:00 PM end 
                         }
                     } else {
                         startDate.setHours(9, 0, 0, 0);
