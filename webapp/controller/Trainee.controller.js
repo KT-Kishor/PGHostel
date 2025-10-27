@@ -279,6 +279,7 @@ sap.ui.define([
                 }
                 var oCalculatedEndDate = new Date(oJoiningDate);
                 oCalculatedEndDate.setMonth(oCalculatedEndDate.getMonth() + months); // Add the number of months
+                oCalculatedEndDate.setDate(oCalculatedEndDate.getDate() - 1);
                 var sFormattedEndDate = oCalculatedEndDate.toISOString().split("T")[0];
                 oTraineeModel.EndDate = new Date(sFormattedEndDate);
                 var oTraineeContext = oSelectedItem.getBindingContext("traineeModel");
