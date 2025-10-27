@@ -158,31 +158,49 @@ sap.ui.define([
             return canvas.toDataURL("image/png");
         },
 
-        handleAppointmentSelect: function(oEvent) {
+        handleAppointmentSelect: function (oEvent) {
             const oAppointment = oEvent.getParameter("appointment");
-            if (!oAppointment) return;
-            const oAppData = oAppointment.getBindingContext("PlanningModel").getObject();
-            const sLeaveID = oAppData.ID;
-            const sTitle = `${oAppData.typeOfLeave}`;
-            const sInfo = oAppData.info;
-            const sFrom = (oAppData.fromDate);
-            const sTo = (oAppData.toDate);
-            const isManager = ["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type);
-            const isAdmin = this.Type === "Admin";
-            const aActions = isManager || isAdmin ? ["Dashboard", sap.m.MessageBox.Action.CLOSE] : [sap.m.MessageBox.Action.CLOSE];
-            sap.m.MessageBox.success(
-            `Type: ${sTitle}\nFrom: ${sFrom} - ${sTo}\n${sInfo}`, {
-                title: "Leave Details",
-                actions: aActions,
-                emphasizedAction: "Dashboard",
-                onClose: function(sAction) {
-                    if (sAction === "Dashboard" && sLeaveID && (isManager || isAdmin)) {
-                        this.getOwnerComponent().setModel(new JSONModel({ from: "LeaveOverview" }), "NavSource");
-                        this.getRouter().navTo("RouteDetailLeave", { sLeaveID: sLeaveID });
+            const aAppointments = oEvent.getParameter("appointments");
+            // Single appointment (Day/Week)
+            if (oAppointment) {
+                const oAppData = oAppointment.getBindingContext("PlanningModel").getObject();
+                const sLeaveID = oAppData.ID;
+                const sTitle = `${oAppData.typeOfLeave}`;
+                const sInfo = oAppData.info;
+                const sFrom = oAppData.fromDate;
+                const sTo = oAppData.toDate;
+                const isManager = ["Manager", "HR Manager", "Account Manager", "IT Manager"].includes(this.Type);
+                const isAdmin = this.Type === "Admin";
+                const aActions = isManager || isAdmin ? ["Dashboard", sap.m.MessageBox.Action.CLOSE] : [sap.m.MessageBox.Action.CLOSE];
+
+                sap.m.MessageBox.success(
+                    `Type: ${sTitle}\nFrom: ${sFrom} - ${sTo}\n${sInfo}`, {
+                        title: "Leave Details",
+                        actions: aActions,
+                        emphasizedAction: "Dashboard",
+                        onClose: function (sAction) {
+                            if (sAction === "Dashboard" && sLeaveID && (isManager || isAdmin)) {
+                                this.getOwnerComponent().setModel(new JSONModel({ from: "LeaveOverview" }), "NavSource");
+                                this.getRouter().navTo("RouteDetailLeave", { sLeaveID: sLeaveID });
+                            }
+                        }.bind(this)
                     }
-                }.bind(this)
+                );
+                return;
             }
-        );
+
+            // Multiple appointments (Month view)
+            if (Array.isArray(aAppointments) && aAppointments.length > 0) {
+                // Combine all selected appointments’ info
+                const summaries = aAppointments.map(a => {
+                    const oAppData = a.getBindingContext("PlanningModel").getObject();
+                    return `Type: ${oAppData.typeOfLeave}\nFrom: ${oAppData.fromDate} - ${oAppData.toDate}\n${oAppData.info}`;
+                });
+
+                sap.m.MessageBox.success(summaries.join("\n\n"), {
+                    title: "Leave Details (Monthly)"
+                });
+            }
         },
 
         _getAppointmentColor: function(status, typeOfLeave) {
