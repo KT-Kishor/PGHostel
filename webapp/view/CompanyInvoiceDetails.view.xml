@@ -120,7 +120,6 @@
 												<m:Title text="{i18n>InvoiceItemDetails} ({= ${CompanyInvoiceItemModel>/CompanyInvoiceItem}.length })"></m:Title>
 												<m:ToolbarSpacer />
 												<m:Button type="Transparent" text="{i18n>btnTransaction}" press="CID_onPressDisplayPaymentDetail" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"/>
-												<m:Button id="CreditNote" visible="{visiablityPlay>/CreditNote}" text="{i18n>CreditNote}" type="Transparent" press="CID_onPressAddInvoiceItems" />
 												<m:Button id="AddItem" visible="{visiablityPlay>/addInvBtn}" text="{i18n>addInvItems}" type="Transparent" press="CID_onPressAddInvoiceItems" />
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
@@ -186,7 +185,7 @@
 													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}"  enabled="{= ${CompanyInvoiceItemModel>Status} === 'Active' ? true : false}" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
@@ -225,10 +224,6 @@
 											<m:HBox justifyContent="SpaceBetween">
 												<m:Label text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{FilteredSOWModel>/RoundOf}" textAlign="End" />
-											</m:HBox>
-											<m:HBox justifyContent="SpaceBetween">
-												<m:Label text="{i18n>CreditNote} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
-												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditNote}" textAlign="End" />
 											</m:HBox>
 											<!-- Total Amount -->
 											<m:HBox justifyContent="SpaceBetween">

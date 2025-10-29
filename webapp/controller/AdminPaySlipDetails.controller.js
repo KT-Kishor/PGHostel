@@ -52,6 +52,12 @@ sap.ui.define([
                                 MessageBox.error(this.i18nModel.getText("bankDetailsNotFound"));
                                 return;
                             }
+                            if(response.result[0].EarningData[0].Amount === 0){
+                              this.oModel.setProperty("/EmpData", {});
+                                this.oModel.setProperty("/isIdSelected", false);
+                                MessageBox.error(this.i18nModel.getText("stipendAmount"));
+                                return;
+                            }
                             this.initializeCompAmounts(oData.EarningData);
                             this.initializeCompAmounts(oData.DeductionData);
                             oData.Currency = "INR";

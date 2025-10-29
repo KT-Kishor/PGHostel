@@ -31,16 +31,26 @@ sap.ui.define(
                     this.AppVisibilityReadCall();
                     await this._fetchCommonData("AllLoginDetails", "EmpModel");
                     await this._fetchCommonData("EmployeeDetails", "EmpDetails");
+                    await this._fetchCommonData("Trainee", "traineePayslipModel", { Status: "Onboarded",
+                        Type: "Stipend" });
 
                     this.CreateEmployeeModel();
                     this.initializeBirthdayCarousel();
                 },
                 CreateEmployeeModel: function() {
                     var empData = this.getView().getModel("EmpDetails").getData() || [];
-                    var filteredData = empData.filter(function(item) {
-                        return item.Role !== "Trainee" && item.Role !== "Contractor";
+                    var filteredEmpData = empData.filter(function(item) {
+                        return item.Role !== "Contractor" && item.Role !== "Trainee";
                     });
-                    var oFilteredModel = new JSONModel(filteredData);
+                    var traineeData = this.getView().getModel("traineePayslipModel").getData() || [];
+                    var normalizedTrainees = traineeData.map(function(item) {
+                        return {
+                            EmployeeID: item.TraineeID,
+                            EmployeeName: item.TraineeName,
+                        };
+                    });
+                    var combinedData = filteredEmpData.concat(normalizedTrainees);
+                    var oFilteredModel = new sap.ui.model.json.JSONModel(combinedData);
                     this.getOwnerComponent().setModel(oFilteredModel, "EmployeeModel");
                 },
                 AppVisibilityReadCall: async function() {
