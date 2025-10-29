@@ -52,7 +52,7 @@ sap.ui.define([
                                 MessageBox.error(this.i18nModel.getText("bankDetailsNotFound"));
                                 return;
                             }
-                            if(response.result[0].EarningData[0].Amount === 0){
+                            if(response.result[0].EarningData[0].Amount === 0 && response.result[0].EarningData[0].YearlyAmount === 0){
                               this.oModel.setProperty("/EmpData", {});
                                 this.oModel.setProperty("/isIdSelected", false);
                                 MessageBox.error(this.i18nModel.getText("stipendAmount"));
