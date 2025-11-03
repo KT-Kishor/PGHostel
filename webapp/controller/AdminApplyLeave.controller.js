@@ -10,7 +10,7 @@ sap.ui.define(
         "sap/suite/ui/commons/TimelineItem", //Import TimelineItem for individual comments
         'sap/ui/export/Spreadsheet'
     ],
-    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem,Spreadsheet) {
+    function (BaseController, JSONModel, MessageToast, utils, Formatter, MessageBox, Timeline, TimelineItem, Spreadsheet) {
         "use strict";
         return BaseController.extend(
             "sap.kt.com.minihrsolution.controller.AdminApplyLeave",
@@ -326,15 +326,22 @@ sap.ui.define(
                     this.getView().byId("AL_id_TypeOfLeave").setSelectedKey("All In One Leave");
                     this.getView().byId("AL_id_LeaveYear").setSelectedKey(this.currentYear);
                     if (this.Type === "Trainee") {
-                        this.byId("AL_id_MonthlyChart").setVisible(false);
-                        this.byId("AL_id_YearlyChart").setVisible(false);
+                        // this.byId("AL_id_MonthlyChart").setVisible(false);
+                        // this.byId("AL_id_YearlyChart").setVisible(false);
                         this.byId("AL_id_LeaveYear").setVisible(false);
                         this.byId("AL_id_YearLabel").setVisible(false);
-                        this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId).then(() => sap.ui.core.BusyIndicator.hide())
-                            .catch((error) => {
-                                this.closeBusyDialog(); //  Close BusyDialog
-                                MessageToast.show(error.message || error.responseText);
-                            });
+                        // this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId).then(() => sap.ui.core.BusyIndicator.hide())
+                        //     .catch((error) => {
+                        //         this.closeBusyDialog(); //  Close BusyDialog
+                        //         MessageToast.show(error.message || error.responseText);
+                        //     });
+                        this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId),
+                            this.MonthBarDisplayFunction("All In One Leave", this.currentYear, this.userId),
+                            this.YearlyBarDisplayFunction(this.userId).then(() => sap.ui.core.BusyIndicator.hide())
+                                .catch((error) => {
+                                    this.closeBusyDialog(); //  Close BusyDialog
+                                    MessageToast.show(error.message || error.responseText);
+                                });
                     } else {
                         this.byId("AL_id_MonthlyChart").setVisible(true);
                         this.byId("AL_id_YearlyChart").setVisible(true);
@@ -568,8 +575,8 @@ sap.ui.define(
                         this.previousLeaveDates.push(d.toDateString());
                     }
 
-                     if (oModelData.typeOfLeave === "CompOff") {
-                        MessageToast.show(this.i18nModel.getText("compoffedit")); 
+                    if (oModelData.typeOfLeave === "CompOff") {
+                        MessageToast.show(this.i18nModel.getText("compoffedit"));
                         return; // stop execution
                     }
 
@@ -713,7 +720,7 @@ sap.ui.define(
                     this.onLiveChange(); // Recalculate No of Days
                 },
 
-               onChangeleasveSessionType: function (oEvent) {
+                onChangeleasveSessionType: function (oEvent) {
                     var selectedIndex = oEvent.getParameter("selectedIndex");
                     var oLeaveModel = this.getView().getModel("LeaveTempModel");
                     var selectedSession = selectedIndex === 0 ? "Morning" : selectedIndex === 1 ? "Afternoon" : "";
@@ -808,7 +815,7 @@ sap.ui.define(
                     try {
                         // Validate fields
                         if (
-                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
@@ -931,12 +938,12 @@ sap.ui.define(
                                 return leave.LeaveStatus === "All Quota";
                             });
 
-                             if (oData.typeOfLeave === "All In One Leave") {
+                            if (oData.typeOfLeave === "All In One Leave") {
                                 var joiningMonth = parseInt(this.JoiningDate[1]); // Joining month (1–12)
-                                var joiningYear  = parseInt(this.JoiningDate[2]);
-                                var currentDate  = new Date();
+                                var joiningYear = parseInt(this.JoiningDate[2]);
+                                var currentDate = new Date();
                                 var currentMonth = currentDate.getMonth() + 1; // Current month (1–12)
-                                var currentYear  = currentDate.getFullYear();
+                                var currentYear = currentDate.getFullYear();
 
                                 var monthsSinceJoining = 0;
 
@@ -948,7 +955,7 @@ sap.ui.define(
                                     }
                                 } else if (joiningYear < currentYear) {
                                     // Joined in past years → count from Jan of this year
-                                    monthsSinceJoining = currentMonth; 
+                                    monthsSinceJoining = currentMonth;
                                 } else {
                                     // Joining year is in the future (not allowed)
                                     return MessageBox.error("Joining year is in the future. Cannot apply leave.");
@@ -960,14 +967,14 @@ sap.ui.define(
                                 var leaveData = oLeaveModel.getProperty("/chartData");
                                 var usedLeaves = leaveData
                                     .filter(l => l.LeaveType === "All In One Leave" &&
-                                                (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                        (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
                                     .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
 
                                 // Include new leave in calculation
                                 var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays);
 
                                 if (projectedLeaves > monthlyQuota) {
-                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                    return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
                                 }
                             }
 
@@ -1013,7 +1020,7 @@ sap.ui.define(
                     try {
                         // Validate fields
                         if (
-                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
+                            utils._LCstrictValidationComboBox(sap.ui.getCore().byId("AL_id_Leavetype"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_FromDate"), "ID") &&
                             utils._LCvalidateDate(sap.ui.getCore().byId("AL_id_ToDate"), "ID") &&
                             utils._LCvalidateMandatoryField(sap.ui.getCore().byId("AL_id_LeaveComments"), "ID")
@@ -1064,7 +1071,7 @@ sap.ui.define(
                                 }
                             }
 
-                             if (oData.typeOfLeave === "All In One Leave") {
+                            if (oData.typeOfLeave === "All In One Leave") {
                                 var fiveDaysBack = new Date(currentDate);
                                 fiveDaysBack.setDate(currentDate.getDate() - 5);
                                 if (startDate < fiveDaysBack) {
@@ -1123,10 +1130,10 @@ sap.ui.define(
 
                             if (oData.typeOfLeave === "All In One Leave") {
                                 var joiningMonth = parseInt(this.JoiningDate[1]); // Joining month (1–12)
-                                var joiningYear  = parseInt(this.JoiningDate[2]);
-                                var currentDate  = new Date();
+                                var joiningYear = parseInt(this.JoiningDate[2]);
+                                var currentDate = new Date();
                                 var currentMonth = currentDate.getMonth() + 1; // Current month (1–12)
-                                var currentYear  = currentDate.getFullYear();
+                                var currentYear = currentDate.getFullYear();
 
                                 var monthsSinceJoining = 0;
 
@@ -1138,7 +1145,7 @@ sap.ui.define(
                                     }
                                 } else if (joiningYear < currentYear) {
                                     // Joined in past years → count from Jan of this year
-                                    monthsSinceJoining = currentMonth; 
+                                    monthsSinceJoining = currentMonth;
                                 } else {
                                     // Joining year is in the future (not allowed)
                                     return MessageBox.error("Joining year is in the future. Cannot apply leave.");
@@ -1150,14 +1157,14 @@ sap.ui.define(
                                 var leaveData = oLeaveModel.getProperty("/chartData");
                                 var usedLeaves = leaveData
                                     .filter(l => l.LeaveType === "All In One Leave" &&
-                                                (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
+                                        (l.LeaveStatus === "Submitted" || l.LeaveStatus === "Approved"))
                                     .reduce((sum, l) => sum + parseFloat(l.Count || 0), 0);
 
                                 // Include new leave in calculation
                                 var projectedLeaves = usedLeaves + parseFloat(oData.NoofDays) - parseFloat(this.UpdateNoofDays || 0);
 
                                 if (projectedLeaves > monthlyQuota) {
-                                        return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
+                                    return MessageBox.error(this.i18nModel.getText("monthlyQuotatillNow"));
                                 }
                             }
 
@@ -1170,7 +1177,7 @@ sap.ui.define(
                             }
 
                             // Check leave type and quota
-                            if (oData.typeOfLeave === "LOP" ||  valid) {
+                            if (oData.typeOfLeave === "LOP" || valid) {
                                 oData.fromDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.toDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
                                 oData.halfDay = oData.halfDay.toString();
@@ -1214,9 +1221,9 @@ sap.ui.define(
                         this.byId("AL_id_Updatebtn").setVisible(false);
                         this.byId("AL_id_Deletebtn").setVisible(false);
                         // Refresh leave data
-                         this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
-                         this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
-                         this._fetchCommonData("Compoff", "CompoffModel", { Employee: this.userId });
+                        this.BarDisplayFunction("All In One Leave", this.currentYear, this.userId)
+                        this._fetchCommonData("Leaves", "LeaveModel", { employeeID: this.userId });
+                        this._fetchCommonData("Compoff", "CompoffModel", { Employee: this.userId });
                     } else {
                         MessageToast.show(error.message || error.responseText);
                     }
@@ -1327,47 +1334,47 @@ sap.ui.define(
                     return this.getStyledGroupHeader(oGroup);
                 },
 
-                AL_ValidateLeavetype:function(oEvent){
-                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+                AL_ValidateLeavetype: function (oEvent) {
+                    utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
                 },
 
-                AL_DownalodTableData:function(){
-                var table = this.byId("AL_id_LeaveTableStandard");
-                const oModelData = table.getModel("LeaveModel").getData();
-                const aFormattedData = oModelData.map(item => {
-                    return {
-                    ...item,      
-                    fromDate: Formatter.formatDate(item.fromDate),
-                    toDate: Formatter.formatDate(item.toDate),
-                
-                    };
-                });
-                const aCols = [
-                    { label: this.i18nModel.getText("fromDate"), property: "fromDate", type: "string" },
-                    { label: this.i18nModel.getText("toDate"), property: "toDate", type: "string" },
-                    { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
-                    { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
-                    { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
-                    // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
-                ];
-                const oSettings = {
-                    workbook: {
-                    columns: aCols,
-                    context: {
-                        sheetName: this.i18nModel.getText("enboxDetails")
-                    }
-                    },
-                    dataSource: aFormattedData,
-                    fileName: "LeaveDetails.xlsx"
-                };
-                const oSheet = new Spreadsheet(oSettings);
-                oSheet.build().then(function () {
-                    MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
-                }.bind(this))
-                    .finally(function () {
-                    oSheet.destroy();
+                AL_DownalodTableData: function () {
+                    var table = this.byId("AL_id_LeaveTableStandard");
+                    const oModelData = table.getModel("LeaveModel").getData();
+                    const aFormattedData = oModelData.map(item => {
+                        return {
+                            ...item,
+                            fromDate: Formatter.formatDate(item.fromDate),
+                            toDate: Formatter.formatDate(item.toDate),
+
+                        };
                     });
-              }
+                    const aCols = [
+                        { label: this.i18nModel.getText("fromDate"), property: "fromDate", type: "string" },
+                        { label: this.i18nModel.getText("toDate"), property: "toDate", type: "string" },
+                        { label: this.i18nModel.getText("noOfDays"), property: "NoofDays", type: "string" },
+                        { label: this.i18nModel.getText("typeOfLeave"), property: "typeOfLeave", type: "string" },
+                        { label: this.i18nModel.getText("halfDay"), property: "halfDay", type: "string " },
+                        // { label: this.i18nModel.getText("enterComments"), property: "comments", type: "string" },
+                    ];
+                    const oSettings = {
+                        workbook: {
+                            columns: aCols,
+                            context: {
+                                sheetName: this.i18nModel.getText("enboxDetails")
+                            }
+                        },
+                        dataSource: aFormattedData,
+                        fileName: "LeaveDetails.xlsx"
+                    };
+                    const oSheet = new Spreadsheet(oSettings);
+                    oSheet.build().then(function () {
+                        MessageToast.show(this.i18nModel.getText("downloadsuccessfully"));
+                    }.bind(this))
+                        .finally(function () {
+                            oSheet.destroy();
+                        });
+                }
             }
         );
     }
