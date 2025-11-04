@@ -171,7 +171,7 @@
 										<m:Label text="{i18n>percentage}" required="{ConsultantInvoiceModel>/GSTValid}" />
 										<m:Input value="{ConsultantInvoiceModel>/Percentage}" liveChange="CI_onPercentageChange"  editable="{ConsultantInvoiceModel>/GSTValid}" maxLength="10"/>
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{CurrencyModel>/}" selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%"  editable="{visiablityPlay>/editable}"  id="CI_id_Currency" change="CI_onCurrencyChange" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{path:'CurrencyModel>/',length:1000}" selectedKey="{ConsultantInvoiceModel>/Currency}" width="100%"  editable="{visiablityPlay>/editable}"  id="CI_id_Currency" change="CI_onCurrencyChange" valueStateText="{i18n>selectCurrency}">
 										<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}"/>
 									</m:ComboBox>
 									</f:content>

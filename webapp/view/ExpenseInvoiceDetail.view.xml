@@ -110,7 +110,7 @@
 										</m:ComboBox>
 
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{CurrencyModel>/}" value="{FilteredSOWModel>/Currency}" id="EID_id_CurrencySelect" change="CID_CurrencyChanges" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{path:'CurrencyModel>/',length:1000}" value="{FilteredSOWModel>/Currency}" id="EID_id_CurrencySelect" change="CID_CurrencyChanges" valueStateText="{i18n>selectCurrency}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:ComboBox>
 

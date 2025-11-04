@@ -111,7 +111,7 @@
 											<Label text="{i18n>ctc}" required="true" />
 											<Input busyIndicatorDelay="0" value="{employeeModel>/CTC}" id="EOD_id_CTC" placeholder="{i18n>placeCtc}" 
                                              liveChange="EOD_validateAmount" maxLength="10" valueStateText="{i18n>ctcValueState}" />
-											<Select items="{CurrencyModel>/}" enabled="false" selectedKey="{employeeModel>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
+											<Select items="{path:'CurrencyModel>/',length:1000}" enabled="false" selectedKey="{employeeModel>/Currency}" id="EOD_id_Currency" width="100%" class="marginLeft">
 												<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 											</Select>
 											<Label text="{i18n>EmpOfferVariablePay}" required="true" />

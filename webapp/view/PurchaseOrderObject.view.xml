@@ -411,7 +411,7 @@
                                             id="FPO_id_Currency"
                                             change="onSelectCurrencyChange"
                                             selectedKey="{PurchaseOrderModel>/Currency}"
-                                            items="{CurrencyModel>/}"
+                                            items="{path:'CurrencyModel>/',length:1000}"
                                             valueStateText="{i18n>selectCurrency}"
                                             width="100%"
                                         >

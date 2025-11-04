@@ -376,10 +376,16 @@ sap.ui.define([
             },
 
             checkEmpty: function (compData) {
-                compData.forEach(function (item) {
-                    if (!item.Description || !item.YearlyAmount) {
-                        throw new Error("Fields cannot be Empty, please recheck the data.");
+               compData.forEach(function (item) {
+                if (item.Description === "Birthday Voucher") {
+                    if (!item.Description && item.YearlyAmount === "") {
+                        throw new Error("Fields cannot be empty, please recheck the data.");
                     }
+                } else {
+                    if (!item.Description || item.YearlyAmount === null || item.YearlyAmount === "" || item.YearlyAmount == 0) {
+                        throw new Error("Fields cannot be empty or zero, please recheck the data.");
+                    }
+                }
                 });
             }
         });

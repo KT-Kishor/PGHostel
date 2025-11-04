@@ -1273,22 +1273,29 @@ sap.ui.define([
                     content: "",
                     isFileUploaded: false,
                     button: true,
-                    Subject: "KALPAVRIKSHA TECHNOLOGIES - INVOICE PAYMENT REMINDER",
-                    htmlbody: `<p>Dear Finance Team,</p>
-                    <p>I hope you're doing well. This is a friendly reminder that payment for invoice ${modelData.CCInvNo}, issued on  ${modelData.InvoiceDate}, is still outstanding.</p>
-                    <li><b>Invoice No : ${modelData.CCInvNo}</b></li>
-                    <li><b>Due Date : ${modelData.PayByDate}</b></li>
-                    <li><b>Invoice Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
-                    <li><b>Received Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount"))} ${modelData.Currency}</b></li>                  
-                    <li><b>Due Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount"))}</b></li>                  
-                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+                    Subject: "KALPAVRIKSHA TECHNOLOGIES - CREDIT MEMO FOLLOW-UP",
+                    htmlbody: `
+                        <p>Dear Finance Team,</p>
 
-                    <p>If you’ve already made the payment, kindly disregard this reminder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
-                    <p>If you have any questions or need further information, please don't hesitate to contact us.</p>
-                    <p>Thank you for your attention to this matter.</p>
-                   <p style="margin: 0;">Best Regards,</p>                  
-                   <p style="margin: 0;">Finance Department</p>
-                    `
+                        <p>I hope you're doing well. This is a gentle reminder regarding the credit memo ${modelData.CreditMemoNo}, issued on ${modelData.CreditMemoDate}, which remains pending for acknowledgment or adjustment.</p>
+
+                        <ul style="margin:0; padding-left:15px;">
+                        <li><b>Credit Memo No :</b> ${modelData.CCInvNo }</li>
+                        <li><b>Credit Memo Date :</b> ${modelData.InvoiceDate}</li>
+                        <li><b>Reference Invoice No :</b> ${modelData.InvNo}</li>
+                        <li><b>Credit Amount :</b> ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</li>
+                        </ul>
+
+                        <p>If this credit memo has already been processed or adjusted, please disregard this message.  
+                        Otherwise, we kindly request you to confirm the status or take the necessary action at your earliest convenience.</p>
+
+                        <p>If you have any questions or require further details, please feel free to reach out to us.</p>
+
+                        <p>Thank you for your attention.</p>
+
+                        <p style="margin: 0;">Best Regards,</p>
+                        <p style="margin: 0;">Finance Department</p>
+                        `
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail", true);
@@ -1312,19 +1319,25 @@ sap.ui.define([
                     content: "",
                     isFileUploaded: false,
                     button: false,
-                    Subject: `${modelData.CustomerName} - ${modelData.InvoiceDescription}`,
-                    htmlbody: `<p>Dear Finance Team,</p>
-                    <p>Please find the following invoice details below:</p>
-                    <li><b>Invoice No : ${modelData.CCInvNo}</b></li>
-                    <li><b>Invoice Date : ${modelData.InvoiceDate}</b></li>
-                    <li><b>Total Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
-                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+                    Subject: `${modelData.CustomerName} - Credit Memo Details`,
+                    htmlbody: `
+                        <p>Dear Finance Team,</p>
+                        <p>Please find below the details of the credit memo issued for your reference:</p>
+                        <ul style="margin:0; padding-left:15px;">
+                        <li><b>Credit Memo No :</b> ${modelData.CCInvNo}</li>
+                        <li><b>Credit Memo Date :</b> ${modelData.InvoiceDate}</li>
+                        <li><b>Reference Invoice No :</b> ${modelData.InvNo}</li>
+                        <li><b>Credit Amount :</b> ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</li>
+                        </ul>
+
+                        <p>This credit memo has been processed in accordance with our agreement.  
+                        Please update your records accordingly.</p>
 
                     <p>If you have any questions or require further information, please do not hesitate to contact us.</p>
-                   <p style="margin: 0;">Best Regards,</p>
-                   <p style="margin: 0;">Nikhil Shah,</p>
-                   <p style="margin: 0;">Accountant Manager</p>
-                   `
+                    <p style="margin: 0;">Best Regards,</p>
+                    <p style="margin: 0;">Nikhil Shah,</p>
+                    <p style="margin: 0;">Accountant Manager</p>
+                    `
                 });
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail", false);

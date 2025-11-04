@@ -1141,7 +1141,11 @@ sap.ui.define([
                 const totalReceivedAmount = items.reduce((sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0), 0);
                 const totalReceivedTDS = items.reduce((sum, item) => sum + (parseFloat(item.ReceivedTDS) || 0), 0);
                 const totalAmount = parseFloat(items[0]?.TotalAmount || 0);
-                const totalDueAmount = totalAmount - (totalReceivedAmount + totalReceivedTDS);
+                const creditMemoTotal = parseFloat(view.getModel("SelectedCustomerModel")?.getData()?.CreditMemoTotal || 0);
+                let totalDueAmount = totalAmount - (totalReceivedAmount + totalReceivedTDS);
+                if (creditMemoTotal > 0) {
+                    totalDueAmount -= creditMemoTotal;
+                }
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
                 invoiceModel.setProperty("/AllReceivedTDS", totalReceivedTDS.toFixed(2));
@@ -1365,7 +1369,18 @@ sap.ui.define([
                 var that = this;
                 that.loginModel.setProperty("/RichText", true);
                 that.loginModel.setProperty("/SimpleForm", false);
+
                 var modelData = that.getView().getModel("SelectedCustomerModel").getData();
+                var oInvoicePayment = that.getView().getModel("InvoicePayment");
+                var totalAmount = parseFloat(modelData.Total || 0);
+                var receivedAmount = parseFloat(oInvoicePayment.getProperty("/AllReceivedAmount") || 0);
+                var netPayable = totalAmount - receivedAmount;
+                if (netPayable < 0) netPayable = 0;
+
+                var creditMemoHTML = "";
+                if (modelData.CreditMemoTotal > 0) {
+                    creditMemoHTML = `<li><b>Credit Amount : ${this.Formatter.fromatNumber(modelData.CreditMemoTotal)} ${modelData.Currency}</b></li>`;
+                }
 
                 var oUploaderDataModel = new JSONModel({
                     isEmailValid: true,
@@ -1379,25 +1394,26 @@ sap.ui.define([
                     button: true,
                     Subject: "KALPAVRIKSHA TECHNOLOGIES - INVOICE PAYMENT REMAINDER",
                     htmlbody: `<p>Dear Finance Team,</p>
-                    <p>I hope you're doing well. This is a friendly remainder that payment for invoice ${modelData.InvNo}, issued on  ${modelData.InvoiceDate}, is still outstanding.</p>
-                    <li><b>Invoice No : ${modelData.InvNo}</b></li>
-                    <li><b>Due Date : ${modelData.PayByDate}</b></li>
-                    <li><b>Invoice Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
-                    <li><b>Received Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount"))} ${modelData.Currency}</b></li>                   
-                    <li><b>Due Amount : ${this.Formatter.fromatNumber(
+                        <p>I hope you're doing well. This is a friendly remainder that payment for invoice ${modelData.InvNo}, issued on ${modelData.InvoiceDate}, is still outstanding.</p>
+                        <li><b>Invoice No : ${modelData.InvNo}</b></li>
+                        <li><b>Due Date : ${modelData.PayByDate}</b></li>
+                        <li><b>Invoice Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
+                        ${creditMemoHTML}
+                         <li><b>Received Amount : ${this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount"))} ${modelData.Currency}</b></li>                   
+                        <li><b>Due Amount : ${this.Formatter.fromatNumber(
                         this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) === '0.00'
                             ? this.Formatter.fromatNumber(modelData.TotalAmount)
                             : this.Formatter.fromatNumber(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount"))
-                        } ${modelData.Currency}</b></li>                   
-                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
-
-                    <p>If you’ve already made the payment, kindly disregard this remainder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
-                    <p>If you have any questions or need further information, please don't hesitate to contact us.</p>
-                    <p>Thank you for your attention to this matter.</p>
-                   <p style="margin: 0;">Best Regards,</p>                   
-                   <p style="margin: 0;">Finance Department</p>
-                    `
+                        } ${modelData.Currency}</b></li>           
+                        <li><b>Total Amount : ${this.Formatter.fromatNumber(netPayable)} ${modelData.Currency}</b></li>   
+                        <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+                        <p>If you’ve already made the payment, kindly disregard this remainder. Otherwise, we would appreciate it if you could arrange payment as soon as possible.</p>
+                        <p>If you have any questions or need further information, please don't hesitate to contact us.</p>
+                        <p>Thank you for your attention to this matter.</p>
+                        <p style="margin: 0;">Best Regards,</p>                   
+                        <p style="margin: 0;">Finance Department</p>`
                 });
+
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.kt.com.minihrsolution.fragment.CommonMail", true);
             },

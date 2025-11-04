@@ -84,7 +84,7 @@
 											<core:Item key="{CombinedData>MsaID} - {CombinedData>SowID}" text="{parts:[{path:'CombinedData>Description'},{path:'CombinedData>StartDate'},{path:'CombinedData>EndDate'}],formatter: '.Formatter.formatCompanyAndDescription'}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>currency}" required="true"/>
-										<m:ComboBox items="{CurrencyModel>/}" value="{FilteredSOWModel>/Currency}" id="CCI_id_CurrencySelect" change="CID_CurrencyChanges" valueStateText="{i18n>selectCurrency}">
+										<m:ComboBox items="{path:'CurrencyModel>/',length:1000}" value="{FilteredSOWModel>/Currency}" id="CCI_id_CurrencySelect" change="CID_CurrencyChanges" valueStateText="{i18n>selectCurrency}">
 											<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 										</m:ComboBox>
 										<m:Label text="{i18n>creditStatus}" visible="{visiablityPlay>/editVisi}" required="true"/>
@@ -181,7 +181,7 @@
 													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}"  valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}"  enabled="{= ${CompanyInvoiceItemModel>Status} === 'Active' ? true : false}" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />

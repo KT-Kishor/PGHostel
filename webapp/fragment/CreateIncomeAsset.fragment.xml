@@ -147,7 +147,7 @@
                     id="FCIA_id_currency"
                     change="FCIA_onbranchchange"
                     selectedKey="{CreateIncomeAssetModel>/Currency}"
-                    items="{CurrencyModel>/}" valueStateText="{i18n>selectCurrency}"
+                    items="{path:'CurrencyModel>/',length:1000}" valueStateText="{i18n>selectCurrency}"
                 >
                     <core:Item
                         text="{CurrencyModel>currency}"

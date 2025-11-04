@@ -42,7 +42,7 @@
 
 				<!-- Currency -->
 				<Label text="{i18n>currency}" required="true" visible="{ContractFormVisibleModel>/showAmountCurrencyFields}"/>
-				<Select id="CR_id_CurrencySelect" items="{CurrencyModel>/}" selectedKey="{ContractActiveModel>/Currency}" width="100%" class="marginLeft" required="true" visible="{ContractFormVisibleModel>/showAmountCurrencyFields}">
+				<Select id="CR_id_CurrencySelect" items="{path:'CurrencyModel>/',length:1000}" selectedKey="{ContractActiveModel>/Currency}" width="100%" class="marginLeft" required="true" visible="{ContractFormVisibleModel>/showAmountCurrencyFields}">
 					<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
 				</Select>
 
