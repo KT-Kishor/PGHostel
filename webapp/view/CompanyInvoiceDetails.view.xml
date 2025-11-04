@@ -156,15 +156,15 @@
 													<m:Input value="{CompanyInvoiceItemModel>IndexNo}" editable="false" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Particulars}" valueStateText="{i18n>ParticularValueText}" editable="{visiablityPlay>/editable}" maxLength="60" liveChange="onParticularsInputLiveChange" />
+													<m:Input value="{CompanyInvoiceItemModel>Particulars}" valueStateText="{i18n>ParticularValueText}" maxLength="60" liveChange="onParticularsInputLiveChange"   editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }" />
 												</m:cells>
 												<m:cells>
-													<m:ComboBox showSecondaryValues="true" items="{InvoiceSAC>/}" editable="{visiablityPlay>/editable}" value="{CompanyInvoiceItemModel>SAC}" selectedKey="1">
+													<m:ComboBox showSecondaryValues="true" items="{InvoiceSAC>/}"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  value="{CompanyInvoiceItemModel>SAC}" selectedKey="1">
 														<core:ListItem key="{InvoiceSAC>ID}" additionalText="{InvoiceSAC>Description}" text="{InvoiceSAC>SAC}" />
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
-													<m:Select width="100%" editable="{visiablityPlay>/editable}" selectedKey="{CompanyInvoiceItemModel>GSTCalculation}" change="Comp_onChangeGSTCalculation">
+													<m:Select width="100%"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  selectedKey="{CompanyInvoiceItemModel>GSTCalculation}" change="Comp_onChangeGSTCalculation">
 														<core:Item key="{i18n>yes}" text="{i18n>yes}"/>
 														<core:Item key="{i18n>no}" text="{i18n>no}"/>
 													</m:Select>
@@ -172,20 +172,20 @@
 												<m:cells>
 													<m:HBox width="100%" justifyContent="SpaceBetween">
 														<m:VBox width="49%">
-															<m:Input value="{CompanyInvoiceItemModel>Unit}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" textAlign="End" maxLength="15" valueStateText="{i18n>UnitValueText}" />
+															<m:Input value="{CompanyInvoiceItemModel>Unit}"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  change="onChangeSowDetailsCal" textAlign="End" maxLength="15" valueStateText="{i18n>UnitValueText}" />
 														</m:VBox>
 														<m:VBox width="49%">
-															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" change="CI_On_ChangeRateType" editable="{visiablityPlay>/editable}" width="100%">
+															<m:ComboBox items="{RateType>/}" selectedKey="Per Day" value="{CompanyInvoiceItemModel>UnitText}" change="CI_On_ChangeRateType"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  width="100%">
 																<core:Item key="{RateType>ID}" text="{RateType>RateType}" />
 															</m:ComboBox>
 														</m:VBox>
 													</m:HBox>
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Rate}" editable="{visiablityPlay>/editable}" change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
+													<m:Input value="{CompanyInvoiceItemModel>Rate}"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  change="onChangeSowDetailsCal" valueStateText="{i18n>RateValueText}" textAlign="End" maxLength="15" />
 												</m:cells>
 												<m:cells>
-													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information" editable="{visiablityPlay>/editable}" change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
+													<m:Input value="{CompanyInvoiceItemModel>Discount}" showValueHelp="true" valueHelpRequest="CD_onDiscountInfoPress" valueHelpIconSrc="sap-icon://message-information"  editable="{= ${CompanyInvoiceItemModel>isCredit} ? false : ${visiablityPlay>/editable} }"  change="Comp_OnChangeDiscount" textAlign="End" maxLength="15" valueStateText="{i18n>discountInfoText}" />
 												</m:cells>
 												<m:cells>
 													<m:Input value="{path:'CompanyInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}" editable="false" textAlign="End" />
@@ -220,15 +220,79 @@
 												<m:Label text="{i18n>IGST} ({SelectedCustomerModel>/Value}%) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{path: 'FilteredSOWModel>/gstAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
+
 											<!-- Round of -->
 											<m:HBox justifyContent="SpaceBetween">
 												<m:Label text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
 												<m:Text class="amountText" text="{FilteredSOWModel>/RoundOf}" textAlign="End" />
 											</m:HBox>
+
+											<!--  Total -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${SelectedCustomerModel>/CreditMemo} > 0 }">
+												<m:Label text="Total ({FilteredSOWModel>/Currency}) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{path:'SelectedCustomerModel>/TotalAmount', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit Note -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${SelectedCustomerModel>/CreditMemo} > 0 }">
+												<m:Label text="{i18n>CreditNote} ({FilteredSOWModel>/Currency}) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditMemo}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit CGST -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${FilteredSOWModel>/Currency} === 'INR' 
+														&amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST'
+														&amp;&amp; ${SelectedCustomerModel>/CreditCGST} > 0 }">
+												<m:Label text="Credit CGST ({SelectedCustomerModel>/Value}%) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditCGST}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit SGST -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${FilteredSOWModel>/Currency} === 'INR' 
+														&amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST'
+														&amp;&amp; ${SelectedCustomerModel>/CreditSGST} > 0 }">
+												<m:Label text="Credit SGST ({SelectedCustomerModel>/Value}%) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditSGST}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit IGST -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${FilteredSOWModel>/Currency} === 'INR' 
+														&amp;&amp; ${SelectedCustomerModel>/Type} === 'IGST'
+														&amp;&amp; ${SelectedCustomerModel>/CreditIGST} > 0 }">
+												<m:Label text="Credit IGST ({SelectedCustomerModel>/Value}%) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditIGST}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit Round Off -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${SelectedCustomerModel>/CreditRoundOff} > 0 }">
+												<m:Label text="Credit Round Off ({FilteredSOWModel>/Currency}) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{SelectedCustomerModel>/CreditRoundOff}" textAlign="End" />
+											</m:HBox>
+
+											<!-- Credit Memo Total -->
+											<m:HBox justifyContent="SpaceBetween"
+												visible="{= ${SelectedCustomerModel>/CreditMemoTotal} > 0 }">
+												<m:Label text="Credit Memo Total ({FilteredSOWModel>/Currency}) :" 
+													class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
+												<m:Text class="amountText" text="{path:'SelectedCustomerModel>/CreditMemoTotal', formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+											</m:HBox>
+
 											<!-- Total Amount -->
 											<m:HBox justifyContent="SpaceBetween">
 												<m:Label text="{i18n>total} ({FilteredSOWModel>/Currency}) :" class="boldBlackText sapUiTinyMarginBottom rightAlignLabel" />
-												<m:Text class="amountText" text="{path:'FilteredSOWModel>/TotalAmount',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
+												<m:Text class="amountText" text="{path:'FilteredSOWModel>/Total',formatter: '.Formatter.fromatNumber'}" textAlign="End" />
 											</m:HBox>
 											<!-- Received Amount -->
 											<m:HBox justifyContent="SpaceBetween" visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }">

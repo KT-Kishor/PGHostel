@@ -714,6 +714,7 @@ sap.ui.define(
                     this._applyResponsiveVideo("videoFrametour_WorkZone", "videoFrameHtml_WorkZone", "../Videos/Workzone.mp4");
                     this._applyResponsiveVideo("videoFrametour_Customer", "videoFrameHtml_Customer", "../Videos/Kvriksha Customer.mp4");
                     this._applyResponsiveVideo("videoFrametourl_Supplier", "videoFrameHtml_Supplier", "../Videos/Kvriksha Supplier.mp4");
+                    this._applyResponsiveVideo("videoBoxOCR", "videoFrametourOCR", "../Videos/KT OCR.mp4");
                     this._applyResponsiveVideo("videoFrametourl_Shah", "videoFrameHtml_Shah", "../Videos/Shah H.mp4");
                 },
                 _applyResponsiveVideo: function(vBoxId, htmlId, videoUrl) {

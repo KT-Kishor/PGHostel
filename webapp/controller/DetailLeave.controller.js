@@ -43,8 +43,8 @@ sap.ui.define([
                 that.EmployeeDetReadCall("Trainee", {
                     "TraineeID": that.userId
                 });
-                that.getView().byId("AL_id_YearlyChart").setVisible(false);
-                that.getView().byId("AL_id_MonthlyChart").setVisible(false);
+                that.getView().byId("AL_id_YearlyChart").setVisible(true);
+                that.getView().byId("AL_id_MonthlyChart").setVisible(true);
             } else {
                 that.EmployeeDetReadCall("EmployeeDetails", {
                     "EmployeeID": that.userId
@@ -74,7 +74,7 @@ sap.ui.define([
             this.YearlyBarDisplayFunction(that.userId);
             this.MonthBarDisplayFunction(oType, this.year, that.userId);
         },
-       DL_onBack: function () {
+        DL_onBack: function () {
             const oNavSourceModel = this.getOwnerComponent().getModel("NavSource");
             const from = oNavSourceModel ? oNavSourceModel.getProperty("/from") : "";
             if (from === "LeaveOverview") {
@@ -119,7 +119,6 @@ sap.ui.define([
                 this._configureFirstChart("AL_id_VizFrame6", oFirstChartModel, this.i18nModel.getText("currentLeaveQuota"), leaveType);
                 this._configureSecondChart("AL_id_VizFrameAll", oSecondChartModel, this.i18nModel.getText("yearlyLeaveQuota"), leaveType);
 
-
             } catch (error) {
                 this.closeBusyDialog(); //  Close BusyDialog
                 MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -128,7 +127,6 @@ sap.ui.define([
         _configureFirstChart: function(chartId, oModel, titleText, leaveType) {
             let oVizFrame = this.getView().byId(chartId);
             if (!oVizFrame) return;
-
             oVizFrame.setModel(oModel);
 
             // Base rules
@@ -363,15 +361,12 @@ sap.ui.define([
         AL_onPressPie: function() {
             this.getView().getModel("MonthlyBar").setProperty("/type", "pie");
         },
-
         AL_onPressColumn: function() {
             this.getView().getModel("MonthlyBar").setProperty("/type", "column");
         },
-
         AL_onPressBar: function() {
             this.getView().getModel("MonthlyBar").setProperty("/type", "line");
         },
-
         // Leave type change handler
         AL_onChangeLeaveType: function(oEvent) {
             this.getBusyDialog(); // Show busy dialog
@@ -380,7 +375,6 @@ sap.ui.define([
             this.BarDisplayFunction(type, year, this.userId);
             this.MonthBarDisplayFunction(type, year, this.userId);
         },
-
         // Year change handler
         AL_onChangeYears: function(oEvent) {
             this.getBusyDialog(); // Show busy dialog
@@ -392,15 +386,12 @@ sap.ui.define([
         AL_onPressBarChartMonth: function() {
             this.getView().getModel("MonthlyBar").setProperty("/Name", "column");
         },
-
         AL_onPresslineChartMonth: function() {
             this.getView().getModel("MonthlyBar").setProperty("/Name", "line");
         },
-
         AL_onPressAreaChart: function() {
             this.getView().getModel("MonthlyBar").setProperty("/AllStatus", "area");
         },
-
         AL_onPressColumnAllStatus: function() {
             this.getView().getModel("MonthlyBar").setProperty("/AllStatus", "column");
         },

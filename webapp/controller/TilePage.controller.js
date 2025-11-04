@@ -417,6 +417,9 @@ sap.ui.define(
                 TileV_onpressLeaveOverview: function() {
                     this.getRouter().navTo("RouteLeaveOverview");
                 },
+                TileV_onpressCreditNoteApp: function() {
+                    this.getRouter().navTo("RouteCreditNote");
+                },
                 onTileRefresh: async function() {
                     this.getBusyDialog();
                     const backendModels = {

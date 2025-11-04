@@ -812,6 +812,20 @@
                     "target": [
                         "TargetLeaveOverview"
                     ]
+                },
+                {
+                    "name": "RouteCreditNote",
+                    "pattern": "CreditNote",
+                    "target": [
+                        "TargetCreditNote"
+                    ]
+                },
+                {
+                    "name": "RouteCreditNoteDetails",
+                    "pattern": "CreditNoteDetails/{sPath}",
+                    "target": [
+                        "TargetCreditNoteDetails"
+                    ]
                 }
             ],
             "targets": {
@@ -1299,6 +1313,20 @@
                 "clearControlAggregation": false,
                 "viewId": "LeaveOverview",
                 "viewName": "LeaveOverview"
+              },
+               "TargetCreditNote": {
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "CreditNote",
+                "viewName": "CreditNote"
+              },
+              "TargetCreditNoteDetails": {
+                "viewType": "XML",
+                "transition": "slide",
+                "clearControlAggregation": false,
+                "viewId": "CreditNoteDetails",
+                "viewName": "CreditNoteDetails"
               }
             }
         },
