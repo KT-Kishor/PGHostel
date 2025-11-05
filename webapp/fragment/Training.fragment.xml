@@ -11,7 +11,7 @@
                 <Image src="../image/SAPUI.png" width="800px" height="250px" visible="true" class="section-image"/>
                   </HBox> 
                   <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineesapui5}"/>
-                  <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeDes1}"/>
+                  <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeDes1}"/>
                   <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeDes2}"/>      
                   <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeUi5highlight}"/>
                   <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeUi5highlight2}"/>
@@ -33,7 +33,7 @@
                 <Image src="../image/CpamDemo.png" width="800px" height="250px" visible="true" class="section-image"/>
                   </HBox>
                     <Text class="custom-trainee-title sapUiSmallMarginBegin" text="{i18n>traineeCapmtitle}"/>
-                    <Text class="description-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight}"/>
+                    <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight}"/>
                     <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmhighlight2}"/>
                     
                     <Text class="checkmark-text sapUiSmallMarginBegin" text="{i18n>traineeCapmDes1}"/>
