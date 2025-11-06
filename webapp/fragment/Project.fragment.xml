@@ -76,7 +76,7 @@
 	</l:Grid>
 
     <!-- Intelligent Docket Automation -->
-	<g:GridContainer class="carrer-office-tour sapUiSmallMargin">
+	<g:GridContainer class="Product-office-tour sapUiMediumMargin">
 		<g:layout>
 			<g:GridContainerSettings columnSize="49.5%" gap="10px" />
 		</g:layout>
@@ -94,11 +94,10 @@
 			<core:HTML id="videoFrametourOCR"
                             content="&lt;div style='width:560px;height:315px;overflow:hidden;border-radius:15px;background:#f3f3f3;'&gt;&lt;iframe src='../Videos/KT OCR.mp4'  allowfullscreen 
                             style='width:100%;height:100%;border:none;'&gt;&lt;/iframe&gt; &lt;/div&gt;" />
-			<Text class="description-text sapUiSmallMargin" text="{i18n>orcResult}" />
 		</VBox>
 		<!-- Right Column -->
 		<VBox alignItems="Start" justifyContent="Center">
-			<Text class="hr-text sapUiSmallMargin" text="Intelligent Docket Automation" />
+			<Text class="hr-text sapUiSmallMargin" text="Intelligent Docket Automation (Document AI)" />
 			<Text class="description-text sapUiSmallMargin" text="{i18n>OCR}" />
 		</VBox>
 	</g:GridContainer>

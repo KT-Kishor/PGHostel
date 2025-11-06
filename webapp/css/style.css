@@ -2965,3 +2965,33 @@ body, html, .sapUiBody {
   word-break: break-word !important;
   max-width: 50px !important;
 }
+
+.Product-office-tour {
+  margin: 2rem 3rem;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  color: #2a5d66;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+/* Tablet screens */
+@media (max-width: 1024px) {
+  .Product-office-tour {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+  .Product-office-tour {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+}
+
+.Product-office-tour {
+  margin-bottom: 0 !important;
+}
+
