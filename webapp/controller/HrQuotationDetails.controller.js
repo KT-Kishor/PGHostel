@@ -1295,6 +1295,7 @@ sap.ui.define(
           "HQD_id_InputCompanyMobileNo",
           "HQD_id_CompanyEmailID",
           "HQD_id_Country",
+          "HRQstate",
           "HQD_id_InputCompanyAddress",
           "HQD_id_CompGSTNO",
           "HQD_id_Percentage",

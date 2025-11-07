@@ -216,14 +216,16 @@ sap.ui.define([
             },
 
             CD_CommonID: function () {
-                const ids = ["CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation", "CD_id_ConsultingService", "CD_id_codeModel", "CD_id_Mobile", "CD_id_DateEnd", "CD_id_Datestart"]
+                const ids = ["CD_id_CompanyCode", "CD_id_CName", "CD_id_Address", "CD_id_Email", "CD_id_Amount", "CD_id_EndClientHirer", "CD_id_Locationcomb", "CD_id_HiringContact", "CD_id_ConLocation", "CD_id_ConsultingService", "CD_id_codeModel", "CD_id_Mobile", "CD_id_DateEnd", "CD_id_Datestart", "CD_id_InsuranceReq", "CD_id_Warranty", "CD_id_AddRate",
+                    "CD_id_PaymentTerms", "CD_id_Country", "CD_id_State" 
+                ]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");
                 });
             },
 
             CU_CommonID: function () {
-                const ids = ["CU_id_ConsultantName", "CU_id_Role", "CU_id_ContractEmailID", "CU_id_ContractAddress", "CU_id_EndClient", "CU_id_ClientReportContact", "CU_id_EditAmountInput", "CU_id_Country", "CU_id_ContractCity", "CU_id_codeModel",
+                const ids = ["CU_id_CompanyCode", "CU_id_ConsultantName", "CU_id_Role", "CU_id_ContractEmailID", "CU_id_ContractAddress", "CU_id_EndClient", "CU_id_ClientReportContact", "CU_id_EditAmountInput", "CU_id_Country", "CU_id_ContractCity", "CU_id_codeModel", "CU_id_AgreementDate", "CU_id_AssignmentStartDate", "CU_id_AssignmentEndDate", "CD_id_contractLocation", "CD_id_contractStatus", "CU_id_WarrantyDate", "CU_id_PaymentTerms", "CU_id_InsuranceRequirement", "CU_id_Country", "CU_id_State", 
                     "CU_id_Mobile", "CU_id_Comments"]
                 ids.forEach((id) => {
                     this.byId(id).setValueState("None");

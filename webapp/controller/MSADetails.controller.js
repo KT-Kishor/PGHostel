@@ -132,6 +132,8 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       this.byId("Msa_Id_Refund").setValueState("None");
       this.byId("MsaD_id_ContractPeriod").setValueState("None");
       this.byId("MsaD_id_Branch").setValueState("None");
+      this.byId("MSA_Id_codeModel").setValueState("None");
+      this.byId("MSA_Id_State").setValueState("None");
     },
     MsaD_onBack: function () {
       this.getRouter().navTo("RouteMSA");

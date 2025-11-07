@@ -467,6 +467,9 @@ sap.ui.define(["./BaseController", "../model/formatter", "../utils/validation", 
         this.byId("SS_id_STDCodeRII").setValueState("None");
         this.byId("SS_id_FatherName").setValueState("None");
         this.byId("SS_id_Compmail").setValueState("None");
+        this.byId("SS_id_Country").setValueState("None");
+        this.byId("SS_id_State").setValueState("None");
+        this.byId("SS_id_BaseL").setValueState("None");
       } catch (error) {
         MessageToast.show(error.message || error.responseText);
      }  finally {

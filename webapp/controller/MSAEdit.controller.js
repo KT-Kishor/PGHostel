@@ -413,6 +413,12 @@ _applyCountryStateCityFilters: function () {
       oView.byId("Ms_Id_PayAdvance")?.setValueState("None");
       oView.byId("Ms_Id_PayBalance")?.setValueState("None");
       oView.byId("Ms_Id_Refund")?.setValueState("None");
+      oView.byId("MsaE_Id_Branch")?.setValueState("None");
+      oView.byId("MsaE_id_MsaAddress")?.setValueState("None");
+      oView.byId("MSA_Nav_Id_Country")?.setValueState("None");
+      oView.byId("MSA_Nav_Id_State")?.setValueState("None");
+      oView.byId("MSA_Nav_Id_City")?.setValueState("None");
+      oView.byId("Msa_LC_Mobile")?.setValueState("None");
     },
 
     MSA_Frg_Close: function () {
