@@ -222,9 +222,9 @@
                                 <Toolbar class="customdashboard">
                                     <Title text="{i18n>paymentBreakdown}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
+                                    <Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>barChartTooltip}"/>
                                     <Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedHorizontalTooltip}"/>
                                     <Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="{i18n>groupedHorizontalTooltip}"/>
-                                    <Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>barChartTooltip}"/>
                                 </Toolbar>
                             </f:header>
                             <f:content>
@@ -238,30 +238,29 @@
                                                         width="100%"
                                                         vizProperties="{
                                                             title: { visible: false },
-                                                            plotArea: { dataLabel: { visible: false, formatString: '#' } },
+                                                            plotArea: { 
+                                                                dataLabel: { visible: false, formatString: '#' },
+                                                                colorPalette: ['#2196F3', '#FFC107','#4CAF50' ] 
+                                                            },
                                                             interaction: { selectability: { mode: 'SINGLE' } }
-                                                        }"
+                                                            }"
                                                         selectData="onPaymentBreakdownSelect">
                                                         <viz:dataset>
                                                             <vizData:FlattenedDataset data="{chartData>/paymentBreakdown}">
                                                                 <vizData:dimensions> <vizData:DimensionDefinition name="Company" value="{chartData>companyName}" /> </vizData:dimensions>
                                                               <vizData:measures>
-    <vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
-    <vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
-    <!-- <vizData:MeasureDefinition name="TDS Amount" value="{chartData>tdsAmount}" /> -->
-    <!-- <vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" />  -->
-</vizData:measures>
-
+                                                                <vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
+                                                                <vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
+                                                                <vizData:MeasureDefinition name="Credit Notes Amount" value="{chartData>CreditNotesTotalAmount}" />
+                                                                <!-- <vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" />  -->
+                                                            </vizData:measures>
                                                             </vizData:FlattenedDataset>
                                                         </viz:dataset>
                                                         <viz:feeds>
-    <vizFeeds:FeedItem uid="valueAxis" type="Measure" 
-        values="Taxable Amount,GST Amount" />
-    <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
-</viz:feeds>
-
+                                                        <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Taxable Amount,GST Amount,Credit Notes Amount" />
+                                                        <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Company" />
+                                                    </viz:feeds>
                                                     </viz:VizFrame>
-                                              
                                             </com:content>
 										</com:ChartContainerContent>
 									</com:content>
@@ -306,6 +305,88 @@
                                                     </viz:VizFrame>
                                               
                                             </com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+                            </f:content>
+                        </f:Card>
+                    </layout:content>
+                </layout:Grid>
+
+                <layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiResponsiveMargin">
+                    <layout:content>
+                        <!-- 7. Status Distribution Chart -->
+                        <f:Card class="sapUiTinyMargin">
+                            <f:header>
+                                <Toolbar class="customdashboard">
+                                    <Title text="{i18n>invoiceStatusDashCredit}" level="H5" wrapping="true" class="Dashboardtitle"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChartTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChartTooltip}"/>
+                                    <Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChartTooltip}"/>
+                                </Toolbar>
+                            </f:header>
+                            <f:content>
+                                <com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+                                                <viz:VizFrame id="donutChartStatusCreditNote" vizType="{invoiceChartTypeModel>/statusType}" width="100%"  vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }" selectData="onStatusChartSelectCreditNote">
+                                                    <viz:dataset>
+                                                        <vizData:FlattenedDataset data="{chartData>/statusDistributionCreditNote}">
+                                                            <vizData:dimensions> <vizData:DimensionDefinition name="Status" value="{chartData>status}" /> </vizData:dimensions>
+                                                            <vizData:measures> <vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" /> </vizData:measures>
+                                                        </vizData:FlattenedDataset>
+                                                    </viz:dataset>
+                                                    <viz:feeds>
+                                                        <vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
+                                                        <vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
+                                                    </viz:feeds>
+                                                </viz:VizFrame>
+                                	        </com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+                            </f:content>
+                        </f:Card>
+
+                        <!-- 8. Monthly Trend Chart -->
+                        <f:Card class="sapUiTinyMargin">
+                            <f:header>
+                                <Toolbar class="customdashboard">
+                                    <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true" class="Dashboardtitle"/>
+                                    <ToolbarSpacer/>
+                                    <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalchartTooltip}"/>
+                                    <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
+                                    <Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChartTooltip}"/>
+                                </Toolbar>
+                            </f:header>
+                            <f:content>
+                            	<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+                                                    <viz:VizFrame id="lineChartMonthlyCreditNote"
+                                                        vizType="{invoiceChartTypeModel>/monthlyType}"
+                                                        width="100%"
+                                                        vizProperties="{
+                                                            title: { visible: false },
+                                                            plotArea: { dataLabel: { visible: false, formatString: '#' } },
+                                                            interaction: { selectability: { mode: 'SINGLE' } }
+                                                        }"
+                                                        selectData="onMonthlyInvoiceSelectCreditNote">
+                                                    <viz:dataset>
+                                                        <vizData:FlattenedDataset data="{chartData>/monthlyValueCreditNote}">
+                                                            <vizData:dimensions> <vizData:DimensionDefinition name="Month" value="{chartData>month}" /> </vizData:dimensions>
+                                                            <vizData:measures> <vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" /> </vizData:measures>
+                                                        </vizData:FlattenedDataset>
+                                                    </viz:dataset>
+                                                    <viz:feeds>
+                                                        <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+                                                        <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Month" />
+                                                    </viz:feeds>
+                                                </viz:VizFrame>
+                                	        </com:content>
 										</com:ChartContainerContent>
 									</com:content>
 								</com:ChartContainer>

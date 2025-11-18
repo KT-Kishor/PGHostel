@@ -200,67 +200,67 @@ sap.ui.define([
             }
         },
 
-       fromatNumber: function(currencyOrValue, totalAmount, amountInINR) {
-    var avalue;
+        fromatNumber: function (currencyOrValue, totalAmount, amountInINR) {
+            var avalue;
 
-    // If only one argument passed, treat it as value to format
-    if (totalAmount === undefined && amountInINR === undefined) {
-        avalue = currencyOrValue;
-    } else {
-        // Multiparameter call from multi-part binding
-        avalue = currencyOrValue === "INR" ? totalAmount : amountInINR;
-    }
-    
-    if (avalue === "0" || avalue === 0) {
-        return "- -";
-    }
-    var numericValue = parseFloat(avalue);
-    if (isNaN(numericValue)) {
-        return "";
-    }
+            // If only one argument passed, treat it as value to format
+            if (totalAmount === undefined && amountInINR === undefined) {
+                avalue = currencyOrValue;
+            } else {
+                // Multiparameter call from multi-part binding
+                avalue = currencyOrValue === "INR" ? totalAmount : amountInINR;
+            }
 
-    var oFormatOptions = {
-        groupingBaseSize: 3,
-        groupingSize: 2,
-        minIntegerDigits: 1,
-        minFractionDigits: 2,
-        maxFractionDigits: 4
-    };
-    
-    var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
-    return oFloatFormat.format(numericValue);
-},
+            if (avalue === "0" || avalue === 0) {
+                return "- -";
+            }
+            var numericValue = parseFloat(avalue);
+            if (isNaN(numericValue)) {
+                return "";
+            }
 
- NotificationNumber: function(currencyOrValue, totalAmount, amountInINR) {
-    var avalue;
+            var oFormatOptions = {
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
+                minFractionDigits: 2,
+                maxFractionDigits: 4
+            };
 
-    // If only one argument passed, treat it as value to format
-    if (totalAmount === undefined && amountInINR === undefined) {
-        avalue = currencyOrValue;
-    } else {
-        // Multiparameter call from multi-part binding
-        avalue = currencyOrValue === "INR" ? totalAmount : amountInINR;
-    }
-    
-    if (avalue === "0" || avalue === 0) {
-        return "- -";
-    }
-    var numericValue = parseFloat(avalue);
-    if (isNaN(numericValue)) {
-        return "";
-    }
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+            return oFloatFormat.format(numericValue);
+        },
 
-    var oFormatOptions = {
-        groupingBaseSize: 3,
-        groupingSize: 2,
-        minIntegerDigits: 1,
-        minFractionDigits: 2,
-        maxFractionDigits: 4
-    };
-    
-    var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
-    return oFloatFormat.format(numericValue) + " INR";
-},
+        NotificationNumber: function (currencyOrValue, totalAmount, amountInINR) {
+            var avalue;
+
+            // If only one argument passed, treat it as value to format
+            if (totalAmount === undefined && amountInINR === undefined) {
+                avalue = currencyOrValue;
+            } else {
+                // Multiparameter call from multi-part binding
+                avalue = currencyOrValue === "INR" ? totalAmount : amountInINR;
+            }
+
+            if (avalue === "0" || avalue === 0) {
+                return "- -";
+            }
+            var numericValue = parseFloat(avalue);
+            if (isNaN(numericValue)) {
+                return "";
+            }
+
+            var oFormatOptions = {
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
+                minFractionDigits: 2,
+                maxFractionDigits: 4
+            };
+
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+            return oFloatFormat.format(numericValue) + " INR";
+        },
 
 
         bytesToMB: function (bytes) {
@@ -372,8 +372,8 @@ sap.ui.define([
             }
         },
 
-       LPAattach: function (sValue) {
-            if (!sValue && sValue !== 0) { 
+        LPAattach: function (sValue) {
+            if (!sValue && sValue !== 0) {
                 return "";
             }
             return sValue + " LPA";
@@ -385,12 +385,37 @@ sap.ui.define([
             }
             return sValue;
         },
-        
-      combineTitle: function(invoiceForText, status) {
-    if (!invoiceForText) invoiceForText = "";
-    if (!status) status = "";
-    return invoiceForText + " '" + status + "'";
-}
+
+        combineTitle: function (invoiceForText, status) {
+            if (!invoiceForText) invoiceForText = "";
+            if (!status) status = "";
+            return invoiceForText + " '" + status + "'";
+        },
+        formatAmountWithCurrency: function (amount, currency) {
+
+            // If amount is missing or not a number → show placeholder
+            if (amount === null || amount === undefined || amount === "" || isNaN(amount)) {
+                return "-- ";
+            }
+
+            // Convert amount safely to number
+            var numericValue = parseFloat(amount);
+
+            // Define formatting options
+            var oFormatOptions = {
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
+                minFractionDigits: 2,
+                maxFractionDigits: 4
+            };
+
+            // Create number formatter
+            var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+
+            // Format amount + add currency
+            return oFloatFormat.format(numericValue) + " " + (currency || "");
+        }
 
 
     }

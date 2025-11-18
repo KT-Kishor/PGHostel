@@ -2,7 +2,6 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core">
     <Dialog
-        id="MonthlyInvoiceDialog"
         contentWidth="800px"
         contentHeight="400px"
         resizable="true"
@@ -24,26 +23,19 @@
                 noDataText="{i18n>nomonthlydata}">
                 <columns>
                   <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
+                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>creditMemoNo}" /></Column>
                     <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceDate}" /></Column>
                      <Column demandPopin="true" hAlign="Left" minScreenWidth="Tablet"><Text text="{i18n>customerName}" /></Column>
-                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>transactionAmount}" /></Column>
-                    <Column demandPopin="true" hAlign="End"><Text text="{i18n>creditNotesAmount}" /></Column>
-                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>exchRate}" /></Column>
-                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>totalAmount}" /></Column>
-                    <Column demandPopin="true" hAlign="Left"><Text text="{i18n>status}" /></Column>
+                    <Column demandPopin="true" hAlign="End"><Text text="{i18n>totalAmount}" /></Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="onPendingInvoicePress">
                         <cells>
                             <Text text="{dialogData>InvNo}" />
+                            <Text text="{dialogData>CCInvNo}" />
                             <Text text="{ path: 'dialogData>InvoiceDate', formatter:'.Formatter.formatDate'}" />
                             <Text text="{dialogData>CustomerName}" />
                             <ObjectNumber number="{parts: [ { path: 'dialogData>TotalAmount' } ], formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
-                            <!-- <ObjectNumber number="{parts: [{ path: 'dialogData>CreditNotesTotal' }],formatter: '.Formatter.fromatNumber'}"/> -->
-                            <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
-                            <ObjectIdentifier title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"/>
-                            <ObjectNumber number="{parts: [{ path: 'dialogData>Currency' },{ path: 'dialogData>TotalAmount' },{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
-                            <Text text="{dialogData>Status}" />
                         </cells>
                     </ColumnListItem>
                 </items>

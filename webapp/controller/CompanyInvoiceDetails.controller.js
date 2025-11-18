@@ -113,7 +113,7 @@ sap.ui.define([
                     Edit: true,
                     IncomeTax: true,
                     minDate: LastInvoiceDate,
-                    isCredit: true 
+                    isCredit: true
                 }), "visiablityPlay");
 
                 var SowDataModel = new JSONModel({
@@ -540,7 +540,7 @@ sap.ui.define([
                 const RoundOff = roundOffNormal > 0 ? `+${roundOffNormal}` : roundOffNormal;
 
                 // --- CREDIT MEMO CALCULATION ---
-                let creditCGST = 0, creditSGST = 0, creditIGST = 0, creditGSTAmt = 0;  
+                let creditCGST = 0, creditSGST = 0, creditIGST = 0, creditGSTAmt = 0;
                 let creditFinal = creditTaxable + creditNonTaxable;
                 if (creditTaxable > 0 && currency === "INR") {
                     if (gstType === "CGST/SGST") {
@@ -567,7 +567,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
                 oCustomerModel.setProperty("/IGST", igst.toFixed(2));
                 oCustomerModel.setProperty("/RoundOff", RoundOff);
-               
+
                 oCustomerModel.setProperty("/CreditMemo", creditTaxable.toFixed(2));
                 oCustomerModel.setProperty("/CreditCGST", creditCGST.toFixed(2));
                 oCustomerModel.setProperty("/CreditSGST", creditSGST.toFixed(2));
@@ -593,10 +593,20 @@ sap.ui.define([
                 if (oEvent) {
                     utils._LCvalidateAmount(oEvent);
                 }
-                var oModel = this.getView().getModel("SelectedCustomerModel").getData().Total;
-                var value = this.getView().getModel("SelectedCustomerModel");
-                var data = parseFloat(value.getData().ConversionRate) * parseFloat(oModel);
-                value.setProperty("/AmountInFCurrency", parseFloat(data).toFixed(2));
+                var oModel = this.getView().getModel("SelectedCustomerModel");
+                var oData = oModel.getData();
+                // Decide which amount to use: DueAmount OR Total
+                var baseAmount = 0;
+                if (oData.DueAmount) {
+                    baseAmount = parseFloat(oData.DueAmount);
+                } else {
+                    baseAmount = parseFloat(oData.Total);
+                }
+                // Apply Conversion Rate
+                var conversionRate = parseFloat(oData.ConversionRate) || 0;
+                var convertedValue = baseAmount * conversionRate;
+                // Set AmountInFCurrency
+                oModel.setProperty("/AmountInFCurrency", convertedValue.toFixed(2));
             },
 
             onChangeSowDetailsCal: async function (oEvent) {
@@ -1326,7 +1336,7 @@ sap.ui.define([
                     sap.m.MessageBox.warning("Credit memo cannot be deleted.", {
                         title: "Delete Not Allowed"
                     });
-                    return; 
+                    return;
                 }
                 if (oContext.getObject().ItemID) {
                     this.showConfirmationDialog(

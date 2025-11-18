@@ -822,7 +822,7 @@
                 },
                 {
                     "name": "RouteCreditNoteDetails",
-                    "pattern": "CreditNoteDetails/{sPath}",
+                    "pattern": "CreditNoteDetails/{sPath}/{dash}",
                     "target": [
                         "TargetCreditNoteDetails"
                     ]

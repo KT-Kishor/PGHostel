@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast, Fragment, Formatter) {
     "use strict";
     // Define the initial default chart types as a constant for clarity and easy maintenance.
-    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "stacked_bar", pendingByCompanyType: "column" };
+    const INITIAL_CHART_TYPES = { statusType: "donut", monthlyType: "line", companyType: "bar", yearlyType: "line", paymentBreakdownType: "bar", pendingByCompanyType: "column" };
     return BaseController.extend("sap.kt.com.minihrsolution.controller.InvoiceDashboard", {
         Formatter: Formatter,
 
@@ -15,7 +15,7 @@ sap.ui.define([
         _aCurrentFilteredData: [],
 
         onInit: function () {
-            const oChartData = { statusDistribution: [], monthlyValue: [], companyTotals: [], yearlyTrend: [], paymentBreakdown: [], pendingByCompany: [] };
+            const oChartData = { statusDistribution: [], monthlyValue: [], companyTotals: [], yearlyTrend: [], paymentBreakdown: [], pendingByCompany: [], statusDistributionCreditNote: [], monthlyValueCreditNote: [] };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel([]), "companies");
             // Initialize the chart type model with the default values.
@@ -32,7 +32,7 @@ sap.ui.define([
             this.getView().getModel("LoginModel").setProperty("/HeaderName", this.i18nModel.getText("invoiceDashboard"));
             this.byId("donutChartStatus").vizSelection([], { clearSelection: true });
             if (this._pPopover) { this._pPopover.then(oPopover => oPopover.close()); }
-            
+
             var legendPosition = sap.ui.Device.system.phone ? "left" : "right";
             oVizFrame.setVizProperties({
                 legend: {
@@ -47,7 +47,31 @@ sap.ui.define([
             try {
                 this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("CompanyInvoice");
-                this.rawInvoiceData = (Array.isArray(oData.data) ? oData.data : [oData.data]);
+                const CreditNote = await this.ajaxReadWithJQuery("CreditNote");
+
+                this.rawInvoiceData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                this.creditNotesData = Array.isArray(CreditNote.data) ? CreditNote.data : [CreditNote.data];
+
+                // Merge logic
+                this.rawInvoiceData = this.rawInvoiceData.map(invoice => {
+                    const matchedNotes = this.creditNotesData.filter(cn => cn.InvNo === invoice.InvNo);
+                    invoice.CCInvNo = matchedNotes[0]?.CCInvNo || "";
+                    if (invoice.Currency === "INR") {
+                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
+                    } else {
+                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.AmountInINR || 0), 0);
+                    }
+                    const creditNotesInINR = invoice.Currency === "INR" ? matchedNotesTotal : matchedNotesTotal * Number(invoice.ConversionRate || 1);
+
+                    return {
+                        ...invoice,
+                        CreditNotes: matchedNotes,
+                        CreditNotesTotal: matchedNotesTotal,
+                        TotalAmount: Number(invoice.TotalAmount || 0),
+                        AmountInINR: Number(invoice.AmountInINR || 0) - creditNotesInINR
+                    };
+                });
+
                 const uniqueCompanies = [...new Set(this.rawInvoiceData.map(item => item.CustomerName))];
                 this.getView().getModel("companies").setData(uniqueCompanies.map(c => ({ key: c, text: c })));
                 const today = new Date();
@@ -64,6 +88,7 @@ sap.ui.define([
                 }
 
                 this.byId("yearFilter").setValue(financialYear);
+                this.InvoicePaymentDetail = await this.ajaxReadWithJQuery("InvoicePaymentDetail");
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
@@ -86,8 +111,7 @@ sap.ui.define([
 
             // set back to DatePicker as string
             this.byId("yearFilter").setValue(financialYear);
-        }
-        ,
+        },
 
         onFilterChange: function () {
             if (!this.rawInvoiceData) return;
@@ -104,13 +128,6 @@ sap.ui.define([
                     let dFrom = oDateRange.getDateValue();
                     let dTo = oDateRange.getSecondDateValue();
 
-                    //  Clear year if date range is selected
-                    // if (dFrom && dTo) {
-                    //     oYearFilter.setValue("");
-                    //     sSelectedYear = "";
-                    // }
-
-                    //  Clear date range if year is selected
                     if (sSelectedYear) {
                         oDateRange.setValue("");
                         dFrom = null;
@@ -140,11 +157,14 @@ sap.ui.define([
 
                     this._aCurrentFilteredData = aFilteredData;
 
+                    const creditInvNos = aFilteredData.map(cn => cn.InvNo);
+                    const aFilterDataCreditNote = this.creditNotesData.filter(inv => creditInvNos.includes(inv.InvNo));
+
                     let aYearlyTrendData = (aSelectedCompanies.length > 0) ?
                         this.rawInvoiceData.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName)) :
                         this.rawInvoiceData;
 
-                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData);
+                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, aFilterDataCreditNote);
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
@@ -164,19 +184,14 @@ sap.ui.define([
                     amount = parseFloat(item.AmountInINR || 0);
                 }
             } else if (item.Status === "Payment Partially") {
-                amount = parseFloat(item.DueAmount || 0);
+                amount = item.Currency === "INR" ? parseFloat(item.TotalAmount || 0) : parseFloat(item.DueAmount || 0);
             } else {
-
                 amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
             }
 
             if (item.Currency === "INR") {
                 return amount;
             }
-            // const totalAmount = parseFloat(item.TotalAmount || 0); 
-            // if (item.Currency === "INR") {
-            //     return totalAmount;
-            // }
             const amountInINR = parseFloat(item.AmountInINR || 0);
             if (amountInINR > 0) {
                 return amountInINR;
@@ -195,7 +210,8 @@ sap.ui.define([
             return numValue * conversionRate;
         },
 
-        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
+        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData, aFilterDataCreditNote) {
+            const AllFilteredData = aFilteredData || [];
             //  fiscal start year from a date Apr-Mar FY
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
@@ -227,18 +243,33 @@ sap.ui.define([
             const pendingByCompany = aFilteredData
                 .filter(item => pendingStatuses.includes(item.Status))
                 .reduce((acc, item) => {
-                    acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
+                    // acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
+                    if (item.Currency === "INR") {
+                        acc[item.CustomerName] = (acc[item.CustomerName] || 0) + (item.DueAmount) ? parseFloat(item.DueAmount || item.TotalAmount) - parseFloat(item.CreditNotesTotal || 0) : item.TotalAmount || 0;
+                    } else {
+                        const data = parseFloat(item.DueAmount || item.TotalAmount) - parseFloat(item.CreditNotesTotal || 0);
+                        acc[item.CustomerName] = (acc[item.CustomerName] || 0) + data * parseFloat(item.ConversionRate || 1);
+                    }
                     return acc;
                 }, {});
 
             this._oGroupedInvoices = {};
-            const statusAmounts = aFilteredData.reduce((acc, item) => {
+            const statusAmounts = AllFilteredData.reduce((acc, item) => {
                 const status = item.Status || "Unknown";
                 if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
-                this._oGroupedInvoices[status].push(item);
 
-                const totalAmount = this._getInrValue(item);
-                acc[status] = (acc[status] || 0) + totalAmount;
+                // const totalAmount = this._getInrValue(item);
+                let TotalAmount = 0;
+                if (item.Currency === "INR") {
+                    TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                    item.TotalAmount = TotalAmount;
+                } else {
+                    var data = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                    TotalAmount = data * parseFloat(item.ConversionRate || 1);
+                    item.AmountInINR = TotalAmount
+                }
+                this._oGroupedInvoices[status].push(item);
+                acc[status] = (acc[status] || 0) + TotalAmount;
                 return acc;
             }, {});
 
@@ -247,24 +278,30 @@ sap.ui.define([
                 const company = item.CustomerName;
 
                 if (!acc[company]) {
-                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0, invoices: [] };
+                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0, CreditNotesTotalAmount: 0, invoices: [] };
                 }
 
                 const totalGst = this._convertToInr(item.CGST, item) +
                     this._convertToInr(item.SGST, item) +
                     this._convertToInr(item.IGST, item);
 
+                // Existing Aggregations
                 acc[company].taxableAmount += this._convertToInr(item.SubTotalInGST, item);
                 acc[company].gstAmount += totalGst;
                 acc[company].tdsAmount += this._convertToInr(item.IncomeTax, item);
 
-                //  Always push invoice details
+                // ⭐ New Aggregation for Credit Notes Total
+                acc[company].CreditNotesTotalAmount += (item.Currency === "INR") ? Number(item.CreditNotesTotal || 0) : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate) || 0);
+
+                // Store invoice details
                 acc[company].invoices.push({
                     InvNo: item.InvNo,
+                    CCInvNo: item.CCInvNo,
                     SubTotalInGST: this._convertToInr(item.SubTotalInGST, item),
                     gstAmount: totalGst,
                     IncomeTax: this._convertToInr(item.IncomeTax, item),
-                    totalAmountInINR: this._getInrValue(item)
+                    totalAmountInINR: this._getInrValue(item),
+                    CreditNotesTotal: (item.Currency === "INR") ? Number(item.CreditNotesTotal || 0) : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate) || 0)
                 });
 
                 return acc;
@@ -324,17 +361,22 @@ sap.ui.define([
                     totalAmountInINR: totalAmount
                 }));
 
-
             let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => {
                 const totalAmountInINR = values.invoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
 
-                // if all values are 0 → fall back to total
+                // Calculate total credit notes for this company
+                const CreditNotesTotalAmount = values.invoices.reduce((sum, inv) => {
+                    return sum + Number(inv.CreditNotesTotal || 0);
+                }, 0);
+
+                // If all amounts are 0 → fallback to total
                 if (values.taxableAmount === 0 && values.gstAmount === 0 && values.tdsAmount === 0) {
                     return {
                         companyName: name,
                         taxableAmount: totalAmountInINR,
                         gstAmount: 0,
                         tdsAmount: 0,
+                        CreditNotesTotalAmount: CreditNotesTotalAmount,
                         invoices: values.invoices
                     };
                 }
@@ -344,14 +386,63 @@ sap.ui.define([
                     taxableAmount: values.taxableAmount,
                     gstAmount: values.gstAmount,
                     tdsAmount: values.tdsAmount,
+                    CreditNotesTotalAmount: CreditNotesTotalAmount,
                     invoices: values.invoices
                 };
             });
 
+            this._oGroupedInvoicesCreditNote = {};
+            const statusAmountsCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
+                const status = item.Status || "Unknown";
+                if (!this._oGroupedInvoicesCreditNote[status]) {
+                    this._oGroupedInvoicesCreditNote[status] = [];
+                }
+                let totalAmountInINR = 0;
+                if (item.Currency === "INR") {
+                    totalAmountInINR = parseFloat(item.TotalAmount || 0);
+                } else {
+                    const base = parseFloat(item.AmountInINR || item.TotalAmount || 0);
+                    const rate = parseFloat(item.ConversionRate || 1);
+                    totalAmountInINR = base * rate;
+                }
+                this._oGroupedInvoicesCreditNote[status].push({
+                    InvNo: item.InvNo,
+                    TotalAmountINR: totalAmountInINR,
+                    OriginalItem: item
+                });
+                acc[status] = (acc[status] || 0) + totalAmountInINR;
+                return acc;
+            }, {});
 
-            // formattedPaymentBreakdown = formattedPaymentBreakdown.filter(company =>
-            //     company.taxableAmount > 0 || company.gstAmount > 0 || company.tdsAmount > 0
-            // );
+            // Convert for charts
+            const formattedStatusCreditNote = Object.entries(statusAmountsCreditNote).map(([status, totalAmount]) => ({
+                status,
+                totalAmountInINR: totalAmount
+            }));
+
+            const monthlyValueCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
+                if (!item || !item.InvoiceDate) return acc;
+
+                const d = new Date(item.InvoiceDate);
+                if (isNaN(d.getTime())) return acc;
+
+                const month = d.getMonth(); // 0 to 11
+                const amountInINR = this._getInrValue(item) || 0;
+
+                acc[month] = (acc[month] || 0) + amountInINR;
+                return acc;
+            }, {});
+
+            // --- Format monthly values for chart ---
+            const formattedMonthlyCreditNote = monthNames.map((monthName, idx) => {
+                const realMonth = (idx + 3) % 12; // April = index 0
+                const displayYear = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
+
+                return {
+                    month: `${monthName}-${displayYear}`,
+                    totalAmountInINR: monthlyValueCreditNote[realMonth] || 0
+                };
+            });
 
             // ------ Set model data ------
             this.getView().getModel("chartData").setData({
@@ -360,11 +451,12 @@ sap.ui.define([
                 companyTotals: formattedCompanyTotals,
                 yearlyTrend: formattedYearlyTrend,
                 paymentBreakdown: formattedPaymentBreakdown,
-                pendingByCompany: formattedPending
+                pendingByCompany: formattedPending,
+                statusDistributionCreditNote: formattedStatusCreditNote,
+                monthlyValueCreditNote: formattedMonthlyCreditNote
             });
             this._formattedPaymentBreakdown = formattedPaymentBreakdown;
-        }
-        ,
+        },
 
         // --- EVENT HANDLERS FOR CHART SELECTIONS ---
         onStatusChartSelect: function (oEvent) {
@@ -392,7 +484,16 @@ sap.ui.define([
             this._pPopover.then(oPopover => {
                 oPopover.setModel(new JSONModel({
                     status: sStatus,
-                    invoices: aInvoicesForStatus
+                    invoices: aInvoicesForStatus,
+                    AllTotalAmount: aInvoicesForStatus.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.TotalAmount || 0);
+                        } else {
+                            amount = parseFloat(inv.AmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
                 }), "popoverData");
 
                 // Set dynamic title combining i18n text and status
@@ -404,6 +505,60 @@ sap.ui.define([
             });
         },
 
+        onStatusChartSelectCreditNote: function (oEvent) {
+            const oSelectedData = oEvent.getParameter("data")[0].data;
+            if (!oSelectedData || !oSelectedData.Status) return;
+            const sStatus = oSelectedData.Status;
+            let aOriginalInvoices = (this._oGroupedInvoicesCreditNote[sStatus] || []).map(i => i.OriginalItem);
+
+            // Sort OriginalItems directly
+            aOriginalInvoices = aOriginalInvoices.sort((a, b) => {
+                const dA = new Date(a.InvoiceDate);
+                const dB = new Date(b.InvoiceDate);
+                return dB - dA; // latest first
+            });
+            const oView = this.getView();
+            if (!this._pPopover) {
+                this._pPopover = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.CreditNoteListPopover",
+                    controller: this
+                }).then(oPopover => {
+                    oView.addDependent(oPopover);
+                    return oPopover;
+                });
+            }
+
+            this._pPopover.then(oPopover => {
+                oPopover.setModel(new JSONModel({
+                    status: sStatus,
+                    invoices: aOriginalInvoices,
+                    AllTotalAmount: aOriginalInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.TotalAmount || 0);
+                        } else {
+                            amount = parseFloat(inv.AmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
+                }), "popoverData");
+
+                // Set dynamic title combining i18n text and status
+                const sTitlePrefix = this.i18nModel.getText("invoiceFor");
+                oPopover.setTitle(`${sTitlePrefix} ${sStatus}`);
+
+                // Open popover near the clicked element
+                oPopover.open(oEvent.getParameter("data")[0].target);
+            });
+        },
+        onPressCreditNoteInvoice: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("popoverData");
+            if (!oContext) return sap.m.MessageToast.show("No data found for this row.");
+            const oRowData = oContext.getObject();
+            if (!oRowData.InvNo) return sap.m.MessageToast.show("No Invoice details found for this credit note.");
+            this.getRouter().navTo("RouteCreditNoteDetails", { sPath: encodeURIComponent(oRowData.CCInvNo), dash: "InvoiceDashboard" });
+        },
 
 
         onPaymentBreakdownSelect: function (oEvent) {
@@ -435,7 +590,16 @@ sap.ui.define([
             this.pPaymentDetailsDialog.then(oDialog => {
                 oDialog.setModel(new JSONModel({
                     companyName: sCompanyName,
-                    invoices: aInvoices
+                    invoices: aInvoices,
+                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.totalAmountInINR || 0);
+                        } else {
+                            amount = parseFloat(inv.totalAmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
                 }), "dialogData");
                 this.getView().addDependent(oDialog);
                 oDialog.open();
@@ -443,13 +607,32 @@ sap.ui.define([
         },
 
 
-        onPendingCompanySelect: function (oEvent) {
+        onPendingCompanySelect: async function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Company) return;
             const sCompanyName = oSelectedData.Company;
             const aPendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
             const aInvoices = this._aCurrentFilteredData.filter(inv => inv.CustomerName === sCompanyName && aPendingStatuses.includes(inv.Status));
-            aInvoices.forEach(inv => { inv.pendingAmountInINR = this._getInrValue(inv); });
+
+            aInvoices.forEach(inv => {
+                const totalAmount = parseFloat(inv.TotalAmount || 0);
+                const dueAmount = parseFloat(inv.DueAmount || inv.TotalAmount || 0);
+                const creditTotal = parseFloat(inv.CreditNotesTotal || 0);
+                const conversion = parseFloat(inv.ConversionRate || 1);
+
+                const pending = dueAmount - creditTotal;
+
+                var ResivedData = this.InvoicePaymentDetail.data.filter(payment => payment.InvNo === inv.InvNo);
+
+                if (inv.Currency === "INR") {
+                    inv.pendingAmountInINR = pending;
+                    inv.ReceivedAmount = ResivedData.reduce((sum, pay) => sum + parseFloat(pay.ReceivedAmount || 0), 0);
+                } else {
+                    inv.pendingAmountInINR = pending * conversion;
+                    inv.ReceivedAmount = (ResivedData.reduce((sum, pay) => sum + parseFloat(pay.ReceivedAmount || 0), 0) * conversion);
+                }
+                if (inv.ReceivedAmount < 0) inv.ReceivedAmount = 0;
+            });
             //sort
             aInvoices.sort((a, b) => {
                 const dA = new Date(a.InvoiceDate);
@@ -460,7 +643,19 @@ sap.ui.define([
                 this.pPendingInvoicesDialog = Fragment.load({ id: this.getView().getId(), name: "sap.kt.com.minihrsolution.fragment.PendingInvoicesDialog", controller: this });
             }
             this.pPendingInvoicesDialog.then(oDialog => {
-                oDialog.setModel(new JSONModel({ companyName: sCompanyName, invoices: aInvoices }), "dialogData");
+                oDialog.setModel(new JSONModel({
+                    companyName: sCompanyName,
+                    invoices: aInvoices,
+                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.pendingAmountInINR || 0);
+                        } else {
+                            amount = parseFloat(inv.pendingAmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
+                }), "dialogData");
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
@@ -470,7 +665,19 @@ sap.ui.define([
             oEvent.getSource().getParent().getParent().close();
         },
 
-        onInvoiceNumberPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo), dash: "InvoiceDashboard" }); },
+        onInvoiceNumberPress: function (oEvent) {
+            this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo), dash: "InvoiceDashboard" });
+        },
+        onInvoiceCreditNotesPress: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext("popoverData");
+            if (!oContext) {
+                var oContext = oEvent.getSource().getBindingContext("dialogData");
+            }
+            if (!oContext) return sap.m.MessageToast.show("No data found for this row.");
+            const oRowData = oContext.getObject();
+            if (!oRowData.CCInvNo) return sap.m.MessageToast.show("No Credit Note details found for this invoice.");
+            this.getRouter().navTo("RouteCreditNoteDetails", { sPath: encodeURIComponent(oRowData.CCInvNo), dash: "InvoiceDashboard" });
+        },
         onPaymentBreakdownPress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo), dash: "InvoiceDashboard" }); },
         onPendingInvoicePress: function (oEvent) { this.getRouter().navTo("RouteCompanyInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo), dash: "InvoiceDashboard" }); },
 
@@ -555,7 +762,16 @@ sap.ui.define([
                 oDialog.setModel(new JSONModel({
                     companyName: sCompanyName,
                     invoices: aInvoices,
-                    totalValue: totalValue
+                    totalValue: totalValue,
+                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.TotalAmount || 0);
+                        } else {
+                            amount = parseFloat(inv.AmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
                 }), "dialogData");
 
                 // Set dynamic title here
@@ -567,6 +783,80 @@ sap.ui.define([
         },
 
         onMonthlyInvoiceSelect: function (oEvent) {
+            var aData = oEvent.getParameter("data");
+            if (!aData || !aData[0] || !aData[0].data) return;
+
+            const oSelectedData = aData[0].data;
+            const sMonthLabel = oSelectedData.Month;  // e.g. "Apr-2024"
+            if (!sMonthLabel) return;
+
+            const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            // Extract month and year
+            const [sMonth, sYear] = sMonthLabel.split("-");
+            const monthIndex = monthNamesShort.indexOf(sMonth); // JS month index (0–11)
+            const iYear = parseInt(sYear, 10);
+
+            if (monthIndex === -1 || isNaN(iYear)) {
+                MessageToast.show(this.i18nModel.getText("noDataForSelectedMonth"));
+                return;
+            }
+
+            // Filter invoices by month + year
+            const aInvoices = (this._aCurrentFilteredData || []).filter(inv => {
+                if (!inv || !inv.InvoiceDate) return false;
+                const invDate = new Date(inv.InvoiceDate);
+                return !isNaN(invDate.getTime()) &&
+                    invDate.getMonth() === monthIndex &&
+                    invDate.getFullYear() === iYear;
+            });
+
+            // Convert each invoice to INR
+            aInvoices.forEach(inv => {
+                const rawValue = this._getInrValue(inv);
+                const numValue = Number(String(rawValue).replace(/[^0-9.-]+/g, ""));
+                inv.totalAmountInINR = isNaN(numValue) ? 0 : numValue;
+            });
+
+            // Total value in INR
+            const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
+
+            // Total considering currency
+            const AllTotalAmount = aInvoices.reduce((sum, inv) => {
+                const amount = (inv.Currency === "INR") ? parseFloat(inv.TotalAmount || 0)
+                    : parseFloat(inv.AmountInINR || 0);
+                return sum + (isNaN(amount) ? 0 : amount);
+            }, 0);
+
+            // Update selected data with total
+            aData[0].data["Total Value (INR)"] = AllTotalAmount;
+
+            // Lazy load fragment
+            if (!this.pMonthlyInvoicesDialog) {
+                this.pMonthlyInvoicesDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.kt.com.minihrsolution.fragment.MonthlyInvoice",
+                    controller: this
+                });
+            }
+
+            this.pMonthlyInvoicesDialog.then(oDialog => {
+                const sTitle = `${this.i18nModel.getText("monthlyinvoicefor")} ${sMonth}-${iYear}`;
+
+                oDialog.setModel(new JSONModel({
+                    month: `${sMonth}-${iYear}`,
+                    invoices: aInvoices,
+                    totalValue: totalValue,
+                    AllTotalAmount: AllTotalAmount
+                }), "dialogData");
+
+                oDialog.setTitle(sTitle);
+                this.getView().addDependent(oDialog);
+                oDialog.open();
+            });
+        },
+        onMonthlyInvoiceSelectCreditNote: function (oEvent) {
             const aData = oEvent.getParameter("data");
             if (!aData || !aData[0] || !aData[0].data) return;
 
@@ -588,7 +878,7 @@ sap.ui.define([
             }
 
             // filter invoices by month + year
-            const aInvoices = (this._aCurrentFilteredData || []).filter(inv => {
+            const aInvoices = (this.creditNotesData || []).filter(inv => {
                 if (!inv || !inv.InvoiceDate) return false;
                 const invDate = new Date(inv.InvoiceDate);
                 if (isNaN(invDate.getTime())) return false;
@@ -605,22 +895,31 @@ sap.ui.define([
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
 
             // lazy load fragment
-            if (!this.pMonthlyInvoicesDialog) {
-                this.pMonthlyInvoicesDialog = Fragment.load({
+            if (!this.pMonthlyInvoicesDialogCreditNote) {
+                this.pMonthlyInvoicesDialogCreditNote = Fragment.load({
                     id: this.getView().getId(),
-                    name: "sap.kt.com.minihrsolution.fragment.MonthlyInvoice",
+                    name: "sap.kt.com.minihrsolution.fragment.MonthlyInvoiceCreditNote",
                     controller: this
                 });
             }
 
-            this.pMonthlyInvoicesDialog.then(oDialog => {
+            this.pMonthlyInvoicesDialogCreditNote.then(oDialog => {
                 // Compose dynamic dialog title using i18n text plus selected month-year
                 const sTitle = this.i18nModel.getText("monthlyinvoicefor") + " " + sMonth + "-" + iYear;
 
                 oDialog.setModel(new JSONModel({
                     month: `${sMonth}-${iYear}`, // pass month + year
                     invoices: aInvoices,
-                    totalValue: totalValue
+                    totalValue: totalValue,
+                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.TotalAmount || 0);
+                        } else {
+                            amount = parseFloat(inv.AmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
                 }), "dialogData");
 
                 oDialog.setTitle(sTitle);  // Set dynamic title here
@@ -629,9 +928,6 @@ sap.ui.define([
                 oDialog.open();
             });
         },
-
-
-
         onYearlyInvoiceSelect: function (oEvent) {
             const aData = oEvent.getParameter("data");
             if (!aData || !aData[0] || !aData[0].data) return;
@@ -690,7 +986,16 @@ sap.ui.define([
                 oDialog.setModel(new JSONModel({
                     year: fyLabel,
                     invoices: aInvoices,
-                    totalValue: totalValue
+                    totalValue: totalValue,
+                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
+                        let amount = 0;
+                        if (inv.Currency === "INR") {
+                            amount = parseFloat(inv.TotalAmount || 0);
+                        } else {
+                            amount = parseFloat(inv.AmountInINR || 0);
+                        }
+                        return sum + amount;
+                    }, 0)
                 }), "dialogData");
 
                 this.getView().addDependent(oDialog);

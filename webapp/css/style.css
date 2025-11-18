@@ -2995,3 +2995,9 @@ body, html, .sapUiBody {
   margin-bottom: 0 !important;
 }
 
+.creditLinkStyle {
+    color: red !important;
+    font-weight: bold !important;
+    font-size: 0.8rem !important;
+    text-decoration: none !important;
+}

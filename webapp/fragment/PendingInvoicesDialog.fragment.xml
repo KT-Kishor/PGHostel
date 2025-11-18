@@ -27,45 +27,40 @@
                 <columns>
                     <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
                     <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceDate}" /></Column>
-                    <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>customerName}" /></Column>
+                    <!-- <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>customerName}" /></Column> -->
                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>transactionAmount}" /></Column>
-                        <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>exchRate}" /></Column>
+                    <Column demandPopin="true" hAlign="End"><Text text="{i18n>creditNotesAmount}" /></Column>
+                    <Column demandPopin="true" hAlign="End"><Text text="{i18n>invoiceReceivedAmount}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>exchRate}" /></Column>
                     <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>pendingAmountInr}" /></Column>
-                     <Column demandPopin="true" hAlign="Left"><Text text="{i18n>status}" /></Column>
+                    <Column demandPopin="true" hAlign="Left"><Text text="{i18n>status}" /></Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="onPendingInvoicePress">
                         <cells>
                             <Text text="{dialogData>InvNo}" />
-                            <Text text="{
-                                path: 'dialogData>InvoiceDate',
-                             formatter:'.Formatter.formatDate'}" />
-                             <Text text="{dialogData>CustomerName}" />
-                    <ObjectNumber
-    number="{
-        parts: [
-          
-            { path: 'dialogData>TotalAmount' }
-        ], 
-        formatter: '.Formatter.fromatNumber'
-    }"
-    unit="{dialogData>Currency}" />
-
-                             <ObjectIdentifier 
-  title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
- />
-                             <ObjectNumber number="{
-                                path: 'dialogData>pendingAmountInINR',
-                               formatter: '.Formatter.fromatNumber'
-                            }" unit="INR" />
-                             <Text text="{dialogData>Status}" />
+                            <Text text="{path: 'dialogData>InvoiceDate',formatter:'.Formatter.formatDate'}" />
+                            <!-- <Text text="{dialogData>CustomerName}" /> -->
+                            <ObjectNumber number="{parts: [{ path: 'dialogData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
+                            <!-- <ObjectNumber number="{parts: [{ path: 'dialogData>CreditNotesTotal' }],formatter: '.Formatter.fromatNumber'}"/> -->
+                            <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+                            <ObjectNumber number="{path: 'dialogData>ReceivedAmount',formatter: '.Formatter.fromatNumber'}" unit="INR" />
+                            <ObjectIdentifier title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"/>
+                            <ObjectNumber number="{path: 'dialogData>pendingAmountInINR',formatter: '.Formatter.fromatNumber'}" unit="INR" />
+                            <Text text="{dialogData>Status}" />
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
-        <!-- <endButton>
-            <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
-        </endButton> -->
+         <footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Text text="Total Amount : "/>
+				<ObjectNumber 
+						number="{parts: [{ path: 'dialogData>/AllTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+						unit="INR" />
+        	</Toolbar>
+		</footer>
     </Dialog>
 </core:FragmentDefinition>

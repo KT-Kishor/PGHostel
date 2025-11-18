@@ -18,6 +18,7 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
                 if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
+                this.dash = oEvent.getParameter("arguments").dash;
                 if (!(await this.commonLoginFunction("CompanyInvoice"))) return;
                 this.scrollToSection("CCI_id_CmpInvObjectPageLayout", "CCI_id_CmpInvGoals");
                 if (!this.getView().getModel("CCMailModel")) this._fetchCommonData("EmailContent", "CCMailModel", { Type: "CompanyInvoice", Action: "CC" });
@@ -630,7 +631,7 @@ sap.ui.define([
 
             CID_onPressback: function () {
                 this.getView().getModel("LoginModel").setProperty("/RichText", false);
-                if (this.sourceView === "InvoiceDashboard") {
+                if (this.dash === "InvoiceDashboard") {
                     this.getRouter().navTo("RouteInvoiceDashboard");
                 } else {
                     this.getRouter().navTo("RouteCreditNote");

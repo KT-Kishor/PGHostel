@@ -1,91 +1,75 @@
 <core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-
-    <Dialog
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Dialog
         id="invoiceListDialog"
         contentWidth="900px"
         contentHeight="500px"
         resizable="true"
         draggable="true">
-                <customHeader >
-        <Bar class="Coursetitle" >
-        <contentLeft>
-              <Title  text="{i18n>invoiceFor} {popoverData>/status}"  />
-        </contentLeft>
-         
-            <contentRight>
-                <Button icon="sap-icon://decline" press="onCloseDialog" tooltip="Close"/>
-            </contentRight>
-        </Bar>
-    </customHeader>
-        <content>
-        
-            <Table
+		<customHeader >
+			<Bar class="Coursetitle" >
+				<contentLeft>
+					<Title  text="{i18n>invoiceFor} {popoverData>/status}"  />
+				</contentLeft>
+				<contentRight>
+					<Button icon="sap-icon://decline" press="onCloseDialog" tooltip="Close"/>
+				</contentRight>
+			</Bar>
+		</customHeader>
+		<content>
+			<Table
                 id="invoiceListTable"
                 inset="false"
                 sticky="ColumnHeaders"
                 items="{popoverData>/invoices}"
                 noDataText="{i18n>noInvoiceStatus}">
-                
-                <columns>
-                      <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
-                    <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceDate}" /></Column>
-                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>customerName}" /></Column>
-
-                     <Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop"><Text text="{i18n>transactionAmount}" /></Column>
-                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>exchRate}" /></Column>
-
-                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>totalAmount}" /></Column>
-                    <!-- <Column><Text text="{i18n>status}" /></Column> -->
-                </columns>
-                
-                <items>
-                    <ColumnListItem type="Navigation" press="onInvoiceNumberPress">
-                        <cells>
-                            <Text text="{popoverData>InvNo}" />
-                             <Text text="{
-                                path: 'popoverData>InvoiceDate',
-                             formatter:'.Formatter.formatDate'}" />
-                            <Text text="{popoverData>CustomerName}" />
-
-                     <!-- <ObjectNumber number="{popoverData>TotalAmount}" unit="{popoverData>Currency}" /> -->
-                      <ObjectNumber
-    number="{
-        parts: [
-          
-            { path: 'popoverData>TotalAmount' }
-        
-        ], 
-        formatter: '.Formatter.fromatNumber'
-    }"
-    unit="{popoverData>Currency}" />
-
-
-                           <ObjectIdentifier 
-  title="{path:'popoverData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
- />
-
-                          <ObjectNumber
-    number="{
-        parts: [
-            { path: 'popoverData>Currency' },
-            { path: 'popoverData>TotalAmount' },
-            { path: 'popoverData>AmountInINR' }
-        ], 
-        formatter: '.Formatter.fromatNumber'
-    }"
-    unit="INR" />
-
-                         
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        
-        <!-- <endButton>
-            <Button text="{i18n>close}" type="Ghost" press="onCloseDialog" />
-        </endButton> -->
-    </Dialog>
+				<columns>
+					<Column demandPopin="true" hAlign="Left">
+						<Text text="{i18n>invoiceNo}" />
+					</Column>
+					<Column demandPopin="true" hAlign="Left">
+						<Text text="{i18n>invoiceDate}" />
+					</Column>
+					<Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop">
+						<Text text="{i18n>customerName}" />
+					</Column>
+					<Column demandPopin="true" hAlign="Left" minScreenWidth="Desktop">
+						<Text text="{i18n>transactionAmount}" />
+					</Column>
+					<Column hAlign="End" demandPopin="true" minScreenWidth="Desktop">
+						<Text text="{i18n>creditNotesAmount}" />
+					</Column>
+					<Column hAlign="End" demandPopin="true" minScreenWidth="Desktop">
+						<Text text="{i18n>exchRate}" />
+					</Column>
+					<Column hAlign="End" demandPopin="true" minScreenWidth="Desktop">
+						<Text text="{i18n>totalAmount}" />
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="onInvoiceNumberPress">
+						<cells>
+							<Text text="{popoverData>InvNo}" />
+							<Text text="{path: 'popoverData>InvoiceDate',formatter:'.Formatter.formatDate'}" />
+							<Text text="{popoverData>CustomerName}" />
+							<ObjectNumber number="{parts: [{ path: 'popoverData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+							<Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotal' },{ path: 'popoverData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+							<ObjectIdentifier title="{path:'popoverData>ConversionRate', formatter: '.Formatter.fromatNumber'}"/>
+							<ObjectNumber number="{parts: [{ path: 'popoverData>Currency' },{ path: 'popoverData>TotalAmount' },{ path: 'popoverData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Text text="Total Amount : "/>
+				<ObjectNumber 
+						number="{parts: [{ path: 'popoverData>/AllTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+						unit="INR" />
+        	</Toolbar>
+		</footer>
+	</Dialog>
 </core:FragmentDefinition>
