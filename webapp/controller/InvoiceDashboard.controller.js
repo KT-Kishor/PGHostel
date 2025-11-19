@@ -115,93 +115,125 @@ sap.ui.define([
         },
 
         onFilterChange: function () {
-            if (!this.rawInvoiceData) return;
-            this.getBusyDialog();
+    if (!this.rawInvoiceData) return;
+    this.getBusyDialog();
 
-            setTimeout(() => {
-                try {
-                    const oCompanyFilter = this.byId("companyFilter");
-                    const oYearFilter = this.byId("yearFilter");
-                    const oDateRange = this.byId("DashI_id_Date");
+    setTimeout(() => {
+        try {
+            // Make deep copy so rawInvoiceData never changes
+            const invoiceDataCopy = JSON.parse(JSON.stringify(this.rawInvoiceData));
+            const creditNotesCopy = JSON.parse(JSON.stringify(this.creditNotesData));
 
-                    const aSelectedCompanies = oCompanyFilter.getSelectedKeys();
-                    let sSelectedYear = oYearFilter.getValue();
-                    let dFrom = oDateRange.getDateValue();
-                    let dTo = oDateRange.getSecondDateValue();
+            const oCompanyFilter = this.byId("companyFilter");
+            const oYearFilter = this.byId("yearFilter");
+            const oDateRange = this.byId("DashI_id_Date");
 
-                    if (sSelectedYear) {
-                        oDateRange.setValue("");
-                        dFrom = null;
-                        dTo = null;
-                    }
+            const aSelectedCompanies = oCompanyFilter.getSelectedKeys();
+            let sSelectedYear = oYearFilter.getValue();
+            let dFrom = oDateRange.getDateValue();
+            let dTo = oDateRange.getSecondDateValue();
 
-                    let aFilteredData = this.rawInvoiceData.filter(item => {
-                        const invoiceDate = new Date(item.InvoiceDate);
+            if (sSelectedYear) {
+                oDateRange.setValue("");
+                dFrom = null;
+                dTo = null;
+            }
 
-                        let bCompanyMatch = aSelectedCompanies.length === 0 || aSelectedCompanies.includes(item.CustomerName);
-                        let bDateMatch = true;
+            // Use the copy (NEVER rawInvoiceData)
+            let aFilteredData = invoiceDataCopy.filter(item => {
+                const invoiceDate = new Date(item.InvoiceDate);
 
-                        if (dFrom && dTo) {
-                            const dEndDate = new Date(dTo);
-                            dEndDate.setDate(dEndDate.getDate() + 1); // include last date
-                            bDateMatch = invoiceDate >= dFrom && invoiceDate < dEndDate;
-                        } else if (sSelectedYear) {
-                            //  Financial Year filtering
-                            // Example: if yearFilter = "2024" → Apr 1, 2024 – Mar 31, 2025
-                            const fyStart = new Date(parseInt(sSelectedYear), 3, 1); // April 1
-                            const fyEnd = new Date(parseInt(sSelectedYear) + 1, 2, 31, 23, 59, 59); // March 31 next year
-                            bDateMatch = invoiceDate >= fyStart && invoiceDate <= fyEnd;
-                        }
+                let bCompanyMatch = aSelectedCompanies.length === 0 || aSelectedCompanies.includes(item.CustomerName);
+                let bDateMatch = true;
 
-                        return bCompanyMatch && bDateMatch;
-                    });
-
-                    this._aCurrentFilteredData = aFilteredData;
-                    
-                    const creditInvNos = aFilteredData.map(cn => cn.InvNo);
-                    const aFilterDataCreditNote = this.creditNotesData.filter(inv => creditInvNos.includes(inv.InvNo));
-                    this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
-
-                    let aYearlyTrendData = (aSelectedCompanies.length > 0) ?
-                        this.rawInvoiceData.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName)) :
-                        this.rawInvoiceData;
-
-                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, aFilterDataCreditNote);
-                } catch (error) {
-                    MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
-                } finally {
-                    this.closeBusyDialog();
+                if (dFrom && dTo) {
+                    const dEndDate = new Date(dTo);
+                    dEndDate.setDate(dEndDate.getDate() + 1);
+                    bDateMatch = invoiceDate >= dFrom && invoiceDate < dEndDate;
+                } else if (sSelectedYear) {
+                    const fyStart = new Date(parseInt(sSelectedYear), 3, 1);
+                    const fyEnd = new Date(parseInt(sSelectedYear) + 1, 2, 31, 23, 59, 59);
+                    bDateMatch = invoiceDate >= fyStart && invoiceDate <= fyEnd;
                 }
-            }, 100);
-        },
+
+                return bCompanyMatch && bDateMatch;
+            });
+
+            this._aCurrentFilteredData = aFilteredData;
+
+            const creditInvNos = aFilteredData.map(cn => cn.InvNo);
+
+            const aFilterDataCreditNote = creditNotesCopy.filter(inv =>
+                creditInvNos.includes(inv.InvNo)
+            );
+
+            this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
+
+            let aYearlyTrendData = (aSelectedCompanies.length > 0)
+                ? invoiceDataCopy.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName))
+                : invoiceDataCopy;
+
+            this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, aFilterDataCreditNote);
+
+        } catch (error) {
+            MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+        } finally {
+            this.closeBusyDialog();
+        }
+    }, 100);
+},
+
 
 
         // --- HELPER to get INR value. Refactored to be reusable --
         _getInrValue: function (item) {
+            if (!item) return 0;
+
+            const currency = item.Currency || "";
+            const status = item.Status || "";
+            const conversionRate = parseFloat(item.ConversionRate) || 1;
+
             let amount = 0;
-            if (item.Status === "Submitted" || item.Status === "Invoice Sent" || item.Status === "Payment Received") {
-                if (item.Currency === "INR") {
-                    amount = parseFloat(item.TotalAmount || 0);
-                } else {
-                    amount = parseFloat(item.AmountInINR || 0);
-                }
-            } else if (item.Status === "Payment Partially") {
-                amount = item.Currency === "INR" ? parseFloat(item.TotalAmount || 0) : parseFloat(item.DueAmount || 0);
+
+            // ---------------------------
+            // 1️⃣ Status Based Amount Logic
+            // ---------------------------
+            if (status === "Submitted" || status === "Invoice Sent" || status === "Payment Received") {
+
+                // If invoice is fully billed / submitted
+                amount = (currency === "INR")
+                    ? parseFloat(item.TotalAmount) || 0
+                    : parseFloat(item.AmountInINR) || parseFloat(item.TotalAmount) || 0;
+
+            } else if (status === "Payment Partially") {
+
+                // Partial payments use Due Amount for foreign currency
+                amount = (currency === "INR")
+                    ? parseFloat(item.DueAmount || item.TotalAmount) || 0
+                    : parseFloat(item.DueAmount) || parseFloat(item.AmountInINR) || 0;
+
             } else {
-                amount = parseFloat(item.DueAmount || item.TotalAmount || 0);
+                // Other statuses → fallback logic
+                amount = parseFloat(item.DueAmount || item.TotalAmount) || 0;
             }
 
-            if (item.Currency === "INR") {
-                return amount;
+            // ---------------------------
+            // 2️⃣ Final Conversion to INR
+            // ---------------------------
+            if (currency === "INR") {
+                return amount; // no conversion needed
             }
-            const amountInINR = parseFloat(item.AmountInINR || 0);
+
+            const amountInINR = parseFloat(item.AmountInINR) || 0;
+
+            // If backend already sent INR → use that  
             if (amountInINR > 0) {
                 return amountInINR;
             }
-            const conversionRate = parseFloat(item.ConversionRate || 1);
+
+            // Otherwise convert manually  
             return amount * conversionRate;
         },
-
 
         _convertToInr: function (value, item) {
             const numValue = parseFloat(value || 0);
@@ -213,241 +245,288 @@ sap.ui.define([
         },
 
         _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData, aFilterDataCreditNote) {
+
             const AllFilteredData = aFilteredData || [];
-            //  fiscal start year from a date Apr-Mar FY
+
+            //---------------------------------------------------------------------
+            // 1️⃣ Monthly Values (Apr–Mar Financial Year)
+            //---------------------------------------------------------------------
             const monthlyValue = aFilteredData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
                 if (isNaN(d.getTime())) return acc;
-                const month = d.getMonth(); // 0 to 11
-                acc[month] = (acc[month] || 0) + this._getInrValue(item);
+
+                const month = d.getMonth();
+                if(item.Currency === "INR"){
+                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                }else{
+                    var TotalAmount = parseFloat(item.AmountInINR || 0);
+                }
+                acc[month] = (acc[month] || 0) + TotalAmount
                 return acc;
             }, {});
 
+            //---------------------------------------------------------------------
+            // 2️⃣ Company Totals
+            //---------------------------------------------------------------------
             const companyTotals = aFilteredData.reduce((acc, item) => {
-                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
+                if(item.Currency === "INR"){
+                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                }else{
+                    var TotalAmount = parseFloat(item.AmountInINR || 0);
+                }
+                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + TotalAmount;
                 return acc;
             }, {});
 
+            //---------------------------------------------------------------------
+            // 3️⃣ Yearly Trend (Apr–Mar)
+            //---------------------------------------------------------------------
             const yearlyTrend = aYearlyTrendData.reduce((acc, item) => {
                 const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime())) return acc;
-                // Calculate fiscal start year (Apr–Mar)
+                if (isNaN(d)) return acc;
+
                 const year = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
-                const fyLabel = `${year}-${year + 1}`; //  '2024-2025'
-                if (!acc[fyLabel]) { acc[fyLabel] = { totalAmountInINR: 0, count: 0 }; }
-                acc[fyLabel].totalAmountInINR += this._getInrValue(item);
+                const fyLabel = `${year}-${year + 1}`;
+
+                if (!acc[fyLabel]) {
+                    acc[fyLabel] = { totalAmountInINR: 0, count: 0 };
+                }
+                 if(item.Currency === "INR"){
+                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                }else{
+                    var TotalAmount = parseFloat(item.AmountInINR || 0);
+                }
+
+                acc[fyLabel].totalAmountInINR += TotalAmount;
                 acc[fyLabel].count++;
+
                 return acc;
             }, {});
 
-
+            //---------------------------------------------------------------------
+            // 4️⃣ Pending / Outstanding Amount per Company
+            //---------------------------------------------------------------------
             const pendingStatuses = ["Submitted", "Invoice Sent", "Payment Partially"];
+
             const pendingByCompany = aFilteredData
                 .filter(item => pendingStatuses.includes(item.Status))
                 .reduce((acc, item) => {
-                    // acc[item.CustomerName] = (acc[item.CustomerName] || 0) + this._getInrValue(item);
-                    if (item.Currency === "INR") {
-                        acc[item.CustomerName] = (acc[item.CustomerName] || 0) + (item.DueAmount) ? parseFloat(item.DueAmount || item.TotalAmount) - parseFloat(item.CreditNotesTotal || 0) : item.TotalAmount || 0;
-                    } else {
-                        const data = parseFloat(item.DueAmount || item.TotalAmount) - parseFloat(item.CreditNotesTotal || 0);
-                        acc[item.CustomerName] = (acc[item.CustomerName] || 0) + data * parseFloat(item.ConversionRate || 1);
+
+                    const due = parseFloat(item.DueAmount || item.TotalAmount || 0);
+                    const cn = parseFloat(item.CreditNotesTotal || 0);
+                    let amount = due - cn;
+
+                    // Convert to INR
+                    if (item.Currency !== "INR") {
+                        amount *= parseFloat(item.ConversionRate || 1);
                     }
+
+                    acc[item.CustomerName] = (acc[item.CustomerName] || 0) + amount;
                     return acc;
                 }, {});
 
+            //---------------------------------------------------------------------
+            // 5️⃣ Status-wise totals + Grouped Invoice Container
+            //---------------------------------------------------------------------
             this._oGroupedInvoices = {};
+
             const statusAmounts = AllFilteredData.reduce((acc, item) => {
                 const status = item.Status || "Unknown";
-                if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
 
-                // const totalAmount = this._getInrValue(item);
+                if (!this._oGroupedInvoices[status]) this._oGroupedInvoices[status] = [];
+
+                // Calculate final amount after credit note
+                const originalAmount = parseFloat(item.TotalAmount || 0);
+                const creditNote = parseFloat(item.CreditNotesTotal || 0);
+                const net = originalAmount - creditNote;
+
+                let inrValue = net;
                 item.OldTotalAmount = item.TotalAmount;
-                let TotalAmount = 0;
-                if (item.Currency === "INR") {
-                    TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
-                    item.TotalAmount = TotalAmount;
+
+                if (item.Currency !== "INR") {
+                    inrValue = net * parseFloat(item.ConversionRate || 1);
+                    item.AmountInINR = inrValue;
                 } else {
-                    var data = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
-                    TotalAmount = data * parseFloat(item.ConversionRate || 1);
-                    item.AmountInINR = TotalAmount
+                    item.TotalAmount = inrValue;
                 }
+
                 this._oGroupedInvoices[status].push(item);
-                acc[status] = (acc[status] || 0) + TotalAmount;
+                acc[status] = (acc[status] || 0) + inrValue;
+
                 return acc;
             }, {});
 
-
+            //---------------------------------------------------------------------
+            // 6️⃣ Payment Breakdown (GST, TDS, Credit Notes)
+            //---------------------------------------------------------------------
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const company = item.CustomerName;
 
                 if (!acc[company]) {
-                    acc[company] = { taxableAmount: 0, gstAmount: 0, tdsAmount: 0, CreditNotesTotalAmount: 0, invoices: [] };
+                    acc[company] = {
+                        taxableAmount: 0,
+                        gstAmount: 0,
+                        tdsAmount: 0,
+                        CreditNotesTotalAmount: 0,
+                        invoices: []
+                    };
                 }
 
-                const totalGst = this._convertToInr(item.CGST, item) +
+                const gst = this._convertToInr(item.CGST, item) +
                     this._convertToInr(item.SGST, item) +
                     this._convertToInr(item.IGST, item);
 
-                // Existing Aggregations
                 acc[company].taxableAmount += this._convertToInr(item.SubTotalInGST, item);
-                acc[company].gstAmount += totalGst;
+                acc[company].gstAmount += gst;
                 acc[company].tdsAmount += this._convertToInr(item.IncomeTax, item);
 
-                // ⭐ New Aggregation for Credit Notes Total
-                acc[company].CreditNotesTotalAmount += (item.Currency === "INR") ? Number(item.CreditNotesTotal || 0) : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate) || 0);
+                // Credit Notes INR
+                const cnInr = item.Currency === "INR"
+                    ? Number(item.CreditNotesTotal || 0)
+                    : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate || 1));
 
-                // Store invoice details
+                acc[company].CreditNotesTotalAmount += cnInr;
+
                 acc[company].invoices.push({
                     InvNo: item.InvNo,
                     CCInvNo: item.CCInvNo,
                     SubTotalInGST: this._convertToInr(item.SubTotalInGST, item),
-                    gstAmount: totalGst,
+                    gstAmount: gst,
                     IncomeTax: this._convertToInr(item.IncomeTax, item),
                     totalAmountInINR: this._getInrValue(item),
-                    CreditNotesTotal: (item.Currency === "INR") ? Number(item.CreditNotesTotal || 0) : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate) || 0)
+                    CreditNotesTotal: cnInr
                 });
 
                 return acc;
             }, {});
 
+            //---------------------------------------------------------------------
+            // 7️⃣ Determine Financial Year Start
+            //---------------------------------------------------------------------
+            const getFY = (d) => d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
 
-            // --- Determine Fiscal Year Start based on filtered data ---
-            const getFiscalStartYearFromDate = (date) => {
-                const m = date.getMonth(); // 0 to 11
-                const y = date.getFullYear();
-                return (m >= 3) ? y : (y - 1); // Apr(3)..Dec => same year; Jan(0)..Mar(2) => prev year
-            };
+            let fyStartYear = new Date().getFullYear();
+            if (aFilteredData.length > 0) {
+                const minDate = aFilteredData
+                    .map(i => new Date(i.InvoiceDate))
+                    .filter(d => !isNaN(d))
+                    .sort((a, b) => a - b)[0];
 
-            let fyStartYear;
-            if (aFilteredData && aFilteredData.length > 0) {
-                // find the earliest invoice date in the filtered set
-                let minDate = null;
-                for (let i = 0; i < aFilteredData.length; i++) {
-                    const d = new Date(aFilteredData[i].InvoiceDate);
-                    if (isNaN(d.getTime())) continue;
-                    if (!minDate || d < minDate) minDate = d;
-                }
-                fyStartYear = minDate ? getFiscalStartYearFromDate(minDate) : getFiscalStartYearFromDate(new Date());
-            } else {
-                // no data: derive from today
-                fyStartYear = getFiscalStartYearFromDate(new Date());
+                fyStartYear = minDate ? getFY(minDate) : getFY(new Date());
             }
 
-            // --- Financial Year Monthly Aggregation (Apr → Mar with Year) ---
+            //---------------------------------------------------------------------
+            // 8️⃣ Monthly Aggregation Format (Apr–Mar)
+            //---------------------------------------------------------------------
             const monthNames = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
 
-            const formattedMonthly = monthNames.map((monthName, idx) => {
-                const realMonth = (idx + 3) % 12; // map Apr idx 0 -> realMonth 3
-                const displayYear = (realMonth >= 3) ? fyStartYear : (fyStartYear + 1);
+            const formattedMonthly = monthNames.map((name, idx) => {
+                const realMonth = (idx + 3) % 12;
+                const year = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
+
                 return {
-                    month: `${monthName}-${displayYear}`,
+                    month: `${name}-${year}`,
                     totalAmountInINR: monthlyValue[realMonth] || 0
                 };
             });
 
+            //---------------------------------------------------------------------
+            // 9️⃣ Company Totals (Sorted)
+            //---------------------------------------------------------------------
             const formattedCompanyTotals = Object.entries(companyTotals)
                 .map(([name, total]) => ({ companyName: name, totalAmountInINR: total }))
                 .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
 
+            //---------------------------------------------------------------------
+            // 🔟 Yearly Trend Sorted
+            //---------------------------------------------------------------------
             const formattedYearlyTrend = Object.entries(yearlyTrend)
-                .map(([fyLabel, data]) => ({ year: fyLabel, ...data }))
+                .map(([fy, obj]) => ({ year: fy, ...obj }))
                 .sort((a, b) => a.year.localeCompare(b.year));
 
+            //---------------------------------------------------------------------
+            // 1️⃣1️⃣ Pending Top 5
+            //---------------------------------------------------------------------
             const formattedPending = Object.entries(pendingByCompany)
-                .map(([name, amount]) => ({ companyName: name, pendingAmountInINR: amount }))
+                .map(([name, amt]) => ({ companyName: name, pendingAmountInINR: amt }))
                 .sort((a, b) => b.pendingAmountInINR - a.pendingAmountInINR)
                 .slice(0, 5);
 
+            //---------------------------------------------------------------------
+            // 1️⃣2️⃣ Status Distribution
+            //---------------------------------------------------------------------
             const formattedStatus = Object.entries(statusAmounts)
-                .map(([status, totalAmount]) => ({
+                .map(([status, totalInr]) => ({
                     status,
-                    totalAmountInINR: totalAmount
+                    totalAmountInINR: totalInr
                 }));
 
-            let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => {
-                const totalAmountInINR = values.invoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
+            //---------------------------------------------------------------------
+            // 1️⃣3️⃣ Payment Breakdown Final Formatting
+            //---------------------------------------------------------------------
+            let formattedPaymentBreakdown = Object.entries(paymentBreakdown).map(([name, values]) => ({
+                companyName: name,
+                taxableAmount: values.taxableAmount || values.invoices.reduce((s, i) => s + i.totalAmountInINR, 0),
+                gstAmount: values.gstAmount,
+                tdsAmount: values.tdsAmount,
+                CreditNotesTotalAmount: values.CreditNotesTotalAmount,
+                invoices: values.invoices
+            }));
 
-                // Calculate total credit notes for this company
-                const CreditNotesTotalAmount = values.invoices.reduce((sum, inv) => {
-                    return sum + Number(inv.CreditNotesTotal || 0);
-                }, 0);
-
-                // If all amounts are 0 → fallback to total
-                if (values.taxableAmount === 0 && values.gstAmount === 0 && values.tdsAmount === 0) {
-                    return {
-                        companyName: name,
-                        taxableAmount: totalAmountInINR,
-                        gstAmount: 0,
-                        tdsAmount: 0,
-                        CreditNotesTotalAmount: CreditNotesTotalAmount,
-                        invoices: values.invoices
-                    };
-                }
-
-                return {
-                    companyName: name,
-                    taxableAmount: values.taxableAmount,
-                    gstAmount: values.gstAmount,
-                    tdsAmount: values.tdsAmount,
-                    CreditNotesTotalAmount: CreditNotesTotalAmount,
-                    invoices: values.invoices
-                };
-            });
-
+            //---------------------------------------------------------------------
+            // 1️⃣4️⃣ Credit Note Aggregation (Status + Monthly)
+            //---------------------------------------------------------------------
+            const statusAmountsCreditNote = {};
             this._oGroupedInvoicesCreditNote = {};
-            const statusAmountsCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
+
+            aFilterDataCreditNote.forEach(item => {
                 const status = item.Status || "Unknown";
+
                 if (!this._oGroupedInvoicesCreditNote[status]) {
                     this._oGroupedInvoicesCreditNote[status] = [];
                 }
-                let totalAmountInINR = 0;
-                if (item.Currency === "INR") {
-                    totalAmountInINR = parseFloat(item.TotalAmount || 0);
-                } else {
-                    const base = parseFloat(item.AmountInINR || item.TotalAmount || 0);
-                    const rate = parseFloat(item.ConversionRate || 1);
-                    totalAmountInINR = base * rate;
-                }
+
+                let totalAmountInINR = item.Currency === "INR"
+                    ? Number(item.TotalAmount || 0)
+                    : Number(item.AmountInINR || item.TotalAmount || 0);
+
                 this._oGroupedInvoicesCreditNote[status].push({
                     InvNo: item.InvNo,
                     TotalAmountINR: totalAmountInINR,
                     OriginalItem: item
                 });
-                acc[status] = (acc[status] || 0) + totalAmountInINR;
-                return acc;
-            }, {});
 
-            // Convert for charts
-            const formattedStatusCreditNote = Object.entries(statusAmountsCreditNote).map(([status, totalAmount]) => ({
-                status,
-                totalAmountInINR: totalAmount
-            }));
+                statusAmountsCreditNote[status] = (statusAmountsCreditNote[status] || 0) + totalAmountInINR;
+            });
 
+            const formattedStatusCreditNote = Object.entries(statusAmountsCreditNote)
+                .map(([st, amt]) => ({ status: st, totalAmountInINR: amt }));
+
+            //-----------------------------------------------------------
+            // Monthly Credit Note
+            //-----------------------------------------------------------
             const monthlyValueCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
-                if (!item || !item.InvoiceDate) return acc;
-
                 const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime())) return acc;
+                if (isNaN(d)) return acc;
 
-                const month = d.getMonth(); // 0 to 11
-                const amountInINR = this._getInrValue(item) || 0;
-
-                acc[month] = (acc[month] || 0) + amountInINR;
+                const month = d.getMonth();
+                acc[month] = (acc[month] || 0) + this._getInrValue(item);
                 return acc;
             }, {});
 
-            // --- Format monthly values for chart ---
-            const formattedMonthlyCreditNote = monthNames.map((monthName, idx) => {
-                const realMonth = (idx + 3) % 12; // April = index 0
-                const displayYear = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
+            const formattedMonthlyCreditNote = monthNames.map((name, idx) => {
+                const realMonth = (idx + 3) % 12;
+                const year = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
 
                 return {
-                    month: `${monthName}-${displayYear}`,
+                    month: `${name}-${year}`,
                     totalAmountInINR: monthlyValueCreditNote[realMonth] || 0
                 };
             });
 
-            // ------ Set model data ------
+            //---------------------------------------------------------------------
+            // 1️⃣5️⃣ SET FINAL MODEL DATA
+            //---------------------------------------------------------------------
             this.getView().getModel("chartData").setData({
                 statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
@@ -458,6 +537,7 @@ sap.ui.define([
                 statusDistributionCreditNote: formattedStatusCreditNote,
                 monthlyValueCreditNote: formattedMonthlyCreditNote
             });
+
             this._formattedPaymentBreakdown = formattedPaymentBreakdown;
         },
 
@@ -623,7 +703,7 @@ sap.ui.define([
                 const creditTotal = parseFloat(inv.CreditNotesTotal || 0);
                 const conversion = parseFloat(inv.ConversionRate || 1);
 
-                const pending = (inv.Currency=== "INR") ? (inv.DueAmount) ? dueAmount - creditTotal : dueAmount : dueAmount - creditTotal;
+                const pending = (inv.Currency === "INR") ? (inv.DueAmount) ? dueAmount - creditTotal : dueAmount : dueAmount - creditTotal;
 
                 var ResivedData = this.InvoicePaymentDetail.data.filter(payment => payment.InvNo === inv.InvNo);
 
@@ -946,7 +1026,7 @@ sap.ui.define([
             const fyEndYear = fyStartYear + 1;
             const fyLabel = `${fyStartYear}-${fyEndYear}`;
 
-            const aAllInvoices = this._aAllInvoices || this.rawInvoiceData || this._aCurrentFilteredData || [];
+            const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || this.rawInvoiceData || [];
 
             // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
             const aInvoices = aAllInvoices.filter(inv => {

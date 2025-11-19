@@ -17,6 +17,7 @@ sap.ui.define([
             _onRouteMatched: async function (oEvent) {
                 var LoginFUnction = await this.commonLoginFunction("CompanyInvoice");
                 if (!LoginFUnction) return;
+                this.CreditMemoTotal = 0;
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "CompanyInvoice";
@@ -214,9 +215,7 @@ sap.ui.define([
                     }
                     this.Status = Status;
                     this.totalAmountCalculation();
-                    this.Readcall("InvoicePaymentDetail", {
-                        InvNo: this.decodedPath
-                    })
+                    this.Readcall("InvoicePaymentDetail", {InvNo: this.decodedPath})
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to load invoice data.");
                 } finally {
@@ -574,6 +573,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/CreditIGST", creditIGST.toFixed(2));
                 oCustomerModel.setProperty("/CreditRoundOff", CreditRoundOff);
                 oCustomerModel.setProperty("/CreditMemoTotal", roundedCredit.toFixed(2));
+                this.CreditMemoTotal = roundedCredit;
                 oCustomerModel.setProperty("/TotalAmount", roundedNormal);
                 oCustomerModel.setProperty("/Total", grandTotal.toFixed(2));
 
@@ -598,9 +598,9 @@ sap.ui.define([
                 // Decide which amount to use: DueAmount OR Total
                 var baseAmount = 0;
                 if (oData.DueAmount) {
-                    baseAmount = parseFloat(oData.DueAmount);
+                    baseAmount = parseFloat(oData.DueAmount) - parseFloat(this.CreditMemoTotal) || 0;
                 } else {
-                    baseAmount = parseFloat(oData.Total);
+                    baseAmount = parseFloat(oData.Total) - parseFloat(this.CreditMemoTotal) || 0;
                 }
                 // Apply Conversion Rate
                 var conversionRate = parseFloat(oData.ConversionRate) || 0;
@@ -957,7 +957,6 @@ sap.ui.define([
                     if (!bIsValid) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     }
-
                     this.getBusyDialog();
                     const oPayload = await this.SubmitPayload("update");
 
@@ -1139,6 +1138,9 @@ sap.ui.define([
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
+                    if (invoiceData.Currency !== "INR") {
+                        await this.onChangeConversionRate();
+                    }
                     return;
                 }
                 // Handle non-"CompanyInvoice" case
@@ -1235,7 +1237,6 @@ sap.ui.define([
                     sap.m.MessageBox.error(this.i18nModel.getText("dueAmountZeroOrNegative"));
                     return;
                 }
-
                 this.getBusyDialog();
                 const jsonData = {
                     InvNo: String(paymentModel.InvNo),
@@ -1257,12 +1258,8 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this.Readcall("InvoicePaymentDetail", {
-                            InvNo: this.decodedPath
-                        });
-                        this.Readcall("CompanyInvoice", {
-                            InvNo: this.decodedPath
-                        });
+                        this.Readcall("InvoicePaymentDetail", {InvNo: this.decodedPath});
+                        this.Readcall("CompanyInvoice", {InvNo: this.decodedPath});
 
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
