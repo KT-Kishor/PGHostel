@@ -157,9 +157,10 @@ sap.ui.define([
                     });
 
                     this._aCurrentFilteredData = aFilteredData;
-
+                    
                     const creditInvNos = aFilteredData.map(cn => cn.InvNo);
                     const aFilterDataCreditNote = this.creditNotesData.filter(inv => creditInvNos.includes(inv.InvNo));
+                    this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
 
                     let aYearlyTrendData = (aSelectedCompanies.length > 0) ?
                         this.rawInvoiceData.filter(invoice => aSelectedCompanies.includes(invoice.CustomerName)) :
@@ -622,7 +623,7 @@ sap.ui.define([
                 const creditTotal = parseFloat(inv.CreditNotesTotal || 0);
                 const conversion = parseFloat(inv.ConversionRate || 1);
 
-                const pending = (inv.Currency=== "INR") ? dueAmount : dueAmount - creditTotal;
+                const pending = (inv.Currency=== "INR") ? (inv.DueAmount) ? dueAmount - creditTotal : dueAmount : dueAmount - creditTotal;
 
                 var ResivedData = this.InvoicePaymentDetail.data.filter(payment => payment.InvNo === inv.InvNo);
 
@@ -877,7 +878,7 @@ sap.ui.define([
             }
 
             // filter invoices by month + year
-            const aInvoices = (this.creditNotesData || []).filter(inv => {
+            const aInvoices = (this._aCurrentFilteredDataCreditNote || []).filter(inv => {
                 if (!inv || !inv.InvoiceDate) return false;
                 const invDate = new Date(inv.InvoiceDate);
                 if (isNaN(invDate.getTime())) return false;

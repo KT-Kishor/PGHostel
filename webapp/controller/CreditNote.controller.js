@@ -165,11 +165,11 @@ sap.ui.define(
                 },
 
                 CI_onPressAddInvoice: function () {
-                    this.getRouter().navTo("RouteCreditNoteDetails" ,{ sPath: "X" });
+                    this.getRouter().navTo("RouteCreditNoteDetails" ,{ sPath: "X" ,dash:"CN" });
                 },
 
                 CI_onPressInvoiceRow: function (oEvent) {
-                    this.getRouter().navTo("RouteCreditNoteDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().CCInvNo) });
+                    this.getRouter().navTo("RouteCreditNoteDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("CompanyInvoiceModel").getObject().CCInvNo),dash:"CN" });
                 },
 
                 onPressback: function() {
