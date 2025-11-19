@@ -59,16 +59,17 @@ sap.ui.define([
                     if (invoice.Currency === "INR") {
                         var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
                     } else {
-                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.AmountInINR || 0), 0);
+                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
                     }
-                    const creditNotesInINR = invoice.Currency === "INR" ? matchedNotesTotal : matchedNotesTotal * Number(invoice.ConversionRate || 1);
+                    const creditNotesInINR = invoice.Currency === "INR" ? matchedNotesTotal : matchedNotes.reduce((sum, cn) => sum + Number(cn.AmountInINR || 0), 0);
 
                     return {
                         ...invoice,
                         CreditNotes: matchedNotes,
                         CreditNotesTotal: matchedNotesTotal,
                         TotalAmount: Number(invoice.TotalAmount || 0),
-                        AmountInINR: Number(invoice.AmountInINR || 0) - creditNotesInINR
+                        AmountInINR: Number(invoice.AmountInINR || 0) - creditNotesInINR,
+                        CreditNotesTotalInINR: creditNotesInINR || 0
                     };
                 });
 
@@ -259,6 +260,7 @@ sap.ui.define([
                 if (!this._oGroupedInvoices[status]) { this._oGroupedInvoices[status] = []; }
 
                 // const totalAmount = this._getInrValue(item);
+                item.OldTotalAmount = item.TotalAmount;
                 let TotalAmount = 0;
                 if (item.Currency === "INR") {
                     TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
@@ -518,8 +520,8 @@ sap.ui.define([
                 return dB - dA; // latest first
             });
             const oView = this.getView();
-            if (!this._pPopover) {
-                this._pPopover = Fragment.load({
+            if (!this._pPopoverCreditNote) {
+                this._pPopoverCreditNote = Fragment.load({
                     id: oView.getId(),
                     name: "sap.kt.com.minihrsolution.fragment.CreditNoteListPopover",
                     controller: this
@@ -529,7 +531,7 @@ sap.ui.define([
                 });
             }
 
-            this._pPopover.then(oPopover => {
+            this._pPopoverCreditNote.then(oPopover => {
                 oPopover.setModel(new JSONModel({
                     status: sStatus,
                     invoices: aOriginalInvoices,
@@ -620,7 +622,7 @@ sap.ui.define([
                 const creditTotal = parseFloat(inv.CreditNotesTotal || 0);
                 const conversion = parseFloat(inv.ConversionRate || 1);
 
-                const pending = dueAmount - creditTotal;
+                const pending = (inv.Currency=== "INR") ? dueAmount : dueAmount - creditTotal;
 
                 var ResivedData = this.InvoicePaymentDetail.data.filter(payment => payment.InvNo === inv.InvNo);
 
@@ -743,7 +745,12 @@ sap.ui.define([
 
             // Calculate total value
             const totalValue = aInvoices.reduce((sum, inv) => sum + inv.totalAmountInINR, 0);
-
+            var AllTotalAmount = aInvoices.reduce((sum, inv) => {
+                let amount = 0;
+                (inv.Currency === "INR") ? amount = parseFloat(inv.TotalAmount || 0) : amount = parseFloat(inv.AmountInINR || 0);
+                return sum + amount;
+            }, 0)
+            oSelectedData['Total Value (INR)'] = AllTotalAmount;
             // Lazy-load the fragment if not already loaded
             if (!this.pTotalInvoicesDialog) {
                 this.pTotalInvoicesDialog = Fragment.load({
@@ -763,15 +770,7 @@ sap.ui.define([
                     companyName: sCompanyName,
                     invoices: aInvoices,
                     totalValue: totalValue,
-                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
-                        let amount = 0;
-                        if (inv.Currency === "INR") {
-                            amount = parseFloat(inv.TotalAmount || 0);
-                        } else {
-                            amount = parseFloat(inv.AmountInINR || 0);
-                        }
-                        return sum + amount;
-                    }, 0)
+                    AllTotalAmount: AllTotalAmount
                 }), "dialogData");
 
                 // Set dynamic title here
@@ -905,7 +904,7 @@ sap.ui.define([
 
             this.pMonthlyInvoicesDialogCreditNote.then(oDialog => {
                 // Compose dynamic dialog title using i18n text plus selected month-year
-                const sTitle = this.i18nModel.getText("monthlyinvoicefor") + " " + sMonth + "-" + iYear;
+                const sTitle = this.i18nModel.getText("monthlycreditnotefor") + " " + sMonth + "-" + iYear;
 
                 oDialog.setModel(new JSONModel({
                     month: `${sMonth}-${iYear}`, // pass month + year
@@ -972,8 +971,13 @@ sap.ui.define([
 
             // Compute FY total
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
-
+            var AllTotalAmount = aInvoices.reduce((sum, inv) => {
+                let amount = 0;
+                (inv.Currency === "INR") ? amount = parseFloat(inv.TotalAmount || 0) : amount = parseFloat(inv.AmountInINR || 0);
+                return sum + amount;
+            }, 0)
             // Lazy load dialog
+            aData[0].data['Total Value (INR)'] = AllTotalAmount
             if (!this.pYearlyInvoicesDialog) {
                 this.pYearlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
@@ -987,15 +991,7 @@ sap.ui.define([
                     year: fyLabel,
                     invoices: aInvoices,
                     totalValue: totalValue,
-                    AllTotalAmount: aInvoices.reduce((sum, inv) => {
-                        let amount = 0;
-                        if (inv.Currency === "INR") {
-                            amount = parseFloat(inv.TotalAmount || 0);
-                        } else {
-                            amount = parseFloat(inv.AmountInINR || 0);
-                        }
-                        return sum + amount;
-                    }, 0)
+                    AllTotalAmount: AllTotalAmount
                 }), "dialogData");
 
                 this.getView().addDependent(oDialog);

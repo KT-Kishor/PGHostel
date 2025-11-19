@@ -3,8 +3,8 @@
     xmlns:core="sap.ui.core">
     <Dialog
         id="MonthlyInvoiceDialog"
-        contentWidth="800px"
-        contentHeight="400px"
+        contentWidth="1000px"
+        contentHeight="500px"
         resizable="true"
         draggable="true">
         <customHeader >
@@ -38,9 +38,12 @@
                             <Text text="{dialogData>InvNo}" />
                             <Text text="{ path: 'dialogData>InvoiceDate', formatter:'.Formatter.formatDate'}" />
                             <Text text="{dialogData>CustomerName}" />
-                            <ObjectNumber number="{parts: [ { path: 'dialogData>TotalAmount' } ], formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
+                            <ObjectNumber number="{parts: [ { path: 'dialogData>OldTotalAmount' } ], formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
                             <!-- <ObjectNumber number="{parts: [{ path: 'dialogData>CreditNotesTotal' }],formatter: '.Formatter.fromatNumber'}"/> -->
-                            <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+                            <VBox >
+                                <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+								<Link wrapping="true" visible="{= ${dialogData>Currency} !== 'INR' }" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotalInINR' },{ value: 'INR' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+							</VBox>
                             <ObjectIdentifier title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"/>
                             <ObjectNumber number="{parts: [{ path: 'dialogData>Currency' },{ path: 'dialogData>TotalAmount' },{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
                             <Text text="{dialogData>Status}" />

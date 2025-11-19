@@ -3,8 +3,8 @@
     xmlns:core="sap.ui.core">
     <Dialog
         id="paymentDetailsDialog"
-        contentWidth="800px"
-        contentHeight="400px"
+        contentWidth="1000px"
+        contentHeight="500px"
         resizable="true"
         draggable="true">
           <customHeader >
@@ -26,8 +26,8 @@
                 <columns>
                     <Column demandPopin="true" hAlign="Left"><Text text="{i18n>invoiceNo}" /></Column>
                     <Column hAlign="End" demandPopin="true"><Text text="{i18n>taxableAmount}" /></Column>
-                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>gstAmount}" /></Column>
                     <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>creditNotesAmount}" /></Column>
+                    <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>gstAmount}" /></Column>
                     <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colTotalAmount}" /></Column>
                   
                 </columns>
@@ -37,8 +37,8 @@
                             <Text text="{dialogData>InvNo}" />
                             <ObjectNumber number="{path: 'dialogData>SubTotalInGST',formatter: '.Formatter.fromatNumber'}" unit="INR" />
                             <!-- <ObjectNumber number="{path: 'dialogData>gstAmount',formatter: '.Formatter.fromatNumber'}" unit="INR" /> -->
-                            <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
-                           	<ObjectNumber number="{parts: [{ path: 'dialogData>CreditNotesTotal' }],formatter: '.Formatter.fromatNumber'}"/>
+                            <Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ value: 'INR' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+                           	<ObjectNumber number="{parts: [{ path: 'dialogData>gstAmount' }],formatter: '.Formatter.fromatNumber'}"/>
                             <ObjectNumber number="{path: 'dialogData>totalAmountInINR',formatter: '.Formatter.fromatNumber'}" unit="INR"/>
                         </cells>
                     </ColumnListItem>

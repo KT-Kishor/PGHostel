@@ -2,7 +2,7 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 	<Dialog
-        contentWidth="900px"
+        contentWidth="1000px"
         contentHeight="500px"
         resizable="true"
         draggable="true">
@@ -37,7 +37,10 @@
 							<Text text="{popoverData>CCInvNo}" />
 							<Text text="{path: 'popoverData>InvoiceDate',formatter:'.Formatter.formatDate'}" />
 							<Text text="{popoverData>CustomerName}" />
-							<ObjectNumber number="{parts: [{ path: 'popoverData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+							<VBox >
+								<ObjectNumber number="{parts: [{ path: 'popoverData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+								<ObjectNumber visible="{= ${popoverData>Currency} !== 'INR' }" number="{parts: [{ path: 'popoverData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
+							</VBox>
 							</cells>
 					</ColumnListItem>
 				</items>

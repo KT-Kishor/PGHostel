@@ -35,7 +35,10 @@
                             <Text text="{dialogData>CCInvNo}" />
                             <Text text="{ path: 'dialogData>InvoiceDate', formatter:'.Formatter.formatDate'}" />
                             <Text text="{dialogData>CustomerName}" />
+                            <VBox >
                             <ObjectNumber number="{parts: [ { path: 'dialogData>TotalAmount' } ], formatter: '.Formatter.fromatNumber'}" unit="{dialogData>Currency}" />
+								<ObjectNumber visible="{= ${dialogData>Currency} !== 'INR' }" number="{parts: [{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
+							</VBox>
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -3,7 +3,7 @@
 	xmlns:core="sap.ui.core">
 	<Dialog
         id="invoiceListDialog"
-        contentWidth="900px"
+       	contentWidth="1000px"
         contentHeight="500px"
         resizable="true"
         draggable="true">
@@ -53,8 +53,11 @@
 							<Text text="{popoverData>InvNo}" />
 							<Text text="{path: 'popoverData>InvoiceDate',formatter:'.Formatter.formatDate'}" />
 							<Text text="{popoverData>CustomerName}" />
-							<ObjectNumber number="{parts: [{ path: 'popoverData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
-							<Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotal' },{ path: 'popoverData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+							<ObjectNumber number="{parts: [{ path: 'popoverData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}" unit="{popoverData>Currency}" />
+							<VBox >
+								<Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotal' },{ path: 'popoverData>Currency' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+								<Link wrapping="true" visible="{= ${popoverData>Currency} !== 'INR' }" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotalInINR' },{ value: 'INR' }],formatter: '.Formatter.formatAmountWithCurrency'}"/>
+							</VBox>
 							<ObjectIdentifier title="{path:'popoverData>ConversionRate', formatter: '.Formatter.fromatNumber'}"/>
 							<ObjectNumber number="{parts: [{ path: 'popoverData>Currency' },{ path: 'popoverData>TotalAmount' },{ path: 'popoverData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}" unit="INR" />
 						</cells>

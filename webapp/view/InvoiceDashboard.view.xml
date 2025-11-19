@@ -354,7 +354,7 @@
                         <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
-                                    <Title text="{i18n>invoiceMonthly}" level="H5" wrapping="true" class="Dashboardtitle"/>
+                                    <Title text="{i18n>creditMemoMonthly}" level="H5" wrapping="true" class="Dashboardtitle"/>
                                     <ToolbarSpacer/>
                                     <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalchartTooltip}"/>
                                     <Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChartTooltip}"/>
