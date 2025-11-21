@@ -570,7 +570,7 @@ sap.ui.define(
           var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
           oSingleCompanyModel.setProperty("/CustomerName", oSelectedCompany.companyName);
           oSingleCompanyModel.setProperty("/CustomerEmailID", oSelectedCompany.mailID);
-          oSingleCompanyModel.setProperty("/CustomerSTDCode", oSelectedCompany.stdCode);
+          oSingleCompanyModel.setProperty("/STDCode", oSelectedCompany.stdCode);
           oSingleCompanyModel.setProperty("/CustomerMobileNo", oSelectedCompany.mobileNo);
           oSingleCompanyModel.setProperty("/CustomerGSTNO", oSelectedCompany.GST);
           oSingleCompanyModel.setProperty("/CustomerAddress", oSelectedCompany.address);
