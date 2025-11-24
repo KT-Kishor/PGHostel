@@ -596,12 +596,12 @@ sap.ui.define([
                 var oModel = this.getView().getModel("SelectedCustomerModel");
                 var oData = oModel.getData();
                 // Decide which amount to use: DueAmount OR Total
-                var baseAmount = 0;
-                if (oData.DueAmount) {
-                    baseAmount = parseFloat(oData.DueAmount) - parseFloat(this.CreditMemoTotal) || 0;
-                } else {
-                    baseAmount = parseFloat(oData.Total) - parseFloat(this.CreditMemoTotal) || 0;
-                }
+                // var baseAmount = 0;
+                // if (oData.DueAmount) {
+                    var baseAmount = parseFloat(oData.TotalAmount) || 0;
+                // } else {
+                //     baseAmount = parseFloat(oData.Total) - parseFloat(this.CreditMemoTotal) || 0;
+                // }
                 // Apply Conversion Rate
                 var conversionRate = parseFloat(oData.ConversionRate) || 0;
                 var convertedValue = baseAmount * conversionRate;
