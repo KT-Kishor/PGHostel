@@ -570,7 +570,7 @@ sap.ui.define(
           var oSingleCompanyModel = this.getView().getModel("SingleCompanyModel");
           oSingleCompanyModel.setProperty("/CustomerName", oSelectedCompany.companyName);
           oSingleCompanyModel.setProperty("/CustomerEmailID", oSelectedCompany.mailID);
-          oSingleCompanyModel.setProperty("/STDCode", oSelectedCompany.stdCode);
+          oSingleCompanyModel.setProperty("/CustomerSTDCode", oSelectedCompany.stdCode);
           oSingleCompanyModel.setProperty("/CustomerMobileNo", oSelectedCompany.mobileNo);
           oSingleCompanyModel.setProperty("/CustomerGSTNO", oSelectedCompany.GST);
           oSingleCompanyModel.setProperty("/CustomerAddress", oSelectedCompany.address);
@@ -690,10 +690,10 @@ sap.ui.define(
         }
         const tmpDiv = document.createElement("div");
         tmpDiv.innerHTML = oNotesHTML;
-        if (!tmpDiv.textContent.trim()) {
-          MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
-          return;
-        }
+        // if (!tmpDiv.textContent.trim()) {
+        //   MessageToast.show(this.i18nModel.getText("quotaionNotemsg"));
+        //   return;
+        // }
        
         // Format dates
         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -1446,10 +1446,10 @@ sap.ui.define(
           }
           const tmpDiv = document.createElement("div");
           tmpDiv.innerHTML = oNotesHTML;
-          if (!tmpDiv.textContent.trim()) {
-            MessageToast.show("Notes field is required.");
-            return;
-          }
+          // if (!tmpDiv.textContent.trim()) {
+          //   MessageToast.show("Notes field is required.");
+          //   return;
+          // }
           const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
           const sQuotationDate = oDateFormat.format(this.byId("HQD_id_Quotation").getDateValue());
           const sValidUntilDate = oDateFormat.format(this.byId("HQD_id_QuotationValid").getDateValue());

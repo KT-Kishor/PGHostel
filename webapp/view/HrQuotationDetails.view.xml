@@ -355,7 +355,7 @@
                                             required="true"
                                         />
                                         <m:ComboBox
-                                            value="{SingleCompanyModel>/STDCode}"
+                                            value="{SingleCompanyModel>/CustomerSTDCode}"
                                             showSecondaryValues="true"
                                             id="HQD_id_CustomerNumberSTD"
                                             items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"

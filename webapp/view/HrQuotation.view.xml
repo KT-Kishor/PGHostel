@@ -79,7 +79,7 @@
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
-                items="{path: 'CompanyQuotationModel>/'}"
+                 items="{path: 'CompanyQuotationModel>/', sorter: {path: 'QuotationNo', descending: true}}"
                 alternateRowColors="true"
                 busyIndicatorDelay="0"
                 mode="SingleSelectLeft"
