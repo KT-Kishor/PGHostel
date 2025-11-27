@@ -1736,7 +1736,7 @@ sap.ui.define(
           mobileUtils.onISDChange(oEvent, this, {
             jobModelName: "SingleCompanyModel",
             countryModelName: "CountryModel",
-            mobileInputId: "HQD_id_InputCompanyMobileNo",
+            // mobileInputId: "HQD_id_InputCompanyMobileNo",
           });
         }
       },
@@ -1758,7 +1758,7 @@ sap.ui.define(
           mobileUtils.onISDChange(oEvent, this, {
             jobModelName: "SingleCompanyModel",
             countryModelName: "CountryModel",
-            mobileInputId: "HQD_id_InputCustomerMobileNo",
+            // mobileInputId: "HQD_id_InputCustomerMobileNo",
           });
         }
       },
