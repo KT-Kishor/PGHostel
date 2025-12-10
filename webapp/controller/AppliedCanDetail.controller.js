@@ -327,9 +327,14 @@ _applyCountryStateCityFilters: function () {
             // Create dialog
             this._oResumeDialog = new sap.m.Dialog({
                 title: sFileName,
-                stretch: true,
+                stretch: true, // Fullscreen on all devices
                 draggable: true,
                 resizable: true,
+                contentWidth: "80%",
+                contentHeight: "80%",
+                horizontalScrolling: false,
+                contentPadding: "0rem",
+                content: [],
                 content: [
                     new sap.ui.core.HTML({
                         content: `

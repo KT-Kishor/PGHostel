@@ -1584,10 +1584,13 @@ oEmployeeModel.setProperty("/0/Branch", oSelectedCompany.branch || "");
       if (!this._oPreviewDialog) {
         this._oPreviewDialog = new sap.m.Dialog({
           title: sFileName,
+          stretch: true, // Fullscreen on all devices
+          draggable: true,
+          resizable: true,
           contentWidth: "50%",
           contentHeight: "auto",
-          resizable: true,
-          draggable: true,
+          horizontalScrolling: false,
+          contentPadding: "0rem",
           content: [],
           endButton: new sap.m.Button({
             text: "Close",

@@ -533,6 +533,11 @@ sap.ui.define([
                         stretch: true, // Fullscreen on all devices
                         draggable: true,
                         resizable: true,
+                        contentWidth: "80%",
+                        contentHeight: "80%",
+                        horizontalScrolling: false,
+                        verticalScrolling: false,
+                        contentPadding: "0rem",
                         content: [],
                         beginButton: new sap.m.Button({
                             text: "Download",
@@ -557,14 +562,14 @@ sap.ui.define([
                 this._oPreviewDialog.removeAllContent();
 
                 if (sMimeType.startsWith("image/")) {
-                    const sFileUri = `data:${sMimeType};base64,${sBase64}`;
-                    const oImage = new sap.m.Image({
-                        src: sFileUri,
-                        densityAware: false
-                    });
-                    oImage.addStyleClass("imagePreviewFit");
-                    this._oPreviewDialog.addContent(oImage);
-                    this._oPreviewDialog.open();
+                const sFileUri = `data:${sMimeType};base64,${sBase64}`;
+                const oImage = new sap.m.Image({
+                    src: sFileUri,
+                    densityAware: false
+                });
+                oImage.addStyleClass("imagePreviewFit");
+                this._oPreviewDialog.addContent(oImage);
+                this._oPreviewDialog.open();
                 } else if (sMimeType === "application/pdf") {
                     const byteCharacters = atob(sBase64);
                     const byteArrays = [];
