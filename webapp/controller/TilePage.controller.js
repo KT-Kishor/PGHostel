@@ -31,8 +31,7 @@ sap.ui.define(
                     this.AppVisibilityReadCall();
                     await this._fetchCommonData("AllLoginDetails", "EmpModel");
                     await this._fetchCommonData("EmployeeDetails", "EmpDetails");
-                    await this._fetchCommonData("Trainee", "traineePayslipModel", { Status: "Onboarded",
-                        Type: "Stipend" });
+                    await this._fetchCommonData("Trainee", "traineePayslipModel", {Type: "Stipend" });
 
                     this.CreateEmployeeModel();
                     this.initializeBirthdayCarousel();
@@ -43,10 +42,13 @@ sap.ui.define(
                         return item.Role !== "Contractor" && item.Role !== "Trainee";
                     });
                     var traineeData = this.getView().getModel("traineePayslipModel").getData() || [];
-                    var normalizedTrainees = traineeData.map(function(item) {
+                    var filteredTrainees = traineeData.filter(function(item) {
+                        return item.Status === "Onboarded" || item.Status === "Training Completed";
+                    });
+                    var normalizedTrainees = filteredTrainees.map(function(item) {
                         return {
                             EmployeeID: item.TraineeID,
-                            EmployeeName: item.TraineeName,
+                            EmployeeName: item.TraineeName
                         };
                     });
                     var combinedData = filteredEmpData.concat(normalizedTrainees);
