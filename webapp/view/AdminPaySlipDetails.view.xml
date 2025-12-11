@@ -199,7 +199,7 @@
                                         id="APD_id_Employee"
                                         change="APD_onEmployeeIDChange"
                                         showClearIcon="true"
-                                        items="{EmployeeModel>/}"
+                                        items="{path:'EmployeeModel>/',length:1000}" 
                                     >
                                         <core:ListItem
                                             key="{EmployeeModel>EmployeeID}"

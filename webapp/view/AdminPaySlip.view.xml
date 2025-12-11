@@ -33,7 +33,7 @@
                             <ComboBox
                                 id="AP_id_Employee"
                                 showClearIcon="true"
-                                items="{EmployeeModel>/}"
+                                items="{path:'EmployeeModel>/',length:1000}"
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
