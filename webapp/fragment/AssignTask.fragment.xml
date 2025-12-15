@@ -15,7 +15,7 @@
     selectionChange="FAT_onchangeEmpId"
     selectedKeys="{EditTaskModel>/EmployeeID}"
     items="{LoginDetailsModel>/}"
-    showSecondaryValues="true"
+    showSecondaryValues="true" filterSecondaryValues="true"
     editable="{= !${visiblePlay>/isEditMode} }">
     <core:ListItem 
         key="{LoginDetailsModel>EmployeeID}" 

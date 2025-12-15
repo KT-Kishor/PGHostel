@@ -38,7 +38,7 @@
                     placeholder="Select Employee"
 
                     selectedKey="{CreateIncomeAssetModel>/PickedEmployeeName}"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{AdminModel>/}"
                     change="IA_validatePickedBy"
                     valueStateText="{i18n>selectvaluefromdropdown}"
@@ -58,7 +58,7 @@
                     valueStateText="Select Branch"
                     value="{CreateIncomeAssetModel>/PickedBranch}"
                     
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
@@ -122,7 +122,7 @@
                     selectionChange="FCIA_onselectionchange"
                     valueStateText="Select Branch"
                     selectedKey="{CreateIncomeAssetModel>/PickedBranch}"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem
@@ -159,7 +159,7 @@
                     id="FCIA_id_transferBy"
 					required="true"
                     selectedKey="{CreateIncomeAssetModel>/TransferByName}"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" 
                     items="{AdminModel>/}"
                 >
                     <core:ListItem
@@ -188,7 +188,7 @@
                     valueStateText="Select Branch"
                     value="{CreateIncomeAssetModel>/TransferBranch}"
                     selectedKey="{CreateIncomeAssetModel>/TransferBranch}"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{CompanyCodeDetailsModel>/}"
                 >
                     <core:ListItem

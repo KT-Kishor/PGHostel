@@ -14,7 +14,7 @@
 						<fb:control>
 							<ComboBox id="EI_id_InvNo"
                     items="{path:'CompanyInvoiceFilterModel>/', length:1000}" filterSecondaryValues="true"
-                    showSecondaryValues="true" showClearIcon="true">
+                    showSecondaryValues="true" filterSecondaryValues="true" showClearIcon="true">
 								<core:ListItem key="{CompanyInvoiceFilterModel>InvNo}" text="{CompanyInvoiceFilterModel>InvNo}" additionalText="{CompanyInvoiceFilterModel>CustomerName}"/>
 							</ComboBox>
 						</fb:control>

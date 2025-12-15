@@ -218,7 +218,7 @@
                                         items="{Quotation>/BaseLocationData}"
                                         change="QF_onBranchCodeChange"
                                         editable="{= ${Quotation>/AddCase} ? true : false }"
-                                        showSecondaryValues="true"
+                                        showSecondaryValues="true" filterSecondaryValues="true"
                                         valueStateText="{i18n>branchCodeValueState}"
                                         required="true"
                                         visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'CEO' ? true : false }"

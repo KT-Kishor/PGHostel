@@ -23,7 +23,7 @@
 									<m:Label text="{i18n>coCode}" required="true" />
 										<m:Input id="CID_id_CompanyCode" editable="false"  value="{SelectedCustomerModel>/CompanyCode}" />
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>customerName}" required="true" />
-										<m:ComboBox change="onChangeAddCustomer" showClearIcon="true" id="CID_id_AddCustComboBox" showButton="true" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" valueStateText="{i18n>selectCustomer}" showSecondaryValues="true">
+										<m:ComboBox change="onChangeAddCustomer" showClearIcon="true" id="CID_id_AddCustComboBox" showButton="true" visible="{visiablityPlay>/createVisi}" items="{ManageCustomerModel>/}" value="{SelectedCustomerModel>/Customer}" valueStateText="{i18n>selectCustomer}"  filterSecondaryValues="true">
 											<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}" />
 										</m:ComboBox>
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>invoiceNo}"/>

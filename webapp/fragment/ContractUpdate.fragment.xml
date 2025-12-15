@@ -57,14 +57,14 @@
 									<f:content>
 									    <!-- Select Company Code -->
 										<m:Label text="{i18n>companyBranch}" required="true" />
-										<m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" valueStateText="{i18n>combovalueState}" showSecondaryValues="true" value="{oFilteredContractModel>/CompanyCode}" id="CU_id_CompanyCode" change="CU_onCompanyCodeChange" editable="{simpleForm>/editable}">
+										<m:ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" valueStateText="{i18n>combovalueState}" showSecondaryValues="true" value="{oFilteredContractModel>/CompanyCode}" id="CU_id_CompanyCode" change="CU_onCompanyCodeChange" editable="{simpleForm>/editable}" filterSecondaryValues="true">
 										<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}"/>
 										</m:ComboBox>	
 										  <!-- Select Branch -->
 										<m:Label text="{i18n>branch}" />
 										<m:ComboBox valueStateText="{i18n>selectBranch}" 
 										id="CU_id_Branch" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
-										value="{oFilteredContractModel>/Branch}" showSecondaryValues="true" enabled="false">
+										value="{oFilteredContractModel>/Branch}" showSecondaryValues="true" filterSecondaryValues="true" enabled="false">
 										<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
 										additionalText="{CompanyCodeDetailsModel>companyName}" />
 										</m:ComboBox>
@@ -101,7 +101,7 @@
 										<m:TextArea value="{oFilteredContractModel>/ConsultantAddress}" valueStateText="{i18n>addressValueState}" liveChange="CD_ValidateCommonFields" id="CU_id_ContractAddress" maxLength="120" editable="{simpleForm>/editable}" rows="2"/>
 										<!-- End Client -->
 										<m:Label text="{i18n>endClient}" required="true"/>
-										<m:ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" valueStateText="{i18n>combovalueState}" showSecondaryValues="true"  value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}">
+										<m:ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" valueStateText="{i18n>combovalueState}" showSecondaryValues="true"  value="{oFilteredContractModel>/EndClient}" id="CU_id_EndClient" change="CD_validateName"  editable="{simpleForm>/editable}" filterSecondaryValues="true">
 										<core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>companyName}" additionalText="{CreateCustomerModel>name}" />
 										</m:ComboBox>	
 										<!-- <m:Input value="{oFilteredContractModel>/EndClient}" liveChange="onLiveValidation" id="idEndClient"  editable="{simpleForm>/editable}" maxLength="50" /> -->
@@ -167,7 +167,7 @@
 										<m:ComboBox id="CU_id_Country" items="{path:'CountryModel>/',length:1000}" 
 										value="{oFilteredContractModel>/Country}" selectedKey="{oFilteredContractModel>/Country}" 
 										showSecondaryValues="true" valueStateText="{i18n>expValStaCountry}" 
-										editable="{simpleForm>/editable}" change="CD_onChangeCountry">
+										editable="{simpleForm>/editable}" change="CD_onChangeCountry" filterSecondaryValues="true">
 										<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" 
 										additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
@@ -185,7 +185,7 @@
 										<m:Label text="{i18n>city}" required="true"/>
 										<m:ComboBox id="CU_id_ContractCity" items="{path:'CityModel>/',length:1000}"
 										value="{oFilteredContractModel>/ContractLocation}" selectedKey="{oFilteredContractModel>/ContractLocation}" showSecondaryValues="true" valueStateText="{i18n>cityValueText}" 
-										editable="{simpleForm>/editable}" change="CD_onBaseLocationChange">
+										editable="{simpleForm>/editable}" change="CD_onBaseLocationChange" filterSecondaryValues="true">
 										 <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 										</m:ComboBox>
 

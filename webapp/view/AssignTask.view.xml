@@ -83,7 +83,7 @@
                                 showClearIcon="true"
                                 items="{LoginDetailsModel>/}"
                                 selectedKey="{filterModel>/SelectedEmployeeId}"
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{LoginDetailsModel>EmployeeID}"

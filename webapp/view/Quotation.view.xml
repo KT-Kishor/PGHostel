@@ -40,7 +40,7 @@
                                     length: 1000
                                 }"
                                 selectionChange="Q_onBranchFilterChange"
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{Quotation>branchCode}"
@@ -71,7 +71,7 @@
                                     },
                                     length: 1000
                                 }"
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{EmpModel>EmployeeName}"

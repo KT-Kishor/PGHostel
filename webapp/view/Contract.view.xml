@@ -15,7 +15,7 @@
 					<fb:FilterGroupItem name="ContractNo" label="{i18n>contractNo}" groupName="Group1" visibleInFilterBar="true">
 					<fb:control>
 						 <ComboBox id="idContractNoCombo" selectedKey="{path: 'filters>/ContractNo'}" showSecondaryValues="true"
-                         showClearIcon="true" items="{ContractModelInitial>/}">
+                         showClearIcon="true" items="{ContractModelInitial>/}" filterSecondaryValues="true">
 						   <core:ListItem key="{ContractModelInitial>ContractNo}" text="{ContractModelInitial>ContractNo}"
                             additionalText="{ContractModelInitial>ConsultantName}"/>
                          </ComboBox>
@@ -52,7 +52,7 @@
 				</fb:FilterGroupItem>
 				<fb:FilterGroupItem name="CompanyCode" label="{i18n>coCode}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="C_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+							<ComboBox id="C_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true" filterSecondaryValues="true">
 								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
 							</ComboBox>
 						</fb:control>

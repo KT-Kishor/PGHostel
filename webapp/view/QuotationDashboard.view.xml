@@ -285,7 +285,7 @@
 										},
 										length: 1000
 									}"
-                                    showSecondaryValues="true"
+                                    showSecondaryValues="true" filterSecondaryValues="true"
                                 >
                                     <core:ListItem
                                         key="{EmpModel>EmployeeID}"

@@ -21,15 +21,15 @@
 					<Label class="sapUiSmallMarginTop" text="Email Address" required="true"/>
 					<Input id="emailInput" type="Email" liveChange="onEmailChange" maxLength="50" required="true" placeholder="Enter email" valueStateText="{i18n>emailValueState}" />
 					<Label class="sapUiSmallMarginTop" text="Country of Residence" />
-					<ComboBox change="MC_onChangeCountry" width="100%" valueStateText="{i18n>JobAppExpValStaCountry}" id="countryCombo" items="{path:'CountryModel>/',length:300}" selectedKey="{JobModel>/country}" showSecondaryValues="true">
+					<ComboBox change="MC_onChangeCountry" width="100%" valueStateText="{i18n>JobAppExpValStaCountry}" id="countryCombo" items="{path:'CountryModel>/',length:300}" selectedKey="{JobModel>/country}" showSecondaryValues="true" filterSecondaryValues="true">
 						<core:ListItem key="{CountryModel>code}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 					</ComboBox>
 					<Label class="sapUiSmallMarginTop" text="State" />
-					<ComboBox id="stateCombo" width="100%" change="MC_onChangeState" items="{path: 'StateModel>/', length: 200, sorter: { path: 'stateName'}}" selectedKey="{JobModel>/state}" showSecondaryValues="true" valueStateText="{i18n>JobAppExpValStaState}">
+					<ComboBox id="stateCombo" width="100%" change="MC_onChangeState" items="{path: 'StateModel>/', length: 200, sorter: { path: 'stateName'}}" selectedKey="{JobModel>/state}" showSecondaryValues="true" valueStateText="{i18n>JobAppExpValStaState}" filterSecondaryValues="true">
 						<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 					</ComboBox>
 					<Label text="City" class="sapUiSmallMarginTop" />
-					<ComboBox id="LocationComboBox" width="100%" change="MC_onChangeCity" items="{path: 'CityModel>/', length: 200, sorter: { path: 'cityName'}}" selectedKey="{JobModel>/city}" showSecondaryValues="true" valueStateText="{i18n>JAcombovalueState}">
+					<ComboBox id="LocationComboBox" width="100%" change="MC_onChangeCity" items="{path: 'CityModel>/', length: 200, sorter: { path: 'cityName'}}" selectedKey="{JobModel>/city}" showSecondaryValues="true" valueStateText="{i18n>JAcombovalueState}" filterSecondaryValues="true">
 						<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>stateName}" />
 					</ComboBox>
 					<Label class="sapUiSmallMarginTop" text="Address" required="false"/>
@@ -37,7 +37,7 @@
 					<HBox alignItems="Center" renderType="Bare">
 						<VBox width="25%">
 							<Label text="ISD Code" required="true" class="sapUiSmallMarginTop"/>
-							<ComboBox id="isd_code" selectedKey="{JobModel>/stdCode}" showSecondaryValues="true" change="MC_ValidateISD" items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}" filterSecondaryValues="true" valueStateText="{i18n>JAcombovalueState}">
+							<ComboBox id="isd_code" selectedKey="{JobModel>/stdCode}" showSecondaryValues="true"  change="MC_ValidateISD" items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}" filterSecondaryValues="true" valueStateText="{i18n>JAcombovalueState}">
 								<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 							</ComboBox>
 						</VBox>

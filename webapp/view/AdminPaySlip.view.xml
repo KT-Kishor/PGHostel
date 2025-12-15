@@ -34,7 +34,7 @@
                                 id="AP_id_Employee"
                                 showClearIcon="true"
                                 items="{path:'EmployeeModel>/',length:1000}"
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{EmployeeModel>EmployeeID}"
@@ -64,7 +64,7 @@
 
                     <fb:FilterGroupItem id="AP_CompanyCode" name="CompanyCode" label="{i18n>coCode}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="AP_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+							<ComboBox id="AP_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true" filterSecondaryValues="true">
 								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
 							</ComboBox>
 						</fb:control>

@@ -83,7 +83,7 @@
                             id="IA_id_PickedBy"
                             items="{pickedByModel>/}"
                             showClearIcon="true"
-                            showSecondaryValues="true"
+                            showSecondaryValues="true" filterSecondaryValues="true"
                         >
                             <items>
                                 <core:ListItem
@@ -151,7 +151,7 @@
                         </ComboBox> -->
                          <ComboBox
                     id="IA_id_branch"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{CompanyCodeDetailsModel>/}"
                     showClearIcon="true"
 

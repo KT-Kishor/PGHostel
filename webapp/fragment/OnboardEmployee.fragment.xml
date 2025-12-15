@@ -28,7 +28,7 @@
 				<Label text="{i18n>joiningDate}" />
 					<DatePicker  value="{ path: 'oEmpolyeeDetailsModel>/JoiningDate',formatter:'.Formatter.formatDate' }"  editable="false"   displayFormat="dd/MM/yyyy"  valueFormat="dd/MM/yyyy"  />
 				<Label text="{i18n>expCountry}" required="true"/>
-				<ComboBox change="OE_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="OEF_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oEmpolyeeDetailsModel>/Country}" showSecondaryValues="true">
+				<ComboBox change="OE_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="OEF_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{oEmpolyeeDetailsModel>/Country}" showSecondaryValues="true" filterSecondaryValues="true">
 				 <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 				<Label text="{i18n>state}" required="true" />
@@ -36,7 +36,7 @@
 				<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 				</ComboBox>
 				<Label text="{i18n>baseLocation}" required="true"/>
-			    <ComboBox items="{path:'CityModel>/',length:1000}"  showSecondaryValues="true" value="{oEmpolyeeDetailsModel>/BaseLocation}" change="EO_onBaseLocationChange" id="idSelect" valueStateText="{i18n>selectBase}">
+			    <ComboBox items="{path:'CityModel>/',length:1000}"  showSecondaryValues="true" filterSecondaryValues="true" value="{oEmpolyeeDetailsModel>/BaseLocation}" change="EO_onBaseLocationChange" id="idSelect" valueStateText="{i18n>selectBase}">
 				<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 				<!-- <Label text="{i18n>branchCode}" />

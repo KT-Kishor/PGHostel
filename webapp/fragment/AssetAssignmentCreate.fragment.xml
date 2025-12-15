@@ -25,7 +25,7 @@
 				<ComboBox
                     required="true"
                     id="FAA_id_employeeID"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     items="{EmpModel>/}"    
                     change="FAA_onEmpIDChange"
                     value="{myform>/formData/data/AssignEmployeeID}"
@@ -72,7 +72,7 @@
 				<Label text="{i18n>branch}" />
 				<ComboBox
                     id="FAA_branch_Id"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     change="FAA_onBranchChange"
                     editable="false"
                     items="{BaseLocationModel>/}"
@@ -114,7 +114,7 @@
                     id="FAA_id_AssignedBy"
                     items="{AdminModel>/}"
                     change="FAA_onChangeAssignedBy"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     value="{myform>/formData/data/AssignedByEmployeeName}"
                     editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager' }"
                     valueStateText="{i18n>commonNameValueState}"

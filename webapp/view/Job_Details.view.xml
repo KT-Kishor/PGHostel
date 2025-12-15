@@ -29,7 +29,7 @@
 									</fb:FilterGroupItem>
 									<fb:FilterGroupItem name="Location" label="{i18n>V1_L_Location}" groupName="Group1" visibleInFilterBar="true">
 										<fb:control>
-											<ComboBox id="V1_ID_LocationComboBox" placeholder="Select Location" items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true">
+											<ComboBox id="V1_ID_LocationComboBox" placeholder="Select Location" items="{BaseLocationModel>/}" showClearIcon="true" showSecondaryValues="true" filterSecondaryValues="true">
 												<core:ListItem key="{BaseLocationModel>id}" text="{BaseLocationModel>city}" additionalText="{BaseLocationModel>branchCode}" />
 											</ComboBox>
 										</fb:control>

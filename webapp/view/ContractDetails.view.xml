@@ -25,11 +25,11 @@
 					<f:SimpleForm  editable="true" layout="ColumnLayout" columnsM="1" columnsL="2" columnsXL="2">
 						<f:content>
 						    <Label text="{i18n>companyBranch}" required="true" />
-							<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{ContractModelWizart>/CompanyCode}" id="CD_id_CompanyCode" valueStateText="{i18n>selectBranch}" change="CD_onCompanyChange">
+							<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{ContractModelWizart>/CompanyCode}" id="CD_id_CompanyCode" valueStateText="{i18n>selectBranch}" change="CD_onCompanyChange" filterSecondaryValues="true">
 						    <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}" />
 				            </ComboBox>
 							<Label text="{i18n>branch}" />
-							<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" selectedKey="{ContractModelWizart>/Branch}" id="CD_id_Branch" valueStateText="{i18n>selectBranch}" enabled="false">
+							<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" selectedKey="{ContractModelWizart>/Branch}" id="CD_id_Branch" valueStateText="{i18n>selectBranch}" enabled="false" filterSecondaryValues="true">
 							<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" additionalText="{CompanyCodeDetailsModel>companyName}"/>
 							</ComboBox>
 							<Label text="{i18n>agreementDate}" required="true"/>
@@ -57,7 +57,7 @@
 							<Input id="CD_id_Currency" value="{ContractModelWizart>/Currency}" editable="false"
 							visible="true" class="marginLeft" change="CD_onChangeCurrency"/>
 							<Label text="{i18n>endClientHirer}" required="true"/>
-							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" showSecondaryValues="true" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}">
+							<ComboBox items="{path:'CreateCustomerModel>/', sorter: {path:'companyName', descending:false }}" value="{ContractModelWizart>/EndClientHirer}" showSecondaryValues="true" id="CD_id_EndClientHirer" change="CD_validateName" valueStateText="{i18n>combovalueState}" filterSecondaryValues="true">
                             <core:ListItem  key="{CreateCustomerModel>salutation}" text="{CreateCustomerModel>companyName}" additionalText="{CreateCustomerModel>name}" />
                             </ComboBox>
 							<Label text="{i18n>hiringContactLabel}" required="true"/>
@@ -102,7 +102,7 @@
 					        <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 				            </ComboBox>
 							<Label text="{i18n>city}" required="true"/>
-							<ComboBox change="CD_onBaseLocationChange" items="{path:'CityModel>/',length:1000}" id="CD_id_ConLocation"  showSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" valueStateText="{i18n>city}" >
+							<ComboBox change="CD_onBaseLocationChange" items="{path:'CityModel>/',length:1000}" id="CD_id_ConLocation"  showSecondaryValues="true" filterSecondaryValues="true" selectedKey="{ContractModelWizart>/contractLocation}" valueStateText="{i18n>city}" >
 							<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 							</ComboBox>	   
 							<Label text="{i18n>mobileNo}" required="true" />

@@ -339,7 +339,7 @@
                                             id="SS_id_Country"
                                             items="{path:'CountryModel>/',length:400}"
                                             value="{sEmployeeModel>/0/Country}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             editable="{viewModel>/AdminRole}"
                                             visible="{viewModel>/RelievingLetter}"
                                         >
@@ -362,7 +362,7 @@
                                             id="SS_id_State"
                                             items="{path:'StateModel>/',length:4000}"
                                             value="{sEmployeeModel>/0/State}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             editable="{viewModel>/AdminRole}"
                                             visible="{viewModel>/RelievingLetter}"
                                         >
@@ -380,7 +380,7 @@
                                         />
                                         <m:ComboBox
                                             items="{path:'CityModel>/',length:4000}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             value="{sEmployeeModel>/0/BaseLocation}"
                                             change="SS_onBaseLocationChange"
                                             id="SS_id_BaseL"
@@ -401,7 +401,7 @@
                                             editable="{viewModel>/AdminRole}"
 											change="SS_onCompanyChange"
 											 items="{CompanyCodeDetailsModel>/}"
-											 showSecondaryValues="true"
+											 showSecondaryValues="true" filterSecondaryValues="true"
                                         >
                                             <core:ListItem
                                                 key="{CompanyCodeDetailsModel>companyCode}"
@@ -431,7 +431,7 @@
                                         <m:ComboBox
                                             items="{DesignationModel>/}"
                                             id="SS_id_Desi"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             value="{sEmployeeModel>/0/Designation}"
                                             editable="{viewModel>/AdminRole}"
                                             change="SS_ValidateCommonFields"
@@ -449,7 +449,7 @@
                                         />
                                         <m:ComboBox
                                             value="{sEmployeeModel>/0/ManagerName}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             id="SS_id_Manager"
                                             editable="{viewModel>/AdminRole}"
                                             items="{empModel>/}"
@@ -470,7 +470,7 @@
                                         />
                                         <!-- value="{sEmployeeModel>/0/STDCode}" -->
                                         <m:ComboBox
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             id="SS_id_STDCode"
                                             items="{path:'CountryModel>/',length:4000}"
                                             filterSecondaryValues="true"
@@ -502,7 +502,7 @@
                                         <m:Select
                                             editable="{viewModel>/AdminRole}"
                                             selectedKey="{sEmployeeModel>/0/Role}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             id="SS_id_RoleEmpSele"
                                             items="{RoleModel>/}"
                                             visible="{viewModel>/RelievingLetter}"
@@ -631,7 +631,7 @@
                                                         />
                                                         <m:ComboBox
                                                             value="{sEmployeeModel>/0/EContactIStdCode}"
-                                                            showSecondaryValues="true"
+                                                            showSecondaryValues="true" 
                                                             id="SS_id_STDCodeRI"
                                                             items="{path:'CountryModel>/',length:4000}"
                                                             filterSecondaryValues="true"
@@ -743,7 +743,7 @@
                                                         />
                                                         <m:ComboBox
                                                             value="{sEmployeeModel>/0/EContactIIStdCode}"
-                                                            showSecondaryValues="true"
+                                                            showSecondaryValues="true" 
                                                             id="SS_id_STDCodeRII"
                                                             items="{path:'CountryModel>/',length:4000}"
                                                             filterSecondaryValues="true"

@@ -27,7 +27,7 @@
     visibleInFilterBar="true">
                         <fb:control>
                             <ComboBox
-            showSecondaryValues="true"
+            showSecondaryValues="true" filterSecondaryValues="true"
             items="{path: 'FilteredQuotations>/'}"
             showClearIcon="true"
             id="HQ_id_quotationNo"
@@ -46,7 +46,7 @@
     visibleInFilterBar="true">
                         <fb:control>
                             <ComboBox
-            showSecondaryValues="true"
+            showSecondaryValues="true" filterSecondaryValues="true"
             items="{path: 'FilteredCustomers>/'}"
             showClearIcon="true"
             id="HQ_id_CustomerName"

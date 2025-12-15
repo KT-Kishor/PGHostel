@@ -26,7 +26,7 @@
                     id="FAU_id_returnTo"
                     items="{AdminModel>/}"
                     change="FAU_onChangeReturnTo"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     value="{myform>/formData/data/ReturnEmpName}"
                     editable="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'IT Manager'}"
                     valueStateText="{i18n>commonNameValueState}">
@@ -49,7 +49,7 @@
 				<ComboBox
                     editable="false"
                     id="FAU_id_branch"
-                    showSecondaryValues="true"
+                    showSecondaryValues="true" filterSecondaryValues="true"
                     change="FAU_onReturnBranchChange"
                     items="{BaseLocationModel>/}"
                     valueStateText="{i18n>selectBranch}"

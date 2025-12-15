@@ -16,7 +16,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="EmployeeID" label="{i18n>employeeID}" groupName="Group1" visibleInFilterBar="{= ${LoginModel>/Role} === 'Admin' ? true : false}">
 						<fb:control>
-							<ComboBox name="EmployeeID" change="onChangeEmployeeID" showSecondaryValues="true" showClearIcon="true" items="{ManagerModel>/}" id="All_id_EmployeeName">
+							<ComboBox name="EmployeeID" change="onChangeEmployeeID" showSecondaryValues="true"  filterSecondaryValues="true"showClearIcon="true" items="{ManagerModel>/}" id="All_id_EmployeeName">
 								<core:ListItem key="{EmpModel>EmployeeID}" text="{ManagerModel>EmployeeID}" additionalText="{ManagerModel>EmployeeName}" />
 							</ComboBox>
 						</fb:control>
@@ -30,14 +30,14 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Source" label="{i18n>expSource}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" id="All_id_SourceFilter" items="{path:'FilterAllowanceModel>/SourceSet',length:1000}">
+							<ComboBox name="Source" showClearIcon="true" showSecondaryValues="true" filterSecondaryValues="true" id="All_id_SourceFilter" items="{path:'FilterAllowanceModel>/SourceSet',length:1000}">
 								<core:ListItem key="{FilterAllowanceModel>Source}" text="{FilterAllowanceModel>Source}" />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="Destination" label="{i18n>expDestination}" groupName="Group1" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox name="Destination" id="All_id_DestinationFilter" showSecondaryValues="true" showClearIcon="true" items="{path:'FilterAllowanceModel>/DestinationSet',length:1000}">
+							<ComboBox name="Destination" id="All_id_DestinationFilter" showSecondaryValues="true"  filterSecondaryValues="true"showClearIcon="true" items="{path:'FilterAllowanceModel>/DestinationSet',length:1000}">
 								<core:ListItem key="{FilterAllowanceModel>Destination}" text="{FilterAllowanceModel>Destination}" />
 							</ComboBox>
 						</fb:control>

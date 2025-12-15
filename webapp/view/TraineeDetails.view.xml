@@ -61,7 +61,7 @@
                     >
 						<f:content>
                        <Label text="{i18n>companyBranch}" required="true" />
-                        <ComboBox  items="{path:'CompanyCodeDetailsModel>/',length:1000}"  showSecondaryValues="true" 
+                        <ComboBox  items="{path:'CompanyCodeDetailsModel>/',length:1000}"  showSecondaryValues="true" filterSecondaryValues="true"
                         selectedKey="{oTraineeDetails>/CompanyCode}" id="TD_id_CompanyCode" valueStateText="{i18n>selectBranch}" 
                         selectionChange="TD_onCompanyCodeChange">
                         <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" 
@@ -69,7 +69,7 @@
                         </ComboBox>
 
                         <Label text="{i18n>branch}"/>
-                        <ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" 
+                        <ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" filterSecondaryValues="true"
                         selectedKey="{oTraineeDetails>/Branch}" id="TD_id_Branch" valueStateText="{i18n>selectBranch}" 
                         enabled="false">
                         <core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
@@ -131,7 +131,7 @@
                                 required="true"
                             />
 							<ComboBox
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                                 change="TD_validateCombo"
                                 selectionChange="onManagerSelectionChange"
                                 selectedKey="1"
@@ -260,7 +260,7 @@
                                 id="TD_Id_Country"
                                 items="{path:'CountryModel>/',length:1000}"
                                 value="{oTraineeDetails>/Country}"
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                                 selectedKey="{oTraineeDetails>/Country}" 
                             >
 								<core:ListItem
@@ -279,7 +279,7 @@
                             />
 							<ComboBox
                                 items="{path:'CityModel>/',length:1000}" 
-                                showSecondaryValues="true"
+                                showSecondaryValues="true" filterSecondaryValues="true"
                                 id="TD_id_Location"
                                 valueStateText="{i18n>cityValueText}"
                                 change="TD_validateCombo"

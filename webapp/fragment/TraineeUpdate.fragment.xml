@@ -68,7 +68,7 @@
 										<m:Label text="{i18n>companyBranch}" required="true" />
 										<m:ComboBox change="TU_onCompanyCodeChange" valueStateText="{i18n>selectBranch}" 
 										id="TU_id_CompanyCode" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
-										value="{oTraineeDetails>/CompanyCode}" showSecondaryValues="true" 
+										value="{oTraineeDetails>/CompanyCode}" showSecondaryValues="true"  filterSecondaryValues="true"
 										editable="{viewModel>/editable}">
 										<core:ListItem	key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}"/>
 										</m:ComboBox>
@@ -76,7 +76,7 @@
 										<m:Label text="{i18n>branch}"/>
 										<m:ComboBox valueStateText="{i18n>selectBranch}" 
 										id="TU_id_Branch" items="{path:'CompanyCodeDetailsModel>/',length:1000}" 
-										value="{oTraineeDetails>/Branch}" showSecondaryValues="true" enabled="false">
+										value="{oTraineeDetails>/Branch}" showSecondaryValues="true" filterSecondaryValues="true" enabled="false">
 										<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" 
 										additionalText="{CompanyCodeDetailsModel>companyName}" />
 										</m:ComboBox>
@@ -101,7 +101,7 @@
 											<core:Item key="{GenderModel>Value}" text="{GenderModel>Value}" />
 										</m:Select>
 										<m:Label text="{i18n>reportingManager}" required="true" />
-										<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}"  editable="{viewModel>/editable}" valueStateText="{i18n>reportingManagerVs}">
+										<m:ComboBox id="TU_id_Manager" showSecondaryValues="true" filterSecondaryValues="true" change="TD_validateName"   value="{oTraineeDetails>/ReportingManager}" items="{empModel>/}"  editable="{viewModel>/editable}" valueStateText="{i18n>reportingManagerVs}">
 											<core:ListItem key="{empModel>EmployeeID}" text="{empModel>EmployeeName}" additionalText="{empModel>EmployeeID}"  />
 										</m:ComboBox>
 										<m:Label text="{i18n>emailId}" required="true" />
@@ -144,18 +144,18 @@
 											<core:Item key="{DurationTraining>Code}" text="{DurationTraining>Code}" />
 										</m:Select>
 										<m:Label text="{i18n>expCountry}" required="true"/>
-										<m:ComboBox change="TU_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="TU_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{oTraineeDetails>/Country}" showSecondaryValues="true" editable="{viewModel>/editable}" >
+										<m:ComboBox change="TU_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="TU_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{oTraineeDetails>/Country}" showSecondaryValues="true" filterSecondaryValues="true" editable="{viewModel>/editable}" >
 											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>state}" required="true"/>
 										<m:ComboBox id="TU_id_State" items="{path:'StateModel>/',length:1000}"  
-										selectedKey="{oTraineeDetails>/State}" showSecondaryValues="true"
+										selectedKey="{oTraineeDetails>/State}" showSecondaryValues="true" filterSecondaryValues="true"
 										valueStateText="{i18n>expValStaState}" editable="{viewModel>/editable}"
 										change="TU_onChangeState">
 											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 										</m:ComboBox>
 										<m:Label text="{i18n>city}" required="true" />
-										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{oTraineeDetails>/BaseLocation}" id="TU_id_Location" valueStateText="{i18n>cityValueText}" change="TD_validateCombo"  editable="{viewModel>/editable}" selectedKey="{oTraineeDetails>/BaseLocation}" >
+										<m:ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" filterSecondaryValues="true" value="{oTraineeDetails>/BaseLocation}" id="TU_id_Location" valueStateText="{i18n>cityValueText}" change="TD_validateCombo"  editable="{viewModel>/editable}" selectedKey="{oTraineeDetails>/BaseLocation}" >
 											<m:items>
 												<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}"/>
 											</m:items>

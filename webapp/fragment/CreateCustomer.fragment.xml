@@ -10,7 +10,7 @@
 				<Input id="MC_id_CustCompanyName" liveChange="MC_ValidateCommonFields" value="{CustomerModel>/companyName}" editable="{ViewModel>/update}" required="true" maxLength="200" placeholder="{i18n>companyNamePlace}" valueStateText="{i18n>placeCompany}"/>
 				<Label text="{i18n>coCode}"/>
 				<ComboBox id="MC_id_ComapnyCode"  editable="{ViewModel>/update}" change="MC_validateCombobox"  valueStateText="{i18n>selectBranch}"
-				items="{path:'CompanyCodeDetailsModel>/',length:1000}" selectedKey="{CustomerModel>/CompanyCode}" showSecondaryValues="true">
+				items="{path:'CompanyCodeDetailsModel>/',length:1000}" selectedKey="{CustomerModel>/CompanyCode}"  filterSecondaryValues="true">
 				<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}"/>
 				</ComboBox> 
 				<Label text="{i18n>customerName}" required="true"/>
@@ -50,19 +50,18 @@
 
 				<Label text="{i18n>expCountry}" required="true"/>
 				<ComboBox id="MC_id_Country" change="MC_onChangeCountry" valueStateText="{i18n>expValStaCountry}"
-				items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}" showSecondaryValues="true">
+				items="{path:'CountryModel>/',length:1000}" selectedKey="{CustomerModel>/country}"  filterSecondaryValues="true">
 				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 
 				<Label text="{i18n>state}" required="true"/>
 				<ComboBox id="MC_id_State" change="MC_onChangeState" valueStateText="{i18n>expValStaState}"
-				items="{path:'StateModel>/',length:1000}" selectedKey="{CustomerModel>/state}" showSecondaryValues="true">
+				items="{path:'StateModel>/',length:1000}" selectedKey="{CustomerModel>/state}" showSecondaryValues="true" filterSecondaryValues="true">
 				<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" />
 				</ComboBox>
 
 				<Label text="{i18n>contractLocation}" required="true"/>
-				<ComboBox id="MC_id_City" change="MC_onChangeCity" valueStateText="{i18n>combovalueState}" items="{path:'CityModel>/',length:1000}" selectedKey="{CustomerModel>/baseLocation}" value="{CustomerModel>/baseLocation}" 
-				showSecondaryValues="true">
+				<ComboBox id="MC_id_City" change="MC_onChangeCity" valueStateText="{i18n>combovalueState}" items="{path:'CityModel>/',length:1000}" selectedKey="{CustomerModel>/baseLocation}" value="{CustomerModel>/baseLocation}" showSecondaryValues="true" filterSecondaryValues="true"> 
 				<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 

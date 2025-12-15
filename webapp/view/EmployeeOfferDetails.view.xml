@@ -40,12 +40,12 @@
 			singleContainerFullSize="false">
 										<f:content>
 										<Label text="{i18n>companyBranch}" required="true" />
-											<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/CompanyCode}" id="EOD_id_CompanyCode" valueStateText="{i18n>selectBranch}" change="EOD_onCompanyCodeChange">
+											<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/CompanyCode}" id="EOD_id_CompanyCode" valueStateText="{i18n>selectBranch}" change="EOD_onCompanyCodeChange" filterSecondaryValues="true">
 						                    <core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branchCode}" />
 				                            </ComboBox>
 
 											<Label text="{i18n>branch}"/>
-											<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" selectedKey="{employeeModel>/Branch}" id="EOD_id_Branch" valueStateText="{i18n>selectBranch}" enabled="false">
+											<ComboBox items="{path:'CompanyCodeDetailsModel>/',length:1000}" showSecondaryValues="true" filterSecondaryValues="true" selectedKey="{employeeModel>/Branch}" id="EOD_id_Branch" valueStateText="{i18n>selectBranch}" enabled="false">
 											<core:ListItem key="{CompanyCodeDetailsModel>branch}" text="{CompanyCodeDetailsModel>branch}" additionalText="{CompanyCodeDetailsModel>companyName}"/>
 											</ComboBox>
 
@@ -86,15 +86,15 @@
 													<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}" />		
 											</ComboBox>
 											<Label text="{i18n>expCountry}" required="true"/>
-				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true"  >
+				                            <ComboBox change="EOD_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="EOD_id_Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{employeeModel>/Country}" showSecondaryValues="true" filterSecondaryValues="true">
 					                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				                            </ComboBox>
 											<Label text="{i18n>state}" required="true" />
-											<ComboBox change="EOD_onChangeState" valueStateText="{i18n>expValStaState}" id="EOD_id_State" items="{path:'StateModel>/',length:1000}" selectedKey="{employeeModel>/State}" showSecondaryValues="true"  >
+											<ComboBox change="EOD_onChangeState" valueStateText="{i18n>expValStaState}" id="EOD_id_State" items="{path:'StateModel>/',length:1000}" selectedKey="{employeeModel>/State}" showSecondaryValues="true" >
 					                        <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 				                            </ComboBox>
 											<Label text="{i18n>city}" required="true" />
-											<ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" value="{employeeModel>/CityModel}" id="EOD_id_Location" valueStateText="{i18n>cityValueText}" change="EOD_validateCombobox">
+											<ComboBox items="{path:'CityModel>/',length:1000}" showSecondaryValues="true" filterSecondaryValues="true" value="{employeeModel>/CityModel}" id="EOD_id_Location" valueStateText="{i18n>cityValueText}" change="EOD_validateCombobox">
 											<items>
 						                        <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 											</items>

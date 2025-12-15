@@ -46,7 +46,7 @@
 										<m:MultiComboBox
 				id="Wish_id_EmployeeEmail"
 				showClearIcon="true"
-				showSecondaryValues="true"
+				showSecondaryValues="true" 
 				showSelectAll="true"
 				placeholder="Select Recipient"
 				change="onEmailSelectionChange"

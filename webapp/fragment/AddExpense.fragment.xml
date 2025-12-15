@@ -45,7 +45,7 @@
 				</ComboBox>
 				<!-- Country -->
 				<Label text="{i18n>expCountry}" required="true"/>
-				<ComboBox change="Exp_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="exp-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CreateExpenseModel>/Country}" showSecondaryValues="true">
+				<ComboBox change="Exp_onChangeCountry" valueStateText="{i18n>expValStaCountry}" id="exp-Id-Country" items="{path:'CountryModel>/',length:1000}" selectedKey="{CreateExpenseModel>/Country}" showSecondaryValues="true" filterSecondaryValues="true"> 
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 				<!-- State -->

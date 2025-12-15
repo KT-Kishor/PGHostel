@@ -21,7 +21,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem id="CI_filterItem_EmployeeID" name="EmployeeID" label="{i18n>employeeID}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_EmployeeID" items="{path:'EmpModel>/', length:1000}" showSecondaryValues="true" showClearIcon="true"  selectionChange="onComboBoxChange">
+							<ComboBox id="CI_id_EmployeeID" items="{path:'EmpModel>/', length:1000}" showSecondaryValues="true" showClearIcon="true"  selectionChange="onComboBoxChange" filterSecondaryValues="true">
 								<core:ListItem key="{EmpModel>EmployeeID}" text="{EmpModel>EmployeeID}" additionalText="{EmpModel>EmployeeName}" />
 							</ComboBox>
 						</fb:control>
@@ -33,7 +33,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem id="CI_filterItem_CompanyCode" name="CompanyCode" label="{i18n>coCode}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CompanyCodeCombo" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+							<ComboBox id="CI_id_CompanyCodeCombo" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true" filterSecondaryValues="true">
 								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
 							</ComboBox>
 						</fb:control>

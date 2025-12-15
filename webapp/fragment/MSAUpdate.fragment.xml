@@ -26,7 +26,7 @@
 					<core:Item key="{ContractPeriodThree>Months}" text="{ContractPeriodThree>Months}" />
 				</Select>
 				<Label text="{i18n>CompBranch}" required="true" />
-				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>selectBranch}" items="{CompanyCodeDetailsModel>/}" value="{FilteredMsaModel>/0/CompanyCode}" showSecondaryValues="true">
+				<ComboBox id="MsaE_Id_Branch" filterSecondaryValues="true" change="Msa_onComboBoxChange" valueStateText="{i18n>selectBranch}" items="{CompanyCodeDetailsModel>/}" value="{FilteredMsaModel>/0/CompanyCode}"  >
 					<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}" additionalText="{CompanyCodeDetailsModel>branch}" />
 				</ComboBox>
 				<Label text="{i18n>panCardReg}" required="true" />
@@ -38,15 +38,15 @@
 				<Label text="{i18n>Address}" required="true" />
 				<TextArea id="MsaE_id_MsaAddress" value="{FilteredMsaModel>/0/Address}" maxLength="120" valueStateText="{i18n>addressValueState}" liveChange="Msa_LC_Address" />
 				<Label text="{i18n>expCountry}" required="true" />
-				<ComboBox valueStateText="{i18n>expValStaCountry}" change="MSA_onChangeCountry" id="MSA_Nav_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{FilteredMsaModel>/0/Country}" showSecondaryValues="true">
+				<ComboBox valueStateText="{i18n>expValStaCountry}" change="MSA_onChangeCountry" id="MSA_Nav_Id_Country" items="{path:'CountryModel>/',length:1000}" value="{FilteredMsaModel>/0/Country}" showSecondaryValues="true" filterSecondaryValues="true">
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
 				</ComboBox>
 				<Label text="{i18n>state}" required="true"/>
-				<ComboBox valueStateText="{i18n>expValStaState}" change="MSA_onChangeState" id="MSA_Nav_Id_State" items="{path:'StateModel>/',length:1000}" value="{FilteredMsaModel>/0/State}" showSecondaryValues="true">
+				<ComboBox valueStateText="{i18n>expValStaState}" change="MSA_onChangeState" id="MSA_Nav_Id_State" items="{path:'StateModel>/',length:1000}" value="{FilteredMsaModel>/0/State}" showSecondaryValues="true" filterSecondaryValues="true">
 					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
 				</ComboBox>
 				<Label text="{i18n>city}" required="true" />
-				<ComboBox change="MSA_onChangeCity" valueStateText="{i18n>cityValueText}" id="MSA_Nav_Id_City" items="{path:'CityModel>/',length:1000}" value="{FilteredMsaModel>/0/City}">
+				<ComboBox change="MSA_onChangeCity" valueStateText="{i18n>cityValueText}" id="MSA_Nav_Id_City" items="{path:'CityModel>/',length:1000}" value="{FilteredMsaModel>/0/City}" showSecondaryValues="true" filterSecondaryValues="true">
 					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />

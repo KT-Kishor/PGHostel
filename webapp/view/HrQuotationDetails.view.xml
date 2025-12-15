@@ -68,7 +68,7 @@
                                             items="{path:'CompanyCodeDetailsModel>/',length: 1000}"
                                          selectedKey="{SingleCompanyModel>/CompanyCode}"
                                             width="100%"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             valueStateText="Enter Company Code"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_CompanyCode"
@@ -114,7 +114,7 @@
                                             items="{path: 'CountryModel>/' , length: 1000, sorter:{ path: 'countryName'}}"
                                             selectedKey="{SingleCompanyModel>/Country}"
                                             width="100%"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             valueStateText="{i18n>countryValueState}"
                                             editable="{visiablityPlay>/editable}"
                                             id="HQD_id_Country"
@@ -137,7 +137,7 @@
                                             width="100%"
                                             change="HR_onChangeState"
                                             items="{path: 'StateModel>/', length: 200, sorter: { path: 'stateName'}}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             valueStateText="{i18n>JobAppExpValStaState}"
                                             editable="{visiablityPlay>/editable}"
                                         >
@@ -157,7 +157,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             visible="{visiablityPlay>/showBranch}"
                                             valueStateText="Enter Branch"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                         >
                                             <core:ListItem
                                                 key="{CityModel>cityName}"
@@ -183,7 +183,7 @@
                                         />
                                         <m:ComboBox
                                             value="{SingleCompanyModel>/STDCode}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             id="HQD_id_mobileNumber"
                                             items="{path: 'CountryModel>/', length: 3000, sorter: { path: 'stdCode'}}"
                                             filterSecondaryValues="true"
@@ -266,7 +266,7 @@
                                             required="true"
                                         />
                                         <m:ComboBox
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" filterSecondaryValues="true"
                                             busyIndicatorDelay="0"
                                             items="{path: 'CountryModel>/', length:1000, sorter:{ path: 'currency'}}"
                                             width="100%"
@@ -356,7 +356,7 @@
                                         />
                                         <m:ComboBox
                                             value="{SingleCompanyModel>/CustomerSTDCode}"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             id="HQD_id_CustomerNumberSTD"
                                             items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"
                                             filterSecondaryValues="true"

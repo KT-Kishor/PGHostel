@@ -76,7 +76,7 @@
                                             valueStateText="Please Select a Branch"
                                             selectedKey="{PurchaseOrderModel>/companyCode}"
                                             filterSecondaryValues="true"
-                                            showSecondaryValues="true"
+                                            showSecondaryValues="true" 
                                             items="{path: 'CompanyCodeDetailsModel>/', length:10000}"
                                         >
                                             <c:ListItem

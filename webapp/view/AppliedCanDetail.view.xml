@@ -35,7 +35,7 @@
 					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
 				</ComboBox>
 				<Label text="State" />
-				<ComboBox items="{path: 'StateModel>/', length: 1000}" change="AC_onChangeState" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" value="{setDataToForm>/State}" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}" >
+				<ComboBox items="{path: 'StateModel>/', length: 1000}" change="AC_onChangeState" editable="{viewModel>/isEditMode}" id="AN_Id_State" showSecondaryValues="true" filterSecondaryValues="true" value="{setDataToForm>/State}" selectedKey="{setDataToForm>/State}" valueStateText="{i18n>combovalueState}" >
 					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}" additionalText="{StateModel>countryCode}" />
 				</ComboBox>
 				<Label text="{i18n>city}" />
@@ -64,7 +64,7 @@
 				<Label text="{i18n>ExpectedSalaryField}" />
 				<Input value="{setDataToForm>/ExpectedSalary}" editable="{viewModel>/isEditMode}" showValueHelp="true" placeholder="{i18n>ExpectedSalaryField}" valueHelpRequest="SalaryInfoPress" valueHelpIconSrc="sap-icon://message-information" valueState="{modelValuStateError>/ExpectedCTCState}" valueStateText="{i18n>ExpectedCTC}" maxLength="10"/>
 				<Label text="{i18n>Jobtitle}" />
-				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'DesignationModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{setDataToForm>/JobTitle}" showSecondaryValues="true" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
+				<ComboBox placeholder="Select Job Title" editable="{viewModel>/isEditMode}" items="{ path: 'DesignationModel>/', sorter: { path: 'department', descending: false, group: true } }" value="{setDataToForm>/JobTitle}" showSecondaryValues="true" filterSecondaryValues="true" change="onJobTitleChange" required="true" valueStateText="{i18n>jpJobTitlevaluestate}">
 					<core:ListItem key="{DesignationModel>designationName}" text="{DesignationModel>designationName}" additionalText="{DesignationModel>department}"/>
 				</ComboBox>
 				<Label text="{i18n>RolesFields}" />

@@ -29,7 +29,7 @@
                                 length: 1000
                             }"
                         change=".FST_onEnableImport"
-                        showSecondaryValues="true"
+                        showSecondaryValues="true" filterSecondaryValues="true"
                     >
                         <core:ListItem
                             key="{Payroll>branchCode}"

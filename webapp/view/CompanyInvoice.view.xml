@@ -26,7 +26,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CustomerName" label="{i18n>customerName}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CustomerNameComboBox" items="{ManageCustomerModel>/}" showSecondaryValues="true" showClearIcon="true">
+							<ComboBox id="CI_id_CustomerNameComboBox" items="{ManageCustomerModel>/}" showSecondaryValues="true" showClearIcon="true" filterSecondaryValues="true">
 								<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}"/>
 							</ComboBox>
 						</fb:control>
@@ -40,7 +40,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="CompanyCode" label="{i18n>coCode}" groupName="ConsultantInvoice" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="CI_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true">
+							<ComboBox id="CI_id_CompanyCodeComboBox" showSecondaryValues="true" items="{CompanyCodeDetailsModel>/}" showClearIcon="true" filterSecondaryValues="true">
 								<core:ListItem key="{CompanyCodeDetailsModel>companyCode}" text="{CompanyCodeDetailsModel>companyCode}"  additionalText="{CompanyCodeDetailsModel>branch}"/>
 							</ComboBox>
 						</fb:control>

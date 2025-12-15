@@ -36,7 +36,7 @@
                             showClearIcon="true"
                             id="AA_id_EmployeeName"
                             items="{EmpModel>/}"
-                            showSecondaryValues="true"
+                            showSecondaryValues="true" filterSecondaryValues="true"
                         >
                             <items>
                                 <core:ListItem
@@ -96,7 +96,7 @@
                             showClearIcon="true"
                             id="AA_id_Branch"
                             items="{CompanyCodeDetailsModel>/}"
-                            showSecondaryValues="true"
+                            showSecondaryValues="true" filterSecondaryValues="true"
                         >
                             <core:ListItem
                                 key="{CompanyCodeDetailsModel>city}"

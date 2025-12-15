@@ -27,7 +27,7 @@
 											<core:ListItem key="{ManageCustomerModel>ID}" text="{ManageCustomerModel>companyName}" additionalText="{ManageCustomerModel>salutation} {ManageCustomerModel>name}" />
 										</m:ComboBox>
 										<m:Label visible="{visiablityPlay>/createVisi}" text="{i18n>selectInvoiceNo}"/>
-										<m:ComboBox visible="{visiablityPlay>/createVisi}" id="idMainInvoiceCombo"	showSecondaryValues="true" items="{FilteredInvoiceModel>/InvoiceList}" value="{SelectedCustomerModel>/InvNo}" selectedKey="{SelectedCustomerModel>InvNo}" change="onChangeInvoiceNo"  >
+										<m:ComboBox visible="{visiablityPlay>/createVisi}" id="idMainInvoiceCombo"	showSecondaryValues="true" items="{FilteredInvoiceModel>/InvoiceList}" value="{SelectedCustomerModel>/InvNo}" selectedKey="{SelectedCustomerModel>InvNo}" change="onChangeInvoiceNo"  filterSecondaryValues="true">
 										<core:ListItem 	key="{FilteredInvoiceModel>InvNo}" text="{FilteredInvoiceModel>InvNo}" 
 												additionalText="{FilteredInvoiceModel>CustomerName}" />
 										</m:ComboBox>
@@ -36,7 +36,7 @@
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>customerName}"/>
 										<m:Input visible="{visiablityPlay>/editVisi}" id="CCI_id_Custmer" value="{SelectedCustomerModel>/CustomerName}" editable="false"/>
 										<m:Label visible="{visiablityPlay>/editVisi}" text="{i18n>selectInvoiceNo}" />
-										<m:ComboBox  visible="{visiablityPlay>/editVisi}" showSecondaryValues="true" items="{FilteredInvoiceModel>/InvoiceList}" value="{SelectedCustomerModel>/InvNo}" selectedKey="{SelectedCustomerModel>InvNo}" change="onChangeInvoiceNo" editable="false">
+										<m:ComboBox  visible="{visiablityPlay>/editVisi}" showSecondaryValues="true" items="{FilteredInvoiceModel>/InvoiceList}" value="{SelectedCustomerModel>/InvNo}" selectedKey="{SelectedCustomerModel>InvNo}" change="onChangeInvoiceNo" editable="false" filterSecondaryValues="true">
 										<core:ListItem 	key="{FilteredInvoiceModel>InvNo}" text="{FilteredInvoiceModel>InvNo}" 
 												additionalText="{FilteredInvoiceModel>CustomerName}" />
 										</m:ComboBox>
