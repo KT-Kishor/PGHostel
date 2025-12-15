@@ -425,6 +425,10 @@ _applyCountryStateCityFilters: function () {
       this.MSA_oDialog.close();
     },
 
+    MSA_onChangeStdCode: function (oEvent) {
+      utils._LCstrictValidationComboBox(oEvent, "oEvent");
+    },
+
     MSA_Frg_Update: async function () {
       const isRecruitment = sap.ui.getCore().byId("MsaE_id_Type").getSelectedIndex() === 1;
 

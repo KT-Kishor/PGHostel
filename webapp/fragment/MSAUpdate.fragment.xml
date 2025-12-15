@@ -50,7 +50,10 @@
 					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}" />
 				</ComboBox>
 				<Label text="{i18n>mobileNo}" required="true" />
-				<Input id="Msa_LC_odeModel" value="{FilteredMsaModel>/0/STDCode}" editable="false" visible="true" class="marginLeft" />
+				<ComboBox value="{FilteredMsaModel>/0/STDCode}" showSecondaryValues="true"  id="Msa_LC_odeModel"
+                items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}"  filterSecondaryValues="true" valueStateText="{i18n>combovalueState}" class="marginLeft" change="MSA_onChangeStdCode">
+                <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}"/>
+                </ComboBox>
 				<Input value="{FilteredMsaModel>/0/MobileNo}" placeholder="{i18n>mobileNo}" liveChange="MSA_validateMobile" id="Msa_LC_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 				<Label text="{i18n>emailId}" required="true" />
 				<TextArea liveChange="Msa_LC_EmailID" maxLength="500" id="MsaE_id_MSAEmail" valueStateText="{i18n>emailValueState}" value="{FilteredMsaModel>/0/MsaEmail}" />

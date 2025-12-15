@@ -92,8 +92,11 @@
 							</ComboBox>
 
 							<Label text="{i18n>mobileNo}" required="true" />
-							<Input id="MSA_Id_codeModel" value="{msaModelWizart>/STDCode}" editable="false"
-                            visible="true" class="marginLeft" />
+							<ComboBox value="{msaModelWizart>/STDCode}" showSecondaryValues="true"  id="MSA_Id_codeModel"
+                            items="{path: 'CountryModel>/', length: 300, sorter: { path: 'stdCode'}}" filterSecondaryValues="true"
+                            valueStateText="{i18n>combovalueState}" class="marginLeft" change="MSA_onChangeStdCode">
+                            <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+                            </ComboBox>
 							<Input value="{msaModelWizart>/MobileNo}" placeholder="{i18n>mobileNo}"  liveChange="MSA_validateMobile" id="MSA_Id_Mobile" valueStateText="{i18n>mobileNoValueState}"/>
 
 							<Label text="{i18n>emailId}" required="true" />
@@ -150,12 +153,12 @@
 							<Text text="{msaModelWizart>/State}"/>
 							<Label text="{i18n>city}"/>
 							<Text text="{msaModelWizart>/City}" />
-
+							<Label text="{i18n>mobileNo}"/>
+							<Text text="{= ${msaModelWizart>/STDCode} + ' ' + ${msaModelWizart>/MobileNo} }" />
 							<Label text="{i18n>emailId}" visible="{= !${msaModelWizart>/MsaEmail} ? false : true}" />
 							<Text text="{msaModelWizart>/MsaEmail}" />
 							<Label text="{i18n>GSTNO}"/>
 							<Text text="{msaModelWizart>/GST}"/>
-
 							<Label text="{i18n>status}"/>
 							<Text text="{msaModelWizart>/Status}" />	
 							<Label text="{i18n>msaRateCharge}" visible="{VisibleModel>/Recruitment}"/>

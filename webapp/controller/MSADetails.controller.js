@@ -303,6 +303,7 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
           utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_Country"), "ID") &&
           utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_State"), "ID") &&
           utils._LCstrictValidationComboBox(this.getView().byId("MSA_Id_City"), "ID") &&
+          utils._LCvalidateMandatoryField(this.getView().byId("MSA_Id_codeModel"), "ID") &&
           oMobileInput.getValue().length <= oMobileInput.getMaxLength() &&
           //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id12"), "ID") &&
           //  utils._LCstrictValidationComboBox(this.getView().byId("MsaD_id_validateGuarantee"), "ID")  &&
@@ -320,6 +321,9 @@ sap.ui.define(["./BaseController", "../utils/validation", "sap/ui/model/json/JSO
       this.byId("MsaD_id_Submit").setEnabled(true);
       this.byId("MsaD_id_Type").setEditable(false);
       this.byId("reviewPageType").setText(this.byId("MsaD_id_Type").getSelectedButton().getText());
+    },
+     MSA_onChangeStdCode: function (oEvent) {
+      utils._LCstrictValidationComboBox(oEvent, "oEvent");
     },
     MsaD_reviewSubmit: async function () {
       var that = this;
