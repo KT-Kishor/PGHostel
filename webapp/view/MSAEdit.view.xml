@@ -223,7 +223,7 @@
                                 class="sapUiTinyMarginBegin"
                             />
                         </layout:HorizontalLayout>
-                    </layout:VerticalLayout>
+                                            </layout:VerticalLayout>
                     <!-- Address -->
                     <layout:VerticalLayout
                         class="sapUiTinyMarginBottom sapUiSmallMarginBegin "
@@ -272,6 +272,22 @@
                             />
                         </layout:HorizontalLayout>
                     </layout:VerticalLayout>
+
+                    <layout:VerticalLayout>
+
+                        <layout:HorizontalLayout>
+                            <m:Label
+                                showColon="true"
+                                text="{i18n>mobileNo}"
+                            />
+                            <m:Text
+                                text="{= ${FilteredMsaModel>/0/STDCode} + ' ' + ${FilteredMsaModel>/0/MobileNo} }"
+                                class="sapUiTinyMarginBegin"
+                            />
+                        </layout:HorizontalLayout>  
+                      </layout:VerticalLayout>
+
+
                 </m:FlexBox>
             </headerContent>
             <sections>
