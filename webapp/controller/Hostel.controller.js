@@ -739,8 +739,23 @@ sap.ui.define([
                 await this._loadRoomsPageData();
             }
         },
+        Branch: function () {
+            return new Promise((resolve) => {
+                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+                const oData = oBRModel.getData();
+
+                if (oData && Array.isArray(oData) && oData.length) {
+                    resolve(oData);
+                } else {
+                    oBRModel.attachRequestCompleted(() => {
+                        resolve(oBRModel.getData());
+                    });
+                }
+            });
+        },
 
         _loadRoomsPageData: async function () {
+
             const oContainer = this.byId("idBedTypeFlex");
             const oBranch = this.byId("id_Branch");
             const oArea = this.byId("id_Area");
@@ -752,11 +767,12 @@ sap.ui.define([
             oRoomType.setBusy(true);
 
             try {
-                await this.onReadcallforRoom();
-                await this.CustomerDetails();
+                // await this.onReadcallforRoom();
+                // await this.CustomerDetails();
 
-                const oBRModel = this.getView().getModel("sBRModel");
-                const oModelData = oBRModel.getData();
+
+
+                const oModelData = await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
                 const aFiltered = oModelData.filter(item => item.City === this.City);
@@ -2424,7 +2440,16 @@ sap.ui.define([
                 oContainer.setBusy(false);
             }
         },
+        model: function (response) {
+            const aRooms = response.data.HM_Rooms || [];
+            const oRoomModel = new JSONModel({ Rooms: aRooms });
+            this.getView().setModel(oRoomModel, "RoomCountModel");
 
+            const aCustomers = Array.isArray(response.data.HM_RoomData) ? response.data.HM_RoomData : [response.data.HM_RoomData];
+
+            const oCustomerModel = new JSONModel(aCustomers);
+            this.getView().setModel(oCustomerModel, "CustomerModel");
+        },
         _loadFilteredData: async function (Scity, sBranchCode, sACType) {
 
             if (sACType === "All") {
@@ -2435,34 +2460,38 @@ sap.ui.define([
 
                 const oView = this.getView();
 
-                let aBranchCodes = [];
+                var aBranchCodes = [];
+                var oBRModel = this.getView().getModel("sBRModel");
+                var aBranchesData = oBRModel.getData(); // adjust path if needed
 
                 if (Scity && !sBranchCode) {
-
-                    const aBranches = await this.ajaxReadWithJQuery("HM_Branch", {
-                        City: Scity
+                    // Filter branches by city
+                    var aFilteredBranches = aBranchesData.filter(function (branch) {
+                        return branch.City === Scity;
                     });
 
-                    if (aBranches.data.length === 0) {
-                        const oModel = this.getView().getModel("VisibilityModel");
-                        oModel.setProperty("/BedTypes", []);
-                        oModel.setProperty("/NoData", true);
+                    if (aFilteredBranches.length === 0) {
+                        const oVisibilityModel = this.getView().getModel("VisibilityModel");
+                        oVisibilityModel.setProperty("/BedTypes", []);
+                        oVisibilityModel.setProperty("/NoData", true);
                         return;
                     }
 
-                    aBranchCodes = (Array.isArray(aBranches.data) ? aBranches.data : [aBranches.data])
-                        .map(branch => branch.BranchID);
-                } else if (Scity && sBranchCode) {
-                    aBranchCodes = [sBranchCode];
-                } else if (!Scity && sBranchCode) {
+                    aBranchCodes = aFilteredBranches.map(function (branch) {
+                        return branch.BranchID;
+                    });
+
+                } else if (sBranchCode) {
+                    // Branch already selected
                     aBranchCodes = [sBranchCode];
                 }
 
                 const response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes
                 });
+                await this.model(response)
 
-                let matchedRooms = response?.data?.data || [];
+                let matchedRooms = response.data.BedTypeDetails || [];
 
 
                 if (sACType) {

@@ -15,6 +15,7 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
              this.commonLoginFunction();
+              this.Code=""
             var model = new JSONModel({
                 FacilityName: "",
                 UnitText: "",
