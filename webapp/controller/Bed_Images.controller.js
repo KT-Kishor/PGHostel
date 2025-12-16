@@ -46,6 +46,7 @@ sap.ui.define([
         _loadBranchCode: async function() {
             sap.ui.core.BusyIndicator.show(0);
             try {
+                 this.commonLoginFunction();
                 const oView = this.getView();
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {});
                 const aBranches = Array.isArray(oResponse?.data) ?

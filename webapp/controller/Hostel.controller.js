@@ -2458,7 +2458,7 @@ sap.ui.define([
                     aBranchCodes = [sBranchCode];
                 }
 
-                const response = await this.ajaxReadWithJQuery("HM_BedType", {
+                const response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes
                 });
 

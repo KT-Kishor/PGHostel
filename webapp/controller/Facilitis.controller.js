@@ -11,6 +11,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function(oEvent) {
+             this.commonLoginFunction();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
 
             var model = new sap.ui.model.json.JSONModel({

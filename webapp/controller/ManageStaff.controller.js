@@ -24,7 +24,7 @@ sap.ui.define([
             try {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
-                // this.onClearAndSearch("MS_id_FilterbarEmployee");
+                this.onClearAndSearch("MS_id_FilterbarEmployee");
                 this.commonLoginFunction();
 
                 await this._loadBranchCode();

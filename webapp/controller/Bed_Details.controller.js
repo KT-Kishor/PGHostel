@@ -13,6 +13,7 @@ sap.ui.define([
 
         _onRouteMatched: async function() {
             try {
+                 this.commonLoginFunction();
                 var model = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",

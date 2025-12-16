@@ -13,17 +13,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteRoomDetails").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function () {
-            // const omodel = new sap.ui.model.json.JSONModel({
-            //     // for Database connection
-            //     url: "https://rest.kalpavrikshatechnologies.com/",
-            //     headers: {
-            //         name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            //         password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-            //         "Content-Type": "application/json",
-            //     },
-            //     isRadioVisible: false,
-            // });
-            // this.getOwnerComponent().setModel(omodel, "LoginModel");
+            this.commonLoginFunction();
 
             var model = new JSONModel({
                 BranchCode: "",
