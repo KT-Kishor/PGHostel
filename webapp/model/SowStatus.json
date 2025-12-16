@@ -1,7 +1,0 @@
-{
-    "SowStatus": [
-        { "ID": "1", "Status": "New" },
-        { "ID": "2", "Status": "Active" },
-        { "ID": "3", "Status": "Inactive" }      
-    ]
-}
