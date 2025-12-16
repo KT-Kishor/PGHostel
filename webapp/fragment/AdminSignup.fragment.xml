@@ -60,7 +60,7 @@
 <Label text="Mobile Number" required="true"/>
 <HBox width="100%" alignItems="Center" class="isdMobileRow">
 	<!-- ISD: 30% -->
-	<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}">
+	<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true"> 
 		<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 		<layoutData>
 			<FlexItemData baseSize="30%" growFactor="0" />
