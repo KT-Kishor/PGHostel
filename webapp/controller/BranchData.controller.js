@@ -55,10 +55,28 @@ sap.ui.define([
 
         Onsearch: function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oView = this.getView();
+
             let filters = {};
 
             if (oExistingModel.Role !== "") {
                 filters.City = oExistingModel.City;
+            }
+            if (oExistingModel.BranchCode) {
+                filters.BranchID = oExistingModel.BranchCode;
+            }
+            let sCustomerName = oView.byId("MD_id_BranchCode").getValue()?.trim();
+            let sPincode = oView.byId("MD_id_SearchField").getValue()?.trim();
+
+            if (sCustomerName) {
+                if (sCustomerName.includes(" - ")) {
+                    sCustomerName = sCustomerName.split(" - ")[0];
+                }
+                filters.SearchText = sCustomerName;
+            }
+
+            if (sPincode) {
+                filters.Pincode = sPincode;
             }
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_Branch", filters).then((oData) => {
@@ -70,18 +88,13 @@ sap.ui.define([
         },
 
         MD_onPressClear: function () {
-            // const oTable = this.byId("id_MD_Table");
-            // if (!oTable) return;
-            // const oBinding = oTable.getBinding("items");
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
             this.getView().byId("MD_id_SearchField").setValue("");
-            //           if (oBinding) {
-            //         oBinding.filter([]);
-            //         this._updateRowCount();
-            // }
         },
 
-        MD_onSearch: function () {
+        MD_onSearch: async function () {
+            sap.ui.core.BusyIndicator.show(0);
+            await this.Onsearch();
             const oView = this.getView();
             const oTable = oView.byId("id_MD_Table");
             const oBinding = oTable.getBinding("items");
@@ -118,6 +131,7 @@ sap.ui.define([
             }
             oBinding.filter(aFilters);
             this._updateRowCount();
+            sap.ui.core.BusyIndicator.hide();
         },
 
         onGlobalSearch: function (oEvent) {

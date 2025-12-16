@@ -2262,7 +2262,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .glassTile .sapUiIcon {
   color: #ffffff !important;
   fill: #ffffff !important;
-  filter: brightness(0) invert(1);
 }
 
 /* Remove default gray backgrounds */
@@ -2283,9 +2282,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .glassTile .sapMImg,
 .glassTile .sapUiIcon {
   color: #ffffff !important;
-  top: -9px;
+  top: -1px;
   fill: #ffffff !important;
-  filter: brightness(0) invert(1);
 }
 
 /* Header (actual clickable text) */
