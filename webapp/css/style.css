@@ -2162,10 +2162,17 @@ span.sapMBtnInner.sapMBtnEmphasized {
     .responsiveFlex {
         justify-content: center !important;
     }
+}
 
-    /* .searchField {
-      justify-content: start !important;
-    } */
+#container-sap\.ui\.com\.project1---Hostel--id_tabBar {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+#container-sap\.ui\.com\.project1---Hostel--id_tabBar.sapMITBBackgroundDesignSolid {
+    box-shadow: none !important;
+    border-bottom: none !important;
 }
 
 /* @media (min-width: 600px) and (max-width: 777px) {
