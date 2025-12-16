@@ -61,7 +61,7 @@ sap.ui.define([
             try {
                 const oView = this.getView();
 
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", filters);
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
 
                 const aBranches = Array.isArray(oResponse?.data)
                     ? oResponse.data

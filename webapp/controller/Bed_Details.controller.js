@@ -61,7 +61,7 @@ sap.ui.define([
             try {
                 const oView = this.getView();
 
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", filters);
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
 
                 const aBranches = Array.isArray(oResponse?.data) ?
                     oResponse.data :
@@ -390,7 +390,7 @@ sap.ui.define([
             }
 
                     if (!this._originalBedData || flag === "true" || flag === undefined) {
-                        this._originalBedData = response[0].data;
+                        this._originalBedData = response;
                     }
 
 
@@ -402,7 +402,7 @@ sap.ui.define([
                         return;
                     }
 
-                    const filteredData = response[0].data;
+                    const filteredData = response;
 
                     const model = new sap.ui.model.json.JSONModel(filteredData);
                     this.getView().setModel(model, "BedDetails");

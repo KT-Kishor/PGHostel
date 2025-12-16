@@ -53,7 +53,7 @@ sap.ui.define([
             try {
                 const oView = this.getView();
 
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {});
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {});
 
                 const aBranches = Array.isArray(oResponse?.data) ?
                     oResponse.data :

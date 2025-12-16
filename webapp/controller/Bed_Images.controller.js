@@ -47,7 +47,7 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oView = this.getView();
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {});
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {});
                 const aBranches = Array.isArray(oResponse?.data) ?
                     oResponse.data :
                     (oResponse?.data ? [oResponse.data] : []);
@@ -77,10 +77,10 @@ sap.ui.define([
                     ID: BEdID
                 })
                 .then(function(oData) {
-                    var oFCIAerData = Array.isArray(oData.data.data) ? oData.data.data : [oData.data.data];
+                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                     var oBedData = oFCIAerData[0]; // main data object
                     that.getView().getModel("BedImageModel").setData(oBedData); // Set BedImageModel data
-                    var oBedImages = oData.data.bedDetails[0]; // Photo1..Photo5
+                    var oBedImages = oData.data[0]; // Photo1..Photo5
 
                     // Transform Photo fields into array
                     var aDisplayImages = [];

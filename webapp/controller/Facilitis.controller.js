@@ -165,7 +165,7 @@ sap.ui.define([
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", filters);
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
