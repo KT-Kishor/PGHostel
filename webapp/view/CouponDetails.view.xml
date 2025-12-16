@@ -14,8 +14,7 @@
 <fb:FilterGroupItem name="BranchCode" groupName="Group" label="Branch" visibleInFilterBar="true">
 	<fb:control>
 		<ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true"	 >
-			<core:ListItem key="{sBRModel>BranchID}" text="{sBRModel>Name}"  additionalText="{sBRModel>BranchID}"/>
-		</ComboBox>
+			<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />                          		</ComboBox>
 	</fb:control>
 </fb:FilterGroupItem>
 					<!-- STATUS -->
@@ -79,10 +78,10 @@
 						</Column>
 						<!-- <Column  demandPopin="true">
 							<Text text="Used Count"/>
-						</Column> -->
+						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="Per User Limit"/>
-						</Column>
+						</Column> -->
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="Min Order Value"/>
 						</Column>
@@ -111,7 +110,7 @@
 	}" />
 								<Text text="{CouponModel>MaxUses}" />
 								<!-- <Text text="{CouponModel>UsedCount}" /> -->
-								<Text text="{CouponModel>PerUserLimit}" />
+								<!-- <Text text="{CouponModel>PerUserLimit}" /> -->
 								<Text text="{CouponModel>MinOrderValue}" />
 								<Text text="{    path: 'CouponModel>StartDate',    formatter: '.Formatter.formatDate'}" />
 								<Text text="{    path: 'CouponModel>EndDate',    formatter: '.Formatter.formatDate'}" />

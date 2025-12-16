@@ -27,15 +27,66 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
-        _onRouteMatched: function () {
+        // _onRouteMatched: function () {
+        //     const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+        //     if (oLoginModel) {
+        //         this.getView().setModel(oLoginModel, "LoginModel");
+        //     }
+        //     this._loadCoupons();
+        //     this._loadRecipientContacts();
+        //     this._loadBranchCode();
+        // },
+        _onRouteMatched: async function () {
+            var LoginFunction = await this.commonLoginFunction("TilePage");
+            if (!LoginFunction) return;
+            this.onClearAndSearch("couponFilterBar");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
                 this.getView().setModel(oLoginModel, "LoginModel");
             }
-            this._loadCoupons();
+
             this._loadRecipientContacts();
             this._loadBranchCode();
+
+            // ✅ ENSURE MODEL EXISTS FIRST (important)
+            await this._loadCoupons();
+
+            // ✅ PREFILL FY DATE RANGE
+            const { fyStart, fyEnd } = this._getFinancialYearDates();
+            const oRange = this.byId("fEndRange");
+
+            if (oRange) {
+                oRange.setDateValue(fyStart);
+                oRange.setSecondDateValue(fyEnd);
+            }
+
+            // ✅ AUTO SEARCH (same as invoice)
+            this.onCouponSearch();
         },
+
+
+
+        _getFinancialYearDates: function () {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            let fyStart, fyEnd;
+
+            // FY = April 1 → March 31
+            if (now.getMonth() >= 3) {
+                fyStart = new Date(currentYear, 3, 1);      // April 1 (this year)
+                fyEnd = new Date(currentYear + 1, 2, 31); // March 31 (next year)
+            } else {
+                fyStart = new Date(currentYear - 1, 3, 1);  // April 1 (last year)
+                fyEnd = new Date(currentYear, 2, 31);     // March 31 (this year)
+            }
+
+            fyStart.setHours(0, 0, 0, 0);
+            fyEnd.setHours(0, 0, 0, 0);
+
+            return { fyStart, fyEnd };
+        },
+
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
@@ -259,6 +310,7 @@ sap.ui.define([
         },
         _openCouponDialog: async function () {
             var oView = this.getView();
+
             if (!this._oCouponDialog) {
                 this._oCouponDialog = await Fragment.load({
                     id: oView.getId(),
@@ -266,19 +318,54 @@ sap.ui.define([
                     controller: this
                 });
                 oView.addDependent(this._oCouponDialog);
+
                 // make DatePickers readonly (no manual typing)
                 var sViewId = oView.getId();
                 this._FragmentDatePickersReadOnly([
                     sViewId + "--dpStartDate",
                     sViewId + "--dpEndDate"
                 ]);
-                // ✅ single source of truth for cleanup
+
                 this._oCouponDialog.attachAfterClose(function () {
                     this._clearTableSelection();
                 }.bind(this));
             }
+
+            const oVM = oView.getModel("CouponView");
+            const sMode = oVM.getProperty("/DialogMode");
+
+            // 🔥 HARD RESET branch on Add
+            if (sMode === "Add") {
+                oVM.setProperty("/CurrentCoupon/BranchCode", "");
+
+                const oBranchCB = sap.ui.getCore().byId(
+                    oView.createId("cbBranchCode")
+                );
+                if (oBranchCB) {
+                    oBranchCB.setSelectedKey("");
+                    oBranchCB.setValue("");
+                }
+            }
+
+            // ===== DATE CONSTRAINTS =====
+            const oStartDP = sap.ui.getCore().byId(oView.createId("dpStartDate"));
+            const oEndDP = sap.ui.getCore().byId(oView.createId("dpEndDate"));
+
+            const oToday = new Date();
+            oToday.setHours(0, 0, 0, 0); // normalize
+
+            if (oStartDP) {
+                oStartDP.setMinDate(oToday);
+            }
+
+            if (oEndDP) {
+                oEndDP.setMinDate(oToday);
+            }
+
+
             this._oCouponDialog.open();
         },
+
         _showTableRowsBusy: function (bBusy) {
             var oTable = this.byId("couponTable");
             var oDom = oTable.$().find(".sapMListItems").get(0);
@@ -428,9 +515,11 @@ sap.ui.define([
         },
 
         onCouponSearch: async function () {
-
             try {
                 sap.ui.core.BusyIndicator.show(0);
+
+                const { fyStart, fyEnd } = this._getFinancialYearDates();
+                let bDateProvided = false;
 
                 const aItems = this.byId("couponFilterBar").getFilterGroupItems();
                 const params = {};
@@ -439,35 +528,58 @@ sap.ui.define([
                 let sEndDate = "";
 
                 aItems.forEach(item => {
-
                     const ctrl = item.getControl();
                     const key = item.getName();
-
                     if (!ctrl) return;
 
                     switch (key) {
 
                         case "Status":
-                        case "DiscountType":
-                        case "BranchCode":
+                        case "DiscountType": {
                             params[key] = ctrl.getSelectedKey?.() || "";
                             break;
+                        }
+
+                        case "BranchCode": {
+                            const oItem = ctrl.getSelectedItem();
+                            if (!oItem) break;
+
+                            const oCtx = oItem.getBindingContext("sBRModel");
+                            if (!oCtx) break;
+
+                            const oBranch = oCtx.getObject();
+                            params.BranchCode = [
+                                oBranch.BranchCode || oBranch.BranchID
+                            ];
+                            break;
+                        }
 
                         case "EndDateRange": {
-
                             const dFrom = ctrl.getDateValue();
                             const dTo = ctrl.getSecondDateValue();
 
                             if (dFrom && dTo) {
                                 sStartDate = dFrom.toISOString().split("T")[0];
                                 sEndDate = dTo.toISOString().split("T")[0];
+                                bDateProvided = true;
                             }
                             break;
                         }
                     }
                 });
 
-                // ✅ ONLY two date params sent — backend contract respected
+                // ✅ DATE DECISION — AFTER LOOP (correct)
+                if (!bDateProvided) {
+                    sStartDate = fyStart.toISOString().split("T")[0];
+                    sEndDate = fyEnd.toISOString().split("T")[0];
+
+                    const oRange = this.byId("fEndRange");
+                    if (oRange) {
+                        oRange.setDateValue(fyStart);
+                        oRange.setSecondDateValue(fyEnd);
+                    }
+                }
+
                 const oResult = await this.ajaxReadWithJQuery("HM_Coupon", {
                     ...params,
                     StartDate: sStartDate,
@@ -475,26 +587,19 @@ sap.ui.define([
                 });
 
                 const aData = this._normalizeCouponResult(oResult);
+                this.getView().getModel("CouponModel").setData(aData);
 
-                this.getView()
-                    .getModel("CouponModel")
-                    .setData(aData);
-
-            }
-            catch (err) {
-
+            } catch (err) {
                 sap.m.MessageBox.error(
                     err?.responseJSON?.message ||
                     err?.message ||
                     "Failed to filter coupons."
                 );
-
-            }
-            finally {
-
+            } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+
         _normalizeCouponResult: function (oResult) {
             let aData = Array.isArray(oResult?.data)
                 ? oResult.data
@@ -513,6 +618,23 @@ sap.ui.define([
                 CreatedAt: c.CreatedAt?.replace("T", " ").slice(0, 19),
                 StatusOrder: mPriority[c.Status] || 99
             }));
+        },
+        onBranchSelect: function (oEvent) {
+            const oItem = oEvent.getParameter("selectedItem");
+            if (!oItem) return;
+
+            const oCtx = oItem.getBindingContext("sBRModel");
+            if (!oCtx) return;
+
+            const oBranch = oCtx.getObject();
+
+            // ✅ single source of truth
+            this.getView()
+                .getModel("CouponView")
+                .setProperty(
+                    "/CurrentCoupon/BranchCode",
+                    oBranch.BranchCode || oBranch.BranchID
+                );
         },
 
 
@@ -607,9 +729,40 @@ sap.ui.define([
         onChange_Status: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
+
+
         onChange_Date: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
+            const oView = this.getView();
+
+            const oStartDP = sap.ui.getCore().byId(oView.createId("dpStartDate"));
+            const oEndDP = sap.ui.getCore().byId(oView.createId("dpEndDate"));
+
+            if (!oStartDP || !oEndDP) return;
+
+            const dStart = oStartDP.getDateValue();
+            const dEnd = oEndDP.getDateValue();
+
+            // Clear previous errors
+            oEndDP.setValueState("None");
+            oEndDP.setValueStateText("");
+
+            // If start date selected → EndDate min must follow StartDate
+            if (dStart) {
+                const dMinEnd = new Date(dStart);
+                dMinEnd.setHours(0, 0, 0, 0);
+                oEndDP.setMinDate(dMinEnd);
+            }
+
+            // If both selected → validate order
+            if (dStart && dEnd && dEnd < dStart) {
+                oEndDP.setValueState("Error");
+                oEndDP.setValueStateText("End Date cannot be earlier than Start Date");
+                oEndDP.setDateValue(null);
+            }
         },
+
+
         _clearTableSelection: function () {
             var oTable = this.byId("couponTable");
             if (oTable) {
