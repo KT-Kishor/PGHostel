@@ -1,0 +1,102 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="sapUiMediumMarginBottom">
+        <Text
+            text="{i18n>selectServicesHeader}"
+            class="serviceHeader"
+        />
+        <FlexBox
+            busyIndicatorDelay="0"
+            wrap="Wrap"
+            justifyContent="Start"
+            class="serviceContainerExtras"
+            id="TC_serviceContainerExtras"
+            busy="true"
+        >
+            <VBox class="serviceCard">
+                <Image
+                    src="images/Traffic_Control/Traffic_Management.png"
+                    alt="{i18n>trafficmanagement}"
+                    class="serviceImage"
+                    decorative="false"
+                    press="TC_onServiceSelect"
+                    load="TC_onLoadImage"
+                />
+                <Link
+                    text="{i18n>trafficmanagement}"
+                    press="TC_onServiceSelect"
+                    class="serviceLabel"
+                />
+            </VBox>
+
+            <VBox class="serviceCard">
+                <Image
+                    src="images/Traffic_Control/Traffic_Control_Vehicles.png"
+                    alt="{i18n>trafficcontrolvehicle}"
+                    class="serviceImage"
+                    decorative="false"
+                    press="TC_onServiceSelect"
+                    load="TC_onLoadImage"
+                />
+                <Link
+                    text="{i18n>trafficcontrolvehicle}"
+                    class="serviceLabel"
+                    press="TC_onServiceSelect"
+                />
+            </VBox>
+
+            <VBox class="serviceCard">
+                <Image
+                    src="images/Traffic_Control/Traffic_Equipment.jpg"
+                    alt="{i18n>trafficEquipment}"
+                    class="serviceImage"
+                    decorative="false"
+                    press="TC_onServiceSelect"
+                    load="TC_onLoadImage"
+                />
+                <Link
+                    text="{i18n>trafficEquipment}"
+                    class="serviceLabel"
+                    press="TC_onServiceSelect"
+                />
+            </VBox>
+
+            <VBox class="serviceCard">
+                <Image
+                    src="images/Traffic_Control/Site_Checks.png"
+                    alt="{i18n>siteChecks}"
+                    class="serviceImage"
+                    decorative="false"
+                    press="TC_onServiceSelect"
+                    load="TC_onLoadImage"
+                />
+                <Link
+                    text="{i18n>siteChecks}"
+                    class="serviceLabel"
+                    press="TC_onServiceSelect"
+                />
+            </VBox>
+
+            <VBox class="serviceCard">
+                <Image
+                    src="images/Traffic_Control/Aftercare.png"
+                    alt="{i18n>aftercare1}"
+                    class="serviceImage"
+                    decorative="false"
+                    press="TC_onServiceSelect"
+                    load="TC_onLoadImage"
+                />
+                <Link
+                    text="{i18n>aftercare1}"
+                    class="serviceLabel"
+                    press="TC_onServiceSelect"
+                />
+            </VBox>
+
+            
+        </FlexBox>
+    </VBox>
+</core:FragmentDefinition>

@@ -1,0 +1,1052 @@
+<mvc:View
+    xmlns:unified="sap.ui.unified"
+    controllerName="sap.ui.com.project1.controller.AdminDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:layout="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Page
+        showHeader="false"
+        class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
+        enableScrolling="true"
+    >
+        <ScrollContainer id="idMainScroll">
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+            <content>
+                <VBox class="sapUiSmallMargin">
+                    <Title
+                        text="Hostel Booking"
+                        class="boldBlackText sapUiSmallMarginBottom"
+                    />
+                    <!-- Responsive Booking Status and Buttons -->
+                    <!-- Left Side Info -->
+                    <FlexBox
+                        wrap="NoWrap"
+                        justifyContent="SpaceBetween"
+                        width="100%"
+                    >
+                        <!-- LEFT SIDE DETAILS -->
+                        <FlexBox direction="Row">
+                            <VBox class="sapUiSmallMarginEnd">
+                                <Text
+                                    text="Status"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <ObjectStatus
+                                    text="{CustomerData>/Status}"
+                                    state="{path:'CustomerData>/Status', formatter:'.Formatter.formatObjectStatus'}"
+                                />
+                            </VBox>
+
+                            <VBox class="sapUiSmallMarginEnd">
+                                <Text
+                                    text="Booking Date"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <ObjectStatus
+                                    text="{path: 'CustomerData>/BookingDate', formatter: '.Formatter.formatDate'}"
+                                />
+                            </VBox>
+
+                            <VBox
+                                class="sapUiSmallMarginEnd"
+                                visible="{= ${CustomerData>/RoomNo} ? true : false }"
+                            >
+                                <Text
+                                    text="Room No"
+                                    class="sapUiSmallMarginBottom"
+                                />
+                                <Text text="{CustomerData>/RoomNo}" />
+                            </VBox>
+                        </FlexBox>
+                        <!-- RIGHT SIDE BUTTONS -->
+                        <FlexBox
+                            class="rightButtons"
+                            wrap="NoWrap"
+                            justifyContent="End"
+                            alignItems="End"
+                        >
+                            <Button
+                                text="Edit"
+                                id="idedit"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                                press="onEditBooking"
+                                visible="{=
+                                    (
+                                        ${CustomerData>/Status} === 'New' ||
+                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; ${LoginModel>/Role} === 'Admin')
+                                    )
+                                    &amp;&amp; !${VisibleModel>/visible}
+                                }"
+                            />
+
+                            <Button
+                                id="idcancel"
+                                text="Cancel Booking"
+                                press="onPressCancelBooking"
+                                visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} }"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+
+                            <Button
+                                text="CheckOut"
+                                id="idCheckout"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                                press="onChekout"
+                                visible="{= ${CustomerData>/Status} === 'Assigned' 
+                                    &amp;&amp; !${VisibleModel>/visible}
+                                    &amp;&amp; ${LoginModel>/Role} === 'Admin' }"
+                            />
+
+                            <Button
+                                text="Save"
+                                id="idsave"
+                                press="onSaveBooking"
+                                visible="{VisibleModel>/visible}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+
+                            <Button
+                                id="idcancelbtn"
+                                text="Cancel"
+                                press="onCancelBooking"
+                                visible="{VisibleModel>/visible}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+                        </FlexBox>
+                    </FlexBox>
+                </VBox>
+            </content>
+            <VBox class="sapUiMediumMarginBottom">
+                <Panel
+                    headerText="{= 'Booking Information - ' + ${CustomerData>/CustomerID} }"
+                    expandable="false"
+                    class="customPanelHeader"
+                >
+                    <f:SimpleForm
+                        id="idsimpleCompanyDetails"
+                        busyIndicatorDelay="0"
+                        editable="true"
+                        layout="ColumnLayout"
+                        labelSpanXL="2"
+                        labelSpanL="3"
+                        labelSpanM="2"
+                        labelSpanS="12"
+                        adjustLabelSpan="false"
+                        emptySpanXL="0"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        emptySpanS="0"
+                        columnsXL="3"
+                        columnsL="2"
+                        columnsM="2"
+                        singleContainerFullSize="true"
+                    >
+                        <f:content>
+                            <!-- Booking Details -->
+                            <!-- Room Type -->
+                            <Label
+                                text="Desired Room Type"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <ComboBox
+                                id="Ad_id_RoomType"
+                                items="{Availablebeds>/}"
+                                showClearIcon="true"
+                                visible="{VisibleModel>/visible}"
+                                selectedKey="{Bookingmodel>/BedTypeName}"
+                                selectionChange="onRoomBedChange"
+                                valueStateText="Select Room Type"
+                                width="40%"
+                            >
+                                <core:ListItem
+                                    key="{Availablebeds>BedTypeName}"
+                                    text="{Availablebeds>BedTypeName}"
+                                />
+                            </ComboBox>
+
+                            <Label
+                                text="Desired Room Type"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                id="Ad_id_RoomType3"
+                                text="{CustomerData>/BedType}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <!-- Price -->
+                            <Label
+                                text="Price"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                id="Ad_id_idPrice4"
+                                text="{=${CustomerData>/OrginalRentPrice} +' ' + ${CustomerData>/Currency}}"
+                            />
+
+                            <!-- Payment -->
+                            <Label
+                                text="Payment Method"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                text="{CustomerData>/PaymentType}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                text="Payment Method"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <ComboBox
+                                id="idPaymentMethod1"
+                                showClearIcon="true"
+                                placeholder="Select Payment Method"
+                                selectedKey="{Bookingmodel>/UnitText}"
+                                width="40%"
+                                selectionChange="onRoomDurationChange"
+                                visible="{VisibleModel>/visible}"
+                                valueStateText="Select Payment Type"
+                                change="onChange"
+                            >
+                                <core:ListItem
+                                    key="daily"
+                                    text="Per Day"
+                                />
+                                <core:ListItem
+                                    key="monthly"
+                                    text="Per Month"
+                                />
+                                <core:ListItem
+                                    key="yearly"
+                                    text="Per Year"
+                                />
+                            </ComboBox>
+                            <!-- Persons -->
+                            <!-- <Label text="No of Persons" required="true" /><Text text="{CustomerData>/Person}" /> -->
+                            <!-- Dates -->
+                            <!-- <core:Title text="" /> -->
+
+                            <!-- Start Date -->
+                            <Label
+                                text="Start Date"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                text="{CustomerData>/StartDate}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                text="Start Date"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <DatePicker
+                                id="Ad_id_editStartDate"
+                                visible="{VisibleModel>/visible}"
+                                value="{Bookingmodel>/StartDate}"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                                change="onBookingEditDateChange"
+                                valueStateText="Select Star Date"
+                                width="40%"
+                            />
+
+                            <!-- Month/Year Select -->
+                            <Label
+                                text="How many Month/Year"
+                                visible="{= ${Bookingmodel>/UnitText} !== 'daily' }"
+                            />
+                            <Select
+                                id="idMonthYearSelect"
+                                width="40%"
+                                visible="{= ${Bookingmodel>/UnitText} !== 'daily'}"
+                                selectedKey="{Bookingmodel>/DurationUnit}"
+                                change=".onBookMonthYearChange"
+                            >
+                                <core:Item
+                                    key="1"
+                                    text="1"
+                                />
+                                <core:Item
+                                    key="2"
+                                    text="2"
+                                />
+                                <core:Item
+                                    key="3"
+                                    text="3"
+                                />
+                                <core:Item
+                                    key="4"
+                                    text="4"
+                                />
+                                <core:Item
+                                    key="5"
+                                    text="5"
+                                />
+                                <core:Item
+                                    key="6"
+                                    text="6"
+                                />
+                                <core:Item
+                                    key="7"
+                                    text="7"
+                                />
+                                <core:Item
+                                    key="8"
+                                    text="8"
+                                />
+                                <core:Item
+                                    key="9"
+                                    text="9"
+                                />
+                                <core:Item
+                                    key="10"
+                                    text="10"
+                                />
+                                <core:Item
+                                    key="11"
+                                    text="11"
+                                />
+                            </Select>
+
+                            <!-- End Date -->
+                            <Label
+                                text="End Date"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                text="{CustomerData>/EndDate}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                text="End Date"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <DatePicker
+                                id="editEndDate"
+                                visible="{VisibleModel>/visible}"
+                                editable="{= ${Bookingmodel>/UnitText} === 'daily' }"
+                                value="{Bookingmodel>/EndDate}"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                                change="onBookingEditDateChange"
+                                width="40%"
+                            />
+
+                            <Label
+                                text="Duration"
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                            />
+                            <Text
+                                text="{= ${CustomerData>/Duration} + ' ' + ${CustomerData>/DurationUnit} }"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+                        </f:content>
+                    </f:SimpleForm>
+                </Panel>
+            </VBox>
+            <VBox>
+                <Panel
+                    headerText="{= 'Personal Information - ' + ${CustomerData>/CustomerName} }"
+                    expandable="false"
+                    class="customPanelHeader"
+                >
+                    <f:SimpleForm
+                        id="SimpleFormChangeColumn_oneGroup"
+                        busyIndicatorDelay="0"
+                        editable="true"
+                        layout="ColumnLayout"
+                        labelSpanXL="2"
+                        labelSpanL="3"
+                        labelSpanM="2"
+                        labelSpanS="12"
+                        adjustLabelSpan="false"
+                        emptySpanXL="0"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        emptySpanS="0"
+                        columnsXL="3"
+                        columnsL="2"
+                        columnsM="2"
+                        singleContainerFullSize="false"
+                    >
+                        <!-- Personal Information -->
+                        <f:content>
+                            <core:Title text="" />
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Full Name"
+                            />
+                            <Text
+                                text="{= ${CustomerData>/Salutation} + ' ' + ${CustomerData>/CustomerName} }"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Full Name"
+                            />
+                            <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
+                            <Select
+                                selectedKey="{Bookingmodel>/Salutation}"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <core:Item
+                                    key="Mr."
+                                    text="Mr."
+                                />
+                                <core:Item
+                                    key="Mrs."
+                                    text="Mrs."
+                                />
+                                <layoutData>
+                                    <f:ColumnElementData
+                                        cellsSmall="3"
+                                        cellsLarge="2"
+                                    />
+                                </layoutData>
+                            </Select>
+                            <Input
+                                value="{Bookingmodel>/CustomerName}"
+                                maxLength="50"
+                                visible="{VisibleModel>/visible}"
+                                id="AD_id_CustomerName"
+                                valueStateText="Enter Customer Name"
+                                change="onChange"
+                                width="50%"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Date of Birth"
+                            />
+                            <Text
+                                text="{CustomerData>/DateOfBirth}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Date of Birth"
+                            />
+                            <DatePicker
+                                width="40%"
+                                value="{Bookingmodel>/DateOfBirth}"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                                visible="{VisibleModel>/visible}"
+                                id="AD_id_Date"
+                                valueStateText="Enter Date of Birth"
+                                change="onDateChange"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Gender"
+                            />
+                            <Text
+                                text="{CustomerData>/Gender}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Gender"
+                            />
+                            <ComboBox
+                                width="40%"
+                                selectedKey="{Bookingmodel>/Gender}"
+                                visible="{VisibleModel>/visible}"
+                                id="Ad_id_gender"
+                                valueStateText="Select Gender"
+                                change="onChange"
+                            >
+                                <core:Item
+                                    key="Male"
+                                    text="Male"
+                                />
+                                <core:Item
+                                    key="Female"
+                                    text="Female"
+                                />
+                                <core:Item
+                                    key="Other"
+                                    text="Other"
+                                />
+                            </ComboBox>
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Email"
+                            />
+                            <Text
+                                text="{CustomerData>/CustomerEmail}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Email"
+                            />
+                            <Input
+                                width="40%"
+                                value="{Bookingmodel>/CustomerEmail}"
+                                type="Email"
+                                maxLength="50"
+                                visible="{VisibleModel>/visible}"
+                                id="Ad_id_CustomerEmail"
+                                valueStateText="Enter Email Id"
+                                change="onChangemail"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Country"
+                            />
+                            <Text
+                                text="{CustomerData>/Country}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Country"
+                            />
+                            <ComboBox
+                                width="40%"
+                                id="CC_id_Country"
+                                change="MC_onChangeCountry"
+                                placeholder="Enter Country"
+                                valueStateText="Select Country"
+                                items="{path:'CountryModel>/',length:1000}"
+                                selectedKey="{Bookingmodel>/Country}"
+                                showSecondaryValues="true"
+                                visible="{VisibleModel>/visible}"
+                                selectionChange="onCountrySelectionChange"
+                            >
+                                <core:ListItem
+                                    key="{CountryModel>countryName}"
+                                    text="{CountryModel>countryName}"
+                                    additionalText="{CountryModel>code}"
+                                />
+                            </ComboBox>
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="State"
+                            />
+                            <Text
+                                text="{CustomerData>/State}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="State"
+                            />
+                            <ComboBox
+                                width="40%"
+                                id="CC_id_State"
+                                change="CC_onChangeState"
+                                placeholder="Enter State"
+                                valueStateText="Select State"
+                                items="{path:'StateModel>/',length:1000}"
+                                selectedKey="{Bookingmodel>/State}"
+                                showSecondaryValues="true"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <core:ListItem
+                                    key="{StateModel>stateName}"
+                                    text="{StateModel>stateName}"
+                                />
+                            </ComboBox>
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="City"
+                            />
+                            <Text
+                                text="{CustomerData>/City}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="City"
+                            />
+                            <ComboBox
+                                width="40%"
+                                id="CC_id_City"
+                                change="onChange"
+                                valueStateText="Select City"
+                                placeholder="Enter City"
+                                items="{
+                                        path:'CityModel>/',
+                                        length:1000
+                                    }"
+                                selectedKey="{Bookingmodel>/City}"
+                                showSecondaryValues="true"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <core:ListItem
+                                    key="{CityModel>cityName}"
+                                    text="{CityModel>cityName}"
+                                    additionalText="{CityModel>branchCode}"
+                                />
+                            </ComboBox>
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Mobile Number"
+                            />
+                            <Text
+                                text="{= ${CustomerData>/STDCode} + ' ' + ${CustomerData>/MobileNo} }"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+                            <!-- <Text text="{CustomerData>/MobileNo}" visible="{= !${VisibleModel>/visible} }" /> -->
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Mobile Number"
+                            />
+                            <Input
+                                id="CC_id_STDCode"
+                                value="{Bookingmodel>/STDCode}"
+                                editable="false"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <layoutData>
+                                    <f:ColumnElementData
+                                        cellsSmall="2"
+                                        cellsLarge="1"
+                                    />
+                                </layoutData>
+                            </Input>
+                            <!-- Phone Number -->
+                            <Input
+                                id="CD_ID_idPhone"
+                                value="{Bookingmodel>/MobileNo}"
+                                placeholder="Enter Contact Number"
+                                maxLength="10"
+                                liveChange="onmobileChange"
+                                valueStateText="Enter Contact Number"
+                                visible="{VisibleModel>/visible}"
+                                width="50%"
+                            />
+                        </f:content>
+                    </f:SimpleForm>
+                    <FlexBox
+                        alignItems="Start"
+                        justifyContent="Start"
+                        class="sapUiSmallMarginTop"
+                        items="{ path: 'CustomerData>/Persons' }"
+                    >
+                        <VBox
+                            width="260px"
+                            class="sapUiSmallMargin"
+                        >
+                            <Title
+                                text="{= 'Facilities for ' + (${CustomerData>CustomerName} || 'Person') }"
+                                level="H6"
+                            />
+                            <FlexBox
+                                justifyContent="Start"
+                                items="{ path: 'CustomerData>PersonFacilitiesSummary' }"
+                            >
+                                <VBox
+                                    width="200px"
+                                    height="200px"
+                                    class="sapUiSmallMargin serviceCard"
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    visible="{= !!${CustomerData>FacilityName} }"
+                                >
+                                    <Image
+                                        src="{CustomerData>Image}"
+                                        width="180px"
+                                        height="140px"
+                                        densityAware="false"
+                                    />
+                                    <Text text="{CustomerData>FacilityName}" />
+                                    <Text
+                                        text="{= '₹ ' + ${CustomerData>Price}}"
+                                    />
+                                </VBox>
+                            </FlexBox>
+                        </VBox>
+                    </FlexBox>
+                    <VBox class="sapUiMediumMarginBottom">
+                        <Panel
+                            headerText="Customer Documents"
+                            expandable="false"
+                            class="customPanelHeader"
+                        >
+                            <Table
+                                id="Ad_id_idFacilityRoomTableDetails1"
+                                width="100%"
+                                class="sapUiSmallMarginTop"
+                                items="{path: 'CustomerData>/Documents'}"
+                                mode="{= ${VisibleModel>/visible} === true ? 'Delete' : 'None' }"
+                                delete="onDocumentDelete"
+                                busyIndicatorDelay="0"
+                                inset="false"
+                                selectionChange="onTableSelection"
+                                growing="true"
+                                growingScrollToLoad="true"
+                            >
+                                <headerToolbar>
+                                    <Toolbar>
+                                        <Title
+                                            text="Document Details ({=${CustomerData>/Documents}.length})"
+                                        />
+                                        <ToolbarSpacer />
+                                        <Button
+                                            text="Upload Documents"
+                                            press="onUploadDocumentFile"
+                                            class="myUnifiedBtn"
+                                            visible="{VisibleModel>/visible}"
+                                        />
+                                    </Toolbar>
+                                </headerToolbar>
+                                <columns>
+                                    <Column demandPopin="true">
+                                        <Text text="File Name" />
+                                    </Column>
+                                    <Column demandPopin="true">
+                                        <Text text="Document Type" />
+                                    </Column>
+                                    <Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <Text text="File Type" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Link
+                                                text="{CustomerData>FileName}"
+                                                press="onFileNameLinkPress"
+                                            />
+                                            <Text
+                                                text="{CustomerData>DocumentType}"
+                                            />
+                                            <Text
+                                                text="{CustomerData>FileType}"
+                                            />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </Panel>
+                    </VBox>
+                    <Table
+                        id="Ad_id_idFacilityRoomTableDetails"
+                        class="sapUiSmallMarginTop"
+                        items="{path: 'CustomerData>/AllSelectedFacilities'}"
+                        mode="{= ${VisibleModel>/visible} === true ? 'SingleSelectLeft' : 'None' }"
+                        busyIndicatorDelay="0"
+                        inset="false"
+                        selectionChange="onTableSelection"
+                    >
+                        <headerToolbar>
+                            <Toolbar>
+                                <Title
+                                    text="Facility Details ({=${CustomerData>/AllSelectedFacilities}.length})"
+                                />
+                                <ToolbarSpacer />
+                                <Button
+                                    text="Add"
+                                    press="onAddFacilityDetails"
+                                    class="myUnifiedBtn"
+                                    visible="{VisibleModel>/visible}"
+                                />
+                                <Button
+                                    text="Edit"
+                                    press="onEditFacilityDetails"
+                                    class="myUnifiedBtn"
+                                    visible="{VisibleModel>/visible}"
+                                />
+                                <Button
+                                    text="Delete"
+                                    press="onDeleteFacilityDetails"
+                                    class="myUnifiedBtn"
+                                    visible="{VisibleModel>/visible}"
+                                />
+                            </Toolbar>
+                        </headerToolbar>
+                        <columns>
+                            <Column demandPopin="true">
+                                <Text text="Facility Name" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="Facility Price" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="Start Date" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="End Date" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="Unit" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="Days" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="Total Price" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{CustomerData>FacilityName}" />
+                                    <Text
+                                        text="{
+                                                parts: [
+                                                    { path: 'CustomerData>Price' },
+                                                    { path: 'CustomerData>Currency' }
+                                                ],
+                                                formatter: '.Formatter.formatCurrency'
+                                            }"
+                                    />
+                                    <Text
+                                        text="{path:'CustomerData>StartDate'}"
+                                    />
+                                    <Text
+                                        text="{path:'CustomerData>EndDate'}"
+                                    />
+                                    <!-- <Text text="{CustomerData>UnitText}" /> -->
+                                    <Text
+                                        text="{= ${CustomerData>UnitText} === 'Per Hour'  ? ${CustomerData>UnitText} + ' (' + ${CustomerData>TotalHour} + ')' : ${CustomerData>UnitText}
+                                            }"
+                                    />
+                                    <Text text="{CustomerData>TotalDays}" />
+                                    <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
+                                    <Text
+                                        text="{
+                                                    parts: [
+                                                        { path: 'CustomerData>TotalAmount' },
+                                                        { path: 'CustomerData>Currency' }
+                                                    ],
+                                                    formatter: '.Formatter.formatCurrency'
+                                                }"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                    <FlexBox
+                        class="custom-flexbox sapUiContentPadding"
+                        direction="Column"
+                    >
+                        <VBox
+                            class="custom-vbox"
+                            width="100%"
+                            alignItems="End"
+                        >
+                            <!-- Coupon Code Row -->
+                            <!-- Total Facility Cost -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Total Facility Cost:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/TotalFacilityPrice' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <!-- Room Rent -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Room Rent:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/RentPrice' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <HBox
+                                width="100%"
+                                justifyContent="End"
+                                alignItems="Center"
+                                class="sapUiSmallMarginBottom"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <!-- Coupon Label -->
+                                <Label
+                                    text="Coupon Code:"
+                                    class="totalColumnBold1 sapUiTinyMarginEnd"
+                                    width="120px"
+                                />
+                                <!-- Coupon Input -->
+                                <Input
+                                    id="couponInput"
+                                    value="{Bookingmodel>/CouponCode}"
+                                    placeholder="Enter Coupon"
+                                    width="150px"
+                                    class="sapUiTinyMarginEnd"
+                                    showValueHelp="true"
+                                    valueHelpIconSrc="sap-icon://decline"
+                                    valueHelpRequest="oncancelCoupon"
+                                    liveChange="onCouponLiveChange"
+                                />
+                                <!-- Apply Now Button -->
+                                <Button
+                                    id="idApplyNowButton"
+                                    text="Apply Now"
+                                    type="Emphasized"
+                                    press=".onApplyCoupon"
+                                    class="sapUiTinyMarginEnd"
+                                    visible="{= !${VisibleModel>/IsCouponApplied} }"
+                                />
+                            </HBox>
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                visible="{= ${CustomerData>/CouponCode} ? true : false }"
+                            >
+                                <Label
+                                    text="Coupon Code:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [{ path: 'CustomerData>/CouponCode' }]
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Discount:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/Discount' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <!-- Sub Total -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Sub Total:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/SubTotal' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <!-- CGST -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="CGST (9%):"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/CGST' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <!-- SGST -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="SGST (9%):"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/SGST' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                            <!-- Grand Total -->
+                            <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Grand Total:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/GrandTotal' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                        </VBox>
+                    </FlexBox>
+                </Panel>
+            </VBox>
+        </ScrollContainer>
+    </Page>
+</mvc:View>

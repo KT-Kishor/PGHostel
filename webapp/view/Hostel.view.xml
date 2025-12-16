@@ -1,0 +1,352 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Hostel"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:tnt="sap.tnt"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:svm="sap.ui.comp.smartvariants"
+    height="100%"
+>
+    <tnt:ToolPage>
+        <tnt:header>
+            <tnt:ToolHeader>
+                <Image
+                    src="./image/LOGO.png"
+                    height="250px"
+                    width="250px"
+                    class="sapUiTinyMarginTop weblogo"
+                    tooltip="Company Logo"
+                />
+                <!-- <Title level="H1" text="SHAH HOSTEL" class="custom-text"/> -->
+                <ToolbarSpacer />
+                <Button
+                    text="SIGN IN / UP"
+                    id="loginButton"
+                    class=" sapUiSmallMarginTop loginButton"
+                    press="onpressLogin"  visible="{= !${UIModel>/isLoggedIn} }"
+                >
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Avatar
+                    visible="{UIModel>/isLoggedIn}"
+                    id="ProfileAvatar"
+                    initials="{profileData>/initials}"
+                    displaySize="XS"
+                    tooltip="Profile pic"
+                    press="onPressAvatar" 
+                />
+            </tnt:ToolHeader>
+        </tnt:header>
+        <tnt:subHeader>
+            <tnt:ToolHeader>
+                <!-- <ToolbarSpacer /> -->
+                <IconTabHeader
+                    id="mainTabHeader"
+                    select="onTabSelect"
+                >
+                    <items>
+                        <IconTabFilter
+                            key="idHome"
+                            text="Home"
+                        />
+                        <IconTabFilter
+                            key="idRooms"
+                            text="Rooms"
+                        />
+                        <!-- <IconTabFilter
+                            key="idFacilities"
+                            text="Facilities"
+                        /> -->
+                        <IconTabFilter
+                            key="idContact"
+                            text="Contact"
+                        />
+                        <!-- <IconTabFilter key="idAdddata" text="Add Data"/> -->
+                    </items>
+                </IconTabHeader>
+            </tnt:ToolHeader>
+        </tnt:subHeader>
+        <tnt:mainContents>
+            <NavContainer id="pageContainer">
+                <pages>
+                    <ScrollContainer
+                        id="idHome"
+                        horizontal="false"
+                        vertical="true"
+                        height="100%"
+                        class="sapUiContentPadding Homepage sapUiTinyMargin"
+                    >
+                        <l:Grid
+                            defaultSpan="XL12 L12 M12 S12"
+                            width="100%"
+                            class="position-welcome"
+                        >
+                            <VBox class="sapUiLargeMarginTop">
+                                <Text
+                                    class="custom-welcome sapUiTinyMarginTopBottom"
+                                    textAlign="Center"
+                                    text="Welcome To "
+                                />
+                                <Text
+                                    class="custom-welcome  sapUiTinyMarginTopBottom "
+                                    text="Shah Hostel"
+                                />
+                                <Text
+                                    text="Your New Home Away to me"
+                                    class="custom-tagline sapUiTinyMarginTop "
+                                />
+                            </VBox>
+                        </l:Grid>
+                        <Button
+                            text="Book Room"
+                            class="RoomBook sapUiLargeMarginBegin "
+                            press="onpressBookrooms"
+                        />
+                    </ScrollContainer>
+                    <Page
+                        id="idRooms"
+                        showHeader="false"
+                    >
+                        <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
+                        <ScrollContainer
+                            horizontal="false"
+                            vertical="true"
+                            height="80%"
+                            class="sapUiContentPadding HostelRooms sapUiTinyMargin"
+                        >
+                            <l:Grid
+                                defaultSpan="XL12 L12 M12 S12"
+                                width="100%"
+                                class="position-welcome"
+                            >
+                                <VBox class="sapUiLargeMarginTop">
+                                    <Text
+                                        class="Welcomeroomtext sapUiTinyMarginTopBottom"
+                                        textAlign="Center"
+                                        text="Book Your Room "
+                                    />
+                                    <Text
+                                        class="Welcomeroomtext  sapUiTinyMarginTopBottom "
+                                        text="Shah Hostel"
+                                    />
+                                    <Text
+                                        text="Your New Home Away to me"
+                                        class="Welcomeroomtext sapUiTinyMarginTop "
+                                    />
+                                </VBox>
+                                <HBox
+                                    width="100%"
+                                    justifyContent="End"
+                                    alignItems="Center"
+                                />
+                            </l:Grid>
+                        </ScrollContainer>
+                      
+                            <fb:FilterBar
+                                id="filterbar"
+                                persistencyKey="myPersKey"
+                                useToolbar="false"
+                                clear="FC_onPressClear"
+                                showClearOnFB="true"
+                                search="onSearchRooms"
+                                filterChange="IA_.onFilterChange"
+                                afterVariantLoad="IA_.onAfterVariantLoad"
+                                showFilterConfiguration="false"
+                                filterContainerWidth="auto"
+                                 class="sapUiContentPadding HostelRooms sapUiTinyMargin"
+                                 busyIndicatorDelay="0"
+                            >
+                                <fb:filterGroupItems>
+                                    <!--  Branch Name -->
+                                    <fb:FilterGroupItem
+                                        name="Branch"
+                                        label="City"
+                                        groupName="Group1"
+                                        visibleInFilterBar="true"
+                                    >
+                                        <fb:control>
+                                            <ComboBox
+                                                id="id_Branch"
+                                                placeholder="Select City"
+                                                showClearIcon="true" busyIndicatorDelay="0"
+                                                enabled="true"
+                                                items="{sBRModel>/}"
+                                                selectionChange=".onBranchSelectionChange"
+                                            >
+                                                <core:ListItem
+                                                    key="{sBRModel>City}"
+                                                    text="{sBRModel>City}"
+                                                />
+                                            </ComboBox>
+                                        </fb:control>
+                                    </fb:FilterGroupItem>
+                                    <!-- Area -->
+                                    <fb:FilterGroupItem
+                                        name="Area"
+                                        label="Locality"
+                                        groupName="Group1"
+                                        visibleInFilterBar="true"
+                                    >
+                                        <fb:control>
+                                            <ComboBox
+                                                id="id_Area"
+                                                placeholder="Select Branch"
+                                                showClearIcon="true"
+                                                enabled="false"
+                                                valueStateText="Select Area"
+                                                items="{AreaModel>/}"
+                                                selectionChange=".onAreaSelectionChange" busyIndicatorDelay="0"
+                                            >
+                                                <core:ListItem
+                                                    key="{AreaModel>BranchID}"
+                                                    text="{AreaModel>Address}"
+                                                />
+                                            </ComboBox>
+                                        </fb:control>
+                                    </fb:FilterGroupItem>
+                                    <!--  Room Type -->
+                                    <fb:FilterGroupItem
+                                        name="RoomType"
+                                        label="Room Type"
+                                        groupName="Group1"
+                                        visibleInFilterBar="true"
+                                    >
+                                        <fb:control>
+                                            <ComboBox
+                                                id="id_Roomtype"
+                                                placeholder="Select Room Type"
+                                                showClearIcon="true" busyIndicatorDelay="0"
+                                            >
+                                                <core:Item
+                                                    key="AC"
+                                                    text="AC"
+                                                />
+                                                <core:Item
+                                                    key="Non-AC"
+                                                    text="Non-AC"
+                                                />
+                                                <core:Item
+                                                    key="All"
+                                                    text="All"
+                                                />
+                                            </ComboBox>
+                                        </fb:control>
+                                    </fb:FilterGroupItem>
+                                </fb:filterGroupItems>
+                            </fb:FilterBar>
+                            <l:Grid
+                                id="idBedTypeFlex"
+                                defaultSpan="XL3 L4 M6 S12"
+                                containerQuery="true"
+                                hSpacing="2"
+                                vSpacing="2"
+                                content="{path: 'VisibilityModel>/BedTypes'}"
+                            >
+                            <VBox class="bedCard" >
+                                <!-- ===== IMAGE CAROUSEL ===== -->
+                                <Carousel
+                                    height="300px"
+                                    width="100%"
+                                    loop="true"
+                                    showPageIndicator="false"
+                                    backgroundDesign="Transparent"
+                                    pages="{VisibilityModel>Images}"
+                                >
+                                    <pages>
+                                        <VBox class="imageWrapper">
+                                            <!-- Area Tag -->
+                                            <HBox class="areaTagBox">
+                                                 <core:Icon
+                                                    src="sap-icon://map-fill"
+                                                    size="0.9rem"
+                                                    color="black"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Text text="{VisibilityModel>Area}" />
+                                            </HBox>
+                                            <!-- Image -->
+                                            <Image
+                                                src="{VisibilityModel>src}"
+                                                width="100%"
+                                                height="300px"
+                                                class="bedCardImage"
+                                                decorative="false"
+                                            />
+                                        </VBox>
+                                    </pages>
+                                </Carousel>
+                                <!-- ===== CARD CONTENT ===== -->
+                                <VBox class="bedCardContent">
+                                    <Text
+                                        text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+                                        class="bedCardTitle"
+                                    />
+                                    <Text text="{VisibilityModel>Description}" class="bedCardDesc" />
+                                    <Text text="{parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+                                    formatter: '.Formatter.formatStartingPrice'}" class="bedCardPrice"/>
+                                    <HBox justifyContent="Center" alignItems="Center" class="sapUiTinyMarginTop">
+                                        <!-- <Button
+                                            text="View Details"
+                                            press=".viewDetails"
+                                              class="btnViewDetails"
+                                            /> -->
+                                            <Link
+                                                text="View Details"
+                                                press="viewDetails"
+                                                class="btnViewDetails"
+                                            />
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+                        </l:Grid>
+                          <IllustratedMessage
+                            visible="{VisibilityModel>/NoData}"
+                            illustrationType="sap.m.IllustratedMessageType.NoData"
+                            title="No Rooms Found"
+                            description="Please select another Branch or City."
+                        />
+                    </Page>
+                    <!-- <ScrollContainer
+                        id="idFacilities"
+                        horizontal="false"
+                        vertical="true"
+                        height="100%"
+                        class="Products_list sapUiTinyMargin"
+                    >
+                        <core:Fragment
+                            fragmentName="sap.ui.com.project1.fragment.HomePage"
+                            type="XML"
+                        />
+                    </ScrollContainer> -->
+                    <ScrollContainer
+                        id="idContact"
+                        horizontal="false"
+                        vertical="true"
+                        height="100%"
+                        class="Products_list sapUiTinyMargin"
+                    >
+                        <core:Fragment
+                            fragmentName="sap.ui.com.project1.fragment.ContactPage"
+                            type="XML"
+                        />
+                    </ScrollContainer>
+                    <ScrollContainer
+                        id="idAdddata"
+                        horizontal="false"
+                        vertical="true"
+                        height="100%"
+                        class="sapUiContentPadding career-background sapUiTinyMargin"
+                    >
+                        <!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.CareerPage" type="XML"/> -->
+                    </ScrollContainer>
+                </pages>
+            </NavContainer>
+        </tnt:mainContents>
+    </tnt:ToolPage>
+</mvc:View>

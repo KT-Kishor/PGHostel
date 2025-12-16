@@ -1,0 +1,184 @@
+<core:FragmentDefinition 
+	xmlns="sap.m" 
+	xmlns:core="sap.ui.core" 
+	xmlns:f="sap.ui.layout.form" 
+	xmlns:l="sap.ui.layout">
+	<Dialog id="authDialog" draggable="true" resizable="true" class="authDialog" contentWidth="28rem" contentHeight="auto">
+	<!--stretch="{= ${device>/system/phone} }"-->
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="{LoginViewModel>/dialogTitle}" />
+				</contentMiddle>
+				<contentRight>
+					<Button type="Transparent" icon="sap-icon://decline" press="onDialogClose" />
+				</contentRight>
+			</Bar>
+		</customHeader>
+		<VBox>
+			<!-- Switch Button -->
+			<HBox justifyContent="Start" class="switch-toggle-container" visible="{= ${LoginViewModel>/authFlow} === 'signin' || ${LoginViewModel>/authFlow} === 'signup' }">
+				<Button text="SIGN IN" type="Transparent" class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} " press="onSwitchToSignIn" visible="{= ${LoginViewModel>/authFlow} !== 'signin' }" />
+				<Button id="signupvisible" text="SIGN UP" type="Transparent" class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} " press="onSwitchToSignUp" visible="{= ${LoginViewModel>/authFlow} !== 'signup' }" />
+			</HBox>
+			<!-- Sign In Panel -->
+			<Panel width="100%" id="signInPanel" expandable="false" visible="{= ${LoginViewModel>/authFlow} === 'signin' }">
+				<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" emptySpanL="0" emptySpanM="0" columnsL="1" columnsM="1">
+					<Label text="User ID" required="true" />
+					<Input id="signInuserid" placeholder="User ID" valueLiveUpdate="true" liveChange="onUserlivechange" valueStateText="Please enter a valid User ID" />
+					<Label text="User Name" required="true" />
+					<Input id="signInusername" placeholder="User Name" valueLiveUpdate="true" liveChange="onUserlivechange" valueStateText="Please enter a valid User Name"/>
+					<Label text="Login with"/>
+					<HBox class="aleftMargin" alignItems="End" justifyContent="Start">
+						<RadioButton text="Password" groupName="loginType" selected="{= ${LoginViewModel>/loginMode} === 'password' }" select="onSelectLoginMode"/>
+						<RadioButton text="OTP" groupName="loginType" selected="{= ${LoginViewModel>/loginMode} === 'otp' }" select="onSelectLoginMode"/>
+						<!-- <Button id="btnSignInSendOTP" text="Send OTP" visible="{= ${LoginViewModel>/loginMode} === 'otp' }" press="onPressOTP"/> -->
+						<Button id="btnSignInSendOTP" text="{LoginViewModel>/otpButtonText}" enabled="{LoginViewModel>/canResendOTP}" visible="{= ${LoginViewModel>/loginMode} === 'otp' }" press="onPressOTP"/>
+					</HBox>
+					<!-- PASSWORD SECTION -->
+					<Label text="Password" required="true" visible="{= ${LoginViewModel>/loginMode} === 'password' }"/>
+					<Input id="signinPassword" placeholder="Enter Password" visible="{= ${LoginViewModel>/loginMode} === 'password' }" submit="onSignIn" type="Password" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" liveChange="onSigninPasswordLive" valueStateText="Please Enter a valid Password"/>
+					<!-- REUSED OTP FIELD FOR LOGIN -->
+					<VBox id="signInOTPBox" visible="{LoginViewModel>/showOTPField}">
+						<Label text="Enter OTP" required="true" />
+						<Input id="signInOTP" placeholder="Enter OTP" liveChange="onLoginOtpLive" maxLength="6" type="Text" />
+					</VBox>
+				</f:SimpleForm>
+				<HBox justifyContent="SpaceBetween" class="sapUiSmallMargin">
+					<Button text="Set / Forgot Password?" type="Transparent" press="onForgotPassword"/>
+					<Button class="myUnifiedBtn" text="Sign In" width="100px" enabled="true" press="onSignIn"/>
+				</HBox>
+			</Panel>
+			<!-- FORGOT FLOW IN ONE PANEL -->
+			<Panel id="forgotFlowPanel" expandable="false" visible="{= ${LoginViewModel>/authFlow} === 'forgot' }">
+				<!-- <HBox justifyContent="Center" class="switch-toggle-container" /> -->
+				<f:SimpleForm id="forgotVBox" editable="true" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" emptySpanL="0" emptySpanM="0" columnsL="1" columnsM="1">
+					<!-- STEP 1: SEND OTP -->
+					<VBox id="fpStepUser" visible="{= ${LoginViewModel>/forgotStep} >= 1 }">
+						<Label text="Enter User ID" required="true" />
+						<Input id="fpUserId" placeholder="Your User ID" liveChange="onUserlivechange" valueStateText="Please enter a valid User ID" enabled="{= ${LoginViewModel>/forgotStep} === 1 }"/>
+						<Label class="sapUiSmallMarginTop" text="Enter User Name" required="true" />
+						<Input id="fpUserName" placeholder="Registered Name" liveChange="onUserlivechange" valueStateText="Please enter a valid User Name" enabled="{= ${LoginViewModel>/forgotStep} === 1 }"/>
+						<HBox justifyContent="End">
+							<Button id="btnFPNext" text="{LoginViewModel>/otpButtonText}" press="onValidateUser" enabled="{= ${LoginViewModel>/forgotStep} &lt;= 2 &amp;&amp; ${LoginViewModel>/canResendOTP} }" class="myUnifiedBtn sapUiSmallMarginTop"/>
+							<!-- <Button id="btnFPNext" text="Send OTP" press="onValidateUser" enabled="{= ${LoginViewModel>/forgotStep} &lt;= 2 }" class="myUnifiedBtn sapUiSmallMarginTop"/> -->
+						</HBox>
+					</VBox>
+					<!-- STEP 2: OTP -->
+					<VBox id="fpStepOtp" visible="{= ${LoginViewModel>/forgotStep} >= 2 }">
+						<Label text="Enter OTP" required="true" />
+						<Input id="fpOTP" placeholder="Enter OTP" liveChange="onOtpLive" maxLength="6" type="Text" valueStateText="Please enter a valid OTP" enabled="{= ${LoginViewModel>/forgotStep} === 2 }"/>
+						<HBox justifyContent="End">
+							<Button id="btnOtpVerify" text="Verify OTP" press="_onVerifyOTP" enabled="{= ${LoginViewModel>/forgotStep} === 2 }" class="myUnifiedBtn sapUiSmallMarginTop"/>
+						</HBox>
+					</VBox>
+					<!-- STEP 3: RESET PASSWORD -->
+					<VBox id="fpStepReset" visible="{= ${LoginViewModel>/forgotStep} >= 3 }">
+						<Label class="sapUiSmallMarginTop sapTinyMarginBottom" text="Create new password" design="Bold"/>
+						<MessageStrip type="Information" showIcon="false" text="Minimum 6 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character" />
+						<Label text="New Password" required="true" class="sapUiSmallMarginTop" />
+						<Input id="newPass" showValueStateMessage="false" type="Password" showValueHelp="true" valueHelpIconSrc="sap-icon://show" liveChange="SM_onChnageSetAndConfirm" maxLength="50" valueHelpRequest=".SM_onTogglePasswordVisibility" enabled="{= ${LoginViewModel>/forgotStep} === 3 }"/>
+						<HBox width="100%" justifyContent="SpaceBetween">
+							<Text id="fpPasswordStrengthText" class="pwdMinFail"/>
+							<Button text="Generate password" type="Transparent" icon="sap-icon://refresh" press="SM_onGenerateForgotPassword"/>
+						</HBox>
+						<Label class="sapUiSmallMarginTop" text="Confirm Password" required="true" />
+						<Input id="confPass" type="Password" change="Forget_onConfirm" liveChange="Forget_onConfirm" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" valueStateText="Enter Confirm Password" maxLength="50" enabled="{= ${LoginViewModel>/forgotStep} === 3 }"/>
+						<HBox justifyContent="End">
+							<Button id="btnUpdatePass" text="Update Password" press="onSubmitNewPassword" enabled="{= ${LoginViewModel>/forgotStep} === 3 }" class="myUnifiedBtn sapUiSmallMarginTop"/>
+						</HBox>
+					</VBox>
+					<HBox alignContent="Start">
+						<Button text="Back to Login" type="Transparent" press="onBackToLogin"/>
+					</HBox>
+				</f:SimpleForm>
+			</Panel>
+			<!-- Sign Up Panel -->
+			<Panel id="signUpPanel" visible="{= ${LoginViewModel>/authFlow} === 'signup' }">
+				<content>
+					<f:SimpleForm id="signUpForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3" emptySpanL="1" emptySpanM="1" columnsL="2" columnsM="1" class="sapUiNoContentPadding">
+						<!-- <Label text=""/> -->
+						<HBox width="100%" alignItems="Center" justifyContent="Start">
+							<VBox width="20%">
+								<Label text="Salutation" required="true"/>
+								<ComboBox id="signUpSalutation" selectedKey="" change="onChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
+									<core:ListItem key="Mr." text="Mr."/>
+									<core:ListItem key="Ms." text="Ms."/>
+									<core:ListItem key="Mrs." text="Mrs."/>
+									<core:ListItem key="Dr." text="Dr."/>
+								</ComboBox>
+							</VBox>
+							<VBox width="80%" class="sapUiTinyMarginBegin">
+								<Label text="Full Name" required="true"/>
+								<Input id="signUpName" value="{LoginMode>/fullname}" placeholder="Full Name" required="true" liveChange="_LCvalidateName" valueStateText="Enter valid name"/>
+							</VBox>
+						</HBox>
+						<Label text="Date Of Birth" required="true" />
+						<DatePicker id="signUpDOB" value="{LoginMode>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" change="onChangeDOB" />
+						<Label text="Gender" required="true"/>
+						<Select id="signUpGender" selectedKey="" change="onChangeGender">
+							<core:Item key="" text="Select Gender" />
+							<core:Item key="Male" text="Male"/>
+							<core:Item key="Female" text="Female"/>
+							<core:Item key="Other" text="Other"/>
+						</Select>
+						<!-- ================== 2) CONTACT DETAILS ================== -->
+						<Label text="Email" required="true" class="sapUiTinyMarginTop" />
+						<Input id="signUpEmail" value="{LoginMode>/Email}" placeholder="Email" type="Email" required="true" liveChange="onEmailliveChange" valueStateText="Enter valid email" />
+						<Label text="Country" required="true"/>
+						<ComboBox id="signUpCountry" change="onChangeCountry" selectionChange="onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
+							<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+						</ComboBox>
+						<Label text="State" required="true"/>
+						<ComboBox id="signUpState" change="onChangeState" selectionChange="onChangeState" placeholder="Select State" valueStateText="Select a valid State" items="{path:'StateModel>/', length:1000}" showSecondaryValues="true">
+							<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+						</ComboBox>
+						<Label text="City" required="true"/>
+						<ComboBox selectionChange="onCitySelect" id="signUpCity" change="onChangeCity" placeholder="Select City" valueStateText="Select a valid City" items="{path:'CityModel>/', length:1000}" showSecondaryValues="true">
+							<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}"/>
+						</ComboBox>
+						<Label text=""/>
+						<HBox width="100%" alignItems="Center" justifyContent="Start">
+							<VBox width="26%">
+								<Label text="ISD Code" required="true"/>
+								<ComboBox change="onSTDChange" id="signUpSTD" placeholder="Code" valueStateText="Select Code" showSecondaryValues="true" items="{path:'CountryModel>/', length:1000}">
+									<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+								</ComboBox>
+							</VBox>
+							<VBox width="74%" class="sapUiTinyMarginBegin">
+								<Label text="Mobile Number" required="true"/>
+								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number" />
+								<!-- <Input id="signUpPhone" type="Number" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number" /> -->
+							</VBox>
+						</HBox>
+						<Label text="Address" required="true"/>
+						<TextArea id="signUpAddress" rows="3" maxLength="500" value="{LoginMode>/Address}" liveChange="onAddressChange" placeholder="Address" />
+						<HBox width="100%">
+							<Label text="Account Security" design="Bold" class="sapUiSmallMarginTop"/>
+						</HBox>
+						<!-- <Title text="Account Security" /> -->
+						<!-- <MessageStrip id="passwordHelpStrip" type="Information" showIcon="false" text="Password must be 6+ characters: upper/lowercase letters, a number, and a special character" /> -->
+						<MessageStrip id="passwordHelpStrip" type="Information" showIcon="false" text="Minimum 6 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character" />
+						<Label text="Create Password" required="true" />
+						<HBox width="100%">
+							<Input showValueStateMessage="false" id="signUpPassword" width="100%" placeholder="Enter Password" value="{LoginMode>/password}" type="Password" liveChange="SM_onChnageSetAndConfirm" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility">
+								<layoutData>
+									<FlexItemData growFactor="1"/>
+								</layoutData>
+							</Input>
+						</HBox>
+						<HBox width="100%" justifyContent="SpaceBetween">
+							<Text id="passwordStrengthText" class="pwdMinFail" />
+							<Button text="Generate password" type="Transparent" icon="sap-icon://refresh" press="SM_onGeneratePassword" />
+						</HBox>
+						<Label text="Confirm Password" required="true" />
+						<Input id="signUpConfirmPassword" placeholder="Enter Confirm Password" value="{LoginMode>/comfirmpass}" type="Password" change="FSM_onConfirm" liveChange="FSM_onConfirm" showValueHelp="true" valueStateText="Enter Confirm Password" valueHelpIconSrc="sap-icon://show" valueHelpRequest="SM_onTogglePasswordVisibility" maxLength="50"/>
+					</f:SimpleForm>
+					<HBox justifyContent="End" class="sapUiSmallMargin">
+						<Button text="Sign Up" class="myUnifiedBtn sapUiSmallMarginEnd" width="120px" press="onSignUp"/>
+					</HBox>
+				</content>
+			</Panel>
+		</VBox>
+	</Dialog>
+</core:FragmentDefinition>

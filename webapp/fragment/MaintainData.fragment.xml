@@ -1,0 +1,106 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        title="Fill Branch Details"
+        type="Message"
+        class="sapUiContentPadding"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="4"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="8"
+        >
+            <f:content>
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <Input
+                    id="idBranch"
+                    value="{MDmodel>/BranchID}"
+                    placeholder="Enter Branch Code"
+                    maxLength="60"
+                    editable="{= !${editableModel>/isEdit}}"
+                    liveChange="onBNameInputLiveChange"
+                    valueStateText="Enter Branch Code"
+                />
+                <Label
+                    text="Branch Name"
+                    required="true"
+                />
+                <Input
+                    id="idBName"
+                    value="{MDmodel>/Name}"
+                    placeholder="Enter Branch Name"
+                    maxLength="60"
+                    liveChange="onNameInputLiveChange"
+                    valueStateText="Enter Branch Name"
+                />
+                <Label
+                    text="Address"
+                    required="true"
+                />
+                <Input
+                    id="idAddress"
+                    value="{MDmodel>/Address}"
+                    placeholder="Enter Address"
+                    maxLength="60"
+                    liveChange="onAddressInputLiveChange"
+                    valueStateText="Enter Address"
+                />
+                <Label
+                    text="Pincode"
+                    required="true"
+                />
+                <Input
+                    id="idPin"
+                    value="{MDmodel>/Pincode}"
+                    placeholder="Enter Pincode"
+                    maxLength="10"
+                    liveChange="onPinInputLiveChange"
+                    valueStateText="Enter Pincode"
+                />
+                <Label
+                    text="Contact Number"
+                    required="true"
+                />
+                <Input
+                    id="idPhone"
+                    value="{MDmodel>/Contact}"
+                    placeholder="Enter Contact Number"
+                    maxLength="10"
+                    liveChange="onPhoneInputLiveChange"
+                    valueStateText="Enter Contact Number"
+                />
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    id="MD_id_saveButoon"
+                    text="Save"
+                    class="myUnifiedBtn"
+                    press="MD_onSaveButtonPress"
+                />
+
+                <Button
+                    text="Cancel"
+                    class="myUnifiedBtn"
+                    press="MD_onCancelButtonPress"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</c:FragmentDefinition> 

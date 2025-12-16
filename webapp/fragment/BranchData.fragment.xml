@@ -1,0 +1,231 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<Dialog
+        title="Fill Branch Details"
+        type="Message"
+        class="sapUiContentPadding" resizable="true" contentWidth="30%"
+        draggable="true">
+		<f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+              labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1">
+			<f:content>
+				<!-- <Label
+                    text="Branch Code"
+                    required="true"
+                />
+				<Input
+                    id="BD_idBranch"
+                    value="{MDmodel>/BranchID}"
+                    placeholder="Enter Branch Code"
+                    maxLength="60"
+                    editable="{= !${editableModel>/isEdit}}"
+                    liveChange="onBNameInputLiveChange"
+                    valueStateText="Enter Branch Code"
+                /> -->
+				<Label
+                    text="Branch Name"
+                    required="true"
+                />
+				<Input
+                    id="BD_idBName"
+                    value="{MDmodel>/Name}"
+                    placeholder="Enter Branch Name"
+                    maxLength="60"
+                    liveChange="onNameInputLiveChange"
+                    valueStateText="Enter Branch Name"
+                />
+				<Label
+                    text="Address"
+                    required="true"
+                />
+				<Input
+                    id="BD_idAddress"
+                    value="{MDmodel>/Address}"
+                    placeholder="Enter Address"
+                    maxLength="60"
+                    liveChange="onAddressInputLiveChange"
+                    valueStateText="Enter Address"
+                />
+				<Label
+                    text="Pincode"
+                    required="true"
+                />
+				<Input
+                    id="BD_idPin"
+                    value="{MDmodel>/Pincode}"
+                    placeholder="Enter Pincode"
+                    maxLength="10"
+                    liveChange="onPinInputLiveChange"
+                    valueStateText="Enter Pincode"
+                />
+				<Label
+                    text="Country"
+                    required="true"
+                />
+				<ComboBox
+                    id="MC_id_Country"
+                    change="MC_onChangeCountry"
+                    placeholder="Enter Country"
+                    valueStateText="Select Country"
+                    items="{path:'CountryModel>/',length:1000}"
+                    selectedKey="{MDmodel>/country}"
+                    showSecondaryValues="true"
+                >
+					<core:ListItem
+                        key="{CountryModel>countryName}"
+                        text="{CountryModel>countryName}"
+                        additionalText="{CountryModel>code}"
+                    />
+				</ComboBox>
+				<Label
+                    text="State"
+                    required="true"
+                />
+				<ComboBox
+                    id="MC_id_State"
+                    change="MC_onChangeState"
+                    placeholder="Enter State"
+                    valueStateText="Select State"
+                    items="{path:'StateModel>/',length:1000}"
+                    selectedKey="{MDmodel>/state}"
+                    showSecondaryValues="true"
+                >
+					<core:ListItem
+                        key="{StateModel>stateName}"
+                        text="{StateModel>stateName}"
+                    />
+				</ComboBox>
+				<Label
+                    text="City"
+                    required="true"
+                />
+				<ComboBox
+                    id="MC_id_City"
+                    change="MC_onChangeCity"
+                    valueStateText="Select City"
+                    placeholder="Enter City"
+                    items="{path:'CityModel>/',length:1000}"
+                    selectedKey="{MDmodel>/baseLocation}"
+                    value="{MDmodel>/baseLocation}"
+                    showSecondaryValues="true"
+                >
+					<core:ListItem
+                        key="{CityModel>cityName}"
+                        text="{CityModel>cityName}"
+                        additionalText="{CityModel>branchCode}"
+                    />
+				</ComboBox>
+				<Label text="Mobile Number" required="true"/>
+				<HBox
+                    width="100%"
+                    justifyContent="Start"
+                    alignItems="Center"
+                >
+					<VBox width="22%">
+						<Input
+                            id="MC_id_codeModel"
+                            value="{MDmodel>/stdCode}"
+                            editable="false"
+                        />
+					</VBox>
+					<VBox width="78%">
+						<Input
+                            value="{MDmodel>/Contact}"
+                            id="BD_idPhone"
+                            placeholder="Enter Contact Number"
+                            maxLength="10"
+                            liveChange="onPhoneInputLiveChange"
+                            valueStateText="Enter Contact Number"
+                        />
+					</VBox>
+				</HBox>
+				<Label
+                    text="Penalty"
+                    required="true"
+                />
+				<Input
+                    id="BD_idPenalty"
+                    value="{MDmodel>/Penalty}"
+                    placeholder="Enter Penalty"
+                    maxLength="10"
+                    liveChange="onPenaltyInputLiveChange"
+                    valueStateText="Enter Penalty"
+                />
+                <Label
+                    text="Add Logo"
+                />
+                <VBox
+                    alignItems="Start"
+                    width="100%"
+                    renderType="Bare"
+                >
+                    <HBox width="25%">
+                        <u:FileUploader
+                            id="BD_id_FileUploader"
+                            fileSizeExceed="onFileSizeExceeds"
+                            maximumFileSize="5MB"
+                            typeMissmatch="onFileTypeMissmatch"
+                            fileType="jpg,jpeg,png"
+                            change="onFacilityFileChange"
+                            buttonOnly="true"
+                            sameFilenameAllowed="true"
+                            iconFirst="true"
+                            buttonText="Upload Images"
+                            multiple="true"
+                            uploadOnChange="false"
+                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                        />
+                    </HBox>
+                    <!-- Tokenizer -->
+                    <HBox width="75%">
+                        <ScrollContainer
+                            height="60px"
+                            width="100%"
+                            horizontal="false"
+                            vertical="true"
+                        >
+                            <Tokenizer
+                                id="BD_id_TokenList"
+                                width="100%"
+                                tokenDelete="onTokenDelete"
+                                tokens="{tokenModel>/tokens}"
+                            >
+                                <Token
+                                    key="{tokenModel>key}"
+                                    text="{tokenModel>text}"
+                                />
+                            </Tokenizer>
+                        </ScrollContainer>
+                    </HBox>
+                </VBox>
+			</f:content>
+		</f:SimpleForm>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Button
+                    id="BD_id_saveButoon"
+                    text="Save"
+                    class="myUnifiedBtn"
+                    press="MD_onSaveButtonPress"
+                />
+				<Button
+                    text="Cancel"
+                    class="myUnifiedBtn"
+                    press="MD_onCancelButtonPress"
+                />
+			</Toolbar>
+		</footer>
+	</Dialog>
+</c:FragmentDefinition>

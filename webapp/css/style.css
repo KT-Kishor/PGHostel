@@ -1,0 +1,2313 @@
+/* General Page Styling */
+.mainPage,
+.mainContainer {
+  height: 100vh !important; /* Full viewport height */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.weblogo {
+  margin-left: -50px !important;
+}
+
+/* Header Styling */
+.headerBar {
+  background-color: white !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+}
+
+.logoImage {
+  max-width: 100px;
+  height: auto;
+}
+
+.logoText {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.navBar {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to new line */
+  justify-content: flex-end; /* Align to right on desktop */
+  align-items: center;
+  gap: 12px; /* Adds spacing between items */
+  text-align: center;
+}
+
+.navText {
+  color: #000000 !important;
+  font-size: 15px;
+  font-weight: bold !important;
+  background-color: transparent !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: color 0.3s ease;
+}
+
+.navText:hover {
+  color: #00bcd4 !important;
+}
+
+/* Login Button */
+.loginButton {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  border-radius: 10px !important;
+  color: white !important;
+  font-size: 1rem !important;
+}
+
+/* Homepage Background */
+.Homepage {
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.6rem;
+}
+/* Welcome Text */
+.custom-welcome {
+  line-height: 1;
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+.custom-text {
+  font-size: 20px !important;
+}
+.custom-tagline {
+  font-size: 48px;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #ffffff;
+  font-weight: bold;
+}
+.RoomBook {
+  font-size: 18px !important;
+  height: 100px !important;
+  width: 200px !important;
+}
+
+.HostelRooms {
+  background-image: url("../image/HostelRoom.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.6rem;
+}
+.Welcomeroomtext {
+  line-height: 1;
+  color: white;
+  font-size: 48px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.sapTntToolHeader .sapMBarChild:not(.sapMMenuBtn).sapMBtn .sapMBtnTransparent .sapMBtnContent,
+.sapUiSizeCompact .sapTntToolHeader .sapMBarChild:not(.sapMMenuBtn).sapMBtn .sapMBtnDefault .sapMBtnContent,
+.sapUiSizeCompact .sapTntToolHeader .sapMBarChild:not(.sapMMenuBtn).sapMBtn .sapMBtnBack .sapMBtnContent,
+.sapUiSizeCompact .sapTntToolHeader .sapMBarChild:not(.sapMMenuBtn).sapMBtn .sapMBtnUp .sapMBtnContent {
+  line-height: 2rem;
+  color: white;
+  font-size: 15px;
+}
+.sapMITBFilter .sapMITBText .sapMITHTextContent {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  font-size: 18px;
+}
+/* .HostelGrid {
+    margin-top: 24px;
+    justify-content: center;
+    height: 80% !important;
+} */
+
+.HostelCard {
+  background: #1bb2bf;
+  color: #fff;
+  height: auto !important;
+  max-width: 370px;
+  margin: 20px auto 10px auto;
+  border-radius: 18px;
+  box-shadow: 0 4px 6px black;
+  padding: 24px 18px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.section-image .sapMImg {
+  width: 350px !important;
+  height: 300px !important;
+  object-fit: cover;
+  margin-bottom: 5px;
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* .section-image {
+   
+} */
+.hr-text {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 2px;
+}
+.description-text {
+  font-size: 1rem;
+  margin-bottom: 18px;
+}
+.tileFullWidth .sapMGT {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.tileFullWidth .sapMGTBackgroundImg {
+  background-size: cover !important;
+  background-position: center !important;
+}
+.customTileSlide {
+  background-image: url("../image/washingRoom.png");
+  background-size: cover;
+  background-position: center;
+}
+.customTileSlide2 {
+  background-image: url("../image/FoodRoom.png");
+  background-size: cover;
+  background-position: center;
+}
+.slideHBox1 {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Hero Banner */
+.contact-hero {
+   background-image: url("../image/washingRoom.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    border-radius: 0.6rem;
+}
+
+.contact-hero::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+/* Responsive Title */
+.contact-hero-title {
+    color: #FFFFFF;
+    font-size: clamp(1.5rem, 6vw, 3.5rem); /* scales between 1.5rem and 3.5rem based on viewport width */
+    font-weight: 700;
+    margin: 0; /* remove negative margin */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+    z-index: 2;
+    transition: all 0.3s ease-in-out;
+}
+.contact-hero-title:hover {
+    color: #00bcd4;
+    transform: scale(1.2);
+    text-shadow: 4px 4px 10px rgba(0,0,0,0.9);
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .contact-hero-title {
+        letter-spacing: 1px;
+    }
+}
+
+/* Subtitle */
+.contact-subtitle {
+    text-align: left;
+}
+
+.contact-text {
+   font-size: 1.5rem;
+    color: #00bcd4 !important;
+    margin: 20px 0;
+    text-align: left;
+    font-weight: bold;
+}
+
+.newcompName{
+    font-weight: bold;
+    line-height: 1.8;  
+}
+
+.oldCompName{
+   font-size: 1.2rem !important;
+    font-weight: bold; 
+}
+
+.compName{
+   font-size: 1.3rem !important;
+    font-weight: bold;
+}
+
+/* Flex container */
+.contact-flex {
+  display: flex;
+  justify-content: start; /* align items to left */
+  align-items: stretch;
+  gap: 0; /* no space between */
+  margin: 0 auto;
+  width: 90%;
+  height: 50%;
+  flex-wrap: wrap; /* stack on mobile */
+}
+
+.contact-address-box {
+  background: #00bcd4;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 20%; /* fixed width */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size: 1.2rem !important;
+}
+
+/* Map Box */
+.contact-map-box {
+  flex-grow: 1; /* take remaining space */
+  flex-shrink: 1;
+  flex-basis: auto;
+  border-radius:  8px 0 0 8px;
+}
+
+/* Map */
+.map-responsive {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+   border-radius: 0 8px 8px 0;
+}
+
+.map-responsive iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
+   border-radius: 8px 0 0 8px;
+}
+
+@media (max-width: 768px) {
+  .contact-flex {
+    flex-direction: column;
+  }
+
+  .contact-address-box,
+  .contact-map-box {
+    width: 100% !important;
+  }
+
+  .contact-address-box {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-map-box {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .map-responsive {
+    aspect-ratio: auto;
+    height: 300px; /* fixed height for mobile */
+  }
+}
+
+.contact-address-box a,
+.contact-address-box .sapMText,
+.contact-address-box .sapMLnk {
+    color: #fff !important;
+    font-size: 14px;
+    text-decoration: none; /* optional, removes underline */
+}
+
+/* Footer */
+.footer-bar {
+  background-color: #1bb2bf;
+  padding: 20px 40px;
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 8px 8px 0 0;
+  margin-top: 3rem;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Footer Columns */
+.footer-column {
+  flex: 1 1 30%;     /* 3 equal sections */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Text & Links */
+.footer-text,
+.footer-link {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+}
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Social Icons */
+.footer-social {
+  display: flex;
+  gap: 20px;
+}
+.social-icon {
+  color: #fff;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+.social-icon:hover { transform: scale(1.3); }
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer-bar {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .footer-column {
+    flex: 1 1 100%;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-size: 15px;
+    font-weight: bold;
+  }
+}
+
+.customPageTitle {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  color: #333333 !important;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+ .switch-toggle-container {
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 4px 12px 0 rgba(60, 70, 90, 0.08);
+  padding: 4px 4px 4px 20px;
+  width: 100%;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  margin: 0 auto 1px auto;
+}
+
+.switch-toggle-btn {
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 32px !important;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: none !important;
+  margin: 0 0.2px;
+  padding: 0.8rem 2.2rem;
+  min-width: 160px;
+  border: none;
+}
+
+.switch-toggle-btn.active {
+  background: linear-gradient(90deg, #2596ff 0, #1669e6 100%);
+  color: #fff !important;
+}
+
+.switch-toggle-btn.inactive {
+  background: transparent;
+  color: #333 !important;
+} 
+
+
+
+/* .switch-toggle-container {
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 4px 12px rgba(60, 70, 90, 0.08);
+  padding: 4px;
+  width: 420px;
+  display: flex;
+  justify-content: left;  
+  align-items: stretch;
+  gap: 4px;                  
+  margin: 0 auto 18px auto;
+}
+
+.switch-toggle-btn {
+  flex: 1;                  
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;  
+  border-radius: 32px !important;
+  transition: background 0.2s, color 0.2s;
+  padding: 0.8rem 0;        
+  min-width: 0;             
+  border: none;
+}
+.switch-toggle-btn {
+  margin: 0;
+}
+.switch-toggle-btn.active {
+  background: linear-gradient(90deg, #2596ff 0%, #1669e6 100%);
+  color: #fff !important;
+}
+
+.switch-toggle-btn.inactive {
+  background: transparent;
+  color: #333 !important;
+} */
+
+
+.customSearchBar.sapMInput {
+  /* background: #1bb2bf  !important;           
+    border-radius: 30px !important;            */
+  box-shadow: 0 2px 8px rgba(80, 80, 0, 0.11);
+  padding: 6px 16px 6px 18px !important;
+  /* border: 2px solid #1bb2bf  !important;     */
+  margin-top: -200px !important;
+}
+
+.customSearchBar .sapMInputBaseInner {
+  border-radius: 3px !important; /* Ensure inner input is round */
+  background: #f9f9f9 !important; /* Light input background */
+  color: #333 !important;
+}
+
+.customSearchBar .sapMInputBaseIcon {
+  color: #fff !important; /* White icon inside circle */
+  background: #1bb2bf !important; /* Yellow icon background */
+  border-radius: 18px !important; /* Circle icon */
+  padding: 5px !important; /* Add space around icon */
+  margin-right: 8px;
+  height: 20px !important;
+}
+
+.customSearchBar input::-webkit-input-placeholder {
+  color: #999;
+  font-size: 1.1em;
+}
+.customSearchBar input:-ms-input-placeholder {
+  color: #999;
+  font-size: 1.1em;
+}
+.customSearchBar input::placeholder {
+  color: #999;
+  font-size: 1.1em;
+}
+
+/* Facilities Section */
+.facilityDynamicBox {
+  position: relative;
+  margin: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-size: cover;
+  background-position: center;
+}
+
+.facilityDynamicBox .sapMBtn {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white !important;
+  border-radius: 8px;
+}
+/* header */
+.customRedBar {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  height: 40px !important;
+  /* Set your desired height */
+  min-height: 40px !important;
+  line-height: 40px !important;
+  /* Vertically center text/icons if needed */
+}
+.customRedBar .sapMBtnIcon {
+  color: white !important;
+  fill: white !important;
+}
+.customPanelHeader .sapMPanelHdr {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 0 !important;
+}
+
+.customPanelHeader {
+  border-radius: 0 !important;
+}
+.sapMWizardStep .sapMWizardStepTitle {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
+}
+
+/* Image + Label container */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+/* Image Container */
+
+/* Container wrapping image and overlay */
+.imageContainer {
+  position: relative;
+  width: 264px;
+  height: 178px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.imageContainer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.serviceImage {
+  border-radius: 8px;
+  object-fit: cover;
+}
+.serviceImage:hover {
+  transform: scale(1.05);
+}
+
+/* Red banner overlay at the bottom */
+.facility-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #1bb2bf;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.facility-overlay:hover {
+  cursor: pointer;
+  background-color: #050808;
+  color: white;
+  transform: scale(1.05);
+}
+/* Clickable white text */
+.facility-overlay-link {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.facility-overlay-link:hover {
+  text-decoration: underline;
+}
+
+/* Highlight selected cards */
+.serviceCardSelected {
+  border: 3px solid #007aff;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 122, 255, 0.5);
+}
+
+.serviceCard {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.serviceCard:hover {
+  transform: scale(1.05);
+}
+
+.facilityNameText {
+  font-weight: bold;
+  text-align: center;
+}
+.card-style {
+  width: 140px;
+  padding: 0.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  align-items: center;
+  text-align: center;
+}
+
+.bedCard {
+  width: auto;
+  height: auto;
+  border-radius: 16px;
+  padding: 6px;
+   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: rgb(0, 0, 0) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover */
+.bedCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.bedCardImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background-color: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.areaTagBox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;           /* creates margin from right */
+  max-width: calc(100% - 20px);
+
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+
+  white-space: normal;
+  word-break: break-word;
+}
+
+
+.areaTagBox .sapMText {
+  color: rgb(0, 0, 0) !important;
+ line-height: 1.2;
+}
+
+.bedCardContent {
+  padding: 1rem;
+  color: #000000;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.bedCardTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000000;
+}
+
+.bedCardDesc {
+  font-size: 0.95rem;
+  color: #080808;
+  margin-top: 0.4rem;
+  min-height: 40px;
+}
+
+.bedCardPrice {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #040404;
+  margin-top: 0.5rem;
+}
+
+/* Carousel Container */
+.HostelFacilityCarousel {
+  border-radius: 0.6rem;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 95%;
+  height: 500px;
+  margin: auto;
+  transition: height 0.3s ease;
+}
+
+/* Common Slide Styles */
+.facilitySlide {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* Slide-specific Images */
+.slide1 {
+  background-image: url("../image/facility.jpg");
+}
+
+.slide2 {
+  background-image: url("../image/facility1.jpg");
+}
+
+.slide3 {
+  background-image: url("../image/facility3.jpg");
+}
+
+.slide4 {
+  background-image: url("../image/facility7.jpeg");
+}
+
+.slide5 {
+  background-image: url("../image/facility6.jpg");
+}
+
+/* ✅ Responsive Adjustments */
+@media (max-width: 1024px) {
+  .HostelFacilityCarousel {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .HostelFacilityCarousel {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .HostelFacilityCarousel {
+    height: 220px;
+    width: 100%;
+    border-radius: 0.4rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .facilitySlide {
+    background-size: cover; /* ensures image fills width and height */
+    background-position: center top;
+  }
+}
+
+.sapMCrsl {
+  touch-action: pan-y !important;
+}
+
+.underlineLink {
+  text-decoration: underline !important;
+}
+
+.sapMLnk:not(.sapMLnkDsbl) {
+  text-shadow: none !important;
+}
+
+.hostelPageContainer {
+  background-color: #fff;
+}
+
+/* Section background */
+.SectionFacility {
+  background-image: url("../image/Footer.png"); /* white page image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.6rem;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servicesContainer {
+  background-color: #ffffff;
+  padding: 2rem;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: 1.6rem;
+  color: #00acc1;
+  margin-bottom: 1.5rem;
+}
+
+.servicesGrid {
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.serviceSection {
+  padding: 0.5rem 0 1.5rem 0;
+}
+
+.serviceTitle {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+
+.serviceSection > .sapMText {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.6;
+}
+.SearchBar {
+  margin-left: 100px;
+  margin-top: 20px;
+}
+
+.sendMail {
+  margin-right: 1vw;
+}
+
+.sapMGT {
+  border-radius: 10px;
+}
+
+.sapUiCompFilterBar {
+  background-image: url("../image/filterbackground.png");
+  background-size: cover;
+  background-position: center;
+}
+.centerUPIImage {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.placeholderBox {
+  margin-top: 8px;
+  border: 2px solid black;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.placeholderBox:hover {
+  background-color: #f4f4f4;
+  border-color: #000000;
+}
+
+/* text style*/
+.boldBlueText {
+  font-weight: bold;
+  color: #00b7c7 !important;
+}
+.centerUPIImage {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.sapUiCompFilterBar {
+  background-image: url("../image/filterbackground.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* UPI QR styling */
+.paymentDialogRoot .UPIQRCodeBox {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 0 auto;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.paymentDialogRoot .paymentTypeGroup .sapMRb {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  height: auto !important;
+}
+
+.paymentDialogRoot .paymentTypeGroup .sapMRbB {
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(0) !important;
+}
+
+.paymentDialogRoot .paymentTypeGroup .sapMRbS {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  transform: translateY(-2px) !important;
+}
+
+.paymentDialogRoot .paymentTypeGroup {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.paymentDialogRoot .paymentTypeGroup .sapMRbS .sapMText {
+  font-weight: 600;
+}
+
+ .paymentDialogRoot,
+.paymentDialogRoot .sapMBar,
+.paymentDialogRoot .sapMBarRight,
+.paymentDialogRoot .sapMBarMiddle,
+.paymentDialogRoot .sapMBarLeft {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+}
+
+#idPaymentDialog-title-inner {
+    color: white !important;
+}
+
+.centerUPIImage {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.placeholderBox {
+  border: 2px solid black;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.placeholderBox:hover {
+  background-color: #f4f4f4;
+  border-color: #000000;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+.sapMGT {
+  background: #ffffff !important;
+  color: #008c9e !important;
+  border-radius: 14px !important;
+  padding: 10px;
+  transition: all 0.25s ease;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.sapMGT:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.barheader,
+.barheader .sapMBar,
+.barheader .sapMBarRight,
+.barheader .sapMBarMiddle,
+.barheader .sapMBarLeft {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+}
+.barheader .sapMText,
+.barheader .sapMLabel,
+.barheader button,
+.barheader .sapMBtnInner,
+.barheader .sapMBtnIcon {
+  color: white !important;
+}
+.barheader .sapMBarRight,
+.barheader .sapMBarRight .sapMBtn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.barheader .sapMBarRight .sapMBtnInner {
+  background: #008b96 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 6px !important;
+}
+.barheader .sapMBarRight .sapMBtnIcon {
+  font-size: 1.2rem !important;
+}
+.barheader .sapMBarRight .sapMBtn:hover .sapMBtnInner {
+  background: #007785 !important;
+}
+.barheader .sapMBarMiddle .sapMTitle {
+    color: white !important; 
+}
+
+
+.roomCarouselImage {
+  width: 100%;
+  height: 500px !important;
+  max-height: 500px !important;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 12px auto !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: height 0.3s ease;
+}
+.roomCarouselImage .sapMCrslInner,
+.roomCarouselImage .sapMCrslItem,
+.roomCarouselImage .sapMCrslItem img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+@media (max-width: 768px) {
+    /* .roomCarouselImage {
+    height: 200px !important;
+    max-height: 200px !important;
+  } */
+  .roomCarouselImage {
+    height: 260px !important;
+    max-height: 260px !important;
+  }
+}
+.roomCarouselImage:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.noImagePlaceholder {
+  height: 250px;
+  width: 100%;
+  border-radius: 10px;
+  background: #e2f9ff;
+  color: #007c8a;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+.roomDetailsCard .sapFCardContent,
+.roomDetailsCard .sapMText,
+.roomDetailsCard .sapMLabel {
+  font-size: 1.2rem !important;
+  line-height: 1.6 !important;
+}
+.roomDetailsCard .sapFCardHeaderTitle {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+}
+.descriptionBox {
+  background: #fafafa;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.descIcon {
+  margin-right: 0.5rem !important;
+  flex-shrink: 0;
+}
+.descTextLarge {
+  display: block !important;
+  /* width: 100% !important; */
+    max-width: 100%;
+  text-align: justify !important;
+  text-justify: inter-word;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: #2c3e50 !important;
+  font-weight: 500 !important;
+  margin-left: 0.5rem;
+  word-break: break-word !important;
+}
+.facilityGrid {
+  padding: 20px;
+  gap: 20px !important;
+}
+.facilityCard .facilityCardPrice,
+.facilityGrid .facilityCardPrice,
+#facilityGrid .facilityCardPrice {
+  color: #0070c9 !important;
+  font-weight: 600;
+}
+.unifiedCard {
+  flex: 0 0 calc((100% - 66px) / 4);
+  max-width: calc((100% - 66px) / 4);
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
+  text-align: center;
+}
+.unifiedCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+.unifiedCardImg {
+  width: 100%;
+  height: 150px !important;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.unifiedCardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #2c3e50;
+}
+.unifiedCardText {
+  font-size: 14px;
+  line-height: 1.35;
+  color: #0070c9;
+  margin-top: 6px;
+}
+.amenityDesc {
+  font-size: 14px;
+  line-height: 1.35;
+  color: #0070c9 !important;
+  margin-top: 6px;
+}
+.expandableAmenityText .sapMLnk {
+  color: #000 !important;
+}
+@media (max-width: 1024px) {
+  .unifiedCard {
+    flex: 0 0 31%;
+    max-width: 31%;
+  }
+}
+@media (max-width: 768px) {
+  .unifiedCard {
+    flex: 0 0 47%;
+    max-width: 47%;
+  }
+}
+@media (max-width: 420px) {
+  .unifiedCard {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .roomTopAligned {
+    margin-top: 6px !important;
+  }
+  .priceRow .sapMGT,
+  .priceRow .priceItem,
+  .bookNowTile {
+    height: 72px !important;
+    min-height: 72px !important;
+    border-radius: 10px !important;
+  }
+  .bookNowTile .sapMGTContent {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .priceRow {
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+  .priceRow .sapMGT * {
+    font-size: 13px !important;
+    line-height: 15px !important;
+  }
+  .bookNowTile * {
+    font-size: 15px !important;
+    line-height: 30px !important;
+    padding: 10px 0 0 0 ! important;
+  }
+  .sapMGTHdrTxt {
+    margin-top: -3px !important;
+  } /* Dialog height always full */
+  
+
+    #roomDetailID .sapMDialogScroll {
+    height: calc(100vh - 60px) !important;
+    max-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    }
+}
+
+
+
+
+
+
+
+
+  #roomDetailID .sapMDialogSection {
+    overflow-y: auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+
+
+
+
+
+.roomTopAligned {
+  margin-top: 12px !important;
+}
+.ImageDialogNoPadding > .sapMDialogScroll {
+  padding: 0 !important;
+}
+.ImageDialogNoPadding .sapMDialogSection {
+  padding: 0 !important;
+}
+.ImageDialogNoPadding .sapMImg {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.upload-star {
+  color: rgb(143, 18, 18);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-left: 6px; /* slight space before Upload button */
+}
+.profile-card {
+  border: 1px solid #d0d0d0; /* light border */
+  border-radius: 12px; /* smooth rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+  padding: 16px; /* inner spacing */
+  background-color: #ffffff; /* white card background */
+}
+.profile-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease-in-out;
+}
+.fullHeightBox {
+  height: 100% !important;
+}
+.sapUiCompFilterBar{
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+}
+.sapUiCompFilterBar .sapMLabel {
+    color: #ffffff !important;
+}
+
+
+
+
+/* 
+ .authDialog .sapMBtnInner {
+    background: linear-gradient(135deg, #00b7c7, #007984) !important;
+} 
+ .authDialog button,
+.authDialog .sapMBtnInner,
+.authDialog .sapMBtnIcon {
+    color: #fff !important;
+} 
+ .authDialog .sapMBtnInner {
+  background-color: #1bb2bf !important;
+    color: #ffffff !important;
+    border: 2px solid #007984 !important;  
+    border-radius: 10px !important;
+    font-size: medium;
+    font-weight: bold;
+    padding:  0.2rem 0 0 0;
+    width: 100px;
+    height: 35px;
+} 
+ .authDialog .sapMBtn:hover .sapMBtnInner,
+.authDialog .sapMBtn.sapMBtnHover .sapMBtnInner {
+    background: #ffffff !important;
+    color: #005bbf !important;      
+     border-color: #005bbf !important;
+}
+ .authDialog .sapMBtn.sapMBtnActive .sapMBtnInner {
+    background: #e6f0ff !important; 
+    color: #005bbf !important;
+     border-color: #005bbf !important;
+}
+.authDialog .sapUiIcon {
+  background-color: #007984 !important;
+    color: #ffffff !important;
+}
+.authDialog .sapUiIcon :hover{
+  background-color: #ffffff !important;
+    color: #005bbf !important;
+}  */
+
+
+
+
+
+
+
+
+
+
+
+span.sapMBtnInner.sapMBtnEmphasized {
+    background-color: #00ACC1 !important; /* light teal */
+    color: #FFFFFF !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+/* span.sapMBtnInner.sapMBtnEmphasized:hover {
+    background-color: #0097A7 !important; /* primary teal */
+/* } */ 
+
+/* Pressed (active) */
+/* .sapMBtnEmphasized.sapMBtnActive > .sapMBtnInner {
+    background-color: #007E8A !important; /* deep teal */
+/* } */ 
+
+/* .sapMBtn > .sapMBtnInner > .sapMBtnContent {
+    color: #FFFFFF !important;
+} */
+
+.sapMBtn:hover>.sapMBtnHoverable {
+    color: #fff;
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+/* Make ONLY FilterBar CLEAR button text white (normal) */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnContent bdi {
+    color: #ffffff !important;
+}
+/* Make ONLY FilterBar CLEAR button text white (normal) */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnContent bdi:hover {
+    color: #0e57bf !important;
+}
+.totalColumnBold {
+    font-weight: bold;
+  
+}
+.totalColumnBold1{
+  font-weight: bold;
+  font-size: 16px;
+}
+/* NORMAL — make CLEAR text white */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons 
+    .sapMBtnTransparent .sapMBtnInner .sapMBtnContent bdi {
+    color: #ffffff !important;
+}
+
+/* HOVER — when mouse enters the button */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons 
+    .sapMBtnTransparent.sapMBtnHover .sapMBtnInner {
+    background-color: #ffffff !important; /* white background */
+}
+
+/* HOVER — change text to BLUE */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons 
+    .sapMBtnTransparent.sapMBtnHover .sapMBtnInner .sapMBtnContent bdi {
+    color: #0e57bf !important; /* blue text */
+}
+
+/* ACTIVE (click) — keep same as hover */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons 
+    .sapMBtnTransparent.sapMBtnActive .sapMBtnInner {
+    background-color: #ffffff !important;
+}
+
+.sapUiCompFilterBar .sapUiCompFilterBarButtons 
+    .sapMBtnTransparent.sapMBtnActive .sapMBtnInner .sapMBtnContent bdi {
+    color: #0e57bf !important;
+}
+
+/* /////////////////////////////////////////////////////////////////////////////////////////////////// */
+.priceGrid .sapUiRespGridSpan,
+.priceGrid .sapUiRespGridSpanXL,
+.priceGrid .sapUiRespGridSpanL,
+.priceGrid .sapUiRespGridSpanM,
+.priceGrid .sapUiRespGridSpanS {
+  overflow: visible !important;
+}
+.sapMGT.defaultTile,
+.sapMGTOneByHalf.defaultTile {
+  background: linear-gradient(135deg, #00b7c7, #007984) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transform: scale(1) !important;
+  border-radius: 14px !important;
+}
+.sapMGT.selectedTile,
+.sapMGTOneByHalf.selectedTile,
+.tileSelected {
+  background: #ffffff !important;
+  border: 2px solid #00b7c7 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.06) !important;
+  border-radius: 14px !important;
+  transition: all 0.15s ease-in-out;
+}
+.defaultTile *,
+.selectedTile *,
+.tileSelected * {
+  font-size: 17px !important;
+  text-align: center !important;
+}
+.defaultTile * {
+  color: whitesmoke !important;
+}
+
+.selectedTile *,
+.tileSelected * {
+  color: #2c3e50 !important;
+}
+.defaultTile,
+.bookNowTile {
+  transition: all 0.14s ease-out !important;
+  transform: scale(1) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  height: 90px !important;
+  min-height: 90px !important;
+  overflow: hidden !important;
+}
+.defaultTile .sapMGTContent,
+.bookNowTile .sapMGTContent {
+  padding: 8px 0 !important;
+  margin: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.defaultTile,
+.bookNowTile,
+.defaultTile .sapMGT,
+.bookNowTile .sapMGT {
+  overflow: visible !important;
+}
+.defaultTile .sapMGTHdrTxt,
+.bookNowTile .sapMGTHdrTxt {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+.defaultTile:hover,
+.bookNowTile:hover {
+  transform: translateY(-1px) scale(1.005) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+}
+.priceRow .sapMGT,
+.priceRow .sapMGT.OneByHalf,
+.priceRow .priceItem,
+.bookNowTile {
+  height: 90px !important;
+  min-height: 90px !important;
+}
+/* .bookNowTile {
+  background: linear-gradient(135deg, #74c7ce, #008c9e) !important;
+  color: white !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.25s ease;
+  height: 90px !important;
+} */
+.bookNowTile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+}
+.bookNowTile * {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  /* color: white !important; */
+}
+.bookNowTile .sapMGTContent {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+.bookNowTile .sapMGTContent,
+.bookNowTile .sapMGTHdrTxt {
+  padding: 0 !important;
+}
+.bookNowTile .sapMGTContent {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.bookNowTile .sapMGTHdrTxt > .sapMText {
+  line-height: 1.8 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-self: center !important;
+}
+.bookNowTile .sapMGTHdrTxt .sapMText {
+  font-size: 17px !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+  margin: 0 !important;
+} /* Center content nicely */
+.priceGrid .sapMGT .sapMGTContent {
+  padding: 6px 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+} /* Wrap header if needed */
+.priceGrid .sapMGTHdrTxt {
+  white-space: normal !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+} /* Keep currency on one line */
+.priceGrid .sapMGTSubHdrTxt {
+  white-space: nowrap !important;
+} /* Standard Tile Shape */
+.priceGrid .sapMGT {
+  height: 90px !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  flex: 1 0 20% !important; /* Try to take 20% of row */
+  max-width: 25% !important;
+  min-width: 180px !important;
+  margin: 6px !important;
+}
+.priceFlex .sapMGT {
+  flex: 1 1 calc(25% - 20px); /* 4 tiles, minus margins */
+  min-width: 220px; /* responsive minimum */
+  height: 90px !important;
+  margin: 10px;
+  border-radius: 14px !important;
+  box-sizing: border-box;
+} /* ==== PRICE TILE WIDTH FIX (FULL EXPAND ON LARGE SCREENS) ==== */
+.priceFlex .sapMGT {
+  flex: 1 1 calc(25% - 20px) !important; /* 4 tiles per row, will grow freely */
+  min-width: 15vw !important; /* min tile size, increased by 20% */
+  height: 90px !important;
+  margin: 10px !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+}
+.priceFlex {
+  width: 100% !important;
+  display: flex !important;
+}
+
+@media (max-width: 720px) {
+  .priceFlex {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+  .priceFlex .sapMGT {
+    flex: 1 1 calc(50% - 20px) !important;
+    min-width: 73vw !important;
+    height: 90px !important;
+    margin: 10px !important;
+    border-radius: 14px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Base */
+.myUnifiedBtn .sapMBtnInner {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    color: white !important;
+
+    transform: scale(1.1);
+    transform-origin: center;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+/* Hover — now gradient instead of flat color */
+.myUnifiedBtn:hover .sapMBtnInner,
+.myUnifiedBtn.sapMBtnHover .sapMBtnInner {
+    background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
+    color: white !important;
+
+    transform: scale(1.1);
+}
+
+/* Active */
+.myUnifiedBtn.sapMBtnActive .sapMBtnInner {
+    background: linear-gradient(135deg, #1fb7c5, #0f99a6) !important;
+    color: white !important;
+
+    transform: scale(1.1);
+}
+/* Space between siblings */
+.myUnifiedBtn {
+    margin-right: 0.5rem !important; ;
+}
+
+/* Remove trailing gap on last button */
+.myUnifiedBtn:last-child {
+    margin-right: 0 !important  ;
+}         
+
+
+.customBoldTitle {
+    font-weight: bold;
+    font-size: 1.5rem; /* optional, adjust size */
+}
+/* .profileAvatar {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+} */
+   .avatarWrapper {
+    position: relative;
+}
+
+.avatarEditIcon {
+    position: absolute;
+    bottom: 1px;
+    right: 10px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    padding: 4px;
+}
+
+/* .avatarEditIcon .sapMBtnInner {
+    border-radius: 50% !important;
+    padding: 3px !important;
+} */
+/* Hide UI5 FileUploader completely but KEEP input clickable */
+.hiddenUploader .sapMBtn {
+    display: none !important;
+}
+
+/* DO NOT use display:none on the input — this breaks camera */
+.hiddenUploader input[type="file"] {
+    opacity: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    position: absolute !important;
+    z-index: -1 !important;
+}
+
+/* Avatar center on small devices */
+@media (max-width: 768px) {
+    .avatarWrapper {
+        width: 100%;
+        margin: auto;
+    }
+}
+.detailRow {
+  padding-bottom: 10px;
+}
+
+.detailLabel {
+  font-weight: bold;
+  width: 120px;
+  display: inline-block;
+}
+
+.detailValue {
+  max-width: 450px;
+  word-wrap: break-word;
+}
+
+.detailsContainer {
+  padding: 10px 16px;
+}
+
+.squareVideo {
+  width: 100%;
+  max-width: 300px;
+  max-height: 300px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.custom-flexbox {
+  margin: 10px 0;
+  margin-right: 10px;
+}
+ 
+.totalColumnBold1 {
+  font-weight: bold;     /* Same as boldBlackText */
+  color: #000;           /* Same black color */
+  text-align: right;     /* Align text to the right */
+  margin-right: 5px;     /* Matches rightAlignLabel spacing */
+  font-size: 1.05rem;    /* Slightly larger to highlight totals */
+}
+/* Mobile view (phone) */
+@media only screen and (max-width: 768px) {
+
+    .responsiveProfileBox {
+        flex-direction: column !important;     /* Stack vertically */
+        align-items: center !important;        /* Center avatar block */
+    }
+
+    .responsiveProfileBox > .sapMFlexItem {
+        width: 100% !important;                /* Full width form */
+    }
+
+    .responsiveProfileBox .sapUiMediumMarginEnd {
+        margin-right: 0 !important;
+        margin-bottom: 1rem !important;        /* Space below avatar */
+    }
+
+    .responsiveProfileBox .sapUiForm {
+        width: 100% !important;
+    }
+}
+.custom-flexbox {
+  margin: 10px 0;
+  margin-right: 10px;
+}
+
+.custom-vbox {
+  align-items: flex-end;
+  width: 100%;
+}
+
+.rightAlignLabel {
+  text-align: right;
+  margin-right: 5px;
+}
+
+.amountText {
+  text-align: end;
+  min-width: 100px;
+  margin-right: 20px;
+}
+
+.boldBlackText {
+  font-weight: bold;
+  color: #000;
+}
+
+.PayByDateClass {
+  white-space: nowrap !important;
+}
+
+
+
+/* .authMargin > * {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+    
+} */
+
+.aleftMargin > *{
+    margin-right: 2.9dvw;
+}
+
+
+/* ===== Base blur fallback (works everywhere) ===== */
+.blur-background > :not(.sapMDialog):not(.sapUiBLy) {
+  filter: blur(10px) saturate(0.85) brightness(0.85);
+  opacity: 0.95;
+  transition: filter 0.35s ease, opacity 0.35s ease;
+}
+
+.sapUiBLy {
+  background: rgba(0,0,0,0.18) !important;
+}
+
+/* ===== Real backdrop blur when supported ===== */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sapUiBLy {
+    background: rgba(0,0,0,0.12) !important;
+    backdrop-filter: blur(12px) saturate(0.9) brightness(0.85);
+    -webkit-backdrop-filter: blur(12px) saturate(0.9) brightness(0.85);
+  }
+}
+
+.sapMDialog {
+  filter: none !important;
+}
+
+.myclass {
+    padding: 0 10px;
+}
+
+@media (max-width: 930px) {
+    .myavatar {
+        margin-top: 10px;
+        align-self: center;
+    }
+}
+
+/* Remove scroll bar inside ActionSheet */
+.sapMActionSheet .sapMActionSheetScroll {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+/* Add padding around ActionSheet container */
+.sapMActionSheetPopover .sapMPopoverCont {
+    padding: 6px 8px !important;
+}
+
+/* Add spacing between ActionSheet buttons */
+.sapMActionSheet button {
+    margin: 4px 0 !important;
+}
+
+/* Ensure full width nice-look buttons */
+.sapMActionSheet button .sapMBtnInner {
+    width: 100% !important;
+    border-radius: 6px !important;
+}
+/* Mobile Screens <= 930px */
+@media only screen and (max-width: 930px) {
+    .myclass {
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .myavatar {
+        margin-bottom: 10px !important;
+        align-self: center !important;
+    }
+
+        #id_address {
+        width: 100% !important;
+    }
+
+    .sapMFlexBox {
+        flex-wrap: wrap !important;
+    }
+
+    .sapMInputBase,
+    .sapMSlt,
+    .sapMTextArea {
+        width: 100% !important;  /* full width inputs */
+    }
+
+    #Id_ProfileaTable {
+        width: 100% !important;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .myavatar .sapFAvatarImage, 
+    .myavatar .sapFAvatarInitials {
+        width: 4rem !important;
+        height: 4rem !important;
+        font-size: 1.5rem !important;
+    }
+}
+@media (max-width: 600px) {
+    #id_address {
+        width: 100% !important;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+}
+/* .customDocToolbar.sapMOverflowToolbar {
+  overflow: visible !important;
+  flex-wrap: wrap !important;
+} */
+
+/* .customDocToolbar .sapMBarChild {
+  margin-bottom: 6px;
+} */
+
+/* MOBILE SCREEN FIX */
+/* @media (max-width: 600px) { */
+
+  /* Hide spacer to prevent pushing controls */
+  /* .customDocToolbar .sapMTBSpacer {
+    display: 0 0 5px !important;
+  } */
+
+  /* Put items in new line automatically */
+  /* .customDocToolbar {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+  } */
+
+  /* Full width child elements */
+  /* .customDocToolbar .sapMBarChild {
+    width: 100% !important;
+    margin-top: 5px !important;
+  } */
+/* } */
+.dialogBlur {
+  filter: blur(15px);
+  pointer-events: none;
+}
+
+/* default tile style already matches price tile */
+.sapMGT.bookNowTile.occupied {
+    background: linear-gradient(
+        135deg,
+        #e9e9e9,
+        #b5b5b5
+    ) !important;
+}
+.sapMGT.bookNowTile.occupied * {
+    color: #5555559a !important;
+}
+/* Kill UI5 overlay glare */
+.sapMGTOverlay { display: none !important; }
+
+/* Center header text */
+.bookNowTile .sapMGTHdrTxt {
+    margin: 0 !important;
+    text-align: center !important;
+}
+  
+/* #roomDetailID.sapMDialog.sapMDialogStretched {
+    width: 100% !important;
+} */
+
+/* .dialogBlur .sapMDialogSection .sapMDialogScrollCont{
+  filter: blur(10px);
+  pointer-events: none;
+  opacity: 0.75;
+} */
+
+/* Blur only Dialog inner content */
+/* .profileContentBlur .sapMDialogSection,
+.profileContentBlur .sapMDialogScrollCont {
+  filter: blur(6px);
+  pointer-events: none;
+  opacity: 0.5;   /* adjust if needed */
+/* } */
+
+/* Optional overlay effect (optional) */
+/* .profileContentBlur::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.4);
+  z-index: 5;
+} */
+.loginBannerBox {
+    background-color: #00b6c6 !important;      /* Light blue */
+    border-radius: 6px;
+    padding: 16px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.loginBannerText {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.loginBannerButton {
+    /* border: 1px solid #00b6c6 !important; */
+    border-radius: 5px;
+    color: #007bff !important;
+    font-weight: bold !important;
+    background: white !important;
+}
+/* Custom button for hostel booking theme */
+/* Normal state */
+.btnViewDetails.sapMLnk {
+    background: linear-gradient(135deg, #02e0fd, #008b96) !important;
+    color: #f8f9f9 !important;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 25px !important;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.5),
+                0 4px 10px rgba(0,0,0,0.2);
+    text-decoration: none !important;
+    display: inline-block;
+}
+
+/* Hover state */
+.btnViewDetails.sapMLnk:hover {
+    text-decoration: none !important;
+    transform: scale(1.05);
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.6);
+}
+
+
+.btnViewDetails.sapMLnk:active {
+    border-radius: 25px !important;
+    background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+    text-decoration: none !important;
+}
+
+
+.btnViewDetails.sapMLnk:focus {
+    border-radius: 25px !important;
+    outline: none;
+    text-decoration: none !important;
+}
+
+.tileContainer {
+  justify-content: flex-start;
+}
+
+/* Center Tiles on Small Screens (Mobile) */
+@media screen and (max-width: 768px) {
+  .tileContainer {
+    justify-content: center !important;
+    /* Center align on mobile */
+  }
+}
+
+.login-background, .service-background {
+  /* background-image: url('../image/hostel.jpg'); */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Apply different background styles for mobile devices */
+@media (max-width: 768px) {
+  .login-background, .service-background {
+    background-size: auto; /* Adjust to fit smaller screens */
+    background-position: top; /* Adjust positioning */
+  }
+}
+
+
+
+.pwdMinFail { color: #b00020; font-weight: 450; }
+.pwdWeak    { color: orangered; font-weight: 500; }
+.pwdMedium  { color: orange;    font-weight: 500; }
+.pwdStrong  { color: green;     font-weight: 500; }
+
+/* hide original SAP icon completely */
+.fa-admin-btn .sapMBtnIcon {
+    font-size: 0 !important;
+    width: 20px;
+    height: 20px;
+    line-height: 1rem ! important ;
+}
+
+/* FontAwesome icon */
+.fa-admin-btn .sapMBtnIcon::before {
+    content: "\f505";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 20px;
+    color: #fff;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    transform: scale(1);
+    transition: transform 0.15s ease-in-out;
+}
+
+/* hover zoom effect */
+.fa-admin-btn:hover .sapMBtnIcon::before {
+    transform: scale(1.15);
+}
+
+/* remove UI5 built-in hover background */
+.fa-admin-btn .sapMBtnInner {
+    background: none !important;
+    border: none !important;
+}
+
+
+.fileErrorHighlight {
+    border: 2px solid red !important;
+    border-radius: 6px;
+}
+
+.requiredStar {
+    color: #d32f2f !important;
+    font-weight: 400 !important;
+    font-size: 16 px !important;
+}
+
+
+.rightButtons {
+    margin-left: auto;        /* Push entire block to the right */
+    justify-content: flex-end !important;
+}
+
+@media only screen and (min-width: 811px) {
+    .responsiveFlex {
+        justify-content: space-between !important;
+    }
+}
+
+@media only screen and (max-width: 810px) {
+    .responsiveFlex {
+        justify-content: center !important;
+    }
+
+    /* .searchField {
+      justify-content: start !important;
+    } */
+}
+
+/* @media (min-width: 600px) and (max-width: 777px) {
+    .myReadOnlyForm .sapUiFormCLContent {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        column-gap: 1.5rem;
+        row-gap: 0.5rem;
+    }
+
+    .myReadOnlyForm .sapUiFormCLContent > * {
+        width: 100% !important;
+    }
+} */
+
+/* Glassy tile */
+.glassTile {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 183, 199, 0.65),
+    rgba(0, 139, 150, 0.65)
+  ) !important;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  /* box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35); */
+}
+
+/* Remove default white tile background */
+.glassTile .sapMGTContent {
+  background: transparent !important;
+}
+
+/* Header text color */
+.glassTile .sapMGTHdrTxt {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Sub text (unit) */
+.glassTile .sapMGTSubHdrTxt {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Icon color */
+.glassTile .sapMImg {
+  filter: brightness(0) invert(1);
+}
+
+/* .glassTile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.35),
+    rgba(255,255,255,0.05)
+  );
+  pointer-events: none;
+} */
+
+/* Header text */
+.glassTile .sapMGTHdrTxt {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Unit / sub text */
+.glassTile .sapMGTSubHdrTxt,
+.glassTile .sapMGTContentTxt {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.glassTile .sapMGTValue {
+  color: #ffffff !important;
+}
+
+/* Icons inside tile */
+.glassTile .sapMImg,
+.glassTile .sapUiIcon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  filter: brightness(0) invert(1);
+}
+
+/* Remove default gray backgrounds */
+.glassTile .sapMGTContent {
+  padding-bottom: 8px !important;
+  background: transparent !important;
+}
+
+.glassTile .sapMTileCntFtrTxt {
+  margin-bottom: 16px !important;
+}
+/* class="sapMTileCntFtrTxt sapMTileCntFooterTextColorNeutral" */
+.glassTile:hover {
+  transform: translateY(-3px);
+  transition: 0.25s ease;
+}
+
+.glassTile .sapMImg,
+.glassTile .sapUiIcon {
+  color: #ffffff !important;
+  top: -9px;
+  fill: #ffffff !important;
+  filter: brightness(0) invert(1);
+}
+
+/* Header (actual clickable text) */
+.glassTile .sapMGTHdrContent,
+.glassTile .sapMGTHdrTxt,
+.glassTile .sapMGTHdrTxt > span,
+.glassTile .sapMGTTitle {
+  color: #ffffff !important;
+}
+
+/* Unit / description text */
+.glassTile .sapMGTSubHdrTxt,
+.glassTile .sapMGTSubHdrTxt > span,
+.glassTile .sapMGTContentTxt,
+.glassTile .sapMText {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.glassTile a,
+.glassTile a span {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.glassTile .sapMGTValue,
+.glassTile .sapMGTValue > span {
+  color: #ffffff !important;
+}
+
+.glassTile * {
+  color: white !important;
+}

@@ -1,0 +1,71 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        title="Manage Room Details"
+        type="Message"
+        class="sapUiContentPadding"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+               <Label
+                                text="Start Date"
+                                required="true"
+                            />
+                         
+                            <DatePicker
+                                id="Ck_id_editStartDate"
+                                editable="false"
+                                value="{Bookingmodel>/StartDate}"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                                change="onBookingEditDateChange"
+                                valueStateText="Select Star Date"
+                            />
+                              <Label
+                                text="End Date"
+                                required="true"
+                            />
+                            <DatePicker
+                                id="Ck_id_editEndDate"
+                                value="{Bookingmodel>/EndDate}"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="dd/MM/yyyy"
+                            />
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Save"
+                    press="Ck_onsavebuttonpress"
+                    type="Accept"
+                    id="Ck_id_saveButton"
+                    class="marginRight myUnifiedBtn"
+                />
+                <Button
+                    text="Cancel"
+                    press="Ck_onCancelButtonPress"
+                    type="Reject"
+                    id="Ck_id_CancelButton"
+                    class="marginRight myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</c:FragmentDefinition>
