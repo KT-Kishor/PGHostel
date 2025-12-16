@@ -1,0 +1,18 @@
+[
+    {
+      "ID": 1,
+      "InvoiceStatus": "Submitted"
+    },
+    {
+      "ID": 2,
+      "InvoiceStatus": "Payment Partially"
+    },
+    {
+      "ID": 3,
+      "InvoiceStatus": "Payment Received"
+    },
+    {
+      "ID": 4,
+      "InvoiceStatus": "Invoice Sent"
+    }
+  ]

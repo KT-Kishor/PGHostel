@@ -1,0 +1,25 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Bar
+        design="Header"
+    >
+       <contentLeft>
+					<Button
+                        icon="sap-icon://nav-back"
+                        press=".onNavBack"
+                    />
+					<Title
+                        text="Shah Hostel"
+                        class="customPageTitle"
+                    />
+				</contentLeft>
+				<contentRight>
+					<Button
+                        icon="sap-icon://log"
+                        press=".onHome"
+                    />
+				</contentRight>
+    </Bar>
+</core:FragmentDefinition>

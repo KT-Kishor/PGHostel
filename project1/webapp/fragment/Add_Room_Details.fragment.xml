@@ -1,0 +1,213 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="sds1"
+        title="Manage Room Details"
+        type="Message"
+        class="sapUiContentPadding"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <ComboBox
+                    id="idRoomType12"
+                    placeholder="Select Branch Code"
+                    selectedKey="{RoomModel>/BranchCode}"
+                    selectionChange=".onBranchChange"
+                    valueStateText="Please select a valid Branch Code"
+                    items="{BranchModel>/}"
+                    showSecondaryValues="true"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"
+                    />
+                </ComboBox>
+
+                <Label
+                    text="Bed Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="idBedType"
+                    placeholder="Select Bed Type"
+                    width="100%"
+                    visible="false"
+                    selectedKey="{RoomModel>/BedTypeName}"
+                    items="{BedTypeModel>/}"
+                    selectionChange=".onBedTypeChange"
+                    valueStateText="Please select a valid Bed Type"
+                >
+                    <core:ListItem
+                        key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
+                        text="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
+                    />
+                </ComboBox>
+                <Label
+                    text="AC Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="idAcType"
+                    placeholder="Select Bed Type"
+                    width="100%"
+                    visible="false"
+                    selectedKey="{RoomModel>/ACType}"
+                    items="{BedTypeModel>/}"
+                    valueStateText="Please select a valid AC Type"
+                    change="onACtypeChange"
+                >
+                    <core:Item
+                        key="{BedTypeModel>ACType}"
+                        text="{BedTypeModel>ACType}"
+                    />
+                </ComboBox>
+                <Label
+                    text="Room No"
+                    required="true"
+                />
+                <Input
+                    id="idRoomNumber"
+                    value="{RoomModel>/RoomNo}"
+                    placeholder="Enter Room No"
+                    maxLength="60"
+                    liveChange="onRoomNoInputLiveChange"
+                    valueStateText="Room No cannot be empty"
+                />
+                <!-- <Label text="No Of person" required="true" />
+                <Input id="idRoomNumber13" value="{RoomModel>/NoofPerson}" placeholder="Enter No of person" type="Number" liveChange="onRoomNoInputLiveChange" valueStateText="No of person cannot be empty" /> -->
+
+                <Label text="Extra Bed" />
+                <Input
+                    id="idExtrabed"
+                    value="{RoomModel>/ExtraBed}"
+                    placeholder="Enter No Of ExtraBed"
+                    liveChange="onPriceInputLiveChange"
+                     maxLength="2"
+                />
+
+                <Label
+                    text="Daily Price"
+                />
+                  <Input
+                            id="idPrice"
+                            value="{RoomModel>/Price}"
+                            placeholder="Enter Price"
+                            maxLength="7"
+                            liveChange="onPriceInputLiveChange"
+
+                            valueStateText="Please enter a valid amount"
+                        />
+                <!-- <HBox
+                    width="100%"
+                    justifyContent="Start"
+                    alignItems="Center"
+                >
+                    <VBox width="50%">
+                        <Input
+                            id="idPrice"
+                            value="{RoomModel>/Price}"
+                            placeholder="Enter Price"
+                            maxLength="7"
+                            liveChange="onPriceInputLiveChange"
+                            valueStateText="Please enter a valid amount"
+                        />
+                    </VBox>
+                    <VBox width="50%">
+                        <ComboBox
+                            id="FO_id_PriceType"
+                            selectedKey="Per Day"
+                            value="{RoomModel>/PriceType}"
+                        >
+                            <core:Item
+                                key="Per Day"
+                                text="Per Day"
+                            />
+                            <core:Item
+                                key="Per Month"
+                                text="Per Month"
+                            />
+                        </ComboBox>
+                    </VBox>
+                </HBox> -->
+                  <Label
+                    text="Monthly Price"
+                />
+                  <Input
+                            id="id_MonthlyPrice"
+                            value="{RoomModel>/MonthPrice}"
+                            placeholder="Enter Month Price"
+                            maxLength="7"
+                            liveChange="onPriceInputLiveChange"
+
+                            valueStateText="Please enter a valid amount"
+                        />
+                          <Label
+                    text="Yearly Price"
+                />
+                  <Input
+                            id="id_YearlyPrice"
+                            value="{RoomModel>/YearPrice}"  
+                            placeholder="Enter Year Price"
+                            maxLength="7"
+                            liveChange="onPriceInputLiveChange"
+
+                            valueStateText="Please enter a valid amount"
+                        />
+                <Label text="Currency" required="true"/>
+                <ComboBox
+                    id="FO_id_Currency"
+                    selectedKey="{RoomModel>/Currency}"
+                    items="{path:'CountryModel>/',length:1000}"
+                    valueStateText="Select Currency"
+                    width="100%"
+                    change="onACtypeChange"
+                    placeholder="Select Currency" showSecondaryValues="true"
+                >
+                    <core:ListItem
+                        key="{CountryModel>currency}"
+                        text="{CountryModel>currency}" additionalText="{CountryModel>countryName}"
+                    />
+                </ComboBox>
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Save"
+                    press="AR_onsavebuttonpress"
+                    type="Accept"
+                    id="AR_id_saveButton"
+                    class="marginRight myUnifiedBtn"
+                />
+                <Button
+                    text="Cancel"
+                    press="AR_onCancelButtonPress"
+                    type="Reject"
+                    id="AR_id_CancelButton"
+                    class="marginRight myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</c:FragmentDefinition>

@@ -1,0 +1,401 @@
+{
+  "_version": "1.59.0",
+  "sap.app": {
+    "id": "sap.ui.com.project1",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.13.3",
+      "toolsId": "65534ecb-f243-4a75-93c4-b1c44137aebd"
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.141.3",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.suite.ui.generic.template": {},
+        "sap.ui.comp": {},
+        "sap.ui.generic.app": {},
+        "sap.ui.table": {},
+        "sap.ushell": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "sap.ui.com.project1.i18n.i18n"
+        }
+      },
+      "RateType": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/RateType.json",
+        "preload": true
+      },
+      "FacilityType": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/FacilityType.json",
+        "preload": true
+      },
+      "CompanyInvoiceStatus": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/CompanyInvoiceStatus.json",
+        "preload": true
+      },
+      "InvoiceSAC": {
+            "type": "sap.ui.model.json.JSONModel",
+            "uri": "model/InvoiceSAC.json",
+            "preload": true
+      },
+      "Rate": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/Rate.json",
+        "preload": true
+      },
+      "Role": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/Role.json",
+        "preload": true
+      }
+    },
+    "resources": {
+            "js": [
+                {
+                    "uri": "./libs/jspdf.umd.min.js"
+                },
+                {
+                    "uri": "./libs/jspdf.plugin.autotable.min.js"
+                },
+                {
+                    "uri": "./libs/xlsx-to-json.js"
+                },
+                {
+                    "uri": "./libs/json-to-xlsx.js"
+                }
+            ],
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "sap.ui.com.project1.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "RouteHostel",
+          "pattern": ":?query:",
+          "target": [
+            "TargetHostel"
+          ]
+        },
+        {
+          "name": "TilePage",
+          "pattern": "TilePage",
+          "target": [
+            "TargetTilepage"
+          ]
+        },
+        {
+          "name": "RouteAdmin",
+          "pattern": "Admin",
+          "target": [
+            "TargetAdmin"
+          ]
+        },
+        {
+          "name": "RouteAdminDetails",
+          "pattern": "AdminDetails/{sPath}",
+          "target": [
+            "TargetAdminDetails"
+          ]
+        },
+        {
+          "name": "RouteRoomDetails",
+          "pattern": "RoomDetails",
+          "target": [
+            "TargetRoomDetails"
+          ]
+        },
+        {
+          "name": "RouteBedDetails",
+          "pattern": "BedDetails",
+          "target": [
+            "TargetBedDetails"
+          ]
+        },
+        {
+          "name": "RouteFacilitis",
+          "pattern": "Facilities/{value}",
+          "target": [
+            "TargetFacilitis"
+          ]
+        },
+        {
+          "name": "RouteBookRoom",
+          "pattern": "BookRoom",
+          "target": [
+            "TargetBookRoom"
+          ]
+        },
+        {
+          "name": "RouteBookRoomSummary",
+          "pattern": "BookRoomSummary",
+          "target": [
+            "TargetBookRoomSummary"
+          ]
+        },
+        {
+          "name": "EditBookingDetails",
+          "pattern": "EditBookingDetails",
+          "target": [
+            "TargetEditBooking"
+          ]
+        },
+        {
+          "name": "RouteRoomImages",
+          "pattern": "RoomImages/{sPath}",
+          "target": [
+            "TargetRoomImages"
+          ]
+        },
+        {
+          "name": "RouteFacilitiesDetails",
+          "pattern": "FacilitiesDetails/{sPath}",
+          "target": [
+            "TargetFacilitiesDetails"
+          ]
+        },
+        {
+          "name": "RouteBranchData",
+          "pattern": "BranchData",
+          "target": [
+            "TargetBranchData"
+          ]
+        },
+        {
+          "name": "RouteHostelFeatures",
+          "pattern": "HostelFeatures",
+          "target": [
+            "TargetHostelFeatures"
+          ]
+        },
+        {
+          "name": "RouteMaintainData",
+          "pattern": "MaintainData",
+          "target": [
+            "TargetMaintainData"
+          ]
+        },
+        {
+          "name": "RouteManageInvoice",
+          "pattern": "ManageInvoice",
+          "target": [
+            "TargetManageInvoice"
+          ]
+        },
+        {
+          "name": "RouteManageInvoiceDetails",
+          "pattern": "InvoiceDetails/{sPath}/{dash}",
+          "target": [
+            "TargetManageInvoiceDetails"
+          ]
+        },
+        {
+          "name": "RouteCouponDetails",
+          "pattern": "CouponDetails",
+          "target": [
+            "TargetCouponDetails"
+          ]
+        },
+        {
+          "name": "RouteManageStaff",
+          "pattern": "ManageStaff",
+          "target": [
+            "TargetManageStaff"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetHostel": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Hostel",
+          "viewName": "Hostel"
+        },
+        "TargetTilepage": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "TilePage",
+          "viewName": "TilePage"
+        },
+        "TargetAdmin": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Admin",
+          "viewName": "Admin"
+        },
+        "TargetAdminDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "AdminDetails",
+          "viewName": "AdminDetails"
+        },
+        "TargetRoomDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Room_Details",
+          "viewName": "Room_Details"
+        },
+        "TargetBedDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Bed_Details",
+          "viewName": "Bed_Details"
+        },
+        "TargetFacilitis": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Facilitis",
+          "viewName": "Facilitis"
+        },
+        "TargetBookRoom": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Book_Room",
+          "viewName": "Book_Room"
+        },
+        "TargetBookRoomSummary": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Book_RoomSummary",
+          "viewName": "Book_RoomSummary"
+        },
+        "TargetEditBooking": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "EditBookingDetails",
+          "viewName": "EditBookingDetails"
+        },
+        "TargetRoomImages": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Bed_Images",
+          "viewName": "Bed_Images"
+        },
+        "TargetFacilitiesDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "FacilitiesDetails",
+          "viewName": "FacilitiesDetails"
+        },
+        "TargetBranchData": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "BranchData",
+          "viewName": "BranchData"
+        },
+        "TargetHostelFeatures": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "HostelFeatures",
+          "viewName": "HostelFeatures"
+        },
+        "TargetMaintainData": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "MaintainData",
+          "viewName": "MaintainData"
+        },
+        "TargetManageInvoice": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageInvoice",
+          "viewName": "ManageInvoice"
+        },
+        "TargetManageInvoiceDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageInvoiceDetails",
+          "viewName": "ManageInvoiceDetails"
+        },
+        "TargetCouponDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "CouponDetails",
+          "viewName": "CouponDetails"
+        },
+        "TargetManageStaff": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageStaff",
+          "viewName": "ManageStaff"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "sap.ui.com.project1.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    }
+  }
+}

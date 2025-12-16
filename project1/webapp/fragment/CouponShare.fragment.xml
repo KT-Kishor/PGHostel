@@ -1,0 +1,26 @@
+<Dialog title="Share Coupon" contentWidth="420px" 
+	xmlns="sap.m" 
+	xmlns:core="sap.ui.core" 
+	xmlns:f="sap.ui.layout.form" afterClose="onShareDialogAfterClose">
+	<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" columnsL="1" columnsM="1" width="100%">
+<!-- Role -->
+<Label text="Recipient role" required="true"/>
+<ComboBox id="cbRole" width="100%" placeholder="Select a Role" items="{RoleModel>/}" selectionChange="onRoleChange" change="onRoleLiveChange" required="true" valueStateText="Select a role">
+	<core:Item key="{RoleModel>}" text="{RoleModel>}"/>
+</ComboBox>
+<!-- Contact recipients -->
+<Label text="Select recipients"/>
+<MultiComboBox selectionChange="onUserSelectionChange" valueStateText="Select recipients" id="cbUser" width="100%" items="{RecipientModel>/}" selectedKeys="{CouponView>/SelectedUsers}" showSelectAll="true" showSecondaryValues="true">
+	<core:ListItem key="{RecipientModel>Email}" text="{RecipientModel>UserName}" additionalText="{RecipientModel>Email}"/>
+</MultiComboBox>
+<!-- Manual email entry -->
+<Label text="Additional email recipients"/>
+<Input id="inpManualEmail" width="100%" placeholder="Enter Email Addresses Separated by Commas" liveChange="onManualEmailLiveChange" valueStateText="Enter email addresses separated by commas" />
+	</f:SimpleForm>
+	<beginButton>
+		<Button text="Send Coupon" class="myUnifiedBtn" press="onConfirmShareCoupon"/>
+	</beginButton>
+	<endButton>
+		<Button text="Cancel" class="myUnifiedBtn" press="onCloseShareDialog"/>
+	</endButton>
+</Dialog>

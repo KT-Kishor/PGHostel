@@ -1,0 +1,155 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="sds"
+        title="Assign Room"
+        type="Message"
+        class="sapUiContentPadding"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="Customer Name"
+                    required="true"
+                />
+                <Text
+                    id="idCustomerNameText"
+                    text="{HostelModel>/CustomerName}"
+                />
+                <Label
+                    text="Room No"
+                    required="true"
+                />
+                <ComboBox
+                    id="idRoomNumber1"
+                    placeholder="Select Room Number"
+                    selectedKey="{HostelModel>/RoomNumber}"
+                    items="{AvailableRoomsModel>/}"
+                    valueStateText="Select Room No"
+                    change="onRoomNoChange"
+                >
+                    <core:ListItem
+                        key="{AvailableRoomsModel>RoomNo}"
+                        text="{AvailableRoomsModel>RoomNo}"
+                    />
+                </ComboBox>
+
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <ComboBox
+                    id="id_BranchCode"
+                    placeholder="Select Branch Code"
+                    selectedKey="{RoomModel>/BranchCode}"
+                    selectionChange=".onBranchChange"
+                    valueStateText="Please select a valid Branch Code"
+                    items="{BranchModel>/}"
+                    showSecondaryValues="true"
+                    visible="{Visiblemodel>/Visible}"
+
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID}"
+                        additionalText="{BranchModel>Name}"
+                    />
+                </ComboBox>
+                <Label
+                    text="Bed Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="idBedType"
+                    placeholder="Select Bed Type"
+                    width="100%"
+                    selectedKey="{HostelModel>/BedTypeName}"
+                    items="{BedTypeModel>/}"
+                    selectionChange=".onBedTypeChange"
+                    valueStateText="Please select a valid Bed Type"
+                    visible="{Visiblemodel>/Visible}"
+
+                >
+                    <core:ListItem
+                        key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
+                        text="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
+                    />
+                </ComboBox>
+
+                <Label text="Start Date" />
+                <DatePicker
+                    id="AR_id_StartDate"
+                    value="{HostelModel>/StartDate}"
+                    change="FCIA_ondatechange"
+                    valueStateText="Select date"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                    visible="{Visiblemodel>/Visible}"
+
+                />
+
+                <Label text="End Date" />
+                <DatePicker
+                    id="AR_id_EndDate"
+                    value="{HostelModel>/EndDate}"
+                    change="FCIA_ondatechange"
+                    valueStateText="Select date"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                    visible="{Visiblemodel>/Visible}"
+
+                />
+                <Label text="Add Facility" />
+                <MultiComboBox
+                    id="id_facility"
+                    placeholder="Select Facility"
+                    selectedKey="{HostelModel>/Facility}"
+                    items="{facilitymodel>/}"
+                    valueStateText="Select Room No"
+                    showSecondaryValues="true"
+                    visible="{Visiblemodel>/Visible}"
+
+                >
+                    <core:ListItem
+                        key="{facilitymodel>FacilityName}"
+                        text="{facilitymodel>FacilityName}"
+                        additionalText="{facilitymodel>UnitText}"
+                    />
+                </MultiComboBox>
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Save"
+                    press="ARNO_onsavebuttonpress"
+                    type="Accept"
+                    id="HM_id_saveButton"
+                    class="marginRight myUnifiedBtn"
+                />
+                <Button
+                    text="Cancel"
+                    press="HM_onCancelButtonPress"
+                    type="Reject"
+                    id="HM_id_CancelButton"
+                    class="marginRight myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</c:FragmentDefinition>

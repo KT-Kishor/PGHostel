@@ -1,0 +1,385 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+>
+    <Dialog
+        id="MS_id_authDialog"
+        draggable="true"
+        resizable="true"
+        class="authDialog"
+        contentWidth="28rem"
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="Add Staff Details" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+        <content>
+            <f:SimpleForm
+                id="MS_id_signUpForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanL="3"
+                labelSpanM="3"
+                emptySpanL="1"
+                emptySpanM="1"
+                columnsL="2"
+                columnsM="1"
+                class="sapUiNoContentPadding"
+            >
+                <!-- <Label text=""/> -->
+                <HBox
+                    width="100%"
+                    alignItems="Center"
+                    justifyContent="Start"
+                >
+                    <VBox width="20%">
+                        <Label
+                            text="Salutation"
+                            required="true"
+                        />
+                        <ComboBox
+                            id="MS_id_signUpSalutation"
+                            selectedKey="{MDmodel>/Salutation}"
+                            change="onChangeSalutation"
+                            placeholder="Mr."
+                            valueStateText="Select Salutation"
+                        >
+                            <core:ListItem
+                                key="Mr."
+                                text="Mr."
+                            />
+                            <core:ListItem
+                                key="Ms."
+                                text="Ms."
+                            />
+                            <core:ListItem
+                                key="Mrs."
+                                text="Mrs."
+                            />
+                            <core:ListItem
+                                key="Dr."
+                                text="Dr."
+                            />
+                        </ComboBox>
+                    </VBox>
+                    <VBox
+                        width="80%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Label
+                            text="Full Name"
+                            required="true"
+                        />
+                        <Input
+                            id="MS_id_signUpName"
+                            value="{MDmodel>/UserName}"
+                            placeholder="Full Name"
+                            required="true"
+                            liveChange="_LCvalidateName"
+                            valueStateText="Enter valid name"
+                        />
+                    </VBox>
+                </HBox>
+                <Label
+                    text="Date Of Birth"
+                    required="true"
+                />
+                <DatePicker
+                    id="MS_id_signUpDOB"
+                    value="{MDmodel>/DateOfBirth}"
+					valueStateText="Pick Date of Birth"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onChangeDOB"
+                    initialFocusedDateValue="{controller>/focusedDate}"
+                    minDate="{controller>/minDate}"
+                />
+                <Label
+                    text="Gender"
+                    required="true"
+                />
+                <Select
+                    id="MS_id_signUpGender"
+                    selectedKey="{MDmodel>/Gender}"
+                    change="onChangeGender"
+                >
+                    <core:Item
+                        key=""
+                        text="Select Gender"
+                    />
+                    <core:Item
+                        key="Male"
+                        text="Male"
+                    />
+                    <core:Item
+                        key="Female"
+                        text="Female"
+                    />
+                    <core:Item
+                        key="Other"
+                        text="Other"
+                    />
+                </Select>
+                <!-- ================== 2) CONTACT DETAILS ================== -->
+                <Label
+                    text="Email"
+                    required="true"
+                    class="sapUiTinyMarginTop"
+                />
+                <Input
+                    id="MS_id_signUpEmail"
+                    value="{MDmodel>/Email}"
+                    placeholder="Email"
+                    type="Email"
+                    required="true"
+                    liveChange="onEmailliveChange"
+                    valueStateText="Enter valid email"
+                />
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <ComboBox
+                    id="MS_id_Branchcode"
+                    placeholder="Select Branch Code"
+                    selectedKey="{MDmodel>/BranchCode}"
+                    items="{BranchModel>/}"
+                    showSecondaryValues="true"
+                    change=".onbranchChange"
+                    valueStateText="{i18n>selectBranchCode}"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID}"
+                        additionalText="{BranchModel>Name}"
+                    />
+                </ComboBox>
+                <Label
+                    text="Role"
+                    required="true"
+                />
+                <ComboBox
+                    id="MS_id_Role"
+                    width="100%"
+                    items="{path: 'Role>/'}"
+                    selectedKey="{MDmodel>/Role}"
+                    change=".onRoleChange"
+                    placeholder="Select Role"
+                    valueStateText="{i18n>selectRole}"
+                >
+                    <core:Item
+                        key="{Role>RoleName}"
+                        text="{Role>RoleName}"
+                    />
+                </ComboBox>
+                <Label
+                    text="Country"
+                    required="true"
+                />
+                <ComboBox
+                    id="MS_id_signUpCountry"
+                    change="onChangeCountry"
+                    selectionChange="onChangeCountry"
+                    placeholder="Select Country"
+                    valueStateText="Select a valid Country"
+                    items="{path:'CountryModel>/', length:1000}"
+                    showSecondaryValues="true"
+                    selectedKey="{MDmodel>/Country}"
+                >
+                    <core:ListItem
+                        key="{CountryModel>countryName}"
+                        text="{CountryModel>countryName}"
+                        additionalText="{CountryModel>code}"
+                    />
+                </ComboBox>
+                <Label
+                    text="State"
+                    required="true"
+                />
+                <ComboBox
+                    id="MS_id_signUpState"
+                    change="onChangeState"
+                    selectionChange="onChangeState"
+                    placeholder="Select State"
+                    valueStateText="Select a valid State"
+                    items="{path:'StateModel>/', length:1000}"
+                    showSecondaryValues="true"
+                    selectedKey="{MDmodel>/State}"
+                >
+                    <core:ListItem
+                        key="{StateModel>stateName}"
+                        text="{StateModel>stateName}"
+                    />
+                </ComboBox>
+                <Label
+                    text="City"
+                    required="true"
+                />
+                <ComboBox
+                    selectionChange="onCitySelect"
+                    id="MS_id_signUpCity"
+                    change="onChangeCity"
+                    placeholder="Select City"
+                    valueStateText="Select a valid City"
+                    items="{path:'CityModel>/', length:1000}"
+                    showSecondaryValues="true"
+                    selectedKey="{MDmodel>/City}"
+                >
+                    <core:ListItem
+                        key="{CityModel>cityName}"
+                        text="{CityModel>cityName}"
+                        additionalText="{CityModel>branchCode}"
+                    />
+                </ComboBox>
+                <Label text="" />
+                <HBox
+                    width="100%"
+                    alignItems="Center"
+                    justifyContent="Start"
+                >
+                    <VBox width="26%">
+                        <Label
+                            text="ISD Code"
+                            required="true"
+                        />
+                        <ComboBox
+                            change="onSTDChange"
+                            id="MS_id_signUpSTD"
+                            placeholder="Code"
+                            valueStateText="Select Code"
+                            showSecondaryValues="true"
+                            items="{path:'CountryModel>/', length:1000}"
+                            selectedKey="{MDmodel>/STDCode}"
+                            filterSecondaryValues="true"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>stdCode}"
+                                text="{CountryModel>stdCode}"
+                                additionalText="{CountryModel>code}"
+                            />
+                        </ComboBox>
+                    </VBox>
+                    <VBox
+                        width="74%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Label
+                            text="Mobile Number"
+                            required="true"
+                        />
+                        <Input
+                            id="MS_id_signUpPhone"
+                            type="Tel"
+                            value="{MDmodel>/MobileNo}"
+                            placeholder="Enter Contact Number"
+                            maxLength="18"
+                            liveChange="onMobileLivechnage"
+                            valueStateText="Enter a valid mobile number"
+                        />
+                    </VBox>
+                </HBox>
+                <Label
+                    text="Address"
+                    required="true"
+                />
+                <TextArea
+                    id="MS_id_signUpAddress"
+                    rows="3"
+                    maxLength="500"
+                    value="{MDmodel>/Address}"
+                    liveChange="onAddressChange"
+                    placeholder="Address"
+                />
+                <HBox width="100%">
+                    <Label
+                        text="Account Security"
+                        design="Bold"
+                        class="sapUiSmallMarginTop"
+                    />
+                </HBox>
+                <MessageStrip
+                    id="MS_id_passwordHelpStrip"
+                    type="Information"
+                    showIcon="false"
+                    text="Minimum 6 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character"
+                />
+                <Label
+                    text="Create Password"
+                    required="true"
+                />
+                <HBox width="100%">
+                    <Input
+                        showValueStateMessage="false"
+                        id="MS_id_signUpPassword"
+                        width="100%"
+                        placeholder="Enter Password"
+                        value="{MDmodel>/password}"
+                        type="Password"
+                        liveChange="SM_onChnageSetAndConfirm"
+                        showValueHelp="true"
+                        valueHelpIconSrc="sap-icon://show"
+                        valueHelpRequest="SM_onTogglePasswordVisibility"
+                        maxLength="50"
+                    >
+                        <layoutData>
+                            <FlexItemData growFactor="1" />
+                        </layoutData>
+                    </Input>
+                </HBox>
+                <HBox
+                    width="100%"
+                    justifyContent="SpaceBetween"
+                >
+                    <Text
+                        id="MS_id_passwordStrengthText"
+                        class="pwdMinFail"
+                    />
+                    <Button
+                        text="Generate password"
+                        type="Transparent"
+                        icon="sap-icon://refresh"
+                        press="SM_onGeneratePassword"
+                    />
+                </HBox>
+                <Label
+                    text="Confirm Password"
+                    required="true"
+                />
+                <Input
+                    id="MS_id_signUpConfirmPassword"
+                    placeholder="Enter Confirm Password"
+                    value="{MDmodel>/comfirmpass}"
+                    type="Password"
+                    change="FSM_onConfirm"
+                    liveChange="FSM_onConfirm"
+                    showValueHelp="true"
+                    valueStateText="Enter Confirm Password"
+                    valueHelpIconSrc="sap-icon://show"
+                    valueHelpRequest="SM_onTogglePasswordVisibility"
+                    maxLength="50"
+                />
+            </f:SimpleForm>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Sign Up"
+                    class="myUnifiedBtn"
+                    press="onSignUp"
+                />
+                <Button
+                    text="Cancel"
+                    class="myUnifiedBtn"
+                    press="FD_onCancelButtonPress"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,90 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="sds1"
+        title="Uplaod Documents"
+        type="Standard"
+        class="sapUiContentPadding"
+    >
+        <customHeader >
+            <Bar >
+                <contentLeft>
+                    <Title
+                        text="Upload Documents"
+                        class="sapUiSmallMarginBegin"
+                    />
+                </contentLeft>
+
+                <contentRight>
+                    <Button
+                        icon="sap-icon://decline"
+                        press="onCloseDialog"
+                        type="Transparent"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="ID Proof Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="idProofType"
+                    placeholder="Select ID Proof"
+                    value="{Bookingmodel>/DocumentType}"
+                    visible="{VisibleModel>/visible}"
+                    valueStateText="Select ID Proof"
+                    change="onidproofchange"
+                >
+                    <core:ListItem
+                        key="Aadhar Card"
+                        text="Aadhar Card"
+                    />
+                    <core:ListItem
+                        key="Pan Card"
+                        text="Pan Card"
+                    />
+                    <core:ListItem
+                        key="Driving License"
+                        text="Driving License"
+                    />
+                    <core:ListItem
+                        key="Passport"
+                        text="Passport"
+                    />
+                </ComboBox>
+                <Label
+                    text="Upload Document"
+                    required="true"
+                />
+                <u:FileUploader
+                    id="BT_id_FileUploader"
+                    fileType="jpg,jpeg,png"
+                    sameFilenameAllowed="false"
+                    change="onFacilityFileChange"
+                    visible="{VisibleModel>/visible}"
+                    class="myUnifiedBtn"
+                    width="100%"
+                />
+            </f:content>
+        </f:SimpleForm>
+    </Dialog>
+</c:FragmentDefinition>
