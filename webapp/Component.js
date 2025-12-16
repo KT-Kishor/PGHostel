@@ -21,7 +21,7 @@
                  * @public
                  * @override
                  */
-                init: function () {
+                init:async function () {
                     // call the base component's init function
                     UIComponent.prototype.init.apply(this, arguments);
 
@@ -47,12 +47,12 @@
                         isRadioVisible: false
                     });
                     this.setModel(omodel, "LoginModel");
+                  await  this._fetchCommonData("HM_Branch", "sBRModel");
 
                     this._fetchCommonData("City", "CityModel");                   
                     this._fetchCommonData("State", "StateModel");
                     this._fetchCommonData("Country", "CountryModel");
                     this._fetchCommonData("BaseLocation", "BaseLocationModel");
-                    this._fetchCommonData("HM_Branch", "sBRModel");
                     this._fetchCommonData("Currency", "CurrencyModel");
 
                 },
