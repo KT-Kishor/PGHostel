@@ -37,7 +37,7 @@ sap.ui.define([
         //     this._loadBranchCode();
         // },
         _onRouteMatched: async function () {
-            var LoginFunction = await this.commonLoginFunction("TilePage");
+            var LoginFunction = await this.commonLoginFunction();
             if (!LoginFunction) return;
             this.onClearAndSearch("couponFilterBar");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
@@ -111,6 +111,35 @@ sap.ui.define([
                 oView.setModel(oBranchModel, "sBRModel");
             } catch (err) {
                 console.error("Error while loading branch data:", err);
+            }
+        },
+        _syncBranchInEditMode: function () {
+            const oView = this.getView();
+            const oVM = oView.getModel("CouponView");
+            const sBranchCode = oVM.getProperty("/CurrentCoupon/BranchCode");
+
+            if (!sBranchCode) return;
+
+            const oBranchCB = sap.ui.getCore().byId(
+                oView.createId("cbBranchCode")
+            );
+            if (!oBranchCB) return;
+
+            const aItems = oBranchCB.getItems();
+
+            const oMatch = aItems.find(item => {
+                const oCtx = item.getBindingContext("sBRModel");
+                if (!oCtx) return false;
+
+                const oBranch = oCtx.getObject();
+                return (
+                    oBranch.BranchCode === sBranchCode ||
+                    oBranch.BranchID === sBranchCode
+                );
+            });
+
+            if (oMatch) {
+                oBranchCB.setSelectedItem(oMatch);
             }
         },
         _loadCoupons: async function () {
@@ -334,7 +363,6 @@ sap.ui.define([
             const oVM = oView.getModel("CouponView");
             const sMode = oVM.getProperty("/DialogMode");
 
-            // 🔥 HARD RESET branch on Add
             if (sMode === "Add") {
                 oVM.setProperty("/CurrentCoupon/BranchCode", "");
 
@@ -342,10 +370,16 @@ sap.ui.define([
                     oView.createId("cbBranchCode")
                 );
                 if (oBranchCB) {
-                    oBranchCB.setSelectedKey("");
+                    oBranchCB.setSelectedItem(null);
                     oBranchCB.setValue("");
                 }
+            } else {
+                // ✏️ Edit mode → restore branch selection
+                this._syncBranchInEditMode();
             }
+
+            this._oCouponDialog.open();
+
 
             // ===== DATE CONSTRAINTS =====
             const oStartDP = sap.ui.getCore().byId(oView.createId("dpStartDate"));
