@@ -89,7 +89,7 @@
                         this.setModel(oModel, modelName);
                     }
                 } catch (error) {
-                    MessageToast.show(error?.responseJSON?.message || "Error loading " + entityName);
+                    sap.m.MessageToast.show(error?.responseJSON?.message || "Error loading " + entityName);
                 }
             }
             });

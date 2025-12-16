@@ -33,12 +33,8 @@
                 class="sapUiNoContentPadding"
             >
                 <!-- <Label text=""/> -->
-                <HBox
-                    width="100%"
-                    alignItems="Center"
-                    justifyContent="Start"
-                >
-                    <VBox width="20%">
+               <HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="25%">
                         <Label
                             text="Salutation"
                             required="true"
@@ -68,10 +64,7 @@
                             />
                         </ComboBox>
                     </VBox>
-                    <VBox
-                        width="80%"
-                        class="sapUiTinyMarginBegin"
-                    >
+                    <VBox width="75%">
                         <Label
                             text="Full Name"
                             required="true"
@@ -238,12 +231,8 @@
                     />
                 </ComboBox>
                 <Label text="" />
-                <HBox
-                    width="100%"
-                    alignItems="Center"
-                    justifyContent="Start"
-                >
-                    <VBox width="26%">
+               <HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="25%">
                         <Label
                             text="ISD Code"
                             required="true"
@@ -265,10 +254,7 @@
                             />
                         </ComboBox>
                     </VBox>
-                    <VBox
-                        width="74%"
-                        class="sapUiTinyMarginBegin"
-                    >
+                    <VBox width="75%">
                         <Label
                             text="Mobile Number"
                             required="true"
