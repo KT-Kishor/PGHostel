@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form" 
 	xmlns:l="sap.ui.layout">
 	<Dialog id="authDialog" draggable="true" resizable="true" class="authDialog" contentWidth="28rem" contentHeight="auto">
-	<!--stretch="{= ${device>/system/phone} }"-->
+		<!--stretch="{= ${device>/system/phone} }"-->
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
@@ -98,7 +98,7 @@
 				<content>
 					<f:SimpleForm id="signUpForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3" emptySpanL="1" emptySpanM="1" columnsL="2" columnsM="1" class="sapUiNoContentPadding">
 						<!-- <Label text=""/> -->
-						<HBox width="100%" alignItems="Center" justifyContent="Start">
+						<HBox width="100%" alignItems="Center" class="isdMobileRow">
 							<VBox width="20%">
 								<Label text="Salutation" required="true"/>
 								<ComboBox id="signUpSalutation" selectedKey="" change="onChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
@@ -106,11 +106,17 @@
 									<core:ListItem key="Ms." text="Ms."/>
 									<core:ListItem key="Mrs." text="Mrs."/>
 									<core:ListItem key="Dr." text="Dr."/>
+									<layoutData>
+										<FlexItemData baseSize="30%" growFactor="0" />
+									</layoutData>
 								</ComboBox>
 							</VBox>
 							<VBox width="80%" class="sapUiTinyMarginBegin">
 								<Label text="Full Name" required="true"/>
 								<Input id="signUpName" value="{LoginMode>/fullname}" placeholder="Full Name" required="true" liveChange="_LCvalidateName" valueStateText="Enter valid name"/>
+								<layoutData>
+									<FlexItemData baseSize="70%" growFactor="1" />
+								</layoutData>
 							</VBox>
 						</HBox>
 						<Label text="Date Of Birth" required="true" />
@@ -138,17 +144,22 @@
 							<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}"/>
 						</ComboBox>
 						<Label text=""/>
-						<HBox width="100%" alignItems="Center" justifyContent="Start">
-							<VBox width="26%">
+						<HBox width="100%" alignItems="Center" class="isdMobileRow">
+							<VBox width="20%">
 								<Label text="ISD Code" required="true"/>
 								<ComboBox change="onSTDChange" id="signUpSTD" placeholder="Code" valueStateText="Select Code" showSecondaryValues="true" items="{path:'CountryModel>/', length:1000}">
 									<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+									<layoutData>
+										<FlexItemData baseSize="30%" growFactor="0" />
+									</layoutData>
 								</ComboBox>
 							</VBox>
-							<VBox width="74%" class="sapUiTinyMarginBegin">
+							<VBox width="80%" class="sapUiTinyMarginBegin">
 								<Label text="Mobile Number" required="true"/>
-								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number" />
-								<!-- <Input id="signUpPhone" type="Number" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number" /> -->
+								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number"/>
+								<layoutData>
+									<FlexItemData baseSize="70%" growFactor="1" />
+								</layoutData>
 							</VBox>
 						</HBox>
 						<Label text="Address" required="true"/>

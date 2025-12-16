@@ -290,9 +290,9 @@ sap.ui.define([
                 Status: "Pending",
                 Country: oData.Country,
                 AvailbleBeds: oData.AvailbleBeds,
-                Price:oData.Price,
-                MonthPrice:oData.MonthPrice,
-                YearPrice:oData.YearPrice
+                Price: oData.Price,
+                MonthPrice: oData.MonthPrice,
+                YearPrice: oData.YearPrice
             };
 
             //  Merge and clean
@@ -4032,6 +4032,7 @@ sap.ui.define([
                 this.getView().addDependent(this._oAdminSignup);
 
                 this._oAdminSignup.attachAfterClose(() => {
+                    this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
                 });
 
@@ -4043,7 +4044,7 @@ sap.ui.define([
                 oDate.setMaxDate(new Date(now.getFullYear() - 18, now.getMonth(), now.getDate()));
                 oDate.setMinDate(new Date(now.getFullYear() - 70, now.getMonth(), now.getDate()));
             }
-
+            this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
         },
 
@@ -4357,14 +4358,12 @@ sap.ui.define([
 
 
 
-
         onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
 
             const oModel = this.getView().getModel("AdminSignupModel");
             const data = oModel.getData();
-            const oAdmin = this.getView().getModel("AdminSignupModel").getData();
-
+            const oAdmin = data;
 
             const payload = {
                 data: {
@@ -4383,105 +4382,38 @@ sap.ui.define([
                     Status: "Active",
                     Documents: data.Documents.map(doc => ({
                         FileName: doc.FileName,
-                        DocumentType: doc.VdocType,    //  document type
-                        FileType: doc.DocumentType,    // mime type
-
-                        File: doc.File                   // base64
+                        DocumentType: doc.VdocType,
+                        FileType: doc.DocumentType,
+                        File: doc.File
                     }))
                 }
             };
 
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
-                sap.m.MessageToast.show("Admin Registered Successfully");
-                this._oAdminSignup.close();
+
+                sap.m.MessageBox.success(
+                    "Thank you for signing up.\n\n" +
+                    "Our team will review your details and uploaded documents.\n" +
+                    "Once the verification is complete, \n  you will receive an email containing:\n\n" +
+                    "• Your User ID and User Name\n\n\n" +
+
+                    "Please check your inbox (and spam folder) for further updates.",
+                    {
+                        title: "Registration Submitted Successfully",
+                        emphasizedAction: sap.m.MessageBox.Action.OK,
+                        onClose: () => {
+                            // ✅ CLOSE ONLY AFTER USER CONFIRMS
+                            this._oAdminSignup.close();
+
+                        }
+                    }
+                );
+
             } catch (err) {
                 sap.m.MessageToast.show("Registration Failed!");
             }
         },
-        // onAdminFileSelect: function (oEvent) {
-
-        //     const oUploader = sap.ui.getCore().byId("adminFileUploader");
-        //     const oDocType = sap.ui.getCore().byId("adminDocType");
-        //     const oModel = this.getView().getModel("AdminSignupModel");
-
-        //     const oFile = oEvent.getParameter("files")?.[0];
-
-        //     if (!oFile) return;
-
-        //     const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-
-        //     if (oFile.size > MAX_SIZE) {
-        //         sap.m.MessageBox.error("File size must not exceed 5 MB.");
-        //         oUploader.clear();              // 🔥 important
-        //         return;
-        //     }
-
-        //     const file = oEvent.getParameter("files")[0];
-        //     if (!file) return;
-
-        //     const selectedDocType = oDocType.getSelectedKey();
-
-        //     // 🔒 Guard 1: Doc type mandatory
-        //     if (!selectedDocType) {
-        //         sap.m.MessageToast.show("Please select document type first.");
-        //         oUploader.clear();
-        //         return;
-        //     }
-
-        //     // 🔒 Guard 2: Duplicate file check
-        //     if (this._isDuplicateFile(file.name)) {
-        //         sap.m.MessageToast.show("This file is already uploaded.");
-        //         oUploader.clear();
-        //         return;
-        //     }
-
-        //     // 🔒 Lock controls during processing
-        //     oModel.setProperty("/UploadEnabled", false);
-        //     oModel.setProperty("/DocTypeEnabled", false);
-
-        //     const reader = new FileReader();
-
-        //     reader.onload = () => {
-        //         const base64 = reader.result.split(",")[1];
-        //         const docs = oModel.getProperty("/Documents") || [];
-
-        //         docs.push({
-        //             FileName: file.name,
-        //             DocumentType: file.type,
-        //             VdocType: selectedDocType,
-        //             File: base64,
-        //             Base64: base64,
-        //             size: file.size
-        //         });
-
-        //         oModel.setProperty("/Documents", docs);
-
-        //         // 🔥 Remove used document type from ComboBox
-        //         const items = oDocType.getItems();
-        //         items.forEach(i => {
-        //             if (i.getKey() === selectedDocType) {
-        //                 oDocType.removeItem(i);
-        //             }
-        //         });
-
-        //         // 🔁 Reset doc type
-        //         oModel.setProperty("/CurrentDocType", "");
-        //         oUploader.clear();
-
-        //         // 🔓 Re-enable ONLY if options remain
-        //         const hasMoreTypes = oDocType.getItems().length > 0;
-
-        //         oModel.setProperty("/DocTypeEnabled", hasMoreTypes);
-        //         oModel.setProperty("/UploadEnabled", false);
-
-        //         if (!hasMoreTypes) {
-        //             sap.m.MessageToast.show("All documents uploaded.");
-        //         }
-        //     };
-
-        //     reader.readAsDataURL(file);
-        // },
 
 
         onAdminFileSelect: function (oEvent) {
@@ -4797,45 +4729,45 @@ sap.ui.define([
         },
 
 
-onAdminPreviewDoc: function (oEvent) {
-    const oDoc = oEvent.getSource()
-        .getBindingContext("AdminSignupModel")
-        .getObject();
+        onAdminPreviewDoc: function (oEvent) {
+            const oDoc = oEvent.getSource()
+                .getBindingContext("AdminSignupModel")
+                .getObject();
 
-    if (!oDoc.PreviewUrl) {
-        sap.m.MessageToast.show("Preview unavailable");
-        return;
-    }
+            if (!oDoc.PreviewUrl) {
+                sap.m.MessageToast.show("Preview unavailable");
+                return;
+            }
 
-    if (!this._previewDialog) {
-        this._previewDialog = new sap.m.Dialog({
-            title: "",
-            contentWidth: "70%",
-            contentHeight: "70%",
-            resizable: true,
-            draggable: true,
-            verticalScrolling: false,   // 🔑 IMPORTANT
-            horizontalScrolling: false, // 🔑 IMPORTANT
-            content: [
-                new sap.m.Image({
-                    width: "100%",
-                    height: "100%",
-                    densityAware: false
-                }).addStyleClass("adminPreviewImage")
-            ],
-            endButton: new sap.m.Button({
-                text: "Close",
-                press: () => this._previewDialog.close()
-            })
-        }).addStyleClass("adminPreviewDialog");
+            if (!this._previewDialog) {
+                this._previewDialog = new sap.m.Dialog({
+                    title: "",
+                    contentWidth: "70%",
+                    contentHeight: "70%",
+                    resizable: true,
+                    draggable: true,
+                    verticalScrolling: false,   // 🔑 IMPORTANT
+                    horizontalScrolling: false, // 🔑 IMPORTANT
+                    content: [
+                        new sap.m.Image({
+                            width: "100%",
+                            height: "100%",
+                            densityAware: false
+                        }).addStyleClass("adminPreviewImage")
+                    ],
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        press: () => this._previewDialog.close()
+                    })
+                }).addStyleClass("adminPreviewDialog");
 
-        this.getView().addDependent(this._previewDialog);
-    }
+                this.getView().addDependent(this._previewDialog);
+            }
 
-    this._previewDialog.setTitle(oDoc.FileName);
-    this._previewDialog.getContent()[0].setSrc(oDoc.PreviewUrl);
-    this._previewDialog.open();
-},
+            this._previewDialog.setTitle(oDoc.FileName);
+            this._previewDialog.getContent()[0].setSrc(oDoc.PreviewUrl);
+            this._previewDialog.open();
+        },
 
 
 
