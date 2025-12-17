@@ -766,7 +766,34 @@ _getPasswordStrength: function(pwd) {
             return isValid;
         },
 
+        _LCstrictValidationMultiComboBox: function (oEvent, type) {
+            var oMultiComboBox = type === "ID" ? oEvent : oEvent.getSource();
 
+            // Get selected keys
+            var aSelectedKeys = oMultiComboBox.getSelectedKeys();
+
+            // Mandatory check
+            if (!aSelectedKeys || !aSelectedKeys.length) {
+                oMultiComboBox.setValueState("Error").focus();
+                return false;
+            }
+
+            // Validate selected keys against items
+            var aItems = oMultiComboBox.getItems();
+            var bValid = aSelectedKeys.every(function (sKey) {
+                return aItems.some(function (oItem) {
+                    return oItem.getKey() === sKey;
+                });
+            });
+
+            if (!bValid) {
+                oMultiComboBox.setValueState("Error").focus();
+                return false;
+            } else {
+                oMultiComboBox.setValueState("None");
+                return true;
+            }
+        }
 
     };
 });

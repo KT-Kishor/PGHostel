@@ -18,7 +18,7 @@
                 showClearOnFB="true" search="Onsearch" filterChange="IA_.onFilterChange" afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"  filterContainerWidth="auto">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="UserID" label="User Id" groupName="Group" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="UserID" label="User ID" groupName="Group" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox id="MS_id_UserID" items="{mainModel>/}" showClearIcon="true">
 								<core:Item key="{mainModel>UserID}" text="{mainModel>UserID}"/>

@@ -138,13 +138,13 @@
                     text="Branch Code"
                     required="true"
                 />
-                <ComboBox
+                <MultiComboBox
                     id="MS_id_Branchcode"
                     placeholder="Select Branch Code"
-                    selectedKey="{MDmodel>/BranchCode}"
+                    selectedKeys="{MDmodel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
-                    change=".onbranchChange"
+                    selectionChange=".onbranchChange"
                     valueStateText="{i18n>selectBranchCode}"
                 >
                     <core:ListItem
@@ -152,7 +152,7 @@
                         text="{BranchModel>BranchID}"
                         additionalText="{BranchModel>Name}"
                     />
-                </ComboBox>
+                </MultiComboBox>
                 <Label
                     text="Role"
                     required="true"

@@ -26,7 +26,6 @@ sap.ui.define([
                 this._initEmptyMDModel();
                 this.onClearAndSearch("MS_id_FilterbarEmployee");
                 this.commonLoginFunction();
-
                 await this._loadBranchCode();
                 await this.Onsearch("true");
             } catch (err) {
@@ -42,7 +41,7 @@ sap.ui.define([
                 Salutation: "",
                 UserName: "",
                 Role: "",
-                BranchCode: "",
+                BranchCode: [],
                 Email: "",
                 MobileNo: "",
                 password: "",
@@ -136,7 +135,7 @@ sap.ui.define([
                 Gender: oData.Gender || "",
                 DateOfBirth: this.Formatter.DateFormat(oData.DateOfBirth) || "",
                 Role: oData.Role || "",
-                BranchCode: oData.BranchCode || "",
+                BranchCode: oData.BranchCode ? oData.BranchCode.split(",") : [],
                 password: "",
                 comfirmpass: ""
             };
@@ -208,7 +207,7 @@ sap.ui.define([
                 utils._LCvalidateDate(this.byId("MS_id_signUpDOB"), "ID") &&
                 utils._LCstrictValidationSelect(C("MS_id_signUpGender")) &&
                 utils._LCvalidateEmail(C("MS_id_signUpEmail"), "ID") &&
-                utils._LCstrictValidationComboBox(C("MS_id_Branchcode"), "ID") &&
+                utils._LCstrictValidationMultiComboBox(C("MS_id_Branchcode"),"ID") &&
                 utils._LCvalidateMandatoryField(C("MS_id_Role"), "ID") &&
                 utils._LCvalidateMandatoryField(C("MS_id_signUpCountry"), "ID") &&
                 utils._LCvalidateMandatoryField(C("MS_id_signUpState"), "ID") &&
@@ -228,12 +227,13 @@ sap.ui.define([
             }
 
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
+            const aBranchCodes = C("MS_id_Branchcode").getSelectedKeys();
 
             const payload = {
                 Salutation: C("MS_id_signUpSalutation").getSelectedKey(),
                 UserName: data.UserName.trim(),
                 Role: C("MS_id_Role").getSelectedKey() || C("MS_id_Role").getValue(),
-                BranchCode: C("MS_id_Branchcode").getSelectedKey(),
+                BranchCode: aBranchCodes.join(","), 
                 EmailID: data.Email.trim(),
                 Password: btoa(data.password),
                 STDCode: data.STDCode || std,
@@ -303,7 +303,10 @@ sap.ui.define([
             // Build Filters for backend
             let filters = {};
 
-            // BranchCode always applied for roles except empty role
+            // Always apply Vendor type
+            filters.Type = "Vendor";
+
+            // BranchCode applied based on role
             if (oExistingModel.Role !== "") {
                 filters.BranchCode = aBranchCodes;
             }
@@ -322,25 +325,20 @@ sap.ui.define([
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
                     const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                    // Store original data on first load or force reload
                     if (!this._originalStaffData || flag === "true") {
                         this._originalStaffData = response;
                     }
 
                     let finalData;
-
-                    // If no filters applied, show original complete data
-                    if (Object.keys(filters).length === 0) {
+                    if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
                         finalData = this._originalStaffData;
                     } else {
                         finalData = response;
                     }
 
-                    // Set main model
                     const model = new sap.ui.model.json.JSONModel(finalData);
                     this.getView().setModel(model, "mainModel");
 
-                    // Populate unique filter dropdown values
                     this._populateUniqueFilterValues(this._originalStaffData);
                 })
                 .catch((err) => {
@@ -444,7 +442,7 @@ sap.ui.define([
 
         onbranchChange:function(oEvent) {
             var oInput = oEvent.getSource();
-            utils._LCstrictValidationComboBox(oEvent);
+            utils._LCstrictValidationMultiComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
