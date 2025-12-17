@@ -99,6 +99,25 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
+
+                     <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="StartDate"
+                        label="Date"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                             <DateRangeSelection
+                            id="PO_id_Date"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd/MM/yyyy"
+                        />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+
+                
             </fb:FilterBar>
             <Table
                 id="idPOTable"

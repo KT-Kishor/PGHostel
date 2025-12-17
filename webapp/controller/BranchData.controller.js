@@ -53,15 +53,26 @@ sap.ui.define([
             }
         },
 
-        Onsearch: function () {
-            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+        Onsearch:async function () {
+            const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+           var filter={
+               UserID:oLoginmodel.EmployeeID
+            }
+ 
+
+            var LoginData=await this.ajaxReadWithJQuery("HM_CustomerContact", filter).then((oData) => {
+                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                  return oFCIAerData
+            })
+            const oExistingModel =LoginData;
             const oView = this.getView();
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
-                filters.City = oExistingModel.City;
-            }
+            // if (oExistingModel.Role !== "") {
+            //     filters.City = oExistingModel.City;
+            // }
             if (oExistingModel.BranchCode) {
                 filters.BranchID = oExistingModel.BranchCode;
             }
@@ -82,7 +93,7 @@ sap.ui.define([
             this.ajaxReadWithJQuery("HM_Branch", filters).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(oFCIAerData);
-                this.getView().setModel(model, "mainModel")
+                this.getOwnerComponent().setModel(model, "mainModel")
                 sap.ui.core.BusyIndicator.hide();
             })
         },

@@ -88,20 +88,25 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
-            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
-               let aBranchCodes = [];
+            let aBranchCodes = "";
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel
+                    .map(item => item.BranchID)
+                    .flat()           
+                    .filter(Boolean)    
+                    .join(",");         
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
-                filters = { BranchID: aBranchCodes };
+            if (oExistingModel.Role && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
             }
             try {
                 const oView = this.getView();

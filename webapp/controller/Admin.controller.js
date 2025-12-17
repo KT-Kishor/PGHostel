@@ -20,6 +20,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteAdmin").attachMatched(this._onRouteMatched, this);
         },
         _onRouteMatched: async function() {
+            this._setDefaultFinancialYear();
             this.commonLoginFunction();
             await this.Cust_read(true)
              this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
@@ -44,6 +45,27 @@ sap.ui.define([
             this.onClearAndSearch("PO_id_FilterbarEmployee");
             // this.BedTypedetails();
         },
+        _setDefaultFinancialYear: function () {
+    const oDateRange = this.getView().byId("PO_id_Date");
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth(); // 0 = Jan
+
+    let startDate, endDate;
+
+    // If before April → previous FY
+    if (currentMonth < 3) {
+        startDate = new Date(currentYear - 1, 3, 1); // 1-Apr
+        endDate = new Date(currentYear, 2, 31);      // 31-Mar
+    } else {
+        startDate = new Date(currentYear, 3, 1);
+        endDate = new Date(currentYear + 1, 2, 31);
+    }
+
+    oDateRange.setDateValue(startDate);
+    oDateRange.setSecondDateValue(endDate);
+},
         BedTypedetails: function() {
             this.ajaxReadWithJQuery("HM_BedType", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -60,19 +82,30 @@ sap.ui.define([
 
             var sStatus =   this.getView().byId("PO_id_Status").getSelectedKey() ||   this.getView().byId("PO_id_Status").getValue();
 
+              var oDateRange = this.getView().byId("PO_id_Date");
+                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                var oStartDate = oDateRange.getDateValue();
+                var oEndDate = oDateRange.getSecondDateValue();
 
-               let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel
+                    .map(item => item.BranchID)
+                    .flat()           
+                    .filter(Boolean)    
+                    .join(",");         
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
-                filters = { BranchCode: aBranchCodes };
+            if (oExistingModel.Role && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
             }
 
             
@@ -88,6 +121,10 @@ sap.ui.define([
              if (sStatus) {
                 filters.Status  = sStatus
             }
+             if (oStartDate && oEndDate) {
+                    filters.StartDate = oDateFormat.format(oStartDate);
+                    filters.EndDate = oDateFormat.format(oEndDate);
+                }
 
             sap.ui.core.BusyIndicator.show(0);
               this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {

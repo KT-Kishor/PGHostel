@@ -2316,3 +2316,13 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .glassTile * {
   color: white !important;
 }
+
+.viewMoreLink {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0a6ed1 !important;   /* SAP primary blue */
+}
+
+.viewMoreLink:hover {
+    text-decoration: underline;
+}

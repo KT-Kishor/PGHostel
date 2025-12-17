@@ -27,6 +27,8 @@ sap.ui.define([
 
 
             await this.BedTypedetails()
+
+
             await this._loadBranchCode()
             await this.Onsearch()
 
@@ -35,18 +37,24 @@ sap.ui.define([
         },
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-            let aBranchCodes = [];
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel
+                    .map(item => item.BranchID)
+                    .flat()           
+                    .filter(Boolean)    
+                    .join(",");         
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
-                filters = { BranchID: aBranchCodes };
+            if (oExistingModel.Role && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
             }
             try {
                 const oView = this.getView();
@@ -59,9 +67,6 @@ sap.ui.define([
 
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 oView.setModel(oBranchModel, "BranchModel");
-
-                console.log("oBranchModel:", oBranchModel.getData());
-                console.log("Branch data loaded successfully");
             } catch (err) {
                 console.error("Error while loading branch data:", err);
             }
