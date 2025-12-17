@@ -18,9 +18,23 @@
 <!-- <f:SimpleForm editable="true" layout="ResponsiveGridLayout"> -->
 			<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1">
 				<!-- (keep your existing fields as-is) -->
-				<Label text="Vendor Name" required="true"/>
-				<Input placeholder="Enter your name" id="adminVendorName" value="{AdminSignupModel>/VendorName}" liveChange="onAdminLiveValidate" valueStateText="Enter valid name"/>
-				<!-- DOB -->
+				<HBox width="100%" alignItems="Center" class="isdMobileRow">
+	<!-- Salutation : 30% -->
+	<VBox width="30%">
+		<Label text="Salutation" required="true"/>
+		<ComboBox id="adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
+			<core:ListItem key="Mr." text="Mr."/>
+			<core:ListItem key="Ms." text="Ms."/>
+			<core:ListItem key="Mrs." text="Mrs."/>
+			<core:ListItem key="Dr." text="Dr."/>
+		</ComboBox>
+	</VBox>
+	<!-- Vendor Name : 70% -->
+	<VBox width="70%" class="sapUiTinyMarginBegin">
+		<Label text="Vendor Name" required="true"/>
+		<Input id="adminVendorName" value="{AdminSignupModel>/VendorName}" placeholder="Enter your name" liveChange="onAdminLiveValidate" valueStateText="Enter valid name"/>
+	</VBox>
+</HBox>		<!-- DOB -->
 				<Label text="Date of Birth" required="true"/>
 				<DatePicker id="adminDOB" value="{AdminSignupModel>/DOB}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" valueStateText="Age must be between 18 and 70" change="ADMIN_onChangeDOB" />
 				<!-- Gender -->

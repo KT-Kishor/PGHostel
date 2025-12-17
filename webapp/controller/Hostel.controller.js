@@ -4428,6 +4428,7 @@ sap.ui.define([
 
             const payload = {
                 data: {
+                    Salutation: oAdmin.Salutation,
                     UserName: oAdmin.VendorName,
                     DateOfBirth: oAdmin.DOB,
                     Gender: oAdmin.Gender,
@@ -4476,6 +4477,36 @@ sap.ui.define([
             }
         },
 
+        onAdminChangeSalutation: function (oEvent) {
+
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+
+            const oGender = sap.ui.getCore().byId("adminGender");
+
+            // 🔥 Clear salutation error immediately
+            oSalutation.setValueState("None");
+
+            if (!oGender) return;
+
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            }
+            else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+            // Dr. → manual gender selection
+
+            // ✅ Strict validation (CONTROL, not event)
+            utils._LCstrictValidationSelect(oSalutation);
+        },
 
         onAdminFileSelect: function (oEvent) {
 
@@ -4579,6 +4610,7 @@ sap.ui.define([
 
             // -------- MODEL RESET (SAFE WAY) --------
             [
+                "/Salutation",
                 "/VendorName",
                 "/DOB",
                 "/Gender",
@@ -4601,6 +4633,7 @@ sap.ui.define([
 
             // -------- RESET CONTROLS (IMPORTANT ORDER) --------
             [
+                "adminSalutation",
                 "adminVendorName",
                 "adminDOB",
                 "adminGender",
@@ -4649,6 +4682,8 @@ sap.ui.define([
             const oAddress = C("adminAddress");
 
             const isValid =
+                utils._LCstrictValidationSelect(sap.ui.getCore().byId("adminSalutation"))
+                &&
                 utils._LCvalidateName(oName, "ID") &&
                 utils._LCvalidateMandatoryField(oDOB, "ID") &&
                 utils._LCstrictValidationSelect(oGender) &&
@@ -4687,8 +4722,10 @@ sap.ui.define([
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
         _initAdminSignupModel: function () {
             const oModel = new sap.ui.model.json.JSONModel({
+                Salutation: "",
                 VendorName: "",
                 DOB: "",
                 Gender: "",
