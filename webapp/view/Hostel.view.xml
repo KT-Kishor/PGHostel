@@ -257,7 +257,7 @@
                                     loop="true"
                                     showPageIndicator="false"
                                     backgroundDesign="Transparent"
-                                    pages="{VisibilityModel>Images}"
+pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                                 >
                                     <pages>
                                         <VBox class="imageWrapper">

@@ -1,8 +1,12 @@
 {
+    "sap.app": {
+        "id": "sap.ui.com.project1.cards.roomDetails",
+        "type": "card",
+        "title": "Room Details"
+    },
     "sap.card": {
         "type": "Object",
         "data": {
-            "path": "/",
             "json": {
                 "BedType": "{HostelModel>/BedType}",
                 "Capacity": "{HostelModel>/Capacity}",

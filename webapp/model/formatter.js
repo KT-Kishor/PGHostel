@@ -27,10 +27,10 @@ sap.ui.define([
             return "₹ " + fTotal.toFixed(2);
         },
 
-        formatCurrency: function(fValue) {
-            if (!fValue) return "₹ 0.00";
-            return "₹ " + parseFloat(fValue).toFixed(2);
-        },
+        // formatCurrency: function(fValue) {
+        //     if (!fValue) return "₹ 0.00";
+        //     return "₹ " + parseFloat(fValue).toFixed(2);
+        // },
 
         calculateDays: function(sStartDate, sEndDate) {
             if (!sStartDate || !sEndDate) return 0;
@@ -72,16 +72,16 @@ sap.ui.define([
             return new Date(`${y}-${m}-${d}`);
         },
 
-        formatCurrency: function(value, code) {
-            if (value || value === 0) {
-                var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-                    currencyCode: false // hides the currency code like "INR"
-                });
-                var formatted = oCurrencyFormat.format(value);
-                return code ? formatted + " " + code : formatted;
-            }
-            return "";
-        },
+        // formatCurrency: function(value, code) {
+        //     if (value || value === 0) {
+        //         var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
+        //             currencyCode: false // hides the currency code like "INR"
+        //         });
+        //         var formatted = oCurrencyFormat.format(value);
+        //         return code ? formatted + " " + code : formatted;
+        //     }
+        //     return "";
+        // },
 
         formatPrice: function (price, currency) {
         if (!price || price === "" || price === 0) {
@@ -112,17 +112,7 @@ sap.ui.define([
 
         var formattedValue = oCurrencyFormat.format(Number(price), currency);
         return "Starting At " + formattedValue;
-    },
-        //   formatCurrency: function (value, code) {
-        //             if (value || value === 0) {
-        //                 var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-        //                     currencyCode: false // hides the currency code like "INR"
-        //                 });
-        //                 var formatted = oCurrencyFormat.format(value);
-        //                 return code ? formatted + " " + code : formatted;
-        //             }
-        //             return "";
-        //         },
+        },
 
         formatCurrency: function (value, code) {
             var n = parseFloat(value);
@@ -306,6 +296,30 @@ sap.ui.define([
 
             return `Type: ${mime}\nSize: ${readable}`;
         },
+        formatFacilityPrice: function (price, currency, unitText) {
+            if (!price || price === 0 || price === "0") {
+                return "";
+            }
+
+            var oFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
+                currencyCode: false,
+                minFractionDigits: 2,
+                maxFractionDigits: 2
+            });
+
+            var formattedPrice = oFormat.format(Number(price));
+
+            var result = formattedPrice;
+            if (currency) {
+                result += " " + currency;
+            }
+            if (unitText) {
+                result += " / " + unitText;
+            }
+
+            return result;
+        },
+
 
 
 

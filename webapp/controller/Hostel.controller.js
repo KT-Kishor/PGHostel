@@ -643,7 +643,46 @@ sap.ui.define([
         },
 
 
+        // _LoadAmenities: async function (sBranchCode) {
+        //     const oAmenityModel = new sap.ui.model.json.JSONModel({
+        //         loading: true,
+        //         Amenities: []
+        //     });
+
+        //     this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
+
+        //     try {
+        //         // 1️⃣ Fetch ALL once (don’t rely on server filter)
+        //         let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
+        //         let allList = resp?.data || [];
+
+        //         // 2️⃣ Filter branch only (strict match)
+        //         const branchList = allList.filter(x => (x.BranchCode || "").trim() === (sBranchCode || "").trim());
+
+        //         if (branchList.length > 0) {
+
+        //             oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchList));
+        //             // } else {
+        //             //     // 🔄 Branch not found → show ONLY blank fallback
+        //             //     const fallbackList = allList.filter(x => (x.BranchCode || "").trim() === "");
+        //             //     console.warn("↩️ Showing fallback amenities:", fallbackList);
+        //             //     oAmenityModel.setProperty("/Amenities", this._convertAmenities(fallbackList));
+        //             // }
+        //         } else {
+        //             console.warn("🚫 No amenities found for this branch:", sBranchCode);
+        //             oAmenityModel.setProperty("/Amenities", []); // show nothing
+        //         }
+
+        //     } catch (err) {
+        //         console.error("❌ Amenity load error:", err);
+        //     }
+        //     oAmenityModel.setProperty("/loading", false);
+        // },
+
+
         _LoadAmenities: async function (sBranchCode) {
+            if (!sBranchCode) return;
+
             const oAmenityModel = new sap.ui.model.json.JSONModel({
                 loading: true,
                 Amenities: []
@@ -652,32 +691,25 @@ sap.ui.define([
             this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
 
             try {
-                // 1️⃣ Fetch ALL once (don’t rely on server filter)
-                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
-                let allList = resp?.data || [];
+                // ✅ Backend filtering ONLY
+                const resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {
+                    BranchCode: sBranchCode
+                });
 
-                // 2️⃣ Filter branch only (strict match)
-                const branchList = allList.filter(x => (x.BranchCode || "").trim() === (sBranchCode || "").trim());
+                const list = resp?.data || [];
 
-                if (branchList.length > 0) {
-
-                    oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchList));
-                    // } else {
-                    //     // 🔄 Branch not found → show ONLY blank fallback
-                    //     const fallbackList = allList.filter(x => (x.BranchCode || "").trim() === "");
-                    //     console.warn("↩️ Showing fallback amenities:", fallbackList);
-                    //     oAmenityModel.setProperty("/Amenities", this._convertAmenities(fallbackList));
-                    // }
-                } else {
-                    console.warn("🚫 No amenities found for this branch:", sBranchCode);
-                    oAmenityModel.setProperty("/Amenities", []); // show nothing
-                }
+                oAmenityModel.setProperty(
+                    "/Amenities",
+                    list.length ? this._convertAmenities(list) : []
+                );
 
             } catch (err) {
                 console.error("❌ Amenity load error:", err);
             }
+
             oAmenityModel.setProperty("/loading", false);
         },
+
 
         _convertAmenities: function (list) {
             return list.map(item => ({

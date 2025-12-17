@@ -90,7 +90,7 @@
 		<VBox class="unifiedCard">
 			<Image src="{FacilityModel>Image}" class="unifiedCardImg" />
 			<Text text="{FacilityModel>FacilityName}" class="unifiedCardTitle" />
-			<Text class="unifiedCardText" text="{        parts: [            'FacilityModel>Price',            'FacilityModel>Currency',            'FacilityModel>UnitText'        ],        formatter: '.Formatter.formatFacilityPrice'      }"/>
+			<Text class="unifiedCardText" text="{        parts: [            'FacilityModel>Price',            'FacilityModel>Currency',            'FacilityModel>UnitText'        ],        formatter: '.Formatter.formatFacilityPrice'      } - Onwards"/>
 					</VBox>
 	</items>
 </HBox>
