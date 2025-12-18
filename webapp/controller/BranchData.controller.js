@@ -26,6 +26,9 @@ sap.ui.define([
                     country: "",
                     state: "",
                     City: "",
+                    GSTIN: "",
+                    Type: "",
+                    Value: "",
                     Penalty: "",
                 });
                 this.getView().setModel(oMDmodel, "MDmodel");
@@ -34,6 +37,10 @@ sap.ui.define([
                     isEdit: false
                 });
                 this.getView().setModel(oeditable, "editableModel");
+                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                    CC_id_CustInput: false,
+                    selectedIndex: -1
+                }), "visiblePlay");
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     Photo1: "",
                     Photo1Type: "",
@@ -53,19 +60,19 @@ sap.ui.define([
             }
         },
 
-        Onsearch:async function () {
+        Onsearch: async function () {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
 
-           var filter={
-               UserID:oLoginmodel.EmployeeID
+            var filter = {
+                UserID: oLoginmodel.EmployeeID
             }
- 
 
-            var LoginData=await this.ajaxReadWithJQuery("HM_CustomerContact", filter).then((oData) => {
+
+            var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                  return oFCIAerData
+                return oFCIAerData
             })
-            const oExistingModel =LoginData;
+            const oExistingModel = LoginData;
             const oView = this.getView();
 
             let filters = {};
@@ -327,8 +334,12 @@ sap.ui.define([
                 country: "",
                 state: "",
                 baseLocation: "",
+                GSTIN: "",
+                Type: "",
+                Value: "",
                 Penalty: ""
             });
+            this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
             this.isEdit = false;
             this.oDialog.open();
         },
@@ -338,6 +349,9 @@ sap.ui.define([
             const oUpload = oView.getModel("UploadModel").getData();
             var oFacilitiesModel = oView.getModel("MDmodel");
             var Payload = oFacilitiesModel.getData();
+            if (!this.MC_ValidateGstNumber()) {
+                sap.m.MessageToast.show(this.i18nModel.getText("GST number should be in proper format (Eg:22AAAAA0000A1Z5)"));
+            }
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
@@ -345,6 +359,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
+                // utils._LCvalidateGstNumber(sap.ui.getCore().byId(oView.createId("MC_id_CustomGst"))) &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPenalty")), "ID")
 
@@ -389,25 +404,15 @@ sap.ui.define([
                 City: Payload.baseLocation,
                 Penalty: Payload.Penalty,
                 Photo1: oUpload.Photo1,
+                GSTIN: Payload.GSTIN,
+                Type: Payload.Type,
+                Value: Payload.Value,
                 Photo1Type: oUpload.Photo1Type,
                 Photo1Name: oUpload.Photo1Name
             };
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const aMainData = oView.getModel("mainModel").getData() || [];
-                // if (!this.isEdit) {
-                //     const isDuplicate = aMainData.some(item =>
-                //         item.BranchID === oData.BranchID
-                //     );
-
-                //     if (isDuplicate) {
-                //         sap.ui.core.BusyIndicator.hide();
-                //         sap.m.MessageBox.error(
-                //             "A branch with the same Branch ID already exists. Please use unique values."
-                //         );
-                //         return;
-                //     }
-                // }
                 if (this.isEdit && Payload.BranchID) {
                     delete oData.UserID;
                     await this.ajaxUpdateWithJQuery("HM_Branch", {
@@ -648,9 +653,23 @@ sap.ui.define([
                 country: oData.Country,
                 state: oData.State,
                 baseLocation: oData.City,
+                GSTIN: oData.GSTIN,
+                Type: oData.Type,
+                Value: oData.Value,
                 Penalty: oData.Penalty
             });
             this.isEdit = true;
+            const oVisible = this.getView().getModel("visiblePlay");
+            // Re-validate GST to refresh UI
+            setTimeout(() => {
+                this.MC_ValidateGstNumber();
+            }, 0);
+
+            if (oData.GST) {
+                oVisible.setProperty("/CC_id_CustInput", true);
+            } else {
+                oVisible.setProperty("/CC_id_CustInput", false);
+            }
             this._resetFacilityValueStates();
             this._applyCountryStateCityFilters();
             this.oDialog.open();
@@ -865,6 +884,94 @@ sap.ui.define([
 
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
+        },
+
+        MC_ValidateGstNumber: function (oEvent) {
+            const oInput = oEvent ? oEvent.getSource() : sap.ui.getCore().byId(this.getView().createId("MC_id_CustomGst"));
+            const sValue = oInput.getValue().trim();
+
+            const dataModel = this.getView().getModel("MDmodel");
+            const visiModel = this.getView().getModel("visiblePlay");
+
+            const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+
+            // GST optional
+            if (!sValue) {
+                oInput.setValueState("None");
+                visiModel.setProperty("/CC_id_CustInput", false);
+                visiModel.setProperty("/selectedIndex", -1);
+                dataModel.setProperty("/Type", "");
+                dataModel.setProperty("/Value", "");
+                return true;
+            }
+
+            // Invalid GST
+            if (!GST_REGEX.test(sValue)) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
+                visiModel.setProperty("/CC_id_CustInput", false);
+                visiModel.setProperty("/selectedIndex", -1);
+                return false;
+            }
+
+            // ✅ Valid GST
+            oInput.setValueState("None");
+            visiModel.setProperty("/CC_id_CustInput", true);
+
+            const stateCode = sValue.substring(0, 2);
+
+            if (stateCode === "29") {
+                visiModel.setProperty("/selectedIndex", 0); // CGST
+                dataModel.setProperty("/Type", "CGST/SGST");
+                dataModel.setProperty("/Value", "9");
+            } else {
+                visiModel.setProperty("/selectedIndex", 1); // IGST
+                dataModel.setProperty("/Type", "IGST");
+                dataModel.setProperty("/Value", "18");
+            }
+
+            return true;
         }
+
+        // MC_ValidateGstNumber: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     const sInputValue = oInput.getValue();
+        //     const dataModel = this.getView().getModel("MDmodel");
+        //     const visiModel = this.getView().getModel("visiblePlay");
+
+        //     // GST regex
+        //     const testPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+        //     if (testPattern.test(sInputValue) && sInputValue) {
+        //         visiModel.setProperty("/CC_id_CustInput", true);
+
+        //         // Extract first 2 digits (state code)
+        //         const stateCode = sInputValue.substring(0, 2);
+
+        //         // If state code is 29 (Karnataka)
+        //         if (stateCode === "29") {
+        //             sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
+        //             // visiModel.setProperty("/isRadioEditable", false); // Make radios non-editable
+        //             dataModel.setProperty("/value", "9");
+        //             dataModel.setProperty("/type", "CGST/SGST");
+        //         } else {
+        //             sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
+        //             dataModel.setProperty("/value", "18");
+        //             dataModel.setProperty("/type", "IGST");
+        //         }
+        //         oInput.setValueState("None");
+        //     } else if (!sInputValue) {
+        //         // Empty input
+        //         dataModel.setProperty("/value", "0");
+        //         dataModel.setProperty("/type", "");
+        //         oInput.setValueState("None");
+        //         visiModel.setProperty("/CC_id_CustInput", false);
+        //     } else {
+        //         // Invalid GST
+        //         visiModel.setProperty("/CC_id_CustInput", false);
+        //         oInput.setValueState("Error");
+        //         oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
+        //     }
+        // },
     })
 });

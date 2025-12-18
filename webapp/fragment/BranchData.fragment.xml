@@ -1,43 +1,35 @@
 <c:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core"
-	xmlns:u="sap.ui.unified">
-	<Dialog
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
         title="Fill Branch Details"
         type="Message"
-        class="sapUiContentPadding" resizable="true" contentWidth="30%"
-        draggable="true">
-		<f:SimpleForm
+        class="sapUiContentPadding"
+        resizable="true"
+        contentWidth="30%"
+        draggable="true"
+    >
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
-              labelSpanXL="4"
+            labelSpanXL="4"
             labelSpanL="3"
             labelSpanM="4"
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
-			<f:content>
-				<!-- <Label
-                    text="Branch Code"
-                    required="true"
-                />
-				<Input
-                    id="BD_idBranch"
-                    value="{MDmodel>/BranchID}"
-                    placeholder="Enter Branch Code"
-                    maxLength="60"
-                    editable="{= !${editableModel>/isEdit}}"
-                    liveChange="onBNameInputLiveChange"
-                    valueStateText="Enter Branch Code"
-                /> -->
-				<Label
+            columnsM="1"
+        >
+            <f:content>
+                <Label
                     text="Branch Name"
                     required="true"
                 />
-				<Input
+                <Input
                     id="BD_idBName"
                     value="{MDmodel>/Name}"
                     placeholder="Enter Branch Name"
@@ -45,11 +37,11 @@
                     liveChange="onNameInputLiveChange"
                     valueStateText="Enter Branch Name"
                 />
-				<Label
+                <Label
                     text="Address"
                     required="true"
                 />
-				<Input
+                <Input
                     id="BD_idAddress"
                     value="{MDmodel>/Address}"
                     placeholder="Enter Address"
@@ -57,11 +49,11 @@
                     liveChange="onAddressInputLiveChange"
                     valueStateText="Enter Address"
                 />
-				<Label
+                <Label
                     text="Pincode"
                     required="true"
                 />
-				<Input
+                <Input
                     id="BD_idPin"
                     value="{MDmodel>/Pincode}"
                     placeholder="Enter Pincode"
@@ -69,11 +61,11 @@
                     liveChange="onPinInputLiveChange"
                     valueStateText="Enter Pincode"
                 />
-				<Label
+                <Label
                     text="Country"
                     required="true"
                 />
-				<ComboBox
+                <ComboBox
                     id="MC_id_Country"
                     change="MC_onChangeCountry"
                     placeholder="Enter Country"
@@ -82,17 +74,17 @@
                     selectedKey="{MDmodel>/country}"
                     showSecondaryValues="true"
                 >
-					<core:ListItem
+                    <core:ListItem
                         key="{CountryModel>countryName}"
                         text="{CountryModel>countryName}"
                         additionalText="{CountryModel>code}"
                     />
-				</ComboBox>
-				<Label
+                </ComboBox>
+                <Label
                     text="State"
                     required="true"
                 />
-				<ComboBox
+                <ComboBox
                     id="MC_id_State"
                     change="MC_onChangeState"
                     placeholder="Enter State"
@@ -101,16 +93,16 @@
                     selectedKey="{MDmodel>/state}"
                     showSecondaryValues="true"
                 >
-					<core:ListItem
+                    <core:ListItem
                         key="{StateModel>stateName}"
                         text="{StateModel>stateName}"
                     />
-				</ComboBox>
-				<Label
+                </ComboBox>
+                <Label
                     text="City"
                     required="true"
                 />
-				<ComboBox
+                <ComboBox
                     id="MC_id_City"
                     change="MC_onChangeCity"
                     valueStateText="Select City"
@@ -120,27 +112,64 @@
                     value="{MDmodel>/baseLocation}"
                     showSecondaryValues="true"
                 >
-					<core:ListItem
+                    <core:ListItem
                         key="{CityModel>cityName}"
                         text="{CityModel>cityName}"
                         additionalText="{CityModel>branchCode}"
                     />
-				</ComboBox>
-				<Label text="Mobile Number" required="true"/>
-				<HBox
+                </ComboBox>
+                <Label text="GSTIN" />
+                <Input
+                    value="{MDmodel>/GSTIN}"
+                    maxLength="15"
+                    placeholder="Enter GST No"
+                    id="MC_id_CustomGst"
+                    liveChange="MC_ValidateGstNumber"
+                    valueStateText="GST number should be in proper format (Eg:22AAAAA0000A1Z5)"
+                />
+                <Label
+                    text="Type"
+                    labelFor="groupC"
+                />
+                <RadioButtonGroup
+                    visible="{visiblePlay>/CC_id_CustInput}"
+                    select="onRadioButtonChange"
+                    selectedIndex="{visiblePlay>/selectedIndex}"
+                    id="MC_id_groupCustGst"
+                    columns="2"
+                    editable="false"
+                >
+                    <RadioButton text="{i18n>cgst}" />
+                    <RadioButton text="{i18n>igst}" />
+                </RadioButtonGroup>
+                <Label
+                    visible="{visiblePlay>/CC_id_CustInput}"
+                    text="Tax Percentage"
+                />
+                <Input
+                    visible="{visiblePlay>/CC_id_CustInput}"
+                    id="CC_id_custValue"
+                    value="{MDmodel>/Value}"
+                    maxLength="5"
+                />
+                <Label
+                    text="Mobile Number"
+                    required="true"
+                />
+                <HBox
                     width="100%"
                     justifyContent="Start"
                     alignItems="Center"
                 >
-					<VBox width="22%">
-						<Input
+                    <VBox width="22%">
+                        <Input
                             id="MC_id_codeModel"
                             value="{MDmodel>/stdCode}"
                             editable="false"
                         />
-					</VBox>
-					<VBox width="78%">
-						<Input
+                    </VBox>
+                    <VBox width="78%">
+                        <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
                             placeholder="Enter Contact Number"
@@ -148,13 +177,13 @@
                             liveChange="onPhoneInputLiveChange"
                             valueStateText="Enter Contact Number"
                         />
-					</VBox>
-				</HBox>
-				<Label
+                    </VBox>
+                </HBox>
+                <Label
                     text="Penalty"
                     required="true"
                 />
-				<Input
+                <Input
                     id="BD_idPenalty"
                     value="{MDmodel>/Penalty}"
                     placeholder="Enter Penalty"
@@ -162,9 +191,7 @@
                     liveChange="onPenaltyInputLiveChange"
                     valueStateText="Enter Penalty"
                 />
-                <Label
-                    text="Add Logo"
-                />
+                <Label text="Add Logo" />
                 <VBox
                     alignItems="Start"
                     width="100%"
@@ -209,23 +236,23 @@
                         </ScrollContainer>
                     </HBox>
                 </VBox>
-			</f:content>
-		</f:SimpleForm>
-		<footer>
-			<Toolbar>
-				<ToolbarSpacer />
-				<Button
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
                     id="BD_id_saveButoon"
                     text="Save"
                     class="myUnifiedBtn"
                     press="MD_onSaveButtonPress"
                 />
-				<Button
+                <Button
                     text="Cancel"
                     class="myUnifiedBtn"
                     press="MD_onCancelButtonPress"
                 />
-			</Toolbar>
-		</footer>
-	</Dialog>
+            </Toolbar>
+        </footer>
+    </Dialog>
 </c:FragmentDefinition>
