@@ -63,8 +63,7 @@ sap.ui.define([
             this._oSelectedIndex = idx;
         },
 
-        // --- Open edit dialog for selected facility ---
-    // --- Open edit dialog for selected facility ---
+      
 // --- Open edit dialog for selected facility ---
 onEditFacilityDetails: function () {
 
@@ -98,7 +97,7 @@ onEditFacilityDetails: function () {
         oSafeCopy.TotalTime = iTotal.toFixed(2); // "1.00"
     }
 
-    this._oEditModel = new sap.ui.model.json.JSONModel(oSafeCopy);
+    this._oEditModel = new JSONModel(oSafeCopy);
 
     // Bind model to view + dialog
     this.getView().setModel(this._oEditModel, "edit");
@@ -158,7 +157,6 @@ _filterRateTypesForEdit: function () {
     const sBranchCode = this._oSelectedFacility.BranchCode || this._oSelectedFacility.Branch || "";
     const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
 
-    // Find the full facility object
     const oFacilityData = aFacilities.find(f =>
         f.FacilityName === this._oSelectedFacility.FacilityName &&
         f.BranchCode === sBranchCode
@@ -170,15 +168,30 @@ _filterRateTypesForEdit: function () {
         return;
     }
 
-    // Get RateType model from manifest.json
     const oRateTypeModel = this.getOwnerComponent().getModel("RateType");
 
-    // Save original full list once
     if (!this._aOriginalRateTypes) {
         this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
     }
 
-    // Map prices from selected facility
+    // 🔹 Booking Duration selection
+    const sSelectedPriceType =
+        this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
+
+    // 🔹 Allowed units based on Booking Duration
+    let aAllowed = [];
+
+    if (sSelectedPriceType === "Per Day") {
+        aAllowed = ["Per Hour", "Per Day"];
+    }
+    else if (sSelectedPriceType === "Per Month") {
+        aAllowed = ["Per Hour", "Per Day", "Per Month"];
+    }
+    else if (sSelectedPriceType === "Per Year") {
+        aAllowed = ["Per Hour", "Per Day", "Per Month", "Per Year"];
+    }
+
+    // 🔹 Price mapping
     const priceMapping = {
         "Per Hour": Number(oFacilityData.PricePerHour),
         "Per Day": Number(oFacilityData.PricePerDay),
@@ -186,17 +199,13 @@ _filterRateTypesForEdit: function () {
         "Per Year": Number(oFacilityData.PricePerYear)
     };
 
-    // Keep only units that have price > 0
+    // ✅ FINAL FILTER (Allowed by duration + price > 0)
     const aFiltered = this._aOriginalRateTypes.filter(rt =>
-        priceMapping[rt.RateType] > 0
+        aAllowed.includes(rt.RateType) && priceMapping[rt.RateType] > 0
     );
 
-    // Update dropdown binding
     oRateTypeModel.setData(aFiltered);
 },
-
-
-
 
 
         _parsePossibleDateString: function (s) {

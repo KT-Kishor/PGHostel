@@ -1122,6 +1122,18 @@ sap.ui.define([
                                 }
                             })
                         ] : []),
+                       new sap.m.HBox({
+            justifyContent: "Start",
+            items: [
+                new sap.m.MessageStrip({
+                    text: "Select a facility by clicking on the image",
+                    type: sap.ui.core.MessageType.Information,
+                    showIcon: true,
+                    showCloseButton: false,
+                    width: "auto"
+                })
+            ]
+        }).addStyleClass("sapUiSmallMarginBottom"),
 
                         new sap.m.FlexBox({
                             wrap: "Wrap",
@@ -1205,7 +1217,7 @@ sap.ui.define([
                                                 }),
 
                                                 // Facility name overlay (hover effect)
-                                                (() => {
+ (() => {
                                                     const oHTML = new sap.ui.core.HTML({
                                                         content: `
                       <div class="facility-overlay">
@@ -4188,7 +4200,7 @@ sap.ui.define([
                     });
                     this.getView().addDependent(this._oProfileDialog);
                 }
-                const oTempModel = new sap.ui.model.json.JSONModel({
+                const oTempModel = new JSONModel({
                     bookings: [],
                     Payments: [],
                     isEditMode: false,
@@ -4299,7 +4311,7 @@ sap.ui.define([
                 // this.byId("id_dialog").removeStyleClass("dialogBlur");
             } catch (err) {
                 console.error("Profile Load Error:", err);
-                const oProfileModel = new sap.ui.model.json.JSONModel({
+                const oProfileModel = new JSONModel({
                     ...fullUserData,
                     photo: "data:image/png;base64," + oUser.FileContent || "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
