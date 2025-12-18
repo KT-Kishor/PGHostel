@@ -253,6 +253,20 @@
           "target": [
             "TargetManageStaff"
           ]
+        },
+         {
+          "name": "RouteManageVendor",
+          "pattern": "ManageVendor",
+          "target": [
+            "TargetManageVendor"
+          ]
+        },
+        {
+          "name": "RouteManageVendorDetail",
+          "pattern": "ManageVendorDetail/{UserID}",
+          "target": [
+            "TargetManageVendorDetail"
+          ]
         }
       ],
       "targets": {
@@ -388,8 +402,22 @@
           "clearControlAggregation": false,
           "viewId": "ManageStaff",
           "viewName": "ManageStaff"
-        }
+        },
+         "TargetManageVendor": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageVendor",
+          "viewName": "ManageVendor"
+      },
+      "TargetManageVendorDetail": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageVendorDetail",
+          "viewName": "ManageVendorDetail"
       }
+    }
     },
     "rootView": {
       "viewName": "sap.ui.com.project1.view.App",

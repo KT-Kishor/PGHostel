@@ -737,7 +737,8 @@ sap.ui.define([
             "ManageAmenities": "/ManageAmenities",
             "ManageInvoice": "/ManageInvoice",
             "ManageCoupon": "/ManageCoupon",
-            "ManageStaff": "/ManageStaff"
+            "ManageStaff": "/ManageStaff",
+            "ManageVendor": "/ManageVendor"
           };
 
           const modelPath = tileMap[value];

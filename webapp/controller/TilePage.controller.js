@@ -8,6 +8,7 @@ sap.ui.define([
         onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("TilePage").attachMatched(this._onRouteMatched, this);
         },
+        
         _onRouteMatched: function() {
              this.AppVisibilityReadCall();
         },
@@ -81,6 +82,9 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageStaff");
         },	
-
+        TileV_onpressManageVendor:function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteManageVendor");
+        }
     })
 })

@@ -126,6 +126,17 @@
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
+
+                 <GenericTile
+                    visible="{= ${TileVisibility>/ManageVendor} !== 0 }"
+                    class="sapUiMediumMargin glassTile"
+                    header="Manage Vendors"
+                    press="TileV_onpressManageVendor"
+                >
+                    <TileContent unit="Vendor Directory">
+                        <ImageContent src="sap-icon://employee" />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <footer>

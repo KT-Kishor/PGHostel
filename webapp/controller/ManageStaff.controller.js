@@ -246,7 +246,7 @@ sap.ui.define([
                 State: data.State,
                 City: data.City,
                 Address: data.Address.trim(),
-                Type: "Vendor"
+                Type: this.getOwnerComponent().getModel("LoginModel").getData().UserID
             };
 
             const isUpdate = !!data.UserID;
@@ -283,9 +283,7 @@ sap.ui.define([
 
         Onsearch: function(flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-
             var oView = this.getView();
-            var oTable = oView.byId("MS_id_ManageStaff");
 
             // Read FilterBar inputs
             var sUserID = oView.byId("MS_id_UserID").getSelectedKey() ||
@@ -304,7 +302,7 @@ sap.ui.define([
             let filters = {};
 
             // Always apply Vendor type
-            filters.Type = "Vendor";
+            filters.Type = oExistingModel.Type;
 
             // BranchCode applied based on role
             if (oExistingModel.Role !== "") {
@@ -340,12 +338,10 @@ sap.ui.define([
                     this.getView().setModel(model, "mainModel");
 
                     this._populateUniqueFilterValues(this._originalStaffData);
-                })
-                .catch((err) => {
+                }).catch((err) => {
                     sap.ui.core.BusyIndicator.hide();
                     sap.m.MessageToast.show(err.message || err.responseText);
-                })
-                .finally(() => {
+                }).finally(() => {
                     sap.ui.core.BusyIndicator.hide();
                 });
         },
