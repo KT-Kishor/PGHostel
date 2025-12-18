@@ -81,10 +81,10 @@
 		</layoutData>
 	</ComboBox>
 	<!-- Mobile: 70% -->
-	<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid Mobile Number">
-		<layoutData>
-			<FlexItemData baseSize="70%" growFactor="1" />
-		</layoutData>
+<Input class="sapUiTinyMarginBegin" id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid mobile number">
+	<layoutData>
+		<FlexItemData baseSize="70%" growFactor="1" />
+	</layoutData>
 	</Input>
 </HBox>
 			

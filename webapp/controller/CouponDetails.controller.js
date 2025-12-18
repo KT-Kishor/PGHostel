@@ -22,49 +22,33 @@ sap.ui.define([
                 CurrentCoupon: {}         // bound to dialog
             });
             this.getView().setModel(oViewModel, "CouponView");
+            if (!this.getView().getModel("CouponModel")) {
+                this.getView().setModel(new JSONModel([]), "CouponModel");
+            }
         },
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
-        // _onRouteMatched: function () {
-        //     const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-        //     if (oLoginModel) {
-        //         this.getView().setModel(oLoginModel, "LoginModel");
-        //     }
-        //     this._loadCoupons();
-        //     this._loadRecipientContacts();
-        //     this._loadBranchCode();
-        // },
+
         _onRouteMatched: async function () {
-            var LoginFunction = await this.commonLoginFunction();
-            if (!LoginFunction) return;
-            this.onClearAndSearch("couponFilterBar");
-            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-            if (oLoginModel) {
-                this.getView().setModel(oLoginModel, "LoginModel");
-            }
+            const ok = await this.commonLoginFunction();
+            if (!ok) return;
 
+            await this._loadBranchCode();
+
+            // fire-and-forget background load
             this._loadRecipientContacts();
-            this._loadBranchCode();
 
-            // ✅ ENSURE MODEL EXISTS FIRST (important)
-            await this._loadCoupons();
-
-            // ✅ PREFILL FY DATE RANGE
             const { fyStart, fyEnd } = this._getFinancialYearDates();
             const oRange = this.byId("fEndRange");
 
-            if (oRange) {
-                oRange.setDateValue(fyStart);
-                oRange.setSecondDateValue(fyEnd);
-            }
+            oRange.setDateValue(fyStart);
+            oRange.setSecondDateValue(fyEnd);
 
-            // ✅ AUTO SEARCH (same as invoice)
-            this.onCouponSearch();
+            // single visible data load
+            await this.onCouponSearch();
         },
-
-
 
         _getFinancialYearDates: function () {
             const now = new Date();
@@ -88,7 +72,7 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
-             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
@@ -96,9 +80,9 @@ sap.ui.define([
             if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel
                     .map(item => item.BranchID)
-                    .flat()           
-                    .filter(Boolean)    
-                    .join(",");         
+                    .flat()
+                    .filter(Boolean)
+                    .join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
@@ -147,73 +131,6 @@ sap.ui.define([
                 oBranchCB.setSelectedItem(oMatch);
             }
         },
-        _loadCoupons: async function () {
-        const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-             let aBranchCodes = [];
-
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
-            }
-
-            let filters = {};
-
-            if (oExistingModel.Role !== "") {
-                filters = { BranchCode: aBranchCodes };
-            }
-            var oView = this.getView();
-            var oTable = oView.byId("couponTable");
-            try {
-                this._showTableRowsBusy(true);
-                var result = await this.ajaxReadWithJQuery("HM_Coupon", filters);
-                var aCoupons;
-                if (Array.isArray(result.data)) aCoupons = result.data;
-                else if (result.data) aCoupons = [result.data];
-                else aCoupons = [];
-                aCoupons = aCoupons.map(function (c) {
-                    if (c.StartDate) c.StartDate = c.StartDate.substring(0, 10);
-                    if (c.EndDate) c.EndDate = c.EndDate.substring(0, 10);
-                    if (c.CreatedAt && c.CreatedAt.includes("T")) {
-                        c.CreatedAt = c.CreatedAt.replace("T", " ").substring(0, 19);
-                    }
-                    // 🔥 Explicit priority for grouping/sorting
-                    var mPriority = {
-                        "Active": 1,
-                        "Inactive": 2,
-                        "Expired": 3
-                    };
-                    c.StatusOrder = mPriority[c.Status] || 99;
-                    return c;
-                });
-                var oModel = new JSONModel(aCoupons);
-                oView.setModel(oModel, "CouponModel");
-                var oBinding = oTable.getBinding("items");
-                var aSorters = [
-                    // 1️⃣ Group and order by StatusOrder (1 → 2 → 3)
-                    new sap.ui.model.Sorter("StatusOrder", false, function (oContext) {
-                        var sStatus = oContext.getProperty("Status");
-                        var iOrder = oContext.getProperty("StatusOrder");
-                        return {
-                            key: iOrder,                 // used for group ordering
-                            text: sStatus + " Coupons"    // what user sees
-                        };
-                    }),
-                    // 2️⃣ Inside each status group → oldest EndDate first
-                    new sap.ui.model.Sorter("EndDate", false),
-                    // 3️⃣ Tie-breaker → higher DiscountValue first
-                    new sap.ui.model.Sorter("DiscountValue", true)
-                ];
-                oBinding.sort(aSorters);
-            } catch (err) {
-                MessageBox.error(
-                    err?.responseJSON?.message || "Failed to Load Coupons (HM_Coupon)."
-                );
-            } finally {
-                // oTable.setBusy(false);
-                this._showTableRowsBusy(false);
-            }
-        },
         createGroupHeader: function (oGroup) {
             return new sap.m.GroupHeaderListItem({
                 title: oGroup.text,
@@ -248,13 +165,12 @@ sap.ui.define([
             });
             this._openCouponDialog();
         },
-
         onEditCoupon: function () {
             var oTable = this.getView().byId("couponTable");
             var oItem = oTable.getSelectedItem();
             var aSel = oTable.getSelectedItems();
             if (!aSel || aSel.length !== 1) {
-                MessageToast.show("Please Select One Coupon to Edit");
+                MessageToast.show("Please select one coupon to edit");
                 return;
             }
             var oItem = aSel[0];   // safe to use
@@ -265,16 +181,15 @@ sap.ui.define([
             oViewModel.setProperty("/CurrentCoupon", oData);
             this._openCouponDialog();
         },
-
         onDeleteCoupon: async function () {
             var oTable = this.getView().byId("couponTable");
             var aSelectedItems = oTable.getSelectedItems();
             if (!aSelectedItems.length) {
-                MessageToast.show("Please Select at Least One Coupon to Delete.");
+                MessageToast.show("Please select at least one coupon to delete.");
                 return;
             }
             MessageBox.confirm(
-                `Delete ${aSelectedItems.length} Selected Coupon(s)?`,
+                `Delete ${aSelectedItems.length} selected coupon(s)?`,
                 {
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -292,11 +207,13 @@ sap.ui.define([
                                     }
                                 });
                             }
-                            MessageToast.show("Selected Coupons Deleted Successfully.");
-                            this._loadCoupons();
+                            MessageToast.show("Selected coupons deleted successfully.");
+                            // this._loadCoupons();
+                            this.onCouponSearch();
+
                         } catch (err) {
                             console.error("Delete failed:", err);
-                            MessageBox.error("Error while Deleting Coupons.");
+                            MessageBox.error("Error while deleting coupons.");
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
                             oTable.removeSelections(true);
@@ -305,12 +222,11 @@ sap.ui.define([
                 }
             );
         },
-
         onDownloadCoupons: function () {
             var oTable = this.getView().byId("couponTable");
             var oBinding = oTable.getBinding("items");
             if (!oBinding || !oBinding.getLength || oBinding.getLength() === 0) {
-                MessageBox.info("No Coupons available to Download.");
+                MessageBox.info("No coupons available to download.");
                 return;
             }
             var aCols = this._createColumnConfig();
@@ -453,13 +369,13 @@ sap.ui.define([
                     sap.ui.getCore().byId(oView.createId("dpEndDate")), "ID"
                 );
             if (!bValid) {
-                MessageToast.show("Please Fill all Mandatory Fields Correctly.");
+                MessageToast.show("Please fill all mandatory fields correctly.");
                 return;
             }
             let dStart = new Date(oVM.getProperty("/CurrentCoupon/StartDate"));
             let dEnd = new Date(oVM.getProperty("/CurrentCoupon/EndDate"));
             if (dEnd < dStart) {
-                MessageToast.show("End Date Cannot be Less than Start Date");
+                MessageToast.show("End Date cannot be less than Start Date");
                 return;
             }
             if (sMode === "Add") {
@@ -478,10 +394,10 @@ sap.ui.define([
                     await this.ajaxCreateWithJQuery("HM_Coupon", {
                         data: oCoupon
                     });
-                    MessageToast.show("Coupon Created Successfully.");
+                    MessageToast.show("Coupon created successfully.");
                 } else {
                     if (!oCoupon.CouponId) {
-                        MessageBox.error("Update Failed: CouponId Missing.");
+                        MessageBox.error("Update failed: CouponId missing.");
                         return;
                     }
                     await this.ajaxUpdateWithJQuery("HM_Coupon", {
@@ -504,20 +420,21 @@ sap.ui.define([
                                     ?.getProperty("/EmployeeName") || oCoupon.CreatedBy
                         }
                     });
-                    MessageToast.show("Coupon Updated Successfully.");
+                    MessageToast.show("Coupon updated successfully.");
                 }
                 this._oCouponDialog.close();
                 this._clearTableSelection();
-                this._loadCoupons();
+                // this._loadCoupons();
+                this.onCouponSearch();
+
             } catch (err) {
                 MessageBox.error(
-                    err?.responseJSON?.message || "Failed to Save Coupon."
+                    err?.responseJSON?.message || "Failed to save coupon."
                 );
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
         onDialogAfterClose: function () {
             const oVM = this.getView().getModel("CouponView");
             // Reset model
@@ -556,19 +473,34 @@ sap.ui.define([
                 }
             });
         },
+        onDateRangeChange: function () {
+            // Intentionally empty
+            // Prevents FilterBar auto-search cascade
+        },
+
 
         onCouponSearch: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
 
-                const { fyStart, fyEnd } = this._getFinancialYearDates();
-                let bDateProvided = false;
+                sap.ui.core.BusyIndicator.show(0);
+                const oRange = this.byId("fEndRange");
+
+
 
                 const aItems = this.byId("couponFilterBar").getFilterGroupItems();
                 const params = {};
 
                 let sStartDate = "";
                 let sEndDate = "";
+
+                const dFrom = oRange.getDateValue();
+                const dTo = oRange.getSecondDateValue();
+
+                if (dFrom && dTo) {
+                    sStartDate = dFrom.toISOString().split("T")[0];
+                    sEndDate = dTo.toISOString().split("T")[0];
+                }
+
 
                 aItems.forEach(item => {
                     const ctrl = item.getControl();
@@ -604,43 +536,54 @@ sap.ui.define([
                             if (dFrom && dTo) {
                                 sStartDate = dFrom.toISOString().split("T")[0];
                                 sEndDate = dTo.toISOString().split("T")[0];
-                                bDateProvided = true;
+
+
                             }
                             break;
                         }
                     }
                 });
 
-                // ✅ DATE DECISION — AFTER LOOP (correct)
-                if (!bDateProvided) {
-                    sStartDate = fyStart.toISOString().split("T")[0];
-                    sEndDate = fyEnd.toISOString().split("T")[0];
 
-                    const oRange = this.byId("fEndRange");
-                    if (oRange) {
-                        oRange.setDateValue(fyStart);
-                        oRange.setSecondDateValue(fyEnd);
-                    }
-                }
 
                 const oResult = await this.ajaxReadWithJQuery("HM_Coupon", {
                     ...params,
                     StartDate: sStartDate,
                     EndDate: sEndDate
                 });
-
                 const aData = this._normalizeCouponResult(oResult);
                 this.getView().getModel("CouponModel").setData(aData);
+                this._applyCouponGroupingAndSorting();
+
+
+
 
             } catch (err) {
                 sap.m.MessageBox.error(
                     err?.responseJSON?.message ||
                     err?.message ||
-                    "Failed to Filter Coupons."
+                    "Failed to filter coupons."
                 );
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+        },
+        _applyCouponGroupingAndSorting: function () {
+            const oTable = this.byId("couponTable");
+            const oBinding = oTable.getBinding("items");
+
+            if (!oBinding) return;
+
+            oBinding.sort([
+                new sap.ui.model.Sorter("StatusOrder", false, function (oCtx) {
+                    return {
+                        key: oCtx.getProperty("StatusOrder"),
+                        text: oCtx.getProperty("Status") + " Coupons"
+                    };
+                }),
+                new sap.ui.model.Sorter("EndDate", false),
+                new sap.ui.model.Sorter("DiscountValue", true)
+            ]);
         },
 
         _normalizeCouponResult: function (oResult) {
@@ -705,7 +648,7 @@ sap.ui.define([
             // Must have discount type selected first
             if (!sType) {
                 oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText("Select Discount Type First");
+                oInput.setValueStateText("Select Discount Type first");
                 return;
             }
             // Only digits + optional decimal
@@ -766,14 +709,13 @@ sap.ui.define([
             }
             oInput.setValueState(sap.ui.core.ValueState.None);
         },
-
         onLiveChange_MinAmount: function (oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
-
         onChange_Status: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
+
 
         onChange_Date: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -813,36 +755,12 @@ sap.ui.define([
                 oTable.removeSelections(true);
             }
         },
-
         onDialogClose: function () {
             if (this._oCouponDialog) {
                 this._oCouponDialog.close();
             }
         },
-        ///
-        // async _loadRecipientContacts() {
-        //     const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", {});
-        //     const aContacts = (oData?.data || []).map(c => ({
-        //         UserName: c.UserName,
-        //         Role: c.Role,
-        //         Email: c.EmailID,
-        //         BranchId: c.BranchId,
-        //         BranchCode: c.BranchCode
-        //     }));
-        //     this._aAllRecipients = aContacts;
-        //     // 🔹 1) Get how many rows we actually have
-        //     const iLength = aContacts.length;
-        //     const iSizeLimit = Math.min(Math.max(iLength, 100), 2000);
-        //     // 🔹 3) Create model and apply dynamic size limit
-        //     const oRecipientModel = new JSONModel(aContacts);
-        //     oRecipientModel.setSizeLimit(iSizeLimit);
-        //     console.log("Recipients:", iLength, "SizeLimit:", iSizeLimit);
-        //     this.getView().setModel(oRecipientModel, "RecipientModel");
-        //     // Roles (unchanged)
-        //     const aRoles = [...new Set(aContacts.map(c => c.Role))];
-        //     this.getView().setModel(new JSONModel(aRoles), "RoleModel");
-        //     return aContacts;
-        // },
+
 
         async _loadRecipientContacts() {
             try {
@@ -874,7 +792,7 @@ sap.ui.define([
             } catch (err) {
 
                 sap.m.MessageBox.error(
-                    err?.responseJSON?.message || "Failed to Load Contacts."
+                    err?.responseJSON?.message || "Failed to load contacts."
                 );
                 return [];
 
@@ -883,18 +801,20 @@ sap.ui.define([
             }
         },
 
+
+
         onShareCoupon: async function () {
             const oTable = this.byId("couponTable");
             const aSel = oTable ? oTable.getSelectedItems() : [];
             if (!aSel || aSel.length !== 1) {
-                MessageToast.show("Select One Coupon to Share.");
+                MessageToast.show("Select one coupon to share.");
                 return;
             }
             this._oCouponToShare =
                 aSel[0].getBindingContext("CouponModel").getObject();
             const aRecipients = this._aAllRecipients || [];
             if (!aRecipients.length) {
-                MessageToast.show("No Contacts Found.");
+                MessageToast.show("No contacts found.");
                 return;
             }
             if (!this._oShareDialog) {
@@ -908,7 +828,6 @@ sap.ui.define([
             }
             this._oShareDialog.open();
         },
-
         onRoleChange: function (e) {
             const sRole = e.getSource().getSelectedKey();
             const aUsers = this._aAllRecipients
@@ -919,7 +838,6 @@ sap.ui.define([
             // Reset user selection after role switch
             this.byId("cbUser").setSelectedKeys([]);
         },
-
         onConfirmShareCoupon: async function () {
 
             const oView = this.getView();
@@ -928,19 +846,19 @@ sap.ui.define([
             const oMail = sap.ui.getCore().byId(oView.createId("inpManualEmail"));
 
             if (!utils._LCstrictValidationComboBox(oRole, "ID")) {
-                MessageToast.show("Please Select a Valid Role");
+                MessageToast.show("Please select a valid Role");
                 return;
             }
 
             const sEmails = oMail.getValue().trim();
             if (sEmails && !utils._LCvalidateEmail(oMail, "ID")) {
-                MessageToast.show("Please Enter Valid Email Address(es)");
+                MessageToast.show("Please enter valid email address(es)");
                 return;
             }
 
             const bHasRecipients = oMCB.getSelectedKeys().length > 0;
             if (!bHasRecipients && !sEmails) {
-                MessageToast.show("Select at Least One u\User or Enter Manual Email");
+                MessageToast.show("Select at least one user or enter manual email");
                 return;
             }
 
@@ -978,7 +896,7 @@ sap.ui.define([
             }
 
             if (!aUsers.length) {
-                MessageToast.show("No Valid Recipients Found");
+                MessageToast.show("No valid recipients found");
                 return;
             }
 
@@ -986,13 +904,13 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.show(0);
 
                 await this.ajaxCreateWithJQuery("CouponCodeEmail", { users: aUsers });
-                MessageToast.show("Coupons Sent");
+                MessageToast.show("Coupons sent");
                 this._oShareDialog.close();
 
             } catch (err) {
 
                 sap.m.MessageBox.error(
-                    err?.responseJSON?.message || "Failed to Send Coupon."
+                    err?.responseJSON?.message || "Failed to send coupon."
                 );
 
             } finally {
@@ -1000,63 +918,6 @@ sap.ui.define([
             }
         },
 
-        // onConfirmShareCoupon: async function () {
-        //     const oView = this.getView();
-        //     const oRole = sap.ui.getCore().byId(oView.createId("cbRole"));
-        //     const oMCB = sap.ui.getCore().byId(oView.createId("cbUser"));
-        //     const oMail = sap.ui.getCore().byId(oView.createId("inpManualEmail"));
-        //     if (!utils._LCstrictValidationComboBox(oRole, "ID")) {
-        //         MessageToast.show("Please select a valid Role");
-        //         return;
-        //     }
-        //     const sEmails = oMail.getValue().trim();
-        //     if (sEmails && !utils._LCvalidateEmail(oMail, "ID")) {
-        //         MessageToast.show("Please enter valid email address(es)");
-        //         return;
-        //     }
-        //     const bHasRecipients = oMCB.getSelectedKeys().length > 0;
-        //     if (!bHasRecipients && !sEmails) {
-        //         MessageToast.show("Select at least one user or enter manual email");
-        //         return;
-        //     }
-        //     const c = this._oCouponToShare;
-        //     const aUsers = [];
-        //     // MultiComboBox selections
-        //     oMCB.getSelectedItems().forEach(item => {
-        //         aUsers.push({
-        //             UserName: item.getText(),
-        //             toEmailID: item.getAdditionalText(),
-        //             COUPONNUMBER: c.CouponCode,
-        //             StartDate: c.StartDate,
-        //             EndDate: c.EndDate,
-        //             MinOrderValue: c.MinOrderValue,
-        //             PerUserLimit: c.PerUserLimit
-        //         });
-        //     });
-        //     // Manual emails
-        //     if (sEmails) {
-        //         sEmails.split(/[,;]+/).forEach(email => {
-        //             email = email.trim();
-        //             if (!email) return;
-        //             aUsers.push({
-        //                 UserName: "Customer",
-        //                 toEmailID: email,
-        //                 COUPONNUMBER: c.CouponCode,
-        //                 StartDate: c.StartDate,
-        //                 EndDate: c.EndDate,
-        //                 MinOrderValue: c.MinOrderValue,
-        //                 PerUserLimit: c.PerUserLimit
-        //             });
-        //         });
-        //     }
-        //     if (!aUsers.length) {
-        //         MessageToast.show("No valid recipients found");
-        //         return;
-        //     }
-        //     await this.ajaxCreateWithJQuery("CouponCodeEmail", { users: aUsers });
-        //     MessageToast.show("Coupons sent");
-        //     this._oShareDialog.close();
-        // },
         onCloseShareDialog: function () {
             this._oShareDialog.close();
         },
@@ -1068,12 +929,11 @@ sap.ui.define([
             const bValid = oMCB.getSelectedKeys().length > 0;
             if (!bValid) {
                 oMCB.setValueState("Error");
-                oMCB.setValueStateText("Select at least one Recipient or enter Manual Email");
+                oMCB.setValueStateText("Select at least one recipient or enter manual email");
             } else {
                 oMCB.setValueState("None");
             }
         },
-
         onManualEmailLiveChange: function (e) {
             const oInput = e.getSource();
             const sVal = oInput.getValue().trim();
@@ -1083,7 +943,6 @@ sap.ui.define([
             }
             utils._LCvalidateEmail(e);
         },
-
         onShareDialogAfterClose: function () {
             const oView = this.getView();
             const oRole = sap.ui.getCore().byId(oView.createId("cbRole"));
