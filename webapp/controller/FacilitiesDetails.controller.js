@@ -162,7 +162,7 @@ sap.ui.define([
             if (!oFile) return;
 
             if (oFile.size > 2 * 1024 * 1024) {
-                sap.m.MessageToast.show(`"${oFile.name}" exceeds the 2 MB file size limit.`);
+                sap.m.MessageToast.show(`"${oFile.name}" Exceeds the 2 MB File Size Limit.`);
                 return;
             }
 
@@ -175,13 +175,13 @@ sap.ui.define([
                 const aRealImages = aImages.filter(img => !img.isPlaceholder);
                 const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
                 if (bFileNameDuplicate) {
-                    sap.m.MessageToast.show(`"${oFile.name}" is already added.`);
+                    sap.m.MessageToast.show(`"${oFile.name}" is already Added.`);
                     return;
                 }
 
                 const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
-                    sap.m.MessageToast.show(`This image is already added.`);
+                    sap.m.MessageToast.show(`This Image is already Added.`);
                     return;
                 }
 
@@ -240,11 +240,11 @@ sap.ui.define([
 
                 // Image validations
                 if (attachments.length === 0) {
-                    sap.m.MessageBox.error("Please upload at least one image.");
+                    sap.m.MessageBox.error("Please Upload at Least One Image.");
                     return;
                 }
                 if (attachments.length > 3) {
-                    sap.m.MessageBox.error("You can upload a maximum of 3 images only.");
+                    sap.m.MessageBox.error("You can Upload a Maximum of 3 Images Only.");
                     return;
                 }
 
@@ -258,7 +258,7 @@ sap.ui.define([
                 });
 
                 if (bDuplicate) {
-                    sap.m.MessageToast.show("Facility with the same rate type already exists for this branch.");
+                    sap.m.MessageToast.show("Facility with the Same Rate type already Exists for this Branch.");
                     return;
                 }
 
@@ -326,7 +326,7 @@ sap.ui.define([
 
                     await this._refreshFacilityDetails(Payload.ID);
                     this.getView().getModel("editable").setProperty("/Edit", false)
-                    sap.m.MessageToast.show("Facility updated successfully!");
+                    sap.m.MessageToast.show("Facility Updated Successfully!");
                 } catch (err) {
                     sap.m.MessageToast.show(err.message || err.responseText);
                 } finally {
@@ -368,7 +368,7 @@ sap.ui.define([
                 }), "DisplayImagesModel");
 
             } catch (err) {
-                sap.m.MessageToast.show("Error refreshing facility details");
+                sap.m.MessageToast.show("Error Refreshing Facility Details");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }

@@ -232,7 +232,7 @@ sap.ui.define([
                         InvNo: this.decodedPath
                     })
                 } catch (error) {
-                    MessageToast.show(error.responseText || "Failed to load invoice data.");
+                    MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -324,7 +324,7 @@ sap.ui.define([
 
                     const bookingDetails = oData.data?.BookingData?.[0];
                     if (!bookingDetails) {
-                        sap.m.MessageToast.show("Booking details not found");
+                        sap.m.MessageToast.show("Booking Details not Found");
                         return;
                     }
 
@@ -334,7 +334,7 @@ sap.ui.define([
 
                     const hasRoomPrice = bookingDetails.BookingPrice && parseFloat(bookingDetails.BookingPrice) > 0;
                     if (hasRoomPrice === 0) {
-                        MessageBox.information("Booking is fully completed. No new invoice can be generated.");
+                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
                         return;
                     }
 
@@ -779,7 +779,7 @@ sap.ui.define([
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
                         sap.ui.core.BusyIndicator.show(0);
-                        sap.m.MessageBox.error(`Please fill all mandatory fields (Particulars) in item row ${i + 1}`);
+                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
                         return false;
                     }
                 }
@@ -893,7 +893,7 @@ sap.ui.define([
                         });
                         oDialog.open();
                     } catch (error) {
-                        sap.m.MessageToast.show(error.responseText || "Submission failed");
+                        sap.m.MessageToast.show(error.responseText || "Submission Failed");
                     }
                 } catch (error) {
                     MessageToast.show(that.i18nModel.getText("technicalError"));

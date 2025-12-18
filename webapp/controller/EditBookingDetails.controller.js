@@ -142,11 +142,11 @@ sap.ui.define([
                             CustomerID: custid
                         }
                     });
-                    sap.m.MessageToast.show("Booking details updated successfully!");
+                    sap.m.MessageToast.show("Booking Details Updated Successfully!");
 
                 } catch (err) {
                     console.error("Error during update:", err);
-                    sap.m.MessageBox.error("Failed to update booking details: " + err.message);
+                    sap.m.MessageBox.error("Failed to Update Booking Details: " + err.message);
                 }
             }
         },
@@ -159,7 +159,7 @@ sap.ui.define([
 
             var that = this;
             sap.m.MessageBox.confirm(
-                "Are you sure you want to cancel this booking?", {
+                "Are you sure you want to Cancel this Booking?", {
                     title: "Confirm Cancellation",
                     icon: sap.m.MessageBox.Icon.WARNING,
                     actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
@@ -231,7 +231,7 @@ sap.ui.define([
                                 }
                             });
 
-                            sap.m.MessageToast.show("Booking cancelled successfully!");
+                            sap.m.MessageToast.show("Booking Cancelled Successfully!");
                             var oEditButton = that.byId("idEditBtn");
                             if (oEditButton) {
                                 oEditButton.setVisible(false);
@@ -279,7 +279,7 @@ sap.ui.define([
                 oHostelModel.setProperty("/RoomType", oSelectedBedType.BedTypeName);
                 oHostelModel.setProperty("/RoomPrice", oSelectedBedType.Price);
 
-                sap.m.MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
+                sap.m.MessageToast.show("Room Type Changed to " + oSelectedBedType.BedTypeName);
             }
         },
 
@@ -288,7 +288,7 @@ sap.ui.define([
             const oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please select a facility to edit.");
+                sap.m.MessageToast.show("Please Select a Facility to Edit.");
                 return;
             }
 
@@ -357,7 +357,7 @@ sap.ui.define([
             oHostelModel.setProperty("/TotalFacilityPrice", total);
             oHostelModel.setProperty("/GrandTotal", total + parseFloat(oHostelModel.getProperty("/RoomPrice") || 0));
 
-            sap.m.MessageToast.show("Facility details updated successfully!");
+            sap.m.MessageToast.show("Facility Details Updated Successfully!");
             this._pEditFacilityDialog.close();
         },
 
@@ -402,7 +402,7 @@ sap.ui.define([
                     const diff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                     sap.ui.getCore().byId("idFacilityDays").setValue(diff);
                 } else {
-                    sap.m.MessageToast.show("End Date must be after Start Date");
+                    sap.m.MessageToast.show("End Date must be After Start Date");
                     sap.ui.getCore().byId("idFacilityDays").setValue("");
                 }
             }
@@ -450,7 +450,7 @@ sap.ui.define([
             oHostelModel.setProperty("/TotalFacilityPrice", total);
             oHostelModel.setProperty("/GrandTotal", total + parseFloat(oHostelModel.getProperty("/RoomPrice") || 0));
 
-            sap.m.MessageToast.show("Facility added successfully!");
+            sap.m.MessageToast.show("Facility Added Successfully!");
 
             this._pAddFacilityDialog.close();
         },
@@ -460,7 +460,5 @@ sap.ui.define([
         oUIModel.setProperty("/isLoggedIn", true);
     this.getOwnerComponent().getRouter().navTo("RouteHostel");
 }
-
-
     })
 })

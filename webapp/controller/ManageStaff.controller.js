@@ -107,7 +107,7 @@ sap.ui.define([
             const oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                return sap.m.MessageToast.show("Please select a record to edit.");
+                return sap.m.MessageToast.show("Please Select a Record to Edit.");
             }
 
             const oData = oSelected.getBindingContext("mainModel").getObject();
@@ -223,7 +223,7 @@ sap.ui.define([
             );
 
             if (!isValid) {
-                return sap.m.MessageToast.show("Please fill all mandatory fields correctly.");
+                return sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
             }
 
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
@@ -263,12 +263,12 @@ sap.ui.define([
                             UserID: data.UserID
                         }
                     });
-                    sap.m.MessageToast.show("User details updated successfully!");
+                    sap.m.MessageToast.show("User Details Updated Successfully!");
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Login", {
                         data: payload
                     });
-                    sap.m.MessageToast.show("Registration successful!");
+                    sap.m.MessageToast.show("Registration Successful!");
                 }
 
                 this.FD_onCancelButtonPress();
@@ -383,7 +383,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please select a record to delete.");
+                sap.m.MessageToast.show("Please Select a Record to Delete.");
                 return;
             }
 
@@ -409,7 +409,7 @@ sap.ui.define([
                                     }
                                 });
 
-                                sap.m.MessageToast.show("Staff data deleted successfully!");
+                                sap.m.MessageToast.show("Staff Data Deleted Successfully!");
                                 await that.Onsearch("true"); // refresh table
                             } catch (err) {
                                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -667,7 +667,7 @@ sap.ui.define([
             // If STD not chosen yet
             if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD code first");
+                oInput.setValueStateText("Select ISD Code First");
                 return;
             }
 
@@ -676,7 +676,7 @@ sap.ui.define([
 
             if (!isValid) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Enter valid mobile number");
+                oInput.setValueStateText("Enter valid Mobile Number");
             } else {
                 oInput.setValueState("None");
             }
@@ -710,7 +710,7 @@ sap.ui.define([
             // Required
             if (!confirm) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Confirm Password is required");
+                oInput.setValueStateText("Confirm Password is Required");
                 return false; //  EXPLICIT FAIL
             }
 

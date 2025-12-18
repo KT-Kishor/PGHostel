@@ -32,21 +32,21 @@
 	<!-- Vendor Name : 70% -->
 	<VBox width="70%" class="sapUiTinyMarginBegin">
 		<Label text="Vendor Name" required="true"/>
-		<Input id="adminVendorName" value="{AdminSignupModel>/VendorName}" placeholder="Enter your name" liveChange="onAdminLiveValidate" valueStateText="Enter valid name"/>
+		<Input id="adminVendorName" value="{AdminSignupModel>/VendorName}" placeholder="Enter your name" liveChange="onAdminLiveValidate" valueStateText="Enter Valid Name"/>
 	</VBox>
 </HBox>		<!-- DOB -->
 				<Label text="Date of Birth" required="true"/>
 				<DatePicker id="adminDOB" value="{AdminSignupModel>/DOB}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" valueStateText="Age must be between 18 and 70" change="ADMIN_onChangeDOB" />
 				<!-- Gender -->
 				<Label text="Gender" required="true"/>
-				<Select  id="adminGender" selectedKey="{AdminSignupModel>/Gender}" forceSelection="false" change="ADMIN_onChangeGender" valueStateText="Please select a gender">
+				<Select  id="adminGender" selectedKey="{AdminSignupModel>/Gender}" forceSelection="false" change="ADMIN_onChangeGender" valueStateText="Please select a Gender">
 					<core:Item key="Male" text="Male" />
 					<core:Item key="Female" text="Female" />
 					<core:Item key="Other" text="Other" />
 				</Select>
 				<!-- Email -->
 				<Label text="Email" required="true"/>
-				<Input placeholder="Enter your email" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="Enter valid Email"/>
+				<Input placeholder="Enter your Email" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="Enter valid Email"/>
 				<!-- Country -->
 				<Label text="Country" required="true"/>
 				<ComboBox id="adminsignUpCountry" selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry" selectionChange="ADMIN_onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
@@ -81,7 +81,7 @@
 		</layoutData>
 	</ComboBox>
 	<!-- Mobile: 70% -->
-	<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid mobile number">
+	<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid Mobile Number">
 		<layoutData>
 			<FlexItemData baseSize="70%" growFactor="1" />
 		</layoutData>
@@ -90,7 +90,7 @@
 			
 				<!-- Address -->
 				<Label text="Address" required="true"/>
-				<TextArea placeholder="Enter your address" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="Enter a valid address" />
+				<TextArea placeholder="Enter your address" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="Enter a valid Address" />
 			</f:SimpleForm>
 			<!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
 			<!-- DOCUMENTS SECTION -->

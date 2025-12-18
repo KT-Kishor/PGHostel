@@ -222,7 +222,7 @@ sap.ui.define([
         MD_onDownload: function () {
             const oModel = this.byId("id_MD_Table").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No data available to download.");
+                MessageToast.show("No Data available to Download.");
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -244,7 +244,7 @@ sap.ui.define([
             const oSheet = new sap.ui.export.Spreadsheet(oSettings);
 
             oSheet.build().then(() => {
-                MessageToast.show("Download complete!");
+                MessageToast.show("Download Complete!");
             }).finally(() => {
                 oSheet.destroy();
             });
@@ -361,7 +361,7 @@ sap.ui.define([
             );
 
             if (!validState) {
-                MessageToast.show("Selected State does not belong to the chosen Country");
+                MessageToast.show("Selected State does not belong to the Chosen Country");
                 sap.ui.getCore().byId(oView.createId("MC_id_State")).setValueState("Error");
                 return;
             }
@@ -372,7 +372,7 @@ sap.ui.define([
             );
 
             if (!validCity) {
-                MessageToast.show("Selected City does not belong to selected State & Country");
+                MessageToast.show("Selected City does not belong to Selected State and Country");
                 sap.ui.getCore().byId(oView.createId("MC_id_City")).setValueState("Error");
                 return;
             }
@@ -417,7 +417,7 @@ sap.ui.define([
                             // UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show("Branch updated successfully!");
+                    sap.m.MessageToast.show("Branch Updated Successfully!");
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Branch", {
                         data: oData,
@@ -425,7 +425,7 @@ sap.ui.define([
                             UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show("Branch added successfully!");
+                    sap.m.MessageToast.show("Branch added Successfully!");
                 }
 
                 await this.Onsearch();
@@ -505,7 +505,7 @@ sap.ui.define([
             // If less than 10 digits → error
             if (value.length < 10) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Phone number must be exactly 10 digits");
+                oInput.setValueStateText("Phone Number must be exactly 10 Digits");
                 return;
             }
 
@@ -550,12 +550,12 @@ sap.ui.define([
             var aSelectedItems = oTable.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one record to delete.");
+                sap.m.MessageToast.show("Please Select at Least One Record to Delete.");
                 return;
             }
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete ${aSelectedItems.length} selected record(s)?`, {
+                `Are you sure you want to Delete ${aSelectedItems.length} Selected Record(s)?`, {
                 icon: sap.m.MessageBox.Icon.WARNING,
                 title: "Confirm Deletion",
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
@@ -581,12 +581,12 @@ sap.ui.define([
                                 });
                             }
 
-                            sap.m.MessageToast.show("Selected records deleted successfully!");
+                            sap.m.MessageToast.show("Selected Records Deleted Successfully!");
                             await this.Onsearch();
 
                         } catch (err) {
                             console.error("Delete failed:", err);
-                            sap.m.MessageBox.error("Error while deleting records. Please try again.");
+                            sap.m.MessageBox.error("Error while Deleting Records. Please try again.");
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
                             oTable.removeSelections(true);
@@ -603,7 +603,7 @@ sap.ui.define([
             var oSelected = oTable.getSelectedItem();
             oView.getModel("editableModel").setProperty("/isEdit", true);
             if (!oSelected) {
-                sap.m.MessageToast.show("Please select a record to edit.");
+                sap.m.MessageToast.show("Please Select a Record to Edit.");
                 return;
             }
 
@@ -826,7 +826,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show("No document found for this room!");
+                sap.m.MessageToast.show("No Document Found for this Room!");
                 return;
             }
 

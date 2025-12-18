@@ -33,8 +33,6 @@ sap.ui.define([], function() {
     }
 },
 
-
-
         // Validate mobile number
         _LCvalidateMobileNumberWithSTD: function(oEventOrControl, sStdCode) {
         var oField = (typeof oEventOrControl.getSource === "function")
@@ -383,11 +381,6 @@ sap.ui.define([], function() {
         //     }
         // },
 
-
-
-
-
-
 _LCgenerateStrongPassword: function () {
 
     var charsUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -462,8 +455,6 @@ _LCvalidatePassword: function (oEventOrInput, oStrengthText) {
             return strength !== "poor";
         },
 
-
-        
 _getPasswordStrength: function(pwd) {
 
     if (!pwd) return "poor";
@@ -495,12 +486,6 @@ _getPasswordStrength: function(pwd) {
 
     return "poor";
 },
-
-
-
-
-
-
 
         // _LCvalidatePassword: function (oEventOrInput) {
         //     // Detect whether event or direct Input control was passed
@@ -570,7 +555,7 @@ _getPasswordStrength: function(pwd) {
                 aSelectedKeys[0] === "" ? aSelectedKeys.slice(1) : aSelectedKeys;
             if (aSelectedKeys.length === 0) {
                 oField.setValueState("Error").focus();
-                oField.setValueStateText("Please select at least one option");
+                oField.setValueStateText("Please Select at Least One Option");
                 return false;
             } else {
                 oField.setValueState("None");
@@ -594,7 +579,7 @@ _getPasswordStrength: function(pwd) {
             var regex = /^\d{1,5}(\.\d{1,2})?$/;
             if (!regex.test(cleanValue) || isNaN(cleanValue)) {
                 oField.setValueState("Error").focus();
-                oField.setValueStateText("Enter a valid number with up to 2 decimal places.");
+                oField.setValueStateText("Enter a Valid Number with up to 2 Decimal Places.");
                 return false;
             }
 
@@ -702,13 +687,14 @@ _getPasswordStrength: function(pwd) {
                 return true;
             }
         },
+
         // Strict validation for Select control (like ComboBox strict)
         _LCstrictValidationSelect: function (oField) {
             if (!oField) return false;
             let key = oField.getSelectedKey();
             if (!key) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Please select value");
+                oField.setValueStateText("Please Select Value");
                 return false;
             }
             oField.setValueState("None");
@@ -721,14 +707,14 @@ _getPasswordStrength: function(pwd) {
             let v = (oField.getValue() || "").trim();
             if (!v) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Address is required");
+                oField.setValueStateText("Address is Required");
                 return false;
             }
             oField.setValueState("None");
             return true;
         },
-        _LCvalidateISDmobile: function (oEventOrControl, sStdCode) {
 
+        _LCvalidateISDmobile: function (oEventOrControl, sStdCode) {
             var oField =
                 (typeof oEventOrControl.getSource === "function")
                     ? oEventOrControl.getSource()
@@ -758,7 +744,7 @@ _getPasswordStrength: function(pwd) {
 
             if (!isValid) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Enter valid mobile number");
+                oField.setValueStateText("Enter Valid Mobile Number");
             } else {
                 oField.setValueState("None");
             }

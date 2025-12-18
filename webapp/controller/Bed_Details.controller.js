@@ -141,15 +141,15 @@ sap.ui.define([
             ) {
                 var Attachment = oView.getModel("tokenModel").getData();
                 if (!Attachment.tokens || Attachment.tokens.length === 0) {
-                    return sap.m.MessageToast.show("Please upload at least one image.");
+                    return sap.m.MessageToast.show("Please Upload at Least One Image.");
                 }
 
                 if (attachments.length === 0) {
-                    sap.m.MessageBox.error("Please upload at least one image.");
+                    sap.m.MessageBox.error("Please Upload at Least One Image.");
                     return;
                 }
                 if (attachments.length > 5) {
-                    sap.m.MessageBox.error("You can upload a maximum of 5 images only.");
+                    sap.m.MessageBox.error("You can Upload a Maximum of 5 Images Only.");
                     return;
                 }
 
@@ -168,7 +168,7 @@ sap.ui.define([
 
                 if (bDuplicate) {
                     sap.m.MessageToast.show(
-                        "A bed with the same Bed Type, Branch Code, and AC Type already exists."
+                        "A Bed with the Same Bed Type, Branch Code, and AC Type Already Exists."
                     );
                     return;
                 }
@@ -219,7 +219,7 @@ sap.ui.define([
                     sap.m.MessageToast.show(err.message || err.responseText);
                 }
             } else {
-                sap.m.MessageToast.show("Please fill all mandatory fields correctly.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
             }
         },
 
@@ -263,7 +263,7 @@ sap.ui.define([
 
             // Block if already 5 files uploaded
             if (aAttachments.length >= 5) {
-                sap.m.MessageToast.show("You can upload a maximum of 5 images only.");
+                sap.m.MessageToast.show("You can Upload a Maximum of 5 Images Only.");
                 return;
             }
 
@@ -275,7 +275,7 @@ sap.ui.define([
                 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
                 if (oFile.size > MAX_SIZE) {
                     sap.m.MessageToast.show(
-                        "File size must be less than 2 MB.\nSelected file size: " +
+                        "File size must be Less than 2 MB.\nSelected file size: " +
                         (oFile.size / 1024 / 1024).toFixed(2) + " MB"
                     );
 
@@ -288,13 +288,13 @@ sap.ui.define([
                 );
 
                 if (bIsDuplicate) {
-                    sap.m.MessageToast.show(`"${oFile.name}" is already uploaded.`);
+                    sap.m.MessageToast.show(`"${oFile.name}" is Already Uploaded.`);
                     return;
                 }
 
                 // Validate file type
                 if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-                    sap.m.MessageToast.show("Only image files (jpg, jpeg, png) are allowed.");
+                    sap.m.MessageToast.show("Only Image files (jpg, jpeg, png) are Allowed.");
                     return;
                 }
 
@@ -305,7 +305,7 @@ sap.ui.define([
                     // Final Duplicate Check using file content
                     const bContentDuplicate = aAttachments.some(att => att.content === sBase64);
                     if (bContentDuplicate) {
-                        sap.m.MessageToast.show(`This image is already uploaded.`);
+                        sap.m.MessageToast.show(`This Image is Already Uploaded.`);
                         return;
                     }
 
@@ -417,7 +417,7 @@ sap.ui.define([
                 })
                 .catch((err) => {
                     console.error("Error in search", err);
-                    sap.m.MessageBox.error("Failed to load bed details.");
+                    sap.m.MessageBox.error("Failed to Load Bed Details.");
                 })
                 .finally(() => {
                     sap.ui.core.BusyIndicator.hide();
@@ -500,7 +500,7 @@ sap.ui.define([
             var aSelectedItems = table.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one record to delete.");
+                sap.m.MessageToast.show("Please Select at Least One record to Delete.");
                 return;
             }
 
@@ -510,7 +510,7 @@ sap.ui.define([
             }).join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the selected bed(s): ${sBedNames}?`, {
+                `Are you sure you want to Delete the Selected Bed(s): ${sBedNames}?`, {
                     title: "Confirm Deletion",
                     icon: sap.m.MessageBox.Icon.WARNING,
                     actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -543,11 +543,11 @@ sap.ui.define([
                                 await Promise.all(deletePromises);
 
                                 await this.Onsearch("true");
-                                sap.m.MessageToast.show("Selected bed(s) deleted successfully!");
+                                sap.m.MessageToast.show("Selected Bed(s) Deleted Successfully!");
 
                             } catch (error) {
                                 console.error("Delete failed:", error);
-                                sap.m.MessageBox.error("Error while deleting bed(s). Please try again.");
+                                sap.m.MessageBox.error("Error while Deleting Bed(s). Please Try Again.");
                             } finally {
                                 sap.ui.core.BusyIndicator.hide();
                                 table.removeSelections(true);
@@ -561,7 +561,7 @@ sap.ui.define([
         BD_onDownload: function() {
             const oModel = this.byId("id_BedTable").getModel("BedDetails").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No data available to download.");
+                MessageToast.show("No Data available to Download.");
                 return;
             }
             const adjustedData = oModel.map(item => ({

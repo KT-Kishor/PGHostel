@@ -75,7 +75,7 @@ sap.ui.define([
         RD_onDownload: function () {
             const oModel = this.byId("id_ARD_Table").getModel("RoomDetailsModel").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No data available to download.");
+                MessageToast.show("No Data Available to Download.");
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -360,7 +360,7 @@ sap.ui.define([
             var oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                sap.m.MessageToast.show("Please select a record to edit the room.");
+                sap.m.MessageToast.show("Please Select a Record to Edit the Room.");
                 return;
             }
 
@@ -477,9 +477,7 @@ sap.ui.define([
 
             // --- Open Dialog ---
             this.AR_Dialog.open();
-        }
-
-        ,
+        },
 
         AR_onCancelButtonPress: function () {
 
@@ -572,12 +570,12 @@ sap.ui.define([
 
 
                 if (aFiltered.length === 0 && !Payload._isEditing) {
-                    sap.m.MessageToast.show("All rooms for this Bed Type are already created");
+                    sap.m.MessageToast.show("All Rooms for this Bed Type are Already Created");
                     return;
                 }
 
                 if (oExistingRoom && !Payload._isEditing && oExistingRoom.RoomNo === Payload.RoomNo) {
-                    sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' already exists");
+                    sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
                     return;
                 }
                 if (Payload._isEditing) {
@@ -585,12 +583,12 @@ sap.ui.define([
                     var sOriginalRoomNo = this.RoomNo; // We'll store this when opening dialog
 
                     if (oExistingRoom && Payload.RoomNo !== sOriginalRoomNo) {
-                        sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' already exists");
+                        sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
                         return;
                     }
                 }
                 if (Payload.Price === 0 && Payload.MonthPrice === 0 && Payload.YearPrice === 0) {
-                    sap.m.MessageToast.show("Please fill at least one price");
+                    sap.m.MessageToast.show("Please Fill at Least One Price");
                     return;
                 }
 
@@ -623,8 +621,8 @@ sap.ui.define([
                     success: function (response) {
                         sap.m.MessageToast.show(
                             sMethod === "POST" ?
-                                "Room added successfully!" :
-                                "Room updated successfully!"
+                                "Room Added Successfully!" :
+                                "Room Updated Successfully!"
                         );
                         this.Onsearch("true");
                         this.BedTypedetails()
@@ -632,12 +630,12 @@ sap.ui.define([
                         this.AR_Dialog.close();
                     }.bind(this),
                     error: function (err) {
-                        sap.m.MessageBox.error("Error saving room data (Add/Update).");
+                        sap.m.MessageBox.error("Error Saving Room Data (Add/Update).");
                         console.error(err);
                     }
                 });
             } else {
-                sap.m.MessageToast.show("Please fill all required fields correctly before saving.");
+                sap.m.MessageToast.show("Please Fill all Required Fields Correctly before Saving.");
                 return;
             }
         },
@@ -646,7 +644,7 @@ sap.ui.define([
             var aSelectedItems = table.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one record to delete.");
+                sap.m.MessageToast.show("Please Select at Least One Record to Delete.");
                 return;
             }
 
@@ -656,7 +654,7 @@ sap.ui.define([
             }).join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the selected Room(s): ${sRoomNos}?`, {
+                `Are you sure you want to Delete the Selected Room(s): ${sRoomNos}?`, {
                 title: "Confirm Deletion",
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -694,13 +692,13 @@ sap.ui.define([
 
                             await this.BedTypedetails();
                             await this.Onsearch("true");
-                            sap.m.MessageToast.show("Selected room(s) deleted successfully!");
+                            sap.m.MessageToast.show("Selected Room(s) Deleted Successfully!");
 
                             //  sap.ui.core.BusyIndicator.hide();
 
                         } catch (error) {
-                            console.error("Delete failed:", error);
-                            sap.m.MessageBox.error("Error while deleting room(s). Please try again.");
+                            console.error("Delete Failed:", error);
+                            sap.m.MessageBox.error("Error while Deleting Room(s). Please try again.");
                         } finally {
                             table.removeSelections(true);
                         }

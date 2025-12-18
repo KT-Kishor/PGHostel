@@ -660,12 +660,12 @@ sap.ui.define([
                     // Use your common AJAX update helper
                     await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
 
-                    sap.m.MessageToast.show("Customer details updated successfully!");
+                    sap.m.MessageToast.show("Customer Details Updated Successfully!");
 
                     // Switch back to view mode
                     oVisibilityModel.setProperty("/editable", false);
                 } catch (err) {
-                    sap.m.MessageBox.error("Failed to update data: " + (err.message || err.responseText));
+                    sap.m.MessageBox.error("Failed to Update Data: " + (err.message || err.responseText));
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -748,7 +748,7 @@ sap.ui.define([
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
             if (OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("Please select a different payment plan in the Booking Information section. This offer is not available."); 
+                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available."); 
                 this.HM_Dialog.close();
                  return;
             }
@@ -895,7 +895,7 @@ sap.ui.define([
             const sStartDate = oModel.getProperty("/StartDate");
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please select Start Date first.");
+                sap.m.MessageToast.show("Please Select Start Date First.");
                 return;
             }
 
@@ -958,13 +958,13 @@ sap.ui.define([
 
                     // Validate Start Time
                     if (!utils._LCvalidateMandatoryField(oStartTime, "ID")) {
-                        sap.m.MessageToast.show("Please enter Start Time");
+                        sap.m.MessageToast.show("Please Enter Start Time");
                         return;
                     }
 
                     // Validate End Time
                     if (!utils._LCvalidateMandatoryField(oEndTime, "ID")) {
-                        sap.m.MessageToast.show("Please enter End Time");
+                        sap.m.MessageToast.show("Please Enter End Time");
                         return;
                     }
 
@@ -978,7 +978,7 @@ sap.ui.define([
 
                     // Check if Start Time is greater than or equal to End Time
                     if (start >= end) {
-                        sap.m.MessageToast.show("Start Time should be less than End Time");
+                        sap.m.MessageToast.show("Start Time Should be Less than End Time");
                         return;
                     }
                 }
@@ -1086,12 +1086,12 @@ sap.ui.define([
                 oCustomerModel.refresh();
 
                 this.HM_Dialog.close();
-                sap.m.MessageToast.show("Facility updated successfully!");
+                sap.m.MessageToast.show("Facility Updated successfully!");
 
                 this._editIndex = undefined;
 
             } else {
-                sap.m.MessageToast.show("Make sure all the mandatory fields are filled and validate the entered value")
+                sap.m.MessageToast.show("Make Sure all the Mandatory Fields are Filled and Validate the Entered Value")
             }
         },
 
@@ -1238,7 +1238,7 @@ sap.ui.define([
             if (sUnit === "daily" || sUnit === "Per Day") {
 
                 if (!oEnd) {
-                    sap.m.MessageToast.show("Please select End Date for daily calculation.");
+                    sap.m.MessageToast.show("Please Select End Date for Daily Calculation.");
                     return;
                 }
 
@@ -1248,7 +1248,7 @@ sap.ui.define([
                     oBookingModel.setProperty("/EndDate", "");
                     if (oEndDatePicker) oEndDatePicker.setValue("");
 
-                    sap.m.MessageToast.show("End Date cannot be earlier than Start Date.");
+                    sap.m.MessageToast.show("End Date Cannot be Earlier than Start Date.");
                     return;
                 }
 
@@ -1351,7 +1351,7 @@ sap.ui.define([
             let sStartDate = oModel.getProperty("/StartDate"); // e.g., "24/11/2025"
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please select Start Date first.");
+                sap.m.MessageToast.show("Please Select Start Date First.");
                 return;
             }
 
@@ -1388,11 +1388,6 @@ sap.ui.define([
             oCustomerData.setProperty("/CGST", CGST);
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", 0.00)
-
-
-
-
-
             // oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice);
             oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST + CGST);
 
@@ -1432,7 +1427,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please select a facility to edit.");
+                sap.m.MessageToast.show("Please Select a Facility to Edit.");
                 return;
             }
 
@@ -1461,7 +1456,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please select a facility to delete.");
+                sap.m.MessageToast.show("Please Select a Facility to Delete.");
                 return;
             }
 
@@ -1490,7 +1485,7 @@ sap.ui.define([
 
             if (sFacilityID) {
                 sap.m.MessageBox.confirm(
-                    "Are you sure you want to delete this Facility?", {
+                    "Are you sure you want to Delete this Facility?", {
                     title: "Confirm Delete",
                     actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                     onClose: function (oAction) {
@@ -1514,10 +1509,10 @@ sap.ui.define([
                                     oCustomerModel.refresh(true);
                                     oTable.removeSelections(true);
 
-                                    sap.m.MessageToast.show("Facility deleted successfully!");
+                                    sap.m.MessageToast.show("Facility Deleted Successfully!");
                                 })
                                 .catch(function () {
-                                    sap.m.MessageToast.show("Failed to delete facility from server.");
+                                    sap.m.MessageToast.show("Failed to Delete Facility from Server.");
                                 });
 
                         }
@@ -1538,7 +1533,7 @@ sap.ui.define([
             oCustomerModel.refresh(true);
             oTable.removeSelections(true);
 
-            sap.m.MessageToast.show("Facility removed successfully!");
+            sap.m.MessageToast.show("Facility Removed Successfully!");
         },
 
         // Helper: Total Calculation
@@ -1777,14 +1772,14 @@ sap.ui.define([
 
             // Validate numbers
             if (isNaN(startHour) || isNaN(endHour)) {
-                sap.m.MessageToast.show("Invalid hour format");
+                sap.m.MessageToast.show("Invalid Hour Format");
                 oModel.setProperty("/TotalHour", "");
                 return;
             }
 
             // Validate end > start
             if (endHour < startHour) {
-                sap.m.MessageToast.show("End Time should be greater than Start Time");
+                sap.m.MessageToast.show("End Time Should be Greater than Start Time");
                 oModel.setProperty("/TotalHour", "");
                 return;
             }
@@ -1912,7 +1907,7 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("Please fill all mandatory fields.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                 return;
             }
 
@@ -1927,7 +1922,7 @@ sap.ui.define([
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
             if (CustomerData.OrginalRentPrice === 0 || CustomerData.OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our hostel.");
+                sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
                 return;
             }
             var Payload = {
@@ -2002,13 +1997,13 @@ sap.ui.define([
                     // Refresh models
 
                     this.AD_onSearch();
-                    sap.m.MessageToast.show("Booking saved successfully!");
+                    sap.m.MessageToast.show("Booking Saved Successfully!");
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
                     this.byId("idMonthYearSelect").setVisible(false);
                 })
                 .catch(err => {
-                    sap.m.MessageToast.show("Error saving booking!");
+                    sap.m.MessageToast.show("Error Saving Booking!");
                     console.error(err);
                 });
         },
@@ -2019,7 +2014,7 @@ sap.ui.define([
             var that = this;
 
             sap.m.MessageBox.confirm(
-                "Are you sure you want to cancel this booking?", {
+                "Are you sure you want to cancel this Booking?", {
                 title: "Confirm Cancellation",
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
@@ -2094,7 +2089,7 @@ sap.ui.define([
                         that.AD_onSearch();
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
-                        sap.m.MessageToast.show("Booking cancelled successfully!");
+                        sap.m.MessageToast.show("Booking Cancelled Successfully!");
 
                         // Hide Extra Buttons after Cancel
                         that.byId("idedit")?.setVisible(false);
@@ -2118,7 +2113,7 @@ sap.ui.define([
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
             if (!DocumentType) {
-                sap.m.MessageToast.show("Please select Document Type first.");
+                sap.m.MessageToast.show("Please Select Document Type First.");
                 oFileUploader.clear();
                 return;
             }
@@ -2131,7 +2126,7 @@ sap.ui.define([
 
             aFiles.forEach(file => {
                 if (file.size > MAX_SIZE) {
-                    sap.m.MessageToast.show("File " + file.name + " exceeds 2 MB limit.");
+                    sap.m.MessageToast.show("File " + file.name + " Exceeds 2 MB Limit.");
                     return; // skip this file
                 }
                 var reader = new FileReader();
@@ -2142,7 +2137,7 @@ sap.ui.define([
                     var isDuplicate = aDocs.some(doc => doc.FileName === file.name);
 
                     if (isDuplicate) {
-                        sap.m.MessageToast.show("File '" + file.name + "' is already uploaded.");
+                        sap.m.MessageToast.show("File '" + file.name + "' is Already Uploaded.");
                         return;
                     }
                     // Push new document into table array
@@ -2178,7 +2173,7 @@ sap.ui.define([
             if (oDoc.DocumentID) {
 
                 MessageBox.confirm(
-                    "This document is already saved. Do you want to delete it?",
+                    "This Document is already Saved. Do you want to Delete it?",
                     {
                         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                         onClose: function (sAction) {
@@ -2198,11 +2193,11 @@ sap.ui.define([
                                         oCustomerModel.refresh(true)
 
 
-                                        sap.m.MessageToast.show("Document deleted successfully");
+                                        sap.m.MessageToast.show("Document Deleted Successfully");
 
                                     })
                                     .catch(function () {
-                                        sap.m.MessageToast.show("Failed to delete Document from server.");
+                                        sap.m.MessageToast.show("Failed to Delete Document from Server.");
                                     });
 
                             }
@@ -2216,7 +2211,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Documents", aDocs);
                 oCustomerModel.refresh(true)
 
-                sap.m.MessageToast.show("Document removed");
+                sap.m.MessageToast.show("Document Removed");
             }
         },
         onFileNameLinkPress: function (oEvent) {
@@ -2251,14 +2246,14 @@ sap.ui.define([
             var oDoc = oContext.getObject();
 
             if (!oDoc) {
-                sap.m.MessageBox.error("No document found!");
+                sap.m.MessageBox.error("No Document Found!");
                 return;
             }
 
             var sBase64 = oDoc.FileContent || oDoc.File;
 
             if (!sBase64) {
-                sap.m.MessageBox.error("No image found for this document!");
+                sap.m.MessageBox.error("No Image Found for this Document!");
                 return;
             }
 
@@ -2356,14 +2351,14 @@ sap.ui.define([
             this.Code = Bookingmodel.CouponCode; // user entered code
 
             if (!sEnteredCode) {
-                sap.m.MessageToast.show("Please enter a coupon code");
+                sap.m.MessageToast.show("Please Enter a Coupon Code");
                 return;
             }
 
 
 
             if (oCustomerData.CouponCode === sEnteredCode) {
-                sap.m.MessageToast.show("Coupon already applied");
+                sap.m.MessageToast.show("Coupon Already Applied");
                 return;
             }
 
@@ -2372,11 +2367,11 @@ sap.ui.define([
 
             var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
             if (!oCoupon) {
-                sap.m.MessageToast.show("Invalid coupon code");
+                sap.m.MessageToast.show("Invalid Coupon Code");
                 return;
             }
             if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
-                sap.m.MessageToast.show("This coupon not available for this branch");
+                sap.m.MessageToast.show("This coupon not Available for this Branch");
                 return;
             }
 
@@ -2395,11 +2390,11 @@ sap.ui.define([
 
 
             if (custStart < coupStart || custStart > coupEnd) {
-                sap.m.MessageToast.show("Coupon not valid for selected dates");
+                sap.m.MessageToast.show("Coupon not Valid for Selected Dates");
                 return; // Exit function immediately
             }
             if (!oCoupon.Status === "Active") {
-                sap.m.MessageToast.show("Coupon not active");
+                sap.m.MessageToast.show("Coupon not Active");
                 return;
             }
 
@@ -2408,7 +2403,7 @@ sap.ui.define([
             var subtotal = oCustomerData.RentPrice + oCustomerData.TotalFacilityPrice
             oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
             if (oCoupon.MinOrderValue > subtotal) {
-                sap.m.MessageToast.show("Coupon not applicable for below minimum value" + ' ' + oCoupon.MinOrderValue);
+                sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
                 return;
             }
             this.Discount = oCustomerData.Discount
@@ -2444,7 +2439,7 @@ sap.ui.define([
             this.getView().getModel("CustomerData").refresh(true);
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", true);
 
-            sap.m.MessageToast.show("Coupon applied successfully!");
+            sap.m.MessageToast.show("Coupon Applied Successfully!");
         },
         oncancelCoupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();

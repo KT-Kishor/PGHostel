@@ -31,7 +31,7 @@
         value="{edit>/FacilityName}"
         change="onFacilityChange"
         width="100%"
-        valueStateText="Plaese Select FacilityName">
+        valueStateText="Plaese Select Facility Name">
         <core:Item key="{Facilities>FacilityName}" text="{Facilities>FacilityName}" />
     </ComboBox>
 
@@ -71,7 +71,6 @@
         <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
     </ComboBox>
    
-
     <!-- Start Date -->
     <Label text="Start Date" />
     <DatePicker
@@ -81,8 +80,7 @@
         valueFormat="yyyy-MM-dd"
         change="onEditDateChange"
         minDate="{CustomerData>/BookingDate}"
-         valueStateText="Plaese Select Date"
-        
+        valueStateText="Plaese Select Date"
      />
 
      <Label 
@@ -121,20 +119,13 @@
         change="onEditDateChange"
          minDate="{CustomerData>/BookingDate}"
          valueStateText="Plaese Select Date"
-
   />
-
-        
-         
-
-
     <!-- Days -->
     <Label text="Days" />
     <Input
         id="editDays"
         value="{edit>/TotalDays}"
         editable="false" />
-
          <Label text="Start Time" required="true" />
 
   <TimePicker
@@ -158,8 +149,6 @@
         change="onEditTimeChange"
         valueStateText="Please select Time"
           visible="{= ${edit>/UnitText} === 'Per Hour'}" 
-
-
      />
       <Label text="Hours" />
     <Input
@@ -170,8 +159,6 @@
   />
      </f:content>
 </f:SimpleForm>
-
-
         <buttons>
             <Button
                 text="Save"

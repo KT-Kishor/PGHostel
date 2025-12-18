@@ -1,13 +1,22 @@
 <c:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core"
-	xmlns:u="sap.ui.unified"
-	xmlns:mvc="sap.ui.core.mvc">
-	<Dialog id="FacilitiesDialog" title="Add facilities" type="Message" class="sapUiContentPadding" resizable="true"
-        draggable="true" contentWidth="40%" contentHeight="auto">
-		<f:SimpleForm
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:mvc="sap.ui.core.mvc"
+>
+    <Dialog
+        id="FacilitiesDialog"
+        title="Add facilities"
+        type="Message"
+        class="sapUiContentPadding"
+        resizable="true"
+        draggable="true"
+        contentWidth="40%"
+        contentHeight="auto"
+    >
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -16,52 +25,125 @@
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
-			<f:content>
-				<Label text="Branch Code" required="true"/>
-				<ComboBox id="idRoomType123" placeholder="Select Branch Code" selectedKey="{FacilitiesModel>/BranchCode}"
-                items="{BranchModel>/}" showSecondaryValues="true" change=".onFacilitybranchChange" valueStateText="Select Branch Code">
-					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
-                        additionalText="{BranchModel>City}"/>
-				</ComboBox>
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <ComboBox
+                    id="idRoomType123"
+                    placeholder="Select Branch Code"
+                    selectedKey="{FacilitiesModel>/BranchCode}"
+                    items="{BranchModel>/}"
+                    showSecondaryValues="true"
+                    change=".onFacilitybranchChange"
+                    valueStateText="Select Branch Code"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"
+                    />
+                </ComboBox>
 
-				<Label  text="Facility Name" required="true"/>
-				<Input id="idFacilityName" value="{FacilitiesModel>/FacilityName}" placeholder="Enter Facility Name"
-                    valueStateText="Enter Facility Name" liveChange="onFacilityNameChange"/>
+                <Label
+                    text="Facility Name"
+                    required="true"
+                />
+                <Input
+                    id="idFacilityName"
+                    value="{FacilitiesModel>/FacilityName}"
+                    placeholder="Enter Facility Name"
+                    valueStateText="Enter Facility Name"
+                    liveChange="onFacilityNameChange"
+                />
 
-				<Label text="Type" required="true"/>
-				<ComboBox id="idFacilityName1" items="{FacilityType>/}" value="{FacilitiesModel>/Type}"
-                    placeholder="Enter Type" valueStateText="Enter Type" change="onFacilityTypeChange">
-				<core:Item  key="{FacilityType>ID}" text="{FacilityType>FacilityName}"/>
-				</ComboBox>
+                <Label
+                    text="Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="idFacilityName1"
+                    items="{FacilityType>/}"
+                    value="{FacilitiesModel>/Type}"
+                    placeholder="Enter Type"
+                    valueStateText="Enter Type"
+                    change="onFacilityTypeChange"
+                >
+                    <core:Item
+                        key="{FacilityType>ID}"
+                        text="{FacilityType>FacilityName}"
+                    />
+                </ComboBox>
 
-				<Label text="Hourly Price" />
-				<Input id="idPerHourPrice" placeholder="Enter Per Hour Price" value="{FacilitiesModel>/PerHourPrice}"
-                    maxLength="10"  liveChange="onPriceChange" valueStateText="Enter Per Hour Price"/>
+                <Label text="Hourly Price" />
+                <Input
+                    id="idPerHourPrice"
+                    placeholder="Enter Per Hour Price"
+                    value="{FacilitiesModel>/PerHourPrice}"
+                    maxLength="10"
+                    liveChange="onPriceChange"
+                    valueStateText="Enter Per Hour Price"
+                />
 
-				<Label text="Daily Price" />
-				<Input id="idPerDayPrice" placeholder="Enter Per Day Price" value="{FacilitiesModel>/PerDayPrice}"
-                    maxLength="10" liveChange="onPriceChange" valueStateText="Enter Per Day Price"/>
+                <Label text="Daily Price" />
+                <Input
+                    id="idPerDayPrice"
+                    placeholder="Enter Per Day Price"
+                    value="{FacilitiesModel>/PerDayPrice}"
+                    maxLength="10"
+                    liveChange="onPriceChange"
+                    valueStateText="Enter Per Day Price"
+                />
 
-				<Label text="Monthly Price" />
-				<Input id="idPerMonthPrice" placeholder="Enter Per Month Price" value="{FacilitiesModel>/PerMonthPrice}"
-                    maxLength="10" liveChange="onPriceChange" valueStateText="Enter Per Month Price"/>
+                <Label text="Monthly Price" />
+                <Input
+                    id="idPerMonthPrice"
+                    placeholder="Enter Per Month Price"
+                    value="{FacilitiesModel>/PerMonthPrice}"
+                    maxLength="10"
+                    liveChange="onPriceChange"
+                    valueStateText="Enter Per Month Price"
+                />
 
-				<Label text="Yearly Price" />
-				<Input id="idPerYearPrice" placeholder="Enter Per Year Price" value="{FacilitiesModel>/PerYearPrice}"
-                maxLength="10" liveChange="onPriceChange" valueStateText="Enter Per Year Price"/>
+                <Label text="Yearly Price" />
+                <Input
+                    id="idPerYearPrice"
+                    placeholder="Enter Per Year Price"
+                    value="{FacilitiesModel>/PerYearPrice}"
+                    maxLength="10"
+                    liveChange="onPriceChange"
+                    valueStateText="Enter Per Year Price"
+                />
 
-				<Label text="Currency" required="true"/>
-				<ComboBox id="FL_id_Currency" selectedKey="{FacilitiesModel>/Currency}" items="{path:'CountryModel>/',length:1000}"
-                placeholder="Select Currency" showSecondaryValues="true" valueStateText="Select Currency">
-				    <core:ListItem key="{CountryModel>currency}" text="{CountryModel>currency}" 
-                    additionalText="{CountryModel>countryName}"/>
-				</ComboBox>
+                <Label
+                    text="Currency"
+                    required="true"
+                />
+                <ComboBox
+                    id="FL_id_Currency"
+                    selectedKey="{FacilitiesModel>/Currency}"
+                    items="{path:'CountryModel>/',length:1000}"
+                    placeholder="Select Currency"
+                    showSecondaryValues="true"
+                    valueStateText="Select Currency"
+                >
+                    <core:ListItem
+                        key="{CountryModel>currency}"
+                        text="{CountryModel>currency}"
+                        additionalText="{CountryModel>countryName}"
+                    />
+                </ComboBox>
 
-				<Label text="" />
-				<VBox width="100%">
-					<HBox justifyContent="End"  width="100%" >
-						<u:FileUploader
+                <Label text="" />
+                <VBox width="100%">
+                    <HBox
+                        justifyContent="End"
+                        width="100%"
+                    >
+                        <u:FileUploader
                             id="id_fileUploader"
                             buttonOnly="true"
                             sameFilenameAllowed="false"
@@ -70,45 +152,68 @@
                             multiple="true"
                             change="onFacilityFileChange"
                         />
-						<Text text="*" class="upload-star"/>
-					</HBox>
-					<Table
+                        <Text
+                            text="*"
+                            class="upload-star"
+                        />
+                    </HBox>
+                    <Table
                         id="id_AttachmentTable"
                         items="{UploaderData>/attachments}"
                         mode="Delete"
                         delete="onTokenDelete"
                         width="100%"
-                        popinLayout="Block">
-						<columns>
-							<Column>
-								<Text text="File Name" />
-							</Column>
-							<Column hAlign="Center">
-								<Text text="File Type" />
-							</Column>
-							<Column hAlign="Center">
-								<Text text="File Size" />
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Text text="{UploaderData>filename}" />
-									<Text text="{UploaderData>fileType}" />
-									<Text text="{UploaderData>size}" />
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-				</VBox>
-			</f:content>
-		</f:SimpleForm>
-		<footer>
-			<Toolbar>
-				<ToolbarSpacer />
-				<Button text="Save" class="myUnifiedBtn" press="FD_onsavebuttonpress"/>
-				<Button text="Cancel" class="myUnifiedBtn" press="FD_onCancelButtonPress"/>
-			</Toolbar>
-		</footer>
-	</Dialog>
+                        popinLayout="Block"
+                    >
+                        <columns>
+                            <Column
+                                minScreenWidth="Phone"
+                                demandPopin="false"
+                            >
+                                <Text text="File Name" />
+                            </Column>
+                            <Column
+                                hAlign="Center"
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="File Type" />
+                            </Column>
+                            <Column
+                                hAlign="Center"
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="File Size" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{UploaderData>filename}" />
+                                    <Text text="{UploaderData>fileType}" />
+                                    <Text text="{UploaderData>size}" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </VBox>
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Save"
+                    class="myUnifiedBtn"
+                    press="FD_onsavebuttonpress"
+                />
+                <Button
+                    text="Cancel"
+                    class="myUnifiedBtn"
+                    press="FD_onCancelButtonPress"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
 </c:FragmentDefinition>

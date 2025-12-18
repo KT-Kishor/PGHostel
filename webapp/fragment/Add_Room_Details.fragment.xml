@@ -32,7 +32,7 @@
                     placeholder="Select Branch Code"
                     selectedKey="{RoomModel>/BranchCode}"
                     selectionChange=".onBranchChange"
-                    valueStateText="Please select a valid Branch Code"
+                    valueStateText="Please Select a Valid Branch Code"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                 >
@@ -55,7 +55,7 @@
                     selectedKey="{RoomModel>/BedTypeName}"
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"
-                    valueStateText="Please select a valid Bed Type"
+                    valueStateText="Please Select a Valid Bed Type"
                 >
                     <core:ListItem
                         key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
@@ -73,7 +73,7 @@
                     visible="false"
                     selectedKey="{RoomModel>/ACType}"
                     items="{BedTypeModel>/}"
-                    valueStateText="Please select a valid AC Type"
+                    valueStateText="Please Select a Valid AC Type"
                     change="onACtypeChange"
                 >
                     <core:Item
@@ -91,7 +91,7 @@
                     placeholder="Enter Room No"
                     maxLength="60"
                     liveChange="onRoomNoInputLiveChange"
-                    valueStateText="Room No cannot be empty"
+                    valueStateText="Room No cannot be Empty"
                 />
                 <!-- <Label text="No Of person" required="true" />
                 <Input id="idRoomNumber13" value="{RoomModel>/NoofPerson}" placeholder="Enter No of person" type="Number" liveChange="onRoomNoInputLiveChange" valueStateText="No of person cannot be empty" /> -->
@@ -100,7 +100,7 @@
                 <Input
                     id="idExtrabed"
                     value="{RoomModel>/ExtraBed}"
-                    placeholder="Enter No Of ExtraBed"
+                    placeholder="Enter No of Extra Bed"
                     liveChange="onPriceInputLiveChange"
                      maxLength="2"
                 />
@@ -115,7 +115,7 @@
                             maxLength="7"
                             liveChange="onPriceInputLiveChange"
 
-                            valueStateText="Please enter a valid amount"
+                            valueStateText="Please enter a Valid Amount"
                         />
                 <!-- <HBox
                     width="100%"
@@ -158,8 +158,7 @@
                             placeholder="Enter Month Price"
                             maxLength="7"
                             liveChange="onPriceInputLiveChange"
-
-                            valueStateText="Please enter a valid amount"
+                            valueStateText="Please enter a Valid Amount"
                         />
                           <Label
                     text="Yearly Price"
@@ -170,8 +169,7 @@
                             placeholder="Enter Year Price"
                             maxLength="7"
                             liveChange="onPriceInputLiveChange"
-
-                            valueStateText="Please enter a valid amount"
+                            valueStateText="Please enter a Valid Amount"
                         />
                 <Label text="Currency" required="true"/>
                 <ComboBox
@@ -196,14 +194,12 @@
                 <Button
                     text="Save"
                     press="AR_onsavebuttonpress"
-                    type="Accept"
                     id="AR_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
                     text="Cancel"
                     press="AR_onCancelButtonPress"
-                    type="Reject"
                     id="AR_id_CancelButton"
                     class="marginRight myUnifiedBtn"
                 />

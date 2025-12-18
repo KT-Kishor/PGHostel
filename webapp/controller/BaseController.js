@@ -194,7 +194,7 @@ sap.ui.define([
                 });
 
             } catch (error) {
-                sap.m.MessageToast.show(error.responseJSON?.message || "Technical error, please contact the administrator");
+                sap.m.MessageToast.show(error.responseJSON?.message || "Technical Error, Please Contact the Administrator");
             }
         },
 
@@ -580,7 +580,7 @@ sap.ui.define([
 
       // Check total size constraint
       if (finalTotalSize > MAX_TOTAL_SIZE) {
-        sap.m.MessageToast.show("Total file size should not exceed 20 MB.");
+        sap.m.MessageToast.show("Total File Size Should not Exceed 20 MB.");
         return;
       }
 

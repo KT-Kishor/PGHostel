@@ -668,13 +668,11 @@ sap.ui.define([
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
-                                    sap.m.MessageToast.show("Date of Birth cannot be in the future.");
+                                    sap.m.MessageToast.show("Date of Birth cannot be in the Future.");
                                     oEvent.getSource().setValue("");
                                 }
                             }
-                        })
-                        ,
-
+                        }),
                         new sap.m.Label({
                             text: "Gender",
                             required: true
@@ -884,7 +882,7 @@ sap.ui.define([
                                     // exact 10 digits required
                                     if (sValue.length !== 10) {
                                         oInput.setValueState("Error");
-                                        oInput.setValueStateText("Mobile No must be exactly 10 digits");
+                                        oInput.setValueStateText("Mobile No must be exactly 10 Digits");
                                     }
                                     // update model value for MobileNo
                                     oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
@@ -894,7 +892,7 @@ sap.ui.define([
                                 // Other countries: minimum 4 digits (example rule)
                                 if (sValue.length < 4) {
                                     oInput.setValueState("Error");
-                                    oInput.setValueStateText("Mobile number must be at least 4 digits");
+                                    oInput.setValueStateText("Mobile Number must be at least 4 Digits");
                                 }
 
                                 // update model value for MobileNo
@@ -975,7 +973,7 @@ sap.ui.define([
                                 const sDocType = oModel.getProperty("/Persons/" + index + "/DocumentType");
 
                                 if (!sDocType) {
-                                    sap.m.MessageBox.error("Please select Document Type before uploading.");
+                                    sap.m.MessageBox.error("Please Select Document Type Before Uploading.");
 
                                     // Reset file uploader
                                     oEvent.getSource().clear();
@@ -986,7 +984,7 @@ sap.ui.define([
 
                                 if (oFile.size > MAX_SIZE) {
                                     sap.m.MessageBox.error(
-                                        "File size must be less than 2 MB.\nSelected file size: " +
+                                        "File Size must be less than 2 MB.\nSelected file size: " +
                                         (oFile.size / 1024 / 1024).toFixed(2) + " MB"
                                     );
 
@@ -1335,7 +1333,7 @@ sap.ui.define([
 
             if (selectedType === "Per Hour") {
                 sap.m.MessageBox.information(
-                    "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, please edit it in the Summary section.",
+                    "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
                     { title: "Default Time Applied" }
                 );
             }
@@ -1372,7 +1370,7 @@ sap.ui.define([
                 const aMissing = this._checkMandatoryFields();
                 if (aMissing.length > 0) {
                     sap.m.MessageBox.error(
-                        "Please fill the following mandatory fields:\n\n" + aMissing.join("\n")
+                        "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
                     );
                     return; // STOP navigation
                 }
@@ -1886,8 +1884,8 @@ sap.ui.define([
 
                 if (diffDays <= 0) {
                     oEndDatePicker.setValueState("Error");
-                    oEndDatePicker.setValueStateText("End date cannot be before start date");
-                    sap.m.MessageToast.show("End date cannot be before start date");
+                    oEndDatePicker.setValueStateText("End date cannot be before Start Date");
+                    sap.m.MessageToast.show("End Date Cannot be before Start Date");
                     oHostelModel.setProperty("/EndDate", "");
                     oBtnModel.setProperty("/Next", false);
                     return;
@@ -1956,13 +1954,13 @@ sap.ui.define([
             const pwd = oInput.getValue();
 
             if (!pwd) {
-                sap.m.MessageToast.show("No password to copy");
+                sap.m.MessageToast.show("No Password to Copy");
                 return;
             }
 
             navigator.clipboard.writeText(pwd)
                 .then(() => {
-                    sap.m.MessageToast.show("Password copied");
+                    sap.m.MessageToast.show("Password Copied");
                 })
                 .catch(() => {
 
@@ -1974,10 +1972,10 @@ sap.ui.define([
                         document.execCommand("copy");
                         document.body.removeChild(oTemp);
 
-                        sap.m.MessageToast.show("Password copied");
+                        sap.m.MessageToast.show("Password Copied");
 
                     } catch (err) {
-                        sap.m.MessageToast.show("Copy failed");
+                        sap.m.MessageToast.show("Copy Failed");
                     }
                 });
         },
@@ -1995,7 +1993,7 @@ sap.ui.define([
             const sStartDate = oView.byId("idStartDate1")?.getValue() || "";
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please select Start Date first.");
+                sap.m.MessageToast.show("Please Select Start Date First.");
                 return;
             }
 
@@ -2017,7 +2015,7 @@ sap.ui.define([
                 oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
             }
             else if (sDuration === "Per Day") {
-                sap.m.MessageToast.show("Duration is per day. No month/year selection needed.");
+                sap.m.MessageToast.show("Duration is per day. No month/year Selection Needed.");
                 return;
             }
 
@@ -2267,7 +2265,7 @@ sap.ui.define([
             // Always validate UserID and UserName
             if (!utils._LCvalidateMandatoryField(ctrlUserId, "ID") ||
                 !utils._LCvalidateMandatoryField(ctrlUserName, "ID")) {
-                sap.m.MessageToast.show("Make sure all the mandatory fields are filled/validate the entered value");
+                sap.m.MessageToast.show("Make Sure all the Mandatory Fields are Filled/Validate the Entered Value");
                 return;
             }
 
@@ -2278,9 +2276,9 @@ sap.ui.define([
                     // but we'll set explicitly to be safe
                     if (ctrlPassword) {
                         ctrlPassword.setValueState("Error");
-                        ctrlPassword.setValueStateText("Enter a valid password");
+                        ctrlPassword.setValueStateText("Enter a Valid Password");
                     }
-                    sap.m.MessageToast.show("Enter a valid password");
+                    sap.m.MessageToast.show("Enter a Valid Password");
                     return;
                 } else if (ctrlPassword) {
                     ctrlPassword.setValueState("None");
@@ -2303,23 +2301,23 @@ sap.ui.define([
 
                     // 1️⃣ OTP has NOT been generated
                     if (!showOTPField) {
-                        sap.m.MessageToast.show("Please generate OTP first.");
+                        sap.m.MessageToast.show("Please Generate OTP First.");
                         return;
                     }
 
                     // 2️⃣ OTP was generated but user has not typed anything
                     if (!isOtpEntered) {
                         otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText("Enter valid 6-digit OTP");
-                        sap.m.MessageToast.show("Enter a valid 6-digit OTP");
+                        otpCtrl.setValueStateText("Enter Valid 6-digit OTP");
+                        sap.m.MessageToast.show("Enter a Valid 6-digit OTP");
                         return;
                     }
 
                     // 3️⃣ Validate OTP format strictly
                     if (!/^\d{6}$/.test(sOTP)) {
                         otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText("Enter a valid 6-digit OTP");
-                        sap.m.MessageToast.show("Enter a valid 6-digit OTP");
+                        otpCtrl.setValueStateText("Enter a Valid 6-digit OTP");
+                        sap.m.MessageToast.show("Enter a Valid 6-digit OTP");
                         return;
                     }
 
@@ -2341,9 +2339,9 @@ sap.ui.define([
                     if (!sPassword) {
                         if (passCtrl) {
                             passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText("Password is required");
+                            passCtrl.setValueStateText("Password is Required");
                         }
-                        sap.m.MessageToast.show("Password is required");
+                        sap.m.MessageToast.show("Password is Required");
                         return;
                     }
 
@@ -2351,9 +2349,9 @@ sap.ui.define([
                     if (!utils._LCvalidatePassword(passCtrl)) {
                         if (passCtrl) {
                             passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText("Enter a valid password");
+                            passCtrl.setValueStateText("Enter a Valid Password");
                         }
-                        sap.m.MessageToast.show("Enter a valid password");
+                        sap.m.MessageToast.show("Enter a Valid Password");
                         return;
                     }
 
@@ -2371,7 +2369,7 @@ sap.ui.define([
                 const oMatchedUser = oResponse?.data?.[0];
 
                 if (!oMatchedUser || !oMatchedUser.UserID) {
-                    sap.m.MessageToast.show("Invalid credentials");
+                    sap.m.MessageToast.show("Invalid Credentials");
                     return;
                 }
 
@@ -2429,7 +2427,7 @@ sap.ui.define([
                 oHostelModel.refresh(true);
 
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Invalid credentials, Please try again");
+                sap.m.MessageToast.show(err.message || "Invalid Credentials, Please try again");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -2449,31 +2447,31 @@ sap.ui.define([
             // 1) Required check for New Password
             if (!pass) {
                 oNew.setValueState("Error");
-                oNew.setValueStateText("Password is required");
-                sap.m.MessageToast.show("Password is required");
+                oNew.setValueStateText("Password is Required");
+                sap.m.MessageToast.show("Password is Required");
                 return;
             }
 
             // 2) Format rule check
             if (!utils._LCvalidatePassword(oNew)) {
                 oNew.setValueState("Error");
-                oNew.setValueStateText("Must contain 1 uppercase, 1 lowercase, 1 number & 1 special character");
+                oNew.setValueStateText("Must Contain 1 Uppercase, 1 Lowercase, 1 Number & 1 Special Character");
                 return;
             }
 
             // 3) Required check for Confirm Password
             if (!confirm) {
                 oConf.setValueState("Error");
-                oConf.setValueStateText("Confirm Password is required");
-                sap.m.MessageToast.show("Confirm Password is required");
+                oConf.setValueStateText("Confirm Password is Required");
+                sap.m.MessageToast.show("Confirm Password is Required");
                 return;
             }
 
             // 4) Match both
             if (pass !== confirm) {
                 oConf.setValueState("Error");
-                oConf.setValueStateText("Passwords do not match");
-                sap.m.MessageToast.show("Passwords do not match");
+                oConf.setValueStateText("Passwords do not Match");
+                sap.m.MessageToast.show("Passwords do not Match");
                 return;
             }
 
@@ -2488,7 +2486,7 @@ sap.ui.define([
                 });
 
 
-                sap.m.MessageBox.success("Password updated successfully", {
+                sap.m.MessageBox.success("Password Updated Successfully", {
                     title: "Success",
                     onClose: () => {
 
@@ -2509,19 +2507,18 @@ sap.ui.define([
                         vm.setProperty("/authFlow", "signin");
                         vm.setProperty("/forgotStep", 1);
                         vm.setProperty("/dialogTitle", "Hostel Access Portal");
-
-
                     }
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show("Password reset failed");
+                sap.m.MessageToast.show("Password Reset Failed");
             }
             finally {
                 sap.ui.core.BusyIndicator.hide();  // ALWAYS stop
                 this._resetOtpState();
             }
         },
+
         _startOtpTimer: function () {
 
             const vm = this.getView().getModel("LoginViewModel");
@@ -2593,7 +2590,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName"), "ID");
 
             if (!isValid) {
-                sap.m.MessageToast.show("Please fill all mandatory fields.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                 return;
             }
 
@@ -2615,7 +2612,7 @@ sap.ui.define([
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
 
                 if (oResp?.success) {
-                    sap.m.MessageToast.show("OTP sent! Check your email.");
+                    sap.m.MessageToast.show("OTP Sent! Check your Email.");
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -2625,7 +2622,7 @@ sap.ui.define([
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
                 } else {
-                    sap.m.MessageToast.show("No user found with given ID / Name");
+                    sap.m.MessageToast.show("No User Found with Given ID / Name");
                 }
 
             } catch (err) {
@@ -2668,7 +2665,7 @@ sap.ui.define([
             // Validate inputs
             if (!utils._LCvalidateMandatoryField(oUserIdCtrl, "ID") ||
                 !utils._LCvalidateMandatoryField(oUserNameCtrl, "ID")) {
-                sap.m.MessageToast.show("Enter valid User ID and User Name");
+                sap.m.MessageToast.show("Enter Valid User ID and User Name");
                 return;
             }
 
@@ -2685,7 +2682,7 @@ sap.ui.define([
 
                 if (oResp?.success) {
 
-                    sap.m.MessageToast.show("OTP sent! Check your email.");
+                    sap.m.MessageToast.show("OTP Sent! Check your Email.");
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -2707,11 +2704,11 @@ sap.ui.define([
 
                 }
                 else {
-                    sap.m.MessageToast.show("User not found or unable to send OTP.");
+                    sap.m.MessageToast.show("User not Found or Unable to Send OTP.");
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show("Invalid credentials, Please try again");
+                sap.m.MessageToast.show("Invalid Credentials, Please try again");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -2735,7 +2732,7 @@ sap.ui.define([
             // --- Basic validation ---
             if (!otp) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
-                oOtpInput.setValueStateText("Please enter OTP");
+                oOtpInput.setValueStateText("Please Enter OTP");
                 sap.m.MessageToast.show("Enter OTP");
                 return;
             }
@@ -2757,7 +2754,7 @@ sap.ui.define([
             try {
                 isValid = await this._verifyOTPWithBackend(otp);
             } catch (e) {
-                sap.m.MessageToast.show("OTP verification failed");
+                sap.m.MessageToast.show("OTP Verification Failed");
                 return;
             }
 
@@ -2795,11 +2792,12 @@ sap.ui.define([
 
             } catch (e) {
 
-                sap.m.MessageToast.show("Login failed");
+                sap.m.MessageToast.show("Login Failed");
                 console.error("OTP login error:", e);
 
             }
         },
+
         _setLoggedInUser: function (user) {
             const oLoginModel = this.getView().getModel("LoginModel");
 
@@ -2942,7 +2940,7 @@ sap.ui.define([
             );
 
             if (!isValid) {
-                sap.m.MessageToast.show("Please fill all mandatory fields correctly.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
                 return;
             }
 
@@ -2950,8 +2948,6 @@ sap.ui.define([
 
             // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
-
-
             const payload = {
                 data: {
                     Salutation: C("signUpSalutation").getSelectedKey(),
@@ -2982,7 +2978,7 @@ sap.ui.define([
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
                 if (!oResp || oResp.success !== true) {
-                    sap.m.MessageToast.show("Registration failed! Please try again.");
+                    sap.m.MessageToast.show("Registration Failed! Please try again.");
                     console.error("SignUp Error Response:", oResp);
                     return;
                 }
@@ -3223,14 +3219,14 @@ sap.ui.define([
             // Required
             if (!confirm) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Confirm Password is required");
+                oInput.setValueStateText("Confirm Password is Required");
                 return false;
             }
 
             // Compare
             if (pass !== confirm) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Passwords do not match");
+                oInput.setValueStateText("Passwords do not Match");
                 return false;
             }
 
@@ -3238,8 +3234,6 @@ sap.ui.define([
             oInput.setValueState("None");
             return true;
         },
-
-
 
         onChangeSalutation: function (oEvent) {
 
@@ -3278,7 +3272,7 @@ sap.ui.define([
 
             if (!v) {
                 oDP.setValueState("Error");
-                oDP.setValueStateText("Date of Birth is required");
+                oDP.setValueStateText("Date of Birth is Required");
                 return false;
             }
 
@@ -3371,7 +3365,7 @@ sap.ui.define([
             // If STD not chosen yet
             if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD code first");
+                oInput.setValueStateText("Select ISD Code First");
                 return;
             }
 
@@ -3380,15 +3374,11 @@ sap.ui.define([
 
             if (!isValid) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Enter valid mobile number");
+                oInput.setValueStateText("Enter valid Mobile Number");
             } else {
                 oInput.setValueState("None");
             }
         },
-
-
-
-
 
         onSTDChange: function () {
             const oSTD = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpSTD");
@@ -3772,10 +3762,8 @@ sap.ui.define([
             ];
 
             aFields.forEach(id => sap.ui.getCore().byId(id)?.setValue(""));
-        }
-        ,
-
-
+        },
+        
         onAmountChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateAmount(oEvent);
@@ -3880,7 +3868,7 @@ sap.ui.define([
                 );
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show("Please fill all mandatory fields.");
+                    sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                     return;
                 }
             }
@@ -3895,7 +3883,7 @@ sap.ui.define([
             // Handle invalid values
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oAmountInput.setValueState("Error");
-                sap.m.MessageToast.show("Invalid amount format");
+                sap.m.MessageToast.show("Invalid Amount Format");
                 return;
             }
 
@@ -3903,12 +3891,10 @@ sap.ui.define([
             if (enteredAmount > grandTotal) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText("Amount cannot be greater than Grand Total");
-                sap.m.MessageToast.show("Amount cannot be greater than Grand Total");
+                sap.m.MessageToast.show("Amount Cannot be Greater than Grand Total");
                 return;
             }
-
             oAmountInput.setValueState("None");
-
 
             try {
                 // Format payload according to your new structure
@@ -4072,7 +4058,7 @@ sap.ui.define([
 
                         if (!isLoggedIn) {
                             sap.m.MessageBox.warning(
-                                "You are booking as a guest and you will not be able to see the booking history.",
+                                "You are Booking as a guest and you will not be able to see the Booking History.",
                                 {
                                     title: "Guest Booking",
                                     actions: [sap.m.MessageBox.Action.OK],
@@ -4084,17 +4070,12 @@ sap.ui.define([
                             );
                             return; // STOP further navigation until user clicks OK
                         }
-
                         // Logged-in user → direct navigation
                         this._navigateAfterBooking();
-
-
-
                     }.bind(this)
                 });
             } catch (e) {
                 BusyIndicator.hide();
-
                 let errorMsg = "Unknown error";
 
                 // jQuery AJAX always returns responseJSON inside e.responseJSON
@@ -4119,6 +4100,7 @@ sap.ui.define([
                 sap.m.MessageBox.error(errorMsg);
             }
         },
+        
         _navigateAfterBooking: function () {
             var oRoute = this.getOwnerComponent().getRouter();
             oRoute.navTo("RouteHostel");
@@ -4138,6 +4120,7 @@ sap.ui.define([
         openProfileDialog: function () {
             this.onPressAvatar()
         },
+
         _onLogout: function () {
             this._oProfileActionSheet.close();
             // sap.m.MessageToast.show("Logging out...");
@@ -4153,11 +4136,13 @@ sap.ui.define([
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
         },
+
         _onEnterProfile: async function () {
             this._oProfileActionSheet.close();
             this._isProfileRequested = true;
             await this.onPressAvatar();
         },
+
         createAvatarActionSheet: function () {
             if (!this._oProfileActionSheet) {
                 this._oProfileActionSheet = new sap.m.ActionSheet({
@@ -4185,7 +4170,7 @@ sap.ui.define([
             try {
                 const sUserID = oUser.UserID || "";
                 if (!sUserID) {
-                    sap.m.MessageToast.show("User not logged in.");
+                    sap.m.MessageToast.show("User not Logged in.");
                     return;
                 }
 
@@ -4545,7 +4530,7 @@ sap.ui.define([
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
                 if (!sUserID) {
-                    sap.m.MessageToast.show("User not logged in");
+                    sap.m.MessageToast.show("User not Logged in");
                     return;
                 }
                 const payload = {
@@ -4560,18 +4545,18 @@ sap.ui.define([
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
 
-                sap.m.MessageToast.show("Profile photo updated!");
+                sap.m.MessageToast.show("Profile Photo Updated!");
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Failed to update profile photo");
+                sap.m.MessageToast.show("Failed to Update Profile Photo");
             }
         },
 
         onPreviewProfilePhoto: function () {
             const sPhoto = this._oProfileDialog.getModel("profileData").getProperty("/photo");
             if (!sPhoto) {
-                sap.m.MessageToast.show("No profile photo available");
+                sap.m.MessageToast.show("No Profile Photo Available");
                 return;
             }
             if (!this._oPreviewDialog) {
@@ -4623,12 +4608,13 @@ sap.ui.define([
                     data: oPayload,
                     filters: filter
                 });
-                sap.m.MessageToast.show("Data Saved successfully ");
+                sap.m.MessageToast.show("Data Saved Successfully ");
                 oSaveModel.setProperty("/isEditMode", false);
             } catch (error) {
                 sap.m.MessageToast.show("Failed");
             }
         },
+
         onEditSaveProfile: async function () {
             const oModel = this._oProfileDialog.getModel("profileData");
             var data = oModel.getData()
@@ -4658,7 +4644,7 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("Please fill all mandatory fields.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                 return;
             }
             const payload = {
@@ -4687,7 +4673,7 @@ sap.ui.define([
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Error updating profile");
+                sap.m.MessageToast.show("Error Updating Profile");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
@@ -4704,7 +4690,7 @@ sap.ui.define([
             // Status check (optional)
             var sStatus = (oBookingData.status || "").trim().toLowerCase();
             if (sStatus !== "new") {
-                sap.m.MessageToast.show("Only bookings with status 'New' can be edited.");
+                sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
                 return;
             }
 
@@ -4716,18 +4702,16 @@ sap.ui.define([
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show("Customer ID not found for this booking.");
+                sap.m.MessageToast.show("Customer ID not found for this Booking.");
                 return;
             }
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show("No customer details found for this booking.");
+                sap.m.MessageToast.show("No Customer Details Found for this Booking.");
                 return;
             }
-
             var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
-
             // Calculate totals
             var oTotals = this.calculateTotals(
                 [{ FullName: oCustomer.customerName, Facilities: { SelectedFacilities: aCustomerFacilities } }],
@@ -4844,7 +4828,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please select a booking to edit.");
+                sap.m.MessageToast.show("Please Select a Booking to Edit.");
                 return;
             }
 
@@ -4858,7 +4842,7 @@ sap.ui.define([
             var sStatus = (oBookingData.status || "").trim().toLowerCase();
 
             if (sStatus !== "new") {
-                sap.m.MessageToast.show("Only bookings with status 'New' can be edited.");
+                sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
                 return;  // ❗ STOP — DO NOT NAVIGATE
             }
             // -------------------------------
@@ -4872,14 +4856,14 @@ sap.ui.define([
             var sCustomerID = oBookingData.cutomerid || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show("Customer ID not found for this booking.");
+                sap.m.MessageToast.show("Customer ID not found for this Booking.");
                 return;
             }
 
             // Find customer
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show("No customer details found for this booking.");
+                sap.m.MessageToast.show("No Customer Details found for this Booking.");
                 return;
             }
 
@@ -5048,18 +5032,18 @@ sap.ui.define([
                             CustomerID: custid
                         }
                     });
-                    sap.m.MessageToast.show("Booking details updated successfully!");
+                    sap.m.MessageToast.show("Booking Details Updated Successfully!");
 
                 } catch (err) {
                     console.error("Error during update:", err);
-                    sap.m.MessageBox.error("Failed to update booking details: " + err.message);
+                    sap.m.MessageBox.error("Failed to Update Booking Details: " + err.message);
                 }
             }
         },
+
         onSelectionChange: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
-
             var sSelectedBedTypeID = oSelectedItem.getKey();
 
             var oBedTypeModel = this.getView().getModel("BedTypeModel");

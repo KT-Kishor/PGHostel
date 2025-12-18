@@ -39,7 +39,7 @@
                     id="ProfileAvatar"
                     initials="{profileData>/initials}"
                     displaySize="XS"
-                    tooltip="Profile pic"
+                    tooltip="Profile Pic"
                     press="onPressAvatar"
                 />
             </tnt:ToolHeader>
@@ -89,7 +89,7 @@
                                 <Text
                                     class="custom-welcome sapUiTinyMarginTopBottom"
                                     textAlign="Center"
-                                    text="Welcome To "
+                                    text="Welcome To"
                                 />
                                 <Text
                                     class="custom-welcome  sapUiTinyMarginTopBottom "

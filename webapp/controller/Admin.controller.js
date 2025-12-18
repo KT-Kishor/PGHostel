@@ -278,7 +278,7 @@ sap.ui.define([
     var table = this.byId("idPOTable");
     var selected = table.getSelectedItem();
     if (!selected) {
-        sap.m.MessageToast.show("Please select a record to assign room.");
+        sap.m.MessageToast.show("Please Select a Record to Assign Room.");
         return;
     }
 
@@ -286,7 +286,7 @@ sap.ui.define([
     this.data = Model.getObject(); // Customer data
 
     if (this.data.Status === "Cancelled" || this.data.Status === "Assigned" || this.data.Status === "Completed") {
-        sap.m.MessageToast.show("This customer can't be assign");
+        sap.m.MessageToast.show("This Customer can't be Assign");
         return;
     }
 
@@ -441,7 +441,7 @@ sap.ui.define([
             var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();
             if (!selected) {
-                sap.m.MessageToast.show("Please select a record to assign room.");
+                sap.m.MessageToast.show("Please Select a Record to Assign Room.");
                 return;
             }
 
@@ -482,7 +482,7 @@ sap.ui.define([
                         password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
                     },
                     success: async function(response) {
-                        sap.m.MessageToast.show("Record updated successfully!");
+                        sap.m.MessageToast.show("Record Updated Successfully!");
                         await this.Cust_read(true)
                         // this.RoomNo()
                         this.HM_Dialog.close();
@@ -492,7 +492,7 @@ sap.ui.define([
                     }
                 });
             } else {
-                sap.m.MessageToast.show("Please fill all required fields correctly before saving.");
+                sap.m.MessageToast.show("Please Fill all Required Fields Correctly before Saving.");
                 return;
             }
 
@@ -629,7 +629,7 @@ sap.ui.define([
                     password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
                 },
                 success: function(response) {
-                    sap.m.MessageToast.show("Record updated successfully!");
+                    sap.m.MessageToast.show("Record Updated Successfully!");
                 },
                 error: function(xhr) {
                     sap.m.MessageToast.show("Error: " + xhr.statusText);

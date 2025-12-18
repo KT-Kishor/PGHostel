@@ -111,7 +111,7 @@ sap.ui.define([
             const oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                return sap.m.MessageToast.show("Please select a record to edit.");
+                return sap.m.MessageToast.show("Please Select a Record to Edit.");
             }
 
             const oData = oSelected.getBindingContext("HostelFeatures").getObject();
@@ -188,7 +188,7 @@ sap.ui.define([
             }
 
             if (!oUpload.Photo1Name) {
-                return sap.m.MessageToast.show("Please upload at least one image.");
+                return sap.m.MessageToast.show("Please Upload at Least One Image.");
             }
 
             //  Duplicate check
@@ -201,7 +201,7 @@ sap.ui.define([
             });
 
             if (bDuplicate) {
-                sap.m.MessageToast.show("Facility with the same name already exists!");
+                sap.m.MessageToast.show("Facility with the Same Name Already Exists!");
                 return;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -227,14 +227,14 @@ sap.ui.define([
                         }
                     });
 
-                    sap.m.MessageToast.show("Facility updated successfully!");
+                    sap.m.MessageToast.show("Facility Updated Successfully!");
                 } else {
                     // CREATE
                     await this.ajaxCreateWithJQuery("HM_HostelFeatures", {
                         data: oPayload
                     });
 
-                    sap.m.MessageToast.show("Facility added successfully!");
+                    sap.m.MessageToast.show("Facility Added Successfully!");
                 }
 
                 this.ARD_Dialog.close();
@@ -362,7 +362,7 @@ sap.ui.define([
             var aSelectedItems = oTable.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one record to delete.");
+                sap.m.MessageToast.show("Please Select at Least One Record to Delete.");
                 return;
             }
 
@@ -375,7 +375,7 @@ sap.ui.define([
             }).join(", ");
 
             MessageBox.confirm(
-                `Are you sure you want to delete the selected Hostel Features: ${sNames}?`, {
+                `Are you sure you want to Delete the Selected Hostel Features: ${sNames}?`, {
                     icon: MessageBox.Icon.WARNING,
                     title: "Confirm Deletion",
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -398,7 +398,7 @@ sap.ui.define([
                                 // Wait for all deletions to complete
                                 await Promise.all(aDeletePromises);
 
-                                sap.m.MessageToast.show("Hostel Feature deleted successfully!");
+                                sap.m.MessageToast.show("Hostel Feature Deleted Successfully!");
                                 await that.Onsearch("true"); // refresh table
                              } catch (err) {
                                 sap.ui.core.BusyIndicator.hide();
@@ -441,7 +441,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-               sap.m.MessageToast.show("No document found for this room!");
+               sap.m.MessageToast.show("No Document Found for this Room!");
                 return;
             }
 

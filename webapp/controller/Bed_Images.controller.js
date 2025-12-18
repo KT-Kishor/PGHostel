@@ -198,7 +198,7 @@ sap.ui.define([
 
                 if (bDuplicate) {
                     sap.m.MessageToast.show(
-                        "A bed with the same Bed Type, Branch Code, and AC Type already exists."
+                        "A Bed with the Same Bed Type, Branch Code, and AC Type already Exists."
                     );
                     return;
                 }
@@ -279,7 +279,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("Bed saved successfully.");
                 this.ARD_Dialog.close();
             } else {
-                sap.m.MessageToast.show("Please fill all mandatory fields correctly.");
+                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
             }
         },
 
@@ -323,7 +323,7 @@ sap.ui.define([
             const MAX_SIZE = 2 * 1024 * 1024; // 2MB
             if (oFile.size > MAX_SIZE) {
                 sap.m.MessageToast.show(
-                    "File size must be less than 2 MB.\nSelected file size: " +
+                    "File Size must be less than 2 MB.\nSelected File Size: " +
                     (oFile.size / 1024 / 1024).toFixed(2) + " MB"
                 );
 
@@ -341,13 +341,13 @@ sap.ui.define([
                 const aRealImages = aImages.filter(img => !img.isPlaceholder);
                 const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
                 if (bFileNameDuplicate) {
-                    sap.m.MessageToast.show(`"${oFile.name}" is already added.`);
+                    sap.m.MessageToast.show(`"${oFile.name}" is already Added.`);
                     return;
                 }
 
                 const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
-                    sap.m.MessageToast.show(`This image is already added.`);
+                    sap.m.MessageToast.show(`This Image is already Added.`);
                     return;
                 }
 

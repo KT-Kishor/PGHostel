@@ -1,12 +1,21 @@
 <c:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core"
-	xmlns:u="sap.ui.unified">
-	<Dialog id="sds12" title="Bed Details" type="Message" class="sapUiContentPadding" resizable="true" draggable="true"
-    contentWidth="40%" contentHeight="auto">
-		<f:SimpleForm
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="sds12"
+        title="Bed Details"
+        type="Message"
+        class="sapUiContentPadding"
+        resizable="true"
+        draggable="true"
+        contentWidth="40%"
+        contentHeight="auto"
+    >
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -15,86 +24,168 @@
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
-			<f:content>
-				<Label text="Branch Code" required="true"/>
-				<ComboBox id="BD_id_RoomType12" selectedKey="{BedModel>/BranchCode}" items="{BranchModel>/}"
-                change="onbranchChange" showSecondaryValues="true" placeholder="Select Branch Code" 
-                valueStateText="Select Branch Code">
-					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
-                        additionalText="{BranchModel>City}"/>
-				</ComboBox>
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="Branch Code"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_id_RoomType12"
+                    selectedKey="{BedModel>/BranchCode}"
+                    items="{BranchModel>/}"
+                    change="onbranchChange"
+                    showSecondaryValues="true"
+                    placeholder="Select Branch Code"
+                    valueStateText="Select Branch Code"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"
+                    />
+                </ComboBox>
 
-				<Label text="Bed Type" required="true"/>
-				<Input id="BD_idBedType" value="{BedModel>/Name}" placeholder="Enter Bed Type" valueStateText="Enter Bed Type"
-                maxLength="50" liveChange="onLivehange"/>
+                <Label
+                    text="Bed Type"
+                    required="true"
+                />
+                <Input
+                    id="BD_idBedType"
+                    value="{BedModel>/Name}"
+                    placeholder="Enter Bed Type"
+                    valueStateText="Enter Bed Type"
+                    maxLength="50"
+                    liveChange="onLivehange"
+                />
 
-				<Label text="Room Type" required="true"/>
-				<ComboBox id="BD_id_Roomtype"  selectedKey="{BedModel>/ACType}"  change="onbranchChange"
-                placeholder="Select Room Type" valueStateText="Select Room Type" >
-				            <core:ListItem key="AC" text="AC"/>
-				            <core:ListItem key="Non-Ac" text="Non-Ac"/>
-				</ComboBox>
+                <Label
+                    text="Room Type"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_id_Roomtype"
+                    selectedKey="{BedModel>/ACType}"
+                    change="onbranchChange"
+                    placeholder="Select Room Type"
+                    valueStateText="Select Room Type"
+                >
+                    <core:ListItem
+                        key="AC"
+                        text="AC"
+                    />
+                    <core:ListItem
+                        key="Non-Ac"
+                        text="Non-Ac"
+                    />
+                </ComboBox>
 
-				<Label text="No of Person" required="true"/>
-				<Input id="BD_id_Person" value="{BedModel>/NoOfPerson}" placeholder="Enter No of Person" valueStateText="Enter No Of Person" liveChange="onNoOfPersonInputLiveChange" maxLength="2"/>
+                <Label
+                    text="No of Person"
+                    required="true"
+                />
+                <Input
+                    id="BD_id_Person"
+                    value="{BedModel>/NoOfPerson}"
+                    placeholder="Enter No of Person"
+                    valueStateText="Enter No of Person"
+                    liveChange="onNoOfPersonInputLiveChange"
+                    maxLength="2"
+                />
 
-				<Label text="No of Rooms" required="true"/>
-				<Input id="BD_id_MaxBeds" value="{BedModel>/MaxBeds}" placeholder="Enter No of Rooms" valueStateText="Enter No Of Rooms"  maxLength="3" liveChange="onNoOfPersonInputLiveChange"/>
+                <Label
+                    text="No of Rooms"
+                    required="true"
+                />
+                <Input
+                    id="BD_id_MaxBeds"
+                    value="{BedModel>/MaxBeds}"
+                    placeholder="Enter No of Rooms"
+                    valueStateText="Enter No of Rooms"
+                    maxLength="3"
+                    liveChange="onNoOfPersonInputLiveChange"
+                />
 
-				<Label text="Description" required="true"/>
-				<TextArea id="BD_id_Description" value="{BedModel>/Description}" maxLength="150" placeholder="Enter Description" valueStateText="Enter Description" liveChange="onLivehange"/>
+                <Label
+                    text="Description"
+                    required="true"
+                />
+                <TextArea
+                    id="BD_id_Description"
+                    value="{BedModel>/Description}"
+                    maxLength="150"
+                    placeholder="Enter Description"
+                    valueStateText="Enter Description"
+                    liveChange="onLivehange"
+                />
 
-				<Label text=""/>
-				<VBox width="100%">
-					<HBox justifyContent="End" width="100%">
-						<u:FileUploader
+                <Label text="" />
+                <VBox width="100%">
+                    <HBox
+                        justifyContent="End"
+                        width="100%"
+                    >
+                        <u:FileUploader
                             id="BT_id_FileUploader"
                             fileType="jpg,jpeg,png"
                             multiple="true"
                             sameFilenameAllowed="false"
                             buttonOnly="true"
                             buttonText="Upload Images"
-                            change="onFacilityFileChange"/>
-						<Text text="*" class="upload-star"/>
-					</HBox>
-					<Table
+                            change="onFacilityFileChange"
+                        />
+                        <Text
+                            text="*"
+                            class="upload-star"
+                        />
+                    </HBox>
+                    <Table
                         id="id_Bed_AttachmentTable"
                         items="{UploaderData>/attachments}"
                         mode="Delete"
                         popinLayout="Block"
                         delete="onTokenDelete"
-                        width="100%">
-						<columns>
-							<Column>
-								<Text text="File Name" />
-							</Column>
-							<Column hAlign="Center">
-								<Text text="File Type" />
-							</Column>
-							<Column hAlign="Center">
-								<Text text="File Size" />
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Text text="{UploaderData>filename}" />
-									<Text text="{UploaderData>fileType}" />
-									<Text text="{UploaderData>size}" />
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-				</VBox>
-			</f:content>
-		</f:SimpleForm>
-		<footer>
-			<Toolbar>
-				<ToolbarSpacer />
-				<Button text="Save" press="BT_onsavebuttonpress" class="myUnifiedBtn"/>
-				<Button text="Cancel" press="BT_onCancelButtonPress" class="myUnifiedBtn"/>
-			</Toolbar>
-		</footer>
-	</Dialog>
+                        width="100%"
+                    >
+                        <columns>
+                            <Column>
+                                <Text text="File Name" />
+                            </Column>
+                            <Column hAlign="Center">
+                                <Text text="File Type" />
+                            </Column>
+                            <Column hAlign="Center">
+                                <Text text="File Size" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{UploaderData>filename}" />
+                                    <Text text="{UploaderData>fileType}" />
+                                    <Text text="{UploaderData>size}" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </VBox>
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Save"
+                    press="BT_onsavebuttonpress"
+                    class="myUnifiedBtn"
+                />
+                <Button
+                    text="Cancel"
+                    press="BT_onCancelButtonPress"
+                    class="myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
 </c:FragmentDefinition>

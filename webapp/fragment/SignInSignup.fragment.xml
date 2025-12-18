@@ -113,13 +113,13 @@
 							</VBox>
 							<VBox width="80%" class="sapUiTinyMarginBegin">
 								<Label text="Full Name" required="true"/>
-								<Input id="signUpName" value="{LoginMode>/fullname}" placeholder="Full Name" required="true" liveChange="_LCvalidateName" valueStateText="Enter valid name"/>
+								<Input id="signUpName" value="{LoginMode>/fullname}" placeholder="Full Name" required="true" liveChange="_LCvalidateName" valueStateText="Enter Valid Name"/>
 								<layoutData>
 									<FlexItemData baseSize="70%" growFactor="1" />
 								</layoutData>
 							</VBox>
 						</HBox>
-						<Label text="Date Of Birth" required="true" />
+						<Label text="Date of Birth" required="true" />
 						<DatePicker id="signUpDOB" value="{LoginMode>/DateOfBirth}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" change="onChangeDOB" />
 						<Label text="Gender" required="true"/>
 						<Select id="signUpGender" selectedKey="" change="onChangeGender">
@@ -130,7 +130,7 @@
 						</Select>
 						<!-- ================== 2) CONTACT DETAILS ================== -->
 						<Label text="Email" required="true" class="sapUiTinyMarginTop" />
-						<Input id="signUpEmail" value="{LoginMode>/Email}" placeholder="Email" type="Email" required="true" liveChange="onEmailliveChange" valueStateText="Enter valid email" />
+						<Input id="signUpEmail" value="{LoginMode>/Email}" placeholder="Email" type="Email" required="true" liveChange="onEmailliveChange" valueStateText="Enter Valid Email" />
 						<Label text="Country" required="true"/>
 						<ComboBox id="signUpCountry" change="onChangeCountry" selectionChange="onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
 							<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>

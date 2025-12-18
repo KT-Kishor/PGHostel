@@ -30,7 +30,7 @@ sap.ui.define([
         onTableSelection: function (oEvent) {
             const oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("No row selected");
+                sap.m.MessageToast.show("No Row Selected");
                 return;
             }
 
@@ -38,7 +38,7 @@ sap.ui.define([
 
             const oContext = oSelectedItem.getBindingContext("HostelModel");
             if (!oContext) {
-                sap.m.MessageToast.show("Selection has no binding context");
+                sap.m.MessageToast.show("Selection has no Binding Context");
                 return;
             }
 
@@ -69,7 +69,7 @@ sap.ui.define([
 onEditFacilityDetails: function () {
 
     if (!this._oSelectedFacility) {
-        sap.m.MessageToast.show("Please select a row to edit.");
+        sap.m.MessageToast.show("Please Select a Row to Edit.");
         return;
     }
 
@@ -166,7 +166,7 @@ _filterRateTypesForEdit: function () {
 
     if (!oFacilityData) {
         console.error("Facility not found:", this._oSelectedFacility);
-        sap.m.MessageToast.show("Facility data missing.");
+        sap.m.MessageToast.show("Facility Data Missing.");
         return;
     }
 
@@ -250,7 +250,7 @@ _filterRateTypesForEdit: function () {
             const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please select Start Date first.");
+                sap.m.MessageToast.show("Please Select Start Date First.");
                 return;
             }
 
@@ -414,7 +414,7 @@ _filterRateTypesForEdit: function () {
             const oEditModel = oView.getModel("edit");
 
             if (!oHostelModel || !oEditModel) {
-                sap.m.MessageToast.show("Missing models");
+                sap.m.MessageToast.show("Missing Models");
                 return;
             }
 
@@ -437,7 +437,7 @@ _filterRateTypesForEdit: function () {
 
             // ---- Per Day validation ----
             if (sUnitText === "Per Day" && iTotalDays < 1) {
-                sap.m.MessageBox.error("Total Days must be at least 1 for Per Day booking.");
+                sap.m.MessageBox.error("Total Days must be at Least 1 for Per Day Booking.");
                 return;
             }
 
@@ -453,7 +453,7 @@ _filterRateTypesForEdit: function () {
                     utils._LCvalidateMandatoryField(oTotalTime, "ID");
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show("Please fill all mandatory fields.");
+                    sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                     return;
                 }
 
@@ -462,7 +462,7 @@ _filterRateTypesForEdit: function () {
                 const end   = new Date("1970-01-01T" + oEndTime.getValue() + ":00");
 
                 if (start >= end) {
-                    sap.m.MessageToast.show("Start Time should be less than End Time");
+                    sap.m.MessageToast.show("Start Time should be Less than End Time");
                     return;
                 }
             }
@@ -509,7 +509,7 @@ _filterRateTypesForEdit: function () {
                     all: aFacilities,
                     selected: this._oSelectedFacility
                 });
-                sap.m.MessageToast.show("Could not find selected facility in global list. Please re-select the row and try again.");
+                sap.m.MessageToast.show("Could not find Selected Facility in Global list. Please re-select the Row and try again.");
                 return;
             }
 
@@ -623,7 +623,7 @@ _filterRateTypesForEdit: function () {
                 // Reset button
                 if (oBtn) oBtn.setText("Apply Now");
 
-                sap.m.MessageToast.show("Coupon removed. Total is less than minimum order value.");
+                sap.m.MessageToast.show("Coupon Removed. Total is Less than Minimum Order Value.");
             }
 
             // 6️⃣ Re-apply taxes (India → CGST + SGST)
@@ -688,7 +688,7 @@ _filterRateTypesForEdit: function () {
             this._oSelectedFacility = null;
             this._oSelectedIndex = null;
             this._sSelectedPath = null;
-            sap.m.MessageToast.show("Facility updated successfully!");
+            sap.m.MessageToast.show("Facility Updated Successfully!");
         },
 
         _formatDateToDDMMYYYY: function (dt) {
@@ -762,7 +762,7 @@ _filterRateTypesForEdit: function () {
 
                     if (!fStartDate || !fEndDate) {
                         // Skip invalid dates
-                        sap.m.MessageToast.show("Invalid facility start/end date for " + (f.FacilityName || ""));
+                        sap.m.MessageToast.show("Invalid Facility Start/End Date for " + (f.FacilityName || ""));
                         return;
                     }
                     // USE the user-calculated dialog value directly
@@ -770,7 +770,7 @@ _filterRateTypesForEdit: function () {
 
 
                     if (fDays <= 0) {
-                        sap.m.MessageToast.show("Facility End Date must be same or after Start Date for " + (f.FacilityName || ""));
+                        sap.m.MessageToast.show("Facility End Date must be Same or after Start Date for " + (f.FacilityName || ""));
                         return;
                     }
 
@@ -928,7 +928,7 @@ _filterRateTypesForEdit: function () {
             );
 
             if (!oMatched) {
-                sap.m.MessageToast.show("Price not found for selected Unit Type.");
+                sap.m.MessageToast.show("Price not Found for Selected Unit Type.");
                 return;
             }
 
@@ -966,7 +966,7 @@ _filterRateTypesForEdit: function () {
             const oDoc = oCtx && oCtx.getObject();
 
             if (!oDoc || !oDoc.Document) {
-                sap.m.MessageToast.show("No document to preview.");
+                sap.m.MessageToast.show("No Document to Preview.");
                 return;
             }
 
@@ -1103,7 +1103,7 @@ _filterRateTypesForEdit: function () {
 
     // Validate number format
     if (isNaN(startHour) || isNaN(endHour)) {
-        sap.m.MessageToast.show("Invalid hour format");
+        sap.m.MessageToast.show("Invalid Hour Format");
         oEditModel.setProperty("/TotalTime", "");
         oTimePicker.setValueState("Error");
         return;
@@ -1111,7 +1111,7 @@ _filterRateTypesForEdit: function () {
 
     // Validate end > start
     if (endHour < startHour) {
-        sap.m.MessageToast.show("End Time should be greater than Start Time");
+        sap.m.MessageToast.show("End Time should be Greater than Start Time");
         oEditModel.setProperty("/TotalTime", "");
         oTimePicker.setValueState("Error");
         oTimePicker.setValueStateText("End Time cannot be earlier than Start Time");
@@ -1225,12 +1225,12 @@ oBtn.setVisible(true);
                 oHostelModel.setProperty("/SGST", originalSGST);
                 oHostelModel.setProperty("/FinalTotalCost", originalFinal);
 
-                sap.m.MessageToast.show("Coupon removed. Prices restored.");
+                sap.m.MessageToast.show("Coupon Removed. Prices Restored.");
                 return;
             }
 
             if (!sEnteredCode) {
-                sap.m.MessageToast.show("Please enter coupon");
+                sap.m.MessageToast.show("Please Enter Coupon");
                 return;
             }
 
@@ -1247,25 +1247,18 @@ oBtn.setVisible(true);
                 const aCoupons = response?.data || [];
 
                 if (!aCoupons.length) {
-                    sap.m.MessageToast.show("No coupons found");
+                    sap.m.MessageToast.show("No Coupons Found");
                     return;
                 }
               const CouponCodeEnddate = aCoupons[0].EndDate;
-
-
-
 const couponEndISO = new Date(CouponCodeEnddate).toISOString().split("T")[0];
 const todayISO = new Date().toISOString().split("T")[0];
 
 // Compare
 if (couponEndISO < todayISO) {
-    sap.m.MessageToast.show("Coupon is expired.");
+    sap.m.MessageToast.show("Coupon is Expired.");
     return;
 }
-
-
-              
-
                 // Match coupon
                 const oMatched = aCoupons.find(c =>
                     String(c.CouponCode).toUpperCase() === sEnteredCode.toUpperCase()
@@ -1281,7 +1274,7 @@ if (couponEndISO < todayISO) {
 
                 if (couponBranch && couponBranch !== selectedBranch) {
                     sap.m.MessageToast.show(
-                        `This coupon is not valid for the selected Branch Room.`
+                        `This Coupon is not Valid for the Selected Branch Room.`
                     );
                     return;
                 }
@@ -1298,12 +1291,12 @@ if (couponEndISO < todayISO) {
                 let subTotal = Number(oHostelModel.getProperty("/OverallTotalCost") || 0);
 
                 if (subTotal <= 0) {
-                    sap.m.MessageToast.show("Subtotal is zero. Cannot apply coupon.");
+                    sap.m.MessageToast.show("Subtotal is Zero. Cannot Apply Coupon.");
                     return;
                 }
                 if (subTotal < minOrderValue) {
                     sap.m.MessageToast.show(
-                        `Minimum order value ₹${minOrderValue} required to apply this coupon.`
+                        `Minimum Order Value ₹${minOrderValue} required to Apply this Coupon.`
                     );
                     return;
                 }
@@ -1355,7 +1348,7 @@ if (couponEndISO < todayISO) {
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Error applying coupon");
+                sap.m.MessageToast.show("Error Applying Coupon");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }

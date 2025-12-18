@@ -75,7 +75,7 @@
                             placeholder="Full Name"
                             required="true"
                             liveChange="_LCvalidateName"
-                            valueStateText="Enter valid name"
+                            valueStateText="Enter Valid Name"
                         />
                     </VBox>
                 </HBox>
@@ -132,7 +132,7 @@
                     type="Email"
                     required="true"
                     liveChange="onEmailliveChange"
-                    valueStateText="Enter valid email"
+                    valueStateText="Enter Valid Email"
                 />
                 <Label
                     text="Branch Code"
