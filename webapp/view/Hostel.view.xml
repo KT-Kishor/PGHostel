@@ -322,16 +322,15 @@
                             title="No Rooms Found"
                             description="Please select another Branch or City."
                         />
-                        <VBox
+                       <VBox
                             alignItems="Center"
                             class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-                            visible="{= !${VisibilityModel>/NoData} }"
+                             visible="{VisibilityModel>/ShowViewMore}"
                         >
                             <Link
                                 text="View more rooms"
-                                tooltip="View more rooms"
                                 press="onViewMoreRooms"
-                                class="viewMoreLink"
+                                class="btnViewDetails"
                             />
                         </VBox>
                     </Page>

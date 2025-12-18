@@ -142,73 +142,42 @@ sap.ui.define([
             })
         },
 
-        _populateUniqueFilterValues: function (data) {
-            const uniqueValues = {
-                PO_id_BookingId: new Set(),
-                PO_id_CustomerId: new Set(),
-                PO_id_CompanyName: new Set(), // RoomNo
-                PO_id_Status: new Set()
-            };
+       _populateUniqueFilterValues: function (data) {
+    let uniqueValues = {
+        PO_id_CompanyName: new Set(),
+        PO_id_Status: new Set()
+    };
 
-            const seenBookingCustomer = new Set();
+    data.forEach(item => {
+        if (item.RoomNo && item.RoomNo.trim()) {  
+            uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
+        }
+        if (item.Status) {  
+            uniqueValues.PO_id_Status.add(item.Status.trim());
+        }
+    });
 
-            // Sort data so latest BookingID comes first
-            const aSortedData = [...data].sort((a, b) => {
-                return Number(b.BookingID) - Number(a.BookingID);
+    let oView = this.getView();
+
+    ["PO_id_CompanyName","PO_id_Status"].forEach(field => {
+        let oComboBox = oView.byId(field);
+        if (!oComboBox) return;
+
+        oComboBox.destroyItems();
+
+        Array.from(uniqueValues[field])
+            .sort()
+            .forEach(value => {
+                oComboBox.addItem(
+                    new sap.ui.core.Item({
+                        key: value,
+                        text: value
+                    })
+                );
             });
+    });
+},
 
-            aSortedData.forEach(item => {
-                if (!item.BookingID || !item.CustomerID) {
-                    return;
-                }
-
-                // Unique combination of BookingID + CustomerID
-                const key = item.BookingID + "|" + item.CustomerID;
-                if (seenBookingCustomer.has(key)) {
-                    return;
-                }
-                seenBookingCustomer.add(key);
-
-                // BookingID
-                uniqueValues.PO_id_BookingId.add(item.BookingID);
-
-                // CustomerID
-                uniqueValues.PO_id_CustomerId.add(item.CustomerID);
-
-                // RoomNo
-                if (item.RoomNo) {
-                    uniqueValues.PO_id_CompanyName.add(item.RoomNo);
-                }
-
-                // Status
-                if (item.Status) {
-                    uniqueValues.PO_id_Status.add(item.Status);
-                }
-            });
-
-            const oView = this.getView();
-
-            [
-                "PO_id_BookingId",
-                "PO_id_CustomerId",
-                "PO_id_CompanyName",
-                "PO_id_Status"
-            ].forEach(field => {
-                const oComboBox = oView.byId(field);
-                if (!oComboBox) return;
-
-                oComboBox.destroyItems();
-
-                Array.from(uniqueValues[field]).forEach(value => {
-                    oComboBox.addItem(
-                        new sap.ui.core.Item({
-                            key: value,
-                            text: value
-                        })
-                    );
-                });
-            });
-        },
 //       HM_viewroom: function (oEvent) {
 
 //     var oContext = oEvent.getSource().getBindingContext("HostelModel");
