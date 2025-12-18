@@ -130,11 +130,13 @@
                         <ToolbarSpacer />
                         <Button
                             text="Assign Rooms"
+                            tooltip="Assign Rooms"
                             press="PO_onCreatePurchaseOrder"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="Delete"
+                            tooltip="Delete"
                             press="PO_onDeleteButtonPress"
                             class="myUnifiedBtn"
                         />
@@ -150,7 +152,7 @@
 					
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>customerName}"
+                            text="{i18n>customerName}" tooltip="{i18n>customerName}"
                         />
                     </Column>
                     <Column
@@ -158,7 +160,7 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>customerAddress}"
+                            text="{i18n>customerAddress}" tooltip="{i18n>customerAddress}"
                         />
                     </Column>
                     <Column
@@ -166,7 +168,7 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>type}"
+                            text="{i18n>type}" tooltip="{i18n>type}"
                         />
                     </Column>
                     <Column
@@ -174,7 +176,7 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>pan}"
+                            text="{i18n>pan}" tooltip="{i18n>pan}"
                         />
                     </Column>
                     <Column

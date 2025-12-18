@@ -1,93 +1,167 @@
 <mvc:View
     controllerName="sap.ui.com.project1.controller.ManageStaff"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:m="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:fb="sap.ui.comp.filterbar"
-	xmlns:core="sap.ui.core"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
-    busyIndicatorDelay="0">
-	<Page showHeader="true">
-		<headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</headerContent>
-		<content>
-			<fb:FilterBar id="MS_id_FilterbarEmployee" persistencyKey="myPersKey" useToolbar="false" clear="FC_onPressClear"
-                showClearOnFB="true" search="Onsearch" filterChange="IA_.onFilterChange" afterVariantLoad="IA_.onAfterVariantLoad"
-                showFilterConfiguration="false"  filterContainerWidth="auto">
-				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="UserID" label="User ID" groupName="Group" visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox id="MS_id_UserID" items="{mainModel>/}" showClearIcon="true">
-								<core:Item key="{mainModel>UserID}" text="{mainModel>UserID}"/>
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem name="UserName" label="User Name" groupName="Group" visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox id="MS_id_UserName" items="{mainModel>/}" showClearIcon="true">
-								<core:Item key="{mainModel>UserName}" text="{mainModel>UserName}" />
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-				</fb:filterGroupItems>
-			</fb:FilterBar>
-			<Table
+    busyIndicatorDelay="0"
+>
+    <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <content>
+            <fb:FilterBar
+                id="MS_id_FilterbarEmployee"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="FC_onPressClear"
+                showClearOnFB="true"
+                search="Onsearch"
+                filterChange="IA_.onFilterChange"
+                afterVariantLoad="IA_.onAfterVariantLoad"
+                showFilterConfiguration="false"
+                filterContainerWidth="auto"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="UserID"
+                        label="User ID"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="MS_id_UserID"
+                                items="{mainModel>/}"
+                                showClearIcon="true"
+                            >
+                                <core:Item
+                                    key="{mainModel>UserID}"
+                                    text="{mainModel>UserID}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        name="UserName"
+                        label="User Name"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="MS_id_UserName"
+                                items="{mainModel>/}"
+                                showClearIcon="true"
+                            >
+                                <core:Item
+                                    key="{mainModel>UserName}"
+                                    text="{mainModel>UserName}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <Table
                 id="MS_id_ManageStaff"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
-                items="{path:'mainModel>/'}">
-				<headerToolbar>
-					<OverflowToolbar>
-						<Title text="Staff Details ({=${mainModel>/}.length})" />
-						<ToolbarSpacer/>
-						<Button text="Add" press="HM_AddHostelFeature" class="myUnifiedBtn"/>
-						<Button text="Edit"  press="HM_EditHostelFeature" class="myUnifiedBtn"/>
-						<Button text="Delete" press="HM_DeleteHostelFeature" class="myUnifiedBtn"/>
-					</OverflowToolbar>
-				</headerToolbar>
-				<columns>
-					<Column demandPopin="true">
-						<Text text="User ID" />
-					</Column>
-					<Column demandPopin="true">
-						<Text text="Staff Name" />
-					</Column>
-					<Column  demandPopin="true">
-						<Text text="Role" />
-					</Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="Email ID" />
-					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="Gender" />
-					</Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet">
-                        <Text text="Mobile No" />
+                items="{path:'mainModel>/'}"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="Staff Details ({=${mainModel>/}.length})"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            text="Add"
+							tooltip="Add Staff"
+                            press="HM_AddHostelFeature"
+                            class="myUnifiedBtn"
+                        />
+                        <Button
+                            text="Edit"
+							tooltip="Edit Staff"
+                            press="HM_EditHostelFeature"
+                            class="myUnifiedBtn"
+                        />
+                        <Button
+                            text="Delete"
+							tooltip="Delete Staff"
+                            press="HM_DeleteHostelFeature"
+                            class="myUnifiedBtn"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column demandPopin="true">
+                        <Text text="User ID" tooltip="User ID" />
                     </Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet">
-                        <Text text="Address" />
+                    <Column demandPopin="true">
+                        <Text text="Staff Name" tooltip="Staff Name" />
                     </Column>
-				</columns>
-				<items>
-					<ColumnListItem>
-						<cells>
-							<Text text="{mainModel>UserID}" />
-                            <Text text="{mainModel>Salutation} {mainModel>UserName}" />
+                    <Column demandPopin="true">
+                        <Text text="Role" tooltip="Role" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Email ID" tooltip="Email ID" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Gender" tooltip="Gender" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Mobile No" tooltip="Mobile Number" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Address" tooltip="Address" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{mainModel>UserID}" />
+                            <Text
+                                text="{mainModel>Salutation} {mainModel>UserName}"
+                            />
                             <Text text="{mainModel>Role}" />
                             <Text text="{mainModel>EmailID}" />
                             <Text text="{mainModel>Gender}" />
-                            <Text text="{mainModel>STDCode} {mainModel>MobileNo}" />
-                            <ExpandableText text="{mainModel>Address}" maxCharacters="20"></ExpandableText>
-						</cells>
-					</ColumnListItem>
-				</items>
-			</Table>
-		</content>
-	</Page>
+                            <Text
+                                text="{mainModel>STDCode} {mainModel>MobileNo}"
+                            />
+                            <ExpandableText
+                                text="{mainModel>Address}"
+                                maxCharacters="20"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
 </mvc:View>

@@ -30,7 +30,6 @@
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
             >
-              
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Booking ID"
@@ -43,7 +42,8 @@
                                 id="PO_id_BookingId"
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
-                                showSecondaryValues="true" filterSecondaryValues="true"
+                                showSecondaryValues="true"
+                                filterSecondaryValues="true"
                             >
                                 <core:ListItem
                                     key="{HostelModel>BookingID}"
@@ -67,12 +67,10 @@
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
-
                             >
                                 <core:ListItem
                                     key="{HostelModel>RoomNo}"
                                     text="{HostelModel>RoomNo}"
-
                                 />
                             </ComboBox>
                         </fb:control>
@@ -100,7 +98,7 @@
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
 
-                     <fb:filterGroupItems>
+                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="StartDate"
                         label="Date"
@@ -108,16 +106,14 @@
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                             <DateRangeSelection
-                            id="PO_id_Date"
-                            valueFormat="yyyy-MM-dd"
-                            displayFormat="dd/MM/yyyy"
-                        />
+                            <DateRangeSelection
+                                id="PO_id_Date"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
-
-                
             </fb:FilterBar>
             <Table
                 id="idPOTable"
@@ -138,6 +134,7 @@
                         <ToolbarSpacer />
                         <Button
                             text="Assign Room"
+                            tooltip="Assign Room"
                             press="HM_AssignRoom"
                             class="myUnifiedBtn"
                         />
@@ -145,49 +142,49 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Customer" />
+                        <Text text="Customer" tooltip="Customer" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Booking ID" />
+                        <Text text="Booking ID" tooltip="Booking ID" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Booking Date" />
+                        <Text text="Booking Date" tooltip="Booking Date" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Gender" />
+                        <Text text="Gender" tooltip="Gender" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Contact Information" />
+                        <Text text="Contact Information" tooltip="Contact Information" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Start/End Date" />
+                        <Text text="Start/End Date" tooltip="Start/End Date" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Room Number" />
+                        <Text text="Room Number" tooltip="Room Number" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Bed Type" />
+                        <Text text="Bed Type" tooltip="Bed Type" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Status" />
+                        <Text text="Status" tooltip="Status" />
                     </Column>
                 </columns>
                 <items>

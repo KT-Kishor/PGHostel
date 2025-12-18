@@ -26,6 +26,7 @@
                 <Button
                     text="SIGN IN / UP"
                     id="loginButton"
+                    tooltip="Sign In or Sign Up"
                     class=" sapUiSmallMarginTop loginButton"
                     press="onpressLogin"
                     visible="{= !${UIModel>/isLoggedIn} }"
@@ -103,6 +104,7 @@
                         </l:Grid>
                         <Button
                             text="Book Room"
+                            tooltip="Book Room"
                             class="RoomBook sapUiLargeMarginBegin "
                             press="onpressBookrooms"
                         />
@@ -257,7 +259,7 @@
                                     loop="true"
                                     showPageIndicator="false"
                                     backgroundDesign="Transparent"
-pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+                                    pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                                 >
                                     <pages>
                                         <VBox class="imageWrapper">
@@ -327,6 +329,7 @@ pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                         >
                             <Link
                                 text="View more rooms"
+                                tooltip="View more rooms"
                                 press="onViewMoreRooms"
                                 class="viewMoreLink"
                             />

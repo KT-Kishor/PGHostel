@@ -28,139 +28,202 @@
                 type="XML"
                 binding="{HostelModel>}"
             />
-            
         </CustomListItem>
     </List>
-   <Table
-    id="idGrandTotalSummaryTable"
-    visible="{HostelModel>/ShowSummary}"
-    items="{
+    <Table
+        id="idGrandTotalSummaryTable"
+        visible="{HostelModel>/ShowSummary}"
+        items="{
         path: 'HostelModel>/Persons'
     }"
->
+    >
+        <headerToolbar>
+            <Toolbar>
+                <Title text="Grand Total Summary" tooltip="Grand Total Summary" />
+            </Toolbar>
+        </headerToolbar>
 
-    <headerToolbar>
-        <Toolbar>
-            <Title text="Grand Total Summary" />
-        </Toolbar>
-    </headerToolbar>
+        <columns>
+            <Column>
+                <Text text="Person Name" tooltip="Person Name" />
+            </Column>
+            <Column>
+                <Text text="Facility Cost" tooltip="Facility Cost" />
+            </Column>
+            <Column>
+                <Text text="Room Rent" tooltip="Room Rent" />
+            </Column>
+            <Column>
+                <Text text="Total" tooltip="Total" />
+            </Column>
+        </columns>
 
-    <columns>
-        <Column><Text text="Person Name" /></Column>
-        <Column><Text text="Facility Cost" /></Column>
-        <Column><Text text="Room Rent" /></Column>
-        <Column><Text text="Total" /></Column>
-    </columns>
-
-    <items>
-        <ColumnListItem>
-            <cells>
-                <Text text="{HostelModel>FullName}" />
-                <Text text="{parts: [
+        <items>
+            <ColumnListItem>
+                <cells>
+                    <Text text="{HostelModel>FullName}" />
+                    <Text
+                        text="{parts: [
         'HostelModel>TotalFacilityPrice',
         'HostelModel>/Currency'
-    ],formatter: '.Formatter.formatCurrency'}" />
-                <Text text="{parts: [
+    ],formatter: '.Formatter.formatCurrency'}"
+                    />
+                    <Text
+                        text="{parts: [
         'HostelModel>RoomRentPerPerson',
         'HostelModel>/Currency'
-    ],formatter: '.Formatter.formatCurrency'}" />
-                <Text class="totalColumnBold" text="{ parts: [
+    ],formatter: '.Formatter.formatCurrency'}"
+                    />
+                    <Text
+                        class="totalColumnBold"
+                        text="{ parts: [
         'HostelModel>GrandTotal',
         'HostelModel>/Currency'
-    ],formatter: '.Formatter.formatCurrency'}" />
-            </cells>
-        </ColumnListItem>
-    </items>
+    ],formatter: '.Formatter.formatCurrency'}"
+                    />
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
 
-</Table>    
-      
-      <FlexBox class="custom-flexbox"
-                                        direction="Column">
+    <FlexBox
+        class="custom-flexbox"
+        direction="Column"
+    >
         <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
         <VBox class="sapUiSmallMarginTop custom-vbox">
-         <HBox id="SummaryCouponid"  width="100%" justifyContent="End" alignItems="Center" class="sapUiSmallMarginBottom"
-                               visible="{= ${LoginModel>/UserID} ? true : false }"
-                               >
- 
-    <!-- Coupon Label -->
-    <Label
-        text="Coupon Code:"
-        class="totalColumnBold1 sapUiTinyMarginEnd"
-        width="120px"
-    />
- 
-    <!-- Coupon Input -->
-    <Input
-        value="{HostelModel>/CouponCode}"
-        placeholder="Enter Coupon"
-        width="150px"
-        class="sapUiTinyMarginEnd"
-        id="BookingcouponInput"
-      showValueHelp="true"
-    valueHelpIconSrc="sap-icon://decline"
-    valueHelpRequest="oncancelCoupon"
-    change="onCouponLiveChange"
-    />
- 
-    <!-- Apply Now Button -->
-    <Button
-        text="Apply Now"
-        type="Emphasized"
-        press="onChangeCouponCode"
-        class="sapUiTinyMarginEnd"
-        id="couponApplyBtn"
-      
-    />
-</HBox>
-<HBox justifyContent="End" >
-    <Label text="Discount:" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text 
-        text="{
+            <HBox
+                id="SummaryCouponid"
+                width="100%"
+                justifyContent="End"
+                alignItems="Center"
+                class="sapUiSmallMarginBottom"
+                visible="{= ${LoginModel>/UserID} ? true : false }"
+            >
+                <!-- Coupon Label -->
+                <Label
+                    text="Coupon Code:"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
+                    width="120px"
+                />
+
+                <!-- Coupon Input -->
+                <Input
+                    value="{HostelModel>/CouponCode}"
+                    placeholder="Enter Coupon"
+                    width="150px"
+                    class="sapUiTinyMarginEnd"
+                    id="BookingcouponInput"
+                    showValueHelp="true"
+                    valueHelpIconSrc="sap-icon://decline"
+                    valueHelpRequest="oncancelCoupon"
+                    change="onCouponLiveChange"
+                />
+
+                <!-- Apply Now Button -->
+                <Button
+                    text="Apply Now"
+                    type="Emphasized"
+                    tooltip="Apply Coupon"
+                    press="onChangeCouponCode"
+                    class="sapUiTinyMarginEnd"
+                    id="couponApplyBtn"
+                />
+            </HBox>
+            <HBox justifyContent="End">
+                <Label
+                    text="Discount:"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{
             parts: ['HostelModel>/AppliedDiscount','HostelModel>/Currency'],
             formatter: '.Formatter.formatCurrency'
         }"
-        class="totalColumnBold1"
-    />
-</HBox>
-           <HBox justifyContent="End" 
-      visible="{= !${HostelModel>/IsIndia} }">
-    <Label text="Sub-Total (Non-Taxable):" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text text="{   parts: [
+                    class="totalColumnBold1"
+                />
+            </HBox>
+            <HBox
+                justifyContent="End"
+                visible="{= !${HostelModel>/IsIndia} }"
+            >
+                <Label
+                    text="Sub-Total (Non-Taxable):"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{   parts: [
         'HostelModel>/OverallTotalCost',
         'HostelModel>/Currency'
-    ], formatter: '.Formatter.formatCurrency'}"  class="totalColumnBold1"/>
-</HBox>
+    ], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
 
-            <HBox justifyContent="End" class="sapUiSmallMarginTop" 
-      visible="{HostelModel>/IsIndia}">
-    <Label text="Sub-Total (Taxable):" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text text="{ parts: [
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+                visible="{HostelModel>/IsIndia}"
+            >
+                <Label
+                    text="Sub-Total (Taxable):"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{ parts: [
         'HostelModel>/OverallTotalCost',
         'HostelModel>/Currency'
-    ], formatter: '.Formatter.formatCurrency'}"  class="totalColumnBold1"/>
-</HBox>
+    ], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
 
-            <HBox justifyContent="End" class="sapUiSmallMarginTop"
-      visible="{HostelModel>/IsIndia}">
-    <Label text="CGST (9%):" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text text="{parts:['HostelModel>/CGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"  class="totalColumnBold1"/>
-</HBox>
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+                visible="{HostelModel>/IsIndia}"
+            >
+                <Label
+                    text="CGST (9%):"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{parts:['HostelModel>/CGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
 
-            <HBox justifyContent="End" class="sapUiSmallMarginTop"
-      visible="{HostelModel>/IsIndia}">
-    <Label text="SGST (9%):" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text text="{parts:['HostelModel>/SGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"  class="totalColumnBold1" />
-</HBox>
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+                visible="{HostelModel>/IsIndia}"
+            >
+                <Label
+                    text="SGST (9%):"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{parts:['HostelModel>/SGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
 
-            <HBox justifyContent="End" class="sapUiSmallMarginTop">
-    <Label text="Total Cost:" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-    <Text text="{parts:['HostelModel>/FinalTotalCost','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}" class="totalColumnBold1" />
-</HBox>
-
-           
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+            >
+                <Label
+                    text="Total Cost:"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{parts:['HostelModel>/FinalTotalCost','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
         </VBox>
-        </FlexBox>
-     <!--<VBox class="sapUiMediumMarginBottom">
+    </FlexBox>
+    <!--<VBox class="sapUiMediumMarginBottom">
         <VBox
             visible="{= ${oTCModel>/Visiblity/Services/TrafficManagement} || ${oTCModel>/Visiblity/Services/TrafficManagementVehicles} }"
         >
@@ -214,6 +277,5 @@
             />
         </VBox> -->
 
-       
     <!-- </VBox> -->
 </mvc:View>

@@ -1,32 +1,42 @@
-<mvc:View controllerName="sap.ui.com.project1.controller.Bed_Images"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:m="sap.m"
-	xmlns:suite="sap.suite.ui.commons"
-	xmlns="sap.uxap"
-	xmlns:uxap="sap.uxap"
-	xmlns:richtexteditor="sap.ui.richtexteditor"
-	xmlns:layout="sap.ui.layout"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:c="sap.ui.core"
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Bed_Images"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns:suite="sap.suite.ui.commons"
+    xmlns="sap.uxap"
+    xmlns:uxap="sap.uxap"
+    xmlns:richtexteditor="sap.ui.richtexteditor"
+    xmlns:layout="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:c="sap.ui.core"
     displayBlock="true"
     height="100%"
-	xmlns:core="sap.ui.core"
+    xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
-	xmlns:u="sap.ui.unified">
-	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="Bed Details">
-		<m:headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</m:headerContent>
-		<ObjectPageLayout id="ObjectPageLayout">
-			<sections>
-				<ObjectPageSection
+    xmlns:u="sap.ui.unified"
+>
+    <m:Page
+        navButtonPress="BI_onButtonPress"
+        showNavButton="true"
+        title="Bed Details"
+    >
+        <m:headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </m:headerContent>
+        <ObjectPageLayout id="ObjectPageLayout">
+            <sections>
+                <ObjectPageSection
                     titleUppercase="false"
                     id="purchaseOrderHeaderSection1"
-                    title="Bed Information">
-					<subSections>
-						<ObjectPageSubSection id="dsd1">
-							<blocks>
-								<f:SimpleForm
+                    title="Bed Information"
+                >
+                    <subSections>
+                        <ObjectPageSubSection id="dsd1">
+                            <blocks>
+                                <f:SimpleForm
                                     id="idsimpleCompanyDetails"
                                     busyIndicatorDelay="0"
                                     editable="true"
@@ -43,51 +53,122 @@
                                     columnsXL="3"
                                     columnsL="2"
                                     columnsM="2"
-                                    singleContainerFullSize="false">
-									<f:content>
-										<m:Label text="Branch Code" required="true"/>
-										<m:ComboBox id="idRoomType12" placeholder="Select Branch Code" selectedKey="{BedImageModel>/BranchCode}" items="{BranchModel>/}" change="onbranchChange" showSecondaryValues="true"
-                                        valueStateText="Select Branch Code" editable="{editable>/Edit}">
-											<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID}"
-                                                additionalText="{BranchModel>Name}"/>
-										</m:ComboBox>
+                                    singleContainerFullSize="false"
+                                >
+                                    <f:content>
+                                        <m:Label
+                                            text="Branch Code"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            id="idRoomType12"
+                                            placeholder="Select Branch Code"
+                                            selectedKey="{BedImageModel>/BranchCode}"
+                                            items="{BranchModel>/}"
+                                            change="onbranchChange"
+                                            showSecondaryValues="true"
+                                            valueStateText="Select Branch Code"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:ListItem
+                                                key="{BranchModel>BranchID}"
+                                                text="{BranchModel>BranchID}"
+                                                additionalText="{BranchModel>Name}"
+                                            />
+                                        </m:ComboBox>
 
-										<m:Label text="Bed Type" required="true"/>
-										<m:Input id="idBedType" value="{BedImageModel>/Name}" placeholder="Enter Bed Type"
-                                        maxLength="60" liveChange="onNameInputLiveChange" valueStateText="Enter Bed Type"
-                                        editable="{editable>/Edit}"/>
+                                        <m:Label
+                                            text="Bed Type"
+                                            required="true"
+                                        />
+                                        <m:Input
+                                            id="idBedType"
+                                            value="{BedImageModel>/Name}"
+                                            placeholder="Enter Bed Type"
+                                            maxLength="60"
+                                            liveChange="onNameInputLiveChange"
+                                            valueStateText="Enter Bed Type"
+                                            editable="{editable>/Edit}"
+                                        />
 
-										<m:Label text="Room Type" required="true"/>
-										<m:ComboBox id="idRoomtype" placeholder="Select Room Type" selectedKey="{BedImageModel>/ACType}" change="onbranchChange" valueStateText="Select Room Type"
-                                         editable="{editable>/Edit}" >
-											<core:ListItem  key="AC" text="AC"/>
-											<core:ListItem key="Non-Ac" text="Non-Ac"/>
-										</m:ComboBox>
+                                        <m:Label
+                                            text="Room Type"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            id="idRoomtype"
+                                            placeholder="Select Room Type"
+                                            selectedKey="{BedImageModel>/ACType}"
+                                            change="onbranchChange"
+                                            valueStateText="Select Room Type"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:ListItem
+                                                key="AC"
+                                                text="AC"
+                                            />
+                                            <core:ListItem
+                                                key="Non-Ac"
+                                                text="Non-Ac"
+                                            />
+                                        </m:ComboBox>
 
-										<m:Label text="No of Person" required="true"/>
-										<m:Input id="idR" value="{BedImageModel>/NoOfPerson}" placeholder="Enter No of Person"
-                                        liveChange="onNameInputLiveChange" type="Number" valueStateText="Enter No of person"
-                                            editable="{editable>/Edit}"/>
+                                        <m:Label
+                                            text="No of Person"
+                                            required="true"
+                                        />
+                                        <m:Input
+                                            id="idR"
+                                            value="{BedImageModel>/NoOfPerson}"
+                                            placeholder="Enter No of Person"
+                                            liveChange="onNameInputLiveChange"
+                                            type="Number"
+                                            valueStateText="Enter No of person"
+                                            editable="{editable>/Edit}"
+                                        />
 
-										<m:Label text="Max No of Rooms" required="true"/>
-										<m:Input id="id_MaxBeds" value="{BedImageModel>/MaxBeds}" placeholder="Enter No of Rooms"
-                                        liveChange="onNameInputLiveChange" type="Number" valueStateText="Enter Max No of Rooms"
-                                        editable="{editable>/Edit}"/>
+                                        <m:Label
+                                            text="Max No of Rooms"
+                                            required="true"
+                                        />
+                                        <m:Input
+                                            id="id_MaxBeds"
+                                            value="{BedImageModel>/MaxBeds}"
+                                            placeholder="Enter No of Rooms"
+                                            liveChange="onNameInputLiveChange"
+                                            type="Number"
+                                            valueStateText="Enter Max No of Rooms"
+                                            editable="{editable>/Edit}"
+                                        />
 
-										<m:Label text="Description" required="true"/>
-										<m:TextArea id="id_Description" value="{BedImageModel>/Description}" placeholder="Enter No of Description" liveChange="onNameInputLiveChange" valueStateText="Enter Description"
-                                        maxLength="150" editable="{editable>/Edit}" />
-									</f:content>
-								</f:SimpleForm>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="purchaseOrderSection" title="Images">
-					<subSections>
-						<ObjectPageSubSection id="POO_Purchaseordersection">
-							<blocks>
-								<m:HBox
+                                        <m:Label
+                                            text="Description"
+                                            required="true"
+                                        />
+                                        <m:TextArea
+                                            id="id_Description"
+                                            value="{BedImageModel>/Description}"
+                                            placeholder="Enter No of Description"
+                                            liveChange="onNameInputLiveChange"
+                                            valueStateText="Enter Description"
+                                            maxLength="150"
+                                            editable="{editable>/Edit}"
+                                        />
+                                    </f:content>
+                                </f:SimpleForm>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+                <ObjectPageSection
+                    titleUppercase="false"
+                    id="purchaseOrderSection"
+                    title="Images"
+                >
+                    <subSections>
+                        <ObjectPageSubSection id="POO_Purchaseordersection">
+                            <blocks>
+                                <m:HBox
                                     id="idImagesContainer"
                                     wrap="Wrap"
                                     justifyContent="Start"
@@ -95,29 +176,30 @@
                                     class="sapUiSmallMargin"
                                     items="{DisplayImagesModel>/DisplayImages}"
                                 >
-									<m:VBox
+                                    <m:VBox
                                         class="sapUiSmallMarginEnd"
                                         width="150px"
                                         alignItems="Center"
                                         justifyContent="Center"
                                     >
-										<!-- Normal Image Display -->
-										<m:Image
+                                        <!-- Normal Image Display -->
+                                        <m:Image
                                             src="{DisplayImagesModel>src}"
                                             width="120px"
                                             height="120px"
                                             press="onImagePress"
                                             visible="{= ${DisplayImagesModel>isPlaceholder} === false }"
                                         />
-										<!-- Placeholder Box (visible only when no image) -->
-										<m:VBox
+                                        <!-- Placeholder Box (visible only when no image) -->
+                                        <m:VBox
                                             visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
                                             width="120px"
                                             height="120px"
                                             alignItems="Center"
                                             justifyContent="Center"
-                                            class="placeholderBox">
-											<u:FileUploader
+                                            class="placeholderBox"
+                                        >
+                                            <u:FileUploader
                                                 id="fileUploader"
                                                 icon="sap-icon://add"
                                                 width="120px"
@@ -127,27 +209,47 @@
                                                 buttonOnly="true"
                                                 sameFilenameAllowed="true"
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
-                                                change=".onFileSelected"/>
-										</m:VBox>
-										<!-- Delete icon -->
-										<m:Button icon="sap-icon://delete" visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }" press=".onDeleteImage" type="Reject"  tooltip="Delete Image" width="100%"/>
-									</m:VBox>
-								</m:HBox>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-			</sections>
-		</ObjectPageLayout>
-		<m:footer>
-			<m:Bar id="IA_id_FooterBar">
-				<m:contentRight>
-					<m:Button id="BI_ideditButton" visible="{= !${editable>/Edit} }" text="Edit"
-                        class="myUnifiedBtn" press="BI_onEditButtonPress"/>
-					<m:Button id="POO_idSaveButton" visible="{=${editable>/Edit}}" text="Save"
-                        class="myUnifiedBtn" press="BT_onsavebuttonpress"/>
-				</m:contentRight>
-			</m:Bar>
-		</m:footer>
-	</m:Page>
+                                                change=".onFileSelected"
+                                            />
+                                        </m:VBox>
+                                        <!-- Delete icon -->
+                                        <m:Button
+                                            icon="sap-icon://delete"
+                                            visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
+                                            press=".onDeleteImage"
+                                            type="Reject"
+                                            tooltip="Delete Image"
+                                            width="100%"
+                                        />
+                                    </m:VBox>
+                                </m:HBox>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Bar id="IA_id_FooterBar">
+                <m:contentRight>
+                    <m:Button
+                        id="BI_ideditButton"
+                        visible="{= !${editable>/Edit} }"
+                        text="Edit"
+						tooltip="Edit Bed Details"
+                        class="myUnifiedBtn"
+                        press="BI_onEditButtonPress"
+                    />
+                    <m:Button
+                        id="POO_idSaveButton"
+                        visible="{=${editable>/Edit}}"
+                        text="Save"
+						tooltip="Save Bed Details"
+                        class="myUnifiedBtn"
+                        press="BT_onsavebuttonpress"
+                    />
+                </m:contentRight>
+            </m:Bar>
+        </m:footer>
+    </m:Page>
 </mvc:View>

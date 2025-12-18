@@ -86,21 +86,25 @@
                         <ToolbarSpacer />
                         <Button
                             text="Add"
+                            tooltip="Add New Branch"
                             press="MD_AddButtonPress"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="Edit"
+                            tooltip="Edit Selected Branch"
                             press="MD_UpdateTableRow"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="Delete"
+                            tooltip="Delete Selected Branch"
                             press="MD_DeleteRow"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="Download"
+                            tooltip="Download Branch Data"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -108,49 +112,49 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Branch Code" />
+                        <Text text="Branch Code" tooltip="Branch Code" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Branch Name" />
+                        <Text text="Branch Name" tooltip="Branch Name" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Address" />
+                        <Text text="Address" tooltip="Address" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Pin Code" />
+                        <Text text="Pin Code" tooltip="Pin Code" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Contact Number" />
+                        <Text text="Contact Number" tooltip="Contact Number" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Country" />
+                        <Text text="Country" tooltip="Country" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="State" />
+                        <Text text="State" tooltip="State" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="City" />
+                        <Text text="City" tooltip="City" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Penalty" />
+                        <Text text="Penalty" tooltip="Penalty" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Image" />
+                        <Text text="Image" tooltip="Image" />
                     </Column>
                 </columns>
                 <items>

@@ -75,6 +75,7 @@
                             <Button
                                 text="Edit"
                                 id="idedit"
+                                tooltip="Edit Booking"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                                 press="onEditBooking"
                                 visible="{=
@@ -88,6 +89,7 @@
 
                             <Button
                                 id="idcancel"
+                                tooltip="Cancel Booking"
                                 text="Cancel Booking"
                                 press="onPressCancelBooking"
                                 visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} }"
@@ -97,6 +99,7 @@
                             <Button
                                 text="CheckOut"
                                 id="idCheckout"
+                                tooltip="CheckOut Booking"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                                 press="onChekout"
                                 visible="{= ${CustomerData>/Status} === 'Assigned' 
@@ -107,6 +110,7 @@
                             <Button
                                 text="Save"
                                 id="idsave"
+                                tooltip="Save Booking"
                                 press="onSaveBooking"
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
@@ -115,6 +119,7 @@
                             <Button
                                 id="idcancelbtn"
                                 text="Cancel"
+                                tooltip="Cancel"
                                 press="onCancelBooking"
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
@@ -706,6 +711,7 @@
                                         <ToolbarSpacer />
                                         <Button
                                             text="Upload Documents"
+                                            tooltip="Upload Documents"
                                             press="onUploadDocumentFile"
                                             class="myUnifiedBtn"
                                             visible="{VisibleModel>/visible}"
@@ -714,16 +720,16 @@
                                 </headerToolbar>
                                 <columns>
                                     <Column demandPopin="true">
-                                        <Text text="File Name" />
+                                        <Text text="File Name" tooltip="File Name" />
                                     </Column>
                                     <Column demandPopin="true">
-                                        <Text text="Document Type" />
+                                        <Text text="Document Type" tooltip="Document Type" />
                                     </Column>
                                     <Column
                                         demandPopin="true"
                                         minScreenWidth="Tablet"
                                     >
-                                        <Text text="File Type" />
+                                        <Text text="File Type" tooltip="File Type" />
                                     </Column>
                                 </columns>
                                 <items>
@@ -762,18 +768,21 @@
                                 <ToolbarSpacer />
                                 <Button
                                     text="Add"
+                                    tooltip="Add Facility"
                                     press="onAddFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
                                 />
                                 <Button
                                     text="Edit"
+                                    tooltip="Edit Facility"
                                     press="onEditFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
                                 />
                                 <Button
                                     text="Delete"
+                                    tooltip="Delete Facility"
                                     press="onDeleteFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
@@ -782,40 +791,40 @@
                         </headerToolbar>
                         <columns>
                             <Column demandPopin="true">
-                                <Text text="Facility Name" />
+                                <Text text="Facility Name" tooltip="Facility Name" />
                             </Column>
                             <Column demandPopin="true">
-                                <Text text="Facility Price" />
+                                <Text text="Facility Price" tooltip="Facility Price" />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Start Date" />
+                                <Text text="Start Date" tooltip="Start Date" />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="End Date" />
+                                <Text text="End Date" tooltip="End Date" />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Unit" />
+                                <Text text="Unit" tooltip="Unit" />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Days" />
+                                <Text text="Days" tooltip="Days" />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Total Price" />
+                                <Text text="Total Price" tooltip="Total Price" />
                             </Column>
                         </columns>
                         <items>
@@ -932,6 +941,7 @@
                                 <Button
                                     id="idApplyNowButton"
                                     text="Apply Now"
+                                    tooltip="Apply Coupon"
                                     type="Emphasized"
                                     press=".onApplyCoupon"
                                     class="sapUiTinyMarginEnd"

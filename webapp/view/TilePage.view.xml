@@ -17,6 +17,7 @@
             <ToolbarSpacer />
             <Button
                 press="Tile_onLogPress"
+                tooltip="Logout"
                 icon="sap-icon://log"
             />
         </headerContent>

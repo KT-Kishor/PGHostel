@@ -6,251 +6,371 @@
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
 >
- <Page
+    <Page
         showHeader="false"
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >
-    <ScrollContainer>
-     <core:Fragment
-            fragmentName="sap.ui.com.project1.fragment.Header"
-            type="XML"
-        />
-    <VBox class="sapUiMediumMarginBottom">
-      <Panel
-        headerText="General Information"
-        expandable="false"
-        class="customPanelHeader"
-    >
-    <HBox justifyContent="End" width="100%">
-     <Button id="idEditBtn" text="Edit" press="onPressEditSave" class="myUnifiedBtn" />
-     <Button text="Cancel" press="onPressCancelBooking" class="myUnifiedBtn"></Button>
-    </HBox>
-   
-        <f:SimpleForm
-        id="idGeneralForm"
-            editable="true"
-            layout="ColumnLayout"
-            columnsM="3"
-            columnsL="4"
-            columnsXL="6"
-        >
-            <f:content>
-                <!-- Booking Details -->
-                <core:Title text="{i18n>bookingDetailsTitle}" />
-               <Label text="Room Type" required="true" />
-        <Text text="{HostelModel>/RoomType}" visible="{= !${viewModel>/editMode} }" />
-     <ComboBox
-    id="idBedTypeCombo"
-    visible="{viewModel>/editMode}"
-    selectedKey="{HostelModel>/RoomType}"
-    items="{
-        path: 'HostelModel>/',
-        templateShareable: false
-    }"
-    selectionChange="onSelectionChange"
->
-    <core:Item key="{HostelModel>Name}" text="{HostelModel>Name}" />
-</ComboBox>
+        <ScrollContainer>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+            <VBox class="sapUiMediumMarginBottom">
+                <Panel
+                    headerText="General Information"
+                    expandable="false"
+                    class="customPanelHeader"
+                >
+                    <HBox
+                        justifyContent="End"
+                        width="100%"
+                    >
+                        <Button
+                            id="idEditBtn"
+                            text="Edit"
+                            tooltip="Edit Booking Details"
+                            press="onPressEditSave"
+                            class="myUnifiedBtn"
+                        />
+                        <Button
+                            text="Cancel"
+                            tooltip="Cancel Booking"
+                            press="onPressCancelBooking"
+                            class="myUnifiedBtn"
+                        />
+                    </HBox>
 
-        
-                            
-                            <Label text="Price" required="true" />
-                            <Text  text="{HostelModel>/RoomPrice}"   />
-                           
-                            <Label text="Payment Method" required="true" />
-                            <Text text="{HostelModel>/PaymentType}" visible="{= !${viewModel>/editMode} }"/>
-                            <ComboBox value="{HostelModel>/PaymentType}" visible="{viewModel>/editMode}" selectedKey="{HostelModel>/PaymentType}" items="{
-                          path: 'BedTypeModel>/',
-        templateShareable: false
-                            }">
-                                <core:ListItem key="Monthly" text="Per Month" />
-                                <core:ListItem key="Daily" text="Per Day" />
-                                </ComboBox>
-                <!-- Project Address -->
-               
-               <!-- <Label text="No of Persons" required="true" />
+                    <f:SimpleForm
+                        id="idGeneralForm"
+                        editable="true"
+                        layout="ColumnLayout"
+                        columnsM="3"
+                        columnsL="4"
+                        columnsXL="6"
+                    >
+                        <f:content>
+                            <!-- Booking Details -->
+                            <core:Title text="{i18n>bookingDetailsTitle}" />
+                            <Label
+                                text="Room Type"
+                                required="true"
+                            />
+                            <Text
+                                text="{HostelModel>/RoomType}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <ComboBox
+                                id="idBedTypeCombo"
+                                visible="{viewModel>/editMode}"
+                                selectedKey="{HostelModel>/RoomType}"
+                                items="{ path: 'HostelModel>/', templateShareable: false}"
+                                selectionChange="onSelectionChange"
+                            >
+                                <core:Item
+                                    key="{HostelModel>Name}"
+                                    text="{HostelModel>Name}"
+                                />
+                            </ComboBox>
+
+                            <Label
+                                text="Price"
+                                required="true"
+                            />
+                            <Text text="{HostelModel>/RoomPrice}" />
+
+                            <Label
+                                text="Payment Method"
+                                required="true"
+                            />
+                            <Text
+                                text="{HostelModel>/PaymentType}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <ComboBox
+                                value="{HostelModel>/PaymentType}"
+                                visible="{viewModel>/editMode}"
+                                selectedKey="{HostelModel>/PaymentType}"
+                                items="{ path: 'BedTypeModel>/', templateShareable: false }"
+                            >
+                                <core:ListItem
+                                    key="Monthly"
+                                    text="Per Month"
+                                />
+                                <core:ListItem
+                                    key="Daily"
+                                    text="Per Day"
+                                />
+                            </ComboBox>
+                            <!-- Project Address -->
+
+                            <!-- <Label text="No of Persons" required="true" />
                 <Text text="{HostelModel>/noofperson}" visible="true"/> -->
-                <!-- <Input value="{HostelModel>/noofperson}" visible="{viewModel>/editMode}"/> -->
+                            <!-- <Input value="{HostelModel>/noofperson}" visible="{viewModel>/editMode}"/> -->
 
-                <!-- Site Contact -->
-                <core:Title text="Dates" />
-                <Label text="Start Date" required="true" />
-                 <Text text="{HostelModel>/StartDate}" visible="{= !${viewModel>/editMode} }"/>
-                 <DatePicker value="{HostelModel>/StartDate}" visible="{viewModel>/editMode}" valueFormat="dd/MM/yyyy"
+                            <!-- Site Contact -->
+                            <core:Title text="Dates" />
+                            <Label
+                                text="Start Date"
+                                required="true"
+                            />
+                            <Text
+                                text="{HostelModel>/StartDate}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <DatePicker
+                                value="{HostelModel>/StartDate}"
+                                visible="{viewModel>/editMode}"
+                                valueFormat="dd/MM/yyyy"
                                 displayFormat="dd/MM/yyyy"
                                 change="onFieldValidation"
-                                width="100%"/>   
+                                width="100%"
+                            />
 
-                    <Label text="End Date" required="true" />
-                <Text text="{HostelModel>/EndDate}" visible="{= !${viewModel>/editMode} }"/>
-                  <DatePicker value="{HostelModel>/EndDate}" visible="{viewModel>/editMode}" valueFormat="dd/MM/yyyy"
+                            <Label
+                                text="End Date"
+                                required="true"
+                            />
+                            <Text
+                                text="{HostelModel>/EndDate}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <DatePicker
+                                value="{HostelModel>/EndDate}"
+                                visible="{viewModel>/editMode}"
+                                valueFormat="dd/MM/yyyy"
                                 displayFormat="dd/MM/yyyy"
                                 change="onFieldValidation"
-                                width="100%"/>
-             
-            </f:content>
-        </f:SimpleForm>
-    </Panel>
-    </VBox>
-    <VBox>
-     <Panel
-        headerText="Personal Information "
-        expandable="false"
-        class="customPanelHeader"
-    >
-        <f:SimpleForm
-        id="idPersonalForm"
-            editable="true"
-            layout="ColumnLayout"
-            columnsM="1"
-            columnsL="2"
-            columnsXL="2"
-            labelSpanXL="4"
-            labelSpanL="3"
-            labelSpanM="4"
-            labelSpanS="12"
-        >
-            <f:content>
-                <core:Title text="" />
-                <Label text="Full Name" />
-                <Text text="{HostelModel>/FullName}"  visible="{= !${viewModel>/editMode} }"/>
-                <Input value="{HostelModel>/FullName}" visible="{viewModel>/editMode}" />
+                                width="100%"
+                            />
+                        </f:content>
+                    </f:SimpleForm>
+                </Panel>
+            </VBox>
+            <VBox>
+                <Panel
+                    headerText="Personal Information "
+                    expandable="false"
+                    class="customPanelHeader"
+                >
+                    <f:SimpleForm
+                        id="idPersonalForm"
+                        editable="true"
+                        layout="ColumnLayout"
+                        columnsM="1"
+                        columnsL="2"
+                        columnsXL="2"
+                        labelSpanXL="4"
+                        labelSpanL="3"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                    >
+                        <f:content>
+                            <core:Title text="" />
+                            <Label text="Full Name" />
+                            <Text
+                                text="{HostelModel>/FullName}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/FullName}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="Date of Birth" />
-                <Text text="{path:'HostelModel>/DateOfBirth',  formatter: '.Formatter.formatDate'}" visible="{= !${viewModel>/editMode} }" />
-                <DatePicker value="{path:'HostelModel>/DateOfBirth',  formatter: '.Formatter.formatDate'}" visible="{viewModel>/editMode}" />
+                            <Label text="Date of Birth" />
+                            <Text
+                                text="{path:'HostelModel>/DateOfBirth',  formatter: '.Formatter.formatDate'}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <DatePicker
+                                value="{path:'HostelModel>/DateOfBirth',  formatter: '.Formatter.formatDate'}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="Gender" />
-                <Text text="{HostelModel>/Gender}" visible="{= !${viewModel>/editMode} }" />
-                <Input value="{HostelModel>/Gender}" visible="{viewModel>/editMode}" />
+                            <Label text="Gender" />
+                            <Text
+                                text="{HostelModel>/Gender}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/Gender}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="Mobile Number" />
-                <Text text="{HostelModel>/MobileNo}" visible="{= !${viewModel>/editMode} }" />
-                <Input value="{HostelModel>/MobileNo}"  visible="{viewModel>/editMode}" />
+                            <Label text="Mobile Number" />
+                            <Text
+                                text="{HostelModel>/MobileNo}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/MobileNo}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="Email" />
-                <Text text="{HostelModel>/CustomerEmail}"  visible="{= !${viewModel>/editMode} }"/>
-                <Input value="{HostelModel>/CustomerEmail}" visible="{viewModel>/editMode}"/>
+                            <Label text="Email" />
+                            <Text
+                                text="{HostelModel>/CustomerEmail}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/CustomerEmail}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="Country" />
-                <Text text="{HostelModel>/Country}" visible="{= !${viewModel>/editMode} }" />
-                <Input value="{HostelModel>/Country}" visible="{viewModel>/editMode}"/>
+                            <Label text="Country" />
+                            <Text
+                                text="{HostelModel>/Country}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/Country}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="State" />
-                <Text text="{HostelModel>/State}" visible="{= !${viewModel>/editMode} }" />
-                <Input value="{HostelModel>/State}" visible="{viewModel>/editMode}" />
+                            <Label text="State" />
+                            <Text
+                                text="{HostelModel>/State}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/State}"
+                                visible="{viewModel>/editMode}"
+                            />
 
-                <Label text="City" />
-                <Text text="{HostelModel>/City}" visible="{= !${viewModel>/editMode} }"/>
-                <Input value="{HostelModel>/City}" visible="{viewModel>/editMode}"/>
-                
-            </f:content>
-        </f:SimpleForm>
+                            <Label text="City" />
+                            <Text
+                                text="{HostelModel>/City}"
+                                visible="{= !${viewModel>/editMode} }"
+                            />
+                            <Input
+                                value="{HostelModel>/City}"
+                                visible="{viewModel>/editMode}"
+                            />
+                        </f:content>
+                    </f:SimpleForm>
 
-   <Table
-    id="idFacilityRoomTableDetails"
-    class="sapUiSmallMarginTop"
-    items="{
-        path: 'HostelModel>/AllSelectedFacilities'
-    }"
-    mode="SingleSelectLeft"
-    inset="false"
-    selectionChange="onTableSelection"
->
-    <headerToolbar>
-        <Toolbar>
-            <Title text="Booking Details" level="H5" />
-            <ToolbarSpacer />
-            <Button 
-                icon=""
-                id="id_addfacility"
-                text="Add Facility"
-                press="onPressAddFaciliti"
-                class="myUnifiedBtn"
-            />
-            <Button 
-                icon="sap-icon://edit"
-                text="Edit"
-                press="onEditFacilityDetails"
-                class="myUnifiedBtn"
-                id="id_editfacility"
-                
-            />
-        </Toolbar>
-    </headerToolbar>
+                    <Table
+                        id="idFacilityRoomTableDetails"
+                        class="sapUiSmallMarginTop"
+                        items="{ path: 'HostelModel>/AllSelectedFacilities'}"
+                        mode="SingleSelectLeft"
+                        inset="false"
+                        selectionChange="onTableSelection"
+                    >
+                        <headerToolbar>
+                            <Toolbar>
+                                <Title
+                                    text="Booking Details"
+                                    level="H5"
+                                />
+                                <ToolbarSpacer />
+                                <Button
+                                    icon=""
+                                    id="id_addfacility"
+                                    text="Add Facility"
+                                    tooltip="Add Facility"
+                                    press="onPressAddFaciliti"
+                                    class="myUnifiedBtn"
+                                />
+                                <Button
+                                    icon="sap-icon://edit"
+                                    text="Edit"
+                                    tooltip="Edit Facility"
+                                    press="onEditFacilityDetails"
+                                    class="myUnifiedBtn"
+                                    id="id_editfacility"
+                                />
+                            </Toolbar>
+                        </headerToolbar>
 
-    <columns>
-        <Column>
-            <Text text="Facility Name" />
-        </Column>
-        <Column>
-            <Text text="Facility Price" />
-        </Column>
-        <Column>
-            <Text text="Start Date" />
-        </Column>
-        <Column>
-            <Text text="End Date" />
-        </Column>
-        <Column>
-            <Text text="Days" />
-        </Column>
-        <Column>
-            <Text text="Total" />
-        </Column>
-    </columns>
+                        <columns>
+                            <Column>
+                                <Text text="Facility Name" />
+                            </Column>
+                            <Column>
+                                <Text text="Facility Price" />
+                            </Column>
+                            <Column>
+                                <Text text="Start Date" />
+                            </Column>
+                            <Column>
+                                <Text text="End Date" />
+                            </Column>
+                            <Column>
+                                <Text text="Days" />
+                            </Column>
+                            <Column>
+                                <Text text="Total" />
+                            </Column>
+                        </columns>
 
-    <items>
-        <ColumnListItem>
-            <cells>
-           
-                <Text text="{HostelModel>FacilityName}" />
-                <Text text="{HostelModel>Price}" />
-                <Text text="{
-                    path: 'HostelModel>StartDate'
-                }" />
-                <Text text="{
-                    path: 'HostelModel>EndDate',
-                     formatter: '.Formatter.formatDate'
-                }" />
-                <Text text="{HostelModel>TotalDays}" />
-               <Text text="{=(${HostelModel>Price} * ${HostelModel>TotalDays}).toFixed(2) }" />
-            </cells>
-        </ColumnListItem>
-    </items>
-</Table>
-<VBox class="sapUiSmallMarginTop">
-    <HBox justifyContent="End" class="sapUiSmallMarginTop">
-        <Label text="Total Facility Cost:" design="Bold" class="sapUiSmallMarginEnd"/>
-        <Text text="{
-            path: 'HostelModel>/TotalFacilityPrice',
-            formatter: '.Formatter.formatCurrency'
-        }" class="sapUiSmallMarginEnd"/>
-    </HBox>
-    <HBox justifyContent="End" class="sapUiSmallMarginTop">
-        <Label text="Room Rent:" design="Bold" class="sapUiSmallMarginEnd"/>
-        <Text text="{HostelModel>/RoomPrice}" class="sapUiSmallMarginEnd"/>
-    </HBox>
-    <HBox justifyContent="End" class="sapUiSmallMarginTop">
-        <Label text="Grand Total:" design="Bold" class="sapUiSmallMarginEnd"/>
-        <Text text="{
-            path: 'HostelModel>/GrandTotal',
-            formatter: '.Formatter.formatCurrency'
-        }" class="sapUiSmallMarginEnd"/>
-    </HBox>
-</VBox>
-
-    </Panel>
-    
-    </VBox>
-    </ScrollContainer>
-    <footer>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{HostelModel>FacilityName}" />
+                                    <Text text="{HostelModel>Price}" />
+                                    <Text text="{ path: 'HostelModel>StartDate'}" />
+                                    <Text text="{ path: 'HostelModel>EndDate', formatter: '.Formatter.formatDate'}" />
+                                    <Text text="{HostelModel>TotalDays}" />
+                                    <Text
+                                        text="{=(${HostelModel>Price} * ${HostelModel>TotalDays}).toFixed(2) }"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                    <VBox class="sapUiSmallMarginTop">
+                        <HBox
+                            justifyContent="End"
+                            class="sapUiSmallMarginTop"
+                        >
+                            <Label
+                                text="Total Facility Cost:"
+                                design="Bold"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Text text="{ path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.formatCurrency'}"
+                                class="sapUiSmallMarginEnd"
+                            />
+                        </HBox>
+                        <HBox
+                            justifyContent="End"
+                            class="sapUiSmallMarginTop"
+                        >
+                            <Label
+                                text="Room Rent:"
+                                design="Bold"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Text
+                                text="{HostelModel>/RoomPrice}"
+                                class="sapUiSmallMarginEnd"
+                            />
+                        </HBox>
+                        <HBox
+                            justifyContent="End"
+                            class="sapUiSmallMarginTop"
+                        >
+                            <Label
+                                text="Grand Total:"
+                                design="Bold"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Text text="{ path: 'HostelModel>/GrandTotal',formatter: '.Formatter.formatCurrency'  }"
+                            class="sapUiSmallMarginEnd"
+                            />
+                        </HBox>
+                    </VBox>
+                </Panel>
+            </VBox>
+        </ScrollContainer>
+        <footer>
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button
                     text="Proceed to pay"
                     visible="false"
+                    tooltip="Proceed to Pay"
                     class="myUnifiedBtn"
                     press="onOpenProceedtoPay"
                 />
