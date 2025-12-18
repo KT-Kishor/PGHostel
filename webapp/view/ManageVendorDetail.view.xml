@@ -124,7 +124,10 @@
 												<m:Text text="File Name" />
 											</m:Column>
 											<m:Column>
-												<m:Text text="Document" />
+												<m:Text text="Document Type" />
+											</m:Column>
+											<m:Column>
+												<m:Text text="File Type" />
 											</m:Column>
 											<m:Column>
 												<m:Text text="Size" />
@@ -135,7 +138,8 @@
 												<m:cells>
 													<m:Link text="{AdminSignupModel>FileName}"
                                                     press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"/>
-													<m:Text text="{AdminSignupModel>VdocType}" />
+													<m:Text text="{AdminSignupModel>DocumentType}" />
+													<m:Text text="{AdminSignupModel>FileType}" />
 													<m:Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}" />
 												</m:cells>
 											</m:ColumnListItem>

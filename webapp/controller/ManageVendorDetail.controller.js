@@ -2,31 +2,31 @@ sap.ui.define([
     "./BaseController",
     "sap/m/MessageBox",
     "../utils/validation",
-     "../model/formatter",
-     "sap/m/Dialog",
+    "../model/formatter",
+    "sap/m/Dialog",
     "sap/m/Button",
     "sap/m/Image",
     "sap/ui/core/HTML",
 ], function(BaseController, MessageBox, utils, Formatter, Dialog, Button, Image, HTML) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendorDetail", {
-         Formatter: Formatter,
+        Formatter: Formatter,
         onInit: function() {
-             var today = new Date();
+            var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
-                oDateModel.setData({
-                    // maxDate: maxDate,
-                    focusedDate: new Date(2000, 0, 1),
-                    minDate: new Date(1950, 0, 1),
-                });
+            oDateModel.setData({
+                // maxDate: maxDate,
+                focusedDate: new Date(2000, 0, 1),
+                minDate: new Date(1950, 0, 1),
+            });
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendorDetail").attachMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: async function(oEvent) {
             try {
-                this.commonLoginFunction();
+                // this.commonLoginFunction();
                 var Layout = this.byId("MV_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("MV_id_OrderHeaderSection1"));
 
@@ -38,12 +38,12 @@ sap.ui.define([
                 });
                 this.getView().setModel(oEditableModel, "editable");
 
-               this._initAdminSignupModel();
+                this._initAdminSignupModel();
                 this.sUserID = oEvent.getParameter("arguments").UserID;
                 await this._loadVendorDetails(this.sUserID);
                 this._applyCountryStateCityFilters();
                 sap.ui.core.BusyIndicator.hide();
-           } catch (err) {
+            } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
@@ -51,7 +51,7 @@ sap.ui.define([
             }
         },
 
-        _initAdminSignupModel: function () {
+        _initAdminSignupModel: function() {
             const oModel = new sap.ui.model.json.JSONModel({
                 Salutation: "",
                 VendorName: "",
@@ -72,49 +72,49 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: function () {
-                const oModel     = this.getView().getModel("AdminSignupModel");
-                const oCountryCB = this.byId("MV_id_Country");
-                const oStateCB   = this.byId("MV_id_State");
-                const oSourceCB  = this.byId("MV_id_City");
- 
-                const sCountry   = oModel.getProperty("/Country");     // e.g. "Australia"
-                const sState     = oModel.getProperty("/State");       // e.g. "Queensland"
-                const sSource    = oModel.getProperty("/City");      // e.g. "Bongaree"
- 
-                // Reset all filters
-                oStateCB.getBinding("items")?.filter([]);
-                oSourceCB.getBinding("items")?.filter([]);
- 
-                if (sCountry) {
-                    // Find countryCode by name
-                    const aCountryData = this.getView().getModel("CountryModel").getData();
-                    const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
- 
-                    if (oCountryObj) {
-                        const sCountryCode = oCountryObj.code;
- 
-                        // Filter States by Country
-                        oStateCB.getBinding("items")?.filter([
+        _applyCountryStateCityFilters: function() {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const oCountryCB = this.byId("MV_id_Country");
+            const oStateCB = this.byId("MV_id_State");
+            const oSourceCB = this.byId("MV_id_City");
+
+            const sCountry = oModel.getProperty("/Country"); // e.g. "Australia"
+            const sState = oModel.getProperty("/State"); // e.g. "Queensland"
+            const sSource = oModel.getProperty("/City"); // e.g. "Bongaree"
+
+            // Reset all filters
+            oStateCB.getBinding("items")?.filter([]);
+            oSourceCB.getBinding("items")?.filter([]);
+
+            if (sCountry) {
+                // Find countryCode by name
+                const aCountryData = this.getView().getModel("CountryModel").getData();
+                const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                if (oCountryObj) {
+                    const sCountryCode = oCountryObj.code;
+
+                    // Filter States by Country
+                    oStateCB.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    if (sState) {
+                        // Filter Cities by State + Country
+                        const aFilters = [
+                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
                             new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                        ]);
- 
-                        if (sState) {
-                            // Filter Cities by State + Country
-                            const aFilters = [
-                                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
-                                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                            ];
-                            oSourceCB.getBinding("items")?.filter(aFilters);
-                        }
+                        ];
+                        oSourceCB.getBinding("items")?.filter(aFilters);
                     }
                 }
- 
-                // Ensure values are set back in UI
-                oCountryCB.setValue(sCountry || "");
-                oStateCB.setValue(sState || "");
-                oSourceCB.setValue(sSource || "");
-            },
+            }
+
+            // Ensure values are set back in UI
+            oCountryCB.setValue(sCountry || "");
+            oStateCB.setValue(sState || "");
+            oSourceCB.setValue(sSource || "");
+        },
 
         _loadVendorDetails: async function(sUserID) {
             try {
@@ -139,11 +139,11 @@ sap.ui.define([
                     Country: oData[0].Country,
                     State: oData[0].State,
                     City: oData[0].City,
-                    DateOfBirth: this.Formatter.DateFormat(oData.DateOfBirth) || "",
-                     Documents: (oData[0].Documents || []).map(doc => ({
+                    DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
+                    Documents: (oData[0].Documents || []).map(doc => ({
                         FileName: doc.FileName,
-                        VdocType: doc.DocumentType,   
-                        size: doc.File ? atob(doc.File).length : 0, 
+                        DocumentType : doc.DocumentType,
+                        size: doc.File ? atob(doc.File).length : 0,
                         File: doc.File,
                         FileType: doc.FileType,
                         DocumentID: doc.DocumentID
@@ -153,7 +153,7 @@ sap.ui.define([
                     DocTypeEnabled: true
                 };
 
-                 let oModel = this.getView().getModel("AdminSignupModel");
+                let oModel = this.getView().getModel("AdminSignupModel");
                 if (!oModel) {
                     oModel = new sap.ui.model.json.JSONModel();
                     this.getView().setModel(oModel, "AdminSignupModel");
@@ -174,7 +174,6 @@ sap.ui.define([
             const reader = new FileReader();
             reader.onload = function(e) {
                 aDocs.push({
-                    DocumentID: sap.ui.core.UUID.randomUUID(),
                     DocumentType: oModel.getProperty("/CurrentDocType"),
                     File: e.target.result.split(",")[1],
                     FileName: oFile.name,
@@ -221,9 +220,17 @@ sap.ui.define([
                         State: oData.State,
                         City: oData.City,
                         DateOfBirth: oData.DOB,
-                        Documents: oData.Documents
-                    }
-                };
+                        File: oData.Documents
+                    },
+                
+
+                 filters: {
+                UserID: oData.UserID
+            }
+        };
+
+
+                
 
                 sap.ui.core.BusyIndicator.show(0);
 
@@ -238,152 +245,200 @@ sap.ui.define([
             }
         },
 
-        _base64ToBlob: function (sBase64, sMimeType) {
-            const byteCharacters = atob(sBase64);
-            const byteArrays = [];
-
-            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                const slice = byteCharacters.slice(offset, offset + 512);
-                const byteNumbers = new Array(slice.length);
-
-                for (let i = 0; i < slice.length; i++) {
-                    byteNumbers[i] = slice.charCodeAt(i);
+        onAdminPreviewDoc: function(oEvent) {
+            function autoDecodeBase64(b64) {
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") || // PNG
+                            last.startsWith("/9j") || // JPG
+                            last.startsWith("JVBER") || // PDF
+                            last.startsWith("0M8R") || // DOC
+                            last.startsWith("UEs") // DOCX
+                        ) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
                 }
-
-                byteArrays.push(new Uint8Array(byteNumbers));
+                return last;
             }
 
-            return new Blob(byteArrays, { type: sMimeType });
-        },
+            const oContext = oEvent.getSource().getBindingContext("AdminSignupModel");
+            const oDoc = oContext && oContext.getObject();
 
-        onAdminPreviewDoc: function (oEvent) {
-            const oSource = oEvent.getSource();
-            const oContext = oSource.getBindingContext("AdminSignupModel");
-
-            if (!oContext) {
-                sap.m.MessageToast.show("No document data found.");
+            if (!oDoc) {
+                sap.m.MessageBox.error("No Document Found!");
                 return;
             }
 
-            const oDoc = oContext.getObject();
-            const sBase64 = oDoc.File;
-            const sMimeType = oDoc.FileType || "image/png";
-            const sFileName = oDoc.FileName || "Document";
-
+            const sBase64 = oDoc.FileContent || oDoc.File;
             if (!sBase64) {
-                sap.m.MessageToast.show("Attachment not available.");
+                sap.m.MessageBox.error("No File Found!");
                 return;
             }
 
-            // Store for download
-            this.SelectedData = {
-                Attachment: sBase64,
-                AttachmentType: sMimeType,
-                AttachmentName: sFileName
+            const fixed = autoDecodeBase64(sBase64);
+            let sMimeType = "application/octet-stream";
+            if (fixed.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (fixed.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (fixed.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            } else if (fixed.startsWith("0M8R")) {
+                sMimeType = "application/msword";
+            } else if (fixed.startsWith("UEs")) {
+                sMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            }
+
+            const byteCharacters = atob(fixed);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const fileBlob = new Blob([byteArray], {
+                type: sMimeType
+            });
+
+            this._previewFile = {
+                blob: fileBlob,
+                mimeType: sMimeType,
+                fileName: oDoc.FileName || "document"
             };
 
-            // Create dialog once
-            if (!this._oPreviewDialog) {
-                this._oPreviewDialog = new Dialog({
-                    title: sFileName,
-                    stretch: true,
-                    draggable: true,
-                    resizable: true,
-                    contentWidth: "80%",
-                    contentHeight: "80%",
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-                    beginButton: new Button({
-                        text: "Download",
-                        press: this.Exp_Det_onPressDownloadAttachment.bind(this)
-                    }),
-                    endButton: new Button({
-                        text: "Close",
-                        press: function () {
-                            if (this._pdfBlobUrl) {
-                                URL.revokeObjectURL(this._pdfBlobUrl);
-                                this._pdfBlobUrl = null;
-                            }
-                            this._oPreviewDialog.close();
-                        }.bind(this)
-                    })
+            if (!this._oDocPreviewDialog) {
+                this._oPreviewImage = new sap.m.Image({
+                    width: "100%",
+                    height: "100%",
+                    fitContainer: true,
+                    densityAware: false,
+                    visible: false
                 });
 
-                this._oPreviewDialog.addStyleClass("noDialogPadding");
-                this.getView().addDependent(this._oPreviewDialog);
+                // PDF preview
+                this._pdfIframe = new sap.ui.core.HTML({
+                     content: "",
+                    visible: false
+                }).addStyleClass("pdfContainer");
+
+                const oFlex = new sap.m.FlexBox({
+                    width: "100%",
+                    height: "100%",
+                    direction: "Column",
+                    renderType: "Div",
+                    items: [
+                        this._oPreviewImage,
+                        this._pdfIframe
+                    ]
+                });
+
+                this._oDocPreviewDialog = new sap.m.Dialog({
+                    title: "Document Preview",
+                    contentWidth: "70%",
+                    contentHeight: "80%",
+                    draggable: true,
+                    resizable: true,
+                    stretchOnPhone: true,
+                    horizontalScrolling: false,
+                    verticalScrolling: true,
+                    content: [oFlex],
+                    beginButton: new sap.m.Button({
+                        text: "Download",
+                        icon: "sap-icon://download",
+                        type: "Emphasized",
+                        press: this.onAdminDownloadDoc.bind(this)
+                    }),
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        press: function() {
+                            this._oDocPreviewDialog.close();
+                        }.bind(this)
+                    }),
+                    afterClose: function() {
+
+                        if (this._pdfObjectUrl) {
+                            URL.revokeObjectURL(this._pdfObjectUrl);
+                            this._pdfObjectUrl = null;
+                        }
+
+                        if (this._oPreviewImage && this._oPreviewImage.getSrc()) {
+                            URL.revokeObjectURL(this._oPreviewImage.getSrc());
+                        }
+
+                        this._oDocPreviewDialog.destroy();
+                        this._oDocPreviewDialog = null;
+                        this._previewFile = null;
+                    }.bind(this)
+                });
+
+                this.getView().addDependent(this._oDocPreviewDialog);
             }
 
-            this._oPreviewDialog.setTitle(sFileName);
-            this._oPreviewDialog.removeAllContent();
+            this._oPreviewImage.setVisible(false);
+            this._pdfIframe.setVisible(false);
 
-            /* ================= Image Preview ================= */
-            if (sMimeType.startsWith("image/")) {
-                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-                const oImage = new Image({
-                    src: sImageSrc,
-                    densityAware: false
-                }).addStyleClass("imagePreviewFit");
+            if (sMimeType.startsWith("image")) {
 
-                this._oPreviewDialog.addContent(oImage);
-                this._oPreviewDialog.open();
-                return;
-            }
+                this._oPreviewImage.setSrc(URL.createObjectURL(fileBlob));
+                this._oPreviewImage.setVisible(true);
+                this._oDocPreviewDialog.open();
 
-            /* ================= PDF Preview ================= */
-            if (sMimeType === "application/pdf") {
-                const oBlob = this._base64ToBlob(sBase64, sMimeType);
-                const sBlobUrl = URL.createObjectURL(oBlob);
-                this._pdfBlobUrl = sBlobUrl;
+            } else if (sMimeType === "application/pdf") {
 
-                this._oPreviewDialog.addContent(
-                    new HTML({
-                        content: `<iframe src="${sBlobUrl}" width="100%" height="100%" style="border:none;"></iframe>`
-                    })
+                const pdfUrl = URL.createObjectURL(fileBlob);
+                this._pdfObjectUrl = pdfUrl;
+
+                this._pdfIframe.setContent(`<iframe src="${pdfUrl}"></iframe>`);
+                this._pdfIframe.setVisible(true);
+                this._oDocPreviewDialog.open();
+
+            } else if (
+                sMimeType === "application/msword" ||
+                sMimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ) {
+
+                sap.m.MessageBox.information(
+                    "Word documents cannot be previewed. The file will be downloaded."
                 );
+                this.onAdminDownloadDoc();
+                return;
 
-                this._oPreviewDialog.open();
+            } else {
+                sap.m.MessageBox.warning("Preview not supported for this file type.");
+            }
+        },
+
+        onAdminDownloadDoc: function() {
+
+            if (!this._previewFile) {
+                sap.m.MessageToast.show("No file available for download");
                 return;
             }
-            this.Exp_Det_onPressDownloadAttachment();
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(this._previewFile.blob);
+            link.download = this._previewFile.fileName;
+
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         },
 
-        Exp_Det_onPressDownloadAttachment: function () {
-            try {
-                if (!this.SelectedData || !this.SelectedData.Attachment) {
-                    sap.m.MessageToast.show("No attachment available for download.");
-                    return;
-                }
-
-                const sBase64 = this.SelectedData.Attachment;
-                const sMimeType = this.SelectedData.AttachmentType || "application/octet-stream";
-                const sFileName = this.SelectedData.AttachmentName || "Document";
-
-                const oBlob = this._base64ToBlob(sBase64, sMimeType);
-                const sBlobUrl = URL.createObjectURL(oBlob);
-
-                const oLink = document.createElement("a");
-                oLink.href = sBlobUrl;
-                oLink.download = sFileName;
-                document.body.appendChild(oLink);
-                oLink.click();
-                document.body.removeChild(oLink);
-
-                URL.revokeObjectURL(sBlobUrl);
-                this.SelectedData = null;
-
-            } catch (e) {
-                sap.m.MessageToast.show("Download failed.");
-            }
-        },
-
-        onAdminChangeSalutation: function (oEvent) {
+        onAdminChangeSalutation: function(oEvent) {
 
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
 
             const oGender = this.byId("adminGender");
 
-            // 🔥 Clear salutation error immediately
             oSalutation.setValueState("None");
 
             if (!oGender) return;
@@ -396,8 +451,7 @@ sap.ui.define([
             if (sKey === "Mr.") {
                 oGender.setSelectedKey("Male");
                 oGender.setEnabled(false);
-            }
-            else if (sKey === "Ms." || sKey === "Mrs.") {
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
             }
@@ -407,7 +461,7 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onAdminLiveValidate: function (oEvent) {
+        onAdminLiveValidate: function(oEvent) {
 
             const id = oEvent.getSource().getId();
 
@@ -429,7 +483,7 @@ sap.ui.define([
             }
         },
 
-         ADMIN_onChangeGender: function (oEvent) {
+        ADMIN_onChangeGender: function(oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
 
@@ -439,7 +493,7 @@ sap.ui.define([
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-         onAdminLiveValidate: function (oEvent) {
+        onAdminLiveValidate: function(oEvent) {
 
             const id = oEvent.getSource().getId();
 
@@ -461,7 +515,7 @@ sap.ui.define([
             }
         },
 
-         ADMIN_onChangeCountry: function (oEvent) {
+        ADMIN_onChangeCountry: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
             const oCountry = oEvent.getSource();
@@ -556,9 +610,9 @@ sap.ui.define([
             if (filteredStates.length === 0) {
                 oCityModel.setProperty("/filtered", []);
             }
-
         },
-        ADMIN_onChangeState: function (oEvent) {
+
+        ADMIN_onChangeState: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -613,8 +667,7 @@ sap.ui.define([
             oCityModel.setProperty("/filtered", filteredCities);
         },
 
-
-        ADMIN_onChangeCity: function (oEvent) {
+        ADMIN_onChangeCity: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -638,25 +691,16 @@ sap.ui.define([
             oModel.setProperty("/City", val);
         },
 
-        ADMIN_onChangeSTD: function (oEvent) {
-
+        ADMIN_onChangeSTD: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
             const oSTD = oEvent.getSource(); // easier than getCore()
             const oMobile = this.byId("adminMobileNo");
             const oModel = this.getView().getModel("AdminSignupModel");
-
-            // Clean its own state
             oSTD.setValueState("None");
-
-            // Reset mobile on STD change
             oMobile.setValue("");
-
-            // Max length logic
             oMobile.setMaxLength(oSTD.getValue() === "+91" ? 10 : 18);
-
-            // Update model
             oModel.setProperty("/STDCode", oSTD.getValue());
         },
 
@@ -664,7 +708,7 @@ sap.ui.define([
             utils._LCvalidateDate(oEvent);
         },
 
-        ADMIN_onMobileLiveChange: function (oEvent) {
+        ADMIN_onMobileLiveChange: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
             const oInput = oEvent.getSource();
@@ -694,13 +738,14 @@ sap.ui.define([
             }
         },
 
-         onAdminDocTypeChange: function (oEvent) {
+        onAdminDocTypeChange: function(oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();
 
             oModel.setProperty("/UploadEnabled", !!key);
         },
-        _isDuplicateFile: function (fileName) {
+
+        _isDuplicateFile: function(fileName) {
             const docs = this.getView()
                 .getModel("AdminSignupModel")
                 .getProperty("/Documents") || [];
@@ -708,9 +753,7 @@ sap.ui.define([
             return docs.some(d => d.FileName === fileName);
         },
 
-
-
-        _onCollectAdminSignupPayloadDocs: function () {
+        _onCollectAdminSignupPayloadDocs: function() {
             const oModel = this.getView().getModel("AdminSignupModel");
             const aDocs = oModel.getProperty("/Documents") || [];
 
@@ -724,7 +767,7 @@ sap.ui.define([
             return aPayloadDocs;
         },
 
-        onAdminDeleteDoc: function (oEvent) {
+        onAdminDeleteDoc: function(oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oDocType = this.byId("adminDocType");
             const table = this.byId("adminAttachmentTable");
@@ -732,9 +775,9 @@ sap.ui.define([
             const oCtx = oEvent.getParameter("listItem")
                 .getBindingContext("AdminSignupModel");
 
-            const doc = oCtx.getObject(); // ✅ define first
+            const doc = oCtx.getObject(); // define first
 
-            // 🧹 Cleanup preview blob
+            // Cleanup preview blob
             if (doc.PreviewUrl) {
                 URL.revokeObjectURL(doc.PreviewUrl);
             }
@@ -745,7 +788,7 @@ sap.ui.define([
             docs.splice(index, 1);
             oModel.setProperty("/Documents", docs);
 
-            // ♻️ Restore doc type option
+            // Restore doc type option
             oDocType.addItem(new sap.ui.core.ListItem({
                 key: doc.VdocType,
                 text: doc.VdocType
@@ -753,11 +796,10 @@ sap.ui.define([
 
             oModel.setProperty("/DocTypeEnabled", true);
 
-            // 🔴 If no documents left → show error highlight
+            // If no documents left → show error highlight
             if (docs.length === 0) {
                 table?.addStyleClass("fileErrorHighlight");
             }
         },
-
     });
 });
