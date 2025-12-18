@@ -2442,6 +2442,18 @@ sap.ui.define([
             if (sSelectedACType === "") {
                 this.byId("id_Roomtype").setSelectedKey("All")
             }
+              if (sSelectedACType === "All") {
+                    this.iTop=4
+                    this.iSkip=0
+                }
+                  if (sSelectedACType === "AC") {
+                    this.iTop=4
+                    this.iSkip=0
+                }
+                  if (sSelectedACType === "Non-AC") {
+                    this.iTop=4
+                    this.iSkip=0
+                }
 
             // Locality ComboBox
             var oAreaCB = this.byId("id_Area");
@@ -2521,9 +2533,7 @@ sap.ui.define([
                     // Branch already selected
                     aBranchCodes = [sBranchCode];
                 }
-                if (sACType === "All") {
-                    sACType = "";
-                }
+              
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes,
