@@ -23,7 +23,7 @@
 		</customHeader>
 		<content>
 			<VBox width="100%" class="roomTopAligned" renderType="Bare">
-				<l:Grid width="100%" hSpacing="1" vSpacing="1" class="sapUiTinyMarginBeginEnd">
+<l:Grid width="100%" hSpacing="1" vSpacing="1">
 					<l:content>
 						<VBox width="100%">
 							<layoutData>
@@ -50,7 +50,7 @@
 						</VBox>
 					</l:content>
 				</l:Grid>
-				<FlexBox id="priceFlex" class="priceFlex sapUiTinyMarginBeginEnd sapUiSmallMarginTop" wrap="Wrap">
+<FlexBox id="priceFlex" class="priceFlex sapUiSmallMarginTop" wrap="Wrap">
 					<items>
 						<GenericTile header="Per Day" subheader="{ parts:['HostelModel>/Price','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }" class=" defaultTile priceItem" frameType="OneByHalf" press=".onSelectPricePlan" visible="{= parseInt(${HostelModel>/Price}.trim()) !== 0 }">
 							<customData>
@@ -99,7 +99,7 @@
 				</VBox>
 				<VBox visible="{= ${AmenityModel>/Amenities}.length > 0 || ${AmenityModel>/loading} }">
 					<!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
-					<Bar design="Header" class="sapUiMediumMarginTop sapUiTinyMarginBeginEnd">
+<Bar design="Header" class="sapUiMediumMarginTop">
 						<contentLeft>
 							<Title text="Amenities" />
 						</contentLeft>
