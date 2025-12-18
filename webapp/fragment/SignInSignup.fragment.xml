@@ -3,7 +3,7 @@
 	xmlns:core="sap.ui.core" 
 	xmlns:f="sap.ui.layout.form" 
 	xmlns:l="sap.ui.layout">
-	<Dialog id="authDialog" draggable="true" resizable="true" class="authDialog" contentWidth="28rem" contentHeight="auto">
+	<Dialog id="authDialog" initialFocus="initialfocus" draggable="true" resizable="true" class="authDialog" contentWidth="28rem" contentHeight="auto">
 		<!--stretch="{= ${device>/system/phone} }"-->
 		<customHeader>
 			<Bar class="barheader">
@@ -17,8 +17,8 @@
 		</customHeader>
 		<VBox>
 			<!-- Switch Button -->
-			<HBox justifyContent="Start" class="switch-toggle-container" visible="{= ${LoginViewModel>/authFlow} === 'signin' || ${LoginViewModel>/authFlow} === 'signup' }">
-				<Button text="SIGN IN" type="Transparent" class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} " press="onSwitchToSignIn" visible="{= ${LoginViewModel>/authFlow} !== 'signin' }" />
+			<HBox id="initialfocus" justifyContent="Start" class="switch-toggle-container" visible="{= ${LoginViewModel>/authFlow} === 'signin' || ${LoginViewModel>/authFlow} === 'signup' }">
+				<Button text="SIGN IN" id="signinvisible" type="Transparent" class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} " press="onSwitchToSignIn" visible="{= ${LoginViewModel>/authFlow} !== 'signin' }" />
 				<Button id="signupvisible" text="SIGN UP" type="Transparent" class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} " press="onSwitchToSignUp" visible="{= ${LoginViewModel>/authFlow} !== 'signup' }" />
 			</HBox>
 			<!-- Sign In Panel -->
@@ -99,7 +99,7 @@
 					<f:SimpleForm id="signUpForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3" emptySpanL="1" emptySpanM="1" columnsL="2" columnsM="1" class="sapUiNoContentPadding">
 						<!-- <Label text=""/> -->
 						<HBox width="100%" alignItems="Center" class="isdMobileRow">
-							<VBox width="20%">
+							<VBox width="25%">
 								<Label text="Salutation" required="true"/>
 								<ComboBox id="signUpSalutation" selectedKey="" change="onChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
 									<core:ListItem key="Mr." text="Mr."/>
@@ -111,7 +111,7 @@
 									</layoutData>
 								</ComboBox>
 							</VBox>
-							<VBox width="80%" class="sapUiTinyMarginBegin">
+							<VBox width="75%" class="sapUiTinyMarginBegin">
 								<Label text="Full Name" required="true"/>
 								<Input id="signUpName" value="{LoginMode>/fullname}" placeholder="Full Name" required="true" liveChange="_LCvalidateName" valueStateText="Enter Valid Name"/>
 								<layoutData>
@@ -145,7 +145,7 @@
 						</ComboBox>
 						<Label text=""/>
 						<HBox width="100%" alignItems="Center" class="isdMobileRow">
-							<VBox width="20%">
+							<VBox width="25%">
 								<Label text="ISD Code" required="true"/>
 								<ComboBox change="onSTDChange" id="signUpSTD" placeholder="+91" valueStateText="Select Code" showSecondaryValues="true" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true"  >
 									<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
@@ -154,7 +154,7 @@
 									</layoutData>
 								</ComboBox>
 							</VBox>
-							<VBox width="80%" class="sapUiTinyMarginBegin">
+							<VBox width="75%" class="sapUiTinyMarginBegin">
 								<Label text="Mobile Number" required="true"/>
 								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number"/>
 								<layoutData>

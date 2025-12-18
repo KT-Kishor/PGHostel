@@ -932,6 +932,7 @@ sap.ui.define([
 
         onSwitchToSignIn: function () {
 
+
             const vm = this.getView().getModel("LoginViewModel");
 
             // -------------------------
@@ -1003,6 +1004,16 @@ sap.ui.define([
 
 
         onSwitchToSignUp: function () {
+            this.getView().getModel("LoginViewModel").setProperty("/authFlow", "signup");
+
+            this.getView().addEventDelegate({
+                onAfterRendering: () => {
+                    const oBtn = sap.ui.getCore().byId("signupvisible"); // or first input
+                    if (oBtn) {
+                        oBtn.focus();
+                    }
+                }
+            }, this);
             const vm = this.getView().getModel("LoginViewModel");
 
             const oSignInPanel = sap.ui.getCore().byId("signInPanel");
@@ -3252,7 +3263,6 @@ sap.ui.define([
             vm.setProperty("/forgotStep", 1);
             vm.setProperty("/dialogTitle", "Hostel Access Portal");
             this._resetOtpState();
-
         },
 
         _setLoggedInUser: function (user) {

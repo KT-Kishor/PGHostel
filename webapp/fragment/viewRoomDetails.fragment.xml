@@ -10,7 +10,7 @@
 
 
 		
-		<Dialog id="roomDetailID" draggable="true" resizable="true" stretch="{= ${device>/system/phone} }" class="sapUiContentPadding" contentWidth="70%" afterOpen=".onRoomDetailOpened" afterClose=".onDialogAfterClose">
+		<Dialog id="roomDetailID" initialFocus="focus" draggable="true" resizable="true" stretch="{= ${device>/system/phone} }" class="sapUiContentPadding" contentWidth="70%" afterOpen=".onRoomDetailOpened" afterClose=".onDialogAfterClose">
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
@@ -41,7 +41,7 @@
 							<layoutData>
 								<l:GridData span="L4 M6 S12"/>
 							</layoutData>
-							<card:Card manifest="./cards/roomDetailsCard.json" class="roomDetailsCard " manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'/>
+							<card:Card  manifest="./cards/roomDetailsCard.json" class="roomDetailsCard " manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'/>
 							<VBox class="descriptionBox sapUiSmallMarginTop" alignItems="Start">
 								<core:Icon src="sap-icon://ui-notifications" size="1.5rem" class="sapUiTinyMarginBegin descIcon"/>
 								<ExpandableText maxCharacters="330" text="{HostelModel>/Description}" class="descTextLarge" />
@@ -74,7 +74,7 @@
 				</FlexBox>
 				<!-- Facilities Header -->
 				<VBox visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }">
-					<Bar design="Header" class="sapUiMediumMarginTop">
+					<Bar id="focus" design="Header" class="sapUiMediumMarginTop">
 						<contentLeft>
 							<Title text="Available Facilities" />
 						</contentLeft>

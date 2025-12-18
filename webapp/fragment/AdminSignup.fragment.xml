@@ -3,7 +3,7 @@
 		xmlns:core="sap.ui.core" 
 		xmlns:f="sap.ui.layout.form" 
 		xmlns:u="sap.ui.unified">
-		<Dialog  id="adminSignupDialog" contentWidth="28rem" stretch="{= ${device>/system/phone} }" draggable="true" resizable="true">
+		<Dialog  id="adminSignupDialog" initialFocus="adminSalutation" contentWidth="28rem" stretch="{= ${device>/system/phone} }" draggable="true" resizable="true">
 			
 			<customHeader>
 	<Bar class="barheader">
@@ -20,7 +20,7 @@
 				<!-- (keep your existing fields as-is) -->
 				<HBox width="100%" alignItems="Center" class="isdMobileRow">
 	<!-- Salutation : 30% -->
-	<VBox width="30%">
+	<VBox width="23%">
 		<Label text="Salutation" required="true"/>
 		<ComboBox id="adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
 			<core:ListItem key="Mr." text="Mr."/>
@@ -30,7 +30,7 @@
 		</ComboBox>
 	</VBox>
 	<!-- Vendor Name : 70% -->
-	<VBox width="70%" class="sapUiTinyMarginBegin">
+	<VBox width="73%" class="sapUiTinyMarginBegin">
 		<Label text="Vendor Name" required="true"/>
 		<Input id="adminVendorName" value="{AdminSignupModel>/VendorName}" placeholder="Enter your name" liveChange="onAdminLiveValidate" valueStateText="Enter Valid Name"/>
 	</VBox>
@@ -150,8 +150,8 @@
 		</items>
 	</Table>
 			<!-- ACTIONS -->
-			<beginButton>
-				<Button text="Register" type="Emphasized" press="onSubmitAdminSignup" class="myUnifiedBtn sapUiSmallMarginEnd" width="120px" />
+			<beginButton >
+				<Button text="Register" type="Emphasized" press="onSubmitAdminSignup" class="myUnifiedBtn sapUiSmallMargin" width="120px" />
 			</beginButton>
 		</Dialog>
 	</core:FragmentDefinition>
