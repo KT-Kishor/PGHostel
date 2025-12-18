@@ -588,44 +588,100 @@
 }
 
 /* Image + Label container */
-.imageContainer {
+/* .imageContainer {
   position: relative;
   width: 100%;
   height: 100%;
-}
+} */
 /* Image Container */
 
 /* Container wrapping image and overlay */
-.imageContainer {
+/* .imageContainer {
   position: relative;
   width: 264px;
   height: 178px;
   border-radius: 8px;
   overflow: hidden;
-}
-.imageContainer {
+} */
+/* .imageContainer {
   position: relative;
   overflow: hidden;
   border-radius: 8px;
+} */
+
+.imageContainer {
+  position: relative;          /* key: parent for absolute child */
+  width: 100%;
+  max-width: 264px;
+  height: auto;
+  overflow: hidden;
+   border-radius: 8px;
 }
 
 .serviceImage {
+  width: 100%;
+  height: auto;
   border-radius: 8px;
   object-fit: cover;
+  display: block;
 }
 .serviceImage:hover {
   transform: scale(1.05);
 }
 
 /* Red banner overlay at the bottom */
+.imageContainer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Bottom banner – ALWAYS visible */
 .facility-overlay {
   position: absolute;
   bottom: 0;
+  left: 0;
   width: 100%;
+  min-height: 36px;
   background-color: #1bb2bf;
-  text-align: center;
-  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.facility-overlay-text {
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.facilityOverlayText {
+    position: absolute;
+    bottom: 8px;
+    left: 4px;
+    right: 4px;
+    background: linear-gradient(transparent, rgba(27,178,191,0.9));
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+ 
+@media only screen and (max-width: 768px) {
+  .facilityOverlayText {
+    font-size: 13px;
+    padding: 4px 2px;
+    margin-top: 20px !important;
+  }
+}
+
+
 
 .facility-overlay:hover {
   cursor: pointer;
@@ -633,13 +689,14 @@
   color: white;
   transform: scale(1.05);
 }
+
 /* Clickable white text */
 .facility-overlay-link {
   color: white;
   font-weight: bold;
   font-size: 16px;
   text-decoration: none;
-  cursor: pointer;
+  display: block;
 }
 
 .facility-overlay-link:hover {

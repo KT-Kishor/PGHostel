@@ -1210,23 +1210,18 @@ sap.ui.define([
                                                         // If NOT selected → open popover to choose price
                                                         const oActionSheet = that._createFacilityActionSheet(facility, iPersonIndex, oCard);
                                                         oActionSheet.openBy(oEvent.getSource());
-
                                                     }
-
-
                                                 }),
 
-                                                // Facility name overlay (hover effect)
- (() => {
-                                                    const oHTML = new sap.ui.core.HTML({
-                                                        content: `
-                      <div class="facility-overlay">
-                        <a href="#" class="facility-overlay-link">{FacilityModel>FacilityName}</a>
-                      </div>
-                    `
-                                                    }).bindElement("FacilityModel");
-                                                    return oHTML;
-                                                })()
+                                              
+ // Replace HTML formatter with:
+new sap.m.Text({
+    text: "{FacilityModel>FacilityName}",
+    textAlign: "Center"
+}).addStyleClass("facilityOverlayText")
+
+
+
                                             ]
                                         }),
 
