@@ -680,6 +680,17 @@
     margin-top: 20px !important;
   }
 }
+.sapMFlexBox{
+  margin: 0;
+}
+   @media only screen and (max-width: 730px) {
+    
+        .sapMFlexBox {
+   
+      justify-content: space-around; /* optional: nicer spacing */
+  }
+    
+}
 
 
 
@@ -1958,9 +1969,9 @@ span.sapMBtnInner.sapMBtnEmphasized {
         width: 100% !important;
     }
 
-    .sapMFlexBox {
+    /* .sapMFlexBox {
         flex-wrap: wrap !important;
-    }
+    } */
 
     .sapMInputBase,
     .sapMSlt,

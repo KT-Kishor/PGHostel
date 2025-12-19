@@ -1167,6 +1167,7 @@ sap.ui.define([
                                                     height: "178px",
                                                     class: "serviceImage",
                                                     densityAware: false,
+                                                    wrap: true,
                                                     press: function (oEvent) {
                                                         const oCtx = oEvent.getSource().getBindingContext("FacilityModel");
                                                         const facility = oCtx.getObject();
