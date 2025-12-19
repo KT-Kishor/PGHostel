@@ -13,9 +13,13 @@
 				<!-- BRANCH -->
 				<fb:FilterGroupItem name="BranchCode" groupName="Group" label="Branch" visibleInFilterBar="true">
 					<fb:control>
-						<ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true">
+						<!-- <ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true">
 							<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />
-						</ComboBox>
+						</ComboBox> -->
+							<ComboBox id="fBranch" width="100%" items="{sBRModel>/}" placeholder="Select Branch" selectedKey="" showSecondaryValues="true" >
+		<core:ListItem key="{sBRModel>BranchID}" text="{sBRModel>BranchID} - {sBRModel>Name}"  additionalText="{sBRModel>City}"/>
+	</ComboBox>
+
 					</fb:control>
 				</fb:FilterGroupItem>
 				<!-- STATUS -->

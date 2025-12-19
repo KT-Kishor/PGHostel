@@ -13,6 +13,8 @@ sap.ui.define([
     var EdmType = exportLibrary.EdmType;
     return BaseController.extend("sap.ui.com.project1.controller.CouponDetails", {
         Formatter: Formatter,
+        _isDateRangeCleared: false,
+
         onInit: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("RouteCouponDetails").attachPatternMatched(this._onRouteMatched, this);
@@ -34,6 +36,11 @@ sap.ui.define([
         _onRouteMatched: async function () {
             const ok = await this.commonLoginFunction();
             if (!ok) return;
+            const oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+
+            this._allowedBranches = oLoginData.BranchCode
+                ? oLoginData.BranchCode.split(",").map(b => b.trim())
+                : [];
 
             await this._loadBranchCode();
 
@@ -45,10 +52,102 @@ sap.ui.define([
 
             oRange.setDateValue(fyStart);
             oRange.setSecondDateValue(fyEnd);
+            this._isDateRangeCleared = false;
+
 
             // single visible data load
             await this.onCouponSearch();
         },
+
+
+        onCouponSearch: async function () {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+                const oRange = this.byId("fEndRange");
+                const aItems = this.byId("couponFilterBar").getFilterGroupItems();
+                const params = {};
+
+
+                // 🔒 ALWAYS enforce login branch scope
+                params.BranchCode = this._allowedBranches;
+
+                let sStartDate = "";
+                let sEndDate = "";
+
+                const dFrom = oRange.getDateValue();
+                const dTo = oRange.getSecondDateValue();
+
+                if (dFrom && dTo) {
+                    sStartDate = dFrom.toISOString().split("T")[0];
+                    sEndDate = dTo.toISOString().split("T")[0];
+                }
+
+
+                aItems.forEach(item => {
+                    const ctrl = item.getControl();
+                    const key = item.getName();
+                    if (!ctrl) return;
+
+                    switch (key) {
+
+                        case "Status":
+                        case "DiscountType": {
+                            params[key] = ctrl.getSelectedKey?.() || "";
+                            break;
+                        }
+                        case "BranchCode": {
+                            const sSelectedKey = ctrl.getSelectedKey();
+                            if (sSelectedKey) {
+                                // 🔒 Narrow only, never expand
+                                params.BranchCode = this._allowedBranches
+                                    .filter(b => b === sSelectedKey);
+                            }
+                            break;
+                        }
+
+
+                        case "EndDateRange": {
+                            const dFrom = ctrl.getDateValue();
+                            const dTo = ctrl.getSecondDateValue();
+
+                            if (dFrom && dTo) {
+                                sStartDate = dFrom.toISOString().split("T")[0];
+                                sEndDate = dTo.toISOString().split("T")[0];
+
+
+                            }
+                            break;
+                        }
+                    }
+                });
+
+
+
+                const oResult = await this.ajaxReadWithJQuery("HM_Coupon", {
+                    ...params,
+                    StartDate: sStartDate,
+                    EndDate: sEndDate
+                });
+                // debugging only: print parameters
+                // console.debug("CouponDetails.controller.js: FilterCoupons: params = ", JSON.stringify(params, null, 2));
+                const aData = this._normalizeCouponResult(oResult);
+                this.getView().getModel("CouponModel").setData(aData);
+                this._applyCouponGroupingAndSorting();
+
+
+
+
+            } catch (err) {
+                sap.m.MessageBox.error(
+                    err?.responseJSON?.message ||
+                    err?.message ||
+                    "Failed to filter coupons."
+                );
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
 
         _getFinancialYearDates: function () {
             const now = new Date();
@@ -479,95 +578,7 @@ sap.ui.define([
         },
 
 
-        onCouponSearch: async function () {
-            try {
 
-                sap.ui.core.BusyIndicator.show(0);
-                const oRange = this.byId("fEndRange");
-
-
-
-                const aItems = this.byId("couponFilterBar").getFilterGroupItems();
-                const params = {};
-
-                let sStartDate = "";
-                let sEndDate = "";
-
-                const dFrom = oRange.getDateValue();
-                const dTo = oRange.getSecondDateValue();
-
-                if (dFrom && dTo) {
-                    sStartDate = dFrom.toISOString().split("T")[0];
-                    sEndDate = dTo.toISOString().split("T")[0];
-                }
-
-
-                aItems.forEach(item => {
-                    const ctrl = item.getControl();
-                    const key = item.getName();
-                    if (!ctrl) return;
-
-                    switch (key) {
-
-                        case "Status":
-                        case "DiscountType": {
-                            params[key] = ctrl.getSelectedKey?.() || "";
-                            break;
-                        }
-
-                        case "BranchCode": {
-                            const oItem = ctrl.getSelectedItem();
-                            if (!oItem) break;
-
-                            const oCtx = oItem.getBindingContext("sBRModel");
-                            if (!oCtx) break;
-
-                            const oBranch = oCtx.getObject();
-                            params.BranchCode = [
-                                oBranch.BranchCode || oBranch.BranchID
-                            ];
-                            break;
-                        }
-
-                        case "EndDateRange": {
-                            const dFrom = ctrl.getDateValue();
-                            const dTo = ctrl.getSecondDateValue();
-
-                            if (dFrom && dTo) {
-                                sStartDate = dFrom.toISOString().split("T")[0];
-                                sEndDate = dTo.toISOString().split("T")[0];
-
-
-                            }
-                            break;
-                        }
-                    }
-                });
-
-
-
-                const oResult = await this.ajaxReadWithJQuery("HM_Coupon", {
-                    ...params,
-                    StartDate: sStartDate,
-                    EndDate: sEndDate
-                });
-                const aData = this._normalizeCouponResult(oResult);
-                this.getView().getModel("CouponModel").setData(aData);
-                this._applyCouponGroupingAndSorting();
-
-
-
-
-            } catch (err) {
-                sap.m.MessageBox.error(
-                    err?.responseJSON?.message ||
-                    err?.message ||
-                    "Failed to filter coupons."
-                );
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
-        },
         _applyCouponGroupingAndSorting: function () {
             const oTable = this.byId("couponTable");
             const oBinding = oTable.getBinding("items");
@@ -622,18 +633,33 @@ sap.ui.define([
                     oBranch.BranchCode || oBranch.BranchID
                 );
         },
-
-
         onClearCoupons: function () {
+            // clear non-date filters always
             this.byId("fStatus").setSelectedKey("");
             this.byId("fDiscountType").setSelectedKey("");
             this.byId("fBranch").setSelectedKey("");
-            var oRange = this.byId("fEndRange");
-            // ✅ Fully reset date range
-            oRange.setValue("");
-            oRange.setDateValue(null);
-            oRange.setSecondDateValue(null);
+
+            const oRange = this.byId("fEndRange");
+
+            // 🔁 TOGGLE LOGIC
+            if (!this._isDateRangeCleared) {
+                // ➜ First clear: EMPTY the date range
+                oRange.setValue("");
+                oRange.setDateValue(null);
+                oRange.setSecondDateValue(null);
+
+                this._isDateRangeCleared = true;
+            } else {
+                // ➜ Second clear: RESTORE FY range
+                const { fyStart, fyEnd } = this._getFinancialYearDates();
+
+                oRange.setDateValue(fyStart);
+                oRange.setSecondDateValue(fyEnd);
+
+                this._isDateRangeCleared = false;
+            }
         },
+
         // ===== Discount Type (STRICT combo) =====
         onChange_DiscountType: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
