@@ -37,7 +37,7 @@
                 class="sapUiResponsiveMargin" items="{path:'mainModel>/'}">
 				<headerToolbar>
 					<OverflowToolbar>
-						<Title text="Staff Details ({=${mainModel>/}.length})" />
+						<Title text="Vendor Details ({=${mainModel>/}.length})" />
 						<ToolbarSpacer/>
 						<!-- <Button text="Add" press="HM_AddHostelFeature" class="myUnifiedBtn"/>
 						<Button text="Edit"  press="HM_EditHostelFeature" class="myUnifiedBtn"/>

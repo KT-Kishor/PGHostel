@@ -4498,7 +4498,7 @@ sap.ui.define([
                     Address: oAdmin.Address,
                     Role: "Admin",
                     Type: "Vendor",
-                    Status: "Active",
+                    Status: "New",
                     Documents: data.Documents.map(doc => ({
                         FileName: doc.FileName,
                         DocumentType: doc.VdocType,

@@ -164,8 +164,10 @@
 		<m:footer>
 			<m:Bar id="MV_id_FooterBar">
 				<m:contentRight>
-					<m:Button id="MV_id_ApproveButton"  text="Approve" class="myUnifiedBtn" press="BI_onEditButtonPress"/>
-					<m:Button id="MV_id_SendBackButton" text="Send Back" class="myUnifiedBtn" press="BT_onsavebuttonpress"/>
+					<m:Button id="MV_id_ApproveButton" text="Approve" class="myUnifiedBtn"
+   					press="MI_onPressButtons" />
+					<m:Button id="MV_id_SendBackButton" text="Send Back" class="myUnifiedBtn"
+   					press="MI_onPressButtons" />
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

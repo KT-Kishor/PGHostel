@@ -317,7 +317,7 @@ sap.ui.define([
             this.byId("AdminDownloadButton").setEnabled(true);
         },
 
-        onAdminDeleteFiles: function () {
+        onAdminDeleteFiles: function() {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oSelectedItem = oTable.getSelectedItem();
 
@@ -339,29 +339,29 @@ sap.ui.define([
                 "Confirm",
                 "Are you sure you want to delete this document?",
                 async () => {
-                    try {
-                        sap.ui.core.BusyIndicator.show(0);
+                        try {
+                            sap.ui.core.BusyIndicator.show(0);
 
-                        await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
-                            filters: {
-                                DocumentID: oContext.getProperty("DocumentID"),
-                                CustomerID: sUserID
-                            }
-                        });
+                            await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
+                                filters: {
+                                    DocumentID: oContext.getProperty("DocumentID"),
+                                    CustomerID: sUserID
+                                }
+                            });
 
-                        sap.m.MessageToast.show("Document deleted successfully");
-                        this._loadVendorDetails(sUserID); // refresh attachment list
+                            sap.m.MessageToast.show("Document deleted successfully");
+                            this._loadVendorDetails(sUserID); // refresh attachment list
+                            fnResetSelection();
+                        } catch (err) {
+                            sap.m.MessageToast.show(err.message || "Delete failed");
+                        } finally {
+                            sap.ui.core.BusyIndicator.hide();
+                        }
+                    },
+                    () => {
+                        // Cancel callback
                         fnResetSelection();
-                    } catch (err) {
-                        sap.m.MessageToast.show(err.message || "Delete failed");
-                    } finally {
-                        sap.ui.core.BusyIndicator.hide();
                     }
-                },
-                () => {
-                    // Cancel callback
-                    fnResetSelection();
-                }
             );
         },
 
@@ -535,6 +535,133 @@ sap.ui.define([
             }
 
             this._oAdminPreviewDialog.open();
+        },
+
+        MI_onPressButtons(oEvent) {
+            const actionText = oEvent.getSource().getText();
+            const i18n = this.getView().getModel("i18n").getResourceBundle();
+
+            const dialogTexts = {
+                "Approve": "confirmApprove",
+                "Send Back": "confirmReSend",
+            };
+
+            this.getText = actionText;
+            this.functionToOpenDialog(actionText, i18n.getText(dialogTexts[actionText]));
+        },
+
+        functionToOpenDialog(text, oDialogTitle) {
+            const oView = this.getView();
+            if (!this.oDialog) {
+                sap.ui.core.Fragment.load({
+                    name: "sap.ui.com.project1.fragment.VendorApprove",
+                    controller: this
+                }).then(oDialog => {
+                    this.oDialog = oDialog;
+                    oView.addDependent(oDialog);
+                    oDialog.open();
+                    this.valueSetFunction(text, oDialogTitle);
+                });
+            } else {
+                this.oDialog.open();
+                this.valueSetFunction(text, oDialogTitle);
+            }
+        },
+
+        valueSetFunction(text, oDialogTitle) {
+            sap.ui.getCore().byId("MIF_id_OkBtn").setText(text);
+            const i18n = this.getView().getModel("i18n").getResourceBundle();
+            let oValue = "";
+            if (text === "Approve") {
+                oValue = i18n.getText("approveRemark");
+            } else if (text === "Send Back") {
+                oValue = i18n.getText("sendBackRemark");
+            }
+            sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(oValue);
+            sap.ui.getCore().byId("MIF_id_remark").setValue("");
+            sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
+            sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
+        },
+
+        MTF_onPressOk: async function() {
+            const btnText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
+            const i18n = this.getView().getModel("i18n").getResourceBundle();
+            const remark = sap.ui.getCore().byId("MIF_id_remark").getValue().trim();
+
+            const statusMap = {
+                "Approve": "Approved",
+                "Send Back": "Send back"
+            };
+
+            if (!remark) {
+                sap.m.MessageToast.show(i18n.getText("enterComments"));
+                sap.ui.getCore().byId("MIF_id_remark").setValueState("Error");
+                return;
+            }
+
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                const oData = this.getView().getModel("AdminSignupModel").getData();
+
+                const payload = {
+                    data: {
+                        UserID: oData.UserID,
+                        UserName: oData.VendorName,
+                        EmailID: oData.Email,
+                        Gender: oData.Gender,
+                        STDCode: oData.STDCode,
+                        MobileNo: oData.Mobile,
+                        Address: oData.Address,
+                        Country: oData.Country,
+                        State: oData.State,
+                        City: oData.City,
+                        DateOfBirth: oData.DateOfBirth,
+                        Status: statusMap[btnText], //  Approval-specific fields
+                        AdminComment: remark
+                    },
+                    filters: {
+                        UserID: oData.UserID
+                    }
+                };
+
+                await this.ajaxUpdateWithJQuery("HM_Login", payload);
+
+                sap.m.MessageToast.show(
+                    btnText === "Approve" ?
+                    i18n.getText("approveMessageSuccess") :
+                    i18n.getText("resendMessageSuccess")
+                );
+
+                this.oDialog.close();
+
+                // Reload latest data
+                await this._loadVendorDetails(oData.UserID);
+
+            } catch (err) {
+                sap.m.MessageBox.error(
+                    btnText === "Approve" ?
+                    i18n.getText("erroApproveMessage") :
+                    i18n.getText("errorResendMessage")
+                );
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        MIF_onPressClose: function() {
+            this.oDialog.close();
+        },
+
+        MIF_liveChangeForMangerComments() {
+            const input = sap.ui.getCore().byId("MIF_id_remark");
+            if (!input.getValue()) {
+                input.setValueStateText(this.getView().getModel('i18n').getResourceBundle().getText("commentsValueState"));
+                input.setValueState("Error");
+                return false;
+            }
+            input.setValueState("None");
+            return true;
         },
 
         onAdminChangeSalutation: function(oEvent) {
