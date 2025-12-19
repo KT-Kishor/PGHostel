@@ -12,16 +12,34 @@
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
     >
         <headerContent>
-            <core:Fragment
+            <!-- <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
-            />
+            /> -->
+
+             
         </headerContent>
         <content>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
+           <Bar
+        design="Header"
+    >
+       <contentLeft>
+					<Button
+                        icon="sap-icon://nav-back"
+                        press=".onNavBack"
+                    />
+					<Title
+                        text="Shah Hostel"
+                        class="customPageTitle"
+                    />
+				</contentLeft>
+				<contentRight>
+					<Button
+                        icon="sap-icon://home"
+                        press=".onHome"
+                    />
+				</contentRight>
+    </Bar>
             <ScrollContainer
                 width="100%"
                 height="100%"
@@ -73,6 +91,7 @@
                                     showIcon="true"
                                     showCloseButton="false"
                                 />
+                                
                                 <!--  LOGIN BUTTON HERE -->
                                 <Button
                                     text="LOGIN"

@@ -3930,7 +3930,7 @@ new sap.m.Text({
                             BedType: `${oData.BedType} - ${oData.ACType}`,
                             BranchCode: oData.BranchCode,
                             Currency: oData.Currency,
-                            Discount: oData.AppliedDiscount,
+                            Discount: oData.AppliedDiscount.toString() || "0",
                             CouponCode: oData.CouponCode || "",
                             UserID: p.UserID
                         });

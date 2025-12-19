@@ -686,7 +686,6 @@
    @media only screen and (max-width: 730px) {
     
         .sapMFlexBox {
-   
       justify-content: space-around; /* optional: nicer spacing */
   }
     
@@ -2099,6 +2098,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
     color: #007bff !important;
     font-weight: bold !important;
     background: white !important;
+}
+@media only screen and (max-width: 700px){
+     .loginBannerButton{
+      margin-left: 10px !important;
+     }
 }
 /* Custom button for hostel booking theme */
 /* Normal state */
