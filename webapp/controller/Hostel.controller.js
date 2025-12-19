@@ -752,6 +752,8 @@ sap.ui.define([
             if (sKey === "idRooms") {
                 await this._loadRoomsPageData();
             }
+            this.flag = true
+
         },
         Branch: function () {
             return new Promise((resolve) => {
@@ -783,6 +785,10 @@ sap.ui.define([
         },
 
         _loadRoomsPageData: async function () {
+               this.iTop = 4; 
+               this.iSkip = 0;   
+
+            this.roomtype = false
 
             const oContainer = this.byId("idBedTypeFlex");
             const oBranch = this.byId("id_Branch");
@@ -2442,15 +2448,15 @@ sap.ui.define([
             if (sSelectedACType === "") {
                 this.byId("id_Roomtype").setSelectedKey("All")
             }
-              if (sSelectedACType === "All") {
+              if (sSelectedACType === "All" || oBranchcity) {
                     this.iTop=4
                     this.iSkip=0
                 }
-                  if (sSelectedACType === "AC") {
+                  if (sSelectedACType === "AC" || oBranchcity) {
                     this.iTop=4
                     this.iSkip=0
                 }
-                  if (sSelectedACType === "Non-AC") {
+                  if (sSelectedACType === "Non-AC" || oBranchcity) {
                     this.iTop=4
                     this.iSkip=0
                 }
@@ -2512,6 +2518,8 @@ sap.ui.define([
                 var aBranchCodes = [];
                 var oBRModel = this.getView().getModel("sBRModel");
                 var aBranchesData = oBRModel.getData(); // adjust path if needed
+                   var sBranchCode= this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
+
 
                 if (Scity && !sBranchCode) {
                     // Filter branches by city
@@ -2539,6 +2547,7 @@ sap.ui.define([
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes,
+                    ACType: sACType,
                     top: this.iTop,
                     skip: this.iSkip
                 });
@@ -2631,7 +2640,8 @@ sap.ui.define([
 
                     // var AvailbleBeds = totalCapacity - totalBooked
                     // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-                    // const isVisible = !isFull && price.trim() !== "";
+                    const isVisible = room?.Status === "Available";
+
 
 
                     const oBranchInfo = aBranchData.find(b =>
@@ -2664,10 +2674,9 @@ sap.ui.define([
                         Currency: Currency,
                         BranchCode: room.BranchCode,
                         Images: aImages,
-                        // Logo: sLogo,
                         Country: sCountry,
-                        Visible: true,
-                        // AvailbleBeds: AvailbleBeds
+                        Visible: isVisible,
+                        AvailbleBeds: room.AvailableRooms
                     };
                 });
 
