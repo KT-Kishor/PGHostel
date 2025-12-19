@@ -24,24 +24,25 @@
 					<subSections>
 						<ObjectPageSubSection id="MV_id_dsd1">
 							<blocks>
-								<f:SimpleForm
-                                    id="MV_id_simpleCompanyDetails"
-                                    busyIndicatorDelay="0" editable="true"
-                                    layout="ColumnLayout"  labelSpanXL="4"
-                                    labelSpanL="3"
-                                    labelSpanM="4"
-                                    labelSpanS="12"
-                                    columnsXL="2"
-                                    columnsL="2"
-                                    columnsM="1">
+								<f:SimpleForm id="Exp_Det_id_DimpleForm" editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+									<f:toolbar>
+										<m:Toolbar>
+											<m:Title text="Vendor Details"/>
+											<m:ToolbarSpacer />
+											<m:Button class="myUnifiedBtn"
+												text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
+												press="onEditOrSavePress"
+											/>
+										</m:Toolbar>
+									</f:toolbar>
 									<f:content>
 										<m:Label text="Vendor Name" required="true"/>
-                                        <m:ComboBox id="MV_id_adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" editable="{editable>/Edit}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
-                                            <core:ListItem key="Mr." text="Mr."/>
-                                            <core:ListItem key="Ms." text="Ms."/>
-                                            <core:ListItem key="Mrs." text="Mrs."/>
-                                            <core:ListItem key="Dr." text="Dr."/>
-                                        </m:ComboBox>
+										<m:ComboBox id="MV_id_adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" editable="{editable>/Edit}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
+											<core:ListItem key="Mr." text="Mr."/>
+											<core:ListItem key="Ms." text="Ms."/>
+											<core:ListItem key="Mrs." text="Mrs."/>
+											<core:ListItem key="Dr." text="Dr."/>
+										</m:ComboBox>
 										<m:Input value="{AdminSignupModel>/VendorName}"
                                         liveChange="onAdminLiveValidate" editable="{editable>/Edit}"/>
 										<m:Label text="Date of Birth" required="true"/>
@@ -61,8 +62,8 @@
                                          liveChange="onAdminLiveValidate" editable="{editable>/Edit}"/>
 										<m:Label text="Country" required="true"/>
 										<m:ComboBox selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry"  id="MV_id_Country" selectionChange="ADMIN_onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}"  showSecondaryValues="true" editable="{editable>/Edit}">
-                                        <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>   
-                                        </m:ComboBox>
+											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
+										</m:ComboBox>
 										<m:Label text="State" required="true"/>
 										<m:ComboBox selectedKey="{AdminSignupModel>/State}" change="ADMIN_onChangeState" items="{StateModel>/}" editable="{editable>/Edit}" placeholder="Select State" valueStateText="Select a valid State" showSecondaryValues="true" id="MV_id_State">
 											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
@@ -70,7 +71,7 @@
 										<m:Label text="City" required="true"/>
 										<m:ComboBox selectedKey="{AdminSignupModel>/City}" change="ADMIN_onChangeCity" selectionChange="ADMIN_onChangeCity" placeholder="Select City" valueStateText="Select a valid City" id="MV_id_City"
                                          items="{path:'CityModel>/', length:1000}" showSecondaryValues="true" editable="{editable>/Edit}">
-                                        <core:ListItem
+											<core:ListItem
                                             key="{CityModel>cityName}"
                                             text="{CityModel>cityName}"
                                             additionalText="{CityModel>branchCode}"
@@ -78,10 +79,10 @@
 										</m:ComboBox>
 										<!-- ISD + Mobile -->
 										<m:Label text="Mobile Number" required="true"/>
-											<m:ComboBox selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true" editable="{editable>/Edit}"> 
-		                                    <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
-											</m:ComboBox>
-											<m:Input value="{AdminSignupModel>/Mobile}"
+										<m:ComboBox selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true" editable="{editable>/Edit}">
+											<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
+										</m:ComboBox>
+										<m:Input value="{AdminSignupModel>/Mobile}"
                                             liveChange="ADMIN_onMobileLiveChange"  editable="{editable>/Edit}"/>
 										<m:Label text="Address" required="true"/>
 										<m:TextArea value="{AdminSignupModel>/Address}" rows="3"
@@ -98,15 +99,16 @@
 							<blocks>
 								<m:VBox>
 									<m:VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
-										<m:MessageStrip text="Upload clear and valid documents only. Max size: 5 MB per file" showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
+									<m:MessageStrip text="Upload clear and valid documents only. Max size: 3 MB per file" showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
 									</m:VBox>
-									<m:Table id="MV_id_adminAttachmentTable" items="{AdminSignupModel>/Documents}" mode="{= ${editable>/Edit} ? 'Delete' : 'None' }" delete="onAdminDeleteDoc" sticky="ColumnHeaders,HeaderToolbar" width="100%">
+									<m:Table id="MV_id_adminAttachmentTable" items="{AdminSignupModel>/Documents}" mode="SingleSelectLeft" sticky="ColumnHeaders,HeaderToolbar" selectionChange="onAdminSelectionChange">
 										<m:headerToolbar>
 											<m:OverflowToolbar>
 												<m:Title text="Documents" />
 												<m:Text text="*" class="requiredStar" />
 												<m:ToolbarSpacer />
-												<m:ComboBox change="onAdminDocTypeChange" id="MV_id_adminDocType" selectedKey="{AdminSignupModel>/CurrentDocType}" enabled="{editable>/Edit}" placeholder="Select Document" width="200px">
+												<m:ComboBox id="MV_id_adminDocType" selectedKey="{AdminSignupModel>/CurrentDocType}" placeholder="Select Document" width="200px" change="onDocumentTypeChange"
+                                                valueStateText="Select Document Type">
 													<core:ListItem key="Aadhaar" text="Aadhar Card"/>
 													<core:ListItem key="PAN" text="PAN Card"/>
 													<core:ListItem key="Driving License" text="Driving License"/>
@@ -115,8 +117,19 @@
 												</m:ComboBox>
 												<!-- Upload button -->
 												<m:VBox id="MV_id_adminUploaderWrapper">
-													<u:FileUploader enabled="{editable>/Edit}" id="MV_id_adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" />
+													<u:FileUploader  id="MV_id_adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" 
+													fileSizeExceed="onFileSizeExceeds"
+                                                    maximumFileSize="3MB"
+                                                    typeMissmatch="onFileTypeMissmatch"
+                                                    sameFilenameAllowed="true"
+                                                    iconFirst="true"/>
 												</m:VBox>
+												<m:Button id="AdminDeleteButton" text="Delete"
+												class="myUnifiedBtn" press="onAdminDeleteFiles"
+												enabled="false"/>
+												<m:Button id="AdminDownloadButton" text="Download"
+												class="myUnifiedBtn" press="onAdminDownloadFiles"
+												enabled="false"/>
 											</m:OverflowToolbar>
 										</m:headerToolbar>
 										<m:columns>
@@ -129,9 +142,6 @@
 											<m:Column>
 												<m:Text text="File Type" />
 											</m:Column>
-											<m:Column>
-												<m:Text text="Size" />
-											</m:Column>
 										</m:columns>
 										<m:items>
 											<m:ColumnListItem>
@@ -140,7 +150,6 @@
                                                     press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"/>
 													<m:Text text="{AdminSignupModel>DocumentType}" />
 													<m:Text text="{AdminSignupModel>FileType}" />
-													<m:Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}" />
 												</m:cells>
 											</m:ColumnListItem>
 										</m:items>
@@ -155,10 +164,8 @@
 		<m:footer>
 			<m:Bar id="MV_id_FooterBar">
 				<m:contentRight>
-					<m:Button id="MV_id_editButton" visible="{= !${editable>/Edit} }"
-                        text="Edit" class="myUnifiedBtn" press="BI_onEditButtonPress"/>
-					<m:Button id="MV_id_SaveButton" visible="{=${editable>/Edit}}"
-                        text="Save" class="myUnifiedBtn" press="BT_onsavebuttonpress"/>
+					<m:Button id="MV_id_ApproveButton"  text="Approve" class="myUnifiedBtn" press="BI_onEditButtonPress"/>
+					<m:Button id="MV_id_SendBackButton" text="Send Back" class="myUnifiedBtn" press="BT_onsavebuttonpress"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>
