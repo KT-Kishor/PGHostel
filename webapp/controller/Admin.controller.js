@@ -104,7 +104,7 @@ sap.ui.define([
 
             let filters = {};
 
-            if (oExistingModel.Role && aBranchCodes) {
+            if (oExistingModel.Role==="Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
 

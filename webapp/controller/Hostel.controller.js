@@ -2502,7 +2502,9 @@ sap.ui.define([
             } else {
                 sACType = this.getView().byId("id_Roomtype").getSelectedKey()
             }
-
+           if (sACType === "All") {
+                sACType = "";
+            }
             try {
 
                 const oView = this.getView();
@@ -2537,13 +2539,12 @@ sap.ui.define([
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes,
-                    ACType: sACType,
                     top: this.iTop,
                     skip: this.iSkip
                 });
                 await this.model(response)
 
-                let matchedRooms = response.data.BedTypeDetails || [];
+                let matchedRooms = response.data.HM_BedType || [];
 
 
                 // if (sACType) {
@@ -2614,23 +2615,23 @@ sap.ui.define([
                     const YearPrice = firstRoom?.YearPrice ? " " + firstRoom.YearPrice : "";
                     const Currency = firstRoom?.Currency ? " " + firstRoom.Currency : "";
 
-                    let totalBooked = 0;
-                    let totalCapacity = 0;
+                    // let totalBooked = 0;
+                    // let totalCapacity = 0;
 
-                    totalCapacity = Number(room.NoOfPerson) * Number(room.MaxBeds) || 0;
-                    matchingRooms.forEach(rm => {
-                        const bookedCount = customerData.filter(cust =>
-                            cust.BranchCode?.toLowerCase() === rm.BranchCode?.toLowerCase() &&
-                            cust.BedType?.trim().toLowerCase() === rm.BedTypeName?.trim().toLowerCase() &&
-                            cust.Status === "Assigned"
-                        ).length;
-                        totalBooked = bookedCount;
-                    });
+                    // totalCapacity = Number(room.NoOfPerson) * Number(room.MaxBeds) || 0;
+                    // matchingRooms.forEach(rm => {
+                    //     const bookedCount = customerData.filter(cust =>
+                    //         cust.BranchCode?.toLowerCase() === rm.BranchCode?.toLowerCase() &&
+                    //         cust.BedType?.trim().toLowerCase() === rm.BedTypeName?.trim().toLowerCase() &&
+                    //         cust.Status === "Assigned"
+                    //     ).length;
+                    //     totalBooked = bookedCount;
+                    // });
 
 
-                    var AvailbleBeds = totalCapacity - totalBooked
-                    const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-                    const isVisible = !isFull && price.trim() !== "";
+                    // var AvailbleBeds = totalCapacity - totalBooked
+                    // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
+                    // const isVisible = !isFull && price.trim() !== "";
 
 
                     const oBranchInfo = aBranchData.find(b =>
@@ -2665,8 +2666,8 @@ sap.ui.define([
                         Images: aImages,
                         // Logo: sLogo,
                         Country: sCountry,
-                        Visible: isVisible,
-                        AvailbleBeds: AvailbleBeds
+                        Visible: true,
+                        // AvailbleBeds: AvailbleBeds
                     };
                 });
 
