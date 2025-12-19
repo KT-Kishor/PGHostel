@@ -57,8 +57,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            this.iSkip = 0;   // starting index
             this.iTop = 4; // records per load
+            this.iSkip = 0;   // starting index
 
             this.flag = false
             this.roomtype = false
@@ -67,7 +67,7 @@ sap.ui.define([
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     BedTypes: [],
                     NoData: false,
-                    ShowViewMore: true
+                    ShowViewMore:false,
                 }), "VisibilityModel");
             }
 
@@ -748,11 +748,15 @@ sap.ui.define([
 
             var page = this.byId(sKey);
             if (page && page.scrollTo) page.scrollTo(0, 0);
+              this.flag = true
+              this.iTop = 4; 
+              this.iSkip = 0;
+            this.roomtype = true
 
             if (sKey === "idRooms") {
                 await this._loadRoomsPageData();
             }
-            this.flag = true
+      
 
         },
         Branch: function () {
@@ -769,13 +773,18 @@ sap.ui.define([
                 }
             });
         },
-        onViewMoreRooms: function () {
+        onViewMoreRooms:async function () {
             // Load next page
             this.flag = false
-            this.roomtype = true
+            this.roomtype = false
             this.iSkip;
             this.iTop
-            this._loadRoomsPageData();
+               const oContainer = this.byId("idBedTypeFlex")
+            oContainer.setBusy(true);
+
+          await  this._loadFilteredData(this.Scity,this.sBranchCode,this.sACType);
+            oContainer.setBusy(false);
+
 
             // Set flag to true if needed
 
@@ -784,7 +793,7 @@ sap.ui.define([
             // So you don't need to manually change them here
         },
 
-        _loadRoomsPageData: async function () {
+  _loadRoomsPageData: async function () {
                this.iTop = 4; 
                this.iSkip = 0;   
 
@@ -835,6 +844,8 @@ sap.ui.define([
                 oRoomType.setBusy(false);
             }
         },
+
+
 
         onpressFilter: function () {
             var oView = this.getView();
@@ -2508,9 +2519,11 @@ sap.ui.define([
             } else {
                 sACType = this.getView().byId("id_Roomtype").getSelectedKey()
             }
+          
            if (sACType === "All") {
                 sACType = "";
             }
+            
             try {
 
                 const oView = this.getView();
@@ -2692,6 +2705,10 @@ sap.ui.define([
                     this.iSkip += this.iTop;
                     //  this.iTop= this.iSkip * this.iSkip
                 }
+                  this.Scity=Scity
+                  this.sACType=sACType
+
+                  this.sBranchCode=sBranchCode
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
                 oVisibilityModel.setProperty("/NoData", aFinal.length === 0);
