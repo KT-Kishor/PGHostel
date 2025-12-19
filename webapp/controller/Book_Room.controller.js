@@ -1024,6 +1024,52 @@ sap.ui.define([
 
                         }),
 
+                     new sap.m.Button({
+    icon: "sap-icon://decline",
+    type: "Transparent",
+    tooltip: "Clear Document",
+    press: function (oEvent) {
+
+        const oButton = oEvent.getSource();
+
+        // Traverse backwards until we find FileUploader
+        let oUploader = null;
+        let oParent = oButton.getParent();
+
+        while (oParent) {
+            if (oParent instanceof sap.ui.unified.FileUploader) {
+                oUploader = oParent;
+                break;
+            }
+            if (oParent.getContent) {
+                const aContent = oParent.getContent();
+                oUploader = aContent.find(c => c instanceof sap.ui.unified.FileUploader);
+                if (oUploader) break;
+            }
+            oParent = oParent.getParent();
+        }
+
+        if (!oUploader) {
+            sap.m.MessageToast.show("Unable to locate uploader");
+            return;
+        }
+
+        const index = oUploader.data("index");
+
+        // 1️⃣ Clear model data
+        oModel.setProperty("/Persons/" + index + "/Documents", []);
+        oModel.setProperty("/Persons/" + index + "/DocumentType", []);
+
+        // 2️⃣ Clear uploader UI
+        oUploader.clear();
+
+        // 3️⃣ Refresh model
+        oModel.refresh(true);
+    }
+})
+
+
+
 
                     ]
                 });
@@ -4082,6 +4128,7 @@ new sap.m.Text({
                         this._navigateAfterBooking();
                     }.bind(this)
                 });
+               
             } catch (e) {
                 BusyIndicator.hide();
                 let errorMsg = "Unknown error";
