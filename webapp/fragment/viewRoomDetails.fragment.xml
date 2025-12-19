@@ -6,11 +6,8 @@
 	xmlns:f="sap.f" 
 	xmlns:et="sap.m" 
 	xmlns:card="sap.ui.integration.widgets">
-	<!-- <Dialog draggable="true" afterOpen=".onRoomDetailOpened" resizable="true"  contentHeight="auto" contentWidth="{= ${device>/system/phone} ? '100%' : '70%' }" id="roomDetailID" title="Room Details" type="Message" class="sapUiContentPadding" afterClose=".onDialogAfterClose"> -->
-
-
-		
-		<Dialog id="roomDetailID" initialFocus="focus" draggable="true" resizable="true" stretch="{= ${device>/system/phone} }" class="sapUiContentPadding" contentWidth="70%" afterOpen=".onRoomDetailOpened" afterClose=".onDialogAfterClose">
+	<!-- <Dialog draggable="true" afterOpen=".onRoomDetailOpened" resizable="true" contentHeight="auto" contentWidth="{= ${device>/system/phone} ? '100%' : '70%' }" id="roomDetailID" title="Room Details" type="Message" class="sapUiContentPadding" afterClose=".onDialogAfterClose"> -->
+	<Dialog id="roomDetailID" initialFocus="focus" draggable="true" resizable="true" stretch="{= ${device>/system/phone} }" class="sapUiContentPadding" contentWidth="70%" afterOpen=".onRoomDetailOpened" afterClose=".onDialogAfterClose">
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
@@ -23,7 +20,7 @@
 		</customHeader>
 		<content>
 			<VBox width="100%" class="roomTopAligned" renderType="Bare">
-<l:Grid width="100%" hSpacing="1" vSpacing="1">
+				<l:Grid width="100%" hSpacing="1" vSpacing="1">
 					<l:content>
 						<VBox width="100%">
 							<layoutData>
@@ -41,7 +38,7 @@
 							<layoutData>
 								<l:GridData span="L4 M6 S12"/>
 							</layoutData>
-							<card:Card  manifest="./cards/roomDetailsCard.json" class="roomDetailsCard " manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'/>
+							<card:Card manifest="./cards/roomDetailsCard.json" class="roomDetailsCard " manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'/>
 							<VBox class="descriptionBox sapUiSmallMarginTop" alignItems="Start">
 								<core:Icon src="sap-icon://ui-notifications" size="1.5rem" class="sapUiTinyMarginBegin descIcon"/>
 								<ExpandableText maxCharacters="330" text="{HostelModel>/Description}" class="descTextLarge" />
@@ -50,7 +47,7 @@
 						</VBox>
 					</l:content>
 				</l:Grid>
-<FlexBox id="priceFlex" class="priceFlex sapUiSmallMarginTop" wrap="Wrap">
+				<FlexBox id="priceFlex" class="priceFlex sapUiSmallMarginTop" wrap="Wrap">
 					<items>
 						<GenericTile header="Per Day" subheader="{ parts:['HostelModel>/Price','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }" class=" defaultTile priceItem" frameType="OneByHalf" press=".onSelectPricePlan" visible="{= parseInt(${HostelModel>/Price}.trim()) !== 0 }">
 							<customData>
@@ -68,8 +65,7 @@
 							</customData>
 						</GenericTile>
 						<!-- <GenericTile header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="{= ${HostelModel>/Visible} ? 'Loaded' : 'Disabled' }" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" press=".onConfirmBooking"/> -->
-					
-					<GenericTile id="bookTile" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="Loaded" press=".onConfirmBooking" />
+						<GenericTile id="bookTile" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="Loaded" press=".onConfirmBooking" />
 					</items>
 				</FlexBox>
 				<!-- Facilities Header -->
@@ -82,24 +78,20 @@
 					<HBox justifyContent="Center" visible="{FacilityModel>/loading}">
 						<BusyIndicator size="0.8rem" />
 					</HBox>
-
-
 					<!-- REAL Responsive Grid -->
-<HBox class="facilityGrid" wrap="Wrap" items="{FacilityModel>/Facilities}">
-	<items>
-		<VBox class="unifiedCard">
-			<Image src="{FacilityModel>Image}" class="unifiedCardImg" />
-			<Text text="{FacilityModel>FacilityName}" class="unifiedCardTitle" />
-			<Text class="unifiedCardText" text="{        parts: [            'FacilityModel>Price',            'FacilityModel>Currency',            'FacilityModel>UnitText'        ],        formatter: '.Formatter.formatFacilityPrice'      } - Onwards"/>
-					</VBox>
-	</items>
-</HBox>
-			
-
+					<HBox class="facilityGrid" wrap="Wrap" items="{FacilityModel>/Facilities}">
+						<items>
+							<VBox class="unifiedCard">
+								<Image src="{FacilityModel>Image}" class="unifiedCardImg" />
+								<Text text="{FacilityModel>FacilityName}" class="unifiedCardTitle" />
+								<Text class="unifiedCardText" text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.formatFacilityPrice'      }"/>
+							</VBox>
+						</items>
+					</HBox>
 				</VBox>
 				<VBox visible="{= ${AmenityModel>/Amenities}.length > 0 || ${AmenityModel>/loading} }">
 					<!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
-<Bar design="Header" class="sapUiMediumMarginTop">
+					<Bar design="Header" class="sapUiMediumMarginTop">
 						<contentLeft>
 							<Title text="Amenities" />
 						</contentLeft>

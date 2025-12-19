@@ -128,7 +128,6 @@
                                 <VBox class="sapUiLargeMarginTop">
                                     <Text
                                         class="Welcomeroomtext sapUiTinyMarginTopBottom"
-                                        textAlign="Center"
                                         text="Book Your Room "
                                     />
                                     <Text
