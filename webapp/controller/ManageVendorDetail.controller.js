@@ -2,8 +2,9 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "../model/formatter",
-    "sap/collaboration/components/fiori/sharing/attachment/Attachment"
-], function(BaseController, utils, Formatter) {
+    "sap/collaboration/components/fiori/sharing/attachment/Attachment",
+    "sap/m/MessageToast",
+], function(BaseController, utils, Formatter, Attachment, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendorDetail", {
         Formatter: Formatter,
@@ -158,7 +159,7 @@ sap.ui.define([
                 }
                 oModel.setData(oAdminData);
             } catch (err) {
-                sap.m.MessageToast.show("Failed to load vendor details");
+                MessageToast.show(this.i18nModel.getText("vendorLoadError"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -175,7 +176,7 @@ sap.ui.define([
 
             /* ================= Mandatory Validation ================= */
             if (!sDocType) {
-                sap.m.MessageToast.show("Please select Document Type");
+                MessageToast.show(this.i18nModel.getText("selectDocType"));
                 this.byId("MV_id_adminFileUploader").clear();
                 return;
             }
@@ -191,7 +192,7 @@ sap.ui.define([
             });
 
             if (bDuplicate) {
-                sap.m.MessageToast.show("Document already uploaded for this type");
+                MessageToast.show(this.i18nModel.getText("reuploadDocType"));
                 this.byId("MV_id_adminFileUploader").clear();
                 return;
             }
@@ -229,13 +230,13 @@ sap.ui.define([
 
                         oModel.setProperty("/Documents", aDocs);
                         oModel.setProperty("/CurrentDocType", "");
-                        sap.m.MessageToast.show("Document uploaded successfully");
+                        MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
                         that._loadVendorDetails(oModel.getProperty("/UserID"));
                         sap.ui.core.BusyIndicator.hide();
                         that.byId("MV_id_adminFileUploader").clear();
                     })
                     .catch(function() {
-                        sap.m.MessageToast.show("Document upload failed");
+                        MessageToast.show(this.i18nModel.getText("docUploadError"));
                         sap.ui.core.BusyIndicator.hide();
                     });
             };
@@ -275,7 +276,7 @@ sap.ui.define([
 
                 // Basic validation
                 if (!oData.VendorName || !oData.Email || !oData.Mobile) {
-                    sap.m.MessageToast.show("Please fill all mandatory fields");
+                    MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                     return;
                 }
 
@@ -302,13 +303,13 @@ sap.ui.define([
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
 
                 this.getView().getModel("editable").setProperty("/Edit", false);
-                sap.m.MessageToast.show("Vendor details updated successfully");
+                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
 
                 // Pass UserID explicitly
                 await this._loadVendorDetails(oData.UserID);
 
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Update failed");
+                MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
