@@ -203,6 +203,7 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
+             this._perDayInfoShown = false;
         },
         Roomdetails: async function () {
             try {
@@ -1036,6 +1037,7 @@ sap.ui.define([
     text: "Clear",
     type: "Transparent",
     tooltip: "Clear Document",
+    class:"",
     press: function (oEvent) {
 
         const oButton = oEvent.getSource();
@@ -1312,6 +1314,13 @@ new sap.m.Text({
                         }
                     }
                 });
+//                 const oBinding = oFacilityFlex.getBinding("items");
+
+// if (oBinding) {
+//     oBinding.attachEventOnce("dataReceived", function () {
+//         sap.ui.core.BusyIndicator.hide();   // ✅ HIDE HERE
+//     });
+// }
 
                 // Add sections for each person
                 oVBox.addItem(oForm);
@@ -1321,7 +1330,16 @@ new sap.m.Text({
                 oVBox.addItem(oFacilities);
             }
             if (oFacilityModel) oFacilityModel.refresh(true);
+
+
+
+             setTimeout(() => {
+        sap.ui.core.BusyIndicator.hide();
+    }, 2000);
+
             if (oModel) oModel.refresh(true);
+
+            
         },
         _createFacilityActionSheet: function (facility, iPersonIndex, oCard) {
             var SelectedPriceType = this.getView().getModel("HostelModel").getProperty("/SelectedPriceType")
@@ -1431,17 +1449,16 @@ new sap.m.Text({
 },
 
 
-       onDialogNextButton: async function () {
+ onDialogNextButton: async function () {
     const oModel = this.getView().getModel("HostelModel");
     const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
 
-    // STEP 0: create UI only once, or when count increased
-    if (this._iSelectedStepIndex === 0) {
-        if (!this._isPersonUIInitialized || this._lastPersonCount !== iPersonCount) {
-            this._createDynamicPersonsUI();    // builds UI for current count
-            this._isPersonUIInitialized = true;
-            this._lastPersonCount = iPersonCount;
-        }
+    // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
+    if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
+        this._createDynamicPersonsUI();              // builds UI for current count
+        this._isPersonUIInitialized = true;
+        this._lastPersonCount = iPersonCount;
+        this._mustRecreatePersonUI = false;
     }
 
     // STEP 1: validations
@@ -1483,6 +1500,7 @@ new sap.m.Text({
 
     this.handleButtonsVisibility();
 }
+
 ,
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
@@ -1886,19 +1904,27 @@ new sap.m.Text({
             // =========================================================
             // Set MIN End Date = StartDate + 1 day
             // =========================================================
-            if (sStartDate) {
-                let date = this._parseDate(sStartDate);
-                let oStart = new Date(date);
-                oStart.setDate(oStart.getDate() + 1);
+           // =========================================================
+// Set MIN End Date based on Start Date
+// =========================================================
+if (sStartDate) {
+    const oStart = this._parseDate(sStartDate);
 
-                const sMinEndDate = [
-                    oStart.getFullYear(),
-                    String(oStart.getMonth() + 1).padStart(2, "0"),
-                    String(oStart.getDate()).padStart(2, "0")
-                ].join("-");
+    if (oStart instanceof Date && !isNaN(oStart)) {
 
-                oEndDatePicker.setMinDate(new Date(sMinEndDate));
-            }
+        // For Per Day → same day allowed
+        if (sPaymentType === "Per Day") {
+            oEndDatePicker.setMinDate(oStart);
+        }
+        // For Per Month / Year → next day minimum
+        else {
+            const oMinEnd = new Date(oStart);
+            oMinEnd.setDate(oMinEnd.getDate() + 1);
+            oEndDatePicker.setMinDate(oMinEnd);
+        }
+    }
+}
+
 
             // =========================================================
             // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
@@ -1923,10 +1949,6 @@ new sap.m.Text({
                     return;
                 }
             }
-
-            // =========================================================
-            // YEARLY PLAN — TRUE CALENDAR YEAR ADDITION
-            // =========================================================
             if (oEvent.getSource().getId().includes("idStartDate1") &&
                 sStartDate &&
                 sPaymentType === "Per Year") {
@@ -1970,6 +1992,22 @@ new sap.m.Text({
                 oHostelModel.setProperty("/TotalDays", diffDays); // Store days
 
                 oEndDatePicker.setValueState("None");
+                 if (!this._perDayInfoShown) {
+
+        const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
+        const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
+
+        const sMessage =
+            "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
+            "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
+
+        sap.m.MessageBox.information(sMessage, {
+            title: "Check-in / Check-out Information"
+        });
+
+        this._perDayInfoShown = true;
+    
+    }
             }
 
             // =========================================================
