@@ -4,7 +4,8 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/m/MessageToast",
     "../model/formatter",
-], function(BaseController, utils, MessageBox, MessageToast, Formatter) {
+     "sap/ui/export/Spreadsheet",
+], function(BaseController, utils, MessageBox, MessageToast, Formatter, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageStaff", {
         Formatter: Formatter,
@@ -777,12 +778,12 @@ sap.ui.define([
         createTableSheet: function () {
             return [{
                 label: "User ID",
-                property: "User ID",
+                property: "UserID",
                 type: "string"
             },
             {
                 label: "Staff Name",
-                property: "Staff Name",
+                property: "UserName",
                 type: "string"
             },
             {
@@ -792,7 +793,7 @@ sap.ui.define([
             },
             {
                 label: "Email ID",
-                property: "Email ID",
+                property: "EmailID",
                 type: "string"
             },
             {
@@ -802,7 +803,7 @@ sap.ui.define([
             },
             {
                 label: "Mobile Number",
-                property: "Mobile Number",
+                property: "MobileNo",
                 type: "string"
             },
             {

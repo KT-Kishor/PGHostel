@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="UserID"
-                        label="User ID"
+                        label="{i18n>MSUserID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -52,7 +52,7 @@
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         name="UserName"
-                        label="User Name"
+                        label="{i18n>MSusername}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -106,7 +106,7 @@
                         />
 						<Button
                             text="{i18n>MSdownload}"
-                            tooltip="Download Branch Data"
+                            tooltip="Download Manage Staff Data"
                             press="MS_onDownload"
                             class="myUnifiedBtn"
                         />

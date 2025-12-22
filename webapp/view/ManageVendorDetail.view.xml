@@ -1,177 +1,422 @@
-<mvc:View controllerName="sap.ui.com.project1.controller.ManageVendorDetail"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:m="sap.m"
-	xmlns:suite="sap.suite.ui.commons"
-	xmlns="sap.uxap"
-	xmlns:uxap="sap.uxap"
-	xmlns:richtexteditor="sap.ui.richtexteditor"
-	xmlns:layout="sap.ui.layout"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:c="sap.ui.core"
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.ManageVendorDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns:suite="sap.suite.ui.commons"
+    xmlns="sap.uxap"
+    xmlns:uxap="sap.uxap"
+    xmlns:richtexteditor="sap.ui.richtexteditor"
+    xmlns:layout="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:c="sap.ui.core"
     displayBlock="true"
     height="100%"
-	xmlns:core="sap.ui.core"
+    xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
-	xmlns:u="sap.ui.unified">
-	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="Vendor Details">
-		<m:headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</m:headerContent>
-		<ObjectPageLayout id="MV_id_ObjectPageLayout">
-			<sections>
-				<ObjectPageSection titleUppercase="false" id="MV_id_OrderHeaderSection1"
-                    title="Vendor Information">
-					<subSections>
-						<ObjectPageSubSection id="MV_id_dsd1">
-							<blocks>
-								<f:SimpleForm id="Exp_Det_id_DimpleForm" editable="true" layout="ColumnLayout" labelSpanXL="4" labelSpanL="3" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
-									<f:toolbar>
-										<m:Toolbar>
-											<m:Title text="Vendor Details"/>
-											<m:ToolbarSpacer />
-											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? 'Save' : 'Edit' }" press="onEditOrSavePress" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"/>
-										</m:Toolbar>
-									</f:toolbar>
-									<f:content>
-										<m:Label text="Vendor Name" required="true"/>
-										<m:ComboBox id="MV_id_adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" editable="{editable>/Edit}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
-											<core:ListItem key="Mr." text="Mr."/>
-											<core:ListItem key="Ms." text="Ms."/>
-											<core:ListItem key="Mrs." text="Mrs."/>
-											<core:ListItem key="Dr." text="Dr."/>
-										</m:ComboBox>
-										<m:Input value="{AdminSignupModel>/VendorName}"
-                                        liveChange="onAdminLiveValidate" editable="{editable>/Edit}"/>
-										<m:Label text="Date of Birth" required="true"/>
-										<m:DatePicker value="{AdminSignupModel>/DateOfBirth}"
-                                        valueStateText="Pick Date of Birth" displayFormat="dd/MM/yyyy"
-                                        valueFormat="dd/MM/yyyy" change="onChangeDOB" editable="{editable>/Edit}"
-                                        initialFocusedDateValue="{controller>/focusedDate}"
-                                        minDate="{controller>/minDate}"/>
-										<m:Label text="Gender" required="true"/>
-										<m:Select selectedKey="{AdminSignupModel>/Gender}" change="ADMIN_onChangeGender"  editable="{editable>/Edit}">
-											<core:Item key="Male" text="Male"/>
-											<core:Item key="Female" text="Female"/>
-											<core:Item key="Other" text="Other"/>
-										</m:Select>
-										<m:Label text="Email" required="true"/>
-										<m:Input value="{AdminSignupModel>/Email}" type="Email"
-                                         liveChange="onAdminLiveValidate" editable="{editable>/Edit}"/>
-										<m:Label text="Country" required="true"/>
-										<m:ComboBox selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry"  id="MV_id_Country" selectionChange="ADMIN_onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}"  showSecondaryValues="true" editable="{editable>/Edit}">
-											<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
-										</m:ComboBox>
-										<m:Label text="State" required="true"/>
-										<m:ComboBox selectedKey="{AdminSignupModel>/State}" change="ADMIN_onChangeState" items="{StateModel>/}" editable="{editable>/Edit}" placeholder="Select State" valueStateText="Select a valid State" showSecondaryValues="true" id="MV_id_State">
-											<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
-										</m:ComboBox>
-										<m:Label text="City" required="true"/>
-										<m:ComboBox selectedKey="{AdminSignupModel>/City}" change="ADMIN_onChangeCity" selectionChange="ADMIN_onChangeCity" placeholder="Select City" valueStateText="Select a valid City" id="MV_id_City"
-                                         items="{path:'CityModel>/', length:1000}" showSecondaryValues="true" editable="{editable>/Edit}">
-											<core:ListItem
-                                            key="{CityModel>cityName}"
-                                            text="{CityModel>cityName}"
-                                            additionalText="{CityModel>branchCode}"
+    xmlns:u="sap.ui.unified"
+>
+    <m:Page
+        navButtonPress="BI_onButtonPress"
+        showNavButton="true"
+        title="{i18n>MVDtitle}"
+    >
+        <m:headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </m:headerContent>
+        <ObjectPageLayout id="MV_id_ObjectPageLayout">
+            <sections>
+                <ObjectPageSection
+                    titleUppercase="false"
+                    id="MV_id_OrderHeaderSection1"
+                    title="{i18n>MVDpersonalDetails}"
+                >
+                    <subSections>
+                        <ObjectPageSubSection id="MV_id_dsd1">
+                            <blocks>
+                                <f:SimpleForm
+                                    id="Exp_Det_id_DimpleForm"
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="4"
+                                    labelSpanL="3"
+                                    labelSpanM="4"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    emptySpanS="0"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1"
+                                >
+                                    <f:toolbar>
+                                        <m:Toolbar>
+                                            <m:Title text="{i18n>MVDtitle}" />
+                                            <m:ToolbarSpacer />
+                                            <m:Button
+                                                class="myUnifiedBtn"
+                                                text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
+                                                press="onEditOrSavePress"
+                                                visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                            />
+                                        </m:Toolbar>
+                                    </f:toolbar>
+                                    <f:content>
+                                        <m:Label
+                                            text="{i18n>MVDname}"
+                                            required="true"
                                         />
-										</m:ComboBox>
-										<!-- ISD + Mobile -->
-										<m:Label text="Mobile Number" required="true"/>
-										<m:ComboBox selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true" editable="{editable>/Edit}">
-											<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
-										</m:ComboBox>
-										<m:Input value="{AdminSignupModel>/Mobile}"
-                                            liveChange="ADMIN_onMobileLiveChange"  editable="{editable>/Edit}"/>
-										<m:Label text="Address" required="true"/>
-										<m:TextArea value="{AdminSignupModel>/Address}" rows="3"
-                                        liveChange="onAdminLiveValidate"  editable="{editable>/Edit}"/>
-									</f:content>
-								</f:SimpleForm>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-				<ObjectPageSection titleUppercase="false" id="connections1" title="{i18n>Attachment}">
-					<subSections>
-						<ObjectPageSubSection id="connectionsSS4" titleUppercase="false">
-							<blocks>
-								<m:VBox>
-									<m:VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
-									<m:MessageStrip text="Upload clear and valid documents only. Max size: 3 MB per file" showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
-									</m:VBox>
-									<m:Table id="MV_id_adminAttachmentTable" items="{AdminSignupModel>/Documents}" mode="SingleSelectLeft" sticky="ColumnHeaders,HeaderToolbar" selectionChange="onAdminSelectionChange">
-										<m:headerToolbar>
-											<m:OverflowToolbar>
-												<m:Title text="Documents" />
-												<m:Text text="*" class="requiredStar" />
-												<m:ToolbarSpacer />
-												<m:ComboBox id="MV_id_adminDocType" selectedKey="{AdminSignupModel>/CurrentDocType}" placeholder="Select Document" width="200px" change="onDocumentTypeChange"
-                                                valueStateText="Select Document Type">
-													<core:ListItem key="Aadhaar" text="Aadhar Card"/>
-													<core:ListItem key="PAN" text="PAN Card"/>
-													<core:ListItem key="Driving License" text="Driving License"/>
-													<core:ListItem key="Bank" text="Bank Account Proof"/>
-													<core:ListItem key="Other" text="Other"/>
-												</m:ComboBox>
-												<!-- Upload button -->
-												<m:VBox id="MV_id_adminUploaderWrapper"  visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }">
-													<u:FileUploader  id="MV_id_adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" 
-													fileSizeExceed="onFileSizeExceeds"
-                                                    maximumFileSize="3MB"
-                                                    typeMissmatch="onFileTypeMissmatch"
-                                                    sameFilenameAllowed="true"
-                                                    iconFirst="true"/>
-												</m:VBox>
-												<m:Button id="AdminDeleteButton" text="Delete"
-												class="myUnifiedBtn" press="onAdminDeleteFiles"
-												enabled="false" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"/>
-												<m:Button id="AdminDownloadButton" text="Download"
-												class="myUnifiedBtn" press="onAdminDownloadFiles"
-												enabled="false"/>
-											</m:OverflowToolbar>
-										</m:headerToolbar>
-										<m:columns>
-											<m:Column>
-												<m:Text text="File Name" />
-											</m:Column>
-											<m:Column>
-												<m:Text text="Document Type" />
-											</m:Column>
-											<m:Column>
-												<m:Text text="File Type" />
-											</m:Column>
-										</m:columns>
-										<m:items>
-											<m:ColumnListItem>
-												<m:cells>
-													<m:Link text="{AdminSignupModel>FileName}"
-                                                    press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"/>
-													<m:Text text="{AdminSignupModel>DocumentType}" />
-													<m:Text text="{AdminSignupModel>FileType}" />
-												</m:cells>
-											</m:ColumnListItem>
-										</m:items>
-									</m:Table>
-								</m:VBox>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-			</sections>
-		</ObjectPageLayout>
-		<m:footer>
-			<m:Bar id="MV_id_FooterBar">
-				<m:contentRight>
-					<m:Button id="MV_id_ApproveButton" text="Approve" class="myUnifiedBtn"
-   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"/>
-					<m:Button id="MV_id_SendBackButton" text="Send Back" class="myUnifiedBtn"
-   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"/>
-				</m:contentRight>
-			</m:Bar>
-		</m:footer>
-	</m:Page>
+                                        <m:ComboBox
+                                            id="MV_id_adminSalutation"
+                                            selectedKey="{AdminSignupModel>/Salutation}"
+                                            editable="{editable>/Edit}"
+                                            change="onAdminChangeSalutation"
+                                            placeholder="Mr."
+                                            valueStateText="{i18n>MVDsalutation}"
+                                        >
+                                            <core:ListItem
+                                                key="Mr."
+                                                text="Mr."
+                                            />
+                                            <core:ListItem
+                                                key="Ms."
+                                                text="Ms."
+                                            />
+                                            <core:ListItem
+                                                key="Mrs."
+                                                text="Mrs."
+                                            />
+                                            <core:ListItem
+                                                key="Dr."
+                                                text="Dr."
+                                            />
+                                        </m:ComboBox>
+                                        <m:Input
+                                            value="{AdminSignupModel>/VendorName}"
+                                            liveChange="onAdminLiveValidate"
+                                            editable="{editable>/Edit}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>MVDDOB}"
+                                            required="true"
+                                        />
+                                        <m:DatePicker
+                                            value="{AdminSignupModel>/DateOfBirth}"
+                                            valueStateText="{i18n>MVDdob}"
+                                            displayFormat="dd/MM/yyyy"
+                                            valueFormat="dd/MM/yyyy"
+                                            change="onChangeDOB"
+                                            editable="{editable>/Edit}"
+                                            initialFocusedDateValue="{controller>/focusedDate}"
+                                            minDate="{controller>/minDate}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>MVgender}"
+                                            required="true"
+                                        />
+                                        <m:Select
+                                            selectedKey="{AdminSignupModel>/Gender}"
+                                            change="ADMIN_onChangeGender"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:Item
+                                                key="Male"
+                                                text="Male"
+                                            />
+                                            <core:Item
+                                                key="Female"
+                                                text="Female"
+                                            />
+                                            <core:Item
+                                                key="Other"
+                                                text="Other"
+                                            />
+                                        </m:Select>
+                                        <m:Label
+                                            text="{i18n>MVemailID}"
+                                            required="true"
+                                        />
+                                        <m:Input
+                                            value="{AdminSignupModel>/Email}"
+                                            type="Email"
+											placeholder="Enter Email ID"
+                                            liveChange="onAdminLiveValidate"
+                                            editable="{editable>/Edit}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>MVDcountry}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            selectedKey="{AdminSignupModel>/Country}"
+                                            change="ADMIN_onChangeCountry"
+                                            id="MV_id_Country"
+                                            selectionChange="ADMIN_onChangeCountry"
+                                            placeholder="Select Country"
+                                            valueStateText="{i18n>MVDselectcountry}"
+                                            items="{path:'CountryModel>/', length:1000}"
+                                            showSecondaryValues="true"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>countryName}"
+                                                text="{CountryModel>countryName}"
+                                                additionalText="{CountryModel>code}"
+                                            />
+                                        </m:ComboBox>
+                                        <m:Label
+                                            text="{i18n>MVDstate}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            selectedKey="{AdminSignupModel>/State}"
+                                            change="ADMIN_onChangeState"
+                                            items="{StateModel>/}"
+                                            editable="{editable>/Edit}"
+                                            placeholder="Select State"
+                                            valueStateText="{i18n>MVDselectstate}"
+                                            showSecondaryValues="true"
+                                            id="MV_id_State"
+                                        >
+                                            <core:ListItem
+                                                key="{StateModel>stateName}"
+                                                text="{StateModel>stateName}"
+                                            />
+                                        </m:ComboBox>
+                                        <m:Label
+                                            text="{i18n>MVDcity}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            selectedKey="{AdminSignupModel>/City}"
+                                            change="ADMIN_onChangeCity"
+                                            selectionChange="ADMIN_onChangeCity"
+                                            placeholder="Select City"
+                                            valueStateText="{i18n>MVDselectcity}"
+                                            id="MV_id_City"
+                                            items="{path:'CityModel>/', length:1000}"
+                                            showSecondaryValues="true"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:ListItem
+                                                key="{CityModel>cityName}"
+                                                text="{CityModel>cityName}"
+                                                additionalText="{CityModel>branchCode}"
+                                            />
+                                        </m:ComboBox>
+                                        <!-- ISD + Mobile -->
+                                        <m:Label
+                                            text="{i18n>MVmobileNo}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            selectedKey="{AdminSignupModel>/STDCode}"
+                                            change="ADMIN_onChangeSTD"
+                                            placeholder="ISD"
+                                            showSecondaryValues="true"
+                                            width="100%"
+                                            items="{path:'CountryModel>/', length:1000}"
+                                            filterSecondaryValues="true"
+                                            editable="{editable>/Edit}"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>stdCode}"
+                                                text="{CountryModel>stdCode}"
+                                                additionalText="{CountryModel>code}"
+                                            />
+                                        </m:ComboBox>
+                                        <m:Input
+                                            value="{AdminSignupModel>/Mobile}"
+                                            liveChange="ADMIN_onMobileLiveChange"
+                                            editable="{editable>/Edit}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>MVaddress}"
+                                            required="true"
+                                        />
+                                        <m:TextArea
+                                            value="{AdminSignupModel>/Address}"
+                                            rows="3"
+                                            liveChange="onAdminLiveValidate"
+                                            editable="{editable>/Edit}"
+                                        />
+                                    </f:content>
+                                </f:SimpleForm>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+                <ObjectPageSection
+                    titleUppercase="false"
+                    id="connections1"
+                    title="{i18n>MVDattachments}"
+                >
+                    <subSections>
+                        <ObjectPageSubSection
+                            id="connectionsSS4"
+                            titleUppercase="false"
+                        >
+                            <blocks>
+                                <m:VBox>
+                                    <m:VBox
+                                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop"
+                                    >
+                                        <m:MessageStrip
+                                            text="Upload clear and valid documents only. Max size: 3 MB per file"
+                                            showIcon="true"
+                                            type="Warning"
+                                            class="sapUiTinyMarginBottom"
+                                        />
+                                    </m:VBox>
+                                    <m:Table
+                                        id="MV_id_adminAttachmentTable"
+                                        items="{AdminSignupModel>/Documents}"
+                                        mode="SingleSelectLeft"
+                                        sticky="ColumnHeaders,HeaderToolbar"
+                                        selectionChange="onAdminSelectionChange"
+                                    >
+                                        <m:headerToolbar>
+                                            <m:OverflowToolbar>
+                                                <m:Title text="{i18n>MVDdocument}" />
+                                                <m:Text
+                                                    text="*"
+                                                    class="requiredStar"
+                                                />
+                                                <m:ToolbarSpacer />
+                                                <m:ComboBox
+                                                    id="MV_id_adminDocType"
+                                                    selectedKey="{AdminSignupModel>/CurrentDocType}"
+                                                    placeholder="Select Document"
+                                                    width="200px"
+                                                    change="onDocumentTypeChange"
+                                                    valueStateText="{i18n>MVDdoc}"
+                                                >
+                                                    <core:ListItem
+                                                        key="Aadhaar"
+                                                        text="Aadhar Card"
+                                                    />
+                                                    <core:ListItem
+                                                        key="PAN"
+                                                        text="PAN Card"
+                                                    />
+                                                    <core:ListItem
+                                                        key="Driving License"
+                                                        text="Driving License"
+                                                    />
+                                                    <core:ListItem
+                                                        key="Bank"
+                                                        text="Bank Account Proof"
+                                                    />
+                                                    <core:ListItem
+                                                        key="Other"
+                                                        text="Other"
+                                                    />
+                                                </m:ComboBox>
+                                                <!-- Upload button -->
+                                                <m:VBox
+                                                    id="MV_id_adminUploaderWrapper"
+                                                    visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                >
+                                                    <u:FileUploader
+                                                        id="MV_id_adminFileUploader"
+                                                        buttonOnly="true"
+                                                        buttonText="{i18n>MVDupload}"
+														tooltip="Upload Document"
+                                                        uploadOnChange="false"
+                                                        change="onAdminFileSelect"
+                                                        fileType="jpg,jpeg,png,pdf,doc,docx"
+                                                        fileSizeExceed="onFileSizeExceeds"
+                                                        maximumFileSize="3MB"
+                                                        typeMissmatch="onFileTypeMissmatch"
+                                                        sameFilenameAllowed="true"
+                                                        iconFirst="true"
+                                                    />
+                                                </m:VBox>
+                                                <m:Button
+                                                    id="AdminDeleteButton"
+                                                    text="{i18n>MVDdelete}"
+                                                    class="myUnifiedBtn"
+													tooltip="Delete Selected File"
+                                                    press="onAdminDeleteFiles"
+                                                    enabled="false"
+                                                    visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                />
+                                                <m:Button
+                                                    id="AdminDownloadButton"
+                                                    text="{i18n>MVDdownload}"
+                                                    class="myUnifiedBtn"
+													tooltip="Download Selected File"
+                                                    press="onAdminDownloadFiles"
+                                                    enabled="false"
+                                                />
+                                            </m:OverflowToolbar>
+                                        </m:headerToolbar>
+                                        <m:columns>
+                                            <m:Column>
+                                                <m:Text text="{i18n>MVDfilename}" tooltip="File Name"/>
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:Text text="{i18n>MVDdocumenttype}" tooltip="Document Type"/>
+                                            </m:Column>
+                                            <m:Column>
+                                                <m:Text text="{i18n>MVDfiletype}" tooltip="File Type"/>
+                                            </m:Column>
+                                        </m:columns>
+                                        <m:items>
+                                            <m:ColumnListItem>
+                                                <m:cells>
+                                                    <m:Link
+                                                        text="{AdminSignupModel>FileName}"
+                                                        press="onAdminPreviewDoc"
+                                                        tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
+                                                    />
+                                                    <m:Text
+                                                        text="{AdminSignupModel>DocumentType}"
+                                                    />
+                                                    <m:Text
+                                                        text="{AdminSignupModel>FileType}"
+                                                    />
+                                                </m:cells>
+                                            </m:ColumnListItem>
+                                        </m:items>
+                                    </m:Table>
+                                </m:VBox>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Bar id="MV_id_FooterBar">
+                <m:contentRight>
+                    <m:Button
+                        id="MV_id_ApproveButton"
+                        text="{i18n>MVDapprove}"
+                        class="myUnifiedBtn"
+						tooltip="Approve Vendor"
+                        press="MI_onPressButtons"
+                        visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"
+                    />
+                    <m:Button
+                        id="MV_id_SendBackButton"
+                        text="{i18n>MVDsendBack}"
+						tooltip="Send Back"
+                        class="myUnifiedBtn"
+                        press="MI_onPressButtons"
+                        visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"
+                    />
+                </m:contentRight>
+            </m:Bar>
+        </m:footer>
+    </m:Page>
 </mvc:View>

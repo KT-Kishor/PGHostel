@@ -1,15 +1,17 @@
 sap.ui.define([
     "./BaseController",
     "../model/formatter",
-], function(BaseController, Formatter) {
+     "sap/ui/export/Spreadsheet",
+     "sap/m/MessageToast",
+], function (BaseController, Formatter, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendor", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendor").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             try {
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
@@ -25,7 +27,7 @@ sap.ui.define([
             }
         },
 
-        _initEmptyMDModel: function() {
+        _initEmptyMDModel: function () {
             const emptyData = {
                 Salutation: "",
                 UserName: "",
@@ -46,7 +48,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "MDmodel");
         },
 
-         _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             let aBranchCodes = [];
 
@@ -73,7 +75,7 @@ sap.ui.define([
             }
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function (flag) {
             var oView = this.getView();
 
             // Read FilterBar inputs
@@ -101,32 +103,32 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
-                    const response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                    if (!this._originalStaffData || flag === "true") {
-                        this._originalStaffData = response;
-                    }
+                if (!this._originalStaffData || flag === "true") {
+                    this._originalStaffData = response;
+                }
 
-                    let finalData;
-                    if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
-                        finalData = this._originalStaffData;
-                    } else {
-                        finalData = response;
-                    }
+                let finalData;
+                if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
+                    finalData = this._originalStaffData;
+                } else {
+                    finalData = response;
+                }
 
-                    const model = new sap.ui.model.json.JSONModel(finalData);
-                    this.getView().setModel(model, "mainModel");
+                const model = new sap.ui.model.json.JSONModel(finalData);
+                this.getView().setModel(model, "mainModel");
 
-                    this._populateUniqueFilterValues(this._originalStaffData);
-                }).catch((err) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show(err.message || err.responseText);
-                }).finally(() => {
-                    sap.ui.core.BusyIndicator.hide();
-                });
+                this._populateUniqueFilterValues(this._originalStaffData);
+            }).catch((err) => {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show(err.message || err.responseText);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            });
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 MV_id_UserID: new Set(),
                 MV_id_UserName: new Set()
@@ -154,26 +156,94 @@ sap.ui.define([
             });
         },
 
-        FC_onPressClear: function() {
+        FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");
             this.getView().byId("MV_id_UserName").setSelectedKey("")
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
         },
 
-        onHome: function() {
+        onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
 
-        HM_OnPressManageStaffItem: function(oEvent) {
+        HM_OnPressManageStaffItem: function (oEvent) {
             var oSelectedItem = oEvent.getSource();
             var oContext = oSelectedItem.getBindingContext("mainModel");
             var sUserID = oContext.getProperty("UserID");
-            this.getOwnerComponent().getRouter().navTo("RouteManageVendorDetail", {UserID: sUserID});
-        }
+            this.getOwnerComponent().getRouter().navTo("RouteManageVendorDetail", { UserID: sUserID });
+        },
+
+         MS_onDownload:function() {
+             const oModel = this.byId("MV_id_ManageVendor").getModel("mainModel").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item,
+                MobileNo: item.MobileNo ? String(item.MobileNo) : ""
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Manage_Vendor.xlsx",
+                worker: false
+            };
+            MessageToast.show(this.i18nModel.getText("MSdownloading"));
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        },
+        createTableSheet: function () {
+            return [{
+                label: "User ID",
+                property: "UserID",
+                type: "string"
+            },
+            {
+                label: "Staff Name",
+                property: "UserName",
+                type: "string"
+            },
+            {
+                label: "Role",
+                property: "Role",
+                type: "string"
+            },
+            {
+                label: "Email ID",
+                property: "EmailID",
+                type: "string"
+            },
+            {
+                label: "Gender",
+                property: "Gender",
+                type: "string"
+            },
+            {
+                label: "Mobile Number",
+                property: "MobileNo",
+                type: "string"
+            },
+            {
+                label: "Address",
+                property: "Address",
+                type: "string"
+            }
+            ]
+        },
     });
 });
