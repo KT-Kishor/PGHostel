@@ -10,7 +10,7 @@
 					<Title text="{= ${CouponView>/DialogMode} === 'Add' ? 'Add Coupon' : 'Edit Coupon'}" />
 				</contentMiddle>
 				<contentRight>
-					<Button class="myUnifiedBtn" icon="sap-icon://decline" type="Transparent" press="onDialogClose" />
+					<Button class="myUnifiedBtn" icon="sap-icon://decline" tooltip="Close" type="Transparent" press="onDialogClose" />
 				</contentRight>
 			</Bar>
 		</customHeader>

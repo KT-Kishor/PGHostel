@@ -934,6 +934,7 @@
                                     class="sapUiTinyMarginEnd"
                                     showValueHelp="true"
                                     valueHelpIconSrc="sap-icon://decline"
+                                    tooltip="Cancel Coupon"
                                     valueHelpRequest="oncancelCoupon"
                                     liveChange="onCouponLiveChange"
                                 />

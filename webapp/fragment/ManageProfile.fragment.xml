@@ -34,6 +34,7 @@
                     <m:Button
                         icon="sap-icon://decline"
                         type="Transparent"
+                        tooltip="Close"
                         press="onProfileDialogClose"
                     />
                 </contentRight>

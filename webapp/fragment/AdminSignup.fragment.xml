@@ -11,7 +11,7 @@
 			<Title text="Admin / Vendor Registration" />
 		</contentMiddle>
 		<contentRight>
-			<Button type="Transparent" icon="sap-icon://decline" press="onCloseAdminSignup" />
+			<Button type="Transparent" icon="sap-icon://decline" tooltip="Close" press="onCloseAdminSignup" />
 		</contentRight>
 	</Bar>
 </customHeader>

@@ -55,15 +55,18 @@
                     <items>
                         <IconTabFilter
                             key="idHome"
+                            tooltip="Home Page"
                             text="Home"
                         />
                         <IconTabFilter
                             key="idRooms"
+                            tooltip="Rooms Page"
                             text="Rooms"
                         />
                         <!-- <IconTabFilter key="idFacilities" text="Facilities" /> -->
                         <IconTabFilter
                             key="idContact"
+                            tooltip="Contact Us Page"
                             text="Contact"
                         />
                         <!-- <IconTabFilter key="idAdddata" text="Add Data"/> -->
@@ -196,7 +199,7 @@
                                     <fb:control>
                                         <ComboBox
                                             id="id_Area"
-                                            placeholder="Select Branch"
+                                            placeholder="Select Locality"
                                             showClearIcon="true"
                                             enabled="false"
                                             valueStateText="Select Area"
@@ -308,6 +311,7 @@
                                         <!-- <Button text="View Details" press=".viewDetails" class="btnViewDetails" /> -->
                                         <Link
                                             text="View Details"
+                                            tooltip="View Room Details"
                                             press="viewDetails"
                                             class="btnViewDetails"
                                         />

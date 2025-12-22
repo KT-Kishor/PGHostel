@@ -11,7 +11,7 @@
 					<Title text="{LoginViewModel>/dialogTitle}" />
 				</contentMiddle>
 				<contentRight>
-					<Button type="Transparent" icon="sap-icon://decline" press="onDialogClose" />
+					<Button type="Transparent" icon="sap-icon://decline" tooltip="Close" press="onDialogClose" />
 				</contentRight>
 			</Bar>
 		</customHeader>
@@ -130,7 +130,7 @@
 						</Select>
 						<!-- ================== 2) CONTACT DETAILS ================== -->
 						<Label text="Email" required="true" class="sapUiTinyMarginTop" />
-						<Input id="signUpEmail" value="{LoginMode>/Email}" placeholder="Email" type="Email" required="true" liveChange="onEmailliveChange" valueStateText="Enter Valid Email" />
+						<Input id="signUpEmail" value="{LoginMode>/Email}" placeholder="Enter Email" type="Email" required="true" liveChange="onEmailliveChange" valueStateText="Enter Valid Email" />
 						<Label text="Country" required="true"/>
 						<ComboBox id="signUpCountry" change="onChangeCountry" selectionChange="onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
 							<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}"/>
@@ -156,7 +156,7 @@
 							</VBox>
 							<VBox width="75%" class="sapUiTinyMarginBegin">
 								<Label text="Mobile Number" required="true"/>
-								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Contact Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number"/>
+								<Input id="signUpPhone" type="Tel" value="{LoginMode>/Mobileno}" placeholder="Enter Mobile Number" maxLength="18" liveChange="onMobileLivechnage" valueStateText="Enter a valid mobile number"/>
 								<layoutData>
 									<FlexItemData baseSize="70%" growFactor="1" />
 								</layoutData>
