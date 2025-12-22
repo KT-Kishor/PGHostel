@@ -61,6 +61,7 @@ sap.ui.define([
                 Mobile: "",
                 Address: "",
                 CurrentDocType: "",
+                Status: "",
                 Documents: [],
                 UploadEnabled: false,
                 DocTypeEnabled: true
@@ -135,6 +136,7 @@ sap.ui.define([
                     Country: oData[0].Country,
                     State: oData[0].State,
                     City: oData[0].City,
+                    Status:oData[0].Status,
                     DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
                     Documents: (oData[0].Documents || []).map(doc => ({
                         FileName: doc.FileName,

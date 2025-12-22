@@ -29,7 +29,8 @@
 										<m:Toolbar>
 											<m:Title text="Vendor Details"/>
 											<m:ToolbarSpacer />
-											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? 'Save' : 'Edit' }" press="onEditOrSavePress" visible="{= ${AdminSignupModel>/Status} !== 'Approved' }"/>
+											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? 'Save' : 'Edit' }" press="onEditOrSavePress" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"/>
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>
@@ -113,7 +114,8 @@
 													<core:ListItem key="Other" text="Other"/>
 												</m:ComboBox>
 												<!-- Upload button -->
-												<m:VBox id="MV_id_adminUploaderWrapper"  visible="{= ${AdminSignupModel>/Status} !== 'Approved' }">
+												<m:VBox id="MV_id_adminUploaderWrapper"  visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }">
 													<u:FileUploader  id="MV_id_adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" 
 													fileSizeExceed="onFileSizeExceeds"
                                                     maximumFileSize="3MB"
@@ -123,7 +125,8 @@
 												</m:VBox>
 												<m:Button id="AdminDeleteButton" text="Delete"
 												class="myUnifiedBtn" press="onAdminDeleteFiles"
-												enabled="false" visible="{= ${AdminSignupModel>/Status} !== 'Approved' }"/>
+												enabled="false" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"/>
 												<m:Button id="AdminDownloadButton" text="Download"
 												class="myUnifiedBtn" press="onAdminDownloadFiles"
 												enabled="false"/>
@@ -162,9 +165,11 @@
 			<m:Bar id="MV_id_FooterBar">
 				<m:contentRight>
 					<m:Button id="MV_id_ApproveButton" text="Approve" class="myUnifiedBtn"
-   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved' }"/>
+   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"/>
 					<m:Button id="MV_id_SendBackButton" text="Send Back" class="myUnifiedBtn"
-   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved' }"/>
+   					press="MI_onPressButtons" visible="{= ${AdminSignupModel>/Status} !== 'Approved'
+           || ${AdminSignupModel>/Status} !== 'Active' }"/>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>
