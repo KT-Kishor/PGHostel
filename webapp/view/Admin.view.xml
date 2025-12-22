@@ -124,7 +124,7 @@
                 updateFinished="onTableUpdateFinished"
                 class="sapUiResponsiveMargin"
                 items="{path: 'HostelModel>/',  sorter: [{
-                    path: 'HostelModel>BranchCode', group: true },
+                    path: 'BranchCode', group: true },
 					    { path: 'BookingDate', descending: true },
 						 { path: 'CustomerID', descending: true }]}"
             >

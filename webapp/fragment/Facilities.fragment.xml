@@ -129,6 +129,7 @@
                     placeholder="Select Currency"
                     showSecondaryValues="true"
                     valueStateText="Select Currency"
+                    change="onChangeCurrency"
                 >
                     <core:ListItem
                         key="{CountryModel>currency}"

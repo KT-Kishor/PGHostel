@@ -11,7 +11,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function(oEvent) {
-             this.commonLoginFunction();
+            this.commonLoginFunction();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
 
             var model = new sap.ui.model.json.JSONModel({
@@ -65,8 +65,8 @@ sap.ui.define([
 
                 // If control has getSelectedKey (ComboBox)
                 if (oControl.getSelectedKey && oControl.getSelectedKey()) {
-                    sValue = oControl.getSelectedKey();     // preferred for ComboBox
-                } 
+                    sValue = oControl.getSelectedKey(); // preferred for ComboBox
+                }
                 // else fallback for Input fields
                 else if (oControl.getValue && oControl.getValue()) {
                     sValue = oControl.getValue();
@@ -84,72 +84,78 @@ sap.ui.define([
             });
         },
 
-      readCallForFacilities: async function(filter) {
+        readCallForFacilities: async function(filter) {
 
-    const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
-    let aBranchCodes = [];
-    if (oExistingModel.BranchCode) {
-        aBranchCodes = oExistingModel.BranchCode
-            .split(",")
-            .map(code => code.trim());
-    }
-
-    // FIX: Do NOT nest filter. Just copy input
-   filter = (typeof filter === "object" && filter !== null) ? filter : { filter: filter };
-
-    if (oExistingModel.Role !== "") {
-        filter.BranchCode = aBranchCodes;
-    }
-
-    console.log("FINAL FILTER →", filter);
-
-    sap.ui.core.BusyIndicator.show(0);
-
-    await this.ajaxReadWithJQuery("HM_ExtraFacilities", filter)
-        .then((oData) => {
-
-            let responseData = [];
-
-            if (Array.isArray(oData.data)) {
-                responseData = oData.data;
-            } else if (oData.data && Array.isArray(oData.data.data)) {
-                responseData = oData.data.data;
-            } else {
-                responseData = [oData.data];
+            let aBranchCodes = [];
+            if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
             }
 
-            this.getOwnerComponent().setModel(
-                new sap.ui.model.json.JSONModel(responseData),
-                "Facilities"
-            );
+            // Normalize filter
+            filter = (typeof filter === "object" && filter !== null) ?
+                filter : {
+                    filter: filter
+                };
 
-            if (filter.filter === "Initial") {
-                const facilitiesData = [
-                    ...new Map(
-                        responseData.filter(item => item.FacilityName)
-                            .map(item => [item.FacilityName.trim(), item])
-                    ).values()
-                ];
+            // IMPORTANT FIX
+            // Apply LoginModel BranchCode only if user did not select BranchCode in filter
+            if (
+                oExistingModel.Role !== "" &&
+                !filter.BranchCode
+            ) {
+                filter.BranchCode = aBranchCodes;
+            }
 
-                this.getView().setModel(
-                    new sap.ui.model.json.JSONModel(facilitiesData),
-                    "facilitiesDataModelInitial"
+            console.log("FINAL FILTER →", filter);
+
+            sap.ui.core.BusyIndicator.show(0);
+
+            try {
+                const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", filter);
+
+                let responseData = [];
+                if (Array.isArray(oData.data)) {
+                    responseData = oData.data;
+                } else if (oData.data && Array.isArray(oData.data.data)) {
+                    responseData = oData.data.data;
+                } else {
+                    responseData = [oData.data];
+                }
+
+                this.getOwnerComponent().setModel(
+                    new sap.ui.model.json.JSONModel(responseData),
+                    "Facilities"
                 );
-            }
 
-        })
-        .catch((error) => {
-            sap.m.MessageToast.show(error.message || error.responseText);
-        })
-        .finally(() => {
-            sap.ui.core.BusyIndicator.hide();
-        });
-},
+                if (filter.filter === "Initial") {
+                    const facilitiesData = [
+                        ...new Map(
+                            responseData
+                            .filter(item => item.FacilityName)
+                            .map(item => [item.FacilityName.trim(), item])
+                        ).values()
+                    ];
+
+                    this.getView().setModel(
+                        new sap.ui.model.json.JSONModel(facilitiesData),
+                        "facilitiesDataModelInitial"
+                    );
+                }
+
+            } catch (error) {
+                sap.m.MessageToast.show(error.message || error.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
 
 
         _loadBranchCode: async function() {
-          const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
@@ -157,16 +163,16 @@ sap.ui.define([
             if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel
                     .map(item => item.BranchID)
-                    .flat()           
-                    .filter(Boolean)    
-                    .join(",");         
+                    .flat()
+                    .filter(Boolean)
+                    .join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role==="Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -178,7 +184,7 @@ sap.ui.define([
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
-            } 
+            }
         },
 
         FD_RoomDetails: function(oEvent) {
@@ -326,10 +332,16 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
             try {
-                await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {data: oData});
+                await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {
+                    data: oData
+                });
                 sap.m.MessageToast.show("Facility added successfully!");
-                oView.getModel("UploaderData").setData({ attachments: [] });
-                oView.getModel("tokenModel").setData({ tokens: [] });
+                oView.getModel("UploaderData").setData({
+                    attachments: []
+                });
+                oView.getModel("tokenModel").setData({
+                    tokens: []
+                });
                 this.ARD_Dialog.close();
                 return this.readCallForFacilities("Initial");
             } catch (err) {
@@ -371,6 +383,12 @@ sap.ui.define([
                 return item.countryName === Branch.Country
             })
             this.getView().getModel("FacilitiesModel").setProperty("/Currency", Currency.currency);
+        },
+
+        onChangeCurrency: function(oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCstrictValidationComboBox(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
         onFacilityNameChange: function(oEvent) {

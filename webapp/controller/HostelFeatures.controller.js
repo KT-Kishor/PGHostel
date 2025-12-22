@@ -461,7 +461,7 @@ sap.ui.define([
             });
 
             var oDialog = new sap.m.Dialog({
-                title: "Room Photo",
+                title: "Amenities",
                 contentWidth: "50%",
                 contentHeight: "60%",
                 horizontalScrolling: false,
