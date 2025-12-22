@@ -23,8 +23,8 @@
                             <Text id="idRoomType2" text="{HostelModel>/BedType}"  />
                             <Label text="Rent Price" /> 
                             <Text id="idPrice3" text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"   />
-                
-                 <Label text="Payment Method" />
+
+                 <Label text="Payment Duration" />
                             <Text text="{HostelModel>/SelectedPriceType}"/>
                 <!-- Project Address -->
               
@@ -37,8 +37,10 @@
                            <Text text="{HostelModel>/StartDate}"/>
                             <Label text="End Date" />
                            <Text text="{HostelModel>/EndDate}"/>
-                            <Label text="Month/Year"  />
-                           <Text text="{HostelModel>/SelectedMonths}" />
+                            <Label text="Month/Year"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"/>
+                           <Text text="{HostelModel>/SelectedMonths}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }" />
+                            <Label text="Total Days"   visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"/>
+                           <Text text="{HostelModel>/TotalDays}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }" />
              
             </f:content>
         </f:SimpleForm>

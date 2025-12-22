@@ -22,21 +22,23 @@
             labelSpanS="12">
             <f:content>
                 <Label text="Full Name" />
-                <Text text="{HostelModel>FullName}" />
+                <Text text="{HostelModel>Salutation} {HostelModel>FullName}" />
                 <Label text="Date of Birth" />
                 <Text text="{path:'HostelModel>DateOfBirth'}" />
                 <Label text="Gender" />
                 <Text text="{HostelModel>Gender}" />
                 <Label text="Mobile Number" />
-                <Text text="{HostelModel>MobileNo}" />
+                <Text text="{HostelModel>STDCode} {HostelModel>MobileNo}" />
                 <Label text="Email" />
                 <Text text="{HostelModel>CustomerEmail}" />
                 <Label text="Country" />
                 <Text text="{HostelModel>Country}" />
                 <Label text="State" />
                 <Text text="{HostelModel>State}" />
-                <Label text="{HostelModel>City}" />
+                <Label text="City" />
                 <Text text="{HostelModel>City}" />
+                <Label text="Address" />
+                <Text text="{HostelModel>Address}" />
             </f:content>
         </f:SimpleForm>
         

@@ -43,7 +43,7 @@
                     class="paymentTypeGroup">
                     <RadioButton text="UPI" />
                     <RadioButton text="Credit / Debit Card" />
-                    <RadioButton text="Pay on CheckIn Time" />
+                    <RadioButton text="Pay at check-in time" />
                 </RadioButtonGroup>
 
                 <!-- MAIN GRID -->

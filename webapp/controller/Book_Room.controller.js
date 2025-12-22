@@ -490,7 +490,8 @@ sap.ui.define([
                                         const bSelected = oEvent.getParameter("selected");
 
                                         const oLoginModel = that.getView().getModel("LoginModel");
-                                        const oUser = oLoginModel ? oLoginModel.getData() : null;
+                                 const oUser = oLoginModel ? oLoginModel.getProperty("/") : null;
+
 
                                         if (bSelected) {
                                             // No login yet → open dialog
@@ -965,67 +966,74 @@ sap.ui.define([
                                 key: "index",
                                 value: i
                             })],
-                            change: function (oEvent) {
-                                const index = parseInt(oEvent.getSource().data("index"));
-                                const oFile = oEvent.getParameter("files")[0];
+                          change: function (oEvent) {
+    const oUploader = oEvent.getSource();
+    const index = parseInt(oUploader.data("index"), 10);
+    const oFile = oEvent.getParameter("files")[0];
 
-                                if (!oFile) return;
-                                const sDocType = oModel.getProperty("/Persons/" + index + "/DocumentType");
+    if (!oFile) {
+        return;
+    }
 
-                                if (!sDocType) {
-                                    sap.m.MessageBox.error("Please Select Document Type Before Uploading.");
+    // 🔹 Get Document Type from the same model used in binding
+    const sDocType = oModel.getProperty("/Persons/" + index + "/DocumentType");
 
-                                    // Reset file uploader
-                                    oEvent.getSource().clear();
-                                    return;
-                                }
+    // 🔴 Validation: Document Type must be selected
+    if (!sDocType) {
+        sap.m.MessageBox.error("Please select Document Type before uploading.");
 
-                                const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+        // Reset FileUploader
+        oUploader.clear();
+        return;
+    }
 
-                                if (oFile.size > MAX_SIZE) {
-                                    sap.m.MessageBox.error(
-                                        "File Size must be less than 2 MB.\nSelected file size: " +
-                                        (oFile.size / 1024 / 1024).toFixed(2) + " MB"
-                                    );
+    // 🔴 File size validation (2 MB)
+    const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+    if (oFile.size > MAX_SIZE) {
+        sap.m.MessageBox.error(
+            "File size must be less than 2 MB.\nSelected file size: " +
+            (oFile.size / 1024 / 1024).toFixed(2) + " MB"
+        );
 
-                                    //  Reset the FileUploader input
-                                    oEvent.getSource().clear();
-                                    return;
-                                }
+        oUploader.clear();
+        return;
+    }
 
-                                const reader = new FileReader();
+    const reader = new FileReader();
 
-                                reader.onload = function (e) {
-                                    const sBase64 = e.target.result;
+    reader.onload = function (e) {
+        const sBase64 = e.target.result;
 
-                                    // Clear previous document
-                                    oData.Persons[index].Documents = [];
+        // Clear previous documents
+        oData.Persons[index].Documents = [];
 
-                                    // Thumbnail logic
-                                    let sThumbnail = sBase64;
-                                    if (oFile.type === "application/pdf") {
-                                        sThumbnail = "sap-icon://pdf-attachment";
-                                    }
+        // Thumbnail logic
+        let sThumbnail = sBase64;
+        if (oFile.type === "application/pdf") {
+            sThumbnail = "sap-icon://pdf-attachment";
+        }
 
-                                    // Push new document
-                                    oData.Persons[index].Documents.push({
-                                        FileName: oFile.name,
-                                        FileType: oFile.type,
-                                        Document: sBase64,
-                                        Thumbnail: sThumbnail
-                                    });
+        // Push document
+        oData.Persons[index].Documents.push({
+            FileName: oFile.name,
+            FileType: oFile.type,
+            Document: sBase64,
+            Thumbnail: sThumbnail,
+            DocumentType: sDocType
+        });
 
-                                    oModel.refresh(true);
-                                };
+        oModel.refresh(true);
+    };
 
-                                reader.readAsDataURL(oFile);
-                            }
+    reader.readAsDataURL(oFile);
+}
+
 
 
                         }),
 
                      new sap.m.Button({
-    icon: "sap-icon://decline",
+    text: "Clear",
     type: "Transparent",
     tooltip: "Clear Document",
     press: function (oEvent) {
@@ -4238,6 +4246,7 @@ new sap.m.Text({
 
                 if (!this._oProfileDialog) {
                     this._oProfileDialog = await sap.ui.core.Fragment.load({
+                         id: "profileFrag",
                         name: "sap.ui.com.project1.fragment.ManageProfile",
                         controller: this
                     });
@@ -4372,11 +4381,113 @@ new sap.m.Text({
                 oProfileModel.refresh(true);
                 this._oProfileDialog.open();
 
-
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+onGlobalSearch: function (oEvent) {
+    const sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
+
+    if (!this._oProfileDialog) {
+        return;
+    }
+
+    const oProfileModel = this._oProfileDialog.getModel("profileData");
+    const sSelectedTab = oProfileModel.getProperty("/selectedTab");
+
+    const oTable = sap.ui.core.Fragment.byId(
+        "profileFrag",
+        sSelectedTab === "Payment"
+            ? "Id_PaymentTable"
+            : "Id_ProfileaTable"
+    );
+
+    if (!oTable) {
+        return;
+    }
+
+    const oBinding = oTable.getBinding("items");
+    if (!oBinding) {
+        return;
+    }
+
+    let aFilters = [];
+
+    if (sQuery) {
+        const fnContains = function (v) {
+            return v != null && v.toString().toLowerCase().includes(sQuery);
+        };
+
+        if (sSelectedTab === "Payment") {
+            aFilters = [
+                new sap.ui.model.Filter({
+                    filters: [
+                        new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "InvNo", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "InvoiceDate", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "CustomerName", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "TotalAmount", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "DueAmount", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                    ],
+                    and: false
+                })
+            ];
+        } else {
+            aFilters = [
+                new sap.ui.model.Filter({
+                    filters: [
+                        new sap.ui.model.Filter({ path: "customerName", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "BookingDate", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "room", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "status", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "amount", test: fnContains }),
+                        new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                    ],
+                    and: false
+                })
+            ];
+        }
+    }
+
+    //  IMPORTANT: Application-level filter
+    oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
+},
+
+
+
+
+
+      onTableUpdateFinished: function (oEvent) {
+    this._updateRowCount(oEvent.getSource());
+},
+
+
+ _updateRowCount: function (oTable) {
+    if (!oTable || !this._oProfileDialog) {
+        return;
+    }
+
+    const oProfileModel = this._oProfileDialog.getModel("profileData");
+    if (!oProfileModel) {
+        return;
+    }
+
+    const oBinding = oTable.getBinding("items");
+    const iCount = oBinding ? oBinding.getLength() : 0;
+
+    const sId = oTable.getId();
+
+    if (sId.includes("Id_PaymentTable")) {
+        oProfileModel.setProperty("/paymentCount", iCount);
+    } else {
+        oProfileModel.setProperty("/bookingCount", iCount);
+    }
+}
+,
+
+
         onPressAvatarEdit: function (oEvent) {
             if (!this._oAvatarActionSheet) {
                 this._oAvatarActionSheet = new sap.m.ActionSheet({
