@@ -789,7 +789,6 @@
                         visible="{= ${visiablityPlay>/Edit} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
                         press="CID_onPressEdit"
-						tooltip="{= ${visiablityPlay>/editable} === true ? {i18n>Save} : {i18n>Edit}}"
                         class="sendMail myUnifiedBtn"
                     />
                     <m:Button
