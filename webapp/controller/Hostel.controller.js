@@ -67,7 +67,7 @@ sap.ui.define([
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     BedTypes: [],
                     NoData: false,
-                    ShowViewMore:false,
+                    ShowViewMore: false,
                 }), "VisibilityModel");
             }
 
@@ -748,15 +748,15 @@ sap.ui.define([
 
             var page = this.byId(sKey);
             if (page && page.scrollTo) page.scrollTo(0, 0);
-              this.flag = true
-              this.iTop = 4; 
-              this.iSkip = 0;
+            this.flag = true
+            this.iTop = 4;
+            this.iSkip = 0;
             this.roomtype = true
 
             if (sKey === "idRooms") {
                 await this._loadRoomsPageData();
             }
-      
+
 
         },
         Branch: function () {
@@ -773,16 +773,15 @@ sap.ui.define([
                 }
             });
         },
-        onViewMoreRooms:async function () {
+        onViewMoreRooms: async function () {
             // Load next page
             this.flag = false
             this.roomtype = false
             this.iSkip;
             this.iTop
-               const oContainer = this.byId("idBedTypeFlex")
-            oContainer.setBusy(true);
-
-          await  this._loadFilteredData(this.Scity,this.sBranchCode,this.sACType);
+            const oContainer = this.byId("idViewMoreBusy")
+            oContainer.setBusy(true)
+            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
             oContainer.setBusy(false);
 
 
@@ -793,9 +792,9 @@ sap.ui.define([
             // So you don't need to manually change them here
         },
 
-  _loadRoomsPageData: async function () {
-               this.iTop = 4; 
-               this.iSkip = 0;   
+        _loadRoomsPageData: async function () {
+            this.iTop = 4;
+            this.iSkip = 0;
 
             this.roomtype = false
 
@@ -818,9 +817,13 @@ sap.ui.define([
                 const oModelData = await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
-                const aFiltered = oModelData.filter(item => item.City === this.City);
+                const sCity = this.City ? this.City : "Kalaburagi";
 
-                if (aFiltered.length === 0) {
+                const aFiltered = oModelData.filter(
+                    item => item.City === sCity
+                );
+
+                if (aFiltered.length === 0 || sCity==="Kalaburagi") {
                     await this._loadFilteredData("Kalaburagi", "", "");
                 } else {
                     await this._loadFilteredData(this.City, "", "");
@@ -2459,18 +2462,18 @@ sap.ui.define([
             if (sSelectedACType === "") {
                 this.byId("id_Roomtype").setSelectedKey("All")
             }
-              if (sSelectedACType === "All" || oBranchcity) {
-                    this.iTop=4
-                    this.iSkip=0
-                }
-                  if (sSelectedACType === "AC" || oBranchcity) {
-                    this.iTop=4
-                    this.iSkip=0
-                }
-                  if (sSelectedACType === "Non-Ac" || oBranchcity) {
-                    this.iTop=4
-                    this.iSkip=0
-                }
+            if (sSelectedACType === "All" || oBranchcity) {
+                this.iTop = 4
+                this.iSkip = 0
+            }
+            if (sSelectedACType === "AC" || oBranchcity) {
+                this.iTop = 4
+                this.iSkip = 0
+            }
+            if (sSelectedACType === "Non-Ac" || oBranchcity) {
+                this.iTop = 4
+                this.iSkip = 0
+            }
 
             // Locality ComboBox
             var oAreaCB = this.byId("id_Area");
@@ -2519,11 +2522,11 @@ sap.ui.define([
             } else {
                 sACType = this.getView().byId("id_Roomtype").getSelectedKey()
             }
-          
-           if (sACType === "All") {
+
+            if (sACType === "All") {
                 sACType = "";
             }
-            
+
             try {
 
                 const oView = this.getView();
@@ -2531,7 +2534,7 @@ sap.ui.define([
                 var aBranchCodes = [];
                 var oBRModel = this.getView().getModel("sBRModel");
                 var aBranchesData = oBRModel.getData(); // adjust path if needed
-                   var sBranchCode= this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
+                var sBranchCode = this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
 
 
                 if (Scity && !sBranchCode) {
@@ -2556,7 +2559,7 @@ sap.ui.define([
                     // Branch already selected
                     aBranchCodes = [sBranchCode];
                 }
-              
+
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     BranchCode: aBranchCodes,
@@ -2705,10 +2708,10 @@ sap.ui.define([
                     this.iSkip += this.iTop;
                     //  this.iTop= this.iSkip * this.iSkip
                 }
-                  this.Scity=Scity
-                  this.sACType=sACType
+                this.Scity = Scity
+                this.sACType = sACType
 
-                  this.sBranchCode=sBranchCode
+                this.sBranchCode = sBranchCode
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
                 oVisibilityModel.setProperty("/NoData", aFinal.length === 0);
@@ -4140,7 +4143,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/bookingCount", length);
             }
         },
-        
+
         onAdminSIGNUP: function () {
 
             if (!this._oAdminSignup) {
@@ -4173,7 +4176,7 @@ sap.ui.define([
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
         },
-       
+
 
 
 
@@ -4781,7 +4784,7 @@ sap.ui.define([
 
         _initAdminSignupModel: function () {
             const oModel = new sap.ui.model.json.JSONModel({
-                Salutation: "", 
+                Salutation: "",
                 VendorName: "",
                 DOB: "",
                 Gender: "",

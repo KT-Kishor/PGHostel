@@ -124,7 +124,7 @@
                 updateFinished="onTableUpdateFinished"
                 class="sapUiResponsiveMargin"
                 items="{path: 'HostelModel>/',  sorter: [{
-                    path: 'BranchCode', group: true },
+                    path: 'HostelModel>BranchCode', group: true },
 					    { path: 'BookingDate', descending: true },
 						 { path: 'CustomerID', descending: true }]}"
             >
@@ -142,49 +142,76 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Customer" tooltip="Customer" />
+                        <Text
+                            text="Customer"
+                            tooltip="Customer"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Booking ID" tooltip="Booking ID" />
+                        <Text
+                            text="Booking ID"
+                            tooltip="Booking ID"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Booking Date" tooltip="Booking Date" />
+                        <Text
+                            text="Booking Date"
+                            tooltip="Booking Date"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Gender" tooltip="Gender" />
+                        <Text
+                            text="Gender"
+                            tooltip="Gender"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Contact Information" tooltip="Contact Information" />
+                        <Text
+                            text="Contact Information"
+                            tooltip="Contact Information"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Start/End Date" tooltip="Start/End Date" />
+                        <Text
+                            text="Start/End Date"
+                            tooltip="Start/End Date"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Room Number" tooltip="Room Number" />
+                        <Text
+                            text="Room Number"
+                            tooltip="Room Number"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Bed Type" tooltip="Bed Type" />
+                        <Text
+                            text="Bed Type"
+                            tooltip="Bed Type"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Status" tooltip="Status" />
+                        <Text
+                            text="Status"
+                            tooltip="Status"
+                        />
                     </Column>
                 </columns>
                 <items>
@@ -193,23 +220,35 @@
                         press="AD_onPressEditDetails"
                     >
                         <cells>
-                            <ObjectIdentifier
-                                title="{HostelModel>CustomerID}"
-                                text="{HostelModel>CustomerName}"
-                            />
+                            <VBox>
+                                <Text
+                                    text="{HostelModel>CustomerID}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <Text text="{HostelModel>CustomerName}" />
+                            </VBox>
                             <Text text="{HostelModel>BookingID}" />
                             <Text
                                 text="{path:'HostelModel>BookingDate',formatter: '.Formatter.formatDate'}"
                             />
                             <Text text="{HostelModel>Gender}" />
-                            <ObjectIdentifier
-                                title="{HostelModel>MobileNo}"
-                                text="{HostelModel>CustomerEmail}"
-                            />
-                            <ObjectIdentifier
-                                title="{path:'HostelModel>StartDate',formatter: '.Formatter.formatDate'}"
-                                text="{path:'HostelModel>EndDate',formatter: '.Formatter.formatDate'}"
-                            />
+                            <VBox>
+                                <Text
+                                    text="{HostelModel>MobileNo}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <Text text="{HostelModel>CustomerEmail}" />
+                            </VBox>
+
+                            <VBox>
+                                <Text
+                                    text="{path:'HostelModel>StartDate',formatter: '.Formatter.formatDate'}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <Text
+                                    text="{path:'HostelModel>EndDate',formatter: '.Formatter.formatDate'}"
+                                />
+                            </VBox>
                             <Text text="{HostelModel>RoomNo}" />
                             <Text text="{HostelModel>BedType}" />
                             <ObjectStatus

@@ -62,7 +62,9 @@
                                     text="Room No"
                                     class="sapUiSmallMarginBottom"
                                 />
-                                <Text text="{CustomerData>/RoomNo}" />
+                                <Text text="{CustomerData>/RoomNo}"
+
+                                 />
                             </VBox>
                         </FlexBox>
                         <!-- RIGHT SIDE BUTTONS -->
@@ -81,7 +83,7 @@
                                 visible="{=
                                     (
                                         ${CustomerData>/Status} === 'New' ||
-                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; ${LoginModel>/Role} === 'Admin')
+                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin')
                                     )
                                     &amp;&amp; !${VisibleModel>/visible}
                                 }"
@@ -104,7 +106,7 @@
                                 press="onChekout"
                                 visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible}
-                                    &amp;&amp; ${LoginModel>/Role} === 'Admin' }"
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'Super Admin') }"
                             />
 
                             <Button
@@ -189,7 +191,6 @@
                             <!-- Price -->
                             <Label
                                 text="Price"
-                                required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
                                 id="Ad_id_idPrice4"

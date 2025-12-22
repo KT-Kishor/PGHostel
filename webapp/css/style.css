@@ -832,7 +832,15 @@
   font-size: 0.95rem;
   color: #080808;
   margin-top: 0.4rem;
-  min-height: 40px;
+
+  line-height: 1.4rem;          
+  min-height: 5.6rem;        
+  max-height: 5.6rem;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 .bedCardPrice {

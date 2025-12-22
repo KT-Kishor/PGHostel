@@ -297,6 +297,8 @@
                                     <Text
                                         text="{VisibilityModel>Description}"
                                         class="bedCardDesc"
+                                        maxLines="4"
+                                        wrapping="true"
                                     />
                                     <Text
                                         text="{parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
@@ -323,18 +325,25 @@
                             visible="{VisibilityModel>/NoData}"
                             illustrationType="sap.m.IllustratedMessageType.NoData"
                             title="No Rooms Found"
-                            description="Please select another Branch or City."
+                            description="Please select another City."
                         />
-                       <VBox
+                        <VBox
                             alignItems="Center"
                             class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-                             visible="{VisibilityModel>/ShowViewMore}"
+                            visible="{VisibilityModel>/ShowViewMore}"
                         >
                             <Link
+                                id="idViewMoreBusy"
                                 text="View more rooms"
                                 press="onViewMoreRooms"
                                 class="btnViewDetails"
                             />
+                           <!-- <BusyIndicator
+    id="idViewMoreBusy"
+    visible="false"
+    size="1rem"
+    class="sapUiTinyMarginTop"
+/> -->
                         </VBox>
                     </Page>
                     <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">

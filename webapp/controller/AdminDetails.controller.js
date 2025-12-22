@@ -14,6 +14,10 @@ sap.ui.define([
 
 
         _onRouteMatched: async function (oEvent) {
+            var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
+            this.getView().setModel(model, "LoginModel");
+
+
              this.commonLoginFunction();
               this.Code=""
             var model = new JSONModel({

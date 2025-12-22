@@ -262,6 +262,13 @@ sap.ui.define([
                     return;
                 }
 
+                 if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
+                   && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0  && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
+                   && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
+                    sap.m.MessageToast.show("Please Fill at Least One Price");
+                    return;
+                }
+
                 // Convert image files to Base64
                 const toBase64 = (file) => {
                     return new Promise((resolve, reject) => {

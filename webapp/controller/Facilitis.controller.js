@@ -300,6 +300,13 @@ sap.ui.define([
                 return;
             }
 
+              if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
+                && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0  && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
+                 && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
+                    sap.m.MessageToast.show("Please Fill at Least One Price");
+                    return;
+                }
+
             const oData = {
                 data: {
                     BranchCode: Payload.BranchCode,
