@@ -2467,7 +2467,7 @@ sap.ui.define([
                     this.iTop=4
                     this.iSkip=0
                 }
-                  if (sSelectedACType === "Non-AC" || oBranchcity) {
+                  if (sSelectedACType === "Non-Ac" || oBranchcity) {
                     this.iTop=4
                     this.iSkip=0
                 }

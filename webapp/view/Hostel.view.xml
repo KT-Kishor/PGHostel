@@ -230,8 +230,8 @@
                                                 text="AC"
                                             />
                                             <core:Item
-                                                key="Non-AC"
-                                                text="Non-AC"
+                                                key="Non-Ac"
+                                                text="Non-Ac"
                                             />
                                             <core:Item
                                                 key="All"

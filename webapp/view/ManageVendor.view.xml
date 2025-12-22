@@ -34,7 +34,8 @@
 			</fb:FilterBar>
 			<Table id="MV_id_ManageVendor" sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft" width="auto" busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin" items="{path:'mainModel>/'}">
+                class="sapUiResponsiveMargin" items="{path: 'mainModel>/', sorter: {path: 'Status',descending: false,group: true}}"
+            >
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="Vendor Details ({=${mainModel>/}.length})" />
