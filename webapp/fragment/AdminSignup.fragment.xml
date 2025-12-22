@@ -111,7 +111,7 @@
 					<core:ListItem key="PAN" text="PAN Card"/>
 					<core:ListItem key="Driving License" text="Driving License"/>
 					<core:ListItem key="Bank" text="Bank Account Proof"/>
-					<core:ListItem key="Resume" text="Resume"/>
+					<!-- <core:ListItem key="Resume" text="Resume"/> -->
 					<core:ListItem key="Other" text="Other"/>
 				</ComboBox>
 				<!-- Upload button -->

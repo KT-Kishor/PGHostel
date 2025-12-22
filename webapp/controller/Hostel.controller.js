@@ -4150,6 +4150,13 @@ sap.ui.define([
                 );
                 this.getView().addDependent(this._oAdminSignup);
 
+                // 🔐 CACHE ORIGINAL DOC TYPES (ONCE)
+                const oDocType = sap.ui.getCore().byId("adminDocType");
+                this._adminDocTypeBackup = oDocType.getItems().map(i => ({
+                    key: i.getKey(),
+                    text: i.getText()
+                }));
+
                 this._oAdminSignup.attachAfterClose(() => {
                     this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
@@ -4166,7 +4173,7 @@ sap.ui.define([
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
         },
-
+       
 
 
 
@@ -4486,6 +4493,7 @@ sap.ui.define([
 
             const payload = {
                 data: {
+                    Salutation: oAdmin.Salutation,
                     UserName: oAdmin.VendorName,
                     DateOfBirth: oAdmin.DOB,
                     Gender: oAdmin.Gender,
@@ -4637,6 +4645,7 @@ sap.ui.define([
 
             // -------- MODEL RESET (SAFE WAY) --------
             [
+                "/Salutation",
                 "/VendorName",
                 "/DOB",
                 "/Gender",
@@ -4659,6 +4668,7 @@ sap.ui.define([
 
             // -------- RESET CONTROLS (IMPORTANT ORDER) --------
             [
+                "adminSalutation",
                 "adminVendorName",
                 "adminDOB",
                 "adminGender",
@@ -4681,6 +4691,28 @@ sap.ui.define([
                 // Inputs / DatePicker
                 c.setValueState?.("None");
             });
+
+
+            // -------- RESTORE DOCUMENT TYPE DROPDOWN --------
+            const oDocType = sap.ui.getCore().byId("adminDocType");
+
+            if (oDocType && this._adminDocTypeBackup) {
+                oDocType.removeAllItems();
+
+                this._adminDocTypeBackup.forEach(d => {
+                    oDocType.addItem(
+                        new sap.ui.core.ListItem({
+                            key: d.key,
+                            text: d.text
+                        })
+                    );
+                });
+            }
+
+            // Reset flags
+            oModel.setProperty("/CurrentDocType", "");
+            oModel.setProperty("/DocTypeEnabled", true);
+
         },
 
 
@@ -4707,6 +4739,8 @@ sap.ui.define([
             const oAddress = C("adminAddress");
 
             const isValid =
+                utils._LCstrictValidationSelect(sap.ui.getCore().byId("adminSalutation"))
+                &&
                 utils._LCvalidateName(oName, "ID") &&
                 utils._LCvalidateMandatoryField(oDOB, "ID") &&
                 utils._LCstrictValidationSelect(oGender) &&
@@ -4747,6 +4781,7 @@ sap.ui.define([
 
         _initAdminSignupModel: function () {
             const oModel = new sap.ui.model.json.JSONModel({
+                Salutation: "", 
                 VendorName: "",
                 DOB: "",
                 Gender: "",
@@ -4903,7 +4938,36 @@ sap.ui.define([
         onClosePreview: function () {
             this._previewDialog.close();
         },
+        onAdminChangeSalutation: function (oEvent) {
 
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+
+            const oGender = sap.ui.getCore().byId("adminGender");
+
+            // 🔥 Clear salutation error immediately
+            oSalutation.setValueState("None");
+
+            if (!oGender) return;
+
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            }
+            else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+            // Dr. → manual gender selection
+
+            // ✅ Strict validation (CONTROL, not event)
+            utils._LCstrictValidationSelect(oSalutation);
+        },
 
 
 
