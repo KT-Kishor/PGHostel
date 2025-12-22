@@ -2,8 +2,9 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "sap/m/MessageBox",
+    "sap/m/MessageToast",
     "../model/formatter",
-], function(BaseController, utils, MessageBox, Formatter) {
+], function(BaseController, utils, MessageBox, MessageToast, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageStaff", {
         Formatter: Formatter,
@@ -107,7 +108,7 @@ sap.ui.define([
             const oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                return sap.m.MessageToast.show("Please Select a Record to Edit.");
+                return MessageToast.show(this.i18nModel.getText("MSediterr"));
             }
 
             const oData = oSelected.getBindingContext("mainModel").getObject();
@@ -223,7 +224,7 @@ sap.ui.define([
             );
 
             if (!isValid) {
-                return sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
+                return MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             }
 
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
@@ -246,7 +247,7 @@ sap.ui.define([
                 State: data.State,
                 City: data.City,
                 Address: data.Address.trim(),
-                Type: this.getOwnerComponent().getModel("LoginModel").getData().UserID
+                Type: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID
             };
 
             const isUpdate = !!data.UserID;
@@ -263,12 +264,12 @@ sap.ui.define([
                             UserID: data.UserID
                         }
                     });
-                    sap.m.MessageToast.show("User Details Updated Successfully!");
+                    MessageToast.show(this.i18nModel.getText("MSstaffeditsuccess"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Login", {
                         data: payload
                     });
-                    sap.m.MessageToast.show("Registration Successful!");
+                    MessageToast.show(this.i18nModel.getText("MSstaffaddsuccess"));
                 }
 
                 this.FD_onCancelButtonPress();
@@ -302,7 +303,7 @@ sap.ui.define([
             let filters = {};
 
             // Always apply Vendor type
-            filters.Type = oExistingModel.Type;
+            filters.Type = oExistingModel.EmployeeID;
 
             // BranchCode applied based on role
             if (oExistingModel.Role !== "") {
@@ -379,7 +380,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please Select a Record to Delete.");
+                MessageToast.show(this.i18nModel.getText("MSdeleteerr"));
                 return;
             }
 
@@ -405,7 +406,7 @@ sap.ui.define([
                                     }
                                 });
 
-                                sap.m.MessageToast.show("Staff Data Deleted Successfully!");
+                                MessageToast.show(this.i18nModel.getText("MSdeletemsg"));
                                 await that.Onsearch("true"); // refresh table
                             } catch (err) {
                                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -741,6 +742,75 @@ sap.ui.define([
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
-        }
+        },
+
+        MS_onDownload:function() {
+             const oModel = this.byId("MS_id_ManageStaff").getModel("mainModel").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item,
+                MobileNo: item.MobileNo ? String(item.MobileNo) : ""
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Manage_Staff.xlsx",
+                worker: false
+            };
+            MessageToast.show(this.i18nModel.getText("MSdownloading"));
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        },
+
+        createTableSheet: function () {
+            return [{
+                label: "User ID",
+                property: "User ID",
+                type: "string"
+            },
+            {
+                label: "Staff Name",
+                property: "Staff Name",
+                type: "string"
+            },
+            {
+                label: "Role",
+                property: "Role",
+                type: "string"
+            },
+            {
+                label: "Email ID",
+                property: "Email ID",
+                type: "string"
+            },
+            {
+                label: "Gender",
+                property: "Gender",
+                type: "string"
+            },
+            {
+                label: "Mobile Number",
+                property: "Mobile Number",
+                type: "string"
+            },
+            {
+                label: "Address",
+                property: "Address",
+                type: "string"
+            }
+            ]
+        },
     });
 });

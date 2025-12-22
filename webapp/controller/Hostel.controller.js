@@ -4140,7 +4140,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/bookingCount", length);
             }
         },
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
         onAdminSIGNUP: function () {
 
             if (!this._oAdminSignup) {
