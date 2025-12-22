@@ -1420,56 +1420,70 @@ new sap.m.Text({
 
             oModel.refresh(true);
         },
+        onPersonCountChange: function (oEvent) {
+    const oModel = this.getView().getModel("HostelModel");
+    const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
 
-        onDialogNextButton: async function () {
+    if (this._lastPersonCount !== iPersonCount) {
+        this._mustRecreatePersonUI = true;
+        this._lastPersonCount = iPersonCount;
+    }
+},
 
-            if (this._iSelectedStepIndex === 0) {
-                this._createDynamicPersonsUI();
-                this._isPersonUIInitialized = true;
-            }
-            if (this._iSelectedStepIndex === 1) {
-                this._resetCouponAndDiscount()
-                const aMissing = this._checkMandatoryFields();
-                if (aMissing.length > 0) {
-                    sap.m.MessageBox.error(
-                        "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
-                    );
-                    return; // STOP navigation
-                }
-            }
 
-            // Ensure wizard exists
-            if (!this._oWizard) {
-                this._oWizard = this.byId("TC_id_wizard");  // <-- ID of your wizard!
-            }
+       onDialogNextButton: async function () {
+    const oModel = this.getView().getModel("HostelModel");
+    const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
 
-            // Ensure selected step exists
-            if (!this._oSelectedStep) {
-                this._oSelectedStep = this._oWizard.getCurrentStep();
-            }
+    // STEP 0: create UI only once, or when count increased
+    if (this._iSelectedStepIndex === 0) {
+        if (!this._isPersonUIInitialized || this._lastPersonCount !== iPersonCount) {
+            this._createDynamicPersonsUI();    // builds UI for current count
+            this._isPersonUIInitialized = true;
+            this._lastPersonCount = iPersonCount;
+        }
+    }
 
-            // SAFE Step index lookup
-            let aSteps = this._oWizard.getSteps();
-            let iIndex = aSteps.indexOf(this._oSelectedStep);
+    // STEP 1: validations
+    if (this._iSelectedStepIndex === 1) {
+        this._resetCouponAndDiscount();
+        const aMissing = this._checkMandatoryFields();
+        if (aMissing.length > 0) {
+            sap.m.MessageBox.error(
+                "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
+            );
+            return;
+        }
+    }
 
-            if (iIndex === -1) {
-                // Force fallback to current step index
-                iIndex = aSteps.indexOf(this._oWizard.getCurrentStep());
-            }
+    // wizard navigation (unchanged)
+    if (!this._oWizard) {
+        this._oWizard = this.byId("TC_id_wizard");
+    }
+    if (!this._oSelectedStep) {
+        this._oSelectedStep = this._oWizard.getCurrentStep();
+    }
 
-            this._iSelectedStepIndex = iIndex;
-            this.oNextStep = aSteps[iIndex + 1];
+    const aSteps = this._oWizard.getSteps();
+    let iIndex = aSteps.indexOf(this._oSelectedStep);
+    if (iIndex === -1) {
+        iIndex = aSteps.indexOf(this._oWizard.getCurrentStep());
+    }
 
-            if (this._oSelectedStep && !this._oSelectedStep.bLast) {
-                this._oWizard.goToStep(this.oNextStep, true);
-            } else {
-                this._oWizard.nextStep();
-            }
-            this._iSelectedStepIndex++;
-            this._oSelectedStep = this.oNextStep;
+    this._iSelectedStepIndex = iIndex;
+    this.oNextStep = aSteps[iIndex + 1];
 
-            this.handleButtonsVisibility();
-        },
+    if (this._oSelectedStep && !this._oSelectedStep.bLast) {
+        this._oWizard.goToStep(this.oNextStep, true);
+    } else {
+        this._oWizard.nextStep();
+    }
+    this._iSelectedStepIndex++;
+    this._oSelectedStep = this.oNextStep;
+
+    this.handleButtonsVisibility();
+}
+,
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
 
