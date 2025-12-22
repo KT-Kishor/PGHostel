@@ -62,7 +62,7 @@
                                                 text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
                                                 press="onEditOrSavePress"
                                                 visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                 || ${AdminSignupModel>/Status} !== 'Active' }"
                                             />
                                         </m:Toolbar>
                                     </f:toolbar>
@@ -99,7 +99,7 @@
                                         <m:Input
                                             value="{AdminSignupModel>/VendorName}"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_VendorName" valueStateText="{i18n>enterMVDname}"
                                         />
                                         <m:Label
                                             text="{i18n>MVDDOB}"
@@ -113,7 +113,7 @@
                                             change="onChangeDOB"
                                             editable="{editable>/Edit}"
                                             initialFocusedDateValue="{controller>/focusedDate}"
-                                            minDate="{controller>/minDate}"
+                                            minDate="{controller>/minDate}" id="MV_id_VendorDOB" 
                                         />
                                         <m:Label
                                             text="{i18n>MVgender}"
@@ -122,7 +122,7 @@
                                         <m:Select
                                             selectedKey="{AdminSignupModel>/Gender}"
                                             change="ADMIN_onChangeGender"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_Gender" valueStateText="{i18n>MVgender}"
                                         >
                                             <core:Item
                                                 key="Male"
@@ -146,7 +146,7 @@
                                             type="Email"
 											placeholder="Enter Email ID"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_Email" valueStateText="{i18n>MSenterValidEmail}"
                                         />
                                         <m:Label
                                             text="{i18n>MVDcountry}"
@@ -222,7 +222,7 @@
                                             width="100%"
                                             items="{path:'CountryModel>/', length:1000}"
                                             filterSecondaryValues="true"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_StdCode"
                                         >
                                             <core:ListItem
                                                 key="{CountryModel>stdCode}"
@@ -233,7 +233,7 @@
                                         <m:Input
                                             value="{AdminSignupModel>/Mobile}"
                                             liveChange="ADMIN_onMobileLiveChange"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_MobileNo" valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
                                             text="{i18n>MVaddress}"
@@ -243,7 +243,7 @@
                                             value="{AdminSignupModel>/Address}"
                                             rows="3"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}"
+                                            editable="{editable>/Edit}" id="MV_id_Address" valueStateText="{i18n>enterMVDAddress}"
                                         />
                                     </f:content>
                                 </f:SimpleForm>
@@ -321,7 +321,7 @@
                                                 <m:VBox
                                                     id="MV_id_adminUploaderWrapper"
                                                     visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                    || ${AdminSignupModel>/Status} !== 'Active' }"
                                                 >
                                                     <u:FileUploader
                                                         id="MV_id_adminFileUploader"
@@ -346,7 +346,7 @@
                                                     press="onAdminDeleteFiles"
                                                     enabled="false"
                                                     visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                         || ${AdminSignupModel>/Status} !== 'Active' }"
                                                 />
                                                 <m:Button
                                                     id="AdminDownloadButton"
@@ -404,7 +404,7 @@
 						tooltip="Approve Vendor"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"
+                          || ${AdminSignupModel>/Status} !== 'Active' }"
                     />
                     <m:Button
                         id="MV_id_SendBackButton"
@@ -413,7 +413,7 @@
                         class="myUnifiedBtn"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-           || ${AdminSignupModel>/Status} !== 'Active' }"
+                           || ${AdminSignupModel>/Status} !== 'Active' }"
                     />
                 </m:contentRight>
             </m:Bar>

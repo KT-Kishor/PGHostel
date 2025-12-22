@@ -253,7 +253,7 @@ sap.ui.define([
             oRouter.navTo("RouteManageVendor");
         },
 
-        onEditOrSavePress: function() {
+       onEditOrSavePress: async function () {
             const oEditableModel = this.getView().getModel("editable");
             const bEditMode = oEditableModel.getProperty("/Edit");
 
@@ -263,21 +263,37 @@ sap.ui.define([
                 oEditableModel.setProperty("/Save", true);
             } else {
                 // === SAVE MODE ===
-                this.BT_onsavebuttonpress(); // implement your save logic here
-                oEditableModel.setProperty("/Edit", false);
-                oEditableModel.setProperty("/Save", false);
+                const bSaved = await this.BT_onsavebuttonpress(); // ✅ await result
+                if (bSaved === true) {
+                    oEditableModel.setProperty("/Edit", false);
+                    oEditableModel.setProperty("/Save", false);
+                }
             }
         },
 
-        BT_onsavebuttonpress: async function() {
+       BT_onsavebuttonpress: async function () {
             try {
+                const C = this.byId.bind(this);
                 const oModel = this.getView().getModel("AdminSignupModel");
                 const oData = oModel.getData();
+                const std = (C("MV_id_StdCode").getValue() || "").trim();
 
-                // Basic validation
-                if (!oData.VendorName || !oData.Email || !oData.Mobile) {
-                    MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-                    return;
+                const isValid =
+                    utils._LCstrictValidationSelect(C("MV_id_adminSalutation")) === true &&
+                    utils._LCvalidateName(C("MV_id_VendorName"), "ID") === true &&
+                    utils._LCvalidateDate(C("MV_id_VendorDOB"), "ID") === true &&
+                    utils._LCstrictValidationSelect(C("MV_id_Gender")) === true &&
+                    utils._LCvalidateEmail(C("MV_id_Email"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("MV_id_Country"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("MV_id_State"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("MV_id_City"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("MV_id_StdCode"), "ID") === true &&
+                    utils._LCvalidateISDmobile(C("MV_id_MobileNo"), std) === true &&
+                    utils._LCvalidateAddress(C("MV_id_Address")) === true;
+
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+                    return false;   // ✅ IMPORTANT
                 }
 
                 const payload = {
@@ -302,14 +318,12 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.show(0);
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
 
-                this.getView().getModel("editable").setProperty("/Edit", false);
                 MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
-
-                // Pass UserID explicitly
                 await this._loadVendorDetails(oData.UserID);
-
+                return true; 
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
+                return false;
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -670,7 +684,7 @@ sap.ui.define([
         onAdminChangeSalutation: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("adminGender");
+            const oGender = this.byId("MV_id_Gender");
             oSalutation.setValueState("None");
 
             if (!oGender) return;
@@ -694,17 +708,17 @@ sap.ui.define([
         onAdminLiveValidate: function(oEvent) {
             const id = oEvent.getSource().getId();
 
-            if (id.includes("adminVendorName")) { // Vendor name
+            if (id.includes("MV_id_VendorName")) { // Vendor name
                 utils._LCvalidateName(oEvent);
                 return;
             }
 
-            if (id.includes("adminEmail")) { // Email
+            if (id.includes("MV_id_Email")) { // Email
                 utils._LCvalidateEmail(oEvent);
                 return;
             }
 
-            if (id.includes("adminAddress")) { // Address
+            if (id.includes("MV_id_Address")) { // Address
                 utils._LCvalidateMandatoryField(oEvent);
                 return;
             }
@@ -717,25 +731,6 @@ sap.ui.define([
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-        onAdminLiveValidate: function(oEvent) {
-            const id = oEvent.getSource().getId();
-            // Vendor name
-            if (id.includes("adminVendorName")) {
-                utils._LCvalidateName(oEvent);
-                return;
-            }
-            // Email
-            if (id.includes("adminEmail")) {
-                utils._LCvalidateEmail(oEvent);
-                return;
-            }
-
-            // Address
-            if (id.includes("adminAddress")) {
-                utils._LCvalidateMandatoryField(oEvent);
-                return;
-            }
-        },
 
         ADMIN_onChangeCountry: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
@@ -745,10 +740,10 @@ sap.ui.define([
 
             const oStateModel = this.getView().getModel("StateModel");
             const oCityModel = this.getView().getModel("CityModel");
-            const oState = this.byId("adminsignUpState");
-            const oCity = this.byId("adminsignUpCity");
-            const oSTD = this.byId("adminsignUpSTD");
-            const oMobile = this.byId("adminMobileNo");
+            const oState = this.byId("MV_id_State");
+            const oCity = this.byId("MV_id_City");
+            const oSTD = this.byId("MV_id_StdCode");
+            const oMobile = this.byId("MV_id_MobileNo");
 
             // --- 1) SANITIZE TYPED COUNTRY TEXT ---
             const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
@@ -830,7 +825,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeState: function(oEvent) {
+        ADMIN_onChangeState: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -838,32 +833,32 @@ sap.ui.define([
             const oModel = this.getView().getModel("AdminSignupModel");
 
             const oCountry = this.byId("adminsignUpCountry");
-            const oCity = this.byId("adminsignUpCity");
+            const oCity = this.byId("MV_id_City");
             const oCityModel = this.getView().getModel("CityModel");
 
             // --- SANITIZE INPUT ---
-            const val = oState.getValue().replace(/[^a-zA-Z\s]/g, "");
+            const val = (oState.getValue() || "").replace(/[^a-zA-Z\s]/g, "");
             oState.setValue(val);
-
-            // Clear state error always (typed or selected)
             oState.setValueState("None");
 
-            // Clear city (dependent)
+            // Clear dependent city
             oModel.setProperty("/City", "");
             oCity.setSelectedKey("").setValue("");
             oCityModel.setProperty("/filtered", []);
 
-            // Detect manual typing: break auto-selection
-            if (oState.getSelectedItem() &&
-                val !== oState.getSelectedItem().getText()) {
+            // Safe selected item access
+            const selected = (typeof oState.getSelectedItem === "function")
+                ? oState.getSelectedItem()
+                : null;
 
+            if (selected && val !== selected.getText()) {
                 oState.setSelectedKey(null);
                 oState.setSelectionItem(null);
             }
 
-            const selected = oState.getSelectedItem();
-            const selectedCountry = oCountry.getSelectedItem();
-
+            const selectedCountry = (typeof oCountry.getSelectedItem === "function")
+                ? oCountry.getSelectedItem()
+                : null;
 
             if (!selected || !selectedCountry) {
                 oModel.setProperty("/State", val);
@@ -875,7 +870,6 @@ sap.ui.define([
 
             const sCountryCode = selectedCountry.getAdditionalText().trim();
 
-            // Filter cities
             const allCities = oCityModel.getData();
             const filteredCities = allCities.filter(c =>
                 c.countryCode === sCountryCode &&
@@ -913,7 +907,7 @@ sap.ui.define([
             if (!isValid) return;
 
             const oSTD = oEvent.getSource(); // easier than getCore()
-            const oMobile = this.byId("adminMobileNo");
+            const oMobile = this.byId("MV_id_MobileNo");
             const oModel = this.getView().getModel("AdminSignupModel");
             oSTD.setValueState("None");
             oMobile.setValue("");
@@ -932,7 +926,7 @@ sap.ui.define([
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
 
-            const oSTD = this.byId("adminsignUpSTD");
+            const oSTD = this.byId("MV_id_StdCode");
             const stdRaw = oSTD?.getValue() || "";
             const std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
 
