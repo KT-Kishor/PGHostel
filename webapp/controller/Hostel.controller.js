@@ -13,6 +13,15 @@ sap.ui.define([
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
+
+            const oUIModel = new sap.ui.model.json.JSONModel({
+                showGlobalFooter: true
+            });
+            this.getView().setModel(oUIModel, "UIModel");
+
+
+
+
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
@@ -740,25 +749,56 @@ sap.ui.define([
             this._clearRoomDetailDialog();
         },
 
-        onTabSelect: async function (oEvent) {
-            var oItem = oEvent.getParameter("item");
-            const sKey = oItem.getKey();
+        // onTabSelect: async function (oEvent) {
+        //     var oItem = oEvent.getParameter("item");
+        //     const sKey = oItem.getKey();
 
+        //     this.byId("pageContainer").to(this.byId(sKey));
+
+        //     var page = this.byId(sKey);
+        //     if (page && page.scrollTo) page.scrollTo(0, 0);
+        //     this.flag = true
+        //     this.iTop = 4;
+        //     this.iSkip = 0;
+        //     this.roomtype = true
+
+        //     if (sKey === "idRooms") {
+        //         await this._loadRoomsPageData();
+        //     }
+
+
+        // },
+
+        onTabSelect: async function (oEvent) {
+            const sKey = oEvent.getParameter("item").getKey();
             this.byId("pageContainer").to(this.byId(sKey));
 
-            var page = this.byId(sKey);
-            if (page && page.scrollTo) page.scrollTo(0, 0);
-            this.flag = true
+            const page = this.byId(sKey);
+            if (page?.scrollTo) {
+                page.scrollTo(0, 0);
+            }
+
+            this.flag = true;
             this.iTop = 4;
             this.iSkip = 0;
-            this.roomtype = true
+            this.roomtype = true;
+
+            // 🔑 Global footer visibility control
+            const oUIModel = this.getView().getModel("UIModel");
+            oUIModel.setProperty("/showGlobalFooter", sKey !== "idRooms");
+
+            // 🔥 FORCE UI5 LAYOUT RECALCULATION
+            sap.ui.getCore().applyChanges();
+            sap.ui.getCore().getEventBus().publish("sap.ui", "resize");
 
             if (sKey === "idRooms") {
                 await this._loadRoomsPageData();
             }
-
-
         },
+
+
+
+
         Branch: function () {
             return new Promise((resolve) => {
                 const oBRModel = this.getOwnerComponent().getModel("sBRModel");

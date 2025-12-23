@@ -121,15 +121,15 @@
                             press="onpressBookrooms"
                         />
                     </ScrollContainer>
-                    <Page
+                     <Page
                         id="idRooms"
                         showHeader="false"
-                    >
+                    ><VBox>
                         <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
                         <ScrollContainer
                             horizontal="false"
                             vertical="true"
-                            height="80%"
+                            height="70%"
                             class="sapUiContentPadding HostelRooms sapUiTinyMargin"
                         >
                             <l:Grid
@@ -348,7 +348,8 @@
                                 class="btnViewDetails"
                             />
                             <VBox height="2rem" />
-
+                        </VBox>
+                        <core:Fragment id="roomsFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
                         </VBox>
                     </Page>
                     <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">
@@ -365,14 +366,15 @@
                         height="100%"
                         class="sapUiContentPadding career-background sapUiTinyMargin"
                     >
-                        <!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.CareerPage" type="XML"/> -->
 
                     </ScrollContainer>
                
                 </pages>
             </NavContainer>
-            <core:Fragment fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
-            </items>
+            <!-- <core:Fragment fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" /> -->
+           <VBox visible="{= ${UIModel>/showGlobalFooter} }">
+	<core:Fragment id="globalFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML"/>
+</VBox>            </items>
    </VBox>
         </tnt:mainContents>
     </tnt:ToolPage>
