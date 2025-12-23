@@ -782,6 +782,11 @@ sap.ui.define([
                 type: "string"
             },
             {
+                label: "Salutation",
+                property: "Salutation",
+                type: "string"
+            },
+            {
                 label: "Staff Name",
                 property: "UserName",
                 type: "string"
@@ -799,6 +804,11 @@ sap.ui.define([
             {
                 label: "Gender",
                 property: "Gender",
+                type: "string"
+            },
+            {
+                label: "STD Code",
+                property: "STDCode",
                 type: "string"
             },
             {

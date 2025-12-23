@@ -333,19 +333,28 @@ sap.ui.define([
                 }
             );
         },
+        
         onDownloadCoupons: function () {
             var oTable = this.getView().byId("couponTable");
-            var oBinding = oTable.getBinding("items");
-            if (!oBinding || !oBinding.getLength || oBinding.getLength() === 0) {
-                MessageBox.info("No coupons available to download.");
+            const oModelData = oTable.getModel("CouponModel").getData();
+            if (!oModelData || oModelData.length === 0) {
+                sap.m.MessageBox.info("No coupons available to download.");
                 return;
             }
+          const aFormattedData = oModelData.map(item => {
+            return {
+              ...item,
+              StartDate: Formatter.formatDate(item.StartDate),
+              EndDate: Formatter.formatDate(item.EndDate),
+              CreatedAt: Formatter.formatDate(item.CreatedAt)
+            }
+        });
             var aCols = this._createColumnConfig();
             var oSettings = {
                 workbook: {
                     columns: aCols
                 },
-                dataSource: oBinding,
+                dataSource: aFormattedData,
                 fileName: "Coupons.xlsx"
             };
             var oSheet = new Spreadsheet(oSettings);
@@ -357,21 +366,23 @@ sap.ui.define([
                     oSheet.destroy();
                 });
         },
+         
         _createColumnConfig: function () {
             return [
-                { label: "Discount Type", property: "DiscountType", type: EdmType.String },
-                { label: "Discount Value", property: "DiscountValue", type: EdmType.Number },
-                { label: "Max Uses", property: "MaxUses", type: EdmType.Number },
-                { label: "Used Count", property: "UsedCount", type: EdmType.Number },
-                { label: "Per User Limit", property: "PerUserLimit", type: EdmType.Number },
-                { label: "Min Order Value", property: "MinOrderValue", type: EdmType.Number },
-                { label: "Start Date", property: "StartDate", type: EdmType.String },
-                { label: "End Date", property: "EndDate", type: EdmType.String },
+                { label: "Branch", property: "BranchCode", type: "String" },
+                { label: "Coupon Code", property: "CouponCode", type: "String" },
+                { label: "Discount Type", property: "DiscountType", type:"String" },
+                { label: "Discount Value", property: "DiscountValue", type: "String" },
+                { label: "Max Uses", property: "MaxUses", type: "String" },
+                { label: "Min Order Value", property: "MinOrderValue", type: "String" },
+                { label: "Start Date", property: "StartDate", type: "String" },
+                { label: "End Date", property: "EndDate", type: "String" },
+                { label: "Created At", property: "CreatedAt", type: "String" },
+                { label: "Created By", property: "CreatedBy", type: EdmType.String },
                 { label: "Status", property: "Status", type: EdmType.String },
-                { label: "Created At", property: "CreatedAt", type: EdmType.String },
-                { label: "Created By", property: "CreatedBy", type: EdmType.String }
             ];
         },
+
         _openCouponDialog: async function () {
             var oView = this.getView();
 

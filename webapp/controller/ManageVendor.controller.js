@@ -207,10 +207,16 @@ sap.ui.define([
                 oSheet.destroy();
             });
         },
+
         createTableSheet: function () {
             return [{
                 label: "User ID",
                 property: "UserID",
+                type: "string"
+            },
+            {
+                label: "Salutation",
+                property: "Salutation",
                 type: "string"
             },
             {
@@ -231,6 +237,11 @@ sap.ui.define([
             {
                 label: "Gender",
                 property: "Gender",
+                type: "string"
+            },
+            {
+                label: "STD Code",
+                property: "STDCode",
                 type: "string"
             },
             {

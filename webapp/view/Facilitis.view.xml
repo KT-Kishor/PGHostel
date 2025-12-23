@@ -102,6 +102,12 @@
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
                         />
+                        <Button
+                            text="Download"
+                            tooltip="Download Facilities Data"
+                            press="MD_onDownload"
+                            class="myUnifiedBtn"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

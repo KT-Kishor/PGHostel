@@ -3,13 +3,17 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
-    "../utils/validation"
+    "../utils/validation",
+     "sap/m/MessageToast",
+    "sap/ui/export/Spreadsheet",
 ], function(
     BaseController,
     Formatter,
     JSONModel,
     MessageBox,
-    utils
+    utils,
+    MessageToast,
+    Spreadsheet
 ) {
     "use strict";
 
@@ -655,5 +659,108 @@ sap.ui.define([
          AD_onPressEditDetails: function (oEvent) {
           this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID)});
         },
+
+         createTableSheet: function () {
+            return [{
+                label: "Customer ID",
+                property: "CustomerID",
+                type: "string"
+            },
+            {
+                label: "Customer Name",
+                property: "CustomerName",
+                type: "string"
+            },
+            {
+                label: "Booking ID",
+                property: "BookingID",
+                type: "string"
+            },
+            {
+                label: "Booking Date",
+                property: "BookingDate",
+                type: "string"
+            },
+            {
+                label: "Gender",
+                property: "Gender",
+                type: "string"
+            },
+            {
+                label: "STD Code",
+                property: "STDCode",
+                type: "string"
+            },
+            {
+                label: "Contact Information",
+                property: "MobileNo",
+                type: "string"
+            },
+            {
+                label: "Email ID ",
+                property: "CustomerEmail",
+                type: "string"
+            },
+            {
+                label: "Start Date",
+                property: "StartDate",
+                type: "string"
+            },
+            {
+                label: "End Date",
+                property: "EndDate",
+                type: "string"
+            },
+            {
+                label: "Room Number",
+                property: "RoomNo",
+                type: "string"
+            },
+            {
+                label: "Bed Type",
+                property: "BedType",
+                type: "string"
+            },
+            {
+                label: "Status",
+                property: "Status",
+                type: "string"
+            }
+            ]
+        },
+
+        MD_onDownload: function () {
+            const oModel = this.byId("idPOTable").getModel("HostelModel").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show("No Data available to Download.");
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item,
+                BookingDate: Formatter.formatDate(item.BookingDate),
+                StartDate: Formatter.formatDate(item.StartDate),
+                EndDate: Formatter.formatDate(item.EndDate)
+                // Pincode: item.Pincode ? String(item.Pincode) : "",
+                // Contact: item.Contact ? String(item.Contact) : ""
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Admin_Details.xlsx",
+                worker: false
+            };
+            MessageToast.show("Downloading Admin Details");
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show("Download Complete!");
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        }
     });
 });

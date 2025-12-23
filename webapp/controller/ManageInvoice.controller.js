@@ -218,6 +218,8 @@ sap.ui.define(
           const aCols = [
             { label: this.i18nModel.getText("invoiceNo"), property: "InvNo", type: "string" },
             { label: this.i18nModel.getText("customerName"), property: "CustomerName", type: "string" },
+            { label: this.i18nModel.getText("customerID"), property: "CustomerID", type: "string" },
+            { label: this.i18nModel.getText("bookingID"), property: "BookingID", type: "string" },
             { label: this.i18nModel.getText("invoiceDate"), property: "InvoiceDate", type: "string" },
             { label: this.i18nModel.getText("invoiceDescription"), property: "InvoiceDescription", type: "string" },
             { label: this.i18nModel.getText("totalAmount"), property: "TotalAmountCurrency", type: "string" },

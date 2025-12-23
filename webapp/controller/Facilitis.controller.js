@@ -2,7 +2,9 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "../model/formatter",
-], function(BaseController, utils, Formatter) {
+     "sap/ui/export/Spreadsheet",
+    "sap/m/MessageToast",
+], function(BaseController, utils, Formatter, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Facilitis", {
         Formatter: Formatter,
@@ -606,6 +608,75 @@ sap.ui.define([
                     }
                 }
             );
-        }
+        },
+
+         createTableSheet: function() {
+            return [{
+                    label: "Facility Name",
+                    property: "FacilityName",
+                    type: "string"
+                },
+                {
+                    label: "Type",
+                    property: "Type",
+                    type: "string"
+                },
+                {
+                    label: "Hourly Price",
+                    property: "PerHourPrice",
+                    type: "string"
+                },
+                {
+                    label: "Daily Price",
+                    property: "PerDayPrice",
+                    type: "string"
+                },
+                {
+                    label: "Monthly Price",
+                    property: "PerMonthPrice",
+                    type: "string"
+                },
+                {
+                    label: "Yearly Price",
+                    property: "PerYearPrice",
+                    type: "string"
+                }
+            ]
+        },
+
+        MD_onDownload: function() {
+            const oModel = this.byId("id_facilityTable").getModel("Facilities").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show("No Data available to Download.");
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item,
+                PerHourPrice: item.PerHourPrice + " " + item.Currency,
+                PerDayPrice: item.PerDayPrice + " " + item.Currency,
+                PerMonthPrice: item.PerMonthPrice + " " + item.Currency,
+                PerYearPrice: item.PerYearPrice + " " + item.Currency
+                // Pincode: item.Pincode ? String(item.Pincode) : "",
+                // Contact: item.Contact ? String(item.Contact) : ""
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Facilities_Details.xlsx",
+                worker: false
+            };
+            MessageToast.show("Downloading Facilities Details");
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show("Download Complete!");
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        },
     });
 });

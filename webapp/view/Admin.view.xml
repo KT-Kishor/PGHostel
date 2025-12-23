@@ -138,6 +138,12 @@
                             press="HM_AssignRoom"
                             class="myUnifiedBtn"
                         />
+                        <Button
+                            text="Download"
+                            tooltip="Download Admin Data"
+                            press="MD_onDownload"
+                            class="myUnifiedBtn"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
