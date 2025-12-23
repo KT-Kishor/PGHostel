@@ -345,7 +345,7 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
-            this.getView().getModel("BedDetails").setData("");
+            this.getView().getModel("BedDetails").setData({});
 
 
         },
@@ -353,7 +353,7 @@ sap.ui.define([
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
-            this.getView().getModel("BedDetails").setData("");
+            this.getView().getModel("BedDetails").setData({});
 
         },
 

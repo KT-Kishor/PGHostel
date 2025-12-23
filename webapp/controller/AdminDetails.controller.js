@@ -18,8 +18,8 @@ sap.ui.define([
             this.getView().setModel(model, "LoginModel");
 
 
-             this.commonLoginFunction();
-              this.Code=""
+            this.commonLoginFunction();
+            this.Code = ""
             var model = new JSONModel({
                 FacilityName: "",
                 UnitText: "",
@@ -191,7 +191,7 @@ sap.ui.define([
             oSourceCB.getBinding("items")?.filter([]);
 
             if (sCountry) {
-                const aCountryData = this.getView().getModel("CountryModel").getData();
+                const aCountryData = this.getOwnerComponent().getModel("CountryModel").getData();
                 const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
 
                 if (oCountryObj) {
@@ -242,13 +242,13 @@ sap.ui.define([
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
             }
-            this.getView().getModel("CustomerData").setData("");
+            this.getView().getModel("CustomerData").setData({});
         },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
-            this.getView().getModel("CustomerData").setData("");
+            this.getView().getModel("CustomerData").setData({});
         },
 
         AD_onSearch: async function () {
@@ -274,6 +274,7 @@ sap.ui.define([
                     City: oCustomer.City,
                     STDCode: oCustomer.STDCode || "",
                     Salutation: oCustomer.Salutation || "Mr.",
+                    Address: oCustomer.PermanentAddress,
                     // RentPrice: oCustomer.Bookings?.[0]?.RentPrice || 0,
                     // OrginalRentPrice: oCustomer.Bookings?.[0]?.RoomPrice || 0,
                     BedType: oCustomer.Bookings?.[0]?.BedType || "",
@@ -754,9 +755,9 @@ sap.ui.define([
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
             if (OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available."); 
+                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available.");
                 this.HM_Dialog.close();
-                 return;
+                return;
             }
 
 
@@ -1171,6 +1172,8 @@ sap.ui.define([
             model.setProperty("/STDCode", data.STDCode)
             model.setProperty("/MobileNo", data.MobileNo)
             model.setProperty("/Salutation", data.Salutation)
+            model.setProperty("/Address", data.Address)
+
 
             if (data.PaymentType === "Per Month") {
                 model.setProperty("/UnitText", "monthly")
@@ -1805,6 +1808,7 @@ sap.ui.define([
             const oView = this.getView();
             const oModel = oView.getModel("Bookingmodel");
 
+            const oPhoneInput = this.byId("CD_ID_idPhone")
             const oStateCB = oView.byId("CC_id_State");
             const oCityCB = oView.byId("CC_id_City");
             const oSTD = oView.byId("CC_id_STDCode");
@@ -1826,6 +1830,12 @@ sap.ui.define([
 
             const sCountryName = oItem.getText();
             const sCountryCode = oItem.getAdditionalText();
+            if (sCountryName === "India") {
+                oPhoneInput.setMaxLength(10);
+            } else {
+                oPhoneInput.setValue("");
+                oPhoneInput.setMaxLength(18);
+            }
 
             oModel.setProperty("/country", sCountryName);
 
@@ -1880,7 +1890,6 @@ sap.ui.define([
         },
         onmobileChange: function (oEvent) {
             const oInput = oEvent.getSource();
-            utils._LCvalidateMobileNumber(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
         onChangemail: function (oEvent) {
@@ -1896,6 +1905,7 @@ sap.ui.define([
         onSaveBooking: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
+                const oInput = this.byId("CD_ID_idPhone")
 
             // Mandatory validation
             const isMandatoryValid = (
@@ -1908,9 +1918,17 @@ sap.ui.define([
                 utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("CC_id_Country"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("CC_id_State"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") &&
-                utils._LCvalidateMobileNumber(this.byId("CD_ID_idPhone"), "ID")
+                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") 
             );
+
+            if (Bookingdata.Country === "India") {
+                if (Bookingdata.MobileNo.length < 10) {
+                    oInput.setValueState("Error");
+                    return;
+                } else {
+                    oInput.setValueState("None");
+                }
+            }
 
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
@@ -1943,6 +1961,7 @@ sap.ui.define([
                 "City": Bookingdata.City,
                 "STDCode": Bookingdata.STDCode,
                 "Salutation": CustomerData.Salutation || "Mr.",
+                "PermanentAddress": Bookingdata.Address,
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
                     "RentPrice": CustomerData.GrandTotal,

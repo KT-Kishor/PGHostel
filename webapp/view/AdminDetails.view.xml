@@ -199,7 +199,7 @@
 
                             <!-- Payment -->
                             <Label
-                                text="Payment Method"
+                                text="Room Plan"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
@@ -208,7 +208,7 @@
                             />
 
                             <Label
-                                text="Payment Method"
+                                text="Room Plan"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <ComboBox
@@ -606,6 +606,30 @@
                                     additionalText="{CityModel>branchCode}"
                                 />
                             </ComboBox>
+
+
+                            
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Address"
+                            />
+                            <Text
+                                text="{CustomerData>/Address}"
+                                visible="{= !${VisibleModel>/visible} }"
+                            />
+
+                            <Label
+                                required="{= ${VisibleModel>/visible} ? true : false }"
+                                text="Address"
+                            />
+                            <TextArea
+                                value="{Bookingmodel>/Address}"
+                                maxLength="150"
+                                visible="{VisibleModel>/visible}"
+                                id="Ad_id_Address"
+                                valueStateText="Enter Address"
+                            />
+
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="Mobile Number"

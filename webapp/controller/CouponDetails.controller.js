@@ -31,7 +31,7 @@ sap.ui.define([
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
-         this.getView().getModel("CouponModel").setData("");
+         this.getView().getModel("CouponModel").setData({});
 
         },
 
@@ -255,7 +255,7 @@ sap.ui.define([
                 var oRouter = this.getOwnerComponent().getRouter();
                 oRouter.navTo("TilePage", {}, true);
             }
-         this.getView().getModel("CouponModel").setData("");
+         this.getView().getModel("CouponModel").setData({});
 
         },
         onAddCoupon: function () {

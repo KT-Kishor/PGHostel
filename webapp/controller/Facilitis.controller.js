@@ -540,14 +540,14 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
-            this.getView().getModel("Facilities").setData("");
+            this.getView().getModel("Facilities").setData({});
 
         },
 
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
-            this.getView().getModel("Faciilties").setData("");
+            this.getView().getModel("Faciilties").setData({});
         },
 
         FD_onFacilityRowPress: function(oEvent) {
