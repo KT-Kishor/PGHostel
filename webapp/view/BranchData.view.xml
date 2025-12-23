@@ -41,7 +41,7 @@
                                 width="100%"
                             >
                                 <core:ListItem
-                                    key="{mainModel>Name}"
+                                    key="{mainModel>BranchID}"
                                     text="{mainModel>BranchID} - {mainModel>Name}"
                                     additionalText="{mainModel>City}"
                                 />

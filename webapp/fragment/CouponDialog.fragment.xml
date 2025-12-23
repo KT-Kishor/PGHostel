@@ -19,8 +19,8 @@
 				<f:content>
 				<Label required="true" text="Branch"/>
 
-<ComboBox id="cbBranchCode" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true" selectionChange="onBranchSelect">
-	<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />
+<ComboBox id="cbBranchCode" width="100%" placeholder="Select Branch" items="{Branchmodel>/}" showSecondaryValues="true" selectionChange="onBranchSelect">
+	<core:ListItem key="{Branchmodel>Name}" text="{Branchmodel>BranchID} - {Branchmodel>Name}" additionalText="{Branchmodel>City}" />
 </ComboBox>
 					<Label required="true" text="Discount Type"/>
 					<ComboBox id="cbDiscountType" placeholder="Select Discount Type" selectedKey="{CouponView>/CurrentCoupon/DiscountType}" change="onChange_DiscountType" valueStateText="Select Discount Type">

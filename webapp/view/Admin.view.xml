@@ -234,7 +234,7 @@
                             <Text text="{HostelModel>Gender}" />
                             <VBox>
                                 <Text
-                                    text="{HostelModel>MobileNo}"
+                                   text="{= ${HostelModel>STDCode} + ' ' + ${HostelModel>MobileNo} }"
                                     class="sapUiTinyMarginBottom"
                                 />
                                 <Text text="{HostelModel>CustomerEmail}" />

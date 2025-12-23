@@ -60,8 +60,10 @@ sap.ui.define([
             }
         },
 
-        Onsearch: async function () {
+       Onsearch: async function () {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+           var Branch= this.getView().byId("MD_id_BranchCode").getSelectedKey()
 
             var filter = {
                 UserID: oLoginmodel.EmployeeID
@@ -72,7 +74,7 @@ sap.ui.define([
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 return oFCIAerData
             })
-            const oExistingModel = LoginData;
+            const oExistingModel = LoginData[0];
             const oView = this.getView();
 
             let filters = {};
@@ -80,8 +82,11 @@ sap.ui.define([
             // if (oExistingModel.Role !== "") {
             //     filters.City = oExistingModel.City;
             // }
-            if (oExistingModel.BranchCode) {
-                filters.BranchID = oExistingModel.BranchCode;
+            if (oLoginmodel.Role==="Admin") {
+                filters.BranchID = Branch === "" ? oExistingModel.BranchCode : Branch;
+;
+            }else{
+                filters.BranchID =  Branch
             }
             let sCustomerName = oView.byId("MD_id_BranchCode").getValue()?.trim();
             let sPincode = oView.byId("MD_id_SearchField").getValue()?.trim();
@@ -445,11 +450,15 @@ sap.ui.define([
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            this.getView().getModel("mainModel").setData("");
+
         },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+             this.getView().getModel("mainModel").setData("");
+
         },
 
         MD_onCancelButtonPress: function () {
