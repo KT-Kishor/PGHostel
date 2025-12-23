@@ -21,23 +21,23 @@
             labelSpanM="4"
             labelSpanS="12">
             <f:content>
-                <Label text="Full Name" />
+                <Label text="{i18n>fullname}" />
                 <Text text="{HostelModel>Salutation} {HostelModel>FullName}" />
-                <Label text="Date of Birth" />
+                <Label text="{i18n>MSdob}" />
                 <Text text="{path:'HostelModel>DateOfBirth'}" />
-                <Label text="Gender" />
+                <Label text="{i18n>MSgender}" />
                 <Text text="{HostelModel>Gender}" />
-                <Label text="Mobile Number" />
+                <Label text="{i18n>MVmobileNo}" />
                 <Text text="{HostelModel>STDCode} {HostelModel>MobileNo}" />
-                <Label text="Email" />
+                <Label text="{i18n>MScontactDetails}" />
                 <Text text="{HostelModel>CustomerEmail}" />
-                <Label text="Country" />
+                <Label text="MVDcountry" />
                 <Text text="{HostelModel>Country}" />
-                <Label text="State" />
+                <Label text="{i18n>MVDstate}" />
                 <Text text="{HostelModel>State}" />
-                <Label text="City" />
+                <Label text="{i18n>MVDcity}" />
                 <Text text="{HostelModel>City}" />
-                <Label text="Address" />
+                <Label text="{i18n>MVDaddress}" />
                 <Text text="{HostelModel>Address}" />
             </f:content>
         </f:SimpleForm>
@@ -50,7 +50,7 @@
     class="sapUiSmallMargin">
 
     <Toolbar>
-        <Title text="Uploaded Documents" level="H4" />
+        <Title text="{i18n>uploadeddocument}" level="H4" />
     </Toolbar>
 
     <!-- Wrap cards like facility layout -->
@@ -86,7 +86,7 @@
 <VBox visible="{= ${HostelModel>AllSelectedFacilities}.length > 0 }">
         <!-- Selected Facilities for THIS person -->
         <Toolbar >
-            <Title text="Selected Facilities" level="H4" />
+            <Title text="{i18n>selectedfacilities}" level="H4" />
         </Toolbar>
         <FlexBox
        
@@ -119,19 +119,19 @@
             selectionChange="onTableSelection">
             <headerToolbar>
                 <Toolbar>
-                    <Title text="Booking Details" level="H5" />
+                    <Title text="{i18n>bookingDetailsTitle}" level="H5" />
                     <ToolbarSpacer />
-                    <Button  text="Edit" press="onEditFacilityDetails" class="myUnifiedBtn" />
+                    <Button  text="{i18n>MSedit}" press="onEditFacilityDetails" class="myUnifiedBtn" />
                 </Toolbar>
             </headerToolbar>
 
             <columns>
-                <Column demandPopin="true" ><Text text="Facility Name" /></Column>
-                <Column demandPopin="true"><Text text="Facility Price" /></Column>
-                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="Start Date" /></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="End Date" /></Column>
-                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="Days" /></Column>
-                <Column demandPopin="true" ><Text class="sapUiSmallBold" text="Total" /></Column>
+                <Column demandPopin="true" ><Text text="{i18n>facilityname}" /></Column>
+                <Column demandPopin="true"><Text text="{i18n>faciltyprice}" /></Column>
+                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="{i18n>startDate}" /></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>endDate}" /></Column>
+                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="{i18n>days}" /></Column>
+                <Column demandPopin="true" ><Text class="sapUiSmallBold" text="{i18n>total}" /></Column>
             </columns>
 
             <items>
@@ -162,7 +162,7 @@
         <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
        
             <HBox justifyContent="End" class="sapUiSmallMarginTop">
-                <Label text="Total Facility Cost:" class="totalColumnBold1 sapUiSmallMarginEnd"/>
+                <Label text="{i18n>totalfacilitycost}" class="totalColumnBold1 sapUiSmallMarginEnd"/>
                 <Text text="{
                    parts: [
         'HostelModel>TotalFacilityPrice',

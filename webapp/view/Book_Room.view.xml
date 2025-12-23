@@ -84,7 +84,9 @@
                                 width="100%"
                                 alignItems="Center"
                                 justifyContent="SpaceBetween"
-                                visible="{= !${LoginModel>/UserID} }"
+                               visible="{= !${LoginModel>/UserID} &amp;&amp; !${LoginModel>/EmployeeID} }"
+
+
                             >
                                 <MessageStrip
                                     text="Login to prefill personal details and get access to secret deals"

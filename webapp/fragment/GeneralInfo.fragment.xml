@@ -20,11 +20,11 @@
                 
            
               <!-- <Input id="idUserID" value="{HostelModel>/UserID}" visible="true" /> -->
-               <Label text="Room Type" />
+               <Label text="{i18n>roomtype}" />
                             <Text id="GI_Roomtype"  text="{=${HostelModel>/BedType} + ' - ' + ${HostelModel>/ACType}}"  width="100%" /> 
-             <Label text="Rent Price" />
+             <Label text="{i18n>rentprice}" />
                             <Text  text="{HostelModel>/FinalPrice} {HostelModel>/Currency}" width="100%" />     
-                <Label text="Booking Duration" required="true" />
+                <Label text="{i18n>bookingduration}" required="true" />
 <ComboBox
     id="idPaymentMethod1"
     items="{HostelModel>/AvailablePaymentMethods}"
@@ -37,7 +37,7 @@
 
                                
               
-            <Label text="No of Persons" required="true" />
+            <Label text="{i18n>noofperson}" required="true" />
 <Select
     id="id_Noofperson1"
     width="100%"
@@ -50,7 +50,7 @@
     <core:Item key="{HostelModel>key}" text="{HostelModel>text}" />
 </Select>
                 <!-- Site Contact -->
-                <Label text="Start Date" required="true" />
+                <Label text="{i18n>CDStartDate}" required="true" />
                             <DatePicker
                                 id="idStartDate1"
                                 value="{HostelModel>/StartDate}"
@@ -60,7 +60,7 @@
                                 width="100%"
                                 minDate="{path: 'HostelModel>/TodayDate'}"
                             />
-                          <Label text="How many Month/Year" />
+                          <Label text="{i18n>howmanymonthyears}" />
 <Select
     id="idMonthsSelect"
     width="100%"
@@ -82,7 +82,7 @@
     <core:Item key="11" text="11" />
 </Select>
 
-<Label text="End Date" required="true" />
+<Label text="{i18n>endDate}" required="true" />
 <DatePicker
     id="idEndDate1"
     value="{HostelModel>/EndDate}"

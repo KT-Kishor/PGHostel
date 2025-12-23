@@ -479,7 +479,7 @@ sap.ui.define([
                         ...(i === 0 ?
                             [
                                 new sap.m.Label({
-                                    text: "Fill Yourself"
+                                    text: "{i18n>fillyearself}"
                                 }),
                                 new sap.m.CheckBox({
                                     width: "100%",
@@ -491,12 +491,10 @@ sap.ui.define([
                                         const bSelected = oEvent.getParameter("selected");
 
                                         const oLoginModel = that.getView().getModel("LoginModel");
-                                 const oUser = oLoginModel ? oLoginModel.getProperty("/") : null;
-
-
+                                        const oUser = oLoginModel ? oLoginModel.getData() : null;
                                         if (bSelected) {
                                             // No login yet → open dialog
-                                            if (!oUser || !oUser.UserID) {
+                                            if (!oUser ||!oUser.EmployeeID) {
                                                 if (!that._oLoginAlertDialog) {
                                                     that._oLoginAlertDialog = sap.ui.xmlfragment(
                                                         that.createId("LoginAlertDialog"),
@@ -559,10 +557,10 @@ sap.ui.define([
                                             oLoginModel.setProperty("/State", oUser.State);
                                             oLoginModel.setProperty("/City", oUser.City);
                                             oLoginModel.setProperty("/Address", oUser.Address);
-                                            oLoginModel.setProperty("/UserName", oUser.UserName);
+                                            oLoginModel.setProperty("/UserName", oUser.EmployeeName);
                                             oLoginModel.setProperty("/EmailID", oUser.EmailID);
                                             oLoginModel.setProperty("/MobileNo", oUser.MobileNo);
-                                            oLoginModel.setProperty("/DateofBirth", oUser.DateOfBirth);
+                                            oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth);
                                             const DOB = that.Formatter.DateFormat(oUser.DateofBirth)
                                             // Already logged in → auto-fill
                                             aPersons.forEach(p => {
@@ -603,7 +601,7 @@ sap.ui.define([
                             ] :
                             []),
                         new sap.m.Label({
-                            text: "Full Name",
+                            text: "{i18n>fullname}",
                             required: true,
                             maxLength: 40
                         }),
@@ -635,6 +633,7 @@ sap.ui.define([
                             ]
                         }),
                         new sap.m.Input({
+                            placeholder: "Enter Full Name",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/FullName}",
                             maxLength: 40
@@ -651,7 +650,7 @@ sap.ui.define([
                         }),
 
                         new sap.m.Label({
-                            text: "Date of Birth",
+                            text: "{i18n>MSdob}",
                             required: true
                         }),
                         new sap.m.DatePicker({
@@ -676,10 +675,12 @@ sap.ui.define([
                             }
                         }),
                         new sap.m.Label({
-                            text: "Gender",
-                            required: true
+                            text: "{i18n>MVgender}",
+                            required: true,
+                          
                         }),
                         new sap.m.Select({
+                          
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Gender}",
                             items: [
@@ -705,9 +706,11 @@ sap.ui.define([
                         new sap.m.Label({
                             text: "Email",
                             required: true,
-                            type: "Email"
+                            type: "Email",
+                            
                         }),
                         new sap.m.Input({
+                            placeholder: "Enter Email",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/CustomerEmail}"
                         }),
@@ -718,6 +721,7 @@ sap.ui.define([
                         }),
 
                         new sap.m.ComboBox({
+                            placeholder: "Select Country",
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Country}",
                             items: {
@@ -783,6 +787,7 @@ sap.ui.define([
                             required: true,
                         }),
                         new sap.m.ComboBox({
+                            placeholder: "Select State",
                             width: "100%",
                             id: that.createId("ID_State_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/State}",
@@ -826,6 +831,7 @@ sap.ui.define([
                         }),
 
                         new sap.m.ComboBox({
+                            placeholder: "Select City",
                             width: "100%",
                             id: that.createId("ID_City_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/City}",
@@ -851,11 +857,12 @@ sap.ui.define([
                         }),
 
                         new sap.m.Input({
-
+                            
                             value: "{HostelModel>/Persons/" + i + "/STDCode}",
                         }),
 
                         new sap.m.Input({
+                            placeholder: "Enter Mobile No",
                             width: "100%",
                             id: that.createId("ID_Mobile_" + i),
                             value: "{HostelModel>/Persons/" + i + "/MobileNo}",
@@ -908,6 +915,7 @@ sap.ui.define([
                             required: true
                         }),
                         new sap.m.TextArea({
+                            placeholder: "Enter Address",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/Address}",
                             placeholder: "Enter Permanent Address",
@@ -934,6 +942,7 @@ sap.ui.define([
                             text: "Document Type"
                         }),
                         new sap.m.ComboBox({
+                            placeholder: "Select Document Type",
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/DocumentType}",
                             items: [
@@ -959,6 +968,7 @@ sap.ui.define([
                             text: "Upload ID Proof"
                         }),
                         new sap.ui.unified.FileUploader({
+                            placeholder: "Choose File",
                             width: "100%",
                             fileType: ["jpg", "jpeg", "png"],
                             mimeType: ["image/jpeg", "image/png"],
@@ -1037,7 +1047,7 @@ sap.ui.define([
     text: "Clear",
     type: "Transparent",
     tooltip: "Clear Document",
-    class:"",
+    class:"Bookingclear",
     press: function (oEvent) {
 
         const oButton = oEvent.getSource();
@@ -1315,7 +1325,6 @@ new sap.m.Text({
                     }
                 });
 //                 const oBinding = oFacilityFlex.getBinding("items");
-
 // if (oBinding) {
 //     oBinding.attachEventOnce("dataReceived", function () {
 //         sap.ui.core.BusyIndicator.hide();   // ✅ HIDE HERE
