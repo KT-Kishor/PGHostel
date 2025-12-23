@@ -319,6 +319,20 @@ sap.ui.define([
 
             return result;
         },
+    formatFacilityPrice: function (price, currency, unitText, totalTime) {
+    if (!price || !currency || !unitText) {
+        return "";
+    }
+
+    // Default hour = 1 if not provided
+    if (unitText === "Per Hour") {
+        const hours = totalTime && Number(totalTime) > 0 ? totalTime : 1;
+        return `${price} ${currency} (${hours} Hour)`;
+    }
+
+    // Other units
+    return `${price} ${currency} ${unitText}`;
+}
 
 
 

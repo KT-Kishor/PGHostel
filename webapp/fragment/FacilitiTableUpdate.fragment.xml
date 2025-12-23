@@ -32,7 +32,6 @@
                 valueStateText="Select Currency" width="100%" change=".onCurrecnyChange" placeholder="Select Currency">
 					<core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}"/>
 				</ComboBox>
-
 				<Label text="Start Date" />
 				<DatePicker id="FT_id_editStartDate" value="{edit>/StartDate}" maxDate="{edit>/NewEndDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy"  change="onEditDateChange" valueStateText="Select Start Date"/>
 				<Label text="How many Month/Year" visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }" />

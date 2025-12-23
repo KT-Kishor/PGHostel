@@ -542,18 +542,23 @@ _filterRateTypesForEdit: function () {
             // --- FIX FOR PER HOUR FACILITY (ensures TotalTime goes to payload) ---
             if (oUpdatedData.UnitText === "Per Hour") {
 
-                // Update global list
-                aFacilities[iIndex].TotalTime = oUpdatedData.TotalTime || "";
+        const hours = Number(oUpdatedData.TotalTime) || 1;
+        const price = Number(oUpdatedData.Price) || 0;
 
-                // Update person-wise list
-                if (aPersons[oUpdatedData.ID] &&
-                    aPersons[oUpdatedData.ID].AllSelectedFacilities &&
-                    aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]) {
+        aFacilities[iIndex].TotalTime = hours;
+        aFacilities[iIndex].TotalDays = hours;
+        aFacilities[iIndex].TotalAmount = price * hours;
 
-                    aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex].TotalTime =
-                        oUpdatedData.TotalTime || "";
-                }
-            }
+        if (aPersons[oUpdatedData.ID] &&
+            aPersons[oUpdatedData.ID].AllSelectedFacilities &&
+            aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]) {
+
+            const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
+            oFac.TotalTime = hours;
+            oFac.TotalDays = hours;
+            oFac.TotalAmount = price * hours;
+        }
+    }
             // 3. Apply model refresh
             oHostelModel.refresh(true);
 

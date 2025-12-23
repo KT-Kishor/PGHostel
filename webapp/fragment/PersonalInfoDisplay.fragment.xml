@@ -137,8 +137,18 @@
                 <ColumnListItem>
                     <cells>
                         <Text text="{HostelModel>FacilityName}" />
-                      <Text 
-    text="{= ${HostelModel>Price} + ' ' + ${HostelModel>Currency} + ' ' + ${HostelModel>UnitText} }"/>
+                     <Text
+    text="{
+        parts: [
+            'HostelModel>Price',
+            'HostelModel>Currency',
+            'HostelModel>UnitText',
+            'HostelModel>TotalTime'
+        ],
+        formatter: '.Formatter.formatFacilityPrice'
+    }"
+/>
+
                         <Text text="{HostelModel>StartDate}" />
                         <Text text="{HostelModel>EndDate}" />
                         <Text text="{HostelModel>TotalDays}" />

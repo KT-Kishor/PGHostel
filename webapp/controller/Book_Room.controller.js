@@ -1893,139 +1893,150 @@ new sap.m.Text({
         //   oWizard.previousStep();
         // },
 
-        onFieldValidation: function (oEvent) {
-            const oView = this.getView();
-            const oHostelModel = oView.getModel("HostelModel");
-            const oBtnModel = oView.getModel("OBTNModel");
+       onFieldValidation: function (oEvent) {
+    const oView = this.getView();
+    const oHostelModel = oView.getModel("HostelModel");
+    const oBtnModel = oView.getModel("OBTNModel");
 
-            const oData = oHostelModel.getData();
-            const oStartDatePicker = oView.byId("idStartDate1");
-            const oEndDatePicker = oView.byId("idEndDate1");
+    const oData = oHostelModel.getData();
+    const oStartDatePicker = oView.byId("idStartDate1");
+    const oEndDatePicker = oView.byId("idEndDate1");
 
-            const sStartDate = oStartDatePicker?.getValue() || "";
-            const sEndDate = oEndDatePicker?.getValue() || "";
-            const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
-            const sPerson = oData.Person || oView.byId("id_Noofperson1")?.getSelectedKey() || "";
+    const sStartDate = oStartDatePicker?.getValue() || "";
+    const sEndDate = oEndDatePicker?.getValue() || "";
+    const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
+    const sPerson = oData.Person || oView.byId("id_Noofperson1")?.getSelectedKey() || "";
 
-            const iSelectedMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || 1, 10);
+    const iSelectedMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || 1, 10);
 
-            let bAllFilled = sPaymentType && sPerson && sStartDate && sEndDate;
+    let bAllFilled = sPaymentType && sPerson && sStartDate && sEndDate;
 
-            // =========================================================
-            // Set MIN End Date = StartDate + 1 day
-            // =========================================================
-           // =========================================================
-// Set MIN End Date based on Start Date
-// =========================================================
-if (sStartDate) {
-    const oStart = this._parseDate(sStartDate);
+    // =========================================================
+    // RESET Per Day info popup when Start/End Date changes
+    // =========================================================
+    if (
+        oEvent.getSource().getId().includes("idStartDate1") ||
+        oEvent.getSource().getId().includes("idEndDate1")
+    ) {
+        this._perDayInfoShown = false;
+    }
 
-    if (oStart instanceof Date && !isNaN(oStart)) {
+    // =========================================================
+    // Set MIN End Date based on Start Date
+    // =========================================================
+    if (sStartDate) {
+        const oStart = this._parseDate(sStartDate);
 
-        // For Per Day → same day allowed
-        if (sPaymentType === "Per Day") {
-            oEndDatePicker.setMinDate(oStart);
-        }
-        // For Per Month / Year → next day minimum
-        else {
-            const oMinEnd = new Date(oStart);
-            oMinEnd.setDate(oMinEnd.getDate() + 1);
-            oEndDatePicker.setMinDate(oMinEnd);
+        if (oStart instanceof Date && !isNaN(oStart)) {
+
+            // For Per Day → same day allowed
+            if (sPaymentType === "Per Day") {
+                oEndDatePicker.setMinDate(oStart);
+            }
+            // For Per Month / Year → next day minimum
+            else {
+                const oMinEnd = new Date(oStart);
+                oMinEnd.setDate(oMinEnd.getDate() + 1);
+                oEndDatePicker.setMinDate(oMinEnd);
+            }
         }
     }
+
+    // =========================================================
+    // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
+    // =========================================================
+    if (
+        oEvent.getSource().getId().includes("idStartDate1") &&
+        sStartDate &&
+        sPaymentType === "Per Month"
+    ) {
+
+        const oStart = this._parseDate(sStartDate);
+
+        if (oStart instanceof Date && !isNaN(oStart)) {
+            let oNewEnd = new Date(oStart);
+            oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
+            oNewEnd.setDate(oNewEnd.getDate() - 1);
+
+            const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
+
+            oHostelModel.setProperty("/EndDate", sNewEndDate);
+            oEndDatePicker.setValue(sNewEndDate);
+
+            oBtnModel.setProperty("/Next", true);
+            return;
+        }
+    }
+
+    if (
+        oEvent.getSource().getId().includes("idStartDate1") &&
+        sStartDate &&
+        sPaymentType === "Per Year"
+    ) {
+
+        const oStart = this._parseDate(sStartDate);
+
+        if (oStart instanceof Date && !isNaN(oStart)) {
+            let oNewEnd = new Date(oStart);
+            oNewEnd.setFullYear(oNewEnd.getFullYear() + iSelectedMonths);
+            oNewEnd.setDate(oNewEnd.getDate() - 1);
+
+            const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
+
+            oHostelModel.setProperty("/EndDate", sNewEndDate);
+            oEndDatePicker.setValue(sNewEndDate);
+
+            oBtnModel.setProperty("/Next", true);
+            return;
+        }
+    }
+
+    // =========================================================
+    // PER DAY inclusive calculation
+    // =========================================================
+    if (sPaymentType === "Per Day" && sStartDate && sEndDate) {
+        const oStart = this._parseDate(sStartDate);
+        const oEnd = this._parseDate(sEndDate);
+
+        // inclusive day count
+        let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+
+        if (diffDays <= 0) {
+            oEndDatePicker.setValueState("Error");
+            oEndDatePicker.setValueStateText("End date cannot be before Start Date");
+            sap.m.MessageToast.show("End Date Cannot be before Start Date");
+            oHostelModel.setProperty("/EndDate", "");
+            oBtnModel.setProperty("/Next", false);
+            return;
+        }
+
+        oHostelModel.setProperty("/TotalDays", diffDays);
+        oEndDatePicker.setValueState("None");
+
+        if (!this._perDayInfoShown) {
+
+            const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
+            const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
+
+            const sMessage =
+                "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
+                "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
+
+            sap.m.MessageBox.information(sMessage, {
+                title: "Check-in / Check-out Information"
+            });
+
+            this._perDayInfoShown = true;
+        }
+    }
+
+    // =========================================================
+    // CONTROL “Next” BUTTON
+    // =========================================================
+    const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
+    oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
 }
-
-
-            // =========================================================
-            // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
-            // =========================================================
-            if (oEvent.getSource().getId().includes("idStartDate1") &&
-                sStartDate &&
-                sPaymentType === "Per Month") {
-
-                const oStart = this._parseDate(sStartDate);
-
-                if (oStart instanceof Date && !isNaN(oStart)) {
-                    let oNewEnd = new Date(oStart);
-                    oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
-                    oNewEnd.setDate(oNewEnd.getDate() - 1);
-
-                    const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
-
-                    oHostelModel.setProperty("/EndDate", sNewEndDate);
-                    oEndDatePicker.setValue(sNewEndDate);
-
-                    oBtnModel.setProperty("/Next", true);
-                    return;
-                }
-            }
-            if (oEvent.getSource().getId().includes("idStartDate1") &&
-                sStartDate &&
-                sPaymentType === "Per Year") {
-
-                const oStart = this._parseDate(sStartDate);
-
-                if (oStart instanceof Date && !isNaN(oStart)) {
-                    let oNewEnd = new Date(oStart);
-                    oNewEnd.setFullYear(oNewEnd.getFullYear() + iSelectedMonths);
-                    oNewEnd.setDate(oNewEnd.getDate() - 1);
-
-                    const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
-
-                    oHostelModel.setProperty("/EndDate", sNewEndDate);
-                    oEndDatePicker.setValue(sNewEndDate);
-
-                    oBtnModel.setProperty("/Next", true);
-                    return;
-                }
-            }
-
-            // =========================================================
-            // PER DAY inclusive calculation (NEW FIX)
-            // =========================================================
-            if (sPaymentType === "Per Day" && sStartDate && sEndDate) {
-                const oStart = this._parseDate(sStartDate);
-                const oEnd = this._parseDate(sEndDate);
-
-                // inclusive day count: (end - start) + 1
-                let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
-
-                if (diffDays <= 0) {
-                    oEndDatePicker.setValueState("Error");
-                    oEndDatePicker.setValueStateText("End date cannot be before Start Date");
-                    sap.m.MessageToast.show("End Date Cannot be before Start Date");
-                    oHostelModel.setProperty("/EndDate", "");
-                    oBtnModel.setProperty("/Next", false);
-                    return;
-                }
-
-                oHostelModel.setProperty("/TotalDays", diffDays); // Store days
-
-                oEndDatePicker.setValueState("None");
-                 if (!this._perDayInfoShown) {
-
-        const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
-        const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
-
-        const sMessage =
-            "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
-            "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
-
-        sap.m.MessageBox.information(sMessage, {
-            title: "Check-in / Check-out Information"
-        });
-
-        this._perDayInfoShown = true;
-    
-    }
-            }
-
-            // =========================================================
-            // CONTROL “Next” BUTTON
-            // =========================================================
-            const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
-            oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
-        },
+,
 
 
         SM_onGeneratePassword: function () {
