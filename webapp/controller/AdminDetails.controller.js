@@ -1411,7 +1411,8 @@ sap.ui.define([
             var originalRent = Number(oCustomerData.RentPrice || 0);
             var FacilitiPrice = Number(oCustomerData.TotalFacilityPrice || 0);
 
-            var previousDiscount = Number(this.originalDis || 0) || oCustomerData.Discount;
+    var previousDiscount = Number(this.originalDis ?? oCustomerData.Discount);
+;
             // Recalculate subtotal (original subtotal before coupon)
             var subtotal = originalRent + FacilitiPrice - previousDiscount; // Assuming SubTotal originally was just RentPrice
             oCustomerData.SubTotal = subtotal;
@@ -2432,7 +2433,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
                 return;
             }
-            this.Discount = oCustomerData.Discount
+               this.originalDis = oCustomerData.Discount
             this.CouponDiscount = oCoupon.DiscountValue
 
             var discountAmount = 0;
