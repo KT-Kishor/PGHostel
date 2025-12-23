@@ -559,8 +559,11 @@ sap.ui.define([
                 return;
             }
 
+            var sRoomNos = aSelectedItems.map(item => {
+                return item.getBindingContext("mainModel").getObject().BranchID;
+            }).join(", ");
             sap.m.MessageBox.confirm(
-                `Are you sure you want to Delete ${aSelectedItems.length} Selected Record(s)?`, {
+                `Are you sure you want to Delete the Selected Room(s): ${sRoomNos}?`, {
                 icon: sap.m.MessageBox.Icon.WARNING,
                 title: "Confirm Deletion",
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
