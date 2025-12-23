@@ -41,15 +41,15 @@
                             <ComboBox
                                 id="fBranch"
                                 width="100%"
-                                items="{sBRModel>/}"
+                                items="{Branchmodel>/}"
                                 placeholder="Select Branch"
                                 selectedKey=""
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
-                                    key="{sBRModel>BranchID}"
-                                    text="{sBRModel>BranchID} - {sBRModel>Name}"
-                                    additionalText="{sBRModel>City}"
+                                    key="{Branchmodel>BranchID}"
+                                    text="{Branchmodel>BranchID} - {Branchmodel>Name}"
+                                    additionalText="{Branchmodel>City}"
                                 />
                             </ComboBox>
                         </fb:control>

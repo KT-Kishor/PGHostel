@@ -36,14 +36,19 @@ sap.ui.define([
         _onRouteMatched: async function () {
             const ok = await this.commonLoginFunction();
             if (!ok) return;
-            const oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+            // const oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
 
-            this._allowedBranches = oLoginData.BranchCode
-                ? oLoginData.BranchCode.split(",").map(b => b.trim())
-                : [];
+            // this._allowedBranches = oLoginData.BranchCode
+            //     ? oLoginData.BranchCode.split(",").map(b => b.trim())
+            //     : [];
 
             await this._loadBranchCode();
 
+            const sBRModel = this.getView().getModel("Branchmodel").getData();
+
+            this._allowedBranches = sBRModel
+                .map(item => item.BranchID)
+                .join(",");
             // fire-and-forget background load
             this._loadRecipientContacts();
 
@@ -100,7 +105,8 @@ sap.ui.define([
                             if (sSelectedKey) {
                                 // 🔒 Narrow only, never expand
                                 params.BranchCode = this._allowedBranches
-                                    .filter(b => b === sSelectedKey);
+                                    .split(",")
+                                    .find(b => b === sSelectedKey) || "";
                             }
                             break;
                         }
@@ -171,6 +177,8 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
+                sap.ui.core.BusyIndicator.show(0);
+
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -188,7 +196,7 @@ sap.ui.define([
 
             let filters = {};
 
-            if (oExistingModel.Role==="Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
             try {
@@ -196,7 +204,7 @@ sap.ui.define([
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
-                oView.setModel(oBranchModel, "sBRModel");
+                oView.setModel(oBranchModel, "Branchmodel");
             } catch (err) {
                 console.error("Error while loading branch data:", err);
             }
