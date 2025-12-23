@@ -1554,7 +1554,7 @@ sap.ui.define([
                     const detailsStartY = 35;
                     const rowHeight = 6.5;
                     const columnWidths = [30, 30];
-                    const rightAlignX = pageWidth - 18 - columnWidths[0] - columnWidths[1];
+                    const rightAlignX = pageWidth - 22 - columnWidths[0] - columnWidths[1];
 
                     doc.setFontSize(12).setFont("times", "bold");
 

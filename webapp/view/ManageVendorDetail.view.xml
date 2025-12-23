@@ -350,7 +350,7 @@
                                                 />
                                                 <m:Button
                                                     id="AdminDownloadButton"
-                                                    text="{i18n>MVDdownload}"
+                                                    text="{i18n>CDDownloadCoupons}"
                                                     class="myUnifiedBtn"
 													tooltip="Download Selected File"
                                                     press="onAdminDownloadFiles"

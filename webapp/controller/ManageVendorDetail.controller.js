@@ -137,7 +137,7 @@ sap.ui.define([
                     Country: oData[0].Country,
                     State: oData[0].State,
                     City: oData[0].City,
-                    Status:oData[0].Status,
+                    Status: oData[0].Status,
                     DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
                     Documents: (oData[0].Documents || []).map(doc => ({
                         FileName: doc.FileName,
@@ -174,7 +174,6 @@ sap.ui.define([
             const oModel = this.getView().getModel("AdminSignupModel");
             const sDocType = oModel.getProperty("/CurrentDocType");
 
-            /* ================= Mandatory Validation ================= */
             if (!sDocType) {
                 MessageToast.show(this.i18nModel.getText("selectDocType"));
                 this.byId("MV_id_adminFileUploader").clear();
@@ -185,11 +184,8 @@ sap.ui.define([
                 return;
             }
 
-            /* ================= Duplicate Check ================= */
             const aDocs = oModel.getProperty("/Documents") || [];
-            const bDuplicate = aDocs.some(function(oDoc) {
-                return oDoc.DocumentType === sDocType;
-            });
+            const bDuplicate = aDocs.some(oDoc => oDoc.DocumentType === sDocType);
 
             if (bDuplicate) {
                 MessageToast.show(this.i18nModel.getText("reuploadDocType"));
@@ -197,48 +193,32 @@ sap.ui.define([
                 return;
             }
 
-            /* ================= Read File ================= */
             const reader = new FileReader();
             const that = this;
-
-            reader.onload = function(e) {
-                const sBase64 = e.target.result.split(",")[1];
-
-                /* ================= Payload (Backend Compatible) ================= */
-                const oPayload = {
-                    data: {
-                        CustomerID: oModel.getProperty("/UserID"),
-                        DocumentType: sDocType,
-                        File: sBase64,
-                        FileName: oFile.name,
-                        FileType: oFile.type
-                    }
-                };
-
-                sap.ui.core.BusyIndicator.show(0);
-
-                that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload)
-                    .then(function(oResponse) {
-
-                        /* ===== Optional local model update ===== */
-                        aDocs.push({
-                            DocumentID: oResponse.DocumentID,
+            reader.onload = async function(e) {
+                try {
+                    const sBase64 = e.target.result.split(",")[1];
+                    const oPayload = {
+                        data: {
+                            CustomerID: oModel.getProperty("/UserID"),
                             DocumentType: sDocType,
+                            File: sBase64,
                             FileName: oFile.name,
                             FileType: oFile.type
-                        });
+                        }
+                    };
 
-                        oModel.setProperty("/Documents", aDocs);
-                        oModel.setProperty("/CurrentDocType", "");
-                        MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
-                        that._loadVendorDetails(oModel.getProperty("/UserID"));
-                        sap.ui.core.BusyIndicator.hide();
-                        that.byId("MV_id_adminFileUploader").clear();
-                    })
-                    .catch(function() {
-                        MessageToast.show(this.i18nModel.getText("docUploadError"));
-                        sap.ui.core.BusyIndicator.hide();
-                    });
+                    sap.ui.core.BusyIndicator.show(0);
+                    await that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
+                    MessageToast.show(that.i18nModel.getText("docUploadSuccess"));
+                    await that._loadVendorDetails(oModel.getProperty("/UserID"));
+                    oModel.setProperty("/CurrentDocType", "");
+                    that.byId("MV_id_adminFileUploader").clear();
+                } catch (err) {
+                    MessageToast.show(that.i18nModel.getText("docUploadError"));
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                }
             };
 
             reader.readAsDataURL(oFile);
@@ -253,7 +233,7 @@ sap.ui.define([
             oRouter.navTo("RouteManageVendor");
         },
 
-       onEditOrSavePress: async function () {
+        onEditOrSavePress: async function() {
             const oEditableModel = this.getView().getModel("editable");
             const bEditMode = oEditableModel.getProperty("/Edit");
 
@@ -271,7 +251,7 @@ sap.ui.define([
             }
         },
 
-       BT_onsavebuttonpress: async function () {
+        BT_onsavebuttonpress: async function() {
             try {
                 const C = this.byId.bind(this);
                 const oModel = this.getView().getModel("AdminSignupModel");
@@ -293,7 +273,7 @@ sap.ui.define([
 
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                    return false;   // ✅ IMPORTANT
+                    return false; 
                 }
 
                 const payload = {
@@ -320,7 +300,8 @@ sap.ui.define([
 
                 MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
                 await this._loadVendorDetails(oData.UserID);
-                return true; 
+                sap.ui.core.BusyIndicator.hide();
+                return true;
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
                 return false;
@@ -456,8 +437,8 @@ sap.ui.define([
             }
 
             const sBase64 = autoDecodeBase64(oDoc.File);
-
             let sMimeType = "application/octet-stream";
+
             if (sBase64.startsWith("iVB")) {
                 sMimeType = "image/png";
             } else if (sBase64.startsWith("/9j")) {
@@ -466,56 +447,16 @@ sap.ui.define([
                 sMimeType = "application/pdf";
             }
 
-            const byteChars = atob(sBase64);
-            const byteArray = new Uint8Array(byteChars.length);
-            for (let i = 0; i < byteChars.length; i++) {
-                byteArray[i] = byteChars.charCodeAt(i);
-            }
-
-            const blob = new Blob([byteArray], {
-                type: sMimeType
-            });
-
-            if (this._previewUrl) {
-                URL.revokeObjectURL(this._previewUrl);
-            }
-            this._previewUrl = URL.createObjectURL(blob);
-
-            /* ================= Dialog Creation ================= */
             if (!this._oAdminPreviewDialog) {
-
-                this._oPreviewImage = new sap.m.Image({
-                    width: "100%",
-                    height: "100%",
-                    densityAware: false,
-                    visible: false
-                });
-
-                this._oPdfHtml = new sap.ui.core.HTML({
-                    visible: false,
-                    sanitizeContent: true
-                });
-
-                const oFlex = new sap.m.FlexBox({
-                    width: "100%",
-                    height: "100%",
-                    fitContainer: true,
-                    direction: "Column",
-                    items: [
-                        this._oPreviewImage,
-                        this._oPdfHtml
-                    ]
-                });
-
                 this._oAdminPreviewDialog = new sap.m.Dialog({
                     title: "Document Preview",
                     stretch: true,
-                    contentWidth: "100%",
-                    contentHeight: "100%",
-                    contentPadding: false,
                     draggable: true,
                     resizable: true,
-                    content: [oFlex],
+                    contentWidth: "50%",
+                    contentHeight: "auto",
+                    horizontalScrolling: false,
+                    contentPadding: "0rem",
                     endButton: new sap.m.Button({
                         text: "Close",
                         press: () => {
@@ -531,26 +472,61 @@ sap.ui.define([
                 this.getView().addDependent(this._oAdminPreviewDialog);
             }
 
-            this._oPreviewImage.setVisible(false);
-            this._oPdfHtml.setVisible(false);
-
-            /* ================= Render Content ================= */
+            this._oAdminPreviewDialog.removeAllContent();
             if (sMimeType.startsWith("image/")) {
 
-                this._oPreviewImage.setSrc(this._previewUrl);
-                this._oPreviewImage.setVisible(true);
+                const sImageUri = `data:${sMimeType};base64,${sBase64}`;
+
+                const oImage = new sap.m.Image({
+                    src: sImageUri,
+                    densityAware: false
+                });
+
+                oImage.addStyleClass("imagePreviewFit");
+
+                this._oAdminPreviewDialog.addContent(oImage);
 
             } else if (sMimeType === "application/pdf") {
 
-                this._oPdfHtml.setContent(`
-            <iframe
-                src="${this._previewUrl}"
-                style="width:100%; height:100vh; border:none;">
-            </iframe>
-        `);
-                this._oPdfHtml.setVisible(true);
-            }
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
 
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, {
+                    type: sMimeType
+                });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._oAdminPreviewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                    <iframe
+                        src="${this._previewUrl}"
+                        style="width:100%; height:600px; border:none; display:block;">
+                    </iframe>
+                `
+                    })
+                );
+            } else {
+                this._oAdminPreviewDialog.addContent(
+                    new sap.m.Text({
+                        text: "Preview not supported."
+                    })
+                );
+            }
             this._oAdminPreviewDialog.open();
         },
 
@@ -731,7 +707,6 @@ sap.ui.define([
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-
         ADMIN_onChangeCountry: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
@@ -825,7 +800,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeState: function (oEvent) {
+        ADMIN_onChangeState: function(oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -836,29 +811,26 @@ sap.ui.define([
             const oCity = this.byId("MV_id_City");
             const oCityModel = this.getView().getModel("CityModel");
 
-            // --- SANITIZE INPUT ---
             const val = (oState.getValue() || "").replace(/[^a-zA-Z\s]/g, "");
             oState.setValue(val);
             oState.setValueState("None");
 
-            // Clear dependent city
-            oModel.setProperty("/City", "");
+            oModel.setProperty("/City", "");   // Clear dependent city
             oCity.setSelectedKey("").setValue("");
             oCityModel.setProperty("/filtered", []);
 
-            // Safe selected item access
-            const selected = (typeof oState.getSelectedItem === "function")
-                ? oState.getSelectedItem()
-                : null;
+            const selected = (typeof oState.getSelectedItem === "function") ?
+                oState.getSelectedItem() :
+                null;
 
             if (selected && val !== selected.getText()) {
                 oState.setSelectedKey(null);
                 oState.setSelectionItem(null);
             }
 
-            const selectedCountry = (typeof oCountry.getSelectedItem === "function")
-                ? oCountry.getSelectedItem()
-                : null;
+            const selectedCountry = (typeof oCountry.getSelectedItem === "function") ?
+                oCountry.getSelectedItem() :
+                null;
 
             if (!selected || !selectedCountry) {
                 oModel.setProperty("/State", val);
@@ -867,7 +839,6 @@ sap.ui.define([
 
             const sStateText = selected.getText();
             oModel.setProperty("/State", sStateText);
-
             const sCountryCode = selectedCountry.getAdditionalText().trim();
 
             const allCities = oCityModel.getData();
@@ -885,12 +856,8 @@ sap.ui.define([
 
             const oCityCtrl = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
-
-            // --- SANITIZE INPUT ---
             const val = oCityCtrl.getValue().replace(/[^a-zA-Z\s]/g, "");
             oCityCtrl.setValue(val);
-
-            // City clears its own error ALWAYS (typed or selected)
             oCityCtrl.setValueState("None");
 
             const selected = oCityCtrl.getSelectedItem();
@@ -898,7 +865,6 @@ sap.ui.define([
                 oModel.setProperty("/City", selected.getText());
                 return;
             }
-
             oModel.setProperty("/City", val);
         },
 
