@@ -162,19 +162,30 @@
                     alignItems="Center"
                 >
                     <VBox width="22%">
-                        <Input
+                         <ComboBox
+                            change="onSTDChange"
                             id="MC_id_codeModel"
-                            value="{MDmodel>/stdCode}"
-                            editable="false"
-                        />
+                            placeholder="Code"
+                            valueStateText="{i18n>MSselectCode}"
+                            showSecondaryValues="true"
+                            items="{path:'CountryModel>/', length:1000}"
+                            selectedKey="{MDmodel>/stdCode}"
+                            filterSecondaryValues="true"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>stdCode}"
+                                text="{CountryModel>stdCode}"
+                                additionalText="{CountryModel>code}"
+                            />
+                        </ComboBox>
                     </VBox>
                     <VBox width="78%">
                         <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
                             placeholder="Enter Contact Number"
-                            maxLength="10"
-                            liveChange="onPhoneInputLiveChange"
+                            maxLength="18"
+                            liveChange="onMobileLivechnage"
                             valueStateText="Enter Contact Number"
                         />
                     </VBox>

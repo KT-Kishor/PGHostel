@@ -224,6 +224,10 @@ sap.ui.define([
             reader.readAsDataURL(oFile);
         },
 
+        onFileSizeExceeds: function() {
+            sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+        },
+
         BI_onEditButtonPress: function() {
             this.getView().getModel("editable").setProperty("/Edit", true);
         },
