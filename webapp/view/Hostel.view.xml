@@ -75,7 +75,15 @@
             </tnt:ToolHeader>
         </tnt:subHeader>
         <tnt:mainContents>
-            <NavContainer id="pageContainer">
+        <VBox height="100%" renderType="Bare"  justifyContent="SpaceBetween"  class="mainScrollWrapper">
+        <items>  
+            <NavContainer id="pageContainer" height="auto">
+<!-- <layoutData>
+	<FlexItemData growFactor="1" baseSize="0" />
+</layoutData> -->
+<layoutData>
+	<FlexItemData growFactor="1" />
+</layoutData>
                 <pages>
                     <ScrollContainer
                         id="idHome"
@@ -105,6 +113,7 @@
                                 />
                             </VBox>
                         </l:Grid>
+         
                         <Button
                             text="Book Room"
                             tooltip="Book Room"
@@ -338,29 +347,17 @@
                                 press="onViewMoreRooms"
                                 class="btnViewDetails"
                             />
-                           <!-- <BusyIndicator
-    id="idViewMoreBusy"
-    visible="false"
-    size="1rem"
-    class="sapUiTinyMarginTop"
-/> -->
+                            <VBox height="2rem" />
+
                         </VBox>
                     </Page>
                     <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">
                         <core:Fragment fragmentName="sap.ui.com.project1.fragment.HomePage" type="XML" />
                     </ScrollContainer> -->
-                    <ScrollContainer
-                        id="idContact"
-                        horizontal="false"
-                        vertical="true"
-                        height="100%"
-                        class="Products_list sapUiTinyMargin"
-                    >
-                        <core:Fragment
-                            fragmentName="sap.ui.com.project1.fragment.ContactPage"
-                            type="XML"
-                        />
-                    </ScrollContainer>
+<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contactScrollWrapper">
+	<core:Fragment fragmentName="sap.ui.com.project1.fragment.ContactPage" type="XML" />
+	<!-- <VBox height="1rem" /> -->
+</ScrollContainer>
                     <ScrollContainer
                         id="idAdddata"
                         horizontal="false"
@@ -369,9 +366,14 @@
                         class="sapUiContentPadding career-background sapUiTinyMargin"
                     >
                         <!-- <core:Fragment fragmentName="sap.kt.com.minihrsolution.fragment.CareerPage" type="XML"/> -->
+
                     </ScrollContainer>
+               
                 </pages>
             </NavContainer>
+            <core:Fragment fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
+            </items>
+   </VBox>
         </tnt:mainContents>
     </tnt:ToolPage>
 </mvc:View>

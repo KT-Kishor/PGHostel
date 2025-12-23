@@ -34,10 +34,9 @@
 		</VBox>
 	</HBox>
 	<!-- Footer -->
-	<HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" width="100%" >
+	<!-- <HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" width="100%" >
 		<Text text="{i18n>companynameKT}" class="footer-text"/>
 		<HBox class="footer-social" justifyContent="End">
-<!-- <Button id="adminBtn" press="onAdminButtonPress" icon="sap-icon://key-user-settings"/> -->
 
 
 <Button press="onAdminSIGNUP" tooltip="Admin / Vendor Registration" type="Transparent" icon="sap-icon://employee"   
@@ -53,5 +52,5 @@
                                   &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;
                                 &lt;/a&gt;"/>
 		</HBox>
-	</HBox> 
+	</HBox>  -->
 </core:FragmentDefinition>

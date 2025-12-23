@@ -64,36 +64,13 @@
   font-size: 1rem !important;
 }
 
-/* Homepage Background */
-.Homepage {
-  background-image: url("../image/BedHostel.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 0.6rem;
-}
-/* Welcome Text */
-.custom-welcome {
-  line-height: 1;
-  color: white;
-  font-size: 48px;
-  font-weight: bold;
-  font-family: Arial, Helvetica, sans-serif !important;
-}
+
+
 .custom-text {
   font-size: 20px !important;
 }
-.custom-tagline {
-  font-size: 48px;
-  font-family: Arial, Helvetica, sans-serif !important;
-  color: #ffffff;
-  font-weight: bold;
-}
-.RoomBook {
-  font-size: 18px !important;
-  height: 100px !important;
-  width: 200px !important;
-}
+
+
 
 .HostelRooms {
   background-image: url("../image/HostelRoom.png");
@@ -275,17 +252,6 @@
     font-weight: bold;
 }
 
-/* Flex container */
-.contact-flex {
-  display: flex;
-  justify-content: start; /* align items to left */
-  align-items: stretch;
-  gap: 0; /* no space between */
-  margin: 0 auto;
-  width: 90%;
-  height: 50%;
-  flex-wrap: wrap; /* stack on mobile */
-}
 
 .contact-address-box {
   background: linear-gradient(135deg, #00b7c7, #007984) !important;
@@ -326,20 +292,6 @@
    border-radius: 8px 0 0 8px;
 }
 
-@media (max-width: 768px) {
-  .contact-flex {
-    flex-direction: column;
-  }
-
-  .contact-address-box,
-  .contact-map-box {
-    width: 100% !important;
-  }
-
-  .contact-address-box {
-    margin-bottom: 1rem;
-  }
-}
 
 @media (max-width: 768px) {
   .contact-map-box {
@@ -359,70 +311,6 @@
     color: #fff !important;
     font-size: 14px;
     text-decoration: none; /* optional, removes underline */
-}
-
-/* Footer */
-.footer-bar {
-    background: linear-gradient(135deg, #00b7c7, #007984) !important;
-
-  padding: 20px 40px;
-  color: #fff;
-  display: flex;
-  flex-wrap: wrap;
-  border-radius: 8px 8px 0 0;
-  margin-top: 3rem;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-/* Footer Columns */
-.footer-column {
-  flex: 1 1 30%;     /* 3 equal sections */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Text & Links */
-.footer-text,
-.footer-link {
-  color: #fff;
-  font-size: 14px;
-  text-decoration: none;
-}
-.footer-link:hover {
-  text-decoration: underline;
-}
-
-/* Social Icons */
-.footer-social {
-  display: flex;
-  gap: 20px;
-}
-.social-icon {
-  color: #fff;
-  font-size: 1.5rem;
-  transition: transform 0.3s ease;
-}
-.social-icon:hover { transform: scale(1.3); }
-
-/* Responsive Footer */
-@media (max-width: 768px) {
-  .footer-bar {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  }
-
-  .footer-column {
-    flex: 1 1 100%;
-    align-items: center;
-  }
-
-  .footer-text {
-    font-size: 15px;
-    font-weight: bold;
-  }
 }
 
 .customPageTitle {
@@ -2193,7 +2081,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
     font-size: 0 !important;
     width: 20px;
     height: 20px;
-    line-height: 1rem ! important ;
+    line-height: 1.6rem ! important ;
 }
 
 /* FontAwesome icon */
@@ -2212,7 +2100,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* hover zoom effect */
 .fa-admin-btn:hover .sapMBtnIcon::before {
-    transform: scale(1.15);
+    transform: scale(1.3);
 }
 
 /* remove UI5 built-in hover background */
@@ -2430,4 +2318,219 @@ span.sapMBtnInner.sapMBtnEmphasized {
     border: 1px solid;
     color: white !important;
      background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+}
+
+
+
+
+/* ////////////////////////////////////////////// */
+
+/* Footer */
+.footer-bar {
+    background: linear-gradient(135deg, #00b7c7, #007984) !important;
+
+  padding: 20px 40px;
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 8px 8px 0 0;
+  margin-top: 3rem;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Footer Columns */
+.footer-column {
+  flex: 1 1 30%;     
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Text & Links */
+.footer-text,
+.footer-link {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+}
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Social Icons */
+.footer-social {
+  display: flex;
+  gap: 20px;
+}
+
+.social-icon:hover { transform: scale(1.3); }
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+
+    .footer-shell {
+        width: calc(100% - 1.2rem) !important; 
+        margin: 0 0.6rem 0 0.6rem !important;
+    }
+    
+    .footer-inner {
+        flex-direction: column !important;
+        padding: 15px 10px !important;
+    }
+
+
+
+    .footer-text {
+        text-align: center;
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .footer-social {
+        justify-content: center !important;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+  .footer-bar {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  .footer-column {
+    flex: 1 1 100%;
+    align-items: center;
+  }
+  .contact-flex {
+    flex-direction: column;
+  }
+  .contact-address-box,
+  .contact-map-box {
+    width: 100% !important;
+  }
+  .contact-address-box {
+    margin-bottom: 1rem;
+  }
+}
+
+
+
+.sapMVBox.sapMVBoxNone.sapUiVlt {
+    height: 100% !important;
+}
+.mainScrollWrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden; 
+     gap: 0 !important; 
+}
+
+#pageContainer {
+    flex: 1 1 auto !important; 
+    width: 100%;
+    overflow-y: auto;
+     margin-bottom: -5px; 
+}
+
+.footer-shell {
+    position: relative; 
+    width: calc(100% - 1.2rem) !important; 
+    margin: 0 0.6rem 0 0.6rem !important; 
+    
+    flex-shrink: 0 !important;     
+    background: linear-gradient(135deg, #00b7c7, #007984) !important;
+    height: auto !important; 
+    min-height: 4rem !important;
+    border: none !important;
+    border-radius: 0.6rem 0.6rem 0 0 !important; 
+    overflow: hidden;
+}
+
+
+.footer-inner {
+    height: 100% !important;
+    padding: 10px 15px !important;
+}
+
+
+.sapMScrollCont {
+    padding-bottom: 0rem !important; 
+}
+.social-icon {
+    font-size: 1.5rem !important;
+    margin: 0 10px;
+    color: white;
+}
+
+#pageContainer-canvas {
+    height: 100% !important;
+}
+
+.contactScrollContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 12rem) !important; 
+    overflow-y: auto !important;
+}
+
+
+
+.contactScrollWrapper {    
+    height: calc(100vh - 200px) !important; 
+    overflow-y: auto !important;
+    padding-bottom: 2rem !important;
+}
+
+.contact-flex {    
+      height: auto !important;
+    min-height: min-content;
+  display: flex;    
+  justify-content: start;    
+  align-items: stretch;    
+  gap: 0;    
+  margin: 0 auto;    
+  width: 90%; 
+  padding-bottom: 0px !important; 
+}
+
+
+/* Welcome Text */
+.custom-welcome {
+  line-height: 1;
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.custom-tagline {
+  font-size: 48px;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+
+.Homepage {
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    border-radius: 0.6rem; 
+    
+    overflow: hidden; 
+    
+    margin-bottom: 2rem !important; 
+    
+    height: calc(100% - 1rem) !important;
+}
+
+.RoomBook {
+    font-size: 18px !important;
+    height: 60px !important; 
+    width: 200px !important;
+    margin-bottom: 1rem !important; 
 }

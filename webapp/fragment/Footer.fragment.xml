@@ -1,15 +1,17 @@
 <core:FragmentDefinition 
 	xmlns="sap.m" 
 	xmlns:core="sap.ui.core">
-	<!-- Footer -->
-	<HBox class="footer-bar" alignItems="Center" justifyContent="SpaceBetween" width="100%">
-		<Text text="{i18n>companynameKT}" class="footer-text"/>
-		<HBox class="footer-social" justifyContent="End">
-			<core:HTML content="    &lt;a href='#' class='admin-signup-btn'&gt;        &lt;i class='fas fa-user-shield social-icon'&gt;&lt;/i&gt;    &lt;/a&gt;
-"/>
-			<core:HTML content="&lt;a href='https://www.instagram.com/' target='_blank'&gt;                                  &lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;                                &lt;/a&gt;"/>
-			<core:HTML content="&lt;a href='https://www.facebook.com/' target='_blank'&gt;                              &lt;i class='fab fa-facebook-f social-icon'&gt;&lt;/i&gt;                            &lt;/a&gt;"/>
-			<core:HTML content="&lt;a href='https://www.youtube.com/' target='_blank'&gt;                                  &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;                                &lt;/a&gt;"/>
+	<!-- MUST be full width -->
+	<OverflowToolbar class="footer-shell ">
+		<!-- THIS creates left/right spacing -->
+		<HBox width="100%" class="footer-inner" alignItems="Center" justifyContent="SpaceBetween">
+			<Text text="{i18n>companynameKT}" class="footer-text"/>
+			<HBox class="footer-social" alignItems="Center" justifyContent="End">
+				<Button press="onAdminSIGNUP" tooltip="Admin / Vendor Registration" type="Transparent" icon="sap-icon://employee" class="fa-admin-btn"/>
+				<core:HTML content="&lt;a href='https://www.instagram.com/' target='_blank'&gt;                   &lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;                   &lt;/a&gt;"/>
+				<core:HTML content="&lt;a href='https://www.facebook.com/' target='_blank'&gt;                   &lt;i class='fab fa-facebook-f social-icon'&gt;&lt;/i&gt;                   &lt;/a&gt;"/>
+				<core:HTML content="&lt;a href='https://www.youtube.com/' target='_blank'&gt;                   &lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;                   &lt;/a&gt;"/>
+			</HBox>
 		</HBox>
-	</HBox>
+	</OverflowToolbar>
 </core:FragmentDefinition>
