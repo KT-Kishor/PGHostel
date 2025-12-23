@@ -4050,6 +4050,7 @@ else if (sDuration === "Per Year") {
                             Currency: oData.Currency,
                             Discount: oData.AppliedDiscount.toString() || "0",
                             CouponCode: oData.CouponCode || "",
+                            TotalRoomprice: p.RoomRentPerPerson|| "0",
                             UserID: p.UserID
                         });
                     }
