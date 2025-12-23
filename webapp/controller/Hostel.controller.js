@@ -14,11 +14,10 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
 
-            const oUIModel = new sap.ui.model.json.JSONModel({
+            const oFooterModel = new sap.ui.model.json.JSONModel({
                 showGlobalFooter: true
             });
-            this.getView().setModel(oUIModel, "UIModel");
-
+            this.getView().setModel(oFooterModel, "FooterModel");
 
 
 
@@ -784,8 +783,9 @@ sap.ui.define([
             this.roomtype = true;
 
             // 🔑 Global footer visibility control
-            const oUIModel = this.getView().getModel("UIModel");
-            oUIModel.setProperty("/showGlobalFooter", sKey !== "idRooms");
+            const oFooterModel = this.getView().getModel("FooterModel");
+            oFooterModel.setProperty("/showGlobalFooter", sKey !== "idRooms");
+
 
             // 🔥 FORCE UI5 LAYOUT RECALCULATION
             sap.ui.getCore().applyChanges();

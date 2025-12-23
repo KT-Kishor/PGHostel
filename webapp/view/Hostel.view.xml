@@ -372,7 +372,7 @@
                 </pages>
             </NavContainer>
             <!-- <core:Fragment fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" /> -->
-           <VBox visible="{= ${UIModel>/showGlobalFooter} }">
+           <VBox visible="{= ${FooterModel>/showGlobalFooter} }">
 	<core:Fragment id="globalFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML"/>
 </VBox>            </items>
    </VBox>
