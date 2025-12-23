@@ -292,34 +292,91 @@ sap.ui.define([
             oViewModel.setProperty("/CurrentCoupon", oData);
             this._openCouponDialog();
         },
+            // onDeleteCoupon: async function () {
+            //     var oTable = this.getView().byId("couponTable");
+            //     var aSelectedItems = oTable.getSelectedItems();
+            //     if (!aSelectedItems.length) {
+            //         MessageToast.show("Please select at least one coupon to delete.");
+            //         return;
+            //     }
+            //     MessageBox.confirm(
+            //         `Delete ${aSelectedItems.length} selected coupon(s)?`,
+            //         {
+            //             icon: MessageBox.Icon.WARNING,
+            //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            //             emphasizedAction: MessageBox.Action.NO,
+            //             onClose: async function (sAction) {
+            //                 if (sAction !== MessageBox.Action.YES) return;
+            //                 sap.ui.core.BusyIndicator.show(0);
+            //                 try {
+            //                     for (let oItem of aSelectedItems) {
+            //                         let oCtx = oItem.getBindingContext("CouponModel");
+            //                         let oData = oCtx.getObject();
+            //                         await this.ajaxDeleteWithJQuery("HM_Coupon", {
+            //                             filters: {
+            //                                 CouponId: oData.CouponId    // ✅ SAFE ROW-LEVEL DELETE
+            //                             }
+            //                         });
+            //                     }
+            //                     MessageToast.show("Selected coupons deleted successfully.");
+            //                     // this._loadCoupons();
+            //                     this.onCouponSearch();
+
+            //                 } catch (err) {
+            //                     console.error("Delete failed:", err);
+            //                     MessageBox.error("Error while deleting coupons.");
+            //                 } finally {
+            //                     sap.ui.core.BusyIndicator.hide();
+            //                     oTable.removeSelections(true);
+            //                 }
+            //             }.bind(this)
+            //         }
+            //     );
+            // },
         onDeleteCoupon: async function () {
             var oTable = this.getView().byId("couponTable");
             var aSelectedItems = oTable.getSelectedItems();
+
             if (!aSelectedItems.length) {
                 MessageToast.show("Please select at least one coupon to delete.");
                 return;
             }
+
+            const aCouponCodes = aSelectedItems
+                .map(oItem => oItem.getBindingContext("CouponModel")?.getObject()?.CouponCode)
+                .filter(Boolean);
+
+            const sCouponText = aCouponCodes.join(", ");
+
             MessageBox.confirm(
-                `Delete ${aSelectedItems.length} selected coupon(s)?`,
+                `Are you sure you want to delete the following coupon(s)?\n\n${sCouponText}`,
                 {
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
                     onClose: async function (sAction) {
-                        if (sAction !== MessageBox.Action.YES) return;
+
+                        // ✅ ALWAYS clear selection (YES or NO)
+                        oTable.removeSelections(true);
+
+                        if (sAction !== MessageBox.Action.YES) {
+                            return;
+                        }
+
                         sap.ui.core.BusyIndicator.show(0);
                         try {
                             for (let oItem of aSelectedItems) {
-                                let oCtx = oItem.getBindingContext("CouponModel");
-                                let oData = oCtx.getObject();
+                                const oCtx = oItem.getBindingContext("CouponModel");
+                                const oData = oCtx.getObject();
+
                                 await this.ajaxDeleteWithJQuery("HM_Coupon", {
                                     filters: {
-                                        CouponId: oData.CouponId    // ✅ SAFE ROW-LEVEL DELETE
+                                        CouponId: oData.CouponId
                                     }
                                 });
                             }
-                            MessageToast.show("Selected coupons deleted successfully.");
-                            // this._loadCoupons();
+
+                            MessageToast.show("Selected coupon(s) deleted successfully.");
                             this.onCouponSearch();
 
                         } catch (err) {
@@ -327,13 +384,12 @@ sap.ui.define([
                             MessageBox.error("Error while deleting coupons.");
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
-                            oTable.removeSelections(true);
                         }
                     }.bind(this)
                 }
             );
         },
-        
+
         onDownloadCoupons: function () {
             var oTable = this.getView().byId("couponTable");
             const oModelData = oTable.getModel("CouponModel").getData();
