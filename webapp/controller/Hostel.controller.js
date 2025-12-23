@@ -1133,12 +1133,31 @@ sap.ui.define([
             utils._LCvalidateEmail(oEvent);
         },
 
-        SM_onTogglePasswordVisibility: function (oEvent) {
-            const oInput = oEvent.getSource();
-            const isPassword = oInput.getType() === "Password";
+        // SM_onTogglePasswordVisibility: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     const isPassword = oInput.getType() === "Password";
 
-            oInput.setType(isPassword ? "Text" : "Password");
-            oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
+        //     oInput.setType(isPassword ? "Text" : "Password");
+        //     oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
+        // },
+
+        SM_onTogglePasswordVisibility: function (oEvent) {
+            var oInput = oEvent.getSource();
+
+            // 1. Capture value BEFORE type change
+            var sValue = oInput.getValue();
+
+            // 2. Toggle type
+            var bIsPassword = oInput.getType() === "Password";
+            oInput.setType(bIsPassword ? "Text" : "Password");
+
+            // 3. Toggle icon
+            oInput.setValueHelpIconSrc(
+                bIsPassword ? "sap-icon://hide" : "sap-icon://show"
+            );
+
+            // 4. Restore value AFTER re-render
+            oInput.setValue(sValue);
         },
 
         SM_onChnageSetAndConfirm: function (oEvent) {
