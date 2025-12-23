@@ -1973,6 +1973,7 @@ sap.ui.define([
                     "RoomPrice": CustomerData.OrginalRentPrice,
                     "Discount": CustomerData.Discount || 0,
                     "CouponCode": Bookingdata.CouponCode,
+                    "TotalRoomprice":CustomerData.RentPrice
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
                     // Normalize UnitText for facility as well

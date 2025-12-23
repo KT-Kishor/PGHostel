@@ -226,7 +226,7 @@ sap.ui.define([
             const aItems = oBranchCB.getItems();
 
             const oMatch = aItems.find(item => {
-                const oCtx = item.getBindingContext("sBRModel");
+                const oCtx = item.getBindingContext("Branchmodel");
                 if (!oCtx) return false;
 
                 const oBranch = oCtx.getObject();
@@ -699,7 +699,7 @@ sap.ui.define([
             const oItem = oEvent.getParameter("selectedItem");
             if (!oItem) return;
 
-            const oCtx = oItem.getBindingContext("sBRModel");
+            const oCtx = oItem.getBindingContext("Branchmodel");
             if (!oCtx) return;
 
             const oBranch = oCtx.getObject();
