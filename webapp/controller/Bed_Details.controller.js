@@ -345,15 +345,20 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            this.getView().getModel("BedDetails").setData("");
+
+
         },
 
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+            this.getView().getModel("BedDetails").setData("");
+
         },
 
         Onsearch: function(flag) {
-                const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
             var oView = this.getView();
             var oTable = oView.byId("id_BedTable");
@@ -374,7 +379,7 @@ sap.ui.define([
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
+            if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
             }
 

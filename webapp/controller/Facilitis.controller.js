@@ -104,7 +104,7 @@ sap.ui.define([
             // IMPORTANT FIX
             // Apply LoginModel BranchCode only if user did not select BranchCode in filter
             if (
-                oExistingModel.Role !== "" &&
+                oExistingModel.Role === "Admin" &&
                 !filter.BranchCode
             ) {
                 filter.BranchCode = aBranchCodes;
@@ -538,11 +538,14 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            this.getView().getModel("Facilities").setData("");
+
         },
 
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+            this.getView().getModel("Faciilties").setData("");
         },
 
         FD_onFacilityRowPress: function(oEvent) {

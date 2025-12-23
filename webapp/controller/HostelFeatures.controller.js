@@ -301,7 +301,7 @@ sap.ui.define([
 
             let filters = {};
 
-            if (oExistingModel.Role !== "") {
+            if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
             }
             if (sFacilityName) filters.FacilityName = sFacilityName;
@@ -429,11 +429,13 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            this.getView().getModel("HostelFeatures").setData("");
         },
 
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+            this.getView().getModel("HostelFeatures").setData("");
         },
 
         HF_viewroom: function(oEvent) {

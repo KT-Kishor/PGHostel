@@ -242,11 +242,13 @@ sap.ui.define([
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
             }
+            this.getView().getModel("CustomerData").setData("");
         },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+            this.getView().getModel("CustomerData").setData("");
         },
 
         AD_onSearch: async function () {
