@@ -31,13 +31,13 @@
                 <Text text="{HostelModel>STDCode} {HostelModel>MobileNo}" />
                 <Label text="{i18n>MScontactDetails}" />
                 <Text text="{HostelModel>CustomerEmail}" />
-                <Label text="MVDcountry" />
+                <Label text="{i18n>MVDcountry}" />
                 <Text text="{HostelModel>Country}" />
                 <Label text="{i18n>MVDstate}" />
                 <Text text="{HostelModel>State}" />
                 <Label text="{i18n>MVDcity}" />
                 <Text text="{HostelModel>City}" />
-                <Label text="{i18n>MVDaddress}" />
+                <Label text="{i18n>MVaddress}" />
                 <Text text="{HostelModel>Address}" />
             </f:content>
         </f:SimpleForm>
@@ -110,7 +110,6 @@
         <!-- Booking Details for THIS person -->
         <Table id="idFacilitySummaryTable"
             class="sapUiSmallMarginTop"
-          
             items="{
                 path: 'HostelModel>AllSelectedFacilities'
             }"

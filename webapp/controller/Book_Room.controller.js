@@ -549,6 +549,7 @@ sap.ui.define([
                                                 oEvent.getSource().setSelected(false);
                                                 return;
                                             }
+                                            
                                             oLoginModel.setProperty("/UserID", oUser.UserID);
                                             oLoginModel.setProperty("/Salutation", oUser.Salutation);
                                             oLoginModel.setProperty("/STDCode", oUser.STDCode);
@@ -1078,7 +1079,7 @@ sap.ui.define([
 
         // 1️⃣ Clear model data
         oModel.setProperty("/Persons/" + index + "/Documents", []);
-        oModel.setProperty("/Persons/" + index + "/DocumentType", []);
+        oModel.setProperty("/Persons/" + index + "/DocumentType", "");
 
         // 2️⃣ Clear uploader UI
         oUploader.clear();
@@ -2131,12 +2132,14 @@ if (sStartDate) {
             let oEnd = new Date(oStart);
 
             // ⭐ REAL DATE LOGIC (CALENDAR ACCURATE)
-            if (sDuration === "Per Month") {
-                oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
-            }
-            else if (sDuration === "Per Year") {
-                oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
-            }
+           if (sDuration === "Per Month") {
+    oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
+    oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+}
+else if (sDuration === "Per Year") {
+    oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
+    oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+}
             else if (sDuration === "Per Day") {
                 sap.m.MessageToast.show("Duration is per day. No month/year Selection Needed.");
                 return;

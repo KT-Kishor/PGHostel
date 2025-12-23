@@ -24,7 +24,7 @@
                             <Text id="GI_Roomtype"  text="{=${HostelModel>/BedType} + ' - ' + ${HostelModel>/ACType}}"  width="100%" /> 
              <Label text="{i18n>rentprice}" />
                             <Text  text="{HostelModel>/FinalPrice} {HostelModel>/Currency}" width="100%" />     
-                <Label text="{i18n>bookingduration}" required="true" />
+                <Label text="{i18n>roomplan}" required="true" />
 <ComboBox
     id="idPaymentMethod1"
     items="{HostelModel>/AvailablePaymentMethods}"

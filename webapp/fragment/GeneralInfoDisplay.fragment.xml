@@ -19,27 +19,27 @@
             labelSpanS="12">
             <f:content>
              <core:Title text="{i18n>bookingDetailsTitle}" />
-               <Label text="Room Type" />
+               <Label text="{i18n>roomtype}" />
                             <Text id="idRoomType2" text="{HostelModel>/BedType}"  />
                             <Label text="Rent Price" /> 
                             <Text id="idPrice3" text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"   />
 
-                 <Label text="Payment Duration" />
+                 <Label text="{i18n>roomplan}" />
                             <Text text="{HostelModel>/SelectedPriceType}"/>
                 <!-- Project Address -->
               
-               <Label text="No of Persons"/>
+               <Label text="{i18n>noofperson}"/>
                <Text text="{HostelModel>/SelectedPerson}"/>
 
                 <!-- Site Contact -->
              
-                <Label text="Start Date" />
+                <Label text="{i18n>CDStartDate}" />
                            <Text text="{HostelModel>/StartDate}"/>
-                            <Label text="End Date" />
+                            <Label text="{i18n>CDEndDate}" />
                            <Text text="{HostelModel>/EndDate}"/>
-                            <Label text="Month/Year"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"/>
+                            <Label text="{i18n>monthyear}"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"/>
                            <Text text="{HostelModel>/SelectedMonths}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }" />
-                            <Label text="Total Days"   visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"/>
+                            <Label text="{i18n>totaldays}"   visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"/>
                            <Text text="{HostelModel>/TotalDays}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }" />
              
             </f:content>

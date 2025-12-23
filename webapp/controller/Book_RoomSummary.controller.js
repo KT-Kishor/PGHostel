@@ -250,48 +250,56 @@ _filterRateTypesForEdit: function () {
         },
 
         onMonthSelectionChange: function (oEvent) {
-            const oView = this.getView();
-            const oHostelModel = oView.getModel("edit");
+    const oView = this.getView();
+    const oHostelModel = oView.getModel("edit");
 
-            const sUnit = oHostelModel.getProperty("/UnitText");
-            const sStartDate = oHostelModel.getProperty("/StartDate") || "";
+    const sUnit = oHostelModel.getProperty("/UnitText");
+    const sStartDate = oHostelModel.getProperty("/StartDate") || "";
 
-            const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
+    const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
 
-            if (!sStartDate) {
-                sap.m.MessageToast.show("Please Select Start Date First.");
-                return;
-            }
+    if (!sStartDate) {
+        sap.m.MessageToast.show("Please Select Start Date First.");
+        return;
+    }
 
-            const oStart = this._parseDate(sStartDate);
-            if (!(oStart instanceof Date) || isNaN(oStart)) {
-                sap.m.MessageToast.show("Invalid Start Date.");
-                return;
-            }
+    const oStart = this._parseDate(sStartDate);
+    if (!(oStart instanceof Date) || isNaN(oStart)) {
+        sap.m.MessageToast.show("Invalid Start Date.");
+        return;
+    }
 
-            let iTotalDays = 0;
-            let oEnd = new Date(oStart);
+    let oEnd = new Date(oStart);
 
-            // Use fixed days: 30 days per month, 365 per year
-            if (sUnit === "Per Month") {
-                iTotalDays = iSelectedNumber * 30;
-                oEnd.setDate(oEnd.getDate() + iTotalDays);
-                oHostelModel.setProperty("/TotalMonths", iSelectedNumber);
-                oHostelModel.setProperty("/TotalYears", 0);
-            } else if (sUnit === "Per Year") {
-                iTotalDays = iSelectedNumber * 365;
-                oEnd.setDate(oEnd.getDate() + iTotalDays);
-                oHostelModel.setProperty("/TotalYears", iSelectedNumber);
-                oHostelModel.setProperty("/TotalMonths", 0);
-            } else {
-                return;
-            }
+    // ⭐ REAL CALENDAR LOGIC (INCLUSIVE)
+    if (sUnit === "Per Month") {
+        oEnd.setMonth(oEnd.getMonth() + iSelectedNumber);
+        oEnd.setDate(oEnd.getDate() - 1);
 
-            const sEndDate = this._formatDateToDDMMYYYY(oEnd);
+        oHostelModel.setProperty("/TotalMonths", iSelectedNumber);
+        oHostelModel.setProperty("/TotalYears", 0);
+    }
+    else if (sUnit === "Per Year") {
+        oEnd.setFullYear(oEnd.getFullYear() + iSelectedNumber);
+        oEnd.setDate(oEnd.getDate() - 1);
 
-            oHostelModel.setProperty("/EndDate", sEndDate);
-            oHostelModel.setProperty("/TotalDays", iTotalDays);
-        },
+        oHostelModel.setProperty("/TotalYears", iSelectedNumber);
+        oHostelModel.setProperty("/TotalMonths", 0);
+    }
+    else {
+        return;
+    }
+
+    // 🔢 Calculate total days (inclusive)
+    const iTotalDays =
+        Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+
+    const sEndDate = this._formatDateToDDMMYYYY(oEnd);
+
+    oHostelModel.setProperty("/EndDate", sEndDate);
+    oHostelModel.setProperty("/TotalDays", iTotalDays);
+}
+,
       onEditDateChange: function (oEvent) {
     utils._LCvalidateMandatoryField(oEvent);
 
