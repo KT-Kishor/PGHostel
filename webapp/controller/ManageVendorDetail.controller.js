@@ -4,11 +4,11 @@ sap.ui.define([
     "../model/formatter",
     "sap/collaboration/components/fiori/sharing/attachment/Attachment",
     "sap/m/MessageToast",
-], function(BaseController, utils, Formatter, Attachment, MessageToast) {
+], function (BaseController, utils, Formatter, Attachment, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendorDetail", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -21,7 +21,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendorDetail").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function(oEvent) {
+        _onRouteMatched: async function (oEvent) {
             try {
                 // this.commonLoginFunction();
                 var Layout = this.byId("MV_id_ObjectPageLayout");
@@ -48,7 +48,7 @@ sap.ui.define([
             }
         },
 
-        _initAdminSignupModel: function() {
+        _initAdminSignupModel: function () {
             const oModel = new sap.ui.model.json.JSONModel({
                 Salutation: "",
                 VendorName: "",
@@ -70,7 +70,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: function() {
+        _applyCountryStateCityFilters: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCountryCB = this.byId("MV_id_Country");
             const oStateCB = this.byId("MV_id_State");
@@ -114,7 +114,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-        _loadVendorDetails: async function(sUserID) {
+        _loadVendorDetails: async function (sUserID) {
             try {
                 sap.ui.core.BusyIndicator.show(0);
 
@@ -165,11 +165,11 @@ sap.ui.define([
             }
         },
 
-        onDocumentTypeChange: function(oEvent) {
+        onDocumentTypeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onAdminFileSelect: function(oEvent) {
+        onAdminFileSelect: function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             const oModel = this.getView().getModel("AdminSignupModel");
             const sDocType = oModel.getProperty("/CurrentDocType");
@@ -195,7 +195,7 @@ sap.ui.define([
 
             const reader = new FileReader();
             const that = this;
-            reader.onload = async function(e) {
+            reader.onload = async function (e) {
                 try {
                     const sBase64 = e.target.result.split(",")[1];
                     const oPayload = {
@@ -224,20 +224,20 @@ sap.ui.define([
             reader.readAsDataURL(oFile);
         },
 
-        onFileSizeExceeds: function() {
+        onFileSizeExceeds: function () {
             sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
         },
 
-        BI_onEditButtonPress: function() {
+        BI_onEditButtonPress: function () {
             this.getView().getModel("editable").setProperty("/Edit", true);
         },
 
-        BI_onButtonPress: function() {
+        BI_onButtonPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageVendor");
         },
 
-        onEditOrSavePress: async function() {
+        onEditOrSavePress: async function () {
             const oEditableModel = this.getView().getModel("editable");
             const bEditMode = oEditableModel.getProperty("/Edit");
 
@@ -255,7 +255,7 @@ sap.ui.define([
             }
         },
 
-        BT_onsavebuttonpress: async function() {
+        BT_onsavebuttonpress: async function () {
             try {
                 const C = this.byId.bind(this);
                 const oModel = this.getView().getModel("AdminSignupModel");
@@ -277,7 +277,7 @@ sap.ui.define([
 
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                    return false; 
+                    return false;
                 }
 
                 const payload = {
@@ -314,12 +314,12 @@ sap.ui.define([
             }
         },
 
-        onAdminSelectionChange: function() {
+        onAdminSelectionChange: function () {
             this.byId("AdminDeleteButton").setEnabled(true);
             this.byId("AdminDownloadButton").setEnabled(true);
         },
 
-        onAdminDeleteFiles: function() {
+        onAdminDeleteFiles: function () {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oSelectedItem = oTable.getSelectedItem();
 
@@ -341,38 +341,38 @@ sap.ui.define([
                 "Confirm",
                 "Are you sure you want to delete this document?",
                 async () => {
-                        try {
-                            sap.ui.core.BusyIndicator.show(0);
+                    try {
+                        sap.ui.core.BusyIndicator.show(0);
 
-                            await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
-                                filters: {
-                                    DocumentID: oContext.getProperty("DocumentID"),
-                                    CustomerID: sUserID
-                                }
-                            });
+                        await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
+                            filters: {
+                                DocumentID: oContext.getProperty("DocumentID"),
+                                CustomerID: sUserID
+                            }
+                        });
 
-                            sap.m.MessageToast.show("Document deleted successfully");
-                            this._loadVendorDetails(sUserID); // refresh attachment list
-                            fnResetSelection();
-                        } catch (err) {
-                            sap.m.MessageToast.show(err.message || "Delete failed");
-                        } finally {
-                            sap.ui.core.BusyIndicator.hide();
-                        }
-                    },
-                    () => {
-                        // Cancel callback
+                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                        this._loadVendorDetails(sUserID); // refresh attachment list
                         fnResetSelection();
+                    } catch (err) {
+                        sap.m.MessageToast.show(err.message || "Delete failed");
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
                     }
+                },
+                () => {
+                    // Cancel callback
+                    fnResetSelection();
+                }
             );
         },
 
-        onAdminDownloadFiles: function() {
+        onAdminDownloadFiles: function () {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oContext = oTable.getSelectedItem()?.getBindingContext("AdminSignupModel");
 
             if (!oContext) {
-                sap.m.MessageToast.show("Please select a document");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectadoc"));
                 return;
             }
 
@@ -408,7 +408,7 @@ sap.ui.define([
             this.byId("AdminDownloadButton").setEnabled(false);
         },
 
-        onAdminPreviewDoc: function(oEvent) {
+        onAdminPreviewDoc: function (oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -431,12 +431,9 @@ sap.ui.define([
                 return last;
             }
 
-            const oDoc = oEvent.getSource()
-                .getBindingContext("AdminSignupModel")
-                ?.getObject();
-
+            const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel")?.getObject();
             if (!oDoc || !oDoc.File) {
-                sap.m.MessageBox.error("No document found");
+                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
                 return;
             }
 
@@ -580,7 +577,7 @@ sap.ui.define([
             sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
         },
 
-        MTF_onPressOk: async function() {
+        MTF_onPressOk: async function () {
             const btnText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
             const i18n = this.getView().getModel("i18n").getResourceBundle();
             const remark = sap.ui.getCore().byId("MIF_id_remark").getValue().trim();
@@ -626,8 +623,8 @@ sap.ui.define([
 
                 sap.m.MessageToast.show(
                     btnText === "Approve" ?
-                    i18n.getText("approveMessageSuccess") :
-                    i18n.getText("resendMessageSuccess")
+                        i18n.getText("approveMessageSuccess") :
+                        i18n.getText("resendMessageSuccess")
                 );
 
                 this.oDialog.close();
@@ -638,15 +635,15 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageBox.error(
                     btnText === "Approve" ?
-                    i18n.getText("erroApproveMessage") :
-                    i18n.getText("errorResendMessage")
+                        i18n.getText("erroApproveMessage") :
+                        i18n.getText("errorResendMessage")
                 );
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
 
-        MIF_onPressClose: function() {
+        MIF_onPressClose: function () {
             this.oDialog.close();
         },
 
@@ -661,7 +658,7 @@ sap.ui.define([
             return true;
         },
 
-        onAdminChangeSalutation: function(oEvent) {
+        onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.byId("MV_id_Gender");
@@ -685,7 +682,7 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onAdminLiveValidate: function(oEvent) {
+        onAdminLiveValidate: function (oEvent) {
             const id = oEvent.getSource().getId();
 
             if (id.includes("MV_id_VendorName")) { // Vendor name
@@ -704,14 +701,14 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeGender: function(oEvent) {
+        ADMIN_onChangeGender: function (oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
             this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-        ADMIN_onChangeCountry: function(oEvent) {
+        ADMIN_onChangeCountry: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
             const oCountry = oEvent.getSource();
@@ -804,7 +801,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeState: function(oEvent) {
+        ADMIN_onChangeState: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -854,7 +851,7 @@ sap.ui.define([
             oCityModel.setProperty("/filtered", filteredCities);
         },
 
-        ADMIN_onChangeCity: function(oEvent) {
+        ADMIN_onChangeCity: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -872,7 +869,7 @@ sap.ui.define([
             oModel.setProperty("/City", val);
         },
 
-        ADMIN_onChangeSTD: function(oEvent) {
+        ADMIN_onChangeSTD: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
 
@@ -885,11 +882,11 @@ sap.ui.define([
             oModel.setProperty("/STDCode", oSTD.getValue());
         },
 
-        onChangeDOB: function(oEvent) {
+        onChangeDOB: function (oEvent) {
             utils._LCvalidateDate(oEvent);
         },
 
-        ADMIN_onMobileLiveChange: function(oEvent) {
+        ADMIN_onMobileLiveChange: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
             const oInput = oEvent.getSource();
@@ -907,14 +904,14 @@ sap.ui.define([
 
             if (!std || std === "+") {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD code first");
+                oInput.setValueStateText(this.i18nModel.getText("enterisdcode"));
                 return;
             }
 
             const valid = utils._LCvalidateISDmobile(oInput, std);
             oInput.setValueState(valid ? "None" : "Error");
             if (!valid) {
-                oInput.setValueStateText("Enter valid mobile number");
+                oInput.setValueStateText(this.i18nModel.getText("enterMobileNo"));
             }
         }
     });

@@ -1,8 +1,8 @@
 sap.ui.define([
     "./BaseController",
     "../model/formatter",
-     "sap/ui/export/Spreadsheet",
-     "sap/m/MessageToast",
+    "sap/ui/export/Spreadsheet",
+    "sap/m/MessageToast",
 ], function (BaseController, Formatter, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendor", {
@@ -178,8 +178,8 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteManageVendorDetail", { UserID: sUserID });
         },
 
-         MS_onDownload:function() {
-             const oModel = this.byId("MV_id_ManageVendor").getModel("mainModel").getData();
+        MS_onDownload: function () {
+            const oModel = this.byId("MV_id_ManageVendor").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;

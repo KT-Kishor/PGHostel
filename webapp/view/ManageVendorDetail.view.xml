@@ -99,7 +99,9 @@
                                         <m:Input
                                             value="{AdminSignupModel>/VendorName}"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}" id="MV_id_VendorName" valueStateText="{i18n>enterMVDname}"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_VendorName"
+                                            valueStateText="{i18n>enterMVDname}"
                                         />
                                         <m:Label
                                             text="{i18n>MVDDOB}"
@@ -113,7 +115,8 @@
                                             change="onChangeDOB"
                                             editable="{editable>/Edit}"
                                             initialFocusedDateValue="{controller>/focusedDate}"
-                                            minDate="{controller>/minDate}" id="MV_id_VendorDOB" 
+                                            minDate="{controller>/minDate}"
+                                            id="MV_id_VendorDOB"
                                         />
                                         <m:Label
                                             text="{i18n>MVgender}"
@@ -122,7 +125,9 @@
                                         <m:Select
                                             selectedKey="{AdminSignupModel>/Gender}"
                                             change="ADMIN_onChangeGender"
-                                            editable="{editable>/Edit}" id="MV_id_Gender" valueStateText="{i18n>MVgender}"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_Gender"
+                                            valueStateText="{i18n>MVgender}"
                                         >
                                             <core:Item
                                                 key="Male"
@@ -138,15 +143,17 @@
                                             />
                                         </m:Select>
                                         <m:Label
-                                            text="{i18n>MVemailID}"
+                                            text="{i18n>emailId}"
                                             required="true"
                                         />
                                         <m:Input
                                             value="{AdminSignupModel>/Email}"
                                             type="Email"
-											placeholder="Enter Email ID"
+                                            placeholder="Enter Email ID"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}" id="MV_id_Email" valueStateText="{i18n>MSenterValidEmail}"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_Email"
+                                            valueStateText="{i18n>MSenterValidEmail}"
                                         />
                                         <m:Label
                                             text="{i18n>MVDcountry}"
@@ -179,7 +186,7 @@
                                             items="{StateModel>/}"
                                             editable="{editable>/Edit}"
                                             placeholder="Select State"
-                                            valueStateText="{i18n>MVDselectstate}"
+                                            valueStateText="{i18n>MSselectState}"
                                             showSecondaryValues="true"
                                             id="MV_id_State"
                                         >
@@ -189,7 +196,7 @@
                                             />
                                         </m:ComboBox>
                                         <m:Label
-                                            text="{i18n>MVDcity}"
+                                            text="{i18n>city}"
                                             required="true"
                                         />
                                         <m:ComboBox
@@ -197,7 +204,7 @@
                                             change="ADMIN_onChangeCity"
                                             selectionChange="ADMIN_onChangeCity"
                                             placeholder="Select City"
-                                            valueStateText="{i18n>MVDselectcity}"
+                                            valueStateText="{i18n>MSselectCity}"
                                             id="MV_id_City"
                                             items="{path:'CityModel>/', length:1000}"
                                             showSecondaryValues="true"
@@ -211,7 +218,7 @@
                                         </m:ComboBox>
                                         <!-- ISD + Mobile -->
                                         <m:Label
-                                            text="{i18n>MVmobileNo}"
+                                            text="{i18n>MSmobileNo}"
                                             required="true"
                                         />
                                         <m:ComboBox
@@ -222,7 +229,8 @@
                                             width="100%"
                                             items="{path:'CountryModel>/', length:1000}"
                                             filterSecondaryValues="true"
-                                            editable="{editable>/Edit}" id="MV_id_StdCode"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_StdCode"
                                         >
                                             <core:ListItem
                                                 key="{CountryModel>stdCode}"
@@ -233,17 +241,21 @@
                                         <m:Input
                                             value="{AdminSignupModel>/Mobile}"
                                             liveChange="ADMIN_onMobileLiveChange"
-                                            editable="{editable>/Edit}" id="MV_id_MobileNo" valueStateText="{i18n>mobileNoValueState}"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_MobileNo"
+                                            valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
-                                            text="{i18n>MVaddress}"
+                                            text="{i18n>address}"
                                             required="true"
                                         />
                                         <m:TextArea
                                             value="{AdminSignupModel>/Address}"
                                             rows="3"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}" id="MV_id_Address" valueStateText="{i18n>enterMVDAddress}"
+                                            editable="{editable>/Edit}"
+                                            id="MV_id_Address"
+                                            valueStateText="{i18n>enterMVDAddress}"
                                         />
                                     </f:content>
                                 </f:SimpleForm>
@@ -282,7 +294,9 @@
                                     >
                                         <m:headerToolbar>
                                             <m:OverflowToolbar>
-                                                <m:Title text="{i18n>MVDdocument}" />
+                                                <m:Title
+                                                    text="{i18n>MVDdocument}"
+                                                />
                                                 <m:Text
                                                     text="*"
                                                     class="requiredStar"
@@ -327,7 +341,7 @@
                                                         id="MV_id_adminFileUploader"
                                                         buttonOnly="true"
                                                         buttonText="{i18n>MVDupload}"
-														tooltip="Upload Document"
+                                                        tooltip="Upload Document"
                                                         uploadOnChange="false"
                                                         change="onAdminFileSelect"
                                                         fileType="jpg,jpeg,png,pdf,doc,docx"
@@ -340,9 +354,9 @@
                                                 </m:VBox>
                                                 <m:Button
                                                     id="AdminDeleteButton"
-                                                    text="{i18n>MVDdelete}"
+                                                    text="{i18n>MSdelete}"
                                                     class="myUnifiedBtn"
-													tooltip="Delete Selected File"
+                                                    tooltip="Delete Selected File"
                                                     press="onAdminDeleteFiles"
                                                     enabled="false"
                                                     visible="{= ${AdminSignupModel>/Status} !== 'Approved'
@@ -350,9 +364,9 @@
                                                 />
                                                 <m:Button
                                                     id="AdminDownloadButton"
-                                                    text="{i18n>CDDownloadCoupons}"
+                                                    text="{i18n>download}"
                                                     class="myUnifiedBtn"
-													tooltip="Download Selected File"
+                                                    tooltip="Download Selected File"
                                                     press="onAdminDownloadFiles"
                                                     enabled="false"
                                                 />
@@ -360,13 +374,22 @@
                                         </m:headerToolbar>
                                         <m:columns>
                                             <m:Column>
-                                                <m:Text text="{i18n>MVDfilename}" tooltip="File Name"/>
+                                                <m:Text
+                                                    text="{i18n>filename}"
+                                                    tooltip="File Name"
+                                                />
                                             </m:Column>
                                             <m:Column>
-                                                <m:Text text="{i18n>MVDdocumenttype}" tooltip="Document Type"/>
+                                                <m:Text
+                                                    text="{i18n>MVDdocumenttype}"
+                                                    tooltip="Document Type"
+                                                />
                                             </m:Column>
                                             <m:Column>
-                                                <m:Text text="{i18n>MVDfiletype}" tooltip="File Type"/>
+                                                <m:Text
+                                                    text="{i18n>FileType}"
+                                                    tooltip="File Type"
+                                                />
                                             </m:Column>
                                         </m:columns>
                                         <m:items>
@@ -401,15 +424,15 @@
                         id="MV_id_ApproveButton"
                         text="{i18n>MVDapprove}"
                         class="myUnifiedBtn"
-						tooltip="Approve Vendor"
+                        tooltip="Approve Vendor"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
                           || ${AdminSignupModel>/Status} !== 'Active' }"
                     />
                     <m:Button
                         id="MV_id_SendBackButton"
-                        text="{i18n>MVDsendBack}"
-						tooltip="Send Back"
+                        text="{i18n>sendBackRemark}"
+                        tooltip="Send Back"
                         class="myUnifiedBtn"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'

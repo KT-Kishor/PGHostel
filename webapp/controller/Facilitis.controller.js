@@ -448,6 +448,7 @@ sap.ui.define([
             }
             oTokenModel.setProperty("/tokens", aTokens);
             oUploaderData.setProperty("/attachments", aAttachments);
+            this.byId("id_fileUploader").clear();
         },
 
         onFacilityFileChange: function(oEvent) {

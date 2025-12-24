@@ -82,11 +82,11 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="{i18n>MVstaffheading} ({= ${mainModel>/}.length})"
+                            text="{i18n>MSstaffheading} ({= ${mainModel>/}.length})"
                         />
                         <ToolbarSpacer />
-						<Button
-                            text="{i18n>MVdownload}"
+                        <Button
+                            text="{i18n>download}"
                             tooltip="Download Vendor Data"
                             press="MS_onDownload"
                             class="myUnifiedBtn"
@@ -98,37 +98,58 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="{i18n>MVUserID}" tooltip="User ID"/>
+                        <Text
+                            text="{i18n>MVUserID}"
+                            tooltip="User ID"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>MVstaffName}" tooltip="Staff Name"/>
+                        <Text
+                            text="{i18n>MVstaffName}"
+                            tooltip="Staff Name"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>MVrole}" tooltip="Role"/>
+                        <Text
+                            text="{i18n>MVrole}"
+                            tooltip="Role"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>MVemailID}" tooltip="Email ID"/>
+                        <Text
+                            text="{i18n>emailId}"
+                            tooltip="Email ID"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>MVgender}" tooltip="Gender"/>
+                        <Text
+                            text="{i18n>MVgender}"
+                            tooltip="Gender"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>MVmobileNo}" tooltip="Mobile Number"/>
+                        <Text
+                            text="{i18n>MSmobileNo}"
+                            tooltip="Mobile Number"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>MVaddress}" tooltip="Address"/>
+                        <Text
+                            text="{i18n>address}"
+                            tooltip="Address"
+                        />
                     </Column>
                 </columns>
                 <items>
