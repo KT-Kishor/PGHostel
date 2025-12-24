@@ -5,17 +5,16 @@
 	xmlns:fb="sap.ui.comp.filterbar" displayBlock="true" busyIndicatorDelay="0">
 	<Page id="couponDetailsPage" showHeader="true">
 		<headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML" />
 		</headerContent>
 		<content>
-			<fb:FilterBar id="couponFilterBar" useToolbar="false" showClearOnFB="true" showFilterConfiguration="false" filterContainerWidth="auto" search="onCouponSearch" clear="onClearCoupons">
-				<fb:filterGroupItems>
+		<fb:FilterBar id="couponFilterBar" showFilterConfiguration="false" useToolbar="false" clear="onClearCoupons" showClearOnFB="true" search="onCouponSearch">				<fb:filterGroupItems>
 					<!-- BRANCH -->
-					<fb:FilterGroupItem name="BranchCode" groupName="Group" label="Branch" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="BranchCode" groupName="Group" label="{i18n>CDBranch}"   visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true">
-								<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />
-							</ComboBox>
+<ComboBox id="fBranch" width="100%" items="{Branchmodel>/}" placeholder="Select Branch" selectedKey="" showSecondaryValues="true">
+	<core:ListItem key="{Branchmodel>BranchID}" text="{Branchmodel>BranchID} - {Branchmodel>Name}" additionalText="{Branchmodel>City}" />
+</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<!-- STATUS -->

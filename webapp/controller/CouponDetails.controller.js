@@ -390,7 +390,6 @@ sap.ui.define([
                     }.bind(this)
                 }
             );
-
         },
 
         onDownloadCoupons: function () {
@@ -659,9 +658,6 @@ sap.ui.define([
             // Prevents FilterBar auto-search cascade
         },
 
-        onBranchChange: function (oEvent) {
-            
-        },
 
         _applyCouponGroupingAndSorting: function () {
             const oTable = this.byId("couponTable");
@@ -974,10 +970,8 @@ sap.ui.define([
                 });
                 oView.addDependent(this._oShareDialog);
             }
-
             this._oShareDialog.open();
         },
-
         onRoleChange: function (e) {
             const sRole = e.getSource().getSelectedKey();
             const aUsers = this._aAllRecipients
