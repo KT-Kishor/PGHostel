@@ -485,15 +485,15 @@ _filterRateTypesForEdit: function () {
                     return;
                 }
             }
-            const oUnitText = sap.ui.core.Fragment.byId(sViewId, "FT_id_UnitType");
 
-// 🔴 BLOCK SAVE if ComboBox invalid
-if (oUnitText.getValueState() === sap.ui.core.ValueState.Error || !oUnitText.getSelectedItem()) {
-    utils._LCvalidationComboBox(oUnitText, "ID");
-    sap.m.MessageBox.error("Please select a valid Unit Type.");
-    return;
-}
+            // const oUnitText = sap.ui.core.Fragment.byId(sViewId, "FT_id_UnitType");
 
+            //  BLOCK SAVE if ComboBox invalid
+            // if (oUnitText.getValueState() === sap.ui.core.ValueState.Error || !oUnitText.getSelectedItem()) {
+            //     utils._LCvalidationComboBox(oUnitText, "ID");
+            //     sap.m.MessageBox.error("Please select a valid Unit Type.");
+            //     return;
+            // }
 
             const oUpdatedData = Object.assign({}, oEditModel.getData()); // shallow copy
             let aFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];

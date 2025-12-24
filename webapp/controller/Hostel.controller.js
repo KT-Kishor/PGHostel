@@ -794,23 +794,19 @@ sap.ui.define([
             }
         },
 
+        Branch: async function () {
+            const oComponent = this.getOwnerComponent();
+            let oBRModel = oComponent.getModel("sBRModel");
 
+            if (!oBRModel) {
+                await oComponent._fetchCommonData("HM_Branch", "sBRModel");
+                oBRModel = oComponent.getModel("sBRModel");
+            }
 
-
-        Branch: function () {
-            return new Promise((resolve) => {
-                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
-                const oData = oBRModel.getData();
-
-                if (oData && Array.isArray(oData) && oData.length) {
-                    resolve(oData);
-                } else {
-                    oBRModel.attachRequestCompleted(() => {
-                        resolve(oBRModel.getData());
-                    });
-                }
-            });
+            const aData = oBRModel?.getData();
+            return Array.isArray(aData) ? aData : [];
         },
+
         onViewMoreRooms: async function () {
             // Load next page
             this.flag = false
