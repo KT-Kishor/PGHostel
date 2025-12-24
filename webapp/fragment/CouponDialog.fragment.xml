@@ -17,11 +17,10 @@
 		<content>
 			<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" emptySpanXL="4" emptySpanL="4" emptySpanM="4" columnsXL="2" columnsL="2" columnsM="1">
 				<f:content>
-				<Label required="true" text="Branch"/>
-
-<ComboBox id="cbBranchCode" width="100%" placeholder="Select Branch" items="{Branchmodel>/}" showSecondaryValues="true" selectionChange="onBranchSelect">
-	<core:ListItem key="{Branchmodel>Name}" text="{Branchmodel>BranchID} - {Branchmodel>Name}" additionalText="{Branchmodel>City}" />
-</ComboBox>
+					<Label required="true" text="Branch"/>
+					<ComboBox valueStateText="Select Branch" change="onChange_DiscountType" id="cbBranchCode" width="100%" placeholder="Select Branch" items="{Branchmodel>/}" showSecondaryValues="true" selectionChange="onBranchSelect">
+						<core:ListItem key="{Branchmodel>Name}" text="{Branchmodel>BranchID} - {Branchmodel>Name}" additionalText="{Branchmodel>City}" />
+					</ComboBox>
 					<Label required="true" text="Discount Type"/>
 					<ComboBox id="cbDiscountType" placeholder="Select Discount Type" selectedKey="{CouponView>/CurrentCoupon/DiscountType}" change="onChange_DiscountType" valueStateText="Select Discount Type">
 						<items>
@@ -33,26 +32,22 @@
 					<Input placeholder="Enter Discount Value" id="inDiscountValue" value="{CouponView>/CurrentCoupon/DiscountValue}" type="Number" liveChange="onLiveChange_DiscountValue" valueStateText="Enter Discount Value" />
 					<Label required="true" text="Max Uses"/>
 					<Input placeholder="Enter Max Uses" id="inMaxUses" value="{CouponView>/CurrentCoupon/MaxUses}" type="Number" liveChange="onLiveChange_Number_MinOne" valueStateText="Enter Max Uses" />
-					<!-- <Label required="true" text="Used Count"/><Input placeholder="Enter Used Count" id="inUsedCount" value="{CouponView>/CurrentCoupon/UsedCount}" type="Number" liveChange="onLiveChange_Number_AllowZero" valueStateText="Enter Used Count" />
-				-
-					<Label required="true" text="Per User Limit"/><Input placeholder="Enter Per User Limit" id="inPerUserLimit" value="{CouponView>/CurrentCoupon/PerUserLimit}" type="Number" liveChange="onLiveChange_Number_MinOne" valueStateText="Enter Per User Limit" />
-					-->
 					<Label required="true" text="Min Order Value"/>
 					<Input placeholder="Enter Minimum Order Value" id="inMinOrderValue" value="{CouponView>/CurrentCoupon/MinOrderValue}" type="Number" liveChange="onLiveChange_MinAmount" valueStateText="Enter Min Order Value" />
 					<Label text="Status" visible="{= ${CouponView>/DialogMode} === 'Edit' }" required="true" />
-					<ComboBox id="cbStatus" selectedKey="{CouponView>/CurrentCoupon/Status}" visible="{= ${CouponView>/DialogMode} === 'Edit' }" change="onChange_Status">
+					<ComboBox id="cbStatus" selectedKey="{CouponView>/CurrentCoupon/Status}" visible="{= ${CouponView>/DialogMode} === 'Edit' }" change="onChange_Status" valueStateText="Select Status" >
 						<core:Item key="Active" text="Active"/>
 						<core:Item key="Inactive" text="Inactive"/>
 						<core:Item key="Expired" text="Expired"/>
 					</ComboBox>
 					<Label required="true" text="Start Date"/>
 					<DatePicker valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" placeholder="Select Start Date" id="dpStartDate" value="{CouponView>/CurrentCoupon/StartDate}" change="onChange_Date" valueStateText="Select Start Date" />
+					
 					<Label required="true" text="End Date"/>
 					<DatePicker placeholder="Select End Date" id="dpEndDate" value="{CouponView>/CurrentCoupon/EndDate}" valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" change="onChange_Date" valueStateText="Select End Date" />
 				</f:content>
 			</f:SimpleForm>
 		</content>
-		<!-- <beginButton><Button text="Save" type="Emphasized" press="onSaveCoupon"/></beginButton><endButton><Button text="Cancel" press="onCancelCouponDialog"/></endButton> -->
 		<beginButton>
 			<Button type="Emphasized" class="myUnifiedBtn" text="{= ${CouponView>/DialogMode} === 'Add' ? 'Create Coupon' : 'Update Coupon'}" press="onSaveCoupon"/>
 		</beginButton>

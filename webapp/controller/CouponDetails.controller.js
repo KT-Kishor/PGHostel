@@ -211,7 +211,7 @@ sap.ui.define([
                 console.error("Error while loading branch data:", err);
             }
         },
-        _syncBranchInEditMode: function () {
+        _syncBranchInEditMode: function () { 
             const oView = this.getView();
             const oVM = oView.getModel("CouponView");
             const sBranchCode = oVM.getProperty("/CurrentCoupon/BranchCode");
@@ -346,10 +346,12 @@ sap.ui.define([
                 .map(oItem => oItem.getBindingContext("CouponModel")?.getObject()?.CouponCode)
                 .filter(Boolean);
 
-            const sCouponText = aCouponCodes.join(", ");
 
+            const sLabel = aCouponCodes.length === 1 ? "Coupon Code" : "Coupon Codes";
+
+            const sCouponText = aCouponCodes.join(", ");
             MessageBox.confirm(
-                `Are you sure you want to delete the following coupon(s)?\n\n${sCouponText}`,
+                `Are you sure you want to delete the following ${sLabel}?\n\n • ${sLabel}: ${sCouponText}`,
                 {
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -388,6 +390,7 @@ sap.ui.define([
                     }.bind(this)
                 }
             );
+
         },
 
         onDownloadCoupons: function () {
@@ -656,7 +659,9 @@ sap.ui.define([
             // Prevents FilterBar auto-search cascade
         },
 
-
+        onBranchChange: function (oEvent) {
+            
+        },
 
         _applyCouponGroupingAndSorting: function () {
             const oTable = this.byId("couponTable");
@@ -906,33 +911,73 @@ sap.ui.define([
             }
         },
 
+        onCouponSelectionChange: function (oEvent) {
+            const oTable = oEvent.getSource();
+            const aSel = oTable.getSelectedItems();
+            const oShareBtn = this.byId("btnShareCoupon");
+
+            if (aSel.length !== 1) {
+                oShareBtn.setEnabled(false);
+                return;
+            }
+
+            const oCoupon =
+                aSel[0].getBindingContext("CouponModel").getObject();
+
+            oShareBtn.setEnabled(oCoupon.Status === "Active");
+        },
+
+
+
 
 
         onShareCoupon: async function () {
             const oTable = this.byId("couponTable");
             const aSel = oTable ? oTable.getSelectedItems() : [];
-            if (!aSel || aSel.length !== 1) {
-                MessageToast.show("Select one coupon to share.");
+
+            if (aSel.length !== 1) {
+                sap.m.MessageToast.show("Select exactly one coupon to share.");
                 return;
             }
-            this._oCouponToShare =
-                aSel[0].getBindingContext("CouponModel").getObject();
+
+            const oCtx = aSel[0].getBindingContext("CouponModel");
+            const oCoupon = oCtx.getObject();
+
+            // 🔒 HARD BUSINESS RULE
+            if (oCoupon.Status !== "Active") {
+                sap.m.MessageToast.show("Only ACTIVE coupons can be shared");
+                return;
+            }
+
+            // cache for share confirm
+            this._oCouponToShare = oCoupon;
+
             const aRecipients = this._aAllRecipients || [];
             if (!aRecipients.length) {
-                MessageToast.show("No contacts found.");
+                sap.m.MessageToast.show("No contacts found.");
                 return;
             }
+            const oView = this.getView();
+            const oVM = oView.getModel("CouponView");
+
+            // this._oCouponToShare is already set earlier
+            oVM.setProperty("/ShareCoupon", {
+                CouponCode: this._oCouponToShare.CouponCode,
+                BranchCode: this._oCouponToShare.BranchCode
+            });
             if (!this._oShareDialog) {
                 const oView = this.getView();
-                this._oShareDialog = await Fragment.load({
+                this._oShareDialog = await sap.ui.core.Fragment.load({
                     id: oView.getId(),
                     name: "sap.ui.com.project1.fragment.CouponShare",
                     controller: this
                 });
                 oView.addDependent(this._oShareDialog);
             }
+
             this._oShareDialog.open();
         },
+
         onRoleChange: function (e) {
             const sRole = e.getSource().getSelectedKey();
             const aUsers = this._aAllRecipients
@@ -1081,6 +1126,12 @@ sap.ui.define([
             }
             this._clearTableSelection();
             this._oCouponToShare = null;
+
+            // 🔒 REQUIRED UX RESET
+            const oShareBtn = this.byId("btnShareCoupon");
+            if (oShareBtn) {
+                oShareBtn.setEnabled(false);
+            }
         },
     });
 });

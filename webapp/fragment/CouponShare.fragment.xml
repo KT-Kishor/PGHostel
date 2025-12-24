@@ -1,8 +1,13 @@
-<Dialog title="Share Coupon" contentWidth="420px" 
+<Dialog title="Share Coupon" contentWidth="420px" id="couponShareDialog"
 	xmlns="sap.m" 
 	xmlns:core="sap.ui.core" 
 	xmlns:f="sap.ui.layout.form" afterClose="onShareDialogAfterClose">
+
 	<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" columnsL="1" columnsM="1" width="100%">
+<VBox class="sapUiSmallMarginBottom">
+	<Title text="{= 'Coupon : ' + ${CouponView>/ShareCoupon/CouponCode} }" wrapping="true" class="sapUiTinyMarginBottom" />
+	<Title text="{= 'Branch : ' + ${CouponView>/ShareCoupon/BranchCode} }" wrapping="true" />
+</VBox>
 <!-- Role -->
 <Label text="Recipient role" required="true"/>
 <ComboBox id="cbRole" width="100%" placeholder="Select a Role" items="{RoleModel>/}" selectionChange="onRoleChange" change="onRoleLiveChange" required="true" valueStateText="Select a role">
@@ -18,7 +23,7 @@
 <Input id="inpManualEmail" width="100%" placeholder="Enter Email Addresses Separated by Commas" liveChange="onManualEmailLiveChange" valueStateText="Enter email addresses separated by commas" />
 	</f:SimpleForm>
 	<beginButton>
-		<Button text="Send Coupon" class="myUnifiedBtn" press="onConfirmShareCoupon"/>
+		<Button text="Send Coupon"  class="myUnifiedBtn" press="onConfirmShareCoupon"/>
 	</beginButton>
 	<endButton>
 		<Button text="Cancel" class="myUnifiedBtn" press="onCloseShareDialog"/>

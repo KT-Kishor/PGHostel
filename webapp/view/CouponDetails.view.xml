@@ -1,301 +1,121 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.CouponDetails"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    displayBlock="true"
-    busyIndicatorDelay="0"
->
-    <Page
-        id="couponDetailsPage"
-        showHeader="true"
-    >
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
-                id="couponFilterBar"
-                showFilterConfiguration="false"
-                useToolbar="false"
-                clear="onClearCoupons"
-                showClearOnFB="true"
-                search="onCouponSearch"
-            >
-                <fb:filterGroupItems>
-                    <!-- BRANCH -->
-                    <fb:FilterGroupItem
-                        name="BranchCode"
-                        groupName="Group"
-                        label="{i18n>CDBranch}"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <!-- <ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true">
-							<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />
-						</ComboBox> -->
-                            <ComboBox
-                                id="fBranch"
-                                width="100%"
-                                items="{Branchmodel>/}"
-                                placeholder="Select Branch"
-                                selectedKey=""
-                                showSecondaryValues="true"
-                            >
-                                <core:ListItem
-                                    key="{Branchmodel>BranchID}"
-                                    text="{Branchmodel>BranchID} - {Branchmodel>Name}"
-                                    additionalText="{Branchmodel>City}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <!-- STATUS -->
-                    <fb:FilterGroupItem
-                        name="Status"
-                        groupName="Group"
-                        label="{i18n>CDStatus}"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="fStatus"
-                                width="100%"
-                                placeholder="Select Status"
-                            >
-                                <!-- <core:Item key="" text="All"/> -->
-                                <core:Item
-                                    key="Active"
-                                    text="Active"
-                                />
-                                <core:Item
-                                    key="Expired"
-                                    text="Expired"
-                                />
-                                <core:Item
-                                    key="Inactive"
-                                    text="Inactive"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <!-- DISCOUNT TYPE -->
-                    <fb:FilterGroupItem
-                        name="DiscountType"
-                        groupName="Group"
-                        label="{i18n>CDDiscountType}"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="fDiscountType"
-                                width="100%"
-                                placeholder="Select Discount Type"
-                            >
-                                <!-- <core:Item key="" text="All"/> -->
-                                <core:Item
-                                    key="Percentage"
-                                    text="Percentage"
-                                />
-                                <core:Item
-                                    key="Fixed Amount"
-                                    text="Fixed Amount"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <!-- END DATE RANGE -->
-                    <fb:FilterGroupItem
-                        name="EndDateRange"
-                        groupName="Group"
-                        label="{i18n>CDEndDate}"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <DateRangeSelection
-                                change="onDateRangeChange"
-                                id="fEndRange"
-                                delimiter=" to "
-                                valueFormat="yyyy-MM-dd"
-                                displayFormat="dd/MM/yyyy"
-                                width="100%"
-                            />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
-                id="couponTable"
-                items="{path: 'CouponModel>/', parameters: { groupHeaderFactory: '.createGroupHeader' }}"
-                mode="MultiSelect"
-                sticky="ColumnHeaders,HeaderToolbar"
-                growing="true"
-                busyIndicatorDelay="0"
-                growingThreshold="100"
-                alternateRowColors="true"
-            >
-                <!-- Header with actions -->
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title text="{i18n>CDtitle} ({= ${CouponModel>/}.length })" />
-                        <ToolbarSpacer />
-                        <Button
-                            text="{i18n>CDShareCoupons}"
-                            tooltip="Share selected coupons"
-                            press="onShareCoupon"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>CDAddCoupon}"
-                            tooltip="Add new coupon"
-                            press="onAddCoupon"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>CDEditCoupon}"
-                            tooltip="Edit selected coupon"
-                            press="onEditCoupon"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>CDDeleteCoupons}"
-                            tooltip="Delete selected coupons"
-                            press="onDeleteCoupon"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>CDDownloadCoupons}"
-                            tooltip="Download coupon list"
-                            press="onDownloadCoupons"
-                            class="myUnifiedBtn"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <!-- Columns -->
-                <columns>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDBranch}"
-                            tooltip="Branch"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>CDCouponCode}"
-                            tooltip="Coupon Code"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Desktop"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDDiscountType}"
-                            tooltip="Discount Type"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDDiscountValue}"
-                            tooltip="Discount Value"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDMaxUses}"
-                            tooltip="Maximum Uses"
-                        />
-                    </Column>
-                    <!-- <Column demandPopin="true"><Text text="Used Count"/></Column><Column minScreenWidth="Tablet" demandPopin="true"><Text text="Per User Limit"/></Column> -->
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDMinOrderValue}"
-                            tooltip="Minimum Order Value"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Desktop"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDStartDate}"
-                            tooltip="Start Date"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Desktop"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDEndDate}"
-                            tooltip="End Date"
-                        />
-                    </Column>
-                    <!-- <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Status"/></Column> -->
-                    <Column
-                        minScreenWidth="Desktop"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDCreatedAt}"
-                            tooltip="Created At"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>CDCreatedBy}"
-                            tooltip="Created By"
-                        />
-                    </Column>
-                </columns>
-                <!-- Row template -->
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <Text text="{CouponModel>BranchCode}" />
-                            <Text text="{CouponModel>CouponCode}" />
-                            <Text text="{CouponModel>DiscountType}" />
-                            <Text
-                                text="{   parts: [      { path: 'CouponModel>DiscountValue' },      { path: 'CouponModel>DiscountType' }   ],   formatter: '.Formatter.formatDiscountValue'	}"
-                            />
-                            <Text text="{CouponModel>MaxUses}" />
-                            <!-- <Text text="{CouponModel>UsedCount}" /> -->
-                            <!-- <Text text="{CouponModel>PerUserLimit}" /> -->
-                            <Text text="{CouponModel>MinOrderValue}" />
-                            <Text
-                                text="{    path: 'CouponModel>StartDate',    formatter: '.Formatter.formatDate'}"
-                            />
-                            <Text
-                                text="{    path: 'CouponModel>EndDate',    formatter: '.Formatter.formatDate'}"
-                            />
-                            <!-- <ObjectStatus text="{CouponModel>Status}" state="{ path: 'CouponModel>Status', formatter: '.Formatter.formatStatusState' }"/> -->
-                            <Text
-                                text="{    path: 'CouponModel>CreatedAt',    formatter: '.Formatter.formatDate'}"
-                            />
-                            <Text text="{CouponModel>CreatedBy}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-    </Page>
+<mvc:View controllerName="sap.ui.com.project1.controller.CouponDetails" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:core="sap.ui.core" 
+	xmlns:fb="sap.ui.comp.filterbar" displayBlock="true" busyIndicatorDelay="0">
+	<Page id="couponDetailsPage" showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar id="couponFilterBar" useToolbar="false" showClearOnFB="true" showFilterConfiguration="false" filterContainerWidth="auto" search="onCouponSearch" clear="onClearCoupons">
+				<fb:filterGroupItems>
+					<!-- BRANCH -->
+					<fb:FilterGroupItem name="BranchCode" groupName="Group" label="Branch" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="fBranch" width="100%" placeholder="Select Branch" items="{sBRModel>/}" showSecondaryValues="true">
+								<core:ListItem key="{sBRModel>Name}" text="{sBRModel>BranchID} - {sBRModel>Name}" additionalText="{sBRModel>City}" />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<!-- STATUS -->
+					<fb:FilterGroupItem name="Status" groupName="Group" label="Status" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="fStatus" width="100%" placeholder="Select Status">
+								<!-- <core:Item key="" text="All"/> -->
+								<core:Item key="Active" text="Active"/>
+								<core:Item key="Expired" text="Expired"/>
+								<core:Item key="Inactive" text="Inactive"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<!-- DISCOUNT TYPE -->
+					<fb:FilterGroupItem name="DiscountType" groupName="Group" label="Discount Type" visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="fDiscountType" width="100%" placeholder="Select Discount Type">
+								<!-- <core:Item key="" text="All"/> -->
+								<core:Item key="Percentage" text="Percentage"/>
+								<core:Item key="Fixed Amount" text="Fixed Amount"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<!-- END DATE RANGE -->
+					<fb:FilterGroupItem name="EndDateRange" groupName="Group" label="End Date" visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection id="fEndRange" delimiter=" to " valueFormat="yyyy-MM-dd" displayFormat="dd/MM/yyyy" width="100%" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="couponTable" selectionChange="onCouponSelectionChange" items="{path: 'CouponModel>/', parameters: { groupHeaderFactory: '.createGroupHeader' }}" mode="MultiSelect" sticky="ColumnHeaders,HeaderToolbar" growing="true" busyIndicatorDelay="0" growingThreshold="100" alternateRowColors="true">
+				<!-- Header with actions -->
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="Coupons ({= ${CouponModel>/}.length })" />
+						<ToolbarSpacer/>
+						<Button id="btnShareCoupon" text="Share Coupon" enabled="false" press="onShareCoupon" class="myUnifiedBtn"/>
+						<Button text="Add" press="onAddCoupon" class="myUnifiedBtn" />
+						<Button text="Edit" press="onEditCoupon" class="myUnifiedBtn" />
+						<Button text="Delete" press="onDeleteCoupon" class="myUnifiedBtn" />
+						<Button text="Download" press="onDownloadCoupons" class="myUnifiedBtn" />
+					</OverflowToolbar>
+				</headerToolbar>
+				<!-- Columns -->
+				<columns>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Branch"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="Coupon Code"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Discount Type"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Discount Value"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Max Uses"/>
+					</Column>
+					<!-- <Column demandPopin="true"><Text text="Used Count"/></Column><Column minScreenWidth="Tablet" demandPopin="true"><Text text="Per User Limit"/></Column> -->
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Min Order Value"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Start Date"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="End Date"/>
+					</Column>
+					<!-- <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Status"/></Column> -->
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Text text="Created At"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Created By"/>
+					</Column>
+				</columns>
+				<!-- Row template -->
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{CouponModel>BranchCode}" />
+							<Text text="{CouponModel>CouponCode}" />
+							<Text text="{CouponModel>DiscountType}" />
+							<Text text="{   parts: [      { path: 'CouponModel>DiscountValue' },      { path: 'CouponModel>DiscountType' }   ],   formatter: '.Formatter.formatDiscountValue'		}" />
+							<Text text="{CouponModel>MaxUses}" />
+							<!-- <Text text="{CouponModel>UsedCount}" /> -->
+							<!-- <Text text="{CouponModel>PerUserLimit}" /> -->
+							<Text text="{CouponModel>MinOrderValue}" />
+							<Text text="{    path: 'CouponModel>StartDate',    formatter: '.Formatter.formatDate'}" />
+							<Text text="{    path: 'CouponModel>EndDate',    formatter: '.Formatter.formatDate'}" />
+							<!-- <ObjectStatus text="{CouponModel>Status}" state="{ path: 'CouponModel>Status', formatter: '.Formatter.formatStatusState' }"/> -->
+							<Text text="{    path: 'CouponModel>CreatedAt',    formatter: '.Formatter.formatDate'}" />
+							<Text text="{CouponModel>CreatedBy}" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
 </mvc:View>
