@@ -463,11 +463,13 @@ _filterRateTypesForEdit: function () {
                 const oStartTime = sap.ui.core.Fragment.byId(sViewId, "FT_id_editStartTime");
                 const oEndTime   = sap.ui.core.Fragment.byId(sViewId, "FT_id_editEndTime");
                 const oTotalTime = sap.ui.core.Fragment.byId(sViewId, "editTotalTime");
+               
 
                 const isMandatoryValid =
                     utils._LCvalidateMandatoryField(oStartTime, "ID") &&
                     utils._LCvalidateMandatoryField(oEndTime, "ID") &&
-                    utils._LCvalidateMandatoryField(oTotalTime, "ID");
+                    utils._LCvalidateMandatoryField(oTotalTime, "ID")
+                  
 
                 if (!isMandatoryValid) {
                     sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
@@ -483,6 +485,15 @@ _filterRateTypesForEdit: function () {
                     return;
                 }
             }
+            const oUnitText = sap.ui.core.Fragment.byId(sViewId, "FT_id_UnitType");
+
+// 🔴 BLOCK SAVE if ComboBox invalid
+if (oUnitText.getValueState() === sap.ui.core.ValueState.Error || !oUnitText.getSelectedItem()) {
+    utils._LCvalidationComboBox(oUnitText, "ID");
+    sap.m.MessageBox.error("Please select a valid Unit Type.");
+    return;
+}
+
 
             const oUpdatedData = Object.assign({}, oEditModel.getData()); // shallow copy
             let aFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
@@ -925,6 +936,17 @@ _filterRateTypesForEdit: function () {
             return new Date(s);
         },
    onUnitTextChange: function (oEvent) {
+          
+  const oCombo = oEvent.getSource();
+
+    // 🔴 Typed value (no selectedItem)
+    if (!oCombo.getSelectedItem()) {
+        utils._LCvalidationComboBox(oEvent); // SAFE call
+        sap.m.MessageToast.show("Please select Unit Type from list.");
+        return;
+    }
+
+    oCombo.setValueState("None");
             const oEditModel = this.getView().getModel("edit");
             const oFacilityModel = this.getView().getModel("FacilityModel");
 

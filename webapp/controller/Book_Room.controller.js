@@ -1050,7 +1050,6 @@ sap.ui.define([
     text: "Clear",
     type: "Transparent",
     tooltip: "Clear Document",
-    class:"Bookingclear",
     press: function (oEvent) {
 
         const oButton = oEvent.getSource();
@@ -1462,6 +1461,32 @@ new sap.m.Text({
 
 
  onDialogNextButton: async function () {
+
+     const aErrorControls = sap.ui.getCore().byFieldGroupId
+        ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
+        : [];
+
+    let bHasError = false;
+
+    // Fallback: scan entire view (SAFE for dynamic controls)
+    if (aErrorControls.length === 0) {
+        this.getView().findAggregatedObjects(true, function (oControl) {
+            if (oControl.getValueState && oControl.getValueState() === sap.ui.core.ValueState.Error) {
+                bHasError = true;
+                return true; // stop scan
+            }
+            return false;
+        });
+    } else {
+        bHasError = aErrorControls.some(c =>
+            c.getValueState && c.getValueState() === sap.ui.core.ValueState.Error
+        );
+    }
+
+    if (bHasError) {
+        sap.m.MessageBox.error("Please correct the highlighted errors before proceeding.");
+        return; // ⛔ STOP wizard navigation
+    }
     const oModel = this.getView().getModel("HostelModel");
     const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
     // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
@@ -5396,6 +5421,11 @@ onGlobalSearch: function (oEvent) {
             if (this._oProfileDialog) this._oProfileDialog.close();
         },
         onCancelPress: function () {
+             this._isPersonUIInitialized = false;
+        this._mustRecreatePersonUI = true;
+        this._lastPersonCount = null;
+        this._iSelectedStepIndex = 0;
+        this._oSelectedStep = null;
             this.resetAllBookingData()
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
