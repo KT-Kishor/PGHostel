@@ -16,6 +16,9 @@ sap.ui.define([
         _onRouteMatched: async function (oEvent) {
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
             this.getView().setModel(model, "LoginModel");
+            var oRateTypeModel = this.getView().getModel("RateType");
+            this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
+
             this.Code = ""
             var model = new JSONModel({
                 FacilityName: "",
@@ -516,13 +519,14 @@ sap.ui.define([
                     // -------------------------------
                     // Calculate Days
                     // -------------------------------
+                    facStart.setHours(0, 0, 0, 0);
+                    facEnd.setHours(0, 0, 0, 0);
                     const dayDiff = facEnd - facStart;
-                    let days = Math.ceil(dayDiff / (1000 * 3600 * 24));
-
-                    if (days.toString().includes("0")) {
-                        // do nothing, keep days as is
+                    let days = 0;
+                    if (unit === "Per Day" || unit === "Per Hour") {
+                        days = dayDiff / (1000 * 60 * 60 * 24) + 1; // inclusive
                     } else {
-                        days += 1; // otherwise add 1
+                        days = 0; // for months/years we don't use days
                     }
 
 
@@ -553,6 +557,7 @@ sap.ui.define([
                     if (unit === "Per Day") {
                         fTotal = fPrice;
                         totalFacilityPricePerDay += fPrice;
+                        let days = dayDiff / (1000 * 60 * 60 * 24) + 1;
 
                     } else if (unit === "Per Month") {
                         f.TotalMonths = totalMonths;
@@ -735,16 +740,12 @@ sap.ui.define([
             var aFacilities = oFacilitiesModel.getData();
 
             // 3. Get RateType Model
-            var oRateTypeModel = this.getView().getModel("RateType");
-            var aRateTypes = oRateTypeModel.getData();
+
 
             // 4. Get selected facility data
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
             if (!oSelectedFacility) return;
 
-            if (!this._aOriginalRateTypes) {
-                this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
-            }
 
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
@@ -781,6 +782,7 @@ sap.ui.define([
                 if (rt.RateType === "Per Hour") return Number(oSelectedFacility.PerHourPrice) !== 0;
                 return true;
             });
+            var oRateTypeModel = this.getView().getModel("RateType");
 
             // 8. Set filtered data back to RateType model
             oRateTypeModel.setData(aFilteredRateTypes);
@@ -917,11 +919,15 @@ sap.ui.define([
             let iDays = 0;
 
             if (sUnit === "Per Month") {
-                oEnd.setDate(oEnd.getDate() + iCount * 30);
-                iDays = iCount * 30; // Add Months as 30 days
+                oEnd.setMonth(oEnd.getMonth() + iCount);
+                oEnd.setDate(oEnd.getDate() - 1)
+
             } else if (sUnit === "Per Year") {
-                oEnd.setDate(oEnd.getDate() + iCount * 365);
-                iDays = iCount * 365; // Add Years as 365 days
+                oEnd.setMonth(oEnd.getMonth() + iCount);
+                oEnd.setDate(oEnd.getDate() - 1)
+            }
+            if (oEnd && iDays === 0) {
+                iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
             }
 
             // Format yyyy-MM-dd for DatePicker
@@ -1408,8 +1414,8 @@ sap.ui.define([
             var originalRent = Number(oCustomerData.RentPrice || 0);
             var FacilitiPrice = Number(oCustomerData.TotalFacilityPrice || 0);
 
-    var previousDiscount = Number(this.originalDis ?? oCustomerData.Discount);
-;
+            var previousDiscount = Number(this.originalDis ?? oCustomerData.Discount);
+            ;
             // Recalculate subtotal (original subtotal before coupon)
             var subtotal = originalRent + FacilitiPrice - previousDiscount; // Assuming SubTotal originally was just RentPrice
             oCustomerData.SubTotal = subtotal;
@@ -1903,7 +1909,7 @@ sap.ui.define([
         onSaveBooking: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
-                const oInput = this.byId("CD_ID_idPhone")
+            const oInput = this.byId("CD_ID_idPhone")
 
             // Mandatory validation
             const isMandatoryValid = (
@@ -1916,7 +1922,7 @@ sap.ui.define([
                 utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("CC_id_Country"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("CC_id_State"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") 
+                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID")
             );
 
             if (Bookingdata.Country === "India") {
@@ -1971,7 +1977,7 @@ sap.ui.define([
                     "RoomPrice": CustomerData.OrginalRentPrice,
                     "Discount": CustomerData.Discount || 0,
                     "CouponCode": Bookingdata.CouponCode,
-                    "TotalRoomprice":CustomerData.RentPrice
+                    "TotalRoomprice": CustomerData.RentPrice
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
                     // Normalize UnitText for facility as well
@@ -2430,7 +2436,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
                 return;
             }
-               this.originalDis = oCustomerData.Discount
+            this.originalDis = oCustomerData.Discount
             this.CouponDiscount = oCoupon.DiscountValue
 
             var discountAmount = 0;
