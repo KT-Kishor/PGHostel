@@ -204,6 +204,8 @@ sap.ui.define([
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
              this._perDayInfoShown = false;
+             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
+
         },
         Roomdetails: async function () {
             try {
@@ -1462,7 +1464,6 @@ new sap.m.Text({
  onDialogNextButton: async function () {
     const oModel = this.getView().getModel("HostelModel");
     const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
-
     // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
     if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
         this._createDynamicPersonsUI();              // builds UI for current count
@@ -1473,6 +1474,7 @@ new sap.m.Text({
 
     // STEP 1: validations
     if (this._iSelectedStepIndex === 1) {
+      
         this._resetCouponAndDiscount();
         const aMissing = this._checkMandatoryFields();
         if (aMissing.length > 0) {
@@ -1572,6 +1574,32 @@ new sap.m.Text({
 
             if (this._iSelectedStepIndex === 1) {
 
+        const sStartDate = oModel.getProperty("/StartDate");
+        const sEndDate   = oModel.getProperty("/EndDate");
+
+        if (!sStartDate || !sEndDate) {
+
+            sap.m.MessageToast.show(
+                "Please select Start Date and End Date before proceeding."
+            );
+
+            // ❌ Cancel navigation
+            this._oWizard.previousStep();
+
+            // 🔄 Reset index
+            this._iSelectedStepIndex = 0;
+
+            // 🔒 Ensure step stays locked
+            oModel.setProperty("/IsGeneralInfoValid", false);
+
+            // Update buttons for Step 0
+        
+            return;
+        }
+    }
+
+            if (this._iSelectedStepIndex === 1) {
+
                 if (this._mustRecreatePersonUI) {
                     this._createDynamicPersonsUI();
                     this._mustRecreatePersonUI = false;
@@ -1582,7 +1610,9 @@ new sap.m.Text({
             if (this._iSelectedStepIndex === 2) {
                 this.TC_onDialogNextButton();
             }
-        },
+        }
+
+,
 
         handleButtonsVisibility: function () {
             var oModel = this.getView().getModel("OBTNModel");
@@ -2191,6 +2221,23 @@ else if (sDuration === "Per Year") {
             const oRoomDetailModel = oView.getModel("RoomDetailModel");
             const oBTN = oView.getModel("OBTNModel");
 
+            if (this._oWizard) {
+        const aSteps = this._oWizard.getSteps();
+        this._oWizard.goToStep(aSteps[0], true); // force General Info
+        this._oSelectedStep = aSteps[0];
+        this._iSelectedStepIndex = 0;
+    }
+
+    // 🔒 LOCK PERSONAL INFO STEP
+    oHostelModel.setProperty("/IsGeneralInfoValid", false);
+    oBTN.setProperty("/Next", false);
+    oBTN.setProperty("/Submit", false);
+    oBTN.setProperty("/Cancel", false);
+
+    // 🔒 FORCE INTERNAL WIZARD STATE
+    this._iSelectedStepIndex = 0;
+    this._oSelectedStep = this._oWizard.getSteps()[0];
+
             if (!oHostelModel || !oRoomDetailModel || !oBTN) return;
 
             // Reset all selected facilities
@@ -2238,6 +2285,7 @@ else if (sDuration === "Per Year") {
 
             /** ⭐ Per Day → user selects date manually */
             if (sValue === "Per Day") {
+                  this._oWizard.previousStep();
                 oBTN.setProperty("/Month", false);
                 oHostelModel.setProperty("/StartDate", "");
                 oHostelModel.setProperty("/EndDate", "");
@@ -2248,7 +2296,9 @@ else if (sDuration === "Per Year") {
 
             /** ⭐ Per Month / Per Year → automatic end date */
             if (sValue === "Per Month" || sValue === "Per Year") {
+                  this._oWizard.previousStep();
                 oBTN.setProperty("/Month", true);
+
                 oHostelModel.setProperty("/SelectedMonths", "1");
                 oHostelModel.setProperty("/StartDate", "");
                 oHostelModel.setProperty("/EndDate", "");

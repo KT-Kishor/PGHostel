@@ -59,7 +59,7 @@
                     <WizardStep
                         id="TC_id_stepGeneralInfo"
                         title="Booking Information"
-                        validated="true"
+                       validated="{HostelModel>/IsGeneralInfoValid}"
                         class="customPanelHeader"
                     >
                         <core:Fragment
@@ -71,7 +71,7 @@
                     <WizardStep
                         id="idStepPersonal1"
                         title="Personal Information"
-                        validated="true"
+                        validated="{HostelModel>/IsGeneralInfoValid}"
                     >
                         <ScrollContainer
                             width="100%"

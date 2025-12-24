@@ -37,7 +37,7 @@
 
                                
               
-            <Label text="{i18n>noofperson}" required="true" />
+     <Label text="{i18n>noofperson}" required="true" />
 <Select
     id="id_Noofperson1"
     width="100%"
