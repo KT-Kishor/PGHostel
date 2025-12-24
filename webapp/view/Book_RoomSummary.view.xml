@@ -98,7 +98,10 @@
                 justifyContent="End"
                 alignItems="Center"
                 class="sapUiSmallMarginBottom"
-                visible="{= ${LoginModel>/UserID} ? true : false }"
+               visible="{= (${LoginModel>/UserID} ? true : false)
+        || (${LoginModel>/EmployeeID} ? true : false) }"
+
+
             >
                 <!-- Coupon Label -->
                 <Label

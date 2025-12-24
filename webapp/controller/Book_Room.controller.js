@@ -653,7 +653,7 @@ sap.ui.define([
                         }),
 
                         new sap.m.Label({
-                            text: "{i18n>MSdob}",
+                            text: "{i18n>MVDDOB}",
                             required: true
                         }),
                         new sap.m.DatePicker({
