@@ -296,7 +296,7 @@ sap.ui.define([
 
             return `Type: ${mime}\nSize: ${readable}`;
         },
-        formatFacilityPrice: function (price, currency, unitText) {
+        VRD_formatFacilityPrice: function (price, currency, unitText) {
             if (!price || price === 0 || price === "0") {
                 return "";
             }

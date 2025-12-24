@@ -84,7 +84,7 @@
 							<VBox class="unifiedCard">
 								<Image src="{FacilityModel>Image}" class="unifiedCardImg" />
 								<Text text="{FacilityModel>FacilityName}" class="unifiedCardTitle" />
-								<Text class="unifiedCardText" text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.formatFacilityPrice'      }"/>
+								<Text class="unifiedCardText" text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"/>
 							</VBox>
 						</items>
 					</HBox>
