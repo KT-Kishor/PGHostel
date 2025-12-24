@@ -67,7 +67,7 @@
                     header="Manage Extra Facilities"
                     press="TileV_onpressextrafacilities"
                 >
-                    <TileContent unit="Extra facilities">
+                    <TileContent unit="Extra Facilities">
                         <ImageContent src="sap-icon://activities" />
                     </TileContent>
                 </GenericTile>

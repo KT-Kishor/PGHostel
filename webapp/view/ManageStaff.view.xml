@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="UserID"
-                        label="{i18n>MSUserID}"
+                        label="{i18n>MVUserID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -52,7 +52,7 @@
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         name="UserName"
-                        label="{i18n>MSusername}"
+                        label="{i18n>MVusername}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -115,7 +115,7 @@
                 <columns>
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>MSUserID}"
+                            text="{i18n>MVUserID}"
                             tooltip="User ID"
                         />
                     </Column>
@@ -127,7 +127,7 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>MSrole}"
+                            text="{i18n>MVrole}"
                             tooltip="Role"
                         />
                     </Column>
@@ -136,7 +136,7 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="{i18n>MScontactDetails}"
+                            text="{i18n>emailId}"
                             tooltip="Email ID"
                         />
                     </Column>
@@ -145,7 +145,7 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="{i18n>MSgender}"
+                            text="{i18n>MVgender}"
                             tooltip="Gender"
                         />
                     </Column>
@@ -163,7 +163,7 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="{i18n>MSaddress}"
+                            text="{i18n>address}"
                             tooltip="Address"
                         />
                     </Column>
@@ -172,19 +172,12 @@
                     <ColumnListItem>
                         <cells>
                             <Text text="{mainModel>UserID}" />
-                            <Text
-                                text="{mainModel>Salutation} {mainModel>UserName}"
-                            />
+                            <Text text="{mainModel>Salutation} {mainModel>UserName}"/>
                             <Text text="{mainModel>Role}" />
                             <Text text="{mainModel>EmailID}" />
                             <Text text="{mainModel>Gender}" />
-                            <Text
-                                text="{mainModel>STDCode} {mainModel>MobileNo}"
-                            />
-                            <ExpandableText
-                                text="{mainModel>Address}"
-                                maxCharacters="20"
-                            />
+                            <Text text="{mainModel>STDCode} {mainModel>MobileNo}"/>
+                            <ExpandableText text="{mainModel>Address}" maxCharacters="20"/>
                         </cells>
                     </ColumnListItem>
                 </items>
