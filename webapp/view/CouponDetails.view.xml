@@ -56,7 +56,7 @@
 						<Button text="Add" press="onAddCoupon" class="myUnifiedBtn" />
 						<Button text="Edit" press="onEditCoupon" class="myUnifiedBtn" />
 						<Button text="Delete" press="onDeleteCoupon" class="myUnifiedBtn" />
-						<Button text="Download" press="onDownloadCoupons" class="myUnifiedBtn" />
+						<Button text="Download1" press="onDownloadCoupons" class="myUnifiedBtn" />
 					</OverflowToolbar>
 				</headerToolbar>
 				<!-- Columns -->
