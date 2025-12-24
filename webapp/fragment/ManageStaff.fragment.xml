@@ -48,7 +48,7 @@
                             selectedKey="{MDmodel>/Salutation}"
                             change="onChangeSalutation"
                             placeholder="Mr."
-                            valueStateText="{i18n>MSselectSalutation}"
+                            valueStateText="{i18n>MVDsalutation}"
                         >
                             <core:ListItem
                                 key="Mr."
@@ -70,7 +70,7 @@
                     </VBox>
                     <VBox width="75%">
                         <Label
-                            text="{i18n>MSfullName}"
+                            text="{i18n>fullname}"
                             required="true"
                         />
                         <Input
@@ -84,13 +84,13 @@
                     </VBox>
                 </HBox>
                 <Label
-                    text="{i18n>MSdob}"
+                    text="{i18n>MVDDOB}"
                     required="true"
                 />
                 <DatePicker
                     id="MS_id_signUpDOB"
                     value="{MDmodel>/DateOfBirth}"
-                    valueStateText="{i18n>MSselectDOB}"
+                    valueStateText="{i18n>MVDdob}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onChangeDOB"
@@ -98,7 +98,7 @@
                     minDate="{controller>/minDate}"
                 />
                 <Label
-                    text="{i18n>MSgender}"
+                    text="{i18n>MVgender}"
                     required="true"
                 />
                 <Select
@@ -125,14 +125,14 @@
                 </Select>
                 <!-- ================== 2) CONTACT DETAILS ================== -->
                 <Label
-                    text="{i18n>MScontactDetails}"
+                    text="{i18n>emailId}"
                     required="true"
                     class="sapUiTinyMarginTop"
                 />
                 <Input
                     id="MS_id_signUpEmail"
                     value="{MDmodel>/Email}"
-                    placeholder="Enter Email"
+                    placeholder="Enter Email ID"
                     type="Email"
                     required="true"
                     liveChange="onEmailliveChange"
@@ -149,7 +149,7 @@
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     selectionChange=".onbranchChange"
-                    valueStateText="{i18n>MSselectBranchCode}"
+                    valueStateText="{i18n>selectBranchCode}"
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -158,7 +158,7 @@
                     />
                 </MultiComboBox>
                 <Label
-                    text="{i18n>MSrole}"
+                    text="{i18n>MVrole}"
                     required="true"
                 />
                 <ComboBox
@@ -168,7 +168,7 @@
                     selectedKey="{MDmodel>/Role}"
                     change=".onRoleChange"
                     placeholder="Select Role"
-                    valueStateText="{i18n>MSselectRole}"
+                    valueStateText="{i18n>selectRole}"
                 >
                     <core:Item
                         key="{Role>RoleName}"
@@ -176,7 +176,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="{i18n>MScountry}"
+                    text="{i18n>MVDcountry}"
                     required="true"
                 />
                 <ComboBox
@@ -184,7 +184,7 @@
                     change="onChangeCountry"
                     selectionChange="onChangeCountry"
                     placeholder="Select Country"
-                    valueStateText="{i18n>MSselectCountry}"
+                    valueStateText="{i18n>MVDselectcountry}"
                     items="{path:'CountryModel>/', length:1000}"
                     showSecondaryValues="true"
                     selectedKey="{MDmodel>/Country}"
@@ -196,7 +196,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="{i18n>MSstate}"
+                    text="{i18n>MVDstate}"
                     required="true"
                 />
                 <ComboBox
@@ -215,7 +215,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="{i18n>MScity}"
+                    text="{i18n>city}"
                     required="true"
                 />
                 <ComboBox
@@ -279,7 +279,7 @@
                     </VBox>
                 </HBox>
                 <Label
-                    text="{i18n>MSaddress}"
+                    text="{i18n>address}"
                     required="true"
                 />
                 <TextArea
@@ -337,6 +337,7 @@
                     <Button
                         text="{i18n>MSgeneratePassword}"
                         type="Transparent"
+                        tooltip="Generate Password"
                         icon="sap-icon://refresh"
                         press="SM_onGeneratePassword"
                     />
@@ -370,7 +371,7 @@
                     press="onSignUp"
                 />
                 <Button
-                    text="{i18n>MScancel}"
+                    text="{i18n>CancelButton}"
                     tooltip="Close"
                     class="myUnifiedBtn"
                     press="FD_onCancelButtonPress"

@@ -104,8 +104,8 @@
                             tooltip="Delete Staff"
                             class="myUnifiedBtn"
                         />
-						<Button
-                            text="{i18n>MSdownload}"
+                        <Button
+                            text="{i18n>download}"
                             tooltip="Download Manage Staff Data"
                             press="MS_onDownload"
                             class="myUnifiedBtn"
@@ -121,7 +121,7 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>MSName}"
+                            text="{i18n>MVstaffName}"
                             tooltip="Staff Name"
                         />
                     </Column>
@@ -172,12 +172,19 @@
                     <ColumnListItem>
                         <cells>
                             <Text text="{mainModel>UserID}" />
-                            <Text text="{mainModel>Salutation} {mainModel>UserName}"/>
+                            <Text
+                                text="{mainModel>Salutation} {mainModel>UserName}"
+                            />
                             <Text text="{mainModel>Role}" />
                             <Text text="{mainModel>EmailID}" />
                             <Text text="{mainModel>Gender}" />
-                            <Text text="{mainModel>STDCode} {mainModel>MobileNo}"/>
-                            <ExpandableText text="{mainModel>Address}" maxCharacters="20"/>
+                            <Text
+                                text="{mainModel>STDCode} {mainModel>MobileNo}"
+                            />
+                            <ExpandableText
+                                text="{mainModel>Address}"
+                                maxCharacters="20"
+                            />
                         </cells>
                     </ColumnListItem>
                 </items>
