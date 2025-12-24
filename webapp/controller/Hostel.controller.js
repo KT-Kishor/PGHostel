@@ -1770,6 +1770,11 @@ sap.ui.define([
                 }
                 this._isProfileRequested = false;
 
+                if (this._oProfileDialog) {
+                    this._oProfileDialog.destroy();
+                    this._oProfileDialog = null;
+                }
+
                 if (!this._oProfileDialog) {
                     this._oProfileDialog = await sap.ui.core.Fragment.load({
                         id: this.getView().getId(),
@@ -2294,13 +2299,6 @@ sap.ui.define([
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-
-            // // Status check (optional)
-            // var sStatus = (oBookingData.status || "").trim().toLowerCase();
-            // if (sStatus !== "new") {
-            //     sap.m.MessageToast.show("Only bookings with status 'New' can be edited.");
-            //     return;
-            // }
 
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this._oProfileDialog.getModel("profileData");

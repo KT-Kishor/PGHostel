@@ -3953,13 +3953,24 @@ else if (sDuration === "Per Year") {
         
         onAmountChange: function (oEvent) {
             const oInput = oEvent.getSource();
-            utils._LCvalidateAmount(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
+            const sValue = oInput.getValue();
 
-            const value = (oInput.getValue());
-            const total = (this.getView().getModel("HostelModel").getProperty("/FinalTotalCost"));
+            if (!sValue || sValue === "." || sValue.endsWith(".")) {
+                return; // Wait for complete input
+            }
 
-            if (value > total) {
+            const enteredAmount = parseFloat(sValue);
+            const grandTotal = parseFloat(
+                this.getView().getModel("HostelModel").getProperty("/FinalTotalCost")
+            );
+
+            if (isNaN(enteredAmount) || isNaN(grandTotal)) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Invalid amount");
+                return;
+            }
+
+            if (enteredAmount > grandTotal) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText("Amount cannot be greater than Grand Total");
             } else {
@@ -4060,21 +4071,29 @@ else if (sDuration === "Per Year") {
                 }
             }
             const oAmountInput = sap.ui.getCore().byId("idAmount");
-            const rawEntered = oAmountInput.getValue();
-            const rawGrand = this.getView().getModel("HostelModel").getProperty("/FinalTotalCost");
+            const rawEntered = (oAmountInput.getValue() || "").replace(/,/g, "").trim();
+            const rawGrand = (this.getView().getModel("HostelModel").getProperty("/FinalTotalCost") || "").toString().replace(/,/g, "").trim();
 
-            // Clean and convert
-            const enteredAmount = parseFloat((rawEntered || "").toString().replace(/,/g, "").trim());
-            const grandTotal = parseFloat((rawGrand || "").toString().replace(/,/g, "").trim());
+            /* ================= Decimal Completion Guard ================= */
+            if (!rawEntered || rawEntered === "." || rawEntered.endsWith(".")) {
+                oAmountInput.setValueState("Error");
+                oAmountInput.setValueStateText("Please enter a valid amount");
+                sap.m.MessageToast.show("Please enter a valid amount");
+                return;
+            }
 
-            // Handle invalid values
+            /* ================= Parse After Validation ================= */
+            const enteredAmount = parseFloat(rawEntered);
+            const grandTotal = parseFloat(rawGrand);
+
+            /* ================= NaN ================= */
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oAmountInput.setValueState("Error");
                 sap.m.MessageToast.show("Invalid Amount Format");
                 return;
             }
 
-            // Final validation
+            /* ================= Business Rule ================= */
             if (enteredAmount > grandTotal) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText("Amount cannot be greater than Grand Total");

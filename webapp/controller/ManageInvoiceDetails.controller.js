@@ -16,7 +16,6 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function(oEvent) {
-                 this.commonLoginFunction();
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
