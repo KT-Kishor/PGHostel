@@ -552,7 +552,7 @@ sap.ui.define([
                                                 return;
                                             }
                                             
-                                            oLoginModel.setProperty("/UserID", oUser.UserID);
+                                            oLoginModel.setProperty("/UserID", oUser.UserID || oUser.EmployeeID);
                                             oLoginModel.setProperty("/Salutation", oUser.Salutation);
                                             oLoginModel.setProperty("/STDCode", oUser.STDCode);
                                             oLoginModel.setProperty("/Gender", oUser.Gender);
@@ -560,11 +560,11 @@ sap.ui.define([
                                             oLoginModel.setProperty("/State", oUser.State);
                                             oLoginModel.setProperty("/City", oUser.City);
                                             oLoginModel.setProperty("/Address", oUser.Address);
-                                            oLoginModel.setProperty("/UserName", oUser.EmployeeName);
+                                            oLoginModel.setProperty("/UserName", oUser.EmployeeName || oUser.UserName);
                                             oLoginModel.setProperty("/EmailID", oUser.EmailID);
                                             oLoginModel.setProperty("/MobileNo", oUser.MobileNo);
-                                            oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth);
-                                            const DOB = that.Formatter.DateFormat(oUser.DateofBirth)
+                                            oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth || oUser.DateofBirth);
+                                            const DOB = that.Formatter.DateFormat(oUser.DateOfBirth)
                                             // Already logged in → auto-fill
                                             aPersons.forEach(p => {
                                                 p.Salutation = oUser.Salutation || "";
@@ -2561,7 +2561,7 @@ else if (sDuration === "Per Year") {
                 }
 
                 // ---------- rest of your existing success logic (unchanged) ----------
-                oLoginModel.setProperty("/UserID", oMatchedUser.UserID);
+                oLoginModel.setProperty("/EmployeeID", oMatchedUser.UserID);
                 oLoginModel.setProperty("/UserName", oMatchedUser.UserName);
                 oLoginModel.setProperty("/EmailID", oMatchedUser.EmailID);
                 oLoginModel.setProperty("/MobileNo", oMatchedUser.MobileNo);
@@ -4291,20 +4291,33 @@ else if (sDuration === "Per Year") {
         },
         
         _navigateAfterBooking: function () {
-            var oRoute = this.getOwnerComponent().getRouter();
-            oRoute.navTo("RouteHostel");
+    var oRoute = this.getOwnerComponent().getRouter();
+    oRoute.navTo("RouteHostel");
 
-            setTimeout(function () {
-                this.resetAllBookingData();
-                this.openProfileDialog();
-            }.bind(this), 500);
+    setTimeout(function () {
+        this.resetAllBookingData();
 
-            // Show avatar
-            const oAvatar = this.byId("ProfileAvatar");
-            if (oAvatar) {
-                oAvatar.setVisible(true);
-            }
-        },
+        // 🔑 RESET DYNAMIC UI FLAGS
+        this._isPersonUIInitialized = false;
+        this._mustRecreatePersonUI = true;
+        this._lastPersonCount = null;
+        this._iSelectedStepIndex = 0;
+        this._oSelectedStep = null;
+
+        // Optional: destroy old dynamic UI explicitly
+     
+
+        this.openProfileDialog();
+    }.bind(this), 500);
+
+    const oAvatar = this.byId("ProfileAvatar");
+    if (oAvatar) {
+        oAvatar.setVisible(true);
+    }
+},
+
+
+
 
         openProfileDialog: function () {
             this.onPressAvatar()
@@ -5058,7 +5071,7 @@ onGlobalSearch: function (oEvent) {
             // ---- RESET MODEL COMPLETELY ----
             oHostelModel.setData({
                 Persons: [],
-                SelectedPerson: "",
+               
                 SelectedMonths: "",
                 SelectedPriceType: "",
                 StartDate: "",
