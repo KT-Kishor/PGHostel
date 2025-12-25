@@ -475,7 +475,7 @@ _filterRateTypesForEdit: function () {
                     sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
                     return;
                 }
-
+                
                 // Time comparison AFTER mandatory validation
                 const start = new Date("1970-01-01T" + oStartTime.getValue() + ":00");
                 const end   = new Date("1970-01-01T" + oEndTime.getValue() + ":00");

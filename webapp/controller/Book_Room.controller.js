@@ -203,8 +203,8 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
-             this._perDayInfoShown = false;
-             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
+            this._perDayInfoShown = false;
+            oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
 
         },
         Roomdetails: async function () {
@@ -496,7 +496,7 @@ sap.ui.define([
                                         const oUser = oLoginModel ? oLoginModel.getData() : null;
                                         if (bSelected) {
                                             // No login yet → open dialog
-                                            if (!oUser ||!oUser.EmployeeID) {
+                                            if (!oUser || !oUser.EmployeeID) {
                                                 if (!that._oLoginAlertDialog) {
                                                     that._oLoginAlertDialog = sap.ui.xmlfragment(
                                                         that.createId("LoginAlertDialog"),
@@ -551,7 +551,7 @@ sap.ui.define([
                                                 oEvent.getSource().setSelected(false);
                                                 return;
                                             }
-                                            
+
                                             oLoginModel.setProperty("/UserID", oUser.UserID || oUser.EmployeeID);
                                             oLoginModel.setProperty("/Salutation", oUser.Salutation);
                                             oLoginModel.setProperty("/STDCode", oUser.STDCode);
@@ -680,10 +680,10 @@ sap.ui.define([
                         new sap.m.Label({
                             text: "{i18n>MVgender}",
                             required: true,
-                          
+
                         }),
                         new sap.m.Select({
-                          
+
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Gender}",
                             items: [
@@ -710,7 +710,7 @@ sap.ui.define([
                             text: "Email",
                             required: true,
                             type: "Email",
-                            
+
                         }),
                         new sap.m.Input({
                             placeholder: "Enter Email",
@@ -860,7 +860,7 @@ sap.ui.define([
                         }),
 
                         new sap.m.Input({
-                            
+
                             value: "{HostelModel>/Persons/" + i + "/STDCode}",
                         }),
 
@@ -980,115 +980,115 @@ sap.ui.define([
                                 key: "index",
                                 value: i
                             })],
-                          change: function (oEvent) {
-    const oUploader = oEvent.getSource();
-    const index = parseInt(oUploader.data("index"), 10);
-    const oFile = oEvent.getParameter("files")[0];
+                            change: function (oEvent) {
+                                const oUploader = oEvent.getSource();
+                                const index = parseInt(oUploader.data("index"), 10);
+                                const oFile = oEvent.getParameter("files")[0];
 
-    if (!oFile) {
-        return;
-    }
+                                if (!oFile) {
+                                    return;
+                                }
 
-    // 🔹 Get Document Type from the same model used in binding
-    const sDocType = oModel.getProperty("/Persons/" + index + "/DocumentType");
+                                // 🔹 Get Document Type from the same model used in binding
+                                const sDocType = oModel.getProperty("/Persons/" + index + "/DocumentType");
 
-    // 🔴 Validation: Document Type must be selected
-    if (!sDocType) {
-        sap.m.MessageBox.error("Please select Document Type before uploading.");
+                                // 🔴 Validation: Document Type must be selected
+                                if (!sDocType) {
+                                    sap.m.MessageBox.error("Please select Document Type before uploading.");
 
-        // Reset FileUploader
-        oUploader.clear();
-        return;
-    }
+                                    // Reset FileUploader
+                                    oUploader.clear();
+                                    return;
+                                }
 
-    // 🔴 File size validation (2 MB)
-    const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
-    if (oFile.size > MAX_SIZE) {
-        sap.m.MessageBox.error(
-            "File size must be less than 2 MB.\nSelected file size: " +
-            (oFile.size / 1024 / 1024).toFixed(2) + " MB"
-        );
+                                // 🔴 File size validation (2 MB)
+                                const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+                                if (oFile.size > MAX_SIZE) {
+                                    sap.m.MessageBox.error(
+                                        "File size must be less than 2 MB.\nSelected file size: " +
+                                        (oFile.size / 1024 / 1024).toFixed(2) + " MB"
+                                    );
 
-        oUploader.clear();
-        return;
-    }
+                                    oUploader.clear();
+                                    return;
+                                }
 
-    const reader = new FileReader();
+                                const reader = new FileReader();
 
-    reader.onload = function (e) {
-        const sBase64 = e.target.result;
+                                reader.onload = function (e) {
+                                    const sBase64 = e.target.result;
 
-        // Clear previous documents
-        oData.Persons[index].Documents = [];
+                                    // Clear previous documents
+                                    oData.Persons[index].Documents = [];
 
-        // Thumbnail logic
-        let sThumbnail = sBase64;
-        if (oFile.type === "application/pdf") {
-            sThumbnail = "sap-icon://pdf-attachment";
-        }
+                                    // Thumbnail logic
+                                    let sThumbnail = sBase64;
+                                    if (oFile.type === "application/pdf") {
+                                        sThumbnail = "sap-icon://pdf-attachment";
+                                    }
 
-        // Push document
-        oData.Persons[index].Documents.push({
-            FileName: oFile.name,
-            FileType: oFile.type,
-            Document: sBase64,
-            Thumbnail: sThumbnail,
-            DocumentType: sDocType
-        });
+                                    // Push document
+                                    oData.Persons[index].Documents.push({
+                                        FileName: oFile.name,
+                                        FileType: oFile.type,
+                                        Document: sBase64,
+                                        Thumbnail: sThumbnail,
+                                        DocumentType: sDocType
+                                    });
 
-        oModel.refresh(true);
-    };
+                                    oModel.refresh(true);
+                                };
 
-    reader.readAsDataURL(oFile);
-}
+                                reader.readAsDataURL(oFile);
+                            }
 
 
 
                         }),
 
-                     new sap.m.Button({
-    text: "Clear",
-    type: "Transparent",
-    tooltip: "Clear Document",
-    press: function (oEvent) {
+                        new sap.m.Button({
+                            text: "Clear",
+                            type: "Transparent",
+                            tooltip: "Clear Document",
+                            press: function (oEvent) {
 
-        const oButton = oEvent.getSource();
+                                const oButton = oEvent.getSource();
 
-        // Traverse backwards until we find FileUploader
-        let oUploader = null;
-        let oParent = oButton.getParent();
+                                // Traverse backwards until we find FileUploader
+                                let oUploader = null;
+                                let oParent = oButton.getParent();
 
-        while (oParent) {
-            if (oParent instanceof sap.ui.unified.FileUploader) {
-                oUploader = oParent;
-                break;
-            }
-            if (oParent.getContent) {
-                const aContent = oParent.getContent();
-                oUploader = aContent.find(c => c instanceof sap.ui.unified.FileUploader);
-                if (oUploader) break;
-            }
-            oParent = oParent.getParent();
-        }
+                                while (oParent) {
+                                    if (oParent instanceof sap.ui.unified.FileUploader) {
+                                        oUploader = oParent;
+                                        break;
+                                    }
+                                    if (oParent.getContent) {
+                                        const aContent = oParent.getContent();
+                                        oUploader = aContent.find(c => c instanceof sap.ui.unified.FileUploader);
+                                        if (oUploader) break;
+                                    }
+                                    oParent = oParent.getParent();
+                                }
 
-        if (!oUploader) {
-            sap.m.MessageToast.show("Unable to locate uploader");
-            return;
-        }
+                                if (!oUploader) {
+                                    sap.m.MessageToast.show("Unable to locate uploader");
+                                    return;
+                                }
 
-        const index = oUploader.data("index");
+                                const index = oUploader.data("index");
 
-        // 1️⃣ Clear model data
-        oModel.setProperty("/Persons/" + index + "/Documents", []);
-        oModel.setProperty("/Persons/" + index + "/DocumentType", "");
+                                // 1️⃣ Clear model data
+                                oModel.setProperty("/Persons/" + index + "/Documents", []);
+                                oModel.setProperty("/Persons/" + index + "/DocumentType", "");
 
-        // 2️⃣ Clear uploader UI
-        oUploader.clear();
+                                // 2️⃣ Clear uploader UI
+                                oUploader.clear();
 
-        // 3️⃣ Refresh model
-        oModel.refresh(true);
-    }
-})
+                                // 3️⃣ Refresh model
+                                oModel.refresh(true);
+                            }
+                        })
 
 
 
@@ -1190,18 +1190,18 @@ sap.ui.define([
                                 }
                             })
                         ] : []),
-                       new sap.m.HBox({
-            justifyContent: "Start",
-            items: [
-                new sap.m.MessageStrip({
-                    text: "Select a facility by clicking on the image",
-                    type: sap.ui.core.MessageType.Information,
-                    showIcon: true,
-                    showCloseButton: false,
-                    width: "auto"
-                })
-            ]
-        }).addStyleClass("sapUiSmallMarginBottom"),
+                        new sap.m.HBox({
+                            justifyContent: "Start",
+                            items: [
+                                new sap.m.MessageStrip({
+                                    text: "Select a facility by clicking on the image",
+                                    type: sap.ui.core.MessageType.Information,
+                                    showIcon: true,
+                                    showCloseButton: false,
+                                    width: "auto"
+                                })
+                            ]
+                        }).addStyleClass("sapUiSmallMarginBottom"),
 
                         new sap.m.FlexBox({
                             wrap: "Wrap",
@@ -1282,12 +1282,12 @@ sap.ui.define([
                                                     }
                                                 }),
 
-                                              
- // Replace HTML formatter with:
-new sap.m.Text({
-    text: "{FacilityModel>FacilityName}",
-    textAlign: "Center"
-}).addStyleClass("facilityOverlayText")
+
+                                                // Replace HTML formatter with:
+                                                new sap.m.Text({
+                                                    text: "{FacilityModel>FacilityName}",
+                                                    textAlign: "Center"
+                                                }).addStyleClass("facilityOverlayText")
 
 
 
@@ -1326,12 +1326,12 @@ new sap.m.Text({
                         }
                     }
                 });
-//                 const oBinding = oFacilityFlex.getBinding("items");
-// if (oBinding) {
-//     oBinding.attachEventOnce("dataReceived", function () {
-//         sap.ui.core.BusyIndicator.hide();   // ✅ HIDE HERE
-//     });
-// }
+                //                 const oBinding = oFacilityFlex.getBinding("items");
+                // if (oBinding) {
+                //     oBinding.attachEventOnce("dataReceived", function () {
+                //         sap.ui.core.BusyIndicator.hide();   // ✅ HIDE HERE
+                //     });
+                // }
 
                 // Add sections for each person
                 oVBox.addItem(oForm);
@@ -1344,13 +1344,13 @@ new sap.m.Text({
 
 
 
-             setTimeout(() => {
-        sap.ui.core.BusyIndicator.hide();
-    }, 2000);
+            setTimeout(() => {
+                sap.ui.core.BusyIndicator.hide();
+            }, 2000);
 
             if (oModel) oModel.refresh(true);
 
-            
+
         },
         _createFacilityActionSheet: function (facility, iPersonIndex, oCard) {
             var SelectedPriceType = this.getView().getModel("HostelModel").getProperty("/SelectedPriceType")
@@ -1450,95 +1450,95 @@ new sap.m.Text({
             oModel.refresh(true);
         },
         onPersonCountChange: function (oEvent) {
-    const oModel = this.getView().getModel("HostelModel");
-    const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
+            const oModel = this.getView().getModel("HostelModel");
+            const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
 
-    if (this._lastPersonCount !== iPersonCount) {
-        this._mustRecreatePersonUI = true;
-        this._lastPersonCount = iPersonCount;
-    }
-},
-
-
- onDialogNextButton: async function () {
-
-     const aErrorControls = sap.ui.getCore().byFieldGroupId
-        ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
-        : [];
-
-    let bHasError = false;
-
-    // Fallback: scan entire view (SAFE for dynamic controls)
-    if (aErrorControls.length === 0) {
-        this.getView().findAggregatedObjects(true, function (oControl) {
-            if (oControl.getValueState && oControl.getValueState() === sap.ui.core.ValueState.Error) {
-                bHasError = true;
-                return true; // stop scan
+            if (this._lastPersonCount !== iPersonCount) {
+                this._mustRecreatePersonUI = true;
+                this._lastPersonCount = iPersonCount;
             }
-            return false;
-        });
-    } else {
-        bHasError = aErrorControls.some(c =>
-            c.getValueState && c.getValueState() === sap.ui.core.ValueState.Error
-        );
-    }
+        },
 
-    if (bHasError) {
-        sap.m.MessageBox.error("Please correct the highlighted errors before proceeding.");
-        return; // ⛔ STOP wizard navigation
-    }
-    const oModel = this.getView().getModel("HostelModel");
-    const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
-    // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
-    if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
-        this._createDynamicPersonsUI();              // builds UI for current count
-        this._isPersonUIInitialized = true;
-        this._lastPersonCount = iPersonCount;
-        this._mustRecreatePersonUI = false;
-    }
 
-    // STEP 1: validations
-    if (this._iSelectedStepIndex === 1) {
-      
-        this._resetCouponAndDiscount();
-        const aMissing = this._checkMandatoryFields();
-        if (aMissing.length > 0) {
-            sap.m.MessageBox.error(
-                "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
-            );
-            return;
+        onDialogNextButton: async function () {
+
+            const aErrorControls = sap.ui.getCore().byFieldGroupId
+                ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
+                : [];
+
+            let bHasError = false;
+
+            // Fallback: scan entire view (SAFE for dynamic controls)
+            if (aErrorControls.length === 0) {
+                this.getView().findAggregatedObjects(true, function (oControl) {
+                    if (oControl.getValueState && oControl.getValueState() === sap.ui.core.ValueState.Error) {
+                        bHasError = true;
+                        return true; // stop scan
+                    }
+                    return false;
+                });
+            } else {
+                bHasError = aErrorControls.some(c =>
+                    c.getValueState && c.getValueState() === sap.ui.core.ValueState.Error
+                );
+            }
+
+            if (bHasError) {
+                sap.m.MessageBox.error("Please correct the highlighted errors before proceeding.");
+                return; // ⛔ STOP wizard navigation
+            }
+            const oModel = this.getView().getModel("HostelModel");
+            const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
+            // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
+            if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
+                this._createDynamicPersonsUI();              // builds UI for current count
+                this._isPersonUIInitialized = true;
+                this._lastPersonCount = iPersonCount;
+                this._mustRecreatePersonUI = false;
+            }
+
+            // STEP 1: validations
+            if (this._iSelectedStepIndex === 1) {
+
+                this._resetCouponAndDiscount();
+                const aMissing = this._checkMandatoryFields();
+                if (aMissing.length > 0) {
+                    sap.m.MessageBox.error(
+                        "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
+                    );
+                    return;
+                }
+            }
+
+            // wizard navigation (unchanged)
+            if (!this._oWizard) {
+                this._oWizard = this.byId("TC_id_wizard");
+            }
+            if (!this._oSelectedStep) {
+                this._oSelectedStep = this._oWizard.getCurrentStep();
+            }
+
+            const aSteps = this._oWizard.getSteps();
+            let iIndex = aSteps.indexOf(this._oSelectedStep);
+            if (iIndex === -1) {
+                iIndex = aSteps.indexOf(this._oWizard.getCurrentStep());
+            }
+
+            this._iSelectedStepIndex = iIndex;
+            this.oNextStep = aSteps[iIndex + 1];
+
+            if (this._oSelectedStep && !this._oSelectedStep.bLast) {
+                this._oWizard.goToStep(this.oNextStep, true);
+            } else {
+                this._oWizard.nextStep();
+            }
+            this._iSelectedStepIndex++;
+            this._oSelectedStep = this.oNextStep;
+
+            this.handleButtonsVisibility();
         }
-    }
 
-    // wizard navigation (unchanged)
-    if (!this._oWizard) {
-        this._oWizard = this.byId("TC_id_wizard");
-    }
-    if (!this._oSelectedStep) {
-        this._oSelectedStep = this._oWizard.getCurrentStep();
-    }
-
-    const aSteps = this._oWizard.getSteps();
-    let iIndex = aSteps.indexOf(this._oSelectedStep);
-    if (iIndex === -1) {
-        iIndex = aSteps.indexOf(this._oWizard.getCurrentStep());
-    }
-
-    this._iSelectedStepIndex = iIndex;
-    this.oNextStep = aSteps[iIndex + 1];
-
-    if (this._oSelectedStep && !this._oSelectedStep.bLast) {
-        this._oWizard.goToStep(this.oNextStep, true);
-    } else {
-        this._oWizard.nextStep();
-    }
-    this._iSelectedStepIndex++;
-    this._oSelectedStep = this.oNextStep;
-
-    this.handleButtonsVisibility();
-}
-
-,
+        ,
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
 
@@ -1599,29 +1599,30 @@ new sap.m.Text({
 
             if (this._iSelectedStepIndex === 1) {
 
-        const sStartDate = oModel.getProperty("/StartDate");
-        const sEndDate   = oModel.getProperty("/EndDate");
+                const sStartDate = oModel.getProperty("/StartDate");
+                const sEndDate = oModel.getProperty("/EndDate");
 
-        if (!sStartDate || !sEndDate) {
+                if (!sStartDate || !sEndDate) {
 
-            sap.m.MessageToast.show(
-                "Please select Start Date and End Date before proceeding."
-            );
+                    sap.m.MessageToast.show(
+                        "Please select Start Date and End Date before proceeding."
+                    );
 
-            // ❌ Cancel navigation
-            this._oWizard.previousStep();
+                    // ❌ Cancel navigation
+                    this._oWizard.invalidateStep();
+                     
 
-            // 🔄 Reset index
-            this._iSelectedStepIndex = 0;
+                    // 🔄 Reset index
+                    // this._iSelectedStepIndex = 0;
 
-            // 🔒 Ensure step stays locked
-            oModel.setProperty("/IsGeneralInfoValid", false);
+                    // 🔒 Ensure step stays locked
+                    oModel.setProperty("/IsGeneralInfoValid", false);
 
-            // Update buttons for Step 0
-        
-            return;
-        }
-    }
+                    // Update buttons for Step 0
+
+                    return;
+                }
+            }
 
             if (this._iSelectedStepIndex === 1) {
 
@@ -1635,9 +1636,7 @@ new sap.m.Text({
             if (this._iSelectedStepIndex === 2) {
                 this.TC_onDialogNextButton();
             }
-        }
-
-,
+        },
 
         handleButtonsVisibility: function () {
             var oModel = this.getView().getModel("OBTNModel");
@@ -1948,150 +1947,150 @@ new sap.m.Text({
         //   oWizard.previousStep();
         // },
 
-       onFieldValidation: function (oEvent) {
-    const oView = this.getView();
-    const oHostelModel = oView.getModel("HostelModel");
-    const oBtnModel = oView.getModel("OBTNModel");
+        onFieldValidation: function (oEvent) {
+            const oView = this.getView();
+            const oHostelModel = oView.getModel("HostelModel");
+            const oBtnModel = oView.getModel("OBTNModel");
 
-    const oData = oHostelModel.getData();
-    const oStartDatePicker = oView.byId("idStartDate1");
-    const oEndDatePicker = oView.byId("idEndDate1");
+            const oData = oHostelModel.getData();
+            const oStartDatePicker = oView.byId("idStartDate1");
+            const oEndDatePicker = oView.byId("idEndDate1");
 
-    const sStartDate = oStartDatePicker?.getValue() || "";
-    const sEndDate = oEndDatePicker?.getValue() || "";
-    const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
-    const sPerson = oData.Person || oView.byId("id_Noofperson1")?.getSelectedKey() || "";
+            const sStartDate = oStartDatePicker?.getValue() || "";
+            const sEndDate = oEndDatePicker?.getValue() || "";
+            const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
+            const sPerson = oData.Person || oView.byId("id_Noofperson1")?.getSelectedKey() || "";
 
-    const iSelectedMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || 1, 10);
+            const iSelectedMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || 1, 10);
 
-    let bAllFilled = sPaymentType && sPerson && sStartDate && sEndDate;
+            let bAllFilled = sPaymentType && sPerson && sStartDate && sEndDate;
 
-    // =========================================================
-    // RESET Per Day info popup when Start/End Date changes
-    // =========================================================
-    if (
-        oEvent.getSource().getId().includes("idStartDate1") ||
-        oEvent.getSource().getId().includes("idEndDate1")
-    ) {
-        this._perDayInfoShown = false;
-    }
-
-    // =========================================================
-    // Set MIN End Date based on Start Date
-    // =========================================================
-    if (sStartDate) {
-        const oStart = this._parseDate(sStartDate);
-
-        if (oStart instanceof Date && !isNaN(oStart)) {
-
-            // For Per Day → same day allowed
-            if (sPaymentType === "Per Day") {
-                oEndDatePicker.setMinDate(oStart);
+            // =========================================================
+            // RESET Per Day info popup when Start/End Date changes
+            // =========================================================
+            if (
+                oEvent.getSource().getId().includes("idStartDate1") ||
+                oEvent.getSource().getId().includes("idEndDate1")
+            ) {
+                this._perDayInfoShown = false;
             }
-            // For Per Month / Year → next day minimum
-            else {
-                const oMinEnd = new Date(oStart);
-                oMinEnd.setDate(oMinEnd.getDate() + 1);
-                oEndDatePicker.setMinDate(oMinEnd);
+
+            // =========================================================
+            // Set MIN End Date based on Start Date
+            // =========================================================
+            if (sStartDate) {
+                const oStart = this._parseDate(sStartDate);
+
+                if (oStart instanceof Date && !isNaN(oStart)) {
+
+                    // For Per Day → same day allowed
+                    if (sPaymentType === "Per Day") {
+                        oEndDatePicker.setMinDate(oStart);
+                    }
+                    // For Per Month / Year → next day minimum
+                    else {
+                        const oMinEnd = new Date(oStart);
+                        oMinEnd.setDate(oMinEnd.getDate() + 1);
+                        oEndDatePicker.setMinDate(oMinEnd);
+                    }
+                }
             }
+
+            // =========================================================
+            // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
+            // =========================================================
+            if (
+                oEvent.getSource().getId().includes("idStartDate1") &&
+                sStartDate &&
+                sPaymentType === "Per Month"
+            ) {
+
+                const oStart = this._parseDate(sStartDate);
+
+                if (oStart instanceof Date && !isNaN(oStart)) {
+                    let oNewEnd = new Date(oStart);
+                    oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
+                    oNewEnd.setDate(oNewEnd.getDate() - 1);
+
+                    const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
+
+                    oHostelModel.setProperty("/EndDate", sNewEndDate);
+                    oEndDatePicker.setValue(sNewEndDate);
+
+                    oBtnModel.setProperty("/Next", true);
+                    return;
+                }
+            }
+
+            if (
+                oEvent.getSource().getId().includes("idStartDate1") &&
+                sStartDate &&
+                sPaymentType === "Per Year"
+            ) {
+
+                const oStart = this._parseDate(sStartDate);
+
+                if (oStart instanceof Date && !isNaN(oStart)) {
+                    let oNewEnd = new Date(oStart);
+                    oNewEnd.setFullYear(oNewEnd.getFullYear() + iSelectedMonths);
+                    oNewEnd.setDate(oNewEnd.getDate() - 1);
+
+                    const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
+
+                    oHostelModel.setProperty("/EndDate", sNewEndDate);
+                    oEndDatePicker.setValue(sNewEndDate);
+
+                    oBtnModel.setProperty("/Next", true);
+                    return;
+                }
+            }
+
+            // =========================================================
+            // PER DAY inclusive calculation
+            // =========================================================
+            if (sPaymentType === "Per Day" && sStartDate && sEndDate) {
+                const oStart = this._parseDate(sStartDate);
+                const oEnd = this._parseDate(sEndDate);
+
+                // inclusive day count
+                let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+
+                if (diffDays <= 0) {
+                    oEndDatePicker.setValueState("Error");
+                    oEndDatePicker.setValueStateText("End date cannot be before Start Date");
+                    sap.m.MessageToast.show("End Date Cannot be before Start Date");
+                    oHostelModel.setProperty("/EndDate", "");
+                    oBtnModel.setProperty("/Next", false);
+                    return;
+                }
+
+                oHostelModel.setProperty("/TotalDays", diffDays);
+                oEndDatePicker.setValueState("None");
+
+                if (!this._perDayInfoShown) {
+
+                    const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
+                    const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
+
+                    const sMessage =
+                        "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
+                        "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
+
+                    sap.m.MessageBox.information(sMessage, {
+                        title: "Check-in / Check-out Information"
+                    });
+
+                    this._perDayInfoShown = true;
+                }
+            }
+
+            // =========================================================
+            // CONTROL “Next” BUTTON
+            // =========================================================
+            const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
+            oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
         }
-    }
-
-    // =========================================================
-    // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
-    // =========================================================
-    if (
-        oEvent.getSource().getId().includes("idStartDate1") &&
-        sStartDate &&
-        sPaymentType === "Per Month"
-    ) {
-
-        const oStart = this._parseDate(sStartDate);
-
-        if (oStart instanceof Date && !isNaN(oStart)) {
-            let oNewEnd = new Date(oStart);
-            oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
-            oNewEnd.setDate(oNewEnd.getDate() - 1);
-
-            const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
-
-            oHostelModel.setProperty("/EndDate", sNewEndDate);
-            oEndDatePicker.setValue(sNewEndDate);
-
-            oBtnModel.setProperty("/Next", true);
-            return;
-        }
-    }
-
-    if (
-        oEvent.getSource().getId().includes("idStartDate1") &&
-        sStartDate &&
-        sPaymentType === "Per Year"
-    ) {
-
-        const oStart = this._parseDate(sStartDate);
-
-        if (oStart instanceof Date && !isNaN(oStart)) {
-            let oNewEnd = new Date(oStart);
-            oNewEnd.setFullYear(oNewEnd.getFullYear() + iSelectedMonths);
-            oNewEnd.setDate(oNewEnd.getDate() - 1);
-
-            const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
-
-            oHostelModel.setProperty("/EndDate", sNewEndDate);
-            oEndDatePicker.setValue(sNewEndDate);
-
-            oBtnModel.setProperty("/Next", true);
-            return;
-        }
-    }
-
-    // =========================================================
-    // PER DAY inclusive calculation
-    // =========================================================
-    if (sPaymentType === "Per Day" && sStartDate && sEndDate) {
-        const oStart = this._parseDate(sStartDate);
-        const oEnd = this._parseDate(sEndDate);
-
-        // inclusive day count
-        let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
-
-        if (diffDays <= 0) {
-            oEndDatePicker.setValueState("Error");
-            oEndDatePicker.setValueStateText("End date cannot be before Start Date");
-            sap.m.MessageToast.show("End Date Cannot be before Start Date");
-            oHostelModel.setProperty("/EndDate", "");
-            oBtnModel.setProperty("/Next", false);
-            return;
-        }
-
-        oHostelModel.setProperty("/TotalDays", diffDays);
-        oEndDatePicker.setValueState("None");
-
-        if (!this._perDayInfoShown) {
-
-            const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
-            const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
-
-            const sMessage =
-                "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
-                "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
-
-            sap.m.MessageBox.information(sMessage, {
-                title: "Check-in / Check-out Information"
-            });
-
-            this._perDayInfoShown = true;
-        }
-    }
-
-    // =========================================================
-    // CONTROL “Next” BUTTON
-    // =========================================================
-    const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
-    oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
-}
-,
+        ,
 
 
         SM_onGeneratePassword: function () {
@@ -2198,14 +2197,14 @@ new sap.m.Text({
             let oEnd = new Date(oStart);
 
             // ⭐ REAL DATE LOGIC (CALENDAR ACCURATE)
-           if (sDuration === "Per Month") {
-    oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
-    oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
-}
-else if (sDuration === "Per Year") {
-    oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
-    oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
-}
+            if (sDuration === "Per Month") {
+                oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
+                oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+            }
+            else if (sDuration === "Per Year") {
+                oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
+                oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+            }
             else if (sDuration === "Per Day") {
                 sap.m.MessageToast.show("Duration is per day. No month/year Selection Needed.");
                 return;
@@ -2239,7 +2238,7 @@ else if (sDuration === "Per Year") {
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
             }
         },
-
+ 
         onRoomDurationChange: function (oEvent) {
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -2247,21 +2246,21 @@ else if (sDuration === "Per Year") {
             const oBTN = oView.getModel("OBTNModel");
 
             if (this._oWizard) {
-        const aSteps = this._oWizard.getSteps();
-        this._oWizard.goToStep(aSteps[0], true); // force General Info
-        this._oSelectedStep = aSteps[0];
-        this._iSelectedStepIndex = 0;
-    }
+                const aSteps = this._oWizard.getSteps();
+                this._oWizard.goToStep(aSteps[0], true); // force General Info
+                this._oSelectedStep = aSteps[0];
+                this._iSelectedStepIndex = 0;
+            }
 
-    // 🔒 LOCK PERSONAL INFO STEP
-    oHostelModel.setProperty("/IsGeneralInfoValid", false);
-    oBTN.setProperty("/Next", false);
-    oBTN.setProperty("/Submit", false);
-    oBTN.setProperty("/Cancel", false);
+            // 🔒 LOCK PERSONAL INFO STEP
+            oHostelModel.setProperty("/IsGeneralInfoValid", false);
+            oBTN.setProperty("/Next", false);
+            oBTN.setProperty("/Submit", false);
+            oBTN.setProperty("/Cancel", false);
 
-    // 🔒 FORCE INTERNAL WIZARD STATE
-    this._iSelectedStepIndex = 0;
-    this._oSelectedStep = this._oWizard.getSteps()[0];
+            // 🔒 FORCE INTERNAL WIZARD STATE
+            this._iSelectedStepIndex = 0;
+            this._oSelectedStep = this._oWizard.getSteps()[0];
 
             if (!oHostelModel || !oRoomDetailModel || !oBTN) return;
 
@@ -2274,7 +2273,41 @@ else if (sDuration === "Per Year") {
             // sValue = "Per Day" / "Per Month" / "Per Year"
 
             const iMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10);
-            const sStartDate = oHostelModel.getProperty("/StartDate");
+        const sStartDate = oHostelModel.getProperty("/StartDate");
+const sEndDate   = oHostelModel.getProperty("/EndDate");
+
+if (!sStartDate || !sEndDate) {
+
+    const aSteps = this._oWizard.getSteps();
+    const oCurrentStep = aSteps[this._iSelectedStepIndex] || aSteps[0];
+
+    if (oCurrentStep && typeof oCurrentStep.setValidated === "function") {
+        oCurrentStep.setValidated(false);
+    }
+
+    // ✅ GET DATE PICKERS CORRECTLY
+    const sViewId = this.getView().getId();
+    const oStartDP = sap.ui.getCore().byId(sViewId + "--idStartDate1");
+    const oEndDP   = sap.ui.getCore().byId(sViewId + "--idEndDate1");
+
+    if (!sStartDate && oStartDP) {
+        oStartDP.setValueState(sap.ui.core.ValueState.Error);
+        oStartDP.setValueStateText("Please select Start Date");
+    }
+
+    if (!sEndDate && oEndDP) {
+        oEndDP.setValueState(sap.ui.core.ValueState.Error);
+        oEndDP.setValueStateText("Please select End Date");
+    }
+
+    oBTN.setProperty("/Next", false);
+    oBTN.setProperty("/Submit", false);
+    oHostelModel.setProperty("/IsGeneralInfoValid", false);
+
+    return;
+}
+
+
 
             // Update selected type
             oHostelModel.setProperty("/SelectedPriceType", sValue);
@@ -2310,7 +2343,7 @@ else if (sDuration === "Per Year") {
 
             /** ⭐ Per Day → user selects date manually */
             if (sValue === "Per Day") {
-                  this._oWizard.previousStep();
+                this._oWizard.invalidateStep();
                 oBTN.setProperty("/Month", false);
                 oHostelModel.setProperty("/StartDate", "");
                 oHostelModel.setProperty("/EndDate", "");
@@ -2321,7 +2354,7 @@ else if (sDuration === "Per Year") {
 
             /** ⭐ Per Month / Per Year → automatic end date */
             if (sValue === "Per Month" || sValue === "Per Year") {
-                  this._oWizard.previousStep();
+                this._oWizard.invalidateStep();
                 oBTN.setProperty("/Month", true);
 
                 oHostelModel.setProperty("/SelectedMonths", "1");
@@ -3975,7 +4008,7 @@ else if (sDuration === "Per Year") {
 
             aFields.forEach(id => sap.ui.getCore().byId(id)?.setValue(""));
         },
-        
+
         onAmountChange: function (oEvent) {
             const oInput = oEvent.getSource();
             const sValue = oInput.getValue();
@@ -4155,7 +4188,7 @@ else if (sDuration === "Per Year") {
                             Currency: oData.Currency,
                             Discount: oData.AppliedDiscount.toString() || "0",
                             CouponCode: oData.CouponCode || "",
-                            TotalRoomprice: p.RoomRentPerPerson|| "0",
+                            TotalRoomprice: p.RoomRentPerPerson || "0",
                             UserID: p.UserID
                         });
                     }
@@ -4306,7 +4339,7 @@ else if (sDuration === "Per Year") {
                         this._navigateAfterBooking();
                     }.bind(this)
                 });
-               
+
             } catch (e) {
                 BusyIndicator.hide();
                 let errorMsg = "Unknown error";
@@ -4333,37 +4366,39 @@ else if (sDuration === "Per Year") {
                 sap.m.MessageBox.error(errorMsg);
             }
         },
-        
+
         _navigateAfterBooking: function () {
-    var oRoute = this.getOwnerComponent().getRouter();
-    oRoute.navTo("RouteHostel");
+            var oRoute = this.getOwnerComponent().getRouter();
+            oRoute.navTo("RouteHostel");
 
-    setTimeout(function () {
-        this.resetAllBookingData();
+            setTimeout(function () {
+                this.resetAllBookingData();
 
-        // 🔑 RESET DYNAMIC UI FLAGS
-        this._isPersonUIInitialized = false;
-        this._mustRecreatePersonUI = true;
-        this._lastPersonCount = null;
-        this._iSelectedStepIndex = 0;
-        this._oSelectedStep = null;
+                // 🔑 RESET DYNAMIC UI FLAGS
+                this._isPersonUIInitialized = false;
+                this._mustRecreatePersonUI = true;
+                this._lastPersonCount = null;
+                this._iSelectedStepIndex = 0;
+                this._oSelectedStep = null;
 
-        // Optional: destroy old dynamic UI explicitly
-     
+                // Optional: destroy old dynamic UI explicitly
 
-        this.openProfileDialog();
-    }.bind(this), 500);
 
-    const oAvatar = this.byId("ProfileAvatar");
-    if (oAvatar) {
-        oAvatar.setVisible(true);
-    }
-},
+                this.openProfileDialog();
+            }.bind(this), 500);
+
+            const oAvatar = this.byId("ProfileAvatar");
+            if (oAvatar) {
+                oAvatar.setVisible(true);
+            }
+        },
 
 
 
 
         openProfileDialog: function () {
+          
+            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
             this.onPressAvatar()
         },
 
@@ -4429,7 +4464,7 @@ else if (sDuration === "Per Year") {
 
                 if (!this._oProfileDialog) {
                     this._oProfileDialog = await sap.ui.core.Fragment.load({
-                         id: "profileFrag",
+                        id: "profileFrag",
                         name: "sap.ui.com.project1.fragment.ManageProfile",
                         controller: this
                     });
@@ -4568,107 +4603,107 @@ else if (sDuration === "Per Year") {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-onGlobalSearch: function (oEvent) {
-    const sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
+        onGlobalSearch: function (oEvent) {
+            const sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
 
-    if (!this._oProfileDialog) {
-        return;
-    }
+            if (!this._oProfileDialog) {
+                return;
+            }
 
-    const oProfileModel = this._oProfileDialog.getModel("profileData");
-    const sSelectedTab = oProfileModel.getProperty("/selectedTab");
+            const oProfileModel = this._oProfileDialog.getModel("profileData");
+            const sSelectedTab = oProfileModel.getProperty("/selectedTab");
 
-    const oTable = sap.ui.core.Fragment.byId(
-        "profileFrag",
-        sSelectedTab === "Payment"
-            ? "Id_PaymentTable"
-            : "Id_ProfileaTable"
-    );
+            const oTable = sap.ui.core.Fragment.byId(
+                "profileFrag",
+                sSelectedTab === "Payment"
+                    ? "Id_PaymentTable"
+                    : "Id_ProfileaTable"
+            );
 
-    if (!oTable) {
-        return;
-    }
+            if (!oTable) {
+                return;
+            }
 
-    const oBinding = oTable.getBinding("items");
-    if (!oBinding) {
-        return;
-    }
+            const oBinding = oTable.getBinding("items");
+            if (!oBinding) {
+                return;
+            }
 
-    let aFilters = [];
+            let aFilters = [];
 
-    if (sQuery) {
-        const fnContains = function (v) {
-            return v != null && v.toString().toLowerCase().includes(sQuery);
-        };
+            if (sQuery) {
+                const fnContains = function (v) {
+                    return v != null && v.toString().toLowerCase().includes(sQuery);
+                };
 
-        if (sSelectedTab === "Payment") {
-            aFilters = [
-                new sap.ui.model.Filter({
-                    filters: [
-                        new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "InvNo", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "InvoiceDate", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "CustomerName", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "TotalAmount", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "DueAmount", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "currency", test: fnContains })
-                    ],
-                    and: false
-                })
-            ];
-        } else {
-            aFilters = [
-                new sap.ui.model.Filter({
-                    filters: [
-                        new sap.ui.model.Filter({ path: "customerName", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "BookingDate", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "room", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "status", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "amount", test: fnContains }),
-                        new sap.ui.model.Filter({ path: "currency", test: fnContains })
-                    ],
-                    and: false
-                })
-            ];
+                if (sSelectedTab === "Payment") {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "InvNo", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "InvoiceDate", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "CustomerName", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "TotalAmount", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "DueAmount", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                            ],
+                            and: false
+                        })
+                    ];
+                } else {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter({ path: "customerName", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "BookingDate", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "room", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "status", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "amount", test: fnContains }),
+                                new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                            ],
+                            and: false
+                        })
+                    ];
+                }
+            }
+
+            //  IMPORTANT: Application-level filter
+            oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
+        },
+
+
+
+
+
+        onTableUpdateFinished: function (oEvent) {
+            this._updateRowCount(oEvent.getSource());
+        },
+
+
+        _updateRowCount: function (oTable) {
+            if (!oTable || !this._oProfileDialog) {
+                return;
+            }
+
+            const oProfileModel = this._oProfileDialog.getModel("profileData");
+            if (!oProfileModel) {
+                return;
+            }
+
+            const oBinding = oTable.getBinding("items");
+            const iCount = oBinding ? oBinding.getLength() : 0;
+
+            const sId = oTable.getId();
+
+            if (sId.includes("Id_PaymentTable")) {
+                oProfileModel.setProperty("/paymentCount", iCount);
+            } else {
+                oProfileModel.setProperty("/bookingCount", iCount);
+            }
         }
-    }
-
-    //  IMPORTANT: Application-level filter
-    oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
-},
-
-
-
-
-
-      onTableUpdateFinished: function (oEvent) {
-    this._updateRowCount(oEvent.getSource());
-},
-
-
- _updateRowCount: function (oTable) {
-    if (!oTable || !this._oProfileDialog) {
-        return;
-    }
-
-    const oProfileModel = this._oProfileDialog.getModel("profileData");
-    if (!oProfileModel) {
-        return;
-    }
-
-    const oBinding = oTable.getBinding("items");
-    const iCount = oBinding ? oBinding.getLength() : 0;
-
-    const sId = oTable.getId();
-
-    if (sId.includes("Id_PaymentTable")) {
-        oProfileModel.setProperty("/paymentCount", iCount);
-    } else {
-        oProfileModel.setProperty("/bookingCount", iCount);
-    }
-}
-,
+        ,
 
 
         onPressAvatarEdit: function (oEvent) {
@@ -5115,7 +5150,7 @@ onGlobalSearch: function (oEvent) {
             // ---- RESET MODEL COMPLETELY ----
             oHostelModel.setData({
                 Persons: [],
-               
+
                 SelectedMonths: "",
                 SelectedPriceType: "",
                 StartDate: "",
@@ -5421,11 +5456,11 @@ onGlobalSearch: function (oEvent) {
             if (this._oProfileDialog) this._oProfileDialog.close();
         },
         onCancelPress: function () {
-             this._isPersonUIInitialized = false;
-        this._mustRecreatePersonUI = true;
-        this._lastPersonCount = null;
-        this._iSelectedStepIndex = 0;
-        this._oSelectedStep = null;
+            this._isPersonUIInitialized = false;
+            this._mustRecreatePersonUI = true;
+            this._lastPersonCount = null;
+            this._iSelectedStepIndex = 0;
+            this._oSelectedStep = null;
             this.resetAllBookingData()
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")

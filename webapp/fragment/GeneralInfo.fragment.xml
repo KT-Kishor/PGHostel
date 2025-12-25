@@ -59,6 +59,7 @@
                                 change="onFieldValidation"
                                 width="100%"
                                 minDate="{path: 'HostelModel>/TodayDate'}"
+                                valueStateText="Enter Start Date"
                             />
                           <Label text="{i18n>howmanymonthyears}" />
 <Select
