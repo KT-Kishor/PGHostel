@@ -13,14 +13,7 @@ sap.ui.define([
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
-
-            const oFooterModel = new sap.ui.model.json.JSONModel({
-                showGlobalFooter: true
-            });
-            this.getView().setModel(oFooterModel, "FooterModel");
-
-
-
+            this.getView().setModel(new sap.ui.model.json.JSONModel({showGlobalFooter: false,showRoomsFooter: false,}),"FooterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
@@ -163,6 +156,12 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
+      
+                const oFooterModel = this.getView().getModel("FooterModel");
+
+                // Default landing tab = Home
+                oFooterModel.setProperty("/showGlobalFooter", true);
+                oFooterModel.setProperty("/showRoomsFooter", false);
         },
 
 
@@ -766,33 +765,38 @@ sap.ui.define([
 
         // },
 
-        onTabSelect: async function (oEvent) {
-            const sKey = oEvent.getParameter("item").getKey();
-            this.byId("pageContainer").to(this.byId(sKey));
+onTabSelect: async function (oEvent) {
+    var oItem = oEvent.getParameter("item");
+    const sKey = oItem.getKey();
 
-            const page = this.byId(sKey);
-            if (page?.scrollTo) {
-                page.scrollTo(0, 0);
-            }
+    this.byId("pageContainer").to(this.byId(sKey));
 
-            this.flag = true;
-            this.iTop = 4;
-            this.iSkip = 0;
-            this.roomtype = true;
+    var page = this.byId(sKey);
+    if (page && page.scrollTo) page.scrollTo(0, 0);
 
-            // 🔑 Global footer visibility control
-            const oFooterModel = this.getView().getModel("FooterModel");
-            oFooterModel.setProperty("/showGlobalFooter", sKey !== "idRooms");
+    this.flag = true;
+    this.iTop = 4;
+    this.iSkip = 0;
+    this.roomtype = true;
 
+    // 🔑 Footer control (added, not disturbing existing flow)
+    const oFooterModel = this.getView().getModel("FooterModel");
 
-            // 🔥 FORCE UI5 LAYOUT RECALCULATION
-            sap.ui.getCore().applyChanges();
-            sap.ui.getCore().getEventBus().publish("sap.ui", "resize");
+    if (sKey === "idRooms") {
+        // entering Rooms
+        oFooterModel.setProperty("/showGlobalFooter", false);
+        oFooterModel.setProperty("/showRoomsFooter", false);
 
-            if (sKey === "idRooms") {
-                await this._loadRoomsPageData();
-            }
-        },
+        // keep original behavior
+        await this._loadRoomsPageData();
+
+    } else {
+        // Home / Contact
+        oFooterModel.setProperty("/showGlobalFooter", true);
+        oFooterModel.setProperty("/showRoomsFooter", false);
+    }
+},
+
 
         Branch: async function () {
             const oComponent = this.getOwnerComponent();
@@ -841,7 +845,9 @@ sap.ui.define([
             oBranch.setBusy(true);
             oArea.setBusy(true);
             oRoomType.setBusy(true);
+            const oFooterModel = this.getView().getModel("FooterModel");
 
+            oFooterModel.setProperty("/showRoomsFooter", false);
             try {
                 // await this.onReadcallforRoom();
                 // await this.CustomerDetails();
@@ -879,7 +885,9 @@ sap.ui.define([
                 oBranch.setBusy(false);
                 oArea.setBusy(false);
                 oRoomType.setBusy(false);
-            }
+            // ✅ show ROOMS footer after success OR failure
+            oFooterModel.setProperty("/showRoomsFooter", true);
+          }
         },
 
 

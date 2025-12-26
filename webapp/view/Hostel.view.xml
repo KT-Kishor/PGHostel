@@ -349,16 +349,18 @@
                             />
                             <VBox height="2rem" />
                         </VBox>
-                        <core:Fragment id="roomsFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
-                        </VBox>
+                          <VBox visible="{FooterModel>/showRoomsFooter}">
+	                            <core:Fragment id="roomsFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
+                            </VBox>
+                         </VBox>
                     </Page>
                     <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">
                         <core:Fragment fragmentName="sap.ui.com.project1.fragment.HomePage" type="XML" />
                     </ScrollContainer> -->
-<ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contactScrollWrapper">
-	<core:Fragment fragmentName="sap.ui.com.project1.fragment.ContactPage" type="XML" />
-	<!-- <VBox height="1rem" /> -->
-</ScrollContainer>
+                    <ScrollContainer id="idContact" horizontal="false" vertical="true" height="100%" class="sapUiContentPadding contactScrollWrapper">
+	                <core:Fragment fragmentName="sap.ui.com.project1.fragment.ContactPage" type="XML" />
+	                <!-- <VBox height="1rem" /> -->
+                    </ScrollContainer>
                     <ScrollContainer
                         id="idAdddata"
                         horizontal="false"
@@ -371,10 +373,10 @@
                
                 </pages>
             </NavContainer>
-            <!-- <core:Fragment fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" /> -->
-           <VBox visible="{= ${FooterModel>/showGlobalFooter} }">
-	<core:Fragment id="globalFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML"/>
-</VBox>            </items>
+                <VBox visible="{FooterModel>/showGlobalFooter}">
+	                    <core:Fragment id="globalFooter" fragmentName="sap.ui.com.project1.fragment.Footer" type="XML" />
+                </VBox>
+            </items>
    </VBox>
         </tnt:mainContents>
     </tnt:ToolPage>
