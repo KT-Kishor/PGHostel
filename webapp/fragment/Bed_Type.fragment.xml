@@ -149,13 +149,14 @@
                         width="100%"
                     >
                         <columns>
-                            <Column>
-                                <Text text="File Name" />
+                            <Column demandPopin="true"   minScreenWidth="Phone"
+>
+                                <Text  text="File Name" />
                             </Column>
-                            <Column hAlign="Center">
+                            <Column demandPopin="true" hAlign="Center" minScreenWidth="Tablet">
                                 <Text text="File Type" />
                             </Column>
-                            <Column hAlign="Center">
+                            <Column demandPopin="true" hAlign="Center" minScreenWidth="Tablet">
                                 <Text text="File Size" />
                             </Column>
                         </columns>

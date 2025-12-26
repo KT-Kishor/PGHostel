@@ -21,6 +21,7 @@ sap.ui.define([
 
 
         _onRouteMatched: function () {
+            this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1"], this.getView());
             var oView = this.getView()
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
@@ -1610,7 +1611,7 @@ sap.ui.define([
 
                     // ❌ Cancel navigation
                     this._oWizard.invalidateStep();
-                     
+
 
                     // 🔄 Reset index
                     // this._iSelectedStepIndex = 0;
@@ -1948,6 +1949,7 @@ sap.ui.define([
         // },
 
         onFieldValidation: function (oEvent) {
+            utils._LCvalidateDate(oEvent);
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
             const oBtnModel = oView.getModel("OBTNModel");
@@ -2238,7 +2240,7 @@ sap.ui.define([
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
             }
         },
- 
+
         onRoomDurationChange: function (oEvent) {
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -2273,39 +2275,40 @@ sap.ui.define([
             // sValue = "Per Day" / "Per Month" / "Per Year"
 
             const iMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10);
-        const sStartDate = oHostelModel.getProperty("/StartDate");
-const sEndDate   = oHostelModel.getProperty("/EndDate");
+            const sStartDate = oHostelModel.getProperty("/StartDate");
+            const sEndDate = oHostelModel.getProperty("/EndDate");
 
-if (!sStartDate || !sEndDate) {
 
-    const aSteps = this._oWizard.getSteps();
-    const oCurrentStep = aSteps[this._iSelectedStepIndex] || aSteps[0];
+            if (!sValue && (!sStartDate || !sEndDate)) {
 
-    if (oCurrentStep && typeof oCurrentStep.setValidated === "function") {
-        oCurrentStep.setValidated(false);
-    }
+                const aSteps = this._oWizard.getSteps();
+                const oCurrentStep = aSteps[this._iSelectedStepIndex] || aSteps[0];
 
-    // ✅ GET DATE PICKERS CORRECTLY
-    const sViewId = this.getView().getId();
-    const oStartDP = sap.ui.getCore().byId(sViewId + "--idStartDate1");
-    const oEndDP   = sap.ui.getCore().byId(sViewId + "--idEndDate1");
+                if (oCurrentStep && typeof oCurrentStep.setValidated === "function") {
+                    oCurrentStep.setValidated(false);
+                }
 
-    if (!sStartDate && oStartDP) {
-        oStartDP.setValueState(sap.ui.core.ValueState.Error);
-        oStartDP.setValueStateText("Please select Start Date");
-    }
+                // ✅ GET DATE PICKERS CORRECTLY
+                const sViewId = this.getView().getId();
+                const oStartDP = sap.ui.getCore().byId(sViewId + "--idStartDate1");
+                const oEndDP = sap.ui.getCore().byId(sViewId + "--idEndDate1");
 
-    if (!sEndDate && oEndDP) {
-        oEndDP.setValueState(sap.ui.core.ValueState.Error);
-        oEndDP.setValueStateText("Please select End Date");
-    }
+                if (!sStartDate && oStartDP) {
+                    oStartDP.setValueState(sap.ui.core.ValueState.Error);
+                    oStartDP.setValueStateText("Please select Start Date");
+                }
 
-    oBTN.setProperty("/Next", false);
-    oBTN.setProperty("/Submit", false);
-    oHostelModel.setProperty("/IsGeneralInfoValid", false);
+                if (!sEndDate && oEndDP) {
+                    oEndDP.setValueState(sap.ui.core.ValueState.Error);
+                    oEndDP.setValueStateText("Please select End Date");
+                }
 
-    return;
-}
+                oBTN.setProperty("/Next", false);
+                oBTN.setProperty("/Submit", false);
+                oHostelModel.setProperty("/IsGeneralInfoValid", false);
+
+                return;
+            }
 
 
 
@@ -4397,7 +4400,7 @@ if (!sStartDate || !sEndDate) {
 
 
         openProfileDialog: function () {
-          
+
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
             this.onPressAvatar()
         },
@@ -4576,7 +4579,7 @@ if (!sStartDate || !sEndDate) {
                     isTableBusy: false
                 });
                 this._oProfileDialog.setModel(oProfileModel, "profileData");
-                 this._applyCountryStateCityFilters();
+                this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
                 // this.byId("id_dialog").removeStyleClass("dialogBlur");
