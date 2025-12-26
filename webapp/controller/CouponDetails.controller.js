@@ -66,30 +66,57 @@ sap.ui.define([
             await this.onCouponSearch();
         },
 
-
         onCouponSearch: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
+                const oFilterBar = this.byId("couponFilterBar");
+                const aItems = oFilterBar.getFilterGroupItems();
                 const oRange = this.byId("fEndRange");
-                const aItems = this.byId("couponFilterBar").getFilterGroupItems();
+
                 const params = {};
 
-
-                // 🔒 ALWAYS enforce login branch scope
+                // ================= Branch Logic =================
                 params.BranchCode = this._allowedBranches;
 
-                let sStartDate = "";
-                let sEndDate = "";
+                // ================= Date Format =================
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "yyyy-MM-dd"
+                });
 
-                const dFrom = oRange.getDateValue();
-                const dTo = oRange.getSecondDateValue();
+                const oStartDate = oRange.getDateValue();
+                const oEndDate = oRange.getSecondDateValue();
 
-                if (dFrom && dTo) {
-                    sStartDate = dFrom.toISOString().split("T")[0];
-                    sEndDate = dTo.toISOString().split("T")[0];
+                let sStartDate, sEndDate;
+
+                // ================= Date Handling =================
+                if (this._isDateRangeCleared === true) {
+                    // Clear → fetch all data
+                    delete params.StartDate;
+                    delete params.EndDate;
+                    this._isDateRangeCleared = false;
+                } else if (oStartDate && oEndDate) {
+                    // User selected date range
+                    sStartDate = oDateFormat.format(oStartDate);
+                    sEndDate = oDateFormat.format(oEndDate);
+
+                } else {
+                    // Default → Financial Year
+                    const { fyStart, fyEnd } = this._getFinancialYearDates();
+
+                    sStartDate = oDateFormat.format(fyStart);
+                    sEndDate = oDateFormat.format(fyEnd);
+
+                    // Sync UI
+                    oRange.setDateValue(fyStart);
+                    oRange.setSecondDateValue(fyEnd);
                 }
 
+                if (sStartDate && sEndDate) {
+                    params.StartDate = sStartDate;
+                    params.EndDate = sEndDate;
+                }
 
+                // ================= Other Filters =================
                 aItems.forEach(item => {
                     const ctrl = item.getControl();
                     const key = item.getName();
@@ -99,51 +126,31 @@ sap.ui.define([
 
                         case "Status":
                         case "DiscountType": {
-                            params[key] = ctrl.getSelectedKey?.() || "";
+                            const val = ctrl.getSelectedKey?.();
+                            if (val) params[key] = val;
                             break;
                         }
+
                         case "BranchCode": {
                             const sSelectedKey = ctrl.getSelectedKey();
-                            if (sSelectedKey) {
-                                // 🔒 Narrow only, never expand
+                            if (sSelectedKey && this._allowedBranches) {
                                 params.BranchCode = this._allowedBranches
                                     .split(",")
-                                    .find(b => b === sSelectedKey) || "";
-                            }
-                            break;
-                        }
-
-
-                        case "EndDateRange": {
-                            const dFrom = ctrl.getDateValue();
-                            const dTo = ctrl.getSecondDateValue();
-
-                            if (dFrom && dTo) {
-                                sStartDate = dFrom.toISOString().split("T")[0];
-                                sEndDate = dTo.toISOString().split("T")[0];
-
-
+                                    .includes(sSelectedKey)
+                                    ? sSelectedKey
+                                    : params.BranchCode;
                             }
                             break;
                         }
                     }
                 });
 
+                // ================= API Call =================
+                const oResult = await this.ajaxReadWithJQuery("HM_Coupon", params);
 
-
-                const oResult = await this.ajaxReadWithJQuery("HM_Coupon", {
-                    ...params,
-                    StartDate: sStartDate,
-                    EndDate: sEndDate
-                });
-                // debugging only: print parameters
-                // console.debug("CouponDetails.controller.js: FilterCoupons: params = ", JSON.stringify(params, null, 2));
                 const aData = this._normalizeCouponResult(oResult);
                 this.getView().getModel("CouponModel").setData(aData);
                 this._applyCouponGroupingAndSorting();
-
-
-
 
             } catch (err) {
                 sap.m.MessageBox.error(
@@ -155,7 +162,6 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
 
         _getFinancialYearDates: function () {
             const now = new Date();
@@ -713,31 +719,21 @@ sap.ui.define([
                     oBranch.BranchCode || oBranch.BranchID
                 );
         },
-        onClearCoupons: function () {
-            // clear non-date filters always
+         onClearCoupons: function () {
+            // Clear non-date filters
             this.byId("fStatus").setSelectedKey("");
             this.byId("fDiscountType").setSelectedKey("");
             this.byId("fBranch").setSelectedKey("");
 
+            // Toggle intent ONLY
+            this._isDateRangeCleared = !this._isDateRangeCleared;
+
+            // Always clear UI date
             const oRange = this.byId("fEndRange");
-
-            // 🔁 TOGGLE LOGIC
-            if (!this._isDateRangeCleared) {
-                // ➜ First clear: EMPTY the date range
-                oRange.setValue("");
-                oRange.setDateValue(null);
-                oRange.setSecondDateValue(null);
-
-                this._isDateRangeCleared = true;
-            } else {
-                // ➜ Second clear: RESTORE FY range
-                const { fyStart, fyEnd } = this._getFinancialYearDates();
-
-                oRange.setDateValue(fyStart);
-                oRange.setSecondDateValue(fyEnd);
-
-                this._isDateRangeCleared = false;
-            }
+            oRange.setValue("");
+            oRange.setDateValue(null);
+            oRange.setSecondDateValue(null);
+            this._isDateRangeCleared = true;
         },
 
         // ===== Discount Type (STRICT combo) =====

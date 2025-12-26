@@ -4,35 +4,43 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "../utils/validation",
-     "sap/m/MessageToast",
+    "sap/m/MessageToast",
     "sap/ui/export/Spreadsheet",
 ], function(
-    BaseController,
-    Formatter,
-    JSONModel,
-    MessageBox,
-    utils,
-    MessageToast,
-    Spreadsheet
-) {
+    BaseController, Formatter, JSONModel, MessageBox, utils,MessageToast,Spreadsheet) {
     "use strict";
-
     return BaseController.extend("sap.ui.com.project1.controller.Admin", {
         Formatter: Formatter,
-
         onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteAdmin").attachMatched(this._onRouteMatched, this);
         },
+
         _onRouteMatched: async function() {
-            this._setDefaultFinancialYear();
             this.commonLoginFunction();
+             this._isClearPressed = false; // ensure full data is not requested'
+             const currentYear = new Date().getFullYear();
+                let fyStart, fyEnd;
+                if (new Date().getMonth() >= 3) {
+                    fyStart = new Date(currentYear, 3, 1); // April 1
+                    fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1); // April 1 last year
+                    fyEnd = new Date(currentYear, 2, 31); // March 31 this year
+                }
+                // Set the date range UI (override user-selected values)
+                const dateRangeControl = this.byId("PO_id_Date");
+                if (dateRangeControl) {
+                    dateRangeControl.setDateValue(fyStart);
+                    dateRangeControl.setSecondDateValue(fyEnd);
+                }
+                 this._loadHostelMasterData();
             await this.Cust_read(true)
-             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
+            this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 var model = new JSONModel(oFCIAerData);
                 this.getView().setModel(model, "RoomDetailsModel");
             })
-           
+
             var model = new JSONModel({
                 BranchCode: "",
                 BedType: "",
@@ -46,30 +54,20 @@ sap.ui.define([
                 Visible: false
             });
             this.getView().setModel(model, "Visiblemodel")
-            this.onClearAndSearch("PO_id_FilterbarEmployee");
             // this.BedTypedetails();
         },
-        _setDefaultFinancialYear: function () {
-    const oDateRange = this.getView().byId("PO_id_Date");
 
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0 = Jan
+        _loadHostelMasterData: function () {
+            this.ajaxReadWithJQuery("HM_Customer", {})
+                .then((response) => {
+                    const oMasterModel = new sap.ui.model.json.JSONModel(response.Customers);
+                    this.getView().setModel(oMasterModel, "HostelMasterModel");
 
-    let startDate, endDate;
+                    // Keep original reference if needed
+                    this._originalRoomdata = response.Customers;
+                });
+        },
 
-    // If before April → previous FY
-    if (currentMonth < 3) {
-        startDate = new Date(currentYear - 1, 3, 1); // 1-Apr
-        endDate = new Date(currentYear, 2, 31);      // 31-Mar
-    } else {
-        startDate = new Date(currentYear, 3, 1);
-        endDate = new Date(currentYear + 1, 2, 31);
-    }
-
-    oDateRange.setDateValue(startDate);
-    oDateRange.setSecondDateValue(endDate);
-},
         BedTypedetails: function() {
             this.ajaxReadWithJQuery("HM_BedType", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -77,269 +75,297 @@ sap.ui.define([
                 this.getView().setModel(model, "BedTypeModel");
             })
         },
-        Cust_read: function(flag) {
-             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
-            //    var sCustId =   this.getView().byId("PO_id_CustomerName").getSelectedKey() ||   this.getView().byId("PO_id_CustomerName").getValue();
-            var sbookID =   this.getView().byId("PO_id_BookingId").getSelectedKey() ||   this.getView().byId("PO_id_BookingId").getValue();
-            var sRoomNo =   this.getView().byId("PO_id_CompanyName").getSelectedKey() ||   this.getView().byId("PO_id_CompanyName").getValue();
+       Cust_read: function (flag) {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
 
-            var sStatus =   this.getView().byId("PO_id_Status").getSelectedKey() ||   this.getView().byId("PO_id_Status").getValue();
+                const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
-              var oDateRange = this.getView().byId("PO_id_Date");
-                var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-                var oStartDate = oDateRange.getDateValue();
-                var oEndDate = oDateRange.getSecondDateValue();
+                const sbookID = this.byId("PO_id_BookingId").getSelectedKey()
+                    || this.byId("PO_id_BookingId").getValue();
 
+                const sRoomNo = this.byId("PO_id_CompanyName").getSelectedKey()
+                    || this.byId("PO_id_CompanyName").getValue();
 
-            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+                const sStatus = this.byId("PO_id_Status").getSelectedKey()
+                    || this.byId("PO_id_Status").getValue();
 
-            let aBranchCodes = "";
+                const oDateRange = this.byId("PO_id_Date");
+                const oStartDate = oDateRange.getDateValue();
+                const oEndDate = oDateRange.getSecondDateValue();
 
-            if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel
-                    .map(item => item.BranchID)
-                    .flat()           
-                    .filter(Boolean)    
-                    .join(",");         
-            } else if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode;
-            }
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "yyyy-MM-dd"
+                });
 
-            let filters = {};
+                // ================= Financial Year Logic =================
+                const currentYear = new Date().getFullYear();
+                let fyStart, fyEnd;
 
-            if (oExistingModel.Role==="Admin" && aBranchCodes) {
-                filters.BranchCode = aBranchCodes;
-            }
+                if (new Date().getMonth() >= 3) { // April or later
+                    fyStart = new Date(currentYear, 3, 1);      // Apr 1
+                    fyEnd = new Date(currentYear + 1, 2, 31);   // Mar 31
+                } else {
+                    fyStart = new Date(currentYear - 1, 3, 1);  // Apr 1 last year
+                    fyEnd = new Date(currentYear, 2, 31);       // Mar 31
+                }
 
-            
-            // if (sCustId) {
-            //     filters.CustomerID = sCustId 
-            // }
-            if (sbookID) {
-                filters.BookingID  = sbookID
-            }
-             if (sRoomNo) {
-                filters.RoomNo  = sRoomNo
-            }
-             if (sStatus) {
-                filters.Status  = sStatus
-            }
-             if (oStartDate && oEndDate) {
+                // ================= Branch Logic =================
+                const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+                let aBranchCodes = "";
+
+                if (Array.isArray(omainModel) && omainModel.length) {
+                    aBranchCodes = omainModel
+                        .map(item => item.BranchID)
+                        .flat()
+                        .filter(Boolean)
+                        .join(",");
+                } else if (oExistingModel.BranchCode) {
+                    aBranchCodes = oExistingModel.BranchCode;
+                }
+
+                let filters = {};
+                if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                    filters.BranchCode = aBranchCodes;
+                }
+
+                if (sbookID) filters.BookingID = sbookID;
+                if (sRoomNo) filters.RoomNo = sRoomNo;
+                if (sStatus) filters.Status = sStatus;
+
+                // ================= Date Handling (Same as Invoice) =================
+                if (this._isClearPressed) {
+                    // Clear → fetch all data
+                    delete filters.StartDate;
+                    delete filters.EndDate;
+                    this._isClearPressed = false;
+
+                } else if (oStartDate && oEndDate) {
+                    // User selected date range
                     filters.StartDate = oDateFormat.format(oStartDate);
                     filters.EndDate = oDateFormat.format(oEndDate);
+
+                } else {
+                    // No date selected → default Financial Year
+                    filters.StartDate = oDateFormat.format(fyStart);
+                    filters.EndDate = oDateFormat.format(fyEnd);
+
+                    // Set picker UI values
+                    oDateRange.setDateValue(fyStart);
+                    oDateRange.setSecondDateValue(fyEnd);
                 }
 
-            sap.ui.core.BusyIndicator.show(0);
-              this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
+                // ================= API Call =================
+                this.ajaxReadWithJQuery("HM_Customer", filters)
+                    .then((response) => {
+                        if (!this._originalRoomdata || flag === true) {
+                            this._originalRoomdata = response.Customers;
+                        }
 
-                
-                if (!this._originalRoomdata || flag===true) {
-                    this._originalRoomdata = response.Customers;
-                }
-                var oModel = new sap.ui.model.json.JSONModel(response.Customers);
-                    this.getView().setModel(oModel, "HostelModel");
-                    this._populateUniqueFilterValues(this._originalRoomdata);
+                        const oModel = new sap.ui.model.json.JSONModel(response.Customers);
+                        this.getView().setModel(oModel, "HostelModel");
 
-
-                    sap.ui.core.BusyIndicator.hide();
-            })
+                        this._populateUniqueFilterValues(this._originalRoomdata);
+                        sap.ui.core.BusyIndicator.hide();
+                    }).catch(() => sap.ui.core.BusyIndicator.hide());
+            } catch (e) {
+                sap.ui.core.BusyIndicator.hide();
+            }
         },
 
-       _populateUniqueFilterValues: function (data) {
-    let uniqueValues = {
-        PO_id_CompanyName: new Set(),
-        PO_id_Status: new Set()
-    };
+        _populateUniqueFilterValues: function(data) {
+            let uniqueValues = {
+                PO_id_CompanyName: new Set(),
+                PO_id_Status: new Set()
+            };
 
-    data.forEach(item => {
-        if (item.RoomNo && item.RoomNo.trim()) {  
-            uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
-        }
-        if (item.Status) {  
-            uniqueValues.PO_id_Status.add(item.Status.trim());
-        }
-    });
-
-    let oView = this.getView();
-
-    ["PO_id_CompanyName","PO_id_Status"].forEach(field => {
-        let oComboBox = oView.byId(field);
-        if (!oComboBox) return;
-
-        oComboBox.destroyItems();
-
-        Array.from(uniqueValues[field])
-            .sort()
-            .forEach(value => {
-                oComboBox.addItem(
-                    new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    })
-                );
+            data.forEach(item => {
+                if (item.RoomNo && item.RoomNo.trim()) {
+                    uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
+                }
+                if (item.Status) {
+                    uniqueValues.PO_id_Status.add(item.Status.trim());
+                }
             });
-    });
-},
 
-//       HM_viewroom: function (oEvent) {
+            let oView = this.getView();
 
-//     var oContext = oEvent.getSource().getBindingContext("HostelModel");
-//     var oData = oContext.getObject();
+            ["PO_id_CompanyName", "PO_id_Status"].forEach(field => {
+                let oComboBox = oView.byId(field);
+                if (!oComboBox) return;
 
-//     if (!oData.Documents || !oData.Documents.length) {
-//         sap.m.MessageBox.error("No document found for this room!");
-//         return;
-//     }
+                oComboBox.destroyItems();
+                Array.from(uniqueValues[field]).sort().forEach(value => {
+                        oComboBox.addItem(
+                            new sap.ui.core.Item({
+                                key: value,
+                                text: value
+                            })
+                        );
+                    });
+            });
+        },
 
-//     var sBase64 = oData.Documents[0].File;
+        //       HM_viewroom: function (oEvent) {
 
-//     if (!sBase64) {
-//         sap.m.MessageBox.error("No document found for this room!");
-//         return;
-//     }
+        //     var oContext = oEvent.getSource().getBindingContext("HostelModel");
+        //     var oData = oContext.getObject();
 
-//     sBase64 = sBase64.replace(/\s/g, "");
-//     var decoded = "";
+        //     if (!oData.Documents || !oData.Documents.length) {
+        //         sap.m.MessageBox.error("No document found for this room!");
+        //         return;
+        //     }
 
-//     try {
-//         decoded = atob(sBase64);
-//     } catch (e) {
-//         decoded = sBase64;
-//     }
+        //     var sBase64 = oData.Documents[0].File;
 
-//     // Extract actual image base64 inside decoded
-//     var imagePart = decoded.includes("base64,")
-//         ? decoded.split("base64,")[1]
-//         : decoded;
+        //     if (!sBase64) {
+        //         sap.m.MessageBox.error("No document found for this room!");
+        //         return;
+        //     }
 
-//     // Identify image type
-//     if (imagePart.startsWith("iVB")) {
-//         sBase64 = "data:image/png;base64," + imagePart;
-//     } else if (imagePart.startsWith("/9j")) {
-//         sBase64 = "data:image/jpeg;base64," + imagePart;
-//     } else {
-//         sBase64 = "data:image/jpeg;base64," + imagePart;
-//     }
+        //     sBase64 = sBase64.replace(/\s/g, "");
+        //     var decoded = "";
 
-//     var oImage = new sap.m.Image({
-//         src: sBase64,
-//         width: "100%",
-//         height: "auto"
-//     });
+        //     try {
+        //         decoded = atob(sBase64);
+        //     } catch (e) {
+        //         decoded = sBase64;
+        //     }
 
-//     var oDialog = new sap.m.Dialog({
-//         title: "View Document",
-//         contentWidth: "400px",
-//         contentHeight: "500px",
-//         verticalScrolling: true,
-//         content: [oImage],
-//         endButton: new sap.m.Button({
-//             text: "Close",
-//             press: function () {
-//                 oDialog.close();
-//             }
-//         }),
-//         afterClose: function () {
-//             oDialog.destroy();
-//         }
-//     });
+        //     // Extract actual image base64 inside decoded
+        //     var imagePart = decoded.includes("base64,")
+        //         ? decoded.split("base64,")[1]
+        //         : decoded;
 
-//     oDialog.open();
-// },
-       HM_AssignRoom: function(oEvent) {
-    var table = this.byId("idPOTable");
-    var selected = table.getSelectedItem();
-    if (!selected) {
-        sap.m.MessageToast.show("Please Select a Record to Assign Room.");
-        return;
-    }
+        //     // Identify image type
+        //     if (imagePart.startsWith("iVB")) {
+        //         sBase64 = "data:image/png;base64," + imagePart;
+        //     } else if (imagePart.startsWith("/9j")) {
+        //         sBase64 = "data:image/jpeg;base64," + imagePart;
+        //     } else {
+        //         sBase64 = "data:image/jpeg;base64," + imagePart;
+        //     }
 
-    var Model = selected.getBindingContext("HostelModel");
-    this.data = Model.getObject(); // Customer data
+        //     var oImage = new sap.m.Image({
+        //         src: sBase64,
+        //         width: "100%",
+        //         height: "auto"
+        //     });
 
-    if (this.data.Status === "Cancelled" || this.data.Status === "Assigned" || this.data.Status === "Completed") {
-        sap.m.MessageToast.show("This Customer can't be Assign");
-        return;
-    }
+        //     var oDialog = new sap.m.Dialog({
+        //         title: "View Document",
+        //         contentWidth: "400px",
+        //         contentHeight: "500px",
+        //         verticalScrolling: true,
+        //         content: [oImage],
+        //         endButton: new sap.m.Button({
+        //             text: "Close",
+        //             press: function () {
+        //                 oDialog.close();
+        //             }
+        //         }),
+        //         afterClose: function () {
+        //             oDialog.destroy();
+        //         }
+        //     });
 
-    var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
-    var aRooms = oRoomDetailsModel.getData(); // All room details
+        //     oDialog.open();
+        // },
+        HM_AssignRoom: function(oEvent) {
+            var table = this.byId("idPOTable");
+            var selected = table.getSelectedItem();
+            if (!selected) {
+                sap.m.MessageToast.show("Please Select a Record to Assign Room.");
+                return;
+            }
 
-    // Get BedTypes from customer's bookings
-    var customerBedTypes = [];
-    // if (this.data) {
-    //     this.data.forEach(function(booking) {
-    //         if (booking.BedType) {
-    //             customerBedTypes.push(booking.BedType);
-    //         }
-    //     });
-    // }
-       customerBedTypes.push(this.data.BedType);
-    // if (customerBedTypes.length === 0) {
-    //     sap.m.MessageToast.show("Customer does not have any BedType assigned.");
-    //     return;
-    // }
+            var Model = selected.getBindingContext("HostelModel");
+            this.data = Model.getObject(); // Customer data
 
-    // Get branch code from selected booking
-    var customerBranchCode = this.data.BranchCode;
+            if (this.data.Status === "Cancelled" || this.data.Status === "Assigned" || this.data.Status === "Completed") {
+                sap.m.MessageToast.show("This Customer can't be Assign");
+                return;
+            }
 
-    // Get all HostelModel data to check room occupancy
-    var oHostelModel = this.getView().getModel("HostelModel");
-    var aCustomers = oHostelModel.getData(); // All customer bookings
+            var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
+            var aRooms = oRoomDetailsModel.getData(); // All room details
 
-    // Filter room numbers that match customer's BedType AND branch AND are not fully booked
-    var availableRoomNos = aRooms.filter(function(room) {
-        // Branch must match customer's booking
-        if (room.BranchCode !== customerBranchCode) {
-            return false;
-        }
+            // Get BedTypes from customer's bookings
+            var customerBedTypes = [];
+            // if (this.data) {
+            //     this.data.forEach(function(booking) {
+            //         if (booking.BedType) {
+            //             customerBedTypes.push(booking.BedType);
+            //         }
+            //     });
+            // }
+            customerBedTypes.push(this.data.BedType);
+            // if (customerBedTypes.length === 0) {
+            //     sap.m.MessageToast.show("Customer does not have any BedType assigned.");
+            //     return;
+            // }
 
-        // BedType must match customer's booking(s)
-        if (!customerBedTypes.includes(room.BedTypeName)) {
-            return false;
-        }
+            // Get branch code from selected booking
+            var customerBranchCode = this.data.BranchCode;
 
-        // Count how many customers already have this RoomNo and BedType
-        var count = 0;
- aCustomers.forEach(function (customer) {
-    if (
-        customer &&
-        customer.RoomNo === room.RoomNo &&
-        customer.BedType === room.BedTypeName &&
-        customer.Status === "Assigned"
-    ) {
-        count++;
-    }
-});
+            // Get all HostelModel data to check room occupancy
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var aCustomers = oHostelModel.getData(); // All customer bookings
+
+            // Filter room numbers that match customer's BedType AND branch AND are not fully booked
+            var availableRoomNos = aRooms.filter(function(room) {
+                // Branch must match customer's booking
+                if (room.BranchCode !== customerBranchCode) {
+                    return false;
+                }
+
+                // BedType must match customer's booking(s)
+                if (!customerBedTypes.includes(room.BedTypeName)) {
+                    return false;
+                }
+
+                // Count how many customers already have this RoomNo and BedType
+                var count = 0;
+                aCustomers.forEach(function(customer) {
+                    if (
+                        customer &&
+                        customer.RoomNo === room.RoomNo &&
+                        customer.BedType === room.BedTypeName &&
+                        customer.Status === "Assigned"
+                    ) {
+                        count++;
+                    }
+                });
 
 
 
 
-        // Only include room if it is not fully booked
-        return count < room.NoofPerson;
-    }).map(function(room) {
-        return { RoomNo: room.RoomNo };
-    });
+                // Only include room if it is not fully booked
+                return count < room.NoofPerson;
+            }).map(function(room) {
+                return {
+                    RoomNo: room.RoomNo
+                };
+            });
 
-    // Set AvailableRoomsModel
-    var oAvailableRoomsModel = new sap.ui.model.json.JSONModel(availableRoomNos);
-    this.getView().setModel(oAvailableRoomsModel, "AvailableRoomsModel");
+            // Set AvailableRoomsModel
+            var oAvailableRoomsModel = new sap.ui.model.json.JSONModel(availableRoomNos);
+            this.getView().setModel(oAvailableRoomsModel, "AvailableRoomsModel");
 
-    // Open dialog
-    if (!this.HM_Dialog) {
-        var oView = this.getView();
-        this.HM_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Assign_Room", this);
-        oView.addDependent(this.HM_Dialog);
-    }
-    this.getView().getModel("Visiblemodel").setProperty("/Visible", false)
-    var oText = sap.ui.getCore().byId("idCustomerNameText");
-    oText.setText(this.data.CustomerName + " (" + this.data.CustomerID + ")");
-    sap.ui.getCore().byId("idRoomNumber1").setValueState("None").setSelectedKey("");
+            // Open dialog
+            if (!this.HM_Dialog) {
+                var oView = this.getView();
+                this.HM_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Assign_Room", this);
+                oView.addDependent(this.HM_Dialog);
+            }
+            this.getView().getModel("Visiblemodel").setProperty("/Visible", false)
+            var oText = sap.ui.getCore().byId("idCustomerNameText");
+            oText.setText(this.data.CustomerName + " (" + this.data.CustomerID + ")");
+            sap.ui.getCore().byId("idRoomNumber1").setValueState("None").setSelectedKey("");
 
-    this.HM_Dialog.open();
-}
-,
+            this.HM_Dialog.open();
+        },
         HM_RoomDetails: function(oEvent) {
             var oView = this.getView();
 
@@ -471,7 +497,7 @@ sap.ui.define([
 
         },
 
-         onTableUpdateFinished: function() {
+        onTableUpdateFinished: function() {
             this._updateRowCount();
         },
 
@@ -481,7 +507,7 @@ sap.ui.define([
             const iLength = oBinding.getLength(); // filtered result count
             this.getView().getModel("HostelModel").setProperty("/count", iLength);
         },
-      
+
         // HM_ChangeRoom: function() {
         //     var table = this.byId("idPOTable");
         //     var selected = table.getSelectedItem();
@@ -625,16 +651,16 @@ sap.ui.define([
             if (sCustomerName) {
                 aFilters.push(new sap.ui.model.Filter("CustomerID", sap.ui.model.FilterOperator.EQ, sCustomerName));
             }
-              if (sRoomNo) {
+            if (sRoomNo) {
                 aFilters.push(new sap.ui.model.Filter("RoomNo", sap.ui.model.FilterOperator.EQ, sRoomNo));
             }
-             if (status) {
+            if (status) {
                 aFilters.push(new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.EQ, status));
             }
-             if (sBookingId) {
+            if (sBookingId) {
                 aFilters.push(new sap.ui.model.Filter("BookingID", sap.ui.model.FilterOperator.EQ, sBookingId));
             }
-            
+
             var oCombinedFilter = new sap.ui.model.Filter({
                 filters: aFilters,
                 and: true
@@ -648,88 +674,91 @@ sap.ui.define([
             oRouter.navTo("RouteHostel");
         },
         PO_onPressClear: function() {
+            this._isClearPressed = true;
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
             this.getView().byId("PO_id_Status").setSelectedKey("")
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
-
+            this.byId("PO_id_Date").setValue("");
         },
         onRoomNoChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
-         AD_onPressEditDetails: function (oEvent) {
-          this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID)});
+        AD_onPressEditDetails: function(oEvent) {
+            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
+                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID)
+            });
         },
 
-         createTableSheet: function () {
+        createTableSheet: function() {
             return [{
-                label: "Customer ID",
-                property: "CustomerID",
-                type: "string"
-            },
-            {
-                label: "Customer Name",
-                property: "CustomerName",
-                type: "string"
-            },
-            {
-                label: "Booking ID",
-                property: "BookingID",
-                type: "string"
-            },
-            {
-                label: "Booking Date",
-                property: "BookingDate",
-                type: "string"
-            },
-            {
-                label: "Gender",
-                property: "Gender",
-                type: "string"
-            },
-            {
-                label: "STD Code",
-                property: "STDCode",
-                type: "string"
-            },
-            {
-                label: "Contact Information",
-                property: "MobileNo",
-                type: "string"
-            },
-            {
-                label: "Email ID ",
-                property: "CustomerEmail",
-                type: "string"
-            },
-            {
-                label: "Start Date",
-                property: "StartDate",
-                type: "string"
-            },
-            {
-                label: "End Date",
-                property: "EndDate",
-                type: "string"
-            },
-            {
-                label: "Room Number",
-                property: "RoomNo",
-                type: "string"
-            },
-            {
-                label: "Bed Type",
-                property: "BedType",
-                type: "string"
-            },
-            {
-                label: "Status",
-                property: "Status",
-                type: "string"
-            }
+                    label: "Customer ID",
+                    property: "CustomerID",
+                    type: "string"
+                },
+                {
+                    label: "Customer Name",
+                    property: "CustomerName",
+                    type: "string"
+                },
+                {
+                    label: "Booking ID",
+                    property: "BookingID",
+                    type: "string"
+                },
+                {
+                    label: "Booking Date",
+                    property: "BookingDate",
+                    type: "string"
+                },
+                {
+                    label: "Gender",
+                    property: "Gender",
+                    type: "string"
+                },
+                {
+                    label: "STD Code",
+                    property: "STDCode",
+                    type: "string"
+                },
+                {
+                    label: "Contact Information",
+                    property: "MobileNo",
+                    type: "string"
+                },
+                {
+                    label: "Email ID ",
+                    property: "CustomerEmail",
+                    type: "string"
+                },
+                {
+                    label: "Start Date",
+                    property: "StartDate",
+                    type: "string"
+                },
+                {
+                    label: "End Date",
+                    property: "EndDate",
+                    type: "string"
+                },
+                {
+                    label: "Room Number",
+                    property: "RoomNo",
+                    type: "string"
+                },
+                {
+                    label: "Bed Type",
+                    property: "BedType",
+                    type: "string"
+                },
+                {
+                    label: "Status",
+                    property: "Status",
+                    type: "string"
+                }
             ]
         },
 
-        MD_onDownload: function () {
+        MD_onDownload: function() {
             const oModel = this.byId("idPOTable").getModel("HostelModel").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show("No Data available to Download.");

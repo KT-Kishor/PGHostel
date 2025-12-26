@@ -40,15 +40,15 @@
                         <fb:control>
                             <ComboBox
                                 id="PO_id_BookingId"
-                                items="{HostelModel>/}"
+                                items="{HostelMasterModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                                 filterSecondaryValues="true"
                             >
                                 <core:ListItem
-                                    key="{HostelModel>BookingID}"
-                                    text="{HostelModel>BookingID}"
-                                    additionalText="{HostelModel>CustomerID}"
+                                    key="{HostelMasterModel>BookingID}"
+                                    text="{HostelMasterModel>BookingID}"
+                                    additionalText="{HostelMasterModel>CustomerID}"
                                 />
                             </ComboBox>
                         </fb:control>
