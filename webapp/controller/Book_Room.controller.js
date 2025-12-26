@@ -1588,54 +1588,90 @@ sap.ui.define([
             this.handleButtonsVisibility();
         },
         handleNavigationChange: function (oEvent) {
-
-            this._oSelectedStep = oEvent.getParameter("step");
             this._oWizard = this._oWizard || this.byId("TC_id_wizard");
-            this._iSelectedStepIndex = this._oWizard.getSteps().indexOf(this._oSelectedStep);
+            this._oSelectedStep = oEvent.getParameter("step");
+            this._iSelectedStepIndex = this._oWizard
+                .getSteps()
+                .indexOf(this._oSelectedStep);
 
             this.handleButtonsVisibility();
 
             const oModel = this.getView().getModel("HostelModel");
-            const currentCount = oModel.getProperty("/SelectedPerson") || 1;
 
+            // ❌ Trying to enter Step 2 while Step 1 invalid
             if (this._iSelectedStepIndex === 1) {
-
                 const sStartDate = oModel.getProperty("/StartDate");
                 const sEndDate = oModel.getProperty("/EndDate");
 
                 if (!sStartDate || !sEndDate) {
-
                     sap.m.MessageToast.show(
-                        "Please select Start Date and End Date before proceeding."
+                        "Please complete Booking Information before proceeding."
                     );
 
-                    // ❌ Cancel navigation
-                    this._oWizard.invalidateStep();
-
-
-                    // 🔄 Reset index
-                    // this._iSelectedStepIndex = 0;
-
-                    // 🔒 Ensure step stays locked
-                    oModel.setProperty("/IsGeneralInfoValid", false);
-
-                    // Update buttons for Step 0
-
+                    // Centralized rollback
+                    this._validateGeneralInfo();
                     return;
                 }
-            }
 
-            if (this._iSelectedStepIndex === 1) {
-
+                // Step 1 valid → continue
                 if (this._mustRecreatePersonUI) {
                     this._createDynamicPersonsUI();
                     this._mustRecreatePersonUI = false;
                 }
-                return;
             }
 
             if (this._iSelectedStepIndex === 2) {
                 this.TC_onDialogNextButton();
+            }
+        },
+
+        _validateGeneralInfo: function () {
+            const oView = this.getView();
+            const oHostelModel = oView.getModel("HostelModel");
+            const oBTN = oView.getModel("OBTNModel");
+            const oWizard = this.byId("TC_id_wizard");
+
+            if (!oWizard) {
+                return;
+            }
+
+            const aSteps = oWizard.getSteps();
+            const oStepGeneral = aSteps[0];   // Step 1
+            const oStepPersonal = aSteps[1];  // Step 2
+
+            // Read required fields of Step 1
+            const sStartDate   = oHostelModel.getProperty("/StartDate");
+            const sEndDate     = oHostelModel.getProperty("/EndDate");
+            const sPaymentType = oHostelModel.getProperty("/SelectedPriceType");
+            const sPerson      = oHostelModel.getProperty("/Person");
+
+            // Step-1 validity rule
+            const bValid = !!(sStartDate && sEndDate && sPaymentType && sPerson);
+
+            // ===============================
+            // MODEL STATE
+            // ===============================
+            oHostelModel.setProperty("/IsGeneralInfoValid", bValid);
+
+            // ===============================
+            // FOOTER BUTTON STATE
+            // ===============================
+            oBTN.setProperty("/Next", bValid);
+            oBTN.setProperty("/Submit", false);
+
+            // ===============================
+            // WIZARD STATE
+            // ===============================
+            oStepGeneral.setValidated(bValid);
+
+            // 🔒 THIS CONTROLS HEADER CLICKABILITY
+            oStepPersonal.setEnabled(bValid);
+
+            // If invalid → force user back to Step 1
+            if (!bValid) {
+                oWizard.goToStep(oStepGeneral, true);
+                this._iSelectedStepIndex = 0;
+                this._oSelectedStep = oStepGeneral;
             }
         },
 
@@ -2399,6 +2435,7 @@ sap.ui.define([
 
             oBTN.refresh(true);
             oHostelModel.refresh(true);
+            this._validateGeneralInfo()
         },
 
         //login
