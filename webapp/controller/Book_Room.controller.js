@@ -4576,6 +4576,7 @@ if (!sStartDate || !sEndDate) {
                     isTableBusy: false
                 });
                 this._oProfileDialog.setModel(oProfileModel, "profileData");
+                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
                 // this.byId("id_dialog").removeStyleClass("dialogBlur");
@@ -4595,6 +4596,7 @@ if (!sStartDate || !sEndDate) {
                     aCustomers: []
                 });
                 this._oProfileDialog.setModel(oProfileModel, "profileData");
+                this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.refresh(true);
                 this._oProfileDialog.open();
@@ -4602,6 +4604,54 @@ if (!sStartDate || !sEndDate) {
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+        },
+
+        _applyCountryStateCityFilters: function () {
+            if (!this._oProfileDialog) return; // safety check
+
+            const oModel = this._oProfileDialog.getModel("profileData");
+            if (!oModel) return;
+
+            const oCountryCB = this.byId("id_country");
+            const oStateCB = this.byId("id_state");
+            const oSourceCB = this.byId("id_city");
+
+            const sCountry = oModel.getProperty("/Country") || "";
+            const sState = oModel.getProperty("/State") || "";
+            const sSource = oModel.getProperty("/City") || "";
+
+            // Reset all filters
+            oStateCB.getBinding("items")?.filter([]);
+            oSourceCB.getBinding("items")?.filter([]);
+
+            if (sCountry) {
+                // Find countryCode by name
+                const aCountryData = this.getView().getModel("CountryModel").getData();
+                const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                if (oCountryObj) {
+                    const sCountryCode = oCountryObj.code;
+
+                    // Filter States by Country
+                    oStateCB.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    if (sState) {
+                        // Filter Cities by State + Country
+                        const aFilters = [
+                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ];
+                        oSourceCB.getBinding("items")?.filter(aFilters);
+                    }
+                }
+            }
+
+            // Ensure values are set back in UI
+            oCountryCB.setValue(sCountry);
+            oStateCB.setValue(sState);
+            oSourceCB.setValue(sSource);
         },
         onGlobalSearch: function (oEvent) {
             const sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
@@ -5007,7 +5057,7 @@ if (!sStartDate || !sEndDate) {
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
-                this._applyCountryStateCityFilters();
+                // this._applyCountryStateCityFilters();
                 // this._oProfileDialog.close();
                 sap.ui.core.BusyIndicator.show(0);
 
