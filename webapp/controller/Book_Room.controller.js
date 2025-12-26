@@ -466,6 +466,64 @@ sap.ui.define([
             });
         },
 
+
+        _applyCountryStateCity: function () {
+            const oView = this.getView();
+            const oModel = oView.getModel("HostelModel");
+            const aPersons = oModel.getProperty("/Persons") || [];
+
+            const aCountryData = oView.getModel("CountryModel").getData();
+
+            aPersons.forEach((p, i) => {
+
+                if (!p.Country) return;
+
+                const oCountryObj = aCountryData.find(
+                    c => c.countryName === p.Country
+                );
+                if (!oCountryObj) return;
+
+                const sCountryCode = oCountryObj.code;
+
+                // ----- STATE FILTER -----
+                const oStateCombo = sap.ui.getCore().byId(
+                    this.createId("ID_State_" + i)
+                );
+                if (oStateCombo) {
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter(
+                            "countryCode",
+                            sap.ui.model.FilterOperator.EQ,
+                            sCountryCode
+                        )
+                    ]);
+                    oStateCombo.setValue(p.State || "");
+                }
+
+                // ----- CITY FILTER -----
+                if (p.State) {
+                    const oCityCombo = sap.ui.getCore().byId(
+                        this.createId("ID_City_" + i)
+                    );
+                    if (oCityCombo) {
+                        oCityCombo.getBinding("items")?.filter([
+                            new sap.ui.model.Filter(
+                                "stateName",
+                                sap.ui.model.FilterOperator.EQ,
+                                p.State
+                            ),
+                            new sap.ui.model.Filter(
+                                "countryCode",
+                                sap.ui.model.FilterOperator.EQ,
+                                sCountryCode
+                            )
+                        ]);
+                        oCityCombo.setValue(p.City || "");
+                    }
+                }
+            });
+        },
+
         _isPersonUIInitialized: false,
         _lastPersonCount: 1,
 
@@ -638,6 +696,7 @@ sap.ui.define([
                                         }
 
                                         oModel.refresh(true);
+                                        that._applyCountryStateCityForPersons();
                                     }
 
                                 })
@@ -1632,33 +1691,35 @@ sap.ui.define([
             this._iSelectedStepIndex = this._oWizard
                 .getSteps()
                 .indexOf(this._oSelectedStep);
-
+ 
             this.handleButtonsVisibility();
-
+ 
             const oModel = this.getView().getModel("HostelModel");
-
+ 
             // ❌ Trying to enter Step 2 while Step 1 invalid
             if (this._iSelectedStepIndex === 1) {
                 const sStartDate = oModel.getProperty("/StartDate");
                 const sEndDate = oModel.getProperty("/EndDate");
-
+ 
                 if (!sStartDate || !sEndDate) {
                     sap.m.MessageToast.show(
                         "Please complete Booking Information before proceeding."
                     );
-
+ 
                     // Centralized rollback
+                   
                     this._validateGeneralInfo();
+                    this._iSelectedStepIndex=1;
                     return;
                 }
-
+ 
                 // Step 1 valid → continue
                 if (this._mustRecreatePersonUI) {
                     this._createDynamicPersonsUI();
                     this._mustRecreatePersonUI = false;
                 }
             }
-
+ 
             if (this._iSelectedStepIndex === 2) {
                 this.TC_onDialogNextButton();
             }
@@ -4656,7 +4717,7 @@ sap.ui.define([
                     isTableBusy: false
                 });
                 this._oProfileDialog.setModel(oProfileModel, "profileData");
-                this._applyCountryStateCityFilters();
+                // this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
                 // this.byId("id_dialog").removeStyleClass("dialogBlur");
@@ -4676,7 +4737,7 @@ sap.ui.define([
                     aCustomers: []
                 });
                 this._oProfileDialog.setModel(oProfileModel, "profileData");
-                this._applyCountryStateCityFilters();
+                // this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.refresh(true);
                 this._oProfileDialog.open();
@@ -5137,7 +5198,7 @@ sap.ui.define([
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
-                // this._applyCountryStateCityFilters();
+                this._applyCountryStateCityFilters();
                 // this._oProfileDialog.close();
                 sap.ui.core.BusyIndicator.show(0);
 
