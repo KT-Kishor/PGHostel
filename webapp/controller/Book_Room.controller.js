@@ -427,6 +427,45 @@ sap.ui.define([
             return true; // Logged in & autofilled
         },
 
+        _applyCountryStateCityForPersons: function () {
+            const oView = this.getView();
+            const oModel = oView.getModel("HostelModel");
+            const aPersons = oModel.getProperty("/Persons") || [];
+
+            const aCountryData = oView.getModel("CountryModel").getData();
+
+            aPersons.forEach((p, i) => {
+
+                if (!p.Country) return;
+
+                const oCountryObj = aCountryData.find(c => c.countryName === p.Country);
+                if (!oCountryObj) return;
+
+                const sCountryCode = oCountryObj.code;
+
+                // ---------- STATE FILTER ----------
+                const oStateCombo = sap.ui.getCore().byId(this.createId("ID_State_" + i));
+                if (oStateCombo) {
+                    oStateCombo.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+                    oStateCombo.setValue(p.State || "");
+                }
+
+                // ---------- CITY FILTER ----------
+                if (p.State) {
+                    const oCityCombo = sap.ui.getCore().byId(this.createId("ID_City_" + i));
+                    if (oCityCombo) {
+                        oCityCombo.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, p.State),
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ]);
+                        oCityCombo.setValue(p.City || "");
+                    }
+                }
+            });
+        },
+
         _isPersonUIInitialized: false,
         _lastPersonCount: 1,
 
@@ -2708,6 +2747,7 @@ sap.ui.define([
                 sap.ui.getCore().setModel(oUserModel, "LoginModel");
                 if (oCheck) {
                     oCheck.setSelected(true);
+                    this._applyCountryStateCityForPersons();
                 }
                 oHostelModel.refresh(true);
 
