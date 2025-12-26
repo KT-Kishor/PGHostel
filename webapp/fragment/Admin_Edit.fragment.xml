@@ -79,7 +79,9 @@
         displayFormat="dd/MM/yyyy"
         valueFormat="yyyy-MM-dd"
         change="onEditDateChange"
-        minDate="{CustomerData>/BookingDate}"
+        minDate="{CustomerData>/minStartDate}"
+         maxDate="{CustomerData>/minEndDate}"
+
         valueStateText="Plaese Select Date"
      />
 
@@ -117,7 +119,9 @@
         displayFormat="dd/MM/yyyy"
         valueFormat="yyyy-MM-dd"
         change="onEditDateChange"
-         minDate="{CustomerData>/BookingDate}"
+        minDate="{CustomerData>/minStartDate}"
+        maxDate="{CustomerData>/minEndDate}"
+
          valueStateText="Plaese Select Date"
   />
     <!-- Days -->

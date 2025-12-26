@@ -21,6 +21,12 @@ sap.ui.define([
     // }
             var inputID = this.getView().byId("BookingcouponInput")
              inputID.setShowValueHelp(false)
+
+               var DateModel = new JSONModel({
+                  minstartDate: "",
+                    minEndDate:""
+                });
+                this.getView().setModel(DateModel, "DateRangeModel");
         },
 
         onNavBack: function () {
@@ -66,6 +72,12 @@ sap.ui.define([
       
 // --- Open edit dialog for selected facility ---
 onEditFacilityDetails: function () {
+
+    const oEditModel = this.getView().getModel("HostelModel").getData();
+    this.getView().getModel("DateRangeModel").setProperty("/minstartDate", new Date(oEditModel.StartDate.split("/").reverse().join("-")));
+    this.getView().getModel("DateRangeModel").setProperty("/minEndDate", new Date(oEditModel.EndDate.split("/").reverse().join("-")));
+
+
 
     if (!this._oSelectedFacility) {
         sap.m.MessageToast.show("Please Select a Row to Edit.");

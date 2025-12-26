@@ -293,7 +293,11 @@ sap.ui.define([
 
 
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
+                    minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
+
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
+                    minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
+
                     AllSelectedFacilities: oCustomer.FaciltyItems || [],
                     Documents: oCustomer.Documents || []
                 };
@@ -682,6 +686,7 @@ sap.ui.define([
         },
 
         onAddFacilityDetails: function () {
+            var data=this.getView().getModel("Bookingmodel").getData()
 
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
@@ -718,6 +723,9 @@ sap.ui.define([
 
 
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
+          this.getView().getModel("CustomerData").setProperty("/minStartDate",new Date(data.StartDate.split("/").reverse().join("-")));
+          this.getView().getModel("CustomerData").setProperty("/minEndDate",new Date(data.EndDate.split("/").reverse().join("-")));
+
         },
 
         onEditDialogClose: function () {
@@ -1436,6 +1444,8 @@ sap.ui.define([
         },
 
         onEditFacilityDetails: function () {
+            var data=this.getView().getModel("Bookingmodel").getData()
+
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
 
@@ -1462,6 +1472,8 @@ sap.ui.define([
             }
             sap.ui.getCore().byId("idUnitType").setVisible(true)
             this.HM_Dialog.open();
+          this.getView().getModel("CustomerData").setProperty("/minStartDate",new Date(data.StartDate.split("/").reverse().join("-")));
+          this.getView().getModel("CustomerData").setProperty("/minEndDate",new Date(data.EndDate.split("/").reverse().join("-")));
         },
 
         onDeleteFacilityDetails: function () {

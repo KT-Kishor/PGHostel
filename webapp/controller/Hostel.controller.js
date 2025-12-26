@@ -75,7 +75,7 @@ sap.ui.define([
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     BedTypes: [],
                     NoData: false,
-                    ShowViewMore: false,
+                    ShowViewMore: false
                 }), "VisibilityModel");
             }
 
