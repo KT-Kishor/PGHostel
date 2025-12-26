@@ -679,11 +679,11 @@
   width: 100%;
 }
 
-.areaTagBox {
+/* .areaTagBox {
   position: absolute;
   top: 10px;
   left: 10px;
-  right: 10px;           /* creates margin from right */
+  right: 10px;           
   max-width: calc(100% - 20px);
 
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
@@ -696,12 +696,48 @@
 
   white-space: normal;
   word-break: break-word;
+} */
+ 
+.areaTagBox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  padding: 6px 12px;
+  border-radius: 12px;
+
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+
+  max-width: calc(100% - 20px);
+  white-space: normal;
+  word-break: break-word;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
-
 .areaTagBox .sapMText {
-  color: rgb(0, 0, 0) !important;
- line-height: 1.2;
+  color: Black !important;   
+  line-height: 1.2;
+}
+
+.areaTagBox .sapUiIcon {
+  flex-shrink: 0;
+  color: #000; /* icon stays dark if you want */
+}
+@media (max-width: 768px) {
+  .areaTagBox {
+    border-radius: 16px;
+  }
+}
+.areaTagBox {
+  backdrop-filter: blur(2px);
 }
 
 .bedCardContent {
