@@ -909,18 +909,26 @@ onTabSelect: async function (oEvent) {
             this.ARD_Dialog.open();
         },
 
-        onpressBookrooms: async function () {
-            var oTabHeader = this.byId("mainTabHeader");
-            oTabHeader.setSelectedKey("idRooms");
-            this.byId("pageContainer").to(this.byId("idRooms"));
+        // onpressBookrooms: async function () {
+        //     var oTabHeader = this.byId("mainTabHeader");
+        //     oTabHeader.setSelectedKey("idRooms");
+        //     this.byId("pageContainer").to(this.byId("idRooms"));
 
-            var page = this.byId("idRooms");
-            if (page && page.scrollTo) {
-                page.scrollTo(0, 0);
-            }
+        //     var page = this.byId("idRooms");
+        //     if (page && page.scrollTo) {
+        //         page.scrollTo(0, 0);
+        //     }
 
-            await this._loadRoomsPageData();
-        },
+        //     await this._loadRoomsPageData();
+        // },
+
+onpressBookrooms: function () {
+    const oTabHeader = this.byId("mainTabHeader");
+    const oItem = oTabHeader.getItems().find(i => i.getKey() === "idRooms");
+
+    oTabHeader.setSelectedKey("idRooms");
+    this.onTabSelect({ getParameter: () => oItem });
+},
 
 
 
