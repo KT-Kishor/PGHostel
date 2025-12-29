@@ -1691,35 +1691,35 @@ sap.ui.define([
             this._iSelectedStepIndex = this._oWizard
                 .getSteps()
                 .indexOf(this._oSelectedStep);
- 
+
             this.handleButtonsVisibility();
- 
+
             const oModel = this.getView().getModel("HostelModel");
- 
+
             // ❌ Trying to enter Step 2 while Step 1 invalid
             if (this._iSelectedStepIndex === 1) {
                 const sStartDate = oModel.getProperty("/StartDate");
                 const sEndDate = oModel.getProperty("/EndDate");
- 
+
                 if (!sStartDate || !sEndDate) {
                     sap.m.MessageToast.show(
                         "Please complete Booking Information before proceeding."
                     );
- 
+
                     // Centralized rollback
-                   
+
                     this._validateGeneralInfo();
-                    this._iSelectedStepIndex=1;
+                    this._iSelectedStepIndex = 1;
                     return;
                 }
- 
+
                 // Step 1 valid → continue
                 if (this._mustRecreatePersonUI) {
                     this._createDynamicPersonsUI();
                     this._mustRecreatePersonUI = false;
                 }
             }
- 
+
             if (this._iSelectedStepIndex === 2) {
                 this.TC_onDialogNextButton();
             }
@@ -1740,10 +1740,10 @@ sap.ui.define([
             const oStepPersonal = aSteps[1];  // Step 2
 
             // Read required fields of Step 1
-            const sStartDate   = oHostelModel.getProperty("/StartDate");
-            const sEndDate     = oHostelModel.getProperty("/EndDate");
+            const sStartDate = oHostelModel.getProperty("/StartDate");
+            const sEndDate = oHostelModel.getProperty("/EndDate");
             const sPaymentType = oHostelModel.getProperty("/SelectedPriceType");
-            const sPerson      = oHostelModel.getProperty("/Person");
+            const sPerson = oHostelModel.getProperty("/Person");
 
             // Step-1 validity rule
             const bValid = !!(sStartDate && sEndDate && sPaymentType && sPerson);
@@ -2775,9 +2775,9 @@ sap.ui.define([
 
                 this._oLoggedInUser = oMatchedUser;
                 this.getOwnerComponent()
-    .getModel("UserModel")
-    ?.setData(oMatchedUser);
-                
+                    .getModel("UserModel")
+                    ?.setData(oMatchedUser);
+
                 // Clear input fields
                 if (ctrlUserName) ctrlUserName.setValue("");
                 if (ctrlPassword) ctrlPassword.setValue("");
@@ -4587,22 +4587,22 @@ sap.ui.define([
             }
         },
         onPressAvatar: async function (oEvent) {
-            const oUser = this._oLoggedInUser 
-             let fullUserData = {}; 
+            const oUser = this._oLoggedInUser
+            let fullUserData = {};
             try {
 
-                  if (!oUser || !oUser.UserID) {
-        oUser = this.getOwnerComponent()
-            .getModel("UserModel")
-            ?.getData();
-    }
-                 const sUserID = oUser.UserID;
+                if (!oUser || !oUser.UserID) {
+                    oUser = this.getOwnerComponent()
+                        .getModel("UserModel")
+                        ?.getData();
+                }
+                const sUserID = oUser.UserID;
                 if (!sUserID) {
                     sap.m.MessageToast.show("User not Logged in.");
                     return;
                 }
-                   fullUserData = oUser;
-  
+                fullUserData = oUser;
+
 
                 // if (!this._isProfileRequested) {
                 //     this.createAvatarActionSheet();
@@ -4630,6 +4630,22 @@ sap.ui.define([
                 this._oProfileDialog.setModel(oTempModel, "profileData");
                 // oProfileModel.refresh(true); 
                 this._oProfileDialog.open();
+                setTimeout(() => {
+                    const oUploader = sap.ui.core.Fragment.byId(
+                        "profileFrag",
+                        "id_fileUploaderAvatar"
+                    );
+
+                    if (oUploader) {
+                        oUploader.clear();
+                        oUploader.setValue("");
+
+                        const oInput = oUploader.getFocusDomRef();
+                        if (oInput) {
+                            oInput.value = "";
+                        }
+                    }
+                }, 0);
                 // this.byId("id_tabBar").setSelectedKey("Booking History");
                 setTimeout(() => {
                     this.byId("id_dialog")?.addStyleClass("dialogBlur");
@@ -5058,22 +5074,28 @@ sap.ui.define([
         },
 
         onUploadPhoto: function () {
-            const uploader = sap.ui.getCore().byId("id_fileUploaderAvatar");
-            if (!uploader) return;
+            const uploader = sap.ui.core.Fragment.byId(
+                "profileFrag",
+                "id_fileUploaderAvatar"
+            );
 
-            setTimeout(() => {
-                const oInput = uploader.getFocusDomRef();
-                if (!oInput) {
-                    console.error("Uploader input not ready");
-                    return;
-                }
-                uploader.clear();
-                uploader.setValue("");
-                oInput.value = "";
-                oInput.accept = "image/*";
-                oInput.capture = "";   // remove camera request → gallery
-                oInput.click();
-            }, 200);
+            if (!uploader) {
+                console.error("FileUploader not found");
+                return;
+            }
+            uploader.clear();
+            uploader.setValue("");
+
+            const oInput = uploader.getFocusDomRef();
+            if (!oInput) {
+                console.error("Uploader input not ready");
+                return;
+            }
+
+            oInput.value = "";
+            oInput.accept = "image/*";
+            oInput.capture = "";
+            oInput.click();
         },
 
         onAvatarFileSelected: function (oEvent) {
