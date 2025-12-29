@@ -2774,6 +2774,10 @@ sap.ui.define([
                 oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
 
                 this._oLoggedInUser = oMatchedUser;
+                this.getOwnerComponent()
+    .getModel("UserModel")
+    ?.setData(oMatchedUser);
+                
                 // Clear input fields
                 if (ctrlUserName) ctrlUserName.setValue("");
                 if (ctrlPassword) ctrlPassword.setValue("");
@@ -4533,10 +4537,6 @@ sap.ui.define([
                 oAvatar.setVisible(true);
             }
         },
-
-
-
-
         openProfileDialog: function () {
 
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
@@ -4587,14 +4587,22 @@ sap.ui.define([
             }
         },
         onPressAvatar: async function (oEvent) {
-            const oUser = this._oLoggedInUser || {};
-            const fullUserData = this._oLoggedInUser || {};
+            const oUser = this._oLoggedInUser 
+             let fullUserData = {}; 
             try {
-                const sUserID = oUser.UserID || "";
+
+                  if (!oUser || !oUser.UserID) {
+        oUser = this.getOwnerComponent()
+            .getModel("UserModel")
+            ?.getData();
+    }
+                 const sUserID = oUser.UserID;
                 if (!sUserID) {
                     sap.m.MessageToast.show("User not Logged in.");
                     return;
                 }
+                   fullUserData = oUser;
+  
 
                 // if (!this._isProfileRequested) {
                 //     this.createAvatarActionSheet();
@@ -5264,10 +5272,10 @@ sap.ui.define([
 
             // Status check (optional)
             var sStatus = (oBookingData.status || "").trim().toLowerCase();
-            if (sStatus !== "new") {
-                sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
-                return;
-            }
+            // if (sStatus !== "new") {
+            //     sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
+            //     return;
+            // }
 
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this._oProfileDialog.getModel("profileData");

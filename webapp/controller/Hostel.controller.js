@@ -1766,14 +1766,24 @@ onpressBookrooms: function () {
         },
 
         onPressAvatar: async function (oEvent) {
-            const oUser = this._oLoggedInUser || {};
-            const fullUserData = this._oLoggedInUser || {};
+            let oUser = this._oLoggedInUser ;
+            // const fullUserData = this._oLoggedInUser || {};
+                  let fullUserData = {}; 
             try {
-                const sUserID = oUser.UserID || "";
+
+                 if (!oUser || !oUser.UserID) {
+        oUser = this.getOwnerComponent()
+            .getModel("UserModel")
+            ?.getData();
+    }
+       const sUserID = oUser.UserID;
+                // const sUserID = oUser.UserID || "";
                 if (!sUserID) {
                     sap.m.MessageToast.show("User not logged in.");
                     return;
                 }
+                   fullUserData = oUser;
+         
 
                 if (!this._isProfileRequested) {
                     this.createAvatarActionSheet();
@@ -1795,7 +1805,7 @@ onpressBookrooms: function () {
                     });
                     this.getView().addDependent(this._oProfileDialog);
                 }
-                const oTempModel = new sap.ui.model.json.JSONModel({
+                const oTempModel = new JSONModel({
                     bookings: [],
                     Payments: [],
                     isEditMode: false,

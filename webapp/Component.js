@@ -35,6 +35,7 @@
                         isLoggedIn: false
                     });
                     this.setModel(oUIModel, "UIModel");
+                     this.setModel(new JSONModel({}), "UserModel");
 
                      // Login model setup
                     var omodel = new sap.ui.model.json.JSONModel({
