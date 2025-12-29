@@ -50,7 +50,7 @@
     <core:Item key="{HostelModel>key}" text="{HostelModel>text}" />
 </Select>
                 <!-- Site Contact -->
-                <Label text="{i18n>CDStartDate}" required="true" />
+                <Label text="{i18n>startDate}" required="true" />
                             <DatePicker
                                 id="idStartDate1"
                                 value="{HostelModel>/StartDate}"
