@@ -3,7 +3,7 @@
     <Dialog id="FT_id_editFacilityDialog" title="Edit Facility" afterClose=".onEditDialogClose" afterOpen=".onEditDialogAfterOpen">
         <content>
             <VBox class="sapUiSmallMargin">
-                <Label text="Facility Name" />
+                <Label text="Facility Name"/>
                 <Input id="FT_id_editFacilityName" value="{edit>/FacilityName}" editable="false" />
 
                 <Label text="Unit Type" required="true" />

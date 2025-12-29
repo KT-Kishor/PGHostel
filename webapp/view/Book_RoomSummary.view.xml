@@ -49,7 +49,7 @@
             </Column>
             <Column>
                 <Text text="Facility Cost" tooltip="Facility Cost" />
-            </Column>
+            </Column> 
             <Column>
                 <Text text="Room Rent" tooltip="Room Rent" />
             </Column>
@@ -100,8 +100,6 @@
                 class="sapUiSmallMarginBottom"
                visible="{= (${LoginModel>/UserID} ? true : false)
         || (${LoginModel>/EmployeeID} ? true : false) }"
-
-
             >
                 <!-- Coupon Label -->
                 <Label
