@@ -75,7 +75,7 @@
             </tnt:ToolHeader>
         </tnt:subHeader>
         <tnt:mainContents>
-        <VBox height="100%" renderType="Bare"  justifyContent="SpaceBetween"  class="mainScrollWrapper">
+        <VBox height="100%" renderType="Bare"  justifyContent="Start"  class="  ">
         <items>  
             <NavContainer id="pageContainer" height="auto">
 <!-- <layoutData>
@@ -97,30 +97,24 @@
                             width="100%"
                             class="position-welcome"
                         >
-                            <VBox class="sapUiLargeMarginTop">
-                                <Text
-                                    class="custom-welcome sapUiTinyMarginTopBottom"
-                                    textAlign="Center"
-                                    text="Welcome To"
-                                />
-                                <Text
-                                    class="custom-welcome  sapUiTinyMarginTopBottom "
-                                    text="Shah Hostel"
-                                />
-                                <Text
-                                    text="Your New Home Away to me"
-                                    class="custom-tagline sapUiTinyMarginTop "
-                                />
-                            </VBox>
+<VBox class="heroTextBox">
+	<Text class="custom-welcome" text="Welcome To" />
+	<Text class="custom-welcome" text="Shah Hostel" />
+	<Text class="custom-tagline" text="Your New Home Away To Me" />
+</VBox>
                         </l:Grid>
          
-                        <Button
-                            text="Book Room"
+                        <!-- <Button  
+                            text="Explore Now"
                             tooltip="Book Room"
-                            class="RoomBook sapUiLargeMarginBegin "
+                            class="exploreBtn  sapUiLargeMarginBegin "
                             press="onpressBookrooms"
-                        />
-                    </ScrollContainer>
+                        /> -->
+<HBox id="exploreWrapper" width="100%" class="exploreBtnWrapper">
+	<Button text="Explore Now" class="exploreBtn" press="onpressBookrooms" />
+</HBox>
+
+           </ScrollContainer>
                      <Page
                         id="idRooms"
                         showHeader="false"
@@ -137,18 +131,18 @@
                                 width="100%"
                                 class="position-welcome"
                             >
-                                <VBox class="sapUiLargeMarginTop">
+                                <VBox class=" sapUiLargeMarginTop">
                                     <Text
-                                        class="Welcomeroomtext sapUiTinyMarginTopBottom"
+                                        class="custom-welcome sapUiTinyMarginTopBottom"
                                         text="Book Your Room "
                                     />
                                     <Text
-                                        class="Welcomeroomtext  sapUiTinyMarginTopBottom "
+                                        class="custom-welcome  sapUiTinyMarginTopBottom "
                                         text="Shah Hostel"
                                     />
                                     <Text
                                         text="Your New Home Away to me"
-                                        class="Welcomeroomtext sapUiTinyMarginTop "
+                                        class="custom-tagline s apUiTinyMarginTop "
                                     />
                                 </VBox>
                                 <HBox
@@ -254,15 +248,18 @@
                                 </fb:FilterGroupItem>
                             </fb:filterGroupItems>
                         </fb:FilterBar>
-                        <l:Grid
+                        <!-- <l:Grid
                             id="idBedTypeFlex"
                             defaultSpan="XL3 L4 M6 S12"
                             containerQuery="true"
                             hSpacing="2"
                             vSpacing="2"
                             content="{path: 'VisibilityModel>/BedTypes'}"
-                        >
-                            <VBox class="bedCard">
+                        > -->
+                    <VBox class="">
+	<l:Grid id="idBedTypeFlex" defaultSpan="XL3 L4 M6 S12" containerQuery="true" 
+    hSpacing="2" vSpacing="2" content="{path: 'VisibilityModel>/BedTypes'}">     
+    <VBox class="bedCard">
                                 <!-- ===== IMAGE CAROUSEL ===== -->
                                 <Carousel
                                     height="300px"
@@ -330,6 +327,8 @@
                                 </VBox>
                             </VBox>
                         </l:Grid>
+                        </VBox>
+
                         <IllustratedMessage
                             visible="{VisibilityModel>/NoData}"
                             illustrationType="sap.m.IllustratedMessageType.NoData"

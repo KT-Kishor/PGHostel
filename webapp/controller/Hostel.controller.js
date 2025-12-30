@@ -162,6 +162,16 @@ sap.ui.define([
                 // Default landing tab = Home
                 oFooterModel.setProperty("/showGlobalFooter", true);
                 oFooterModel.setProperty("/showRoomsFooter", false);
+
+            const oWrapper = this.byId("exploreWrapper");
+            if (oWrapper && !this._exploreAnimated) {
+                this._exploreAnimated = true;
+                this._animateExploreButton();
+            }
+
+            const oNav = this.byId("pageContainer");
+            oNav.setDefaultTransitionName("None");
+
         },
 
 
@@ -765,37 +775,105 @@ sap.ui.define([
 
         // },
 
+    // onTabSelect: async function (oEvent) {
+    //     var oItem = oEvent.getParameter("item");
+    //     const sKey = oItem.getKey();
+
+    //     this.byId("pageContainer").to(this.byId(sKey));
+
+    //     var page = this.byId(sKey);
+    //     if (page && page.scrollTo) page.scrollTo(0, 0);
+
+    //     this.flag = true;
+    //     this.iTop = 4;
+    //     this.iSkip = 0;
+    //     this.roomtype = true;
+
+    //     // 🔑 Footer control (added, not disturbing existing flow)
+    //     const oFooterModel = this.getView().getModel("FooterModel");
+
+    //     if (sKey === "idRooms") {
+    //         // entering Rooms
+    //         oFooterModel.setProperty("/showGlobalFooter", false);
+    //         oFooterModel.setProperty("/showRoomsFooter", false);
+
+    //         // keep original behavior
+    //         await this._loadRoomsPageData();
+
+    //     } else {
+    //         // Home / Contact
+    //         oFooterModel.setProperty("/showGlobalFooter", true);
+    //         oFooterModel.setProperty("/showRoomsFooter", false);
+    //     }
+    //     const oNav = this.byId("pageContainer");
+    // oNav.setDefaultTransitionName("Slide");
+
+    // const sKeys = oEvent.getParameter("item").getKey();
+    // oNav.to(this.byId(sKeys));
+    // },
 onTabSelect: async function (oEvent) {
-    var oItem = oEvent.getParameter("item");
-    const sKey = oItem.getKey();
+    const sKey = oEvent.getParameter("item").getKey();
+    const oNav = this.byId("pageContainer");
 
-    this.byId("pageContainer").to(this.byId(sKey));
+    /* 1️⃣ Set transition BEFORE navigation */
+    oNav.setDefaultTransitionName("Slide");
 
-    var page = this.byId(sKey);
-    if (page && page.scrollTo) page.scrollTo(0, 0);
+    /* 2️⃣ Navigate ONCE */
+    oNav.to(this.byId(sKey));
 
+    /* 3️⃣ Reset scroll (safe) */
+    const page = this.byId(sKey);
+    if (page && page.scrollTo) {
+        page.scrollTo(0, 0);
+    }
+
+    /* 4️⃣ State flags (unchanged) */
     this.flag = true;
     this.iTop = 4;
     this.iSkip = 0;
     this.roomtype = true;
 
-    // 🔑 Footer control (added, not disturbing existing flow)
+    /* 5️⃣ Footer control */
     const oFooterModel = this.getView().getModel("FooterModel");
 
     if (sKey === "idRooms") {
-        // entering Rooms
+        // Entering Rooms
         oFooterModel.setProperty("/showGlobalFooter", false);
         oFooterModel.setProperty("/showRoomsFooter", false);
 
-        // keep original behavior
         await this._loadRoomsPageData();
-
     } else {
         // Home / Contact
         oFooterModel.setProperty("/showGlobalFooter", true);
         oFooterModel.setProperty("/showRoomsFooter", false);
     }
+
+    /* 6️⃣ Animate Explore button ONLY on Home */
+    if (sKey === "idHome") {
+        this._animateExploreButton();
+    }
 },
+
+
+_animateExploreButton: function () {
+    const oWrapper = this.byId("exploreWrapper");
+    if (!oWrapper) return;
+
+    // restart animation cleanly
+    oWrapper.removeStyleClass("explore-enter");
+
+    // force reflow so animation restarts
+    oWrapper.getDomRef()?.offsetHeight;
+
+    oWrapper.addStyleClass("explore-enter");
+
+    // cleanup after animation ends
+    setTimeout(() => {
+        oWrapper.removeStyleClass("explore-enter");
+    }, 1900);
+},  
+
+
 
 
         Branch: async function () {
