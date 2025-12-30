@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="FacilityName"
-                        label="Facility Name"
+                        label="{i18n>facilityname}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -64,23 +64,23 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Hostel Features ({=${HostelFeatures>/}.length})"
+                            text="{i18n>hostelFeatures} ({= ${HostelFeatures>/}.length})"
                         />
                         <ToolbarSpacer />
                         <Button
-                            text="Add Hostel Features"
+                            text="{i18n>addHostelFeatures}"
 							tooltip="Add Hostel Features"
                             press="HM_AddHostelFeature"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Edit"
+                            text="{i18n>MSedit}"
 							tooltip="Edit Hostel Feature"
                             press="HM_EditHostelFeature"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
+                            text="{i18n>MSdelete}"
 							tooltip="Delete Hostel Feature"
                             press="HM_DeleteHostelFeature"
                             class="myUnifiedBtn"
@@ -89,13 +89,13 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Facility Name" tooltip="Facility Name"/>
+                        <Text text="{i18n>facilityname}" tooltip="Facility Name"/>
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Description" tooltip="Description"/>
+                        <Text text="{i18n>description}" tooltip="Description"/>
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Image" tooltip="Image"/>
+                        <Text text="{i18n>image}" tooltip="Image"/>
                     </Column>
                 </columns>
                 <items>
@@ -107,7 +107,7 @@
                                 maxCharacters="20"
                             />
                             <Button
-                                text="View"
+                                text="{i18n>view}"
                                 press="HF_viewroom"
                             />
                         </cells>

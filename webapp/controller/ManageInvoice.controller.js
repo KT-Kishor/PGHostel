@@ -15,40 +15,40 @@ sap.ui.define(
           this.getOwnerComponent().getRouter().getRoute("RouteManageInvoice").attachMatched(this._onRouteMatched, this);
         },
 
-         _onRouteMatched: async function() {
-            try {
-               this.commonLoginFunction();
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._isClearPressed = false; // ensure full data is not requested'
-                const currentYear = new Date().getFullYear();
-                let fyStart, fyEnd;
+        _onRouteMatched: async function () {
+          try {
+            this.commonLoginFunction();
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this._isClearPressed = false; // ensure full data is not requested'
+            const currentYear = new Date().getFullYear();
+            let fyStart, fyEnd;
 
-                if (new Date().getMonth() >= 3) {
-                    fyStart = new Date(currentYear, 3, 1); // April 1
-                    fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
-                } else {
-                    fyStart = new Date(currentYear - 1, 3, 1); // April 1 last year
-                    fyEnd = new Date(currentYear, 2, 31); // March 31 this year
-                }
-                // Set the date range UI (override user-selected values)
-                const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
-                if (dateRangeControl) {
-                    dateRangeControl.setDateValue(fyStart);
-                    dateRangeControl.setSecondDateValue(fyEnd);
-                }
-                await this.ManageInvoice_onSearch();
-              
-            } catch (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageToast.show(error.message || error.responseText);
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
+            if (new Date().getMonth() >= 3) {
+              fyStart = new Date(currentYear, 3, 1); // April 1
+              fyEnd = new Date(currentYear + 1, 2, 31); // March 31 next year
+            } else {
+              fyStart = new Date(currentYear - 1, 3, 1); // April 1 last year
+              fyEnd = new Date(currentYear, 2, 31); // March 31 this year
             }
+            // Set the date range UI (override user-selected values)
+            const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
+            if (dateRangeControl) {
+              dateRangeControl.setDateValue(fyStart);
+              dateRangeControl.setSecondDateValue(fyEnd);
+            }
+            await this.ManageInvoice_onSearch();
+
+          } catch (error) {
+            sap.ui.core.BusyIndicator.hide();
+            MessageToast.show(error.message || error.responseText);
+          } finally {
+            sap.ui.core.BusyIndicator.hide();
+          }
         },
 
         ManageInvoice_onSearch: async function () {
           try {
-           sap.ui.core.BusyIndicator.show(0);
+            sap.ui.core.BusyIndicator.show(0);
             const filterItems = this.byId("CI_id_InvoiceFilterBar").getFilterGroupItems();
             const params = {};
 
@@ -76,7 +76,7 @@ sap.ui.define(
             });
 
             const currentYear = new Date().getFullYear();
-          
+
             let fyStart, fyEnd, financialYearLabel;
             if (new Date().getMonth() >= 3) { // April or later
               fyStart = new Date(currentYear, 3, 1); // April 1st
@@ -91,31 +91,31 @@ sap.ui.define(
             const formatDate = (date) => date.toISOString().split("T")[0];
 
             // Check if clear button was pressed
-                    if (this._isClearPressed) {
-                        // fetch all data, no filters
-                        delete params.StartDate;
-                        delete params.EndDate;
-                        delete params.FinancialYear;
-                        this._isClearPressed = false; // reset flag
-                    } else if (!invoiceDateProvided) {
-                        // No date selected by user → apply financial year filter
-                        params.StartDate = formatDate(fyStart);
-                        params.EndDate = formatDate(fyEnd);
-                        params.FinancialYear = financialYearLabel;
+            if (this._isClearPressed) {
+              // fetch all data, no filters
+              delete params.StartDate;
+              delete params.EndDate;
+              delete params.FinancialYear;
+              this._isClearPressed = false; // reset flag
+            } else if (!invoiceDateProvided) {
+              // No date selected by user → apply financial year filter
+              params.StartDate = formatDate(fyStart);
+              params.EndDate = formatDate(fyEnd);
+              params.FinancialYear = financialYearLabel;
 
-                        const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
-                        if (dateRangeControl) {
-                            dateRangeControl.setDateValue(fyStart);
-                            dateRangeControl.setSecondDateValue(fyEnd);
-                        }
-                    } else {
-                        // Date was selected by user → check if it's financial year
-                        const startDate = new Date(params.StartDate);
-                        const endDate = new Date(params.EndDate);
-                        if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
-                            params.FinancialYear = financialYearLabel;
-                        }
-                    }
+              const dateRangeControl = this.byId("CI_id_InvoiceDatePicker");
+              if (dateRangeControl) {
+                dateRangeControl.setDateValue(fyStart);
+                dateRangeControl.setSecondDateValue(fyEnd);
+              }
+            } else {
+              // Date was selected by user → check if it's financial year
+              const startDate = new Date(params.StartDate);
+              const endDate = new Date(params.EndDate);
+              if (startDate.getTime() === fyStart.getTime() && endDate.getTime() === fyEnd.getTime()) {
+                params.FinancialYear = financialYearLabel;
+              }
+            }
             // Fetch data
             this._fetchCommonData("HM_ManageInvoice", "ManageInvoiceFilterModel", { InvoiceStartDate: params.InvoiceStartDate, InvoiceEndDate: params.InvoiceEndDate });
             await this._fetchCommonData("HM_ManageInvoice", "ManageInvoiceModel", params);
@@ -129,21 +129,21 @@ sap.ui.define(
         },
 
         _buildUniqueCustomerModel: function (aInvoices) {
-            const oMap = {};
-            const aUniqueCustomers = [];
+          const oMap = {};
+          const aUniqueCustomers = [];
 
-            aInvoices.forEach(oItem => {
-                if (!oMap[oItem.CustomerID]) {
-                    oMap[oItem.CustomerID] = true;
-                    aUniqueCustomers.push({
-                        CustomerID: oItem.CustomerID,
-                        CustomerName: oItem.CustomerName
-                    });
-                }
-            });
+          aInvoices.forEach(oItem => {
+            if (!oMap[oItem.CustomerID]) {
+              oMap[oItem.CustomerID] = true;
+              aUniqueCustomers.push({
+                CustomerID: oItem.CustomerID,
+                CustomerName: oItem.CustomerName
+              });
+            }
+          });
 
-            const oModel = new sap.ui.model.json.JSONModel(aUniqueCustomers);
-            this.getView().setModel(oModel, "CustomerFilterModel");
+          const oModel = new sap.ui.model.json.JSONModel(aUniqueCustomers);
+          this.getView().setModel(oModel, "CustomerFilterModel");
         },
 
         onPressClear: function () {
@@ -185,24 +185,24 @@ sap.ui.define(
 
 
         CI_onPressAddInvoice: function () {
-          this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: "X" ,dash:"ManageInvoice"});
+          this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: "X", dash: "ManageInvoice" });
         },
-        
+
 
         CI_onPressInvoiceRow: function (oEvent) {
-          this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("ManageInvoiceModel").getObject().InvNo), dash:"ManageInvoice" });
+          this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("ManageInvoiceModel").getObject().InvNo), dash: "ManageInvoice" });
         },
 
-        onNavBack: function() {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("TilePage");
+        onNavBack: function () {
+          var oRouter = this.getOwnerComponent().getRouter();
+          oRouter.navTo("TilePage");
         },
 
-        onHome: function() {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
+        onHome: function () {
+          var oRouter = this.getOwnerComponent().getRouter();
+          oRouter.navTo("RouteHostel");
         },
-        
+
         CI_onPressDownload: function () {
           var table = this.byId("CI_id_InvoiceTable");
           const oModelData = table.getModel("ManageInvoiceModel").getData();
@@ -212,7 +212,7 @@ sap.ui.define(
               InvoiceDate: Formatter.formatDate(item.InvoiceDate),
               PayByDate: Formatter.formatDate(item.PayByDate),
               TotalAmountCurrency: item.TotalAmount + " " + item.Currency
-              
+
             };
           });
           const aCols = [

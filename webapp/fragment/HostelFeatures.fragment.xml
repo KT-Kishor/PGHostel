@@ -1,16 +1,20 @@
 <c:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core"
-	xmlns:u="sap.ui.unified"
-	xmlns:mvc="sap.ui.core.mvc">
-	<Dialog
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:mvc="sap.ui.core.mvc"
+>
+    <Dialog
         id="HF_id_HostelFeaturesDialog"
-        title="Hostel Features"
+        title="{i18n>hostelFeatures}"
         type="Message"
-        class="sapUiContentPadding" resizable="true" draggable="true">
-		<f:SimpleForm
+        class="sapUiContentPadding"
+        resizable="true"
+        draggable="true"
+    >
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -19,9 +23,13 @@
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
-			<f:content>
-			 <Label text="Branch Code" required="true" />
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="{i18n>MSbranchCode}"
+                    required="true"
+                />
                 <ComboBox
                     id="HFF_id_BranchCode"
                     placeholder="Select Branch Code"
@@ -37,20 +45,44 @@
                         additionalText="{BranchModel>Name}"
                     />
                 </ComboBox>
-				<!-- Facility Name -->
-				<Label text="Facility Name" required="true" />
-				<Input id="HFF_id_FacilityName" value="{HostelFeaturesModel>/FacilityName}" placeholder="Enter Facility Name"
-                 maxLength="60" liveChange=".onFacilityNameChange"  valueStateText="{i18n>enterFacilityName}" />
-				<!-- Description -->
-				<Label text="Description" required="true"/>
-				<TextArea id="HFF_id_Description" value="{HostelFeaturesModel>/Description}"
-                placeholder="Enter Description" liveChange="onNameInputLiveChange" valueStateText="Enter Description"
-                maxLength="150"/>
-				<!-- Upload -->
-				<Label text="Add Image" required="true"/>
-				<VBox alignItems="Start" width="100%" renderType="Bare">
-					<HBox width="25%">
-						<u:FileUploader
+                <!-- Facility Name -->
+                <Label
+                    text="{i18n>facilityname}"
+                    required="true"
+                />
+                <Input
+                    id="HFF_id_FacilityName"
+                    value="{HostelFeaturesModel>/FacilityName}"
+                    placeholder="Enter Facility Name"
+                    maxLength="60"
+                    liveChange=".onFacilityNameChange"
+                    valueStateText="{i18n>enterFacilityName}"
+                />
+                <!-- Description -->
+                <Label
+                    text="{i18n>description}"
+                    required="true"
+                />
+                <TextArea
+                    id="HFF_id_Description"
+                    value="{HostelFeaturesModel>/Description}"
+                    placeholder="Enter Description"
+                    liveChange="onNameInputLiveChange"
+                    valueStateText="{i18n>enterDescription}"
+                    maxLength="150"
+                />
+                <!-- Upload -->
+                <Label
+                    text="{i18n>addImage}"
+                    required="true"
+                />
+                <VBox
+                    alignItems="Start"
+                    width="100%"
+                    renderType="Bare"
+                >
+                    <HBox width="25%">
+                        <u:FileUploader
                             id="HFF_id_FileUploader"
                             fileSizeExceed="onFileSizeExceeds"
                             maximumFileSize="5MB"
@@ -63,29 +95,51 @@
                             buttonText="Upload Images"
                             multiple="true"
                             uploadOnChange="false"
-                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"/>
-					</HBox>
-					<!-- Tokenizer -->
-					<HBox width="75%">
-						<ScrollContainer
+                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                        />
+                    </HBox>
+                    <!-- Tokenizer -->
+                    <HBox width="75%">
+                        <ScrollContainer
                             height="60px"
                             width="100%"
                             horizontal="false"
-                            vertical="true">
-							<Tokenizer id="HFF_id_TokenList" width="100%"  tokenDelete="onTokenDelete" tokens="{tokenModel>/tokens}">
-								<Token key="{tokenModel>key}" text="{tokenModel>text}"/>
-							</Tokenizer>
-						</ScrollContainer>
-					</HBox>
-				</VBox>
-			</f:content>
-		</f:SimpleForm>
-		<footer>
-			<Toolbar>
-				<ToolbarSpacer />
-				<Button text="Save" press="HF_onsavebuttonpress" id="HFF_id_saveButton" class="marginRight myUnifiedBtn" />
-				<Button text="Cancel" press="HF_onCancelButtonPress" id="HFF_id_CancelButton" class="marginRight myUnifiedBtn" />
-			</Toolbar>
-		</footer>
-	</Dialog>
+                            vertical="true"
+                        >
+                            <Tokenizer
+                                id="HFF_id_TokenList"
+                                width="100%"
+                                tokenDelete="onTokenDelete"
+                                tokens="{tokenModel>/tokens}"
+                            >
+                                <Token
+                                    key="{tokenModel>key}"
+                                    text="{tokenModel>text}"
+                                />
+                            </Tokenizer>
+                        </ScrollContainer>
+                    </HBox>
+                </VBox>
+            </f:content>
+        </f:SimpleForm>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="{i18n>save}"
+                    tooltip="Save"
+                    press="HF_onsavebuttonpress"
+                    id="HFF_id_saveButton"
+                    class="marginRight myUnifiedBtn"
+                />
+                <Button
+                    text="{i18n>CancelButton}"
+                    tooltip="Cancel"
+                    press="HF_onCancelButtonPress"
+                    id="HFF_id_CancelButton"
+                    class="marginRight myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
 </c:FragmentDefinition>

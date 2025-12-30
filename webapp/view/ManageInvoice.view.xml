@@ -130,43 +130,67 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="{i18n>invoiceNo}" tooltip="{i18n>invoiceNo}" />
+                        <Text
+                            text="{i18n>invoiceNo}"
+                            tooltip="{i18n>invoiceNo}"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>customerName}" tooltip="{i18n>customerName}" />
+                        <Text
+                            text="{i18n>customerName}"
+                            tooltip="{i18n>customerName}"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Customer" tooltip="Customer" />
+                        <Text
+                            text="Customer"
+                            tooltip="Customer"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>invoiceDate}" tooltip="{i18n>invoiceDate}" />
+                        <Text
+                            text="{i18n>invoiceDate}"
+                            tooltip="{i18n>invoiceDate}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>invoiceDescription}" tooltip="{i18n>invoiceDescription}" />
+                        <Text
+                            text="{i18n>invoiceDescription}"
+                            tooltip="{i18n>invoiceDescription}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>totalAmount}" tooltip="{i18n>totalAmount}" />
+                        <Text
+                            text="{i18n>totalAmount}"
+                            tooltip="{i18n>totalAmount}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>PayByDate}" tooltip="{i18n>PayByDate}" />
+                        <Text
+                            text="{i18n>PayByDate}"
+                            tooltip="{i18n>PayByDate}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>status}" tooltip="{i18n>status}" />
+                        <Text
+                            text="{i18n>status}"
+                            tooltip="{i18n>status}"
+                        />
                     </Column>
                 </columns>
                 <items>
