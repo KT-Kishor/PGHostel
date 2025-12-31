@@ -611,6 +611,8 @@ sap.ui.define([
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            this.getView().getModel("HostelModel").setData({});
+
         },
         HM_id_saveButton: function(oEvent) {
             var oModel = this.getView().getModel("HostelModel");
@@ -672,6 +674,7 @@ sap.ui.define([
         onHome: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+            this.getView().getModel("HostelModel").setData({});
         },
         PO_onPressClear: function() {
             this._isClearPressed = true;

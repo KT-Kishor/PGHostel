@@ -401,7 +401,7 @@ sap.ui.define([
 
                 if (sStartDateRaw && sEndDateRaw) {
 
-                    const start = new Date(sStartDateRaw);
+                    const start = new Date(sStartDateRaw);  
                     const end = new Date(sEndDateRaw);
 
                     const paymentType = (oCustomer.Bookings?.[0]?.PaymentType || "").toLowerCase();
@@ -532,14 +532,14 @@ sap.ui.define([
                     if (unit === "Per Day" || unit === "Per Hour") {
                         days = dayDiff / (1000 * 60 * 60 * 24) + 1; // inclusive
                     } else {
-                        days = 0; // for months/years we don't use days
+                        days = dayDiff / (1000 * 60 * 60 * 24); // for months/years we don't use days
                     }
 
 
-                    if (days <= 0) {
-                        console.warn("Invalid facility date range:", f);
-                        return;
-                    }
+                    // if (days <= 0) {
+                    //     console.warn("Invalid facility date range:", f);
+                    //     return;
+                    // }
 
                     // -------------------------------
                     // Calculate Months
