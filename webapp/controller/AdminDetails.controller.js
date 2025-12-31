@@ -14,7 +14,7 @@ sap.ui.define([
 
 
         _onRouteMatched: async function (oEvent) {
-            this._ViewDatePickersReadOnly(["Ad_id_editStartDate","editEndDate","AD_id_Date"],this.getView());
+            this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
 
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
             this.getView().setModel(model, "LoginModel");
@@ -401,7 +401,7 @@ sap.ui.define([
 
                 if (sStartDateRaw && sEndDateRaw) {
 
-                    const start = new Date(sStartDateRaw);  
+                    const start = new Date(sStartDateRaw);
                     const end = new Date(sEndDateRaw);
 
                     const paymentType = (oCustomer.Bookings?.[0]?.PaymentType || "").toLowerCase();
@@ -532,14 +532,14 @@ sap.ui.define([
                     if (unit === "Per Day" || unit === "Per Hour") {
                         days = dayDiff / (1000 * 60 * 60 * 24) + 1; // inclusive
                     } else {
-                        days = dayDiff / (1000 * 60 * 60 * 24); // for months/years we don't use days
+                        days = dayDiff / (1000 * 60 * 60 * 24) + 1; // for months/years we don't use days
                     }
 
 
                     // if (days <= 0) {
                     //     console.warn("Invalid facility date range:", f);
                     //     return;
-                    // }
+                    // } 
 
                     // -------------------------------
                     // Calculate Months
@@ -563,7 +563,6 @@ sap.ui.define([
                     if (unit === "Per Day") {
                         fTotal = fPrice;
                         totalFacilityPricePerDay += fPrice;
-                        let days = dayDiff / (1000 * 60 * 60 * 24) + 1;
 
                     } else if (unit === "Per Month") {
                         f.TotalMonths = totalMonths;
@@ -688,7 +687,7 @@ sap.ui.define([
         },
 
         onAddFacilityDetails: function () {
-            var data=this.getView().getModel("Bookingmodel").getData()
+            var data = this.getView().getModel("Bookingmodel").getData()
 
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
@@ -725,8 +724,8 @@ sap.ui.define([
 
 
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
-          this.getView().getModel("CustomerData").setProperty("/minStartDate",new Date(data.StartDate.split("/").reverse().join("-")));
-          this.getView().getModel("CustomerData").setProperty("/minEndDate",new Date(data.EndDate.split("/").reverse().join("-")));
+            this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
+            this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
 
         },
 
@@ -780,9 +779,14 @@ sap.ui.define([
             } else {
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
-
+            var _aOriginalRateTypes = [
+                { "RateType": "Per Day" },
+                { "RateType": "Per Hour" },
+                { "RateType": "Per Month" },
+                { "RateType": "Per Year" }
+            ]
             // 7. Filter RateType based on facility price AND booking unitText
-            var aFilteredRateTypes = this._aOriginalRateTypes.filter(rt => {
+            var aFilteredRateTypes = _aOriginalRateTypes.filter(rt => {
                 if (!aAllowedRateTypes.includes(rt.RateType)) {
                     return false;
                 }
@@ -1446,7 +1450,7 @@ sap.ui.define([
         },
 
         onEditFacilityDetails: function () {
-            var data=this.getView().getModel("Bookingmodel").getData()
+            var data = this.getView().getModel("Bookingmodel").getData()
 
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
@@ -1474,8 +1478,67 @@ sap.ui.define([
             }
             sap.ui.getCore().byId("idUnitType").setVisible(true)
             this.HM_Dialog.open();
-          this.getView().getModel("CustomerData").setProperty("/minStartDate",new Date(data.StartDate.split("/").reverse().join("-")));
-          this.getView().getModel("CustomerData").setProperty("/minEndDate",new Date(data.EndDate.split("/").reverse().join("-")));
+            this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
+            this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
+
+            var sSelectedFacility = oSelectedData.FacilityName;
+
+            // 2. Get Facilities Model
+            var oFacilitiesModel = this.getView().getModel("Facilities");
+            var aFacilities = oFacilitiesModel.getData();
+
+            // 3. Get RateType Model
+
+
+            // 4. Get selected facility data
+            var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
+            if (!oSelectedFacility) return;
+
+
+            // 5. Get booking unitText
+            var oBookingModel = this.getView().getModel("Bookingmodel");
+            var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
+            var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
+
+            if (OrginalRentPrice === "0.00") {
+                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available.");
+                this.HM_Dialog.close();
+                return;
+            }
+
+
+            // 6. Define allowed rate types based on booking unitText
+            var aAllowedRateTypes = [];
+            if (sUnitText === "Per Month" || sUnitText === "monthly") {
+                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+            } else if (sUnitText === "Per Day" || sUnitText === "daily") {
+                aAllowedRateTypes = ["Per Day", "Per Hour"];
+            } else if (sUnitText === "Per Hour") {
+                aAllowedRateTypes = ["Per Hour"];
+            } else {
+                aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
+            }
+            var _aOriginalRateTypes = [
+                { "RateType": "Per Day" },
+                { "RateType": "Per Hour" },
+                { "RateType": "Per Month" },
+                { "RateType": "Per Year" }
+            ]
+            // 7. Filter RateType based on facility price AND booking unitText
+            var aFilteredRateTypes = _aOriginalRateTypes.filter(rt => {
+                if (!aAllowedRateTypes.includes(rt.RateType)) {
+                    return false;
+                }
+                if (rt.RateType === "Per Day") return Number(oSelectedFacility.PerDayPrice) !== 0;
+                if (rt.RateType === "Per Month") return Number(oSelectedFacility.PerMonthPrice) !== 0;
+                if (rt.RateType === "Per Year") return Number(oSelectedFacility.PerYearPrice) !== 0;
+                if (rt.RateType === "Per Hour") return Number(oSelectedFacility.PerHourPrice) !== 0;
+                return true;
+            });
+            var oRateTypeModel = this.getView().getModel("RateType");
+
+            // 8. Set filtered data back to RateType model
+            oRateTypeModel.setData(aFilteredRateTypes);
         },
 
         onDeleteFacilityDetails: function () {
