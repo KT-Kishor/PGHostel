@@ -181,7 +181,7 @@ sap.ui.define([
 
                 const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
-                    sap.m.MessageToast.show(`This Image is already Added.`);
+                    sap.m.MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
                     return;
                 }
 
@@ -240,11 +240,11 @@ sap.ui.define([
 
                 // Image validations
                 if (attachments.length === 0) {
-                    sap.m.MessageBox.error("Please Upload at Least One Image.");
+                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseuploadatleastoneimage"));
                     return;
                 }
                 if (attachments.length > 3) {
-                    sap.m.MessageBox.error("You can Upload a Maximum of 3 Images Only.");
+                    sap.m.MessageBox.error(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
                     return;
                 }
 
@@ -258,14 +258,14 @@ sap.ui.define([
                 });
 
                 if (bDuplicate) {
-                    sap.m.MessageToast.show("Facility with the Same Rate type already Exists for this Branch.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("facilitywithSameRatetypeExistsforBranch"));
                     return;
                 }
 
                  if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
                    && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0  && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
                    && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
-                    sap.m.MessageToast.show("Please Fill at Least One Price");
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }
 
@@ -333,7 +333,7 @@ sap.ui.define([
 
                     await this._refreshFacilityDetails(Payload.ID);
                     this.getView().getModel("editable").setProperty("/Edit", false)
-                    sap.m.MessageToast.show("Facility Updated Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
                 } catch (err) {
                     sap.m.MessageToast.show(err.message || err.responseText);
                 } finally {
@@ -375,7 +375,7 @@ sap.ui.define([
                 }), "DisplayImagesModel");
 
             } catch (err) {
-                sap.m.MessageToast.show("Error Refreshing Facility Details");
+                sap.m.MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }

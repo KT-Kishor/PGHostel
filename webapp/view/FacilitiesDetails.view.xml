@@ -18,7 +18,7 @@
     <m:Page
         navButtonPress="BI_onButtonPress"
         showNavButton="true"
-        title="Facility Details"
+        title="{i18n>facilityDetails}"
     >
         <m:headerContent>
             <core:Fragment
@@ -58,7 +58,7 @@
                                     <f:content>
                                         <!-- Branch Code -->
                                         <m:Label
-                                            text="Branch Code"
+                                            text="{i18n>MSbranchCode}"
                                             required="true"
                                         />
                                         <m:ComboBox
@@ -79,7 +79,7 @@
                                         </m:ComboBox>
                                         <!-- Facility Name -->
                                         <m:Label
-                                            text="Facility Name"
+                                            text="{i18n>facilityname}"
                                             required="true"
                                         />
                                         <m:Input
@@ -93,7 +93,7 @@
                                         />
                                         <!-- Type -->
                                         <m:Label
-                                            text="Type"
+                                            text="{i18n>type}"
                                             required="true"
                                         />
                                         <m:ComboBox
@@ -111,7 +111,7 @@
                                                 text="{FacilityType>FacilityName}"
                                             />
                                         </m:ComboBox>
-                                        <m:Label text="Hourly Price" />
+                                        <m:Label text="{i18n>hourlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerHourPrice"
                                             placeholder="Enter Per Hour Price"
@@ -120,7 +120,7 @@
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
                                         />
-                                        <m:Label text="Daily Price" />
+                                        <m:Label text="{i18n>dailyPrice}" />
                                         <m:Input
                                             id="FD_id_PerDayPrice"
                                             placeholder="Enter Per Day Price"
@@ -129,7 +129,7 @@
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
                                         />
-                                        <m:Label text="Monthly Price" />
+                                        <m:Label text="{i18n>monthlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerMonthPrice"
                                             placeholder="Enter Per Month Price"
@@ -138,7 +138,7 @@
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
                                         />
-                                        <m:Label text="Yearly Price" />
+                                        <m:Label text="{i18n>yearlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerYearPrice"
                                             placeholder="Enter Per Year Price"
@@ -149,14 +149,14 @@
                                         />
                                         <!-- Currency -->
                                         <m:Label
-                                            text="Currency"
+                                            text="{i18n>currency}"
                                             required="true"
                                         />
                                         <m:ComboBox
                                             id="FD_id_Currency"
                                             selectedKey="{FacilitiesModel>/Currency}"
                                             items="{CurrencyModel>/}"
-                                            valueStateText="Select Currency"
+                                            valueStateText="{i18n>selectCurrency}"
                                             width="100%"
                                             change=".onFacilitybranchChange"
                                             placeholder="Select Currency"
@@ -247,7 +247,7 @@
                     <m:Button
                         id="FD_id_editButton"
                         visible="{= !${editable>/Edit} }"
-                        text="Edit"
+                        text="{i18n>MSedit}"
                         tooltip="Edit Facility Details"
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
@@ -255,7 +255,7 @@
                     <m:Button
                         id="FD_id_SaveButton"
                         visible="{=${editable>/Edit}}"
-                        text="Save"
+                        text="{i18n>save}"
                         tooltip="Save Facility Details"
                         class="myUnifiedBtn"
                         press="BT_onsavebuttonpress"

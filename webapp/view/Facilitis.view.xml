@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="FacilityName"
-                        label="Facility Name"
+                        label="{i18n>facilityname}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -55,7 +55,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="BranchCode"
-                        label="Branch Code"
+                        label="{i18n>MSbranchCode}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -88,22 +88,22 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="Facilities ({=${Facilities>/}.length})" />
+                        <Title text="{i18n>facilities} ({= ${Facilities>/}.length})" />
                         <ToolbarSpacer />
                         <Button
-                            text="Add Facility"
-							tooltip="Add a new Facility"
+                            text="{i18n>addFacility}"
+                            tooltip="Add a new Facility"
                             press="FD_RoomDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
-							tooltip="Delete Selected Facilities"
+                            text="{i18n>MSdelete}"
+                            tooltip="Delete Selected Facilities"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Download"
+                            text="{i18n>download}"
                             tooltip="Download Facilities Data"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
@@ -112,34 +112,52 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Facility Name" tooltip="Facility Name"/>
+                        <Text
+                            text="{i18n>facilityname}"
+                            tooltip="Facility Name"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Type" tooltip="Type"/>
+                        <Text
+                            text="{i18n>type}"
+                            tooltip="Type"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Hourly Price" tooltip="Hourly Price"/>
+                        <Text
+                            text="{i18n>hourlyPrice}"
+                            tooltip="Hourly Price"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Daily Price" tooltip="Daily Price"/>
+                        <Text
+                            text="{i18n>dailyPrice}"
+                            tooltip="Daily Price"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Monthly Price" tooltip="Monthly Price"/>
+                        <Text
+                            text="{i18n>monthlyPrice}"
+                            tooltip="Monthly Price"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Yearly Price" tooltip="Yearly Price"/>
+                        <Text
+                            text="{i18n>yearlyPrice}"
+                            tooltip="Yearly Price"
+                        />
                     </Column>
                 </columns>
                 <items>

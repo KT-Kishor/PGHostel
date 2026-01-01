@@ -259,7 +259,7 @@ sap.ui.define([
             const oSheet = new sap.ui.export.Spreadsheet(oSettings);
 
             oSheet.build().then(() => {
-                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess!"));
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
             }).finally(() => {
                 oSheet.destroy();
             });
@@ -534,7 +534,7 @@ sap.ui.define([
             var aSelectedItems = oTable.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete."));
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
                 return;
             }
 

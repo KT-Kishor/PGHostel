@@ -29,7 +29,7 @@
         >
             <f:content>
                 <Label
-                    text="Branch Code"
+                    text="{i18n>MSbranchCode}"
                     required="true"
                 />
                 <ComboBox
@@ -39,7 +39,7 @@
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     change=".onFacilitybranchChange"
-                    valueStateText="Select Branch Code"
+                    valueStateText="{i18n>selectBranchCode}"
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -49,19 +49,19 @@
                 </ComboBox>
 
                 <Label
-                    text="Facility Name"
+                    text="{i18n>facilityname}"
                     required="true"
                 />
                 <Input
                     id="idFacilityName"
                     value="{FacilitiesModel>/FacilityName}"
                     placeholder="Enter Facility Name"
-                    valueStateText="Enter Facility Name"
+                    valueStateText="{i18n>enterFacilityName}"
                     liveChange="onFacilityNameChange"
                 />
 
                 <Label
-                    text="Type"
+                    text="{i18n>type}"
                     required="true"
                 />
                 <ComboBox
@@ -69,7 +69,7 @@
                     items="{FacilityType>/}"
                     value="{FacilitiesModel>/Type}"
                     placeholder="Enter Type"
-                    valueStateText="Enter Type"
+                    valueStateText="{i18n>enterType}"
                     change="onFacilityTypeChange"
                 >
                     <core:Item
@@ -78,48 +78,48 @@
                     />
                 </ComboBox>
 
-                <Label text="Hourly Price" />
+                <Label text="{i18n>hourlyPrice}" />
                 <Input
                     id="idPerHourPrice"
                     placeholder="Enter Per Hour Price"
                     value="{FacilitiesModel>/PerHourPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
-                    valueStateText="Enter Per Hour Price"
+                    valueStateText="{i18n>enterPerHourPrice}"
                 />
 
-                <Label text="Daily Price" />
+                <Label text="{i18n>dailyPrice}" />
                 <Input
                     id="idPerDayPrice"
                     placeholder="Enter Per Day Price"
                     value="{FacilitiesModel>/PerDayPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
-                    valueStateText="Enter Per Day Price"
+                    valueStateText="{i18n>enterPerDayPrice}"
                 />
 
-                <Label text="Monthly Price" />
+                <Label text="{i18n>monthlyPrice}" />
                 <Input
                     id="idPerMonthPrice"
                     placeholder="Enter Per Month Price"
                     value="{FacilitiesModel>/PerMonthPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
-                    valueStateText="Enter Per Month Price"
+                    valueStateText="{i18n>enterPerMonthPrice}"
                 />
 
-                <Label text="Yearly Price" />
+                <Label text="{i18n>yearlyPrice}" />
                 <Input
                     id="idPerYearPrice"
                     placeholder="Enter Per Year Price"
                     value="{FacilitiesModel>/PerYearPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
-                    valueStateText="Enter Per Year Price"
+                    valueStateText="{i18n>enterPerYearPrice}"
                 />
 
                 <Label
-                    text="Currency"
+                    text="{i18n>currency}"
                     required="true"
                 />
                 <ComboBox
@@ -128,7 +128,7 @@
                     items="{path:'CountryModel>/',length:1000}"
                     placeholder="Select Currency"
                     showSecondaryValues="true"
-                    valueStateText="Select Currency"
+                    valueStateText="{i18n>selectCurrency}"
                     change="onChangeCurrency"
                 >
                     <core:ListItem
@@ -171,21 +171,21 @@
                                 minScreenWidth="Phone"
                                 demandPopin="false"
                             >
-                                <Text text="File Name" />
+                                <Text text="{i18n>filename}" />
                             </Column>
                             <Column
                                 hAlign="Center"
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="File Type" />
+                                <Text text="{i18n>FileType}" />
                             </Column>
                             <Column
                                 hAlign="Center"
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="File Size" />
+                                <Text text="{i18n>FileSize}" />
                             </Column>
                         </columns>
                         <items>
@@ -205,12 +205,14 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="Save"
                     class="myUnifiedBtn"
                     press="FD_onsavebuttonpress"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="Cancel"
                     class="myUnifiedBtn"
                     press="FD_onCancelButtonPress"
                 />
