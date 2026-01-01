@@ -69,7 +69,6 @@ sap.ui.define([
                 UserID: oLoginmodel.EmployeeID
             }
 
-
             var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 return oFCIAerData
@@ -238,7 +237,7 @@ sap.ui.define([
         MD_onDownload: function () {
             const oModel = this.byId("id_MD_Table").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No Data available to Download.");
+                MessageToast.show(this.i18nModel.getText("MSnodata."));
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -256,11 +255,11 @@ sap.ui.define([
                 fileName: "Branch_Details.xlsx",
                 worker: false
             };
-            MessageToast.show("Downloading Branch Details");
+            MessageToast.show(this.i18nModel.getText("downloadingBranchDetails"));
             const oSheet = new sap.ui.export.Spreadsheet(oSettings);
 
             oSheet.build().then(() => {
-                MessageToast.show("Download Complete!");
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess!"));
             }).finally(() => {
                 oSheet.destroy();
             });
@@ -325,13 +324,13 @@ sap.ui.define([
             oPhone.setValueState("None");
             oPhone.setValueStateText("");
             // oBranch.setValueStateText("Enter Branch Code");
-            oName.setValueStateText("Enter Branch Name");
-            oAddress.setValueStateText("Enter Address");
-            oPin.setValueStateText("Enter Pincode");
-            oCountry.setValueStateText("Select Country");
-            oState.setValueStateText("Select State");
-            oCity.setValueStateText("Select City");
-            oPhone.setValueStateText("Enter Contact Number");
+            oName.setValueStateText(this.i18nModel.getText("enterBranchName"));
+            oAddress.setValueStateText(this.i18nModel.getText("enterAddress"));
+            oPin.setValueStateText(this.i18nModel.getText("enterPincode"));
+            oCountry.setValueStateText(this.i18nModel.getText("selectCountry"));
+            oState.setValueStateText(this.i18nModel.getText("selectState"));
+            oCity.setValueStateText(this.i18nModel.getText("cityValueText"));
+            oPhone.setValueStateText(this.i18nModel.getText("enterContactNumber"));
             this._resetFacilityValueStates();
             oView.getModel("MDmodel").setData({
                 // BranchID: "",
@@ -359,7 +358,7 @@ sap.ui.define([
             var oFacilitiesModel = oView.getModel("MDmodel");
             var Payload = oFacilitiesModel.getData();
             if (!this.MC_ValidateGstNumber()) {
-                sap.m.MessageToast.show(this.i18nModel.getText("GST number should be in proper format (Eg:22AAAAA0000A1Z5)"));
+                sap.m.MessageToast.show(this.i18nModel.getText("gstError"));
             }
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
@@ -385,7 +384,7 @@ sap.ui.define([
             );
 
             if (!validState) {
-                MessageToast.show("Selected State does not belong to the Chosen Country");
+                MessageToast.show(this.i18nModel.getText("Irrstate"));
                 sap.ui.getCore().byId(oView.createId("MC_id_State")).setValueState("Error");
                 return;
             }
@@ -396,7 +395,7 @@ sap.ui.define([
             );
 
             if (!validCity) {
-                MessageToast.show("Selected City does not belong to Selected State and Country");
+                MessageToast.show(this.i18nModel.getText("Irrcity"));
                 sap.ui.getCore().byId(oView.createId("MC_id_City")).setValueState("Error");
                 return;
             }
@@ -431,7 +430,7 @@ sap.ui.define([
                             // UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show("Branch Updated Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully!"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Branch", {
                         data: oData,
@@ -439,7 +438,7 @@ sap.ui.define([
                             UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show("Branch added Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully!"));
                 }
 
                 await this.Onsearch();
@@ -535,7 +534,7 @@ sap.ui.define([
             var aSelectedItems = oTable.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please Select at Least One Record to Delete.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete."));
                 return;
             }
 
@@ -569,7 +568,7 @@ sap.ui.define([
                                 });
                             }
 
-                            sap.m.MessageToast.show("Selected Records Deleted Successfully!");
+                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully!"));
                             await this.Onsearch();
 
                         } catch (err) {
@@ -591,7 +590,7 @@ sap.ui.define([
             var oSelected = oTable.getSelectedItem();
             oView.getModel("editableModel").setProperty("/isEdit", true);
             if (!oSelected) {
-                sap.m.MessageToast.show("Please Select a Record to Edit.");
+                sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
                 return;
             }
 
@@ -742,10 +741,7 @@ sap.ui.define([
             oModel.setProperty("/country", sCountry);
 
             // STD handling
-            const countries = this.getOwnerComponent()
-                .getModel("CountryModel")
-                .getData();
-
+            const countries = this.getOwnerComponent().getModel("CountryModel").getData();
             const data = countries.find(c => c.countryName === sCountry);
             if (data?.stdCode) {
                 oModel.setProperty("/stdCode", data.stdCode);
@@ -764,7 +760,6 @@ sap.ui.define([
                 ]);
             }
         },
-
 
         MC_onChangeState: function (oEvent) {
             const oState = oEvent.getSource();
@@ -804,7 +799,6 @@ sap.ui.define([
             ]);
         },
 
-
         MC_onChangeCity: function (oEvent) {
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
@@ -842,7 +836,6 @@ sap.ui.define([
             oModel.setProperty("/baseLocation", sCityText);
         },
 
-
         onSTDChange: function () {
             const oSTD = this.byId("MC_id_codeModel");
             const oMobile = this.byId("BD_idPhone");
@@ -878,7 +871,7 @@ sap.ui.define([
 
             if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD Code First");
+                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
 
@@ -886,7 +879,7 @@ sap.ui.define([
 
             if (!isValid) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Enter valid Mobile Number");
+                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
             } else {
                 oInput.setValueState("None");
             }
@@ -947,7 +940,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show("No Document Found for this Room!");
+                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisRoom!"));
                 return;
             }
 

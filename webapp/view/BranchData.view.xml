@@ -28,7 +28,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Name"
-                        label="Branch Code"
+                        label="{i18n>MSbranchCode}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -52,7 +52,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Pincode"
-                        label="Pin Code"
+                        label="{i18n>pinCode}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -82,28 +82,28 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="Branch Details ({mainModel>/count})" />
+                        <Title text="{i18n>branchDetails} ({mainModel>/count})" />
                         <ToolbarSpacer />
                         <Button
-                            text="Add"
+                            text="{i18n>MSadd}"
                             tooltip="Add New Branch"
                             press="MD_AddButtonPress"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Edit"
+                            text="{i18n>MSedit}"
                             tooltip="Edit Selected Branch"
                             press="MD_UpdateTableRow"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
+                            text="{i18n>MSdelete}"
                             tooltip="Delete Selected Branch"
                             press="MD_DeleteRow"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Download"
+                            text="{i18n>download}"
                             tooltip="Download Branch Data"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
@@ -112,49 +112,79 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Branch Code" tooltip="Branch Code" />
+                        <Text
+                            text="{i18n>MSbranchCode}"
+                            tooltip="Branch Code"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Branch Name" tooltip="Branch Name" />
+                        <Text
+                            text="{i18n>branchName}"
+                            tooltip="Branch Name"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Address" tooltip="Address" />
+                        <Text
+                            text="{i18n>address}"
+                            tooltip="Address"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Pin Code" tooltip="Pin Code" />
+                        <Text
+                            text="{i18n>pinCode}"
+                            tooltip="Pin Code"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Contact Number" tooltip="Contact Number" />
+                        <Text
+                            text="{i18n>contactNumber}"
+                            tooltip="Contact Number"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Country" tooltip="Country" />
+                        <Text
+                            text="{i18n>MVDcountry}"
+                            tooltip="Country"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="State" tooltip="State" />
+                        <Text
+                            text="{i18n>MVDstate}"
+                            tooltip="State"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="City" tooltip="City" />
+                        <Text
+                            text="{i18n>city}"
+                            tooltip="City"
+                        />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="Penalty" tooltip="Penalty" />
+                        <Text
+                            text="{i18n>penalty}"
+                            tooltip="Penalty"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Image" tooltip="Image" />
+                        <Text
+                            text="{i18n>image}"
+                            tooltip="Image"
+                        />
                     </Column>
                 </columns>
                 <items>
@@ -170,7 +200,7 @@
                             <Text text="{mainModel>City}" />
                             <Text text="{mainModel>Penalty}" />
                             <Button
-                                text="View"
+                                text="{i18n>view}"
                                 press="HF_viewroom"
                             />
                         </cells>

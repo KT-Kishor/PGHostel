@@ -26,7 +26,7 @@
         >
             <f:content>
                 <Label
-                    text="Branch Name"
+                    text="{i18n>branchName}"
                     required="true"
                 />
                 <Input
@@ -35,10 +35,10 @@
                     placeholder="Enter Branch Name"
                     maxLength="60"
                     liveChange="onNameInputLiveChange"
-                    valueStateText="Enter Branch Name"
+                    valueStateText="{i18n>enterBranchName}"
                 />
                 <Label
-                    text="Address"
+                    text="{i18n>address}"
                     required="true"
                 />
                 <Input
@@ -47,10 +47,10 @@
                     placeholder="Enter Address"
                     maxLength="60"
                     liveChange="onAddressInputLiveChange"
-                    valueStateText="Enter Address"
+                    valueStateText="{i18n>enterAddress}"
                 />
                 <Label
-                    text="Pincode"
+                    text="{i18n>pinCode}"
                     required="true"
                 />
                 <Input
@@ -59,17 +59,17 @@
                     placeholder="Enter Pincode"
                     maxLength="10"
                     liveChange="onPinInputLiveChange"
-                    valueStateText="Enter Pincode"
+                    valueStateText="{i18n>enterPincode}"
                 />
                 <Label
-                    text="Country"
+                    text="{i18n>MVDcountry}"
                     required="true"
                 />
                 <ComboBox
                     id="MC_id_Country"
                     change="MC_onChangeCountry"
                     placeholder="Enter Country"
-                    valueStateText="Select Country"
+                    valueStateText="{i18n>selectCountry}"
                     items="{path:'CountryModel>/',length:1000}"
                     selectedKey="{MDmodel>/country}"
                     showSecondaryValues="true"
@@ -81,14 +81,14 @@
                     />
                 </ComboBox>
                 <Label
-                    text="State"
+                    text="{i18n>MVDstate}"
                     required="true"
                 />
                 <ComboBox
                     id="MC_id_State"
                     change="MC_onChangeState"
                     placeholder="Enter State"
-                    valueStateText="Select State"
+                    valueStateText="{i18n>selectState}"
                     items="{path:'StateModel>/',length:1000}"
                     selectedKey="{MDmodel>/state}"
                     showSecondaryValues="true"
@@ -99,13 +99,13 @@
                     />
                 </ComboBox>
                 <Label
-                    text="City"
+                    text="{i18n>city}"
                     required="true"
                 />
                 <ComboBox
                     id="MC_id_City"
                     change="MC_onChangeCity"
-                    valueStateText="Select City"
+                    valueStateText="{i18n>cityValueText}"
                     placeholder="Enter City"
                     items="{path:'CityModel>/',length:1000}"
                     selectedKey="{MDmodel>/baseLocation}"
@@ -118,17 +118,17 @@
                         additionalText="{CityModel>branchCode}"
                     />
                 </ComboBox>
-                <Label text="GSTIN" />
+                <Label text="{i18n>gstNo}" />
                 <Input
                     value="{MDmodel>/GSTIN}"
                     maxLength="15"
                     placeholder="Enter GST No"
                     id="MC_id_CustomGst"
                     liveChange="MC_ValidateGstNumber"
-                    valueStateText="GST number should be in proper format (Eg:22AAAAA0000A1Z5)"
+                    valueStateText="{i18n>gstError}"
                 />
                 <Label
-                    text="Type"
+                    text="{i18n>type}"
                     labelFor="groupC"
                 />
                 <RadioButtonGroup
@@ -144,7 +144,7 @@
                 </RadioButtonGroup>
                 <Label
                     visible="{visiblePlay>/CC_id_CustInput}"
-                    text="Tax Percentage"
+                    text="{i18n>taxPercentage}"
                 />
                 <Input
                     visible="{visiblePlay>/CC_id_CustInput}"
@@ -153,7 +153,7 @@
                     maxLength="5"
                 />
                 <Label
-                    text="Mobile Number"
+                    text="{i18n>MSmobileNo}"
                     required="true"
                 />
                 <HBox
@@ -162,7 +162,7 @@
                     alignItems="Center"
                 >
                     <VBox width="22%">
-                         <ComboBox
+                        <ComboBox
                             change="onSTDChange"
                             id="MC_id_codeModel"
                             placeholder="Code"
@@ -186,12 +186,12 @@
                             placeholder="Enter Contact Number"
                             maxLength="18"
                             liveChange="onMobileLivechnage"
-                            valueStateText="Enter Contact Number"
+                            valueStateText="{i18n>enterContactNumber}"
                         />
                     </VBox>
                 </HBox>
                 <Label
-                    text="Penalty"
+                    text="{i18n>penalty}"
                     required="true"
                 />
                 <Input
@@ -200,9 +200,9 @@
                     placeholder="Enter Penalty"
                     maxLength="10"
                     liveChange="onPenaltyInputLiveChange"
-                    valueStateText="Enter Penalty"
+                    valueStateText="{i18n>enterPenalty}"
                 />
-                <Label text="Add Logo" />
+                <Label text="{i18n>addLogo}" />
                 <VBox
                     alignItems="Start"
                     width="100%"
@@ -254,12 +254,14 @@
                 <ToolbarSpacer />
                 <Button
                     id="BD_id_saveButoon"
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="Save"
                     class="myUnifiedBtn"
                     press="MD_onSaveButtonPress"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="Cancel"
                     class="myUnifiedBtn"
                     press="MD_onCancelButtonPress"
                 />
