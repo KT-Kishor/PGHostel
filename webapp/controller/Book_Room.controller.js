@@ -1685,44 +1685,36 @@ sap.ui.define([
 
             this.handleButtonsVisibility();
         },
+
         handleNavigationChange: function (oEvent) {
-            this._oWizard = this._oWizard || this.byId("TC_id_wizard");
-            this._oSelectedStep = oEvent.getParameter("step");
-            this._iSelectedStepIndex = this._oWizard
-                .getSteps()
-                .indexOf(this._oSelectedStep);
+            this._oWizard = this.byId("TC_id_wizard");
+            const oTargetStep = oEvent.getParameter("step");
+            const aSteps = this._oWizard.getSteps();
+            const iTargetIndex = aSteps.indexOf(oTargetStep);
+
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            // STEP 1 REQUIRED FIELDS
+            const bStep1Valid = !!(
+                oHostelModel.getProperty("/StartDate") &&
+                oHostelModel.getProperty("/EndDate") &&
+                oHostelModel.getProperty("/SelectedPriceType") &&
+                oHostelModel.getProperty("/SelectedPerson")
+            );
+
+            // ❌ BLOCK HEADER JUMP IF STEP 1 INVALID
+            if (iTargetIndex > 0 && !bStep1Valid) {
+                sap.m.MessageToast.show("Please complete Booking Information before proceeding.");
+
+                this._resetWizardFromStep1();
+                return;
+            }
+
+            // ✅ Normal navigation
+            this._oSelectedStep = oTargetStep;
+            this._iSelectedStepIndex = iTargetIndex;
 
             this.handleButtonsVisibility();
-
-            const oModel = this.getView().getModel("HostelModel");
-
-            // ❌ Trying to enter Step 2 while Step 1 invalid
-            if (this._iSelectedStepIndex === 1) {
-                const sStartDate = oModel.getProperty("/StartDate");
-                const sEndDate = oModel.getProperty("/EndDate");
-
-                if (!sStartDate || !sEndDate) {
-                    sap.m.MessageToast.show(
-                        "Please complete Booking Information before proceeding."
-                    );
-
-                    // Centralized rollback
-
-                    this._validateGeneralInfo();
-                    this._iSelectedStepIndex = 1;
-                    return;
-                }
-
-                // Step 1 valid → continue
-                if (this._mustRecreatePersonUI) {
-                    this._createDynamicPersonsUI();
-                    this._mustRecreatePersonUI = false;
-                }
-            }
-
-            if (this._iSelectedStepIndex === 2) {
-                this.TC_onDialogNextButton();
-            }
         },
 
         _validateGeneralInfo: function () {
@@ -1819,6 +1811,57 @@ sap.ui.define([
                     break;
             }
         },
+
+        _resetWizardFromStep1: function () {
+            const oWizard = this.byId("TC_id_wizard");
+            const aSteps = oWizard.getSteps();
+            const oBTN = this.getView().getModel("OBTNModel");
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            const oStep1 = aSteps[0];
+            const oStep2 = aSteps[1];
+            const oStep3 = aSteps[2];
+
+            // ===============================
+            // 1️⃣ HARD RESET WIZARD PROGRESS
+            // ===============================
+            oWizard.discardProgress(oStep1);
+
+            // ===============================
+            // 2️⃣ RESET VALIDATION STATES
+            // ===============================
+            oStep1.setValidated(false);
+            oStep2.setValidated(false);
+            oStep3.setValidated(false);
+
+            // ===============================
+            // 3️⃣ INVALIDATE DOWNSTREAM STEPS
+            // ===============================
+            oWizard.invalidateStep(oStep2);
+            oWizard.invalidateStep(oStep3);
+
+            // ===============================
+            // 4️⃣ FORCE USER TO STEP 1
+            // ===============================
+            oWizard.goToStep(oStep1, true);
+            this._iSelectedStepIndex = 0;
+            this._oSelectedStep = oStep1;
+
+            // ===============================
+            // 5️⃣ FOOTER BUTTON STATE
+            // ===============================
+            oBTN.setProperty("/Next", false);
+            oBTN.setProperty("/Submit", false);
+            oBTN.setProperty("/Cancel", false);
+            oBTN.setProperty("/PERVIOUSVIS", false);
+            oBTN.setProperty("/NXTVis", true);
+
+            // ===============================
+            // 6️⃣ MODEL STATE
+            // ===============================
+            oHostelModel.setProperty("/IsGeneralInfoValid", false);
+        },
+
         TC_onDialogNextButton: function () {
             const oView = this.getView();
 
@@ -2222,6 +2265,13 @@ sap.ui.define([
                 }
             }
 
+            if (oEvent.getSource().getId().includes("idStartDate1") ||
+                oEvent.getSource().getId().includes("idEndDate1") ||
+                oEvent.getSource().getId().includes("id_Noofperson1")
+            ) {
+                this._resetWizardFromStep1();
+            }
+
             // =========================================================
             // CONTROL “Next” BUTTON
             // =========================================================
@@ -2378,6 +2428,7 @@ sap.ui.define([
         },
 
         onRoomDurationChange: function (oEvent) {
+            this._resetWizardFromStep1();
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
             const oRoomDetailModel = oView.getModel("RoomDetailModel");
