@@ -1353,7 +1353,14 @@ sap.ui.define([
                                                         // If selected → REMOVE it
                                                         if (existsIndex > -1) {
 
-                                                            aSelected.splice(existsIndex, 1); // remove
+                                                           aSelected.splice(existsIndex, 1);
+
+// 🔥 Force summary recalculation
+aPersons[iPersonIndex].PersonFacilitiesSummary = [];
+aPersons[iPersonIndex].AllSelectedFacilities = [];
+aPersons[iPersonIndex].TotalFacilityPrice = 0;
+aPersons[iPersonIndex].GrandTotal = 0;
+
                                                             oCard.removeStyleClass("serviceCardSelected");
 
                                                             // If select-for-all ON and first person
@@ -1917,7 +1924,12 @@ sap.ui.define([
             // Reset flags
             oHostelModel.setProperty("/StopPriceRecalculate", false);
             oHostelModel.setProperty("/StopPriceRecalculateByPerson", false);
-
+aPersons.forEach(p => {
+    p.PersonFacilitiesSummary = [];
+    p.AllSelectedFacilities = [];
+    p.TotalFacilityPrice = 0;
+    p.GrandTotal = 0;
+});
             // Continue existing logic...
             const totals = this.calculateTotals(aPersons, sStartDate, sEndDate, perUnitPrice);
             if (!totals) return;

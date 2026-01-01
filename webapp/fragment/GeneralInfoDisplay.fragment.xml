@@ -33,9 +33,9 @@
 
                 <!-- Site Contact -->
              
-                <Label text="{i18n>CDStartDate}" />
+                <Label text="{i18n>startDate}" />
                            <Text text="{HostelModel>/StartDate}"/>
-                            <Label text="{i18n>CDEndDate}" />
+                            <Label text="{i18n>endDate}" />
                            <Text text="{HostelModel>/EndDate}"/>
                             <Label text="{i18n>monthyear}"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"/>
                            <Text text="{HostelModel>/SelectedMonths}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }" />

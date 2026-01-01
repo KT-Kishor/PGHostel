@@ -23,21 +23,21 @@
             <f:content>
                 <Label text="{i18n>fullname}" />
                 <Text text="{HostelModel>Salutation} {HostelModel>FullName}" />
-                <Label text="{i18n>MSdob}" />
+                <Label text="{i18n>MVDDOB}" />
                 <Text text="{path:'HostelModel>DateOfBirth'}" />
-                <Label text="{i18n>MSgender}" />
+                <Label text="{i18n>MVgender}" />
                 <Text text="{HostelModel>Gender}" />
-                <Label text="{i18n>MVmobileNo}" />
+                <Label text="{i18n>mobileNo}" />
                 <Text text="{HostelModel>STDCode} {HostelModel>MobileNo}" />
-                <Label text="{i18n>MScontactDetails}" />
+                <Label text="{i18n>email}" />
                 <Text text="{HostelModel>CustomerEmail}" />
                 <Label text="{i18n>MVDcountry}" />
                 <Text text="{HostelModel>Country}" />
                 <Label text="{i18n>MVDstate}" />
                 <Text text="{HostelModel>State}" />
-                <Label text="{i18n>MVDcity}" />
+                <Label text="{i18n>city}" />
                 <Text text="{HostelModel>City}" />
-                <Label text="{i18n>MVaddress}" />
+                <Label text="{i18n>address}" />
                 <Text text="{HostelModel>Address}" />
             </f:content>
         </f:SimpleForm>
