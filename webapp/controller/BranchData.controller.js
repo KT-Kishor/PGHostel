@@ -104,7 +104,7 @@ sap.ui.define([
             this.ajaxReadWithJQuery("HM_Branch", filters).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(oFCIAerData);
-                this.getOwnerComponent().setModel(model, "mainModel")
+                this.getView().setModel(model, "mainModel")
                 sap.ui.core.BusyIndicator.hide();
             })
         },
