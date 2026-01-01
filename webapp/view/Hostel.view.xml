@@ -100,7 +100,7 @@
 <VBox class="heroTextBox">
 	<Text class="custom-welcome" text="Welcome To" />
 	<Text class="custom-welcome" text="Shah Hostel" />
-	<Text class="custom-tagline" text="Your New Home Away To Me" />
+	<Text class="custom-tagline" text="Your New Home Away from Home" />
 </VBox>
                         </l:Grid>
          
@@ -141,7 +141,7 @@
                                         text="Shah Hostel"
                                     />
                                     <Text
-                                        text="Your New Home Away to me"
+                                        text="Your New Home Away from Home"
                                         class="custom-tagline s apUiTinyMarginTop "
                                     />
                                 </VBox>

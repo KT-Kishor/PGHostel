@@ -2391,13 +2391,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
     border: 2px solid #0a6ed1 !important;
     border-radius: 8px !important;
 } */
-.sapUiSizeCompact .sapMBtnInner.sapMBtnText {
+
+
+/* .sapUiSizeCompact .sapMBtnInner.sapMBtnText {
     padding-left: 0.4375rem;
     padding-right: 0.4375rem;
     border: 1px solid;
     color: white !important;
      background: linear-gradient(135deg, #02d0ed, #007f89) !important;
-}
+} */
 
 
 
