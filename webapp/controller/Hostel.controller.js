@@ -2100,13 +2100,13 @@ onpressBookrooms: function () {
             }
             const isMandatoryValid = (
                 utils._LCvalidateMandatoryField(this.byId("id_Name"), "ID") &&
+                utils._LCvalidateEmail(this.byId("id_mail"), "ID") &&
                 utils._LCvalidateDate(this.byId("id_dob"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("id_gender"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("id_mail"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("id_country"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("id_state"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("id_city"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("id_country"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("id_state"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("id_city"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("id_phone"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("id_gender"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("id_address"), "ID")
             );
 
@@ -2708,6 +2708,7 @@ onpressBookrooms: function () {
                 oContainer.setBusy(false);
             }
         },
+
         model: function (response) {
             const aRooms = response.data.HM_Rooms || [];
             const oRoomModel = new JSONModel({ Rooms: aRooms });
@@ -2718,6 +2719,7 @@ onpressBookrooms: function () {
             const oCustomerModel = new JSONModel(aCustomers);
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
+
         _loadFilteredData: async function (Scity, sBranchCode, sACType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
@@ -2932,9 +2934,7 @@ onpressBookrooms: function () {
             }
         },
 
-
         onBookNow: function (oEvent) {
-
             // Get selected bed type object
             const oItem = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 
@@ -3056,7 +3056,6 @@ onpressBookrooms: function () {
                 sInput.setValueStateText("Enter a valid 6-digit OTP");
             }
         },
-
 
         onBackToForgot: function () {
             const vm = this.getView().getModel("LoginViewModel");
@@ -3291,7 +3290,6 @@ onpressBookrooms: function () {
             }
         },
 
-
         _resetAllAuthFields: function () {
             ["signInuserid", "signInusername", "signinPassword",
                 "fpUserId", "fpUserName", "fpOTP", "newPass", "confPass", "loginOTP"
@@ -3325,8 +3323,6 @@ onpressBookrooms: function () {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
-
 
         onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
@@ -3410,6 +3406,7 @@ onpressBookrooms: function () {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+
         _onVerifyOTP: async function () {
 
             const vm = this.getView().getModel("LoginViewModel");
@@ -3492,11 +3489,9 @@ onpressBookrooms: function () {
             }
         },
 
-
         onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
         },
-
 
         onBackToLogin: function () {
 
@@ -3816,7 +3811,6 @@ onpressBookrooms: function () {
             this._oPreviewDialog.open();
         },
 
-
         onSigninPasswordLive: function (oEvent) {
             utils._LCvalidatePassword(oEvent.getSource());
         },
@@ -3984,7 +3978,6 @@ onpressBookrooms: function () {
             }
         },
 
-
         onChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
@@ -4117,7 +4110,6 @@ onpressBookrooms: function () {
         },
 
         onValidateUser: async function () {
-
             const isValid =
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("fpUserId"), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("fpUserName"), "ID");
@@ -4165,13 +4157,9 @@ onpressBookrooms: function () {
             }
         },
 
-
         _startOtpTimer: function () {
-
             const vm = this.getView().getModel("LoginViewModel");
-
             this._clearOtpTimer();
-
             const START = 20;
 
             vm.setProperty("/canResendOTP", false);
@@ -4200,7 +4188,6 @@ onpressBookrooms: function () {
             }, 1000);
         },
 
-
         _clearOtpTimer: function () {
             if (this._otpInterval) {
                 clearInterval(this._otpInterval);
@@ -4226,15 +4213,12 @@ onpressBookrooms: function () {
             clearInterval(this._otpInterval);
             this._otpInterval = null;
 
-
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
         },
 
-
         _startOtpCooldown: function (iSeconds = 20) {
-
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
@@ -4265,7 +4249,6 @@ onpressBookrooms: function () {
         },
 
         _resetOtpCooldown: function () {
-
             const vm = this.getView().getModel("LoginViewModel");
 
             if (this._otpInterval) {
@@ -4350,7 +4333,6 @@ onpressBookrooms: function () {
         },
 
         onAdminSIGNUP: function () {
-
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment(
                     "sap.ui.com.project1.fragment.AdminSignup",
@@ -4382,16 +4364,13 @@ onpressBookrooms: function () {
             this._oAdminSignup.open();
         },
 
-
-
-
-
         onCloseAdminSignup: function () {
             if (this._oAdminSignup) {
                 this._resetAdminSignupForm();
                 this._oAdminSignup.close();
             }
         },
+
         ADMIN_onChangeCountry: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
@@ -4489,6 +4468,7 @@ onpressBookrooms: function () {
             }
 
         },
+
         ADMIN_onChangeState: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
@@ -4544,7 +4524,6 @@ onpressBookrooms: function () {
             oCityModel.setProperty("/filtered", filteredCities);
         },
 
-
         ADMIN_onChangeCity: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
@@ -4591,8 +4570,6 @@ onpressBookrooms: function () {
             oModel.setProperty("/STDCode", oSTD.getValue());
         },
 
-
-
         ADMIN_onMobileLiveChange: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
@@ -4623,14 +4600,7 @@ onpressBookrooms: function () {
             }
         },
 
-
-
-
-
-
-
         onAdminLiveValidate: function (oEvent) {
-
             const id = oEvent.getSource().getId();
 
             // Vendor name
@@ -4652,7 +4622,6 @@ onpressBookrooms: function () {
         },
 
         ADMIN_onChangeDOB: function (oEvent) {
-
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
 
@@ -4689,8 +4658,6 @@ onpressBookrooms: function () {
             // Save to model in yyyy-MM-dd format for payload
             oModel.setProperty("/DOB", oDatePicker.getDateValue().toISOString().split("T")[0]);
         },
-
-
 
         onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
@@ -4750,9 +4717,7 @@ onpressBookrooms: function () {
             }
         },
 
-
         onAdminFileSelect: function (oEvent) {
-
             const oUploader = sap.ui.getCore().byId("adminFileUploader");
             const oDocType = sap.ui.getCore().byId("adminDocType");
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -4837,7 +4802,6 @@ onpressBookrooms: function () {
             reader.readAsDataURL(file);
         },
 
-
         ADMIN_onChangeGender: function (oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
@@ -4847,6 +4811,7 @@ onpressBookrooms: function () {
 
             oSelect.setValueState(key ? "None" : "Error");
         },
+
         _resetAdminSignupForm: function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -4900,7 +4865,6 @@ onpressBookrooms: function () {
                 c.setValueState?.("None");
             });
 
-
             // -------- RESTORE DOCUMENT TYPE DROPDOWN --------
             const oDocType = sap.ui.getCore().byId("adminDocType");
 
@@ -4923,15 +4887,9 @@ onpressBookrooms: function () {
 
         },
 
-
-
-
-
         _validateAdminSignupFields: function () {
-
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const M = this.getView().getModel("AdminSignupModel");
-
             const std = (C("adminsignUpSTD").getValue() || "").trim();
 
             // Pick actual UI5 controls
@@ -4982,11 +4940,6 @@ onpressBookrooms: function () {
             return true;
         },
 
-
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         _initAdminSignupModel: function () {
             const oModel = new sap.ui.model.json.JSONModel({
                 Salutation: "",
@@ -5000,7 +4953,6 @@ onpressBookrooms: function () {
                 STDCode: "",
                 Mobile: "",
                 Address: "",
-
                 CurrentDocType: "",
                 Documents: [],
 
@@ -5011,12 +4963,14 @@ onpressBookrooms: function () {
 
             this.getView().setModel(oModel, "AdminSignupModel");
         },
+
         onAdminDocTypeChange: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();
 
             oModel.setProperty("/UploadEnabled", !!key);
         },
+
         _isDuplicateFile: function (fileName) {
             const docs = this.getView()
                 .getModel("AdminSignupModel")
@@ -5024,8 +4978,6 @@ onpressBookrooms: function () {
 
             return docs.some(d => d.FileName === fileName);
         },
-
-
 
         _onCollectAdminSignupPayloadDocs: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -5045,10 +4997,7 @@ onpressBookrooms: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oDocType = sap.ui.getCore().byId("adminDocType");
             const table = sap.ui.getCore().byId("adminAttachmentTable");
-
-            const oCtx = oEvent.getParameter("listItem")
-                .getBindingContext("AdminSignupModel");
-
+            const oCtx = oEvent.getParameter("listItem").getBindingContext("AdminSignupModel");
             const doc = oCtx.getObject(); // ✅ define first
 
             // 🧹 Cleanup preview blob
@@ -5076,12 +5025,6 @@ onpressBookrooms: function () {
             }
         },
 
-
-
-
-
-
-
         onAdminDocTypeSelected: function () {
             const uploader = sap.ui.getCore().byId("hiddenAdminUploader");
 
@@ -5089,7 +5032,6 @@ onpressBookrooms: function () {
                 uploader.openFileDialog();   // <--- THIS opens Browse dialog
             }
         },
-
 
         onAdminPreviewDoc: function (oEvent) {
             const oDoc = oEvent.getSource()
@@ -5131,8 +5073,6 @@ onpressBookrooms: function () {
             this._previewDialog.open();
         },
 
-
-
         _openReadOnlyDoc: function (oDoc) {
             sap.m.MessageBox.information(
                 "Preview not available for this document type.\n\nFile: " + oDoc.FileName,
@@ -5140,12 +5080,10 @@ onpressBookrooms: function () {
             );
         },
 
-
-
-
         onClosePreview: function () {
             this._previewDialog.close();
         },
+        
         onAdminChangeSalutation: function (oEvent) {
 
             const oSalutation = oEvent.getSource();
@@ -5176,8 +5114,62 @@ onpressBookrooms: function () {
             // ✅ Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
+        onEmailChange: function (oEvent) {
+    utils._LCvalidateEmail(oEvent);
+},
 
+onMobileChange:function(){
+    const oModel = this._oProfileDialog.getModel("profileData");
+    const sStd = oModel.getProperty("/STDCode");
+    utils._LCvalidateISDmobile(oEvent, sStd);
+},
 
+MPonAddressChange:function(oEvent){
+    utils._LCvalidateAddress(oEvent.getSource());
+},
+onNameInputLiveChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateName(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+        onEmailliveChange: function (oEvent) {
+            utils._LCvalidateEmail(oEvent);
+        },
+        onChangeDOB: function (oEvent) {
+            utils._LCvalidateDate(oEvent);
+        },
+        MPonMobileLivechnage: function (oEvent) {
+            const oInput = oEvent.getSource();
 
+            // Digits only
+            let val = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(val);
+
+            const stdRaw = this.byId("MC_id_codeModel").getValue() || "";
+            const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
+                stdRaw.replace(/\s+/g, "") :
+                "+" + stdRaw.replace(/\s+/g, "");
+
+            // Untouched empty field → no error
+            if (val.length === 0) {
+                oInput.setValueState("None");
+                return;
+            }
+
+            if (!std) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Select ISD Code First");
+                return;
+            }
+
+            const isValid = utils._LCvalidateISDmobile(oInput, std);
+
+            if (!isValid) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Enter valid Mobile Number");
+            } else {
+                oInput.setValueState("None");
+            }
+        },
     });
 });

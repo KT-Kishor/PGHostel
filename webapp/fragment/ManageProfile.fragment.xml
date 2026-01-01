@@ -147,7 +147,7 @@
                             maxLength="20"
                             value="{profileData>/name}"
                             valueStateText="Enter Customer Name"
-                            change="onChange"
+                            liveChange="onNameInputLiveChange"
                         />
 
                         <m:Label
@@ -160,7 +160,7 @@
                             type="Email"
                             maxLength="30"
                             valueStateText="Enter Email Id"
-                            change="onChange"
+                            liveChange="onEmailliveChange"
                         />
 
                         <m:Label
@@ -173,7 +173,7 @@
                             displayFormat="dd/MM/yyyy"
                             valueFormat="dd/MM/yyyy"
                             valueStateText="Enter Date of Birth"
-                            change="onDateChange"
+                            change="onChangeDOB"
                         />
 
                         <m:Label
@@ -250,8 +250,8 @@
                             id="id_phone"
                             value="{profileData>/phone}"
                             placeholder="Enter Contact Number"
-                            maxLength="10"
-                            liveChange="onChange"
+                            maxLength="18"
+                            liveChange="MPonMobileLivechnage"
                             valueStateText="Enter Contact Number"
                         />
 
@@ -286,6 +286,7 @@
                             id="id_address"
                             value="{profileData>/address}"
                             rows="3"
+                            liveChange="MPonAddressChange"
                             growing="false"
                             width="100%"
                         />

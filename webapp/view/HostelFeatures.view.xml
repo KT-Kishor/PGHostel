@@ -69,19 +69,19 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>addHostelFeatures}"
-							tooltip="Add Hostel Features"
+                            tooltip="Add Hostel Features"
                             press="HM_AddHostelFeature"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSedit}"
-							tooltip="Edit Hostel Feature"
+                            tooltip="Edit Hostel Feature"
                             press="HM_EditHostelFeature"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-							tooltip="Delete Hostel Feature"
+                            tooltip="Delete Hostel Feature"
                             press="HM_DeleteHostelFeature"
                             class="myUnifiedBtn"
                         />
@@ -89,13 +89,22 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="{i18n>facilityname}" tooltip="Facility Name"/>
+                        <Text
+                            text="{i18n>facilityname}"
+                            tooltip="Facility Name"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>description}" tooltip="Description"/>
+                        <Text
+                            text="{i18n>description}"
+                            tooltip="Description"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>image}" tooltip="Image"/>
+                        <Text
+                            text="{i18n>image}"
+                            tooltip="Image"
+                        />
                     </Column>
                 </columns>
                 <items>
