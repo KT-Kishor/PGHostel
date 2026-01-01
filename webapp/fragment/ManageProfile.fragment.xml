@@ -241,11 +241,23 @@
                             text="Mobile Number"
                             required="{profileData>/isEditMode}"
                         />
-                        <Input
+
+                         <ComboBox
+                            change="_onProfileSTDChange"
                             id="id_std"
-                            value="{profileData>/STDCode}"
-                            editable="false"
-                        />
+                            placeholder="Code"
+                            valueStateText="{i18n>MSselectCode}"
+                            showSecondaryValues="true"
+                            items="{path:'CountryModel>/', length:1000}"
+                            selectedKey="{profileData>/STDCode}"
+                            filterSecondaryValues="true"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>stdCode}"
+                                text="{CountryModel>stdCode}"
+                                additionalText="{CountryModel>code}"
+                            />
+                        </ComboBox>
                         <Input
                             id="id_phone"
                             value="{profileData>/phone}"

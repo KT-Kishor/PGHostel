@@ -3991,60 +3991,119 @@ onpressBookrooms: function () {
         },
 
         onCountrySelectionChange: function (oEvent) {
+            const oCountry = oEvent.getSource();
+            const oModel = this._oProfileDialog.getModel("profileData");
+
             utils._LCvalidateMandatoryField(oEvent);
 
-            const oModel = this._oProfileDialog.getModel("profileData");
-            const oItem = oEvent.getSource().getSelectedItem();
-
             const oStateCB = this.byId("id_state");
-            const oCityCB = this.byId("id_city");
-            const oSTD = this.byId("id_std");
+            const oCityCB  = this.byId("id_city");
+            const oSTD     = this.byId("id_std");
+            const oMobile  = this.byId("id_phone");
 
-            // Clear value state on country
-            oEvent.getSource().setValueState("None");
+            // Clear value state
+            oCountry.setValueState("None");
 
-            // Reset dependent fields in model
-            oModel.setProperty("/State", "");
-            oModel.setProperty("/City", "");
-            // if you have an explicit city property, you can also clear it:
-            // oModel.setProperty("/city", "");
+            /* ---------------- Reset Model ---------------- */
+            ["State", "City", "STDCode", "phone"].forEach(p =>
+                oModel.setProperty("/" + p, "")
+            );
 
-            // Reset dependent controls
+            /* ---------------- Reset UI ---------------- */
             oStateCB?.setSelectedKey("");
             oCityCB?.setSelectedKey("");
             oCityCB?.setValue("");
+            oSTD?.setValue("");
+            oMobile?.setValue("");
 
             oStateCB?.getBinding("items")?.filter([]);
             oCityCB?.getBinding("items")?.filter([]);
 
-            oSTD?.setValue("");
-
-            // If nothing is selected, clear country and exit
+            const oItem = oCountry.getSelectedItem();
             if (!oItem) {
                 oModel.setProperty("/Country", "");
                 return;
             }
 
             const sCountryName = oItem.getText();
-            const sCountryCode = oItem.getAdditionalText();
+            const sCountryCode = oItem.getAdditionalText()?.trim();
 
-            // Save country in model
             oModel.setProperty("/Country", sCountryName);
 
-            // Fetch country STD code from CountryModel
-            const aCountryData = this.getOwnerComponent().getModel("CountryModel").getData();
-            const oCountryObj = aCountryData.find(c => c.countryName === sCountryName);
+            /* ---------------- STD Handling (Same as MC_onChangeCountry) ---------------- */
+            const aCountries = this.getOwnerComponent()
+                .getModel("CountryModel")
+                .getData();
 
-            const sStdCode = oCountryObj?.stdCode || "";
-            oModel.setProperty("/STDCode", sStdCode);
-            oSTD?.setValue(sStdCode);
+            const oCountryData = aCountries.find(c => c.countryName === sCountryName);
 
-            // Filter states by country code
-            oStateCB?.getBinding("items")?.filter([
-                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-            ]);
+            if (oCountryData?.stdCode) {
+                oModel.setProperty("/STDCode", oCountryData.stdCode);
+                oSTD.setValue(oCountryData.stdCode);
+
+                this._onProfileSTDChange(); // ⬅ same behavior
+            }
+
+            /* ---------------- Filter States ---------------- */
+            if (sCountryCode) {
+                oStateCB?.getBinding("items")?.filter([
+                    new sap.ui.model.Filter(
+                        "countryCode",
+                        sap.ui.model.FilterOperator.EQ,
+                        sCountryCode
+                    )
+                ]);
+            }
         },
 
+        _onProfileSTDChange: function () {
+            const oSTD = this.byId("id_std");
+            const oMobile = this.byId("id_phone");
+
+            const std = oSTD.getValue();
+            oMobile.setValue("");
+
+            // Dynamic mobile length
+            if (std === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
+        },
+
+        MPonMobileLivechnage: function (oEvent) {
+            const oInput = oEvent.getSource();
+
+            // Digits only
+            let val = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(val);
+
+            const stdRaw = this.byId("id_std").getValue() || "";
+            const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
+                stdRaw.replace(/\s+/g, "") :
+                "+" + stdRaw.replace(/\s+/g, "");
+
+            // Untouched empty field → no error
+            if (val.length === 0) {
+                oInput.setValueState("None");
+                return;
+            }
+
+            if (!std) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Select ISD Code First");
+                return;
+            }
+
+            const isValid = utils._LCvalidateISDmobile(oInput, std);
+
+            if (!isValid) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Enter valid Mobile Number");
+            } else {
+                oInput.setValueState("None");
+            }
+        },
 
         CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -5137,39 +5196,6 @@ onNameInputLiveChange: function (oEvent) {
         },
         onChangeDOB: function (oEvent) {
             utils._LCvalidateDate(oEvent);
-        },
-        MPonMobileLivechnage: function (oEvent) {
-            const oInput = oEvent.getSource();
-
-            // Digits only
-            let val = oInput.getValue().replace(/\D/g, "");
-            oInput.setValue(val);
-
-            const stdRaw = this.byId("MC_id_codeModel").getValue() || "";
-            const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
-                stdRaw.replace(/\s+/g, "") :
-                "+" + stdRaw.replace(/\s+/g, "");
-
-            // Untouched empty field → no error
-            if (val.length === 0) {
-                oInput.setValueState("None");
-                return;
-            }
-
-            if (!std) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD Code First");
-                return;
-            }
-
-            const isValid = utils._LCvalidateISDmobile(oInput, std);
-
-            if (!isValid) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText("Enter valid Mobile Number");
-            } else {
-                oInput.setValueState("None");
-            }
         },
     });
 });
