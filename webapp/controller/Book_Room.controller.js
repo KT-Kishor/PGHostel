@@ -1716,6 +1716,10 @@ aPersons[iPersonIndex].GrandTotal = 0;
                 this._resetWizardFromStep1();
                 return;
             }
+              if (this._mustRecreatePersonUI) {
+                    this._createDynamicPersonsUI();
+                    this._mustRecreatePersonUI = false;
+                }
 
             // ✅ Normal navigation
             this._oSelectedStep = oTargetStep;
