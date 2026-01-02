@@ -293,7 +293,7 @@ sap.ui.define([
             }
 
             if (attachments.length === 0) {
-                sap.m.MessageBox.error(this.i18nModel.getText("pleaseuploadatleastoneimage"));
+                sap.m.MessageBox.error(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                 return;
             }
 
@@ -563,7 +563,7 @@ sap.ui.define([
             var aSelectedItems = oTable.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectatleastonerecordtodelete"));
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
                 return;
             }
 

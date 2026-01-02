@@ -550,7 +550,7 @@ sap.ui.define([
                     sap.ui.getCore().byId(oView.createId("dpEndDate")), "ID"
                 );
             if (!bValid) {
-                MessageToast.show(this.i18nModel.getText("pleasefillallmandatoryfieldscorrectly"));
+                MessageToast.show(this.i18nModel.getText("MSfillallfields"));
                 return;
             }
             let dStart = new Date(oVM.getProperty("/CurrentCoupon/StartDate"));

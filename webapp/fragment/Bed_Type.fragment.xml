@@ -7,7 +7,7 @@
 >
     <Dialog
         id="sds12"
-        title="Bed Details"
+        title="{i18n>bedDetails}"
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
@@ -28,7 +28,7 @@
         >
             <f:content>
                 <Label
-                    text="Branch Code"
+                    text="{i18n>MSbranchCode}"
                     required="true"
                 />
                 <ComboBox
@@ -38,7 +38,7 @@
                     change="onbranchChange"
                     showSecondaryValues="true"
                     placeholder="Select Branch Code"
-                    valueStateText="Select Branch Code"
+                    valueStateText="{i18n>selectBranchCode}"
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -48,20 +48,20 @@
                 </ComboBox>
 
                 <Label
-                    text="Bed Type"
+                    text="{i18n>bedType}"
                     required="true"
                 />
                 <Input
                     id="BD_idBedType"
                     value="{BedModel>/Name}"
                     placeholder="Enter Bed Type"
-                    valueStateText="Enter Bed Type"
+                    valueStateText="{i18n>enterBedType}"
                     maxLength="50"
                     liveChange="onLivehange"
                 />
 
                 <Label
-                    text="Room Type"
+                    text="{i18n>roomtype}"
                     required="true"
                 />
                 <ComboBox
@@ -69,7 +69,7 @@
                     selectedKey="{BedModel>/ACType}"
                     change="onbranchChange"
                     placeholder="Select Room Type"
-                    valueStateText="Select Room Type"
+                    valueStateText="{i18n>selectRoomType}"
                 >
                     <core:ListItem
                         key="AC"
@@ -82,33 +82,33 @@
                 </ComboBox>
 
                 <Label
-                    text="No of Person"
+                    text="{i18n>noofPerson}"
                     required="true"
                 />
                 <Input
                     id="BD_id_Person"
                     value="{BedModel>/NoOfPerson}"
                     placeholder="Enter No of Person"
-                    valueStateText="Enter No of Person"
+                    valueStateText="{i18n>enterNoofPerson}"
                     liveChange="onNoOfPersonInputLiveChange"
                     maxLength="2"
                 />
 
                 <Label
-                    text="No of Rooms"
+                    text="{i18n>noofRooms}"
                     required="true"
                 />
                 <Input
                     id="BD_id_MaxBeds"
                     value="{BedModel>/MaxBeds}"
                     placeholder="Enter No of Rooms"
-                    valueStateText="Enter No of Rooms"
+                    valueStateText="{i18n>enterNoofRooms}"
                     maxLength="3"
                     liveChange="onNoOfPersonInputLiveChange"
                 />
 
                 <Label
-                    text="Description"
+                    text="{i18n>description}"
                     required="true"
                 />
                 <TextArea
@@ -116,7 +116,7 @@
                     value="{BedModel>/Description}"
                     maxLength="150"
                     placeholder="Enter Description"
-                    valueStateText="Enter Description"
+                    valueStateText="{i18n>enterDescription}"
                     liveChange="onLivehange"
                 />
 
@@ -149,15 +149,25 @@
                         width="100%"
                     >
                         <columns>
-                            <Column demandPopin="true"   minScreenWidth="Phone"
->
-                                <Text  text="File Name" />
+                            <Column
+                                demandPopin="true"
+                                minScreenWidth="Phone"
+                            >
+                                <Text text="{i18n>filename}" />
                             </Column>
-                            <Column demandPopin="true" hAlign="Center" minScreenWidth="Tablet">
-                                <Text text="File Type" />
+                            <Column
+                                demandPopin="true"
+                                hAlign="Center"
+                                minScreenWidth="Tablet"
+                            >
+                                <Text text="{i18n>FileType}" />
                             </Column>
-                            <Column demandPopin="true" hAlign="Center" minScreenWidth="Tablet">
-                                <Text text="File Size" />
+                            <Column
+                                demandPopin="true"
+                                hAlign="Center"
+                                minScreenWidth="Tablet"
+                            >
+                                <Text text="{i18n>FileSize}" />
                             </Column>
                         </columns>
                         <items>
@@ -177,12 +187,14 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="Save"
                     press="BT_onsavebuttonpress"
                     class="myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="Cancel"
                     press="BT_onCancelButtonPress"
                     class="myUnifiedBtn"
                 />

@@ -240,7 +240,7 @@ sap.ui.define([
 
                 // Image validations
                 if (attachments.length === 0) {
-                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseuploadatleastoneimage"));
+                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                     return;
                 }
                 if (attachments.length > 3) {

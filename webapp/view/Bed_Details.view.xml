@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Bed Type"
-                        label="Bed Type"
+                        label="{i18n>bedType}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -54,7 +54,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room Type"
-                        label="Room Type"
+                        label="{i18n>roomtype}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -84,23 +84,23 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="Bed List ({=${BedDetails>/}.length})" />
+                        <Title text="{i18n>bedList} ({= ${BedDetails>/}.length})" />
                         <ToolbarSpacer />
                         <Button
-                            text="Add Bed"
-							tooltip="Add Bed"
+                            text="{i18n>addBed}"
+                            tooltip="Add Bed"
                             press="HM_RoomDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
-							tooltip="Delete Selected Beds"
+                            text="{i18n>MSdelete}"
+                            tooltip="Delete Selected Beds"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Download"
-							tooltip="Download Bed Details"
+                            text="{i18n>download}"
+                            tooltip="Download Bed Details"
                             press="BD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -108,25 +108,40 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Bed Type" tooltip="Bed Type" />
+                        <Text
+                            text="{i18n>bedType}"
+                            tooltip="Bed Type"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Room Type" tooltip="Room Type" />
+                        <Text
+                            text="{i18n>roomtype}"
+                            tooltip="Room Type"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="No of Rooms" tooltip="Number of Rooms" />
+                        <Text
+                            text="{i18n>noofRooms}"
+                            tooltip="Number of Rooms"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="No of Person" tooltip="Number of Person" />
+                        <Text
+                            text="{i18n>noofPerson}"
+                            tooltip="Number of Person"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="Description" tooltip="Description" />
+                        <Text
+                            text="{i18n>description}"
+                            tooltip="Description"
+                        />
                     </Column>
                 </columns>
                 <items>

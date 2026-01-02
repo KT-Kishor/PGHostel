@@ -3,24 +3,24 @@ sap.ui.define([
     "../utils/validation",
     "sap/m/MessageToast",
     "sap/ui/export/Spreadsheet"
-], function(BaseController, utils, MessageToast,
+], function (BaseController, utils, MessageToast,
     Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Bed_Details", {
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             try {
-                 this.commonLoginFunction();
+                this.commonLoginFunction();
                 var model = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",
                     ACType: "",
                 });
                 this.getView().setModel(model, "BedModel")
-
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oTokenModel = new sap.ui.model.json.JSONModel({
                     tokens: []
                 });
@@ -42,25 +42,21 @@ sap.ui.define([
             }
         },
 
-        _loadBranchCode: async function() {
-             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+        _loadBranchCode: async function () {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
 
             if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel
-                    .map(item => item.BranchID)
-                    .flat()           
-                    .filter(Boolean)    
-                    .join(",");         
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role==="Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -82,7 +78,7 @@ sap.ui.define([
             }
         },
 
-        HM_RoomDetails: function(oEvent) {
+        HM_RoomDetails: function (oEvent) {
             this.byId("id_BedTable").removeSelections();
             var oView = this.getView();
 
@@ -102,30 +98,30 @@ sap.ui.define([
                 isFileUploaded: false
             });
 
-            var aControls = this.ARD_Dialog.findAggregatedObjects(true, function(oControl) {
+            var aControls = this.ARD_Dialog.findAggregatedObjects(true, function (oControl) {
                 return oControl instanceof sap.m.Input ||
                     oControl instanceof sap.m.ComboBox ||
                     oControl instanceof sap.m.Select ||
                     oControl instanceof sap.m.TextArea;
             });
 
-            aControls.forEach(function(oControl) {
+            aControls.forEach(function (oControl) {
                 oControl.setValueState("None");
             });
             this.ARD_Dialog.open();
         },
 
-        onNoOfPersonInputLiveChange: function(oEvent) {
+        onNoOfPersonInputLiveChange: function (oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
-        onLivehange: function(oEvent) {
+        onLivehange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        BT_onsavebuttonpress: async function() {
+        BT_onsavebuttonpress: async function () {
             var oView = this.getView();
             var Payload = oView.getModel("BedModel").getData();
             const oUploaderData = oView.getModel("UploaderData");
@@ -141,7 +137,7 @@ sap.ui.define([
             ) {
                 var Attachment = oView.getModel("tokenModel").getData();
                 if (!Attachment.tokens || Attachment.tokens.length === 0) {
-                    return sap.m.MessageToast.show("Please Upload at Least One Image.");
+                    return sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                 }
 
                 if (attachments.length === 0) {
@@ -154,7 +150,7 @@ sap.ui.define([
                 }
 
                 var aBedDetails = oView.getModel("BedDetails").getData() || "";
-                var bDuplicate = aBedDetails.some(function(bed) {
+                var bDuplicate = aBedDetails.some(function (bed) {
                     // skip the same record in edit mode
                     if (Payload.ID && bed.ID === Payload.ID) {
                         return false;
@@ -168,7 +164,7 @@ sap.ui.define([
 
                 if (bDuplicate) {
                     sap.m.MessageToast.show(
-                        "A Bed with the Same Bed Type, Branch Code, and AC Type Already Exists."
+                        this.i18nModel.getText("bedwithSameBedTypeBranchCodeACTypeAlreadyExists")
                     );
                     return;
                 }
@@ -212,18 +208,18 @@ sap.ui.define([
                         tokens: []
                     });
                     await this.Onsearch("true");
-                    sap.m.MessageToast.show("Bed saved successfully.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("bedsavedsuccessfully"));
                     this.ARD_Dialog.close();
                 } catch (err) {
                     sap.ui.core.BusyIndicator.hide();
                     sap.m.MessageToast.show(err.message || err.responseText);
                 }
             } else {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
+                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             }
         },
 
-        onTokenDelete: function(oEvent) {
+        onTokenDelete: function (oEvent) {
             const oView = this.getView();
             const oModel = oView.getModel("tokenModel");
             const oUploaderData = oView.getModel("UploaderData");
@@ -251,7 +247,7 @@ sap.ui.define([
             this.byId("BT_id_FileUploader").clear();
         },
 
-        onFacilityFileChange: function(oEvent) {
+        onFacilityFileChange: function (oEvent) {
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -264,7 +260,7 @@ sap.ui.define([
 
             // Block if already 5 files uploaded
             if (aAttachments.length >= 5) {
-                sap.m.MessageToast.show("You can Upload a Maximum of 5 Images Only.");
+                sap.m.MessageToast.show(this.i18nModel.getText("youcanUploadMaximumof5ImagesOnly"));
                 return;
             }
 
@@ -295,7 +291,7 @@ sap.ui.define([
 
                 // Validate file type
                 if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-                    sap.m.MessageToast.show("Only Image files (jpg, jpeg, png) are Allowed.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("onlyimagefilesareallowed"));
                     return;
                 }
 
@@ -306,7 +302,7 @@ sap.ui.define([
                     // Final Duplicate Check using file content
                     const bContentDuplicate = aAttachments.some(att => att.content === sBase64);
                     if (bContentDuplicate) {
-                        sap.m.MessageToast.show(`This Image is Already Uploaded.`);
+                        sap.m.MessageToast.show(this.i18nModel.getText("thisimageisalreadyuploaded"));
                         return;
                     }
 
@@ -332,18 +328,18 @@ sap.ui.define([
             });
         },
 
-        formatFileSize: function(bytes) {
+        formatFileSize: function (bytes) {
             if (!bytes) return "0 Bytes";
             const sizes = ["Bytes", "KB", "MB", "GB"];
             let i = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
         },
 
-        BT_onCancelButtonPress: function() {
+        BT_onCancelButtonPress: function () {
             this.ARD_Dialog.close();
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("BedDetails").setData({});
@@ -351,14 +347,14 @@ sap.ui.define([
 
         },
 
-        onHome: function() {
+        onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
             this.getView().getModel("BedDetails").setData({});
 
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
             var oView = this.getView();
@@ -370,7 +366,7 @@ sap.ui.define([
             var sCustomerID = oView.byId("PO_id_CompanyName").getSelectedKey() ||
                 oView.byId("PO_id_CompanyName").getValue();
 
-           let aBranchCodes = [];
+            let aBranchCodes = [];
 
             if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
@@ -395,11 +391,11 @@ sap.ui.define([
                     const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
                     if (!response || response.length === 0) {
-                this._originalBedData = [];
-                const emptyModel = new sap.ui.model.json.JSONModel([]);
-                this.getView().setModel(emptyModel, "BedDetails");
-                return;
-            }
+                        this._originalBedData = [];
+                        const emptyModel = new sap.ui.model.json.JSONModel([]);
+                        this.getView().setModel(emptyModel, "BedDetails");
+                        return;
+                    }
 
                     if (!this._originalBedData || flag === "true" || flag === undefined) {
                         this._originalBedData = response;
@@ -423,14 +419,14 @@ sap.ui.define([
                 })
                 .catch((err) => {
                     console.error("Error in search", err);
-                    sap.m.MessageBox.error("Failed to Load Bed Details.");
+                    sap.m.MessageBox.error(this.i18nModel.getText("failedtoLoadBedDetails"));
                 })
                 .finally(() => {
                     sap.ui.core.BusyIndicator.hide();
                 });
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 PO_id_CustomerName: new Set(),
                 PO_id_CompanyName: new Set(),
@@ -455,7 +451,7 @@ sap.ui.define([
             });
         },
 
-        HM_onSearch: function() {
+        HM_onSearch: function () {
             var oView = this.getView();
             var oTable = oView.byId("id_BedTable");
             var oBinding = oTable.getBinding("items");
@@ -480,20 +476,20 @@ sap.ui.define([
             oBinding.filter(oCombinedFilter);
         },
 
-        PO_onPressClear: function() {
+        PO_onPressClear: function () {
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
         },
 
-        onbranchChange: function(oEvent) {
+        onbranchChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        onNameInputLiveChange: function(oEvent) {
+        onNameInputLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
 
-        onColumnListItemPress: function(oEvent) {
+        onColumnListItemPress: function (oEvent) {
             var BEdID = oEvent.getSource().getBindingContext("BedDetails").getObject().ID;
             var onav = this.getOwnerComponent().getRouter()
             onav.navTo("RouteRoomImages", {
@@ -501,12 +497,12 @@ sap.ui.define([
             })
         },
 
-        HM_DeleteDetails: function() {
+        HM_DeleteDetails: function () {
             var table = this.byId("id_BedTable");
             var aSelectedItems = table.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please Select at Least One record to Delete.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
                 return;
             }
 
@@ -517,57 +513,56 @@ sap.ui.define([
 
             sap.m.MessageBox.confirm(
                 `Are you sure you want to Delete the Selected Bed(s): ${sBedNames}?`, {
-                    title: "Confirm Deletion",
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                    onClose: async function(sAction) {
-                        if (sAction === sap.m.MessageBox.Action.OK) {
-                            sap.ui.core.BusyIndicator.show(0);
-                            try {
-                                // Create array of delete promises
-                                const deletePromises = aSelectedItems.map((item) => {
-                                    const data = item.getBindingContext("BedDetails").getObject();
-                                    const oBody = {
-                                        filters: {
-                                            ID: data.ID
-                                        }
-                                    };
+                title: "Confirm Deletion",
+                icon: sap.m.MessageBox.Icon.WARNING,
+                actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                onClose: async function (sAction) {
+                    if (sAction === sap.m.MessageBox.Action.OK) {
+                        sap.ui.core.BusyIndicator.show(0);
+                        try {
+                            // Create array of delete promises
+                            const deletePromises = aSelectedItems.map((item) => {
+                                const data = item.getBindingContext("BedDetails").getObject();
+                                const oBody = {
+                                    filters: {
+                                        ID: data.ID
+                                    }
+                                };
 
-                                    return $.ajax({
-                                        url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
-                                        method: "DELETE",
-                                        contentType: "application/json",
-                                        data: JSON.stringify(oBody),
-                                        headers: {
-                                            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                                            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-                                        }
-                                    });
+                                return $.ajax({
+                                    url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+                                    method: "DELETE",
+                                    contentType: "application/json",
+                                    data: JSON.stringify(oBody),
+                                    headers: {
+                                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+                                    }
                                 });
+                            });
 
-                                // Wait for all deletions to complete
-                                await Promise.all(deletePromises);
+                            // Wait for all deletions to complete
+                            await Promise.all(deletePromises);
+                            await this.Onsearch("true");
+                            sap.m.MessageToast.show(this.i18nModel.getText("selectedBedDeletedSuccessfully"));
 
-                                await this.Onsearch("true");
-                                sap.m.MessageToast.show("Selected Bed(s) Deleted Successfully!");
-
-                            } catch (error) {
-                                console.error("Delete failed:", error);
-                                sap.m.MessageBox.error("Error while Deleting Bed(s). Please Try Again.");
-                            } finally {
-                                sap.ui.core.BusyIndicator.hide();
-                                table.removeSelections(true);
-                            }
+                        } catch (error) {
+                            console.error("Delete failed:", error);
+                            sap.m.MessageBox.error("Error while Deleting Bed(s). Please Try Again.");
+                        } finally {
+                            sap.ui.core.BusyIndicator.hide();
+                            table.removeSelections(true);
                         }
-                    }.bind(this)
-                }
+                    }
+                }.bind(this)
+            }
             );
         },
 
-        BD_onDownload: function() {
+        BD_onDownload: function () {
             const oModel = this.byId("id_BedTable").getModel("BedDetails").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No Data available to Download.");
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -585,44 +580,44 @@ sap.ui.define([
                 fileName: "Bed_Details.xlsx",
                 worker: false,
             };
-            MessageToast.show("Downloading Room Details");
+            MessageToast.show(this.i18nModel.getText("downloadingRoomDetails"));
             const oSheet = new Spreadsheet(oSettings);
-            oSheet.build().finally(function() {
+            oSheet.build().finally(function () {
                 oSheet.destroy();
             });
         },
 
-        createTableSheet: function() {
+        createTableSheet: function () {
             return [{
-                    label: "Branch Code",
-                    property: "BranchCode",
-                    type: "string"
-                },
-                {
-                    label: "Bed Type",
-                    property: "Name",
-                    type: "string"
-                },
-                {
-                    label: "Room Type",
-                    property: "ACType",
-                    type: "string"
-                },
-                {
-                    label: "Max No of Rooms",
-                    property: "MaxBeds",
-                    type: "string"
-                },
-                {
-                    label: "No of Persons",
-                    property: "NoOfPerson",
-                    type: "string"
-                },
-                {
-                    label: "Description",
-                    property: "Description",
-                    type: "string"
-                }
+                label: "Branch Code",
+                property: "BranchCode",
+                type: "string"
+            },
+            {
+                label: "Bed Type",
+                property: "Name",
+                type: "string"
+            },
+            {
+                label: "Room Type",
+                property: "ACType",
+                type: "string"
+            },
+            {
+                label: "Max No of Rooms",
+                property: "MaxBeds",
+                type: "string"
+            },
+            {
+                label: "No of Persons",
+                property: "NoOfPerson",
+                type: "string"
+            },
+            {
+                label: "Description",
+                property: "Description",
+                type: "string"
+            }
             ]
         },
     });
