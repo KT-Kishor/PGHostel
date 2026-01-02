@@ -13,7 +13,7 @@ sap.ui.define([
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
-            this.getView().setModel(new sap.ui.model.json.JSONModel({showGlobalFooter: false,showRoomsFooter: false,}),"FooterModel");
+            this.getView().setModel(new sap.ui.model.json.JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
@@ -156,12 +156,12 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
-      
-                const oFooterModel = this.getView().getModel("FooterModel");
 
-                // Default landing tab = Home
-                oFooterModel.setProperty("/showGlobalFooter", true);
-                oFooterModel.setProperty("/showRoomsFooter", false);
+            const oFooterModel = this.getView().getModel("FooterModel");
+
+            // Default landing tab = Home
+            oFooterModel.setProperty("/showGlobalFooter", true);
+            oFooterModel.setProperty("/showRoomsFooter", false);
 
             const oWrapper = this.byId("exploreWrapper");
             if (oWrapper && !this._exploreAnimated) {
@@ -277,110 +277,110 @@ sap.ui.define([
             oTile.addStyleClass("selectedTile");
         },
 
-       onConfirmBooking: function () {
+        onConfirmBooking: function () {
 
-    const oView = this.getView();
-    const oLocalModel = oView.getModel("HostelModel");
-    const oData = oLocalModel?.getData?.() || {};
+            const oView = this.getView();
+            const oLocalModel = oView.getModel("HostelModel");
+            const oData = oLocalModel?.getData?.() || {};
 
-    // -------------------------
-    // BASIC VALIDATIONS
-    // -------------------------
-    if (!oData.Visible) {
-        sap.m.MessageToast.show("This room is currently occupied. Please select another room.");
-        return;
-    }
+            // -------------------------
+            // BASIC VALIDATIONS
+            // -------------------------
+            if (!oData.Visible) {
+                sap.m.MessageToast.show("This room is currently occupied. Please select another room.");
+                return;
+            }
 
-    if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
-        sap.m.MessageToast.show("Please select a pricing plan before booking.");
-        return;
-    }
+            if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
+                sap.m.MessageToast.show("Please select a pricing plan before booking.");
+                return;
+            }
 
-    // -------------------------
-    // GET / CREATE GLOBAL MODEL
-    // -------------------------
-    let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
-    if (!oGlobalModel) {
-        oGlobalModel = new sap.ui.model.json.JSONModel({});
-        sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
-    }
+            // -------------------------
+            // GET / CREATE GLOBAL MODEL
+            // -------------------------
+            let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
+            if (!oGlobalModel) {
+                oGlobalModel = new sap.ui.model.json.JSONModel({});
+                sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
+            }
 
-    // -------------------------
-    // BUILD BOOKING DATA
-    // -------------------------
-    const oBookingData = {
-        BookingDate: new Date().toISOString(),
-        RoomNo: oData.RoomNo || "",
-        BedType: oData.BedType || "",
-        ACType: oData.ACType || "",
-        Capacity: parseInt(oData.Capacity, 10) || 1,
-        Address: oData.Address || "",
-        Description: oData.Description || "",
-        BranchCode: oData.BranchCode || "",
-        SelectedPriceType: oData.SelectedPriceType,
-        FinalPrice: oData.SelectedPriceValue,
-        Currency: oData.Currency || "INR",
-        Source: "UI5_HostelApp",
-        Status: "Pending",
-        Country: oData.Country,
-        AvailbleBeds: parseInt(oData.AvailbleBeds, 10) || 0,
-        Price: oData.Price,
-        MonthPrice: oData.MonthPrice,
-        YearPrice: oData.YearPrice
-    };
+            // -------------------------
+            // BUILD BOOKING DATA
+            // -------------------------
+            const oBookingData = {
+                BookingDate: new Date().toISOString(),
+                RoomNo: oData.RoomNo || "",
+                BedType: oData.BedType || "",
+                ACType: oData.ACType || "",
+                Capacity: parseInt(oData.Capacity, 10) || 1,
+                Address: oData.Address || "",
+                Description: oData.Description || "",
+                BranchCode: oData.BranchCode || "",
+                SelectedPriceType: oData.SelectedPriceType,
+                FinalPrice: oData.SelectedPriceValue,
+                Currency: oData.Currency || "INR",
+                Source: "UI5_HostelApp",
+                Status: "Pending",
+                Country: oData.Country,
+                AvailbleBeds: parseInt(oData.AvailbleBeds, 10) || 0,
+                Price: oData.Price,
+                MonthPrice: oData.MonthPrice,
+                YearPrice: oData.YearPrice
+            };
 
-    // -------------------------
-    // MERGE WITH GLOBAL MODEL
-    // -------------------------
-    const oMergedData = {
-        ...oGlobalModel.getData(),
-        ...oBookingData
-    };
+            // -------------------------
+            // MERGE WITH GLOBAL MODEL
+            // -------------------------
+            const oMergedData = {
+                ...oGlobalModel.getData(),
+                ...oBookingData
+            };
 
-    // -------------------------
-    // ✅ FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
-    // -------------------------
-    const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
+            // -------------------------
+            // ✅ FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
+            // -------------------------
+            const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
 
-    if (iAvailableBeds <= 0) {
-        sap.m.MessageToast.show("No beds available for booking.");
-        return;
-    }
+            if (iAvailableBeds <= 0) {
+                sap.m.MessageToast.show("No beds available for booking.");
+                return;
+            }
 
-    const aPersonsList = [];
-    for (let i = 1; i <= iAvailableBeds; i++) {
-        aPersonsList.push({
-            key: i.toString(),
-            text: i.toString()
-        });
-    }
+            const aPersonsList = [];
+            for (let i = 1; i <= iAvailableBeds; i++) {
+                aPersonsList.push({
+                    key: i.toString(),
+                    text: i.toString()
+                });
+            }
 
-    oMergedData.NoOfPersonsList = aPersonsList;
+            oMergedData.NoOfPersonsList = aPersonsList;
 
-    // Optional: auto-select max available persons
-    oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
+            // Optional: auto-select max available persons
+            oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
 
-    // -------------------------
-    // UPDATE GLOBAL MODEL
-    // -------------------------
-    oGlobalModel.setData(oMergedData, true);
+            // -------------------------
+            // UPDATE GLOBAL MODEL
+            // -------------------------
+            oGlobalModel.setData(oMergedData, true);
 
-    // -------------------------
-    // CLOSE ROOM DETAIL DIALOG
-    // -------------------------
-    if (this._oRoomDetailFragment) {
-        this._oRoomDetailFragment.close();
-    }
+            // -------------------------
+            // CLOSE ROOM DETAIL DIALOG
+            // -------------------------
+            if (this._oRoomDetailFragment) {
+                this._oRoomDetailFragment.close();
+            }
 
-    this._clearRoomDetailDialog();
+            this._clearRoomDetailDialog();
 
-    // -------------------------
-    // NAVIGATE TO BOOKING PAGE
-    // -------------------------
-    const oRouter = this.getOwnerComponent().getRouter();
-    oRouter.navTo("RouteBookRoom");
-}
-,
+            // -------------------------
+            // NAVIGATE TO BOOKING PAGE
+            // -------------------------
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteBookRoom");
+        }
+        ,
 
         _clearRoomDetailDialog: function () {
             if (!this._oRoomDetailFragment) return;
@@ -775,103 +775,103 @@ sap.ui.define([
 
         // },
 
-    // onTabSelect: async function (oEvent) {
-    //     var oItem = oEvent.getParameter("item");
-    //     const sKey = oItem.getKey();
+        // onTabSelect: async function (oEvent) {
+        //     var oItem = oEvent.getParameter("item");
+        //     const sKey = oItem.getKey();
 
-    //     this.byId("pageContainer").to(this.byId(sKey));
+        //     this.byId("pageContainer").to(this.byId(sKey));
 
-    //     var page = this.byId(sKey);
-    //     if (page && page.scrollTo) page.scrollTo(0, 0);
+        //     var page = this.byId(sKey);
+        //     if (page && page.scrollTo) page.scrollTo(0, 0);
 
-    //     this.flag = true;
-    //     this.iTop = 4;
-    //     this.iSkip = 0;
-    //     this.roomtype = true;
+        //     this.flag = true;
+        //     this.iTop = 4;
+        //     this.iSkip = 0;
+        //     this.roomtype = true;
 
-    //     // 🔑 Footer control (added, not disturbing existing flow)
-    //     const oFooterModel = this.getView().getModel("FooterModel");
+        //     // 🔑 Footer control (added, not disturbing existing flow)
+        //     const oFooterModel = this.getView().getModel("FooterModel");
 
-    //     if (sKey === "idRooms") {
-    //         // entering Rooms
-    //         oFooterModel.setProperty("/showGlobalFooter", false);
-    //         oFooterModel.setProperty("/showRoomsFooter", false);
+        //     if (sKey === "idRooms") {
+        //         // entering Rooms
+        //         oFooterModel.setProperty("/showGlobalFooter", false);
+        //         oFooterModel.setProperty("/showRoomsFooter", false);
 
-    //         // keep original behavior
-    //         await this._loadRoomsPageData();
+        //         // keep original behavior
+        //         await this._loadRoomsPageData();
 
-    //     } else {
-    //         // Home / Contact
-    //         oFooterModel.setProperty("/showGlobalFooter", true);
-    //         oFooterModel.setProperty("/showRoomsFooter", false);
-    //     }
-    //     const oNav = this.byId("pageContainer");
-    // oNav.setDefaultTransitionName("Slide");
+        //     } else {
+        //         // Home / Contact
+        //         oFooterModel.setProperty("/showGlobalFooter", true);
+        //         oFooterModel.setProperty("/showRoomsFooter", false);
+        //     }
+        //     const oNav = this.byId("pageContainer");
+        // oNav.setDefaultTransitionName("Slide");
 
-    // const sKeys = oEvent.getParameter("item").getKey();
-    // oNav.to(this.byId(sKeys));
-    // },
-onTabSelect: async function (oEvent) {
-    const sKey = oEvent.getParameter("item").getKey();
-    const oNav = this.byId("pageContainer");
+        // const sKeys = oEvent.getParameter("item").getKey();
+        // oNav.to(this.byId(sKeys));
+        // },
+        onTabSelect: async function (oEvent) {
+            const sKey = oEvent.getParameter("item").getKey();
+            const oNav = this.byId("pageContainer");
 
-    /* 1️⃣ Set transition BEFORE navigation */
-    oNav.setDefaultTransitionName("Slide");
+            /* 1️⃣ Set transition BEFORE navigation */
+            oNav.setDefaultTransitionName("Slide");
 
-    /* 2️⃣ Navigate ONCE */
-    oNav.to(this.byId(sKey));
+            /* 2️⃣ Navigate ONCE */
+            oNav.to(this.byId(sKey));
 
-    /* 3️⃣ Reset scroll (safe) */
-    const page = this.byId(sKey);
-    if (page && page.scrollTo) {
-        page.scrollTo(0, 0);
-    }
+            /* 3️⃣ Reset scroll (safe) */
+            const page = this.byId(sKey);
+            if (page && page.scrollTo) {
+                page.scrollTo(0, 0);
+            }
 
-    /* 4️⃣ State flags (unchanged) */
-    this.flag = true;
-    this.iTop = 4;
-    this.iSkip = 0;
-    this.roomtype = true;
+            /* 4️⃣ State flags (unchanged) */
+            this.flag = true;
+            this.iTop = 4;
+            this.iSkip = 0;
+            this.roomtype = true;
 
-    /* 5️⃣ Footer control */
-    const oFooterModel = this.getView().getModel("FooterModel");
+            /* 5️⃣ Footer control */
+            const oFooterModel = this.getView().getModel("FooterModel");
 
-    if (sKey === "idRooms") {
-        // Entering Rooms
-        oFooterModel.setProperty("/showGlobalFooter", false);
-        oFooterModel.setProperty("/showRoomsFooter", false);
+            if (sKey === "idRooms") {
+                // Entering Rooms
+                oFooterModel.setProperty("/showGlobalFooter", false);
+                oFooterModel.setProperty("/showRoomsFooter", false);
 
-        await this._loadRoomsPageData();
-    } else {
-        // Home / Contact
-        oFooterModel.setProperty("/showGlobalFooter", true);
-        oFooterModel.setProperty("/showRoomsFooter", false);
-    }
+                await this._loadRoomsPageData();
+            } else {
+                // Home / Contact
+                oFooterModel.setProperty("/showGlobalFooter", true);
+                oFooterModel.setProperty("/showRoomsFooter", false);
+            }
 
-    /* 6️⃣ Animate Explore button ONLY on Home */
-    if (sKey === "idHome") {
-        this._animateExploreButton();
-    }
-},
+            /* 6️⃣ Animate Explore button ONLY on Home */
+            if (sKey === "idHome") {
+                this._animateExploreButton();
+            }
+        },
 
 
-_animateExploreButton: function () {
-    const oWrapper = this.byId("exploreWrapper");
-    if (!oWrapper) return;
+        _animateExploreButton: function () {
+            const oWrapper = this.byId("exploreWrapper");
+            if (!oWrapper) return;
 
-    // restart animation cleanly
-    oWrapper.removeStyleClass("explore-enter");
+            // restart animation cleanly
+            oWrapper.removeStyleClass("explore-enter");
 
-    // force reflow so animation restarts
-    oWrapper.getDomRef()?.offsetHeight;
+            // force reflow so animation restarts
+            oWrapper.getDomRef()?.offsetHeight;
 
-    oWrapper.addStyleClass("explore-enter");
+            oWrapper.addStyleClass("explore-enter");
 
-    // cleanup after animation ends
-    setTimeout(() => {
-        oWrapper.removeStyleClass("explore-enter");
-    }, 1900);
-},  
+            // cleanup after animation ends
+            setTimeout(() => {
+                oWrapper.removeStyleClass("explore-enter");
+            }, 1900);
+        },
 
 
 
@@ -941,7 +941,7 @@ _animateExploreButton: function () {
                     item => item.City === sCity
                 );
 
-                if (aFiltered.length === 0 || sCity==="Kalaburagi") {
+                if (aFiltered.length === 0 || sCity === "Kalaburagi") {
                     await this._loadFilteredData("Kalaburagi", "", "");
                 } else {
                     await this._loadFilteredData(this.City, "", "");
@@ -963,9 +963,9 @@ _animateExploreButton: function () {
                 oBranch.setBusy(false);
                 oArea.setBusy(false);
                 oRoomType.setBusy(false);
-            // ✅ show ROOMS footer after success OR failure
-            oFooterModel.setProperty("/showRoomsFooter", true);
-          }
+                // ✅ show ROOMS footer after success OR failure
+                oFooterModel.setProperty("/showRoomsFooter", true);
+            }
         },
 
 
@@ -1000,13 +1000,13 @@ _animateExploreButton: function () {
         //     await this._loadRoomsPageData();
         // },
 
-onpressBookrooms: function () {
-    const oTabHeader = this.byId("mainTabHeader");
-    const oItem = oTabHeader.getItems().find(i => i.getKey() === "idRooms");
+        onpressBookrooms: function () {
+            const oTabHeader = this.byId("mainTabHeader");
+            const oItem = oTabHeader.getItems().find(i => i.getKey() === "idRooms");
 
-    oTabHeader.setSelectedKey("idRooms");
-    this.onTabSelect({ getParameter: () => oItem });
-},
+            oTabHeader.setSelectedKey("idRooms");
+            this.onTabSelect({ getParameter: () => oItem });
+        },
 
 
 
@@ -1844,24 +1844,24 @@ onpressBookrooms: function () {
         },
 
         onPressAvatar: async function (oEvent) {
-            let oUser = this._oLoggedInUser ;
+            let oUser = this._oLoggedInUser;
             // const fullUserData = this._oLoggedInUser || {};
-                  let fullUserData = {}; 
+            let fullUserData = {};
             try {
 
-                 if (!oUser || !oUser.UserID) {
-        oUser = this.getOwnerComponent()
-            .getModel("UserModel")
-            ?.getData();
-    }
-       const sUserID = oUser.UserID;
+                if (!oUser || !oUser.UserID) {
+                    oUser = this.getOwnerComponent()
+                        .getModel("UserModel")
+                        ?.getData();
+                }
+                const sUserID = oUser.UserID;
                 // const sUserID = oUser.UserID || "";
                 if (!sUserID) {
                     sap.m.MessageToast.show("User not logged in.");
                     return;
                 }
-                   fullUserData = oUser;
-         
+                fullUserData = oUser;
+
 
                 if (!this._isProfileRequested) {
                     this.createAvatarActionSheet();
@@ -1939,12 +1939,15 @@ onpressBookrooms: function () {
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
                         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                        amount: booking.RentPrice?.toString() || "",
+                        amount: (
+                            (Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) +
+                            ((Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0)) * 0.09 * 2)
+                        ).toString() || "",
+
                         status: booking.Status,
                         currency: booking.Currency,
                         customerID: booking.CustomerID,
                         BookingID: booking.BookingID?.toString() || "",
-                        bookingGroup: bookingGroup
                     }
 
                 });
@@ -2026,7 +2029,7 @@ onpressBookrooms: function () {
             }
         },
 
-         _applyCountryStateCityFilters: function () {
+        _applyCountryStateCityFilters: function () {
             if (!this._oProfileDialog) return; // safety check
 
             const oModel = this._oProfileDialog.getModel("profileData");
@@ -3997,9 +4000,9 @@ onpressBookrooms: function () {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oStateCB = this.byId("id_state");
-            const oCityCB  = this.byId("id_city");
-            const oSTD     = this.byId("id_std");
-            const oMobile  = this.byId("id_phone");
+            const oCityCB = this.byId("id_city");
+            const oSTD = this.byId("id_std");
+            const oMobile = this.byId("id_phone");
 
             // Clear value state
             oCountry.setValueState("None");
@@ -5142,7 +5145,7 @@ onpressBookrooms: function () {
         onClosePreview: function () {
             this._previewDialog.close();
         },
-        
+
         onAdminChangeSalutation: function (oEvent) {
 
             const oSalutation = oEvent.getSource();
@@ -5174,19 +5177,19 @@ onpressBookrooms: function () {
             utils._LCstrictValidationSelect(oSalutation);
         },
         onEmailChange: function (oEvent) {
-    utils._LCvalidateEmail(oEvent);
-},
+            utils._LCvalidateEmail(oEvent);
+        },
 
-onMobileChange:function(){
-    const oModel = this._oProfileDialog.getModel("profileData");
-    const sStd = oModel.getProperty("/STDCode");
-    utils._LCvalidateISDmobile(oEvent, sStd);
-},
+        onMobileChange: function () {
+            const oModel = this._oProfileDialog.getModel("profileData");
+            const sStd = oModel.getProperty("/STDCode");
+            utils._LCvalidateISDmobile(oEvent, sStd);
+        },
 
-MPonAddressChange:function(oEvent){
-    utils._LCvalidateAddress(oEvent.getSource());
-},
-onNameInputLiveChange: function (oEvent) {
+        MPonAddressChange: function (oEvent) {
+            utils._LCvalidateAddress(oEvent.getSource());
+        },
+        onNameInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateName(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
