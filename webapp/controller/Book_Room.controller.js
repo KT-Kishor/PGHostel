@@ -4758,7 +4758,10 @@ aPersons.forEach(p => {
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
                         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                        amount: booking.RentPrice,
+                        amount: (
+                            (Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) +
+                            ((Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0)) * 0.09 * 2)
+                        ).toString() || "",
                         status: booking.Status,
                         customerID: booking.CustomerID,
                         currency: booking.Currency,
