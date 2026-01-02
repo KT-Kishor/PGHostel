@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room Number"
-                        label="Room Number"
+                        label="{i18n>roomNumber}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -54,7 +54,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Bed Type"
-                        label="Bed Type"
+                        label="{i18n>bedType}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -85,30 +85,30 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Room List ({=${RoomDetailsModel>/}.length})"
+                            text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"
                         />
                         <ToolbarSpacer />
                         <Button
-                            text="Create Room"
+                            text="{i18n>createRoom}"
                             press="HM_AddRoom"
-							tooltip="Add New Room"
+                            tooltip="Add New Room"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Edit"
-							tooltip="Edit Selected Room"
+                            text="{i18n>MSedit}"
+                            tooltip="Edit Selected Room"
                             press="HM_EditRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
-							tooltip="Delete Selected Room"
+                            text="{i18n>MSdelete}"
+                            tooltip="Delete Selected Room"
                             press="HM_DeleteRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Download"
-							tooltip="Download Room List"
+                            text="{i18n>download}"
+                            tooltip="Download Room List"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -116,31 +116,49 @@
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text text="Room No" tooltip="Room Number" />
+                        <Text
+                            text="{i18n>roomNo}"
+                            tooltip="Room Number"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Bed Type" tooltip="Bed Type" />
+                        <Text
+                            text="{i18n>bedType}"
+                            tooltip="Bed Type"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="Extra Bed" tooltip="Extra Bed" />
+                        <Text
+                            text="{i18n>extraBed}"
+                            tooltip="Extra Bed"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="Daily Price" tooltip="Daily Price" />
+                        <Text
+                            text="{i18n>dailyPrice}"
+                            tooltip="Daily Price"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="Month Price" tooltip="Month Price" />
+                        <Text
+                            text="{i18n>monthPrice}"
+                            tooltip="Month Price"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="Year Price" tooltip="Year Price" />
+                        <Text
+                            text="{i18n>yearPrice}"
+                            tooltip="Year Price"
+                        />
                     </Column>
                 </columns>
                 <items>

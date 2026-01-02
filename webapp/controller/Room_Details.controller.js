@@ -12,6 +12,7 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteRoomDetails").attachMatched(this._onRouteMatched, this);
         },
+        
         _onRouteMatched: async function () {
             this.commonLoginFunction();
 
@@ -24,17 +25,14 @@ sap.ui.define([
             this.getView().setModel(model, "RoomModel")
             this.onClearAndSearch("RD_id_FilterbarEmployee");
             sap.ui.core.BusyIndicator.show(0);
-
-
             await this.BedTypedetails()
-
-
             await this._loadBranchCode()
             await this.Onsearch()
 
             //  sap.ui.core.BusyIndicator.hide();
 
         },
+
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -42,18 +40,14 @@ sap.ui.define([
             let aBranchCodes = "";
 
             if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel
-                    .map(item => item.BranchID)
-                    .flat()           
-                    .filter(Boolean)    
-                    .join(",");         
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
 
             let filters = {};
 
-            if (oExistingModel.Role==="Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
             try {
@@ -75,7 +69,7 @@ sap.ui.define([
         RD_onDownload: function () {
             const oModel = this.byId("id_ARD_Table").getModel("RoomDetailsModel").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show("No Data Available to Download.");
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -94,7 +88,7 @@ sap.ui.define([
                 fileName: "Room_Details.xlsx",
                 worker: false,
             };
-            MessageToast.show("Downloading Room Details");
+            MessageToast.show(this.i18nModel.getText("downloadingRoomDetails"));
             const oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(function () {
                 oSheet.destroy();
@@ -148,6 +142,7 @@ sap.ui.define([
                 this._aAllBedTypes = oFCIAerData;
             })
         },
+
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 RD_id_CustomerName1: new Set(),
@@ -172,6 +167,7 @@ sap.ui.define([
                 });
             });
         },
+
         HM_AddRoom: function (oEvent) {
             var oView = this.getView();
             this.byId("id_ARD_Table").removeSelections();
@@ -242,8 +238,7 @@ sap.ui.define([
                 var iBedNoOfPerson = bed.MaxBeds || 0;
 
                 // Sum all NoofPerson for rooms with same BranchCode & BedTypeName
-                var iRoomNoOfPerson = aRoomDetails
-                    .filter(function (room) {
+                var iRoomNoOfPerson = aRoomDetails.filter(function (room) {
                         return (
                             room.BranchCode === bed.BranchCode &&
                             room.BedTypeName === bed.Name + " - " + bed.ACType
@@ -268,8 +263,6 @@ sap.ui.define([
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             var oView = this.getView();
             var sBranchCode = oEvent.getParameter("selectedItem").getKey();
-
-
             // Models
             var oBedTypeModel = oView.getModel("BedTypeModel");
             var oRoomDetailsModel = oView.getModel("RoomDetailsModel");
@@ -285,9 +278,6 @@ sap.ui.define([
                 return item.countryName === Branch.Country
             })
             this.getView().getModel("RoomModel").setProperty("/Currency", Currency.currency);
-
-
-
             // Get all bed types (from a backup copy)
             var aAllBedTypes = this._aAllBedTypes || oBedTypeModel.getProperty("/");
             this._aAllBedTypes = aAllBedTypes; // store once
@@ -310,7 +300,6 @@ sap.ui.define([
 
 
         },
-
 
         onBedTypeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
@@ -360,7 +349,7 @@ sap.ui.define([
             var oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                sap.m.MessageToast.show("Please Select a Record to Edit the Room.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordEditRoom"));
                 return;
             }
 
@@ -408,8 +397,7 @@ sap.ui.define([
                 var iBedNoOfPerson = bed.MaxBeds || 0;
 
                 // Sum NoofPerson for all matching rooms
-                var iRoomNoOfPerson = aRoomDetails
-                    .filter(function (room) {
+                var iRoomNoOfPerson = aRoomDetails.filter(function (room) {
                         return (
                             room.BranchCode === sBranchCode &&
                             room.BedTypeName === bed.Name + " - " + bed.ACType
@@ -485,12 +473,14 @@ sap.ui.define([
             var table = this.byId("id_ARD_Table");
             table.removeSelections(true);
         },
+
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("RoomDetailsModel").setData({});
 
         },
+        
         AR_onsavebuttonpress: function () {
             var oView = this.getView();
             var oRoomModel = oView.getModel("RoomModel");
@@ -506,14 +496,11 @@ sap.ui.define([
 
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
-
-
             var Noofper = aBedTypes.find(function (bed) {
                 return bed.BranchCode === Payload.BranchCode && bed.Name === Payload.BedTypeName.split("-")[0].trim() &&
                     bed.ACType === Payload.BedTypeName.split("-").slice(1).join("-").trim();
 
             });
-
 
             // Field validations
             if (
@@ -522,8 +509,6 @@ sap.ui.define([
                 (utils._LCstrictValidationComboBox(oView.byId("idBedType"), "ID") || Payload.BedTypeName) &&
                 utils._LCvalidateMandatoryField(oView.byId("idRoomNumber"), "ID") &&
                 // utils._LCvalidateMandatoryField(oView.byId("idRoomNumber13"), "ID") &&
-
-
                 utils._LCstrictValidationComboBox(oView.byId("FO_id_Currency"), "ID")
 
             ) {
@@ -531,22 +516,16 @@ sap.ui.define([
                 Payload.NoofPerson = parseInt(Noofper.NoOfPerson) * parseInt(Noofper.MaxBeds) || 0;
                 Payload.ExtraBed = parseInt(Payload.ExtraBed) || 0;
                 Payload.Price = parseInt(Payload.Price) || 0;
-
                 Payload.MonthPrice = parseInt(Payload.MonthPrice) || 0;
-
                 Payload.YearPrice = parseInt(Payload.YearPrice) || 0;
-
 
                 // Check if RoomNo already exists
                 var oExistingRoom = aRoomDetails.find(function (room) {
                     return room.RoomNo === Payload.RoomNo;
                 });
 
-
-
                 var selectedBedTypeName = Payload.BedTypeName.split("-")[0].trim();
                 var selectedACType = Payload.BedTypeName.split("-").slice(1).join("-").trim();
-
                 var aFiltered = aBedTypes.filter(function (bed) {
 
                     // Only check selected Bed Type
@@ -572,7 +551,7 @@ sap.ui.define([
 
 
                 if (aFiltered.length === 0 && !Payload._isEditing) {
-                    sap.m.MessageToast.show("All Rooms for this Bed Type are Already Created");
+                    sap.m.MessageToast.show(this.i18nModel.getText("allRoomsforthisBedTypeAlreadyCreated"));
                     return;
                 }
 
@@ -637,7 +616,7 @@ sap.ui.define([
                     }
                 });
             } else {
-                sap.m.MessageToast.show("Please Fill all Required Fields Correctly before Saving.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving"));
                 return;
             }
         },
@@ -646,7 +625,7 @@ sap.ui.define([
             var aSelectedItems = table.getSelectedItems();
 
             if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please Select at Least One Record to Delete.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
                 return;
             }
 
@@ -694,7 +673,7 @@ sap.ui.define([
 
                             await this.BedTypedetails();
                             await this.Onsearch("true");
-                            sap.m.MessageToast.show("Selected Room(s) Deleted Successfully!");
+                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRoomDeletedSuccessfully"));
 
                             //  sap.ui.core.BusyIndicator.hide();
 
@@ -709,6 +688,7 @@ sap.ui.define([
             }
             );
         },
+
         Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
@@ -725,9 +705,7 @@ sap.ui.define([
             let aBranchCodes = [];
 
             if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
 
             let filters = {};
@@ -755,6 +733,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             })
         },
+
         RD_onSearch: function () {
             var oView = this.getView();
 
@@ -783,10 +762,12 @@ sap.ui.define([
 
             oBinding.filter(oCombinedFilter);
         },
+
         RD_onPressClear: function () {
             this.getView().byId("RD_id_CustomerName1").setSelectedKey("")
             this.getView().byId("RD_id_CompanyName1").setSelectedKey("")
         },
+
         onRoomNoInputLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
@@ -804,11 +785,11 @@ sap.ui.define([
         onACtypeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
+
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
             this.getView().getModel("RoomDetailsModel").setData({});
-
         },
     });
 });

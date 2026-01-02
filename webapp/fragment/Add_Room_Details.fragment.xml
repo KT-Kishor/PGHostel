@@ -7,7 +7,7 @@
 >
     <Dialog
         id="sds1"
-        title="Manage Room Details"
+        title="{i18n>manageRoomDetails}"
         type="Message"
         class="sapUiContentPadding"
     >
@@ -24,7 +24,7 @@
         >
             <f:content>
                 <Label
-                    text="Branch Code"
+                    text="{i18n>MSbranchCode}"
                     required="true"
                 />
                 <ComboBox
@@ -32,7 +32,7 @@
                     placeholder="Select Branch Code"
                     selectedKey="{RoomModel>/BranchCode}"
                     selectionChange=".onBranchChange"
-                    valueStateText="Please Select a Valid Branch Code"
+                    valueStateText="{i18n>pleaseSelectValidBranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                 >
@@ -44,7 +44,7 @@
                 </ComboBox>
 
                 <Label
-                    text="Bed Type"
+                    text="{i18n>bedType}"
                     required="true"
                 />
                 <ComboBox
@@ -55,7 +55,7 @@
                     selectedKey="{RoomModel>/BedTypeName}"
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"
-                    valueStateText="Please Select a Valid Bed Type"
+                    valueStateText="{i18n>pleaseSelectValidBedType}"
                 >
                     <core:ListItem
                         key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
@@ -63,7 +63,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="AC Type"
+                    text="{i18n>aCType}"
                     required="true"
                 />
                 <ComboBox
@@ -73,7 +73,7 @@
                     visible="false"
                     selectedKey="{RoomModel>/ACType}"
                     items="{BedTypeModel>/}"
-                    valueStateText="Please Select a Valid AC Type"
+                    valueStateText="{i18n>pleaseSelectValidACType}"
                     change="onACtypeChange"
                 >
                     <core:Item
@@ -82,7 +82,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="Room No"
+                    text="{i18n>roomNo}"
                     required="true"
                 />
                 <Input
@@ -91,32 +91,29 @@
                     placeholder="Enter Room No"
                     maxLength="60"
                     liveChange="onRoomNoInputLiveChange"
-                    valueStateText="Room No cannot be Empty"
+                    valueStateText="{i18n>roomNocannotbeEmpty}"
                 />
                 <!-- <Label text="No Of person" required="true" />
                 <Input id="idRoomNumber13" value="{RoomModel>/NoofPerson}" placeholder="Enter No of person" type="Number" liveChange="onRoomNoInputLiveChange" valueStateText="No of person cannot be empty" /> -->
 
-                <Label text="Extra Bed" />
+                <Label text="{i18n>extraBed}" />
                 <Input
                     id="idExtrabed"
                     value="{RoomModel>/ExtraBed}"
                     placeholder="Enter No of Extra Bed"
                     liveChange="onPriceInputLiveChange"
-                     maxLength="2"
+                    maxLength="2"
                 />
 
-                <Label
-                    text="Daily Price"
+                <Label text="{i18n>dailyPrice}" />
+                <Input
+                    id="idPrice"
+                    value="{RoomModel>/Price}"
+                    placeholder="Enter Price"
+                    maxLength="7"
+                    liveChange="onPriceInputLiveChange"
+                    valueStateText="{i18n>pleaseenterValidAmount}"
                 />
-                  <Input
-                            id="idPrice"
-                            value="{RoomModel>/Price}"
-                            placeholder="Enter Price"
-                            maxLength="7"
-                            liveChange="onPriceInputLiveChange"
-
-                            valueStateText="Please enter a Valid Amount"
-                        />
                 <!-- <HBox
                     width="100%"
                     justifyContent="Start"
@@ -149,41 +146,42 @@
                         </ComboBox>
                     </VBox>
                 </HBox> -->
-                  <Label
-                    text="Monthly Price"
+                <Label text="{i18n>monthlyPrice}" />
+                <Input
+                    id="id_MonthlyPrice"
+                    value="{RoomModel>/MonthPrice}"
+                    placeholder="Enter Month Price"
+                    maxLength="7"
+                    liveChange="onPriceInputLiveChange"
+                    valueStateText="{i18n>pleaseenterValidAmount}"
                 />
-                  <Input
-                            id="id_MonthlyPrice"
-                            value="{RoomModel>/MonthPrice}"
-                            placeholder="Enter Month Price"
-                            maxLength="7"
-                            liveChange="onPriceInputLiveChange"
-                            valueStateText="Please enter a Valid Amount"
-                        />
-                          <Label
-                    text="Yearly Price"
+                <Label text="{i18n>yearlyPrice}" />
+                <Input
+                    id="id_YearlyPrice"
+                    value="{RoomModel>/YearPrice}"
+                    placeholder="Enter Year Price"
+                    maxLength="7"
+                    liveChange="onPriceInputLiveChange"
+                    valueStateText="{i18n>pleaseenterValidAmount}"
                 />
-                  <Input
-                            id="id_YearlyPrice"
-                            value="{RoomModel>/YearPrice}"  
-                            placeholder="Enter Year Price"
-                            maxLength="7"
-                            liveChange="onPriceInputLiveChange"
-                            valueStateText="Please enter a Valid Amount"
-                        />
-                <Label text="Currency" required="true"/>
+                <Label
+                    text="{i18n>currency}"
+                    required="true"
+                />
                 <ComboBox
                     id="FO_id_Currency"
                     selectedKey="{RoomModel>/Currency}"
                     items="{path:'CountryModel>/',length:1000}"
-                    valueStateText="Select Currency"
+                    valueStateText="{i18n>selectCurrency}"
                     width="100%"
                     change="onACtypeChange"
-                    placeholder="Select Currency" showSecondaryValues="true"
+                    placeholder="Select Currency"
+                    showSecondaryValues="true"
                 >
                     <core:ListItem
                         key="{CountryModel>currency}"
-                        text="{CountryModel>currency}" additionalText="{CountryModel>countryName}"
+                        text="{CountryModel>currency}"
+                        additionalText="{CountryModel>countryName}"
                     />
                 </ComboBox>
             </f:content>
@@ -192,13 +190,15 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="Save"
                     press="AR_onsavebuttonpress"
                     id="AR_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="Cancel"
                     press="AR_onCancelButtonPress"
                     id="AR_id_CancelButton"
                     class="marginRight myUnifiedBtn"
