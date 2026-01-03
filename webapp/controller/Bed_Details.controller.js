@@ -141,11 +141,11 @@ sap.ui.define([
                 }
 
                 if (attachments.length === 0) {
-                    sap.m.MessageBox.error("Please Upload at Least One Image.");
+                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                     return;
                 }
                 if (attachments.length > 5) {
-                    sap.m.MessageBox.error("You can Upload a Maximum of 5 Images Only.");
+                    sap.m.MessageBox.error(this.i18nModel.getText("youcanUploadMaximumof5ImagesOnly"));
                     return;
                 }
 
@@ -548,7 +548,7 @@ sap.ui.define([
 
                         } catch (error) {
                             console.error("Delete failed:", error);
-                            sap.m.MessageBox.error("Error while Deleting Bed(s). Please Try Again.");
+                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain"));
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
                             table.removeSelections(true);

@@ -24,7 +24,7 @@ sap.ui.define([
 
                 });
                 this.getView().setModel(model, "editable")
-
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var BedImageModel = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",
@@ -198,8 +198,8 @@ sap.ui.define([
 
                 if (bDuplicate) {
                     sap.m.MessageToast.show(
-                        "A Bed with the Same Bed Type, Branch Code, and AC Type already Exists."
-                    );
+                        this.i18nModel.getText("bedwithSameBedTypeBranchCodeACTypeAlreadyExists"
+                    ));
                     return;
                 }
 
@@ -276,10 +276,10 @@ sap.ui.define([
                 }
                 await this.Onsearch();
                 sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show("Bed saved successfully.");
+                sap.m.MessageToast.show(this.i18nModel.getText("bedsavedsuccessfully"));
                 this.ARD_Dialog.close();
             } else {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
+                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             }
         },
 
@@ -347,7 +347,7 @@ sap.ui.define([
 
                 const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
-                    sap.m.MessageToast.show(`This Image is already Added.`);
+                    sap.m.MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
                     return;
                 }
 

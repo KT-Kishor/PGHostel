@@ -11,11 +11,10 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteAdminDetails").attachMatched(this._onRouteMatched, this);
         },
-
-
+        
         _onRouteMatched: async function (oEvent) {
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
-
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
             this.getView().setModel(model, "LoginModel");
             var oRateTypeModel = this.getView().getModel("RateType");
@@ -51,21 +50,15 @@ sap.ui.define([
 
             });
             this.getView().setModel(model, "VisibleModel")
-
             this._sLoggedUserID = "";
-
             this.getView().setModel(new sap.ui.model.json.JSONModel({
                 editable: true,
             }), "visiablityPlay");
 
             var sPath = oEvent.getParameter("arguments").sPath;
             this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
-
-
             this.valuestate()
-
             await this.OnRoom();
-
             this.AD_onSearch()
 
             //    const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {});
@@ -82,28 +75,22 @@ sap.ui.define([
             //              }
 
         },
+
         valuestate: function () {
             this.getView().byId("Ad_id_RoomType").setValueState("None")
-
             this.getView().byId("idPaymentMethod1").setValueState("None")
-
             this.getView().byId("Ad_id_editStartDate").setValueState("None")
             this.getView().byId("editEndDate").setValueState("None")
-
             this.getView().byId("AD_id_CustomerName").setValueState("None")
-
             this.getView().byId("AD_id_Date").setValueState("None")
-
             this.getView().byId("Ad_id_gender").setValueState("None")
-
             this.getView().byId("Ad_id_CustomerEmail").setValueState("None")
-
             this.getView().byId("CC_id_Country").setValueState("None")
             this.getView().byId("CC_id_State").setValueState("None")
-
             this.getView().byId("CC_id_City").setValueState("None")
             this.getView().byId("CD_ID_idPhone").setValueState("None")
         },
+
         OnRoom: function () {
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
@@ -125,6 +112,7 @@ sap.ui.define([
 
             });
         },
+
         onChekout: function () {
             var data = this.getView().getModel("CustomerData").getData()
 
@@ -138,19 +126,18 @@ sap.ui.define([
 
             this.CK_Dialog.open();
         },
+
         Ck_onCancelButtonPress: function () {
             this.CK_Dialog.close();
 
         },
-        Ck_onsavebuttonpress: function () {
 
+        Ck_onsavebuttonpress: function () {
             // Get edited data from Bookingmodel
             var oBookingData = this.getView().getModel("Bookingmodel").getData();
 
             // Update CustomerData model with edited dates
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
-
-
             // Refresh model to update UI bindings
 
             var Payload = {
@@ -169,7 +156,7 @@ sap.ui.define([
                 }
             })
                 .then(() => {
-                    sap.m.MessageToast.show("Customer Completed successfully!")
+                    sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
                 });
 
             // Refresh models
@@ -261,8 +248,6 @@ sap.ui.define([
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
-
-
                 const oCustomerData = {
                     CustomerName: oCustomer.CustomerName,
                     CustomerID: oCustomer.CustomerID,
@@ -319,9 +304,6 @@ sap.ui.define([
                         SelectedFacilities: oCustomer.FaciltyItems || []
                     }
                 }];
-
-
-
                 // Calculate totals
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 var BedType = oCustomer.Bookings?.[0]?.BedType
@@ -350,9 +332,6 @@ sap.ui.define([
                 //     var RoomBedprice = aFilteredRooms.filter(function (item) {
                 //         return item.BedTypeName === BedType
                 //     });
-
-
-
                 // })
                 var aAllRooms = this.getView().getModel("Availablebeds").getData();
 
@@ -385,13 +364,11 @@ sap.ui.define([
                     roomRentPrice = Availablebedprice[0].Price;
                     oCustomerData.OrginalRentPrice = Availablebedprice[0].Price;
 
-
                 } else if (PaymentType === "Per Year") {
                     roomRentPrice = Availablebedprice[0].YearPrice;
                     oCustomerData.OrginalRentPrice = Availablebedprice[0].YearPrice;
 
                 }
-
 
                 let Duration = 0;
                 let DurationUnit = "";
@@ -447,29 +424,19 @@ sap.ui.define([
                 oCustomerData.RentPrice = Duration * roomRentPrice;
                 oCustomerData.Discount = oCustomer.Bookings?.[0]?.Discount || "0.00";
 
-
                 // Add duration to model
                 oCustomerData.Duration = Duration;
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode)
-
-
                 const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount);
-
-
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
                 this.getView().setModel(oCustomerModel, "CustomerData");
 
-
                 // Now it is available here:
-
-
-
-
                 // Set model
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -673,8 +640,7 @@ sap.ui.define([
 
                     // Use your common AJAX update helper
                     await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
-
-                    sap.m.MessageToast.show("Customer Details Updated Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("customerDetailsUpdatedSuccessfully"));
 
                     // Switch back to view mode
                     oVisibilityModel.setProperty("/editable", false);
@@ -688,7 +654,6 @@ sap.ui.define([
 
         onAddFacilityDetails: function () {
             var data = this.getView().getModel("Bookingmodel").getData()
-
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
             if (!this.HM_Dialog) {
@@ -697,7 +662,6 @@ sap.ui.define([
                 oView.addDependent(this.HM_Dialog);
             }
             this.HM_Dialog.open();
-
             this.getView().getModel("edit").setData({
                 FacilityName: "",
                 UnitText: "",
@@ -716,13 +680,8 @@ sap.ui.define([
             sap.ui.getCore().byId("editEndTime").setVisible(false).setValueState("None")
             sap.ui.getCore().byId("editHours").setVisible(false)
             sap.ui.getCore().byId("editFacilityName").setValueState("None")
-
             sap.ui.getCore().byId("editStartDate").setValueState("None")
-
             sap.ui.getCore().byId("editEndDate").setValueState("None")
-
-
-
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
@@ -749,12 +708,9 @@ sap.ui.define([
             var aFacilities = oFacilitiesModel.getData();
 
             // 3. Get RateType Model
-
-
             // 4. Get selected facility data
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
             if (!oSelectedFacility) return;
-
 
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
@@ -762,11 +718,10 @@ sap.ui.define([
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
             if (OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available.");
+                sap.m.MessageToast.show(this.i18nModel.getText("diffBooking"));
                 this.HM_Dialog.close();
                 return;
             }
-
 
             // 6. Define allowed rate types based on booking unitText
             var aAllowedRateTypes = [];
@@ -915,7 +870,7 @@ sap.ui.define([
             const sStartDate = oModel.getProperty("/StartDate");
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please Select Start Date First.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
                 return;
             }
 
@@ -952,7 +907,6 @@ sap.ui.define([
         },
 
         onEditFacilitySave: function () {
-
             var oCustomerModel = this.getView().getModel("CustomerData");
             var oCustomerData = oCustomerModel.getData();
             var oPayload = this.getView().getModel("edit").getData();
@@ -965,7 +919,6 @@ sap.ui.define([
                 oPayload.TotalHour = Month || "1";
             }
 
-
             if (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") &&
                 // utils._LCstrictValidationComboBox(oView.byId("idBedType"), "ID") &&
@@ -974,7 +927,6 @@ sap.ui.define([
                 // utils._LCvalidateMandatoryField(oView.byId("idRoomNumber13"), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editEndDate"), "ID")
 
-
             ) {
                 if (oPayload.UnitText === "Per Hour") {
                     var oStartTime = sap.ui.getCore().byId("editStartTime");
@@ -982,13 +934,13 @@ sap.ui.define([
 
                     // Validate Start Time
                     if (!utils._LCvalidateMandatoryField(oStartTime, "ID")) {
-                        sap.m.MessageToast.show("Please Enter Start Time");
+                        sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterStartTime"));
                         return;
                     }
 
                     // Validate End Time
                     if (!utils._LCvalidateMandatoryField(oEndTime, "ID")) {
-                        sap.m.MessageToast.show("Please Enter End Time");
+                        sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterEndTime"));
                         return;
                     }
 
@@ -1002,7 +954,7 @@ sap.ui.define([
 
                     // Check if Start Time is greater than or equal to End Time
                     if (start >= end) {
-                        sap.m.MessageToast.show("Start Time Should be Less than End Time");
+                        sap.m.MessageToast.show(this.i18nModel.getText("startTimeShouldbeLessthanEndTime"));
                         return;
                     }
                 }
@@ -1021,8 +973,6 @@ sap.ui.define([
 
                     oPayload.EndDate = oPayload.EndDate;
                 }
-
-
                 // BASE PRICE
                 var basePrice = Number(oPayload.Price) || 0;
                 var iDays = Number(oPayload.TotalDays) || 0;
@@ -1074,7 +1024,6 @@ sap.ui.define([
                     var sEnteredCode = this.Code || oCustomerData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-
                     if (oMatchedCoupon.MinOrderValue <= (total + (oCustomerData.RentPrice || 0))) {
 
                         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount) {
@@ -1091,18 +1040,13 @@ sap.ui.define([
                         this.Code = ""
                         oInput.setValue("");
                         oInput.setShowValueHelp(false);
-
                     }
                 }
 
-
                 oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
                 oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0) - Number(oCustomerData.Discount));
-
                 oCustomerData.SGST = oCustomerData.SubTotal * 0.09;
-
                 oCustomerData.CGST = oCustomerData.SubTotal * 0.09;
-
                 oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
 
                 // Update model
@@ -1110,12 +1054,12 @@ sap.ui.define([
                 oCustomerModel.refresh();
 
                 this.HM_Dialog.close();
-                sap.m.MessageToast.show("Facility Updated successfully!");
+                sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
 
                 this._editIndex = undefined;
 
             } else {
-                sap.m.MessageToast.show("Make Sure all the Mandatory Fields are Filled and Validate the Entered Value")
+                sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"))
             }
         },
 
@@ -1126,15 +1070,10 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.hide();
             const oCustomer = response?.Customers || response?.value?.[0] || {};
 
-
-
             this.getView().getModel("VisibleModel").setProperty("/visible", true)
             var data = this.getView().getModel("CustomerData").getData()
             var model = this.getView().getModel("Bookingmodel")
-
             var aAvailableBeds = this.getView().getModel("Availablebeds").getData()
-
-
             var filteredBeds = aAvailableBeds.filter(function (bed) {
 
                 // 1) Count assigned customers for this bed
@@ -1168,29 +1107,19 @@ sap.ui.define([
             model.setProperty("/BedTypeName", data.BedType)
             model.setProperty("/CouponCode", data.CouponCode)
             model.setProperty("/UnitText", data.PaymentType)
-
-
-
-
             model.setProperty("/StartDate", data.StartDate)
             model.setProperty("/EndDate", data.EndDate)
             model.setProperty("/CustomerName", data.CustomerName)
-
             model.setProperty("/DateOfBirth", data.DateOfBirth)
-
             model.setProperty("/Gender", data.Gender)
-
             model.setProperty("/CustomerEmail", data.CustomerEmail)
-
             model.setProperty("/Country", data.Country)
             model.setProperty("/State", data.State)
-
             model.setProperty("/City", data.City)
             model.setProperty("/STDCode", data.STDCode)
             model.setProperty("/MobileNo", data.MobileNo)
             model.setProperty("/Salutation", data.Salutation)
             model.setProperty("/Address", data.Address)
-
 
             if (data.PaymentType === "Per Month") {
                 model.setProperty("/UnitText", "monthly")
@@ -1215,8 +1144,6 @@ sap.ui.define([
 
             }
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
-
-
         },
 
         onBookingEditDateChange: function (oEvent) {
@@ -1264,7 +1191,7 @@ sap.ui.define([
             if (sUnit === "daily" || sUnit === "Per Day") {
 
                 if (!oEnd) {
-                    sap.m.MessageToast.show("Please Select End Date for Daily Calculation.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectEndDateforDailyCalculation"));
                     return;
                 }
 
@@ -1274,7 +1201,7 @@ sap.ui.define([
                     oBookingModel.setProperty("/EndDate", "");
                     if (oEndDatePicker) oEndDatePicker.setValue("");
 
-                    sap.m.MessageToast.show("End Date Cannot be Earlier than Start Date.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
                     return;
                 }
 
@@ -1291,12 +1218,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/CGST", SGST);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", 0.00)
-
-
                 oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
-
-
-
                 oData.EndDate = this._formatDate(oEnd);
                 oBookingModel.refresh();
                 return;
@@ -1304,7 +1226,6 @@ sap.ui.define([
 
             // MONTHLY CALCULATION
             if (sUnit === "monthly" || sUnit === "Per Month") {
-
                 // Reset EndDate to StartDate always
                 oEnd = new Date(oStart);
 
@@ -1319,10 +1240,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SGST", SGST);
                 oCustomerModel.setProperty("/CGST", SGST);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-
                 oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
-
-
             }
 
             // YEARLY CALCULATION
@@ -1342,9 +1260,6 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SGST", SGST);
                 oCustomerModel.setProperty("/CGST", SGST);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-
-
-
                 oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
             }
 
@@ -1377,7 +1292,7 @@ sap.ui.define([
             let sStartDate = oModel.getProperty("/StartDate"); // e.g., "24/11/2025"
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please Select Start Date First.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
                 return;
             }
 
@@ -1427,7 +1342,6 @@ sap.ui.define([
 
             var originalRent = Number(oCustomerData.RentPrice || 0);
             var FacilitiPrice = Number(oCustomerData.TotalFacilityPrice || 0);
-
             var previousDiscount = Number(this.originalDis ?? oCustomerData.Discount);
             ;
             // Recalculate subtotal (original subtotal before coupon)
@@ -1451,12 +1365,11 @@ sap.ui.define([
 
         onEditFacilityDetails: function () {
             var data = this.getView().getModel("Bookingmodel").getData()
-
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please Select a Facility to Edit.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoEdit"));
                 return;
             }
 
@@ -1468,8 +1381,6 @@ sap.ui.define([
 
             // Load data into edit model
             this.getView().getModel("edit").setData(Object.assign({}, oSelectedData));
-
-
             // Open dialog
             if (!this.HM_Dialog) {
                 var oView = this.getView();
@@ -1488,24 +1399,19 @@ sap.ui.define([
             var aFacilities = oFacilitiesModel.getData();
 
             // 3. Get RateType Model
-
-
             // 4. Get selected facility data
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
             if (!oSelectedFacility) return;
-
-
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
             if (OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("Please Select a Different Payment Plan in the Booking Information Section. This Offer is not Available.");
+                sap.m.MessageToast.show(this.i18nModel.getText("diffBooking"));
                 this.HM_Dialog.close();
                 return;
             }
-
 
             // 6. Define allowed rate types based on booking unitText
             var aAllowedRateTypes = [];
@@ -1546,7 +1452,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please Select a Facility to Delete.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoDelete"));
                 return;
             }
 
@@ -1599,10 +1505,10 @@ sap.ui.define([
                                     oCustomerModel.refresh(true);
                                     oTable.removeSelections(true);
 
-                                    sap.m.MessageToast.show("Facility Deleted Successfully!");
+                                    sap.m.MessageToast.show(this.i18nModel.getText("facilityDeletedSuccessfully"));
                                 })
                                 .catch(function () {
-                                    sap.m.MessageToast.show("Failed to Delete Facility from Server.");
+                                    sap.m.MessageToast.show(this.i18nModel.getText("failedtoDeleteFacilityfromServer"));
                                 });
 
                         }
@@ -1613,7 +1519,6 @@ sap.ui.define([
                 return;
             }
 
-
             if (deleteIndex > -1) {
                 aFacilities.splice(deleteIndex, 1);
             }
@@ -1623,15 +1528,12 @@ sap.ui.define([
             oCustomerModel.refresh(true);
             oTable.removeSelections(true);
 
-            sap.m.MessageToast.show("Facility Removed Successfully!");
+            sap.m.MessageToast.show(this.i18nModel.getText("facilityRemovedSuccessfully"));
         },
 
         // Helper: Total Calculation
         _recalculateFacilityTotals: function (oCustomerData) {
-
-
             var total = 0;
-
             (oCustomerData.AllSelectedFacilities || []).forEach(function (fac) {
                 total += Number(fac.TotalAmount) || 0;
             });
@@ -1641,7 +1543,6 @@ sap.ui.define([
                 var oCouponData = this.getView().getModel("CouponModel").getData().
                     find((item) => item.CouponCode === this.Code || oCustomerData.CouponCode)
                     || {};
-
 
                 if (oCouponData.DiscountType === "Percentage") {
                     oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
@@ -1659,9 +1560,7 @@ sap.ui.define([
                 }
             }
 
-
             oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0) - Number(oCustomerData.Discount));
-
             oCustomerData.SGST = oCustomerData.SubTotal * 0.09;
             oCustomerData.CGST = oCustomerData.SubTotal * 0.09;
             oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
@@ -1693,17 +1592,13 @@ sap.ui.define([
             var sUnit = oEvent.getParameter("selectedItem").getKey(); // daily / monthly / yearly
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var oCustomerModel = this.getView().getModel("CustomerData");
-
             var sBedType = oBookingModel.getProperty("/BedTypeName"); // currently selected bed type
             var aAvailableBeds = this.getView().getModel("Availablebeds").getData(); // all available beds
-
-
             oCustomerModel.setProperty("/PaymentType", sUnit);
             this.byId("idPaymentMethod1").setSelectedKey(sUnit);
 
             // Find the bed object
             var oSelectedBed = aAvailableBeds.find(bed => bed.BedTypeName === sBedType);
-
             if (oSelectedBed) {
                 // Get the correct price based on duration
                 var fPrice = 0;
@@ -1727,20 +1622,15 @@ sap.ui.define([
                 // Update RentPrice
                 oCustomerModel.setProperty("/RentPrice", fPrice);
                 oCustomerModel.setProperty("/OrginalRentPrice", fPrice);
-
-
                 // Update GrandTotal
                 var fFacilityPrice = parseFloat(oCustomerModel.getProperty("/TotalFacilityPrice") || 0);
                 var SubTotal = fPrice + fFacilityPrice
-
                 var CGST = (fPrice + fFacilityPrice) * 0.09
 
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
                 oCustomerModel.setProperty("/Discount", 0.00)
-
-
                 oCustomerModel.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST * 2);
 
             }
@@ -1829,26 +1719,20 @@ sap.ui.define([
                 // Recalculate GrandTotal
                 var fFacilityPrice = parseFloat(oCustomerModel.getProperty("/TotalFacilityPrice") || 0);
                 var SubTotal = fOriginalRentPrice + fFacilityPrice
-
                 var CGST = (fOriginalRentPrice + fFacilityPrice) * 0.09
 
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
                 oCustomerModel.setProperty("/Discount", 0.00)
-
-
-
                 oCustomerModel.setProperty("/GrandTotal", fOriginalRentPrice + fFacilityPrice + CGST * 2);
             }
         },
 
         onEditTimeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
-
             var oModel = this.getView().getModel("edit");
             var oData = oModel.getData();
-
             var sStart = oData.StartTime;  // Example: "9" or "09"
             var sEnd = oData.EndTime;      // Example: "17" or "17"
 
@@ -1862,14 +1746,14 @@ sap.ui.define([
 
             // Validate numbers
             if (isNaN(startHour) || isNaN(endHour)) {
-                sap.m.MessageToast.show("Invalid Hour Format");
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
                 oModel.setProperty("/TotalHour", "");
                 return;
             }
 
             // Validate end > start
             if (endHour < startHour) {
-                sap.m.MessageToast.show("End Time Should be Greater than Start Time");
+                sap.m.MessageToast.show(this.i18nModel.getText("endTimeShouldbeGreaterthanStartTime"));
                 oModel.setProperty("/TotalHour", "");
                 return;
             }
@@ -1879,16 +1763,13 @@ sap.ui.define([
 
             // Format (optional)
             var formatted = diff.toFixed(2);
-
             oModel.setProperty("/TotalHour", formatted);
         },
-
 
         onCountrySelectionChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oView = this.getView();
             const oModel = oView.getModel("Bookingmodel");
-
             const oPhoneInput = this.byId("CD_ID_idPhone")
             const oStateCB = oView.byId("CC_id_State");
             const oCityCB = oView.byId("CC_id_City");
@@ -1904,7 +1785,6 @@ sap.ui.define([
             oStateCB.setSelectedKey("");
             oCityCB.setSelectedKey("");
             oCityCB.setValue("");
-
             oStateCB.getBinding("items")?.filter([]);
             oCityCB.getBinding("items")?.filter([]);
             oSTD.setValue("");
@@ -1944,7 +1824,6 @@ sap.ui.define([
             oModel.setProperty("/City", "");
             oCityCB.setSelectedKey("");
             oCityCB.setValue("");
-
             oCityCB.getBinding("items")?.filter([]);
 
             if (!oItem) {
@@ -1954,7 +1833,6 @@ sap.ui.define([
 
             const sStateName = oItem.getKey();
             const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
-
             oModel.setProperty("/State", sStateName);
 
             // Apply city filter
@@ -1969,10 +1847,12 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
+
         onmobileChange: function (oEvent) {
             const oInput = oEvent.getSource();
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
+
         onChangemail: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
@@ -2012,7 +1892,7 @@ sap.ui.define([
             }
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
@@ -2092,7 +1972,6 @@ sap.ui.define([
 
             // Send payload
             sap.ui.core.BusyIndicator.show(0);
-
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
@@ -2102,15 +1981,14 @@ sap.ui.define([
                 .then(() => {
 
                     // Refresh models
-
                     this.AD_onSearch();
-                    sap.m.MessageToast.show("Booking Saved Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
                     this.byId("idMonthYearSelect").setVisible(false);
                 })
                 .catch(err => {
-                    sap.m.MessageToast.show("Error Saving Booking!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
                     console.error(err);
                 });
         },
@@ -2196,7 +2074,7 @@ sap.ui.define([
                         that.AD_onSearch();
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
-                        sap.m.MessageToast.show("Booking Cancelled Successfully!");
+                        sap.m.MessageToast.show(this.i18nModel.getText("bookingCancelledSuccessfully"));
 
                         // Hide Extra Buttons after Cancel
                         that.byId("idedit")?.setVisible(false);
@@ -2211,16 +2089,16 @@ sap.ui.define([
             }
             );
         },
+
         onFacilityFileChange: function (oEvent) {
             var oFileUploader = oEvent.getSource();
             var aFiles = oEvent.getParameter("files");  // selected files
             var oCustomerModel = this.getView().getModel("CustomerData");
             var DocumentType = this.getView().getModel("Bookingmodel").getData().DocumentType;
-
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
             if (!DocumentType) {
-                sap.m.MessageToast.show("Please Select Document Type First.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 oFileUploader.clear();
                 return;
             }
@@ -2240,7 +2118,6 @@ sap.ui.define([
 
                 reader.onload = (e) => {
                     var sBase64 = e.target.result.split(",")[1]; // file base64 string
-
                     var isDuplicate = aDocs.some(doc => doc.FileName === file.name);
 
                     if (isDuplicate) {
@@ -2263,12 +2140,11 @@ sap.ui.define([
                 reader.readAsDataURL(file);
             });
             this.UD_Dialog.close();
-
         },
+
         onDocumentDelete: function (oEvent) {
             var oCustomerModel = this.getView().getModel("CustomerData");
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
-
             var oItem = oEvent.getParameter("listItem");
             var oCtx = oItem.getBindingContext("CustomerData");
             var iIndex = oCtx.getPath().split("/").pop();
@@ -2278,7 +2154,6 @@ sap.ui.define([
 
             // If saved document → ask confirmation + AJAX delete
             if (oDoc.DocumentID) {
-
                 MessageBox.confirm(
                     "This Document is already Saved. Do you want to Delete it?",
                     {
@@ -2286,8 +2161,6 @@ sap.ui.define([
                         onClose: function (sAction) {
 
                             if (sAction === MessageBox.Action.YES) {
-
-
                                 that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
                                     filters: {
                                         DocumentID: oDoc.DocumentID
@@ -2299,33 +2172,29 @@ sap.ui.define([
                                         oCustomerModel.setProperty("/Documents", aDocs);
                                         oCustomerModel.refresh(true)
 
-
-                                        sap.m.MessageToast.show("Document Deleted Successfully");
+                                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
 
                                     })
                                     .catch(function () {
-                                        sap.m.MessageToast.show("Failed to Delete Document from Server.");
+                                        sap.m.MessageToast.show(this.i18nModel.getText("failedDeleteDocumentfromServer"));
                                     });
-
                             }
                         }
                     }
                 );
-
             } else {
                 // No DocumentID → only local delete
                 aDocs.splice(iIndex, 1);
                 oCustomerModel.setProperty("/Documents", aDocs);
                 oCustomerModel.refresh(true)
 
-                sap.m.MessageToast.show("Document Removed");
+                sap.m.MessageToast.show(this.i18nModel.getText("documentRemoved"));
             }
         },
-        onFileNameLinkPress: function (oEvent) {
 
+        onFileNameLinkPress: function (oEvent) {
             function autoDecodeBase64(b64) {
                 b64 = b64.replace(/\s/g, "");
-
                 let last = b64;
 
                 // Try decoding multiple times (max 5 to prevent infinite loop)
@@ -2353,14 +2222,13 @@ sap.ui.define([
             var oDoc = oContext.getObject();
 
             if (!oDoc) {
-                sap.m.MessageBox.error("No Document Found!");
+                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
                 return;
             }
-
             var sBase64 = oDoc.FileContent || oDoc.File;
 
             if (!sBase64) {
-                sap.m.MessageBox.error("No Image Found for this Document!");
+                sap.m.MessageBox.error(this.i18nModel.getText("noImageFoundforthisDocument"));
                 return;
             }
 
@@ -2381,7 +2249,6 @@ sap.ui.define([
 
             // Create or reuse dialog
             if (!this._oDocPreviewDialog) {
-
                 var oFlex = new sap.m.FlexBox({
                     width: "100%",
                     height: "100%",
@@ -2430,11 +2297,10 @@ sap.ui.define([
 
             // Set final image
             this.byId("docPreviewImage").setSrc(finalSrc);
-
             this._oDocPreviewDialog.open();
         },
-        onApplyCoupon: async function () {
 
+        onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
 
@@ -2451,37 +2317,30 @@ sap.ui.define([
 
             });
             sap.ui.core.BusyIndicator.hide();
-
             var oCouponData = this.getView().getModel("CouponModel").getData();
 
             // user entered code
             this.Code = Bookingmodel.CouponCode; // user entered code
-
             if (!sEnteredCode) {
-                sap.m.MessageToast.show("Please Enter a Coupon Code");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
                 return;
             }
 
-
-
             if (oCustomerData.CouponCode === sEnteredCode) {
-                sap.m.MessageToast.show("Coupon Already Applied");
+                sap.m.MessageToast.show(this.i18nModel.getText("couponAlreadyApplied"));
                 return;
             }
 
             // 1. Check coupon exists
-
-
             var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
             if (!oCoupon) {
-                sap.m.MessageToast.show("Invalid Coupon Code");
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                 return;
             }
             if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
-                sap.m.MessageToast.show("This coupon not Available for this Branch");
+                sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
                 return;
             }
-
 
             if (Bookingmodel.StartDate.includes("/")) {
                 Bookingmodel.StartDate = Bookingmodel.StartDate.split("/").reverse().join("-");
@@ -2494,14 +2353,12 @@ sap.ui.define([
             var coupStart = new Date(oCoupon.StartDate);
             var coupEnd = new Date(oCoupon.EndDate);
 
-
-
             if (custStart < coupStart || custStart > coupEnd) {
-                sap.m.MessageToast.show("Coupon not Valid for Selected Dates");
+                sap.m.MessageToast.show(this.i18nModel.getText("couponnotValidforSelectedDates"));
                 return; // Exit function immediately
             }
             if (!oCoupon.Status === "Active") {
-                sap.m.MessageToast.show("Coupon not Active");
+                sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
                 return;
             }
 
@@ -2527,13 +2384,8 @@ sap.ui.define([
                 discountAmount = Number(oCoupon.DiscountValue || 0);
                 newSubtotal = subtotal - discountAmount;
             }
-
-
-
-
             var cgst = newSubtotal * 0.09;
             var sgst = newSubtotal * 0.09;
-
             var grandTotal = newSubtotal + cgst + sgst;
 
             // 5. Update Model
@@ -2546,8 +2398,9 @@ sap.ui.define([
             this.getView().getModel("CustomerData").refresh(true);
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", true);
 
-            sap.m.MessageToast.show("Coupon Applied Successfully!");
+            sap.m.MessageToast.show(this.i18nModel.getText("couponAppliedSuccessfully"));
         },
+
         oncancelCoupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
@@ -2583,6 +2436,7 @@ sap.ui.define([
             oInput.setShowValueHelp(false);
 
         },
+
         onUploadDocumentFile: function () {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -2604,20 +2458,16 @@ sap.ui.define([
 
             this.UD_Dialog.open();
         },
+
         onCloseDialog: function () {
             this.UD_Dialog.close();
-
-
         },
+
         onCouponLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oInput.getValue();
-
             // Show icon only if there is value
             oInput.setShowValueHelp(!!sValue);
         }
-
-
-
     });
 });

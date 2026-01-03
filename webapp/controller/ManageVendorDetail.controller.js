@@ -904,14 +904,14 @@ sap.ui.define([
 
             if (!std || std === "+") {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("enterisdcode"));
+                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
 
             const valid = utils._LCvalidateISDmobile(oInput, std);
             oInput.setValueState(valid ? "None" : "Error");
             if (!valid) {
-                oInput.setValueStateText(this.i18nModel.getText("enterMobileNo"));
+                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
             }
         }
     });

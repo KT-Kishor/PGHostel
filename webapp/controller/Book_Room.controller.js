@@ -19,8 +19,8 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
         },
 
-
         _onRouteMatched: function () {
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1"], this.getView());
             var oView = this.getView()
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
@@ -208,6 +208,7 @@ sap.ui.define([
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
 
         },
+
         Roomdetails: async function () {
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_Rooms", {});
@@ -225,6 +226,7 @@ sap.ui.define([
                 console.error("Error while fetching Bed Type details:", err);
             }
         },
+
         _LoadFacilities: async function () {
             const oView = this.getView();
             let oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
@@ -329,6 +331,7 @@ sap.ui.define([
 
             return aMissingFields;
         },
+
         onNoOfPersonSelect: function (oEvent) {
             const oModel = this.getView().getModel("HostelModel");
 
@@ -353,6 +356,7 @@ sap.ui.define([
         onPressLoginBanner: function () {
             this._handleLoginAndAutofill();
         },
+
         _handleLoginAndAutofill: function () {
             const that = this;
             const oView = this.getView();
@@ -465,7 +469,6 @@ sap.ui.define([
                 }
             });
         },
-
 
         _applyCountryStateCity: function () {
             const oView = this.getView();
@@ -698,7 +701,6 @@ sap.ui.define([
                                         oModel.refresh(true);
                                         that._applyCountryStateCityForPersons();
                                     }
-
                                 })
                             ] :
                             []),
@@ -731,7 +733,6 @@ sap.ui.define([
                                     key: "Dr.",
                                     text: "Dr"
                                 }),
-
                             ]
                         }),
                         new sap.m.Input({
@@ -771,7 +772,7 @@ sap.ui.define([
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
-                                    sap.m.MessageToast.show("Date of Birth cannot be in the Future.");
+                                    sap.m.MessageToast.show(this.i18nModel.getText("dateofBirthcannotbeFuture"));
                                     oEvent.getSource().setValue("");
                                 }
                             }
@@ -993,7 +994,7 @@ sap.ui.define([
                                     // exact 10 digits required
                                     if (sValue.length !== 10) {
                                         oInput.setValueState("Error");
-                                        oInput.setValueStateText("Mobile No must be exactly 10 Digits");
+                                        oInput.setValueStateText(this.i18nModel.getText("mobileNomustbeexactlyDigits"));
                                     }
                                     // update model value for MobileNo
                                     oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
@@ -1003,14 +1004,13 @@ sap.ui.define([
                                 // Other countries: minimum 4 digits (example rule)
                                 if (sValue.length < 4) {
                                     oInput.setValueState("Error");
-                                    oInput.setValueStateText("Mobile Number must be at least 4 Digits");
+                                    oInput.setValueStateText(this.i18nModel.getText("mobileNumbermustbeatleastDigits"));
                                 }
 
                                 // update model value for MobileNo
                                 oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
                             }
                         }),
-
 
                         new sap.m.Label({
                             text: "Address",
@@ -1093,7 +1093,7 @@ sap.ui.define([
 
                                 // 🔴 Validation: Document Type must be selected
                                 if (!sDocType) {
-                                    sap.m.MessageBox.error("Please select Document Type before uploading.");
+                                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
 
                                     // Reset FileUploader
                                     oUploader.clear();
@@ -1140,9 +1140,6 @@ sap.ui.define([
 
                                 reader.readAsDataURL(oFile);
                             }
-
-
-
                         }),
 
                         new sap.m.Button({
@@ -1171,7 +1168,7 @@ sap.ui.define([
                                 }
 
                                 if (!oUploader) {
-                                    sap.m.MessageToast.show("Unable to locate uploader");
+                                    sap.m.MessageToast.show(this.i18nModel.getText("unablelocateuploader"));
                                     return;
                                 }
 
@@ -1188,10 +1185,6 @@ sap.ui.define([
                                 oModel.refresh(true);
                             }
                         })
-
-
-
-
                     ]
                 });
 
@@ -1353,13 +1346,13 @@ sap.ui.define([
                                                         // If selected → REMOVE it
                                                         if (existsIndex > -1) {
 
-                                                           aSelected.splice(existsIndex, 1);
+                                                            aSelected.splice(existsIndex, 1);
 
-// 🔥 Force summary recalculation
-aPersons[iPersonIndex].PersonFacilitiesSummary = [];
-aPersons[iPersonIndex].AllSelectedFacilities = [];
-aPersons[iPersonIndex].TotalFacilityPrice = 0;
-aPersons[iPersonIndex].GrandTotal = 0;
+                                                            // 🔥 Force summary recalculation
+                                                            aPersons[iPersonIndex].PersonFacilitiesSummary = [];
+                                                            aPersons[iPersonIndex].AllSelectedFacilities = [];
+                                                            aPersons[iPersonIndex].TotalFacilityPrice = 0;
+                                                            aPersons[iPersonIndex].GrandTotal = 0;
 
                                                             oCard.removeStyleClass("serviceCardSelected");
 
@@ -1447,9 +1440,6 @@ aPersons[iPersonIndex].GrandTotal = 0;
                 oVBox.addItem(oFacilities);
             }
             if (oFacilityModel) oFacilityModel.refresh(true);
-
-
-
             setTimeout(() => {
                 sap.ui.core.BusyIndicator.hide();
             }, 2000);
@@ -1458,6 +1448,7 @@ aPersons[iPersonIndex].GrandTotal = 0;
 
 
         },
+
         _createFacilityActionSheet: function (facility, iPersonIndex, oCard) {
             var SelectedPriceType = this.getView().getModel("HostelModel").getProperty("/SelectedPriceType")
             const that = this;
@@ -1526,8 +1517,6 @@ aPersons[iPersonIndex].GrandTotal = 0;
                 Image: facility.Image
             };
 
-
-
             if (selectedType === "Per Hour") {
                 sap.m.MessageBox.information(
                     "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
@@ -1555,6 +1544,7 @@ aPersons[iPersonIndex].GrandTotal = 0;
 
             oModel.refresh(true);
         },
+
         onPersonCountChange: function (oEvent) {
             const oModel = this.getView().getModel("HostelModel");
             const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
@@ -1565,9 +1555,7 @@ aPersons[iPersonIndex].GrandTotal = 0;
             }
         },
 
-
         onDialogNextButton: async function () {
-
             const aErrorControls = sap.ui.getCore().byFieldGroupId
                 ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
                 : [];
@@ -1590,7 +1578,7 @@ aPersons[iPersonIndex].GrandTotal = 0;
             }
 
             if (bHasError) {
-                sap.m.MessageBox.error("Please correct the highlighted errors before proceeding.");
+                sap.m.MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
                 return; // ⛔ STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
@@ -1642,9 +1630,8 @@ aPersons[iPersonIndex].GrandTotal = 0;
             this._oSelectedStep = this.oNextStep;
 
             this.handleButtonsVisibility();
-        }
+        },
 
-        ,
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
 
@@ -1698,7 +1685,6 @@ aPersons[iPersonIndex].GrandTotal = 0;
             const oTargetStep = oEvent.getParameter("step");
             const aSteps = this._oWizard.getSteps();
             const iTargetIndex = aSteps.indexOf(oTargetStep);
-
             const oHostelModel = this.getView().getModel("HostelModel");
 
             // STEP 1 REQUIRED FIELDS
@@ -1711,15 +1697,15 @@ aPersons[iPersonIndex].GrandTotal = 0;
 
             // ❌ BLOCK HEADER JUMP IF STEP 1 INVALID
             if (iTargetIndex > 0 && !bStep1Valid) {
-                sap.m.MessageToast.show("Please complete Booking Information before proceeding.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleasecompleteBookingInformationbeforeproceeding"));
 
                 this._resetWizardFromStep1();
                 return;
             }
-              if (this._mustRecreatePersonUI) {
-                    this._createDynamicPersonsUI();
-                    this._mustRecreatePersonUI = false;
-                }
+            if (this._mustRecreatePersonUI) {
+                this._createDynamicPersonsUI();
+                this._mustRecreatePersonUI = false;
+            }
 
             // ✅ Normal navigation
             this._oSelectedStep = oTargetStep;
@@ -1899,7 +1885,7 @@ aPersons[iPersonIndex].GrandTotal = 0;
             let iDays = Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;
 
             if (iDays <= 0) {
-                sap.m.MessageToast.show("End Date must be after Start Date");
+                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return;
             }
 
@@ -1928,12 +1914,12 @@ aPersons[iPersonIndex].GrandTotal = 0;
             // Reset flags
             oHostelModel.setProperty("/StopPriceRecalculate", false);
             oHostelModel.setProperty("/StopPriceRecalculateByPerson", false);
-aPersons.forEach(p => {
-    p.PersonFacilitiesSummary = [];
-    p.AllSelectedFacilities = [];
-    p.TotalFacilityPrice = 0;
-    p.GrandTotal = 0;
-});
+            aPersons.forEach(p => {
+                p.PersonFacilitiesSummary = [];
+                p.AllSelectedFacilities = [];
+                p.TotalFacilityPrice = 0;
+                p.GrandTotal = 0;
+            });
             // Continue existing logic...
             const totals = this.calculateTotals(aPersons, sStartDate, sEndDate, perUnitPrice);
             if (!totals) return;
@@ -2005,10 +1991,8 @@ aPersons.forEach(p => {
 
             oHostelModel.updateBindings(true);
             oHostelModel.refresh(true);
-        }
-        ,
-
-
+        },
+        
         // Separated calculation function
         // signature now: calculateTotals(aPersons, sStartDate, sEndDate, roomRentPrice, sPaymentType, iSelectedMonths)
         calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice) {
@@ -2025,7 +2009,7 @@ aPersons.forEach(p => {
             const diffHours = 1; // keep your logic unchanged
 
             if (iDays <= 0 && diffHours <= 0) {
-                sap.m.MessageToast.show("End Date must be after Start Date");
+                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
 
@@ -2106,11 +2090,8 @@ aPersons.forEach(p => {
                 GrandTotal: grandTotal,
                 AllSelectedFacilities: aAllFacilities
             };
-        }
-        ,
-
-
-
+        },
+        
         // Helper function to parse date
         _parseDate: function (sDate) {
 
@@ -2254,8 +2235,8 @@ aPersons.forEach(p => {
 
                 if (diffDays <= 0) {
                     oEndDatePicker.setValueState("Error");
-                    oEndDatePicker.setValueStateText("End date cannot be before Start Date");
-                    sap.m.MessageToast.show("End Date Cannot be before Start Date");
+                    oEndDatePicker.setValueStateText(this.i18nModel.getText("endDateCannotbeforeStartDate"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("endDateCannotbeforeStartDate"));
                     oHostelModel.setProperty("/EndDate", "");
                     oBtnModel.setProperty("/Next", false);
                     return;
@@ -2293,12 +2274,9 @@ aPersons.forEach(p => {
             // =========================================================
             const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
             oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
-        }
-        ,
-
-
+        },
+        
         SM_onGeneratePassword: function () {
-
             var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword");
             var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "passwordStrengthText"); // signup label
 
@@ -2313,7 +2291,6 @@ aPersons.forEach(p => {
             // Run same validation logic + update strength label
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-
 
         _addPasswordGenerateIcon: function () {
 
@@ -2336,9 +2313,7 @@ aPersons.forEach(p => {
             });
         },
 
-
         SM_onCopyPassword: function (oEvent) {
-
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent();
 
@@ -2347,13 +2322,13 @@ aPersons.forEach(p => {
             const pwd = oInput.getValue();
 
             if (!pwd) {
-                sap.m.MessageToast.show("No Password to Copy");
+                sap.m.MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
                 return;
             }
 
             navigator.clipboard.writeText(pwd)
                 .then(() => {
-                    sap.m.MessageToast.show("Password Copied");
+                    sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
                 })
                 .catch(() => {
 
@@ -2365,13 +2340,14 @@ aPersons.forEach(p => {
                         document.execCommand("copy");
                         document.body.removeChild(oTemp);
 
-                        sap.m.MessageToast.show("Password Copied");
+                        sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
 
                     } catch (err) {
-                        sap.m.MessageToast.show("Copy Failed");
+                        sap.m.MessageToast.show(this.i18nModel.getText("copyFailed"));
                     }
                 });
         },
+
         onMonthSelectionChange: function (oEvent) {
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -2386,14 +2362,14 @@ aPersons.forEach(p => {
             const sStartDate = oView.byId("idStartDate1")?.getValue() || "";
 
             if (!sStartDate) {
-                sap.m.MessageToast.show("Please Select Start Date First.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
                 return;
             }
 
             // Convert dd/MM/yyyy → Date object
             const oStart = this._parseDate(sStartDate);
             if (!(oStart instanceof Date) || isNaN(oStart)) {
-                sap.m.MessageToast.show("Invalid Start Date.");
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartDate"));
                 return;
             }
 
@@ -2410,7 +2386,7 @@ aPersons.forEach(p => {
                 oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
             }
             else if (sDuration === "Per Day") {
-                sap.m.MessageToast.show("Duration is per day. No month/year Selection Needed.");
+                sap.m.MessageToast.show(this.i18nModel.getText("durationperdayNoSelectionNeeded"));
                 return;
             }
 
@@ -2421,6 +2397,7 @@ aPersons.forEach(p => {
             oHostelModel.setProperty("/EndDate", sEndDate);
             oView.byId("idEndDate1")?.setValue(sEndDate);
         },
+
         _formatDateToDDMMYYYY: function (oDate) {
             if (!(oDate instanceof Date)) return "";
             const dd = String(oDate.getDate()).padStart(2, "0");
@@ -2481,7 +2458,6 @@ aPersons.forEach(p => {
             const sStartDate = oHostelModel.getProperty("/StartDate");
             const sEndDate = oHostelModel.getProperty("/EndDate");
 
-
             if (!sValue && (!sStartDate || !sEndDate)) {
 
                 const aSteps = this._oWizard.getSteps();
@@ -2498,12 +2474,12 @@ aPersons.forEach(p => {
 
                 if (!sStartDate && oStartDP) {
                     oStartDP.setValueState(sap.ui.core.ValueState.Error);
-                    oStartDP.setValueStateText("Please select Start Date");
+                    oStartDP.setValueStateText(this.i18nModel.getText("pleaseselectStartDate"));
                 }
 
                 if (!sEndDate && oEndDP) {
                     oEndDP.setValueState(sap.ui.core.ValueState.Error);
-                    oEndDP.setValueStateText("Please select End Date");
+                    oEndDP.setValueStateText(this.i18nModel.getText("pleaseselectEndDate"));
                 }
 
                 oBTN.setProperty("/Next", false);
@@ -2512,9 +2488,6 @@ aPersons.forEach(p => {
 
                 return;
             }
-
-
-
             // Update selected type
             oHostelModel.setProperty("/SelectedPriceType", sValue);
 
@@ -2619,7 +2592,6 @@ aPersons.forEach(p => {
             const mode = e.getSource().getText().toLowerCase();
 
             vm.setProperty("/loginMode", mode);
-
             vm.setProperty("/showOTPField", false);
             vm.setProperty("/isOtpEntered", false);
 
@@ -2646,6 +2618,7 @@ aPersons.forEach(p => {
                 passCtrl.setValueState("None");
             }
         },
+
         _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
@@ -2659,6 +2632,7 @@ aPersons.forEach(p => {
             this._storedLoginCreds = null;
             this._oResetUser = null;
         },
+
         onFPValidate: function () {
             const id = sap.ui.getCore().byId("fpUserId").getValue().trim();
             const name = sap.ui.getCore().byId("fpUserName").getValue().trim();
@@ -2674,6 +2648,7 @@ aPersons.forEach(p => {
         onSigninPasswordLive: function (oEvent) {
             utils._LCvalidatePassword(oEvent);
         },
+
         onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const input = e.getSource();
@@ -2691,11 +2666,12 @@ aPersons.forEach(p => {
                 input.setValueState("None");
             } else if (!isValid) {
                 input.setValueState("Error");
-                input.setValueStateText("Enter valid 6-digit OTP");
+                input.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
             } else {
                 input.setValueState("None");
             }
         },
+        
         onSignIn: async function () {
             var oLoginModel = this.getView().getModel("LoginModel");
             var vm = this.getView().getModel("LoginViewModel");
@@ -2717,7 +2693,7 @@ aPersons.forEach(p => {
             // Always validate UserID and UserName
             if (!utils._LCvalidateMandatoryField(ctrlUserId, "ID") ||
                 !utils._LCvalidateMandatoryField(ctrlUserName, "ID")) {
-                sap.m.MessageToast.show("Make Sure all the Mandatory Fields are Filled/Validate the Entered Value");
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
 
@@ -2728,9 +2704,9 @@ aPersons.forEach(p => {
                     // but we'll set explicitly to be safe
                     if (ctrlPassword) {
                         ctrlPassword.setValueState("Error");
-                        ctrlPassword.setValueStateText("Enter a Valid Password");
+                        ctrlPassword.setValueStateText(this.i18nModel,getText("enterValidPassword"));
                     }
-                    sap.m.MessageToast.show("Enter a Valid Password");
+                    sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                     return;
                 } else if (ctrlPassword) {
                     ctrlPassword.setValueState("None");
@@ -2753,30 +2729,30 @@ aPersons.forEach(p => {
 
                     // 1️⃣ OTP has NOT been generated
                     if (!showOTPField) {
-                        sap.m.MessageToast.show("Please Generate OTP First.");
+                        sap.m.MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
                         return;
                     }
 
                     // 2️⃣ OTP was generated but user has not typed anything
                     if (!isOtpEntered) {
                         otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText("Enter Valid 6-digit OTP");
-                        sap.m.MessageToast.show("Enter a Valid 6-digit OTP");
+                        otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                         return;
                     }
 
                     // 3️⃣ Validate OTP format strictly
                     if (!/^\d{6}$/.test(sOTP)) {
                         otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText("Enter a Valid 6-digit OTP");
-                        sap.m.MessageToast.show("Enter a Valid 6-digit OTP");
+                        otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                         return;
                     }
 
                     // 4️⃣ Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
                     if (!isValid) {
-                        sap.m.MessageToast.show("Incorrect OTP");
+                        sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
                         return;
                     }
 
@@ -2791,9 +2767,9 @@ aPersons.forEach(p => {
                     if (!sPassword) {
                         if (passCtrl) {
                             passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText("Password is Required");
+                            passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
                         }
-                        sap.m.MessageToast.show("Password is Required");
+                        sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
                         return;
                     }
 
@@ -2801,9 +2777,9 @@ aPersons.forEach(p => {
                     if (!utils._LCvalidatePassword(passCtrl)) {
                         if (passCtrl) {
                             passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText("Enter a Valid Password");
+                            passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
                         }
-                        sap.m.MessageToast.show("Enter a Valid Password");
+                        sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                         return;
                     }
 
@@ -2821,7 +2797,7 @@ aPersons.forEach(p => {
                 const oMatchedUser = oResponse?.data?.[0];
 
                 if (!oMatchedUser || !oMatchedUser.UserID) {
-                    sap.m.MessageToast.show("Invalid Credentials");
+                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
 
@@ -2904,34 +2880,33 @@ aPersons.forEach(p => {
             // 1) Required check for New Password
             if (!pass) {
                 oNew.setValueState("Error");
-                oNew.setValueStateText("Password is Required");
-                sap.m.MessageToast.show("Password is Required");
+                oNew.setValueStateText(this.i18nModel.getText("passwordRequired"));
+                sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
                 return;
             }
 
             // 2) Format rule check
             if (!utils._LCvalidatePassword(oNew)) {
                 oNew.setValueState("Error");
-                oNew.setValueStateText("Must Contain 1 Uppercase, 1 Lowercase, 1 Number & 1 Special Character");
+                oNew.setValueStateText(this.i18nModel.getText("mustContainUppercaseLowercaseNumberSpecialCharacter"));
                 return;
             }
 
             // 3) Required check for Confirm Password
             if (!confirm) {
                 oConf.setValueState("Error");
-                oConf.setValueStateText("Confirm Password is Required");
-                sap.m.MessageToast.show("Confirm Password is Required");
+                oConf.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
+                sap.m.MessageToast.show(this.i18nModel.getText("confirmPasswordRequired"));
                 return;
             }
 
             // 4) Match both
             if (pass !== confirm) {
                 oConf.setValueState("Error");
-                oConf.setValueStateText("Passwords do not Match");
-                sap.m.MessageToast.show("Passwords do not Match");
+                oConf.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
+                sap.m.MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
                 return;
             }
-
             // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
@@ -2941,8 +2916,6 @@ aPersons.forEach(p => {
                     data: { Password: btoa(pass) },
                     filters: { UserID: this._oResetUser?.UserID }
                 });
-
-
                 sap.m.MessageBox.success("Password Updated Successfully", {
                     title: "Success",
                     onClose: () => {
@@ -2968,7 +2941,7 @@ aPersons.forEach(p => {
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show("Password Reset Failed");
+                sap.m.MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
                 sap.ui.core.BusyIndicator.hide();  // ALWAYS stop
@@ -2977,7 +2950,6 @@ aPersons.forEach(p => {
         },
 
         _startOtpTimer: function () {
-
             const vm = this.getView().getModel("LoginViewModel");
 
             this._clearOtpTimer();
@@ -3010,7 +2982,6 @@ aPersons.forEach(p => {
             }, 1000);
         },
 
-
         _clearOtpTimer: function () {
             if (this._otpInterval) {
                 clearInterval(this._otpInterval);
@@ -3041,13 +3012,14 @@ aPersons.forEach(p => {
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
         },
+
         onValidateUser: async function () {
             const isValid =
                 utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserId"), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName"), "ID");
 
             if (!isValid) {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
@@ -3069,7 +3041,7 @@ aPersons.forEach(p => {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
 
                 if (oResp?.success) {
-                    sap.m.MessageToast.show("OTP Sent! Check your Email.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -3079,7 +3051,7 @@ aPersons.forEach(p => {
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
                 } else {
-                    sap.m.MessageToast.show("No User Found with Given ID / Name");
+                    sap.m.MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
                 }
 
             } catch (err) {
@@ -3112,17 +3084,17 @@ aPersons.forEach(p => {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+
         onPressOTP: async function () {
             const oUserIdCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInuserid");
             const oUserNameCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInusername");
-
             const sUserId = oUserIdCtrl.getValue().trim();
             const sUserName = oUserNameCtrl.getValue().trim();
 
             // Validate inputs
             if (!utils._LCvalidateMandatoryField(oUserIdCtrl, "ID") ||
                 !utils._LCvalidateMandatoryField(oUserNameCtrl, "ID")) {
-                sap.m.MessageToast.show("Enter Valid User ID and User Name");
+                sap.m.MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
                 return;
             }
 
@@ -3139,7 +3111,7 @@ aPersons.forEach(p => {
 
                 if (oResp?.success) {
 
-                    sap.m.MessageToast.show("OTP Sent! Check your Email.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -3161,11 +3133,11 @@ aPersons.forEach(p => {
 
                 }
                 else {
-                    sap.m.MessageToast.show("User not Found or Unable to Send OTP.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show("Invalid Credentials, Please try again");
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -3174,6 +3146,7 @@ aPersons.forEach(p => {
         onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
         },
+
         _onVerifyOTP: async function () {
 
             const vm = this.getView().getModel("LoginViewModel");
@@ -3189,15 +3162,15 @@ aPersons.forEach(p => {
             // --- Basic validation ---
             if (!otp) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
-                oOtpInput.setValueStateText("Please Enter OTP");
-                sap.m.MessageToast.show("Enter OTP");
+                oOtpInput.setValueStateText(this.i18nModel.getText("pleaseEnterOTP"));
+                sap.m.MessageToast.show(this.i18nModel.getText("enterOTP"));
                 return;
             }
 
             if (!/^\d{6}$/.test(otp)) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
-                oOtpInput.setValueStateText("Enter a valid 6-digit OTP");
-                sap.m.MessageToast.show("Invalid OTP");
+                oOtpInput.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidOTP"));
                 return;
             }
 
@@ -3211,12 +3184,12 @@ aPersons.forEach(p => {
             try {
                 isValid = await this._verifyOTPWithBackend(otp);
             } catch (e) {
-                sap.m.MessageToast.show("OTP Verification Failed");
+                sap.m.MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
                 return;
             }
 
             if (!isValid) {
-                sap.m.MessageToast.show("Incorrect OTP");
+                sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
                 return;
             }
 
@@ -3242,14 +3215,14 @@ aPersons.forEach(p => {
                     OTP: otp
                 });
 
-                sap.m.MessageToast.show("Login Successful!");
+                sap.m.MessageToast.show(this.i18nModel.getText("loginSuccessful"));
                 this._setLoggedInUser(resp.data[0]);
                 this._resetAllAuthFields();
                 this._oSignDialog.close();
 
             } catch (e) {
 
-                sap.m.MessageToast.show("Login Failed");
+                sap.m.MessageToast.show(this.i18nModel.getText("loginFailed"));
                 console.error("OTP login error:", e);
 
             }
@@ -3273,8 +3246,8 @@ aPersons.forEach(p => {
                 this.getOwnerComponent().getRouter().navTo("TilePage");
             }
         },
-        _startOtpCooldown: function (iSeconds = 20) {
 
+        _startOtpCooldown: function (iSeconds = 20) {
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
@@ -3287,7 +3260,6 @@ aPersons.forEach(p => {
             }
 
             this._otpInterval = setInterval(() => {
-
                 remaining--;
 
                 if (remaining <= 0) {
@@ -3298,13 +3270,12 @@ aPersons.forEach(p => {
                     vm.setProperty("/otpButtonText", "Resend OTP");
                     return;
                 }
-
                 vm.setProperty("/otpButtonText", `Resend OTP in ${remaining}s`);
 
             }, 1000);
         },
-        _resetOtpCooldown: function () {
 
+        _resetOtpCooldown: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             if (this._otpInterval) {
@@ -3315,8 +3286,8 @@ aPersons.forEach(p => {
             vm.setProperty("/otpButtonText", "Send OTP");
             vm.setProperty("/canResendOTP", false);
         },
-        onBackToLogin: function () {
 
+        onBackToLogin: function () {
             // Clean auth data & any internal flags
             this._clearAllAuthFields();
 
@@ -3349,6 +3320,7 @@ aPersons.forEach(p => {
                     if (o) o.setValue("");
                 });
         },
+
         onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
@@ -3368,15 +3340,14 @@ aPersons.forEach(p => {
         onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
+
         //onsignup
         onSignUp: async function () {
-
             const fragId = this.createId("LoginAlertDialog");
             const C = (id) => sap.ui.core.Fragment.byId(fragId, id);
 
             const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
-
             const std = (C("signUpSTD").getValue() || "").trim();
 
             // ---- VALIDATION GATE ----
@@ -3397,12 +3368,10 @@ aPersons.forEach(p => {
             );
 
             if (!isValid) {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields Correctly.");
+                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
                 return;
             }
-
             // ---- PAYLOAD BUILD ----
-
             // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
             const payload = {
@@ -3435,7 +3404,7 @@ aPersons.forEach(p => {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
                 if (!oResp || oResp.success !== true) {
-                    sap.m.MessageToast.show("Registration Failed! Please try again.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("registrationFailedPleasetryagain"));
                     console.error("SignUp Error Response:", oResp);
                     return;
                 }
@@ -3520,11 +3489,10 @@ aPersons.forEach(p => {
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
-
         },
+
         _resetAuthDialog: function () {
             const oModel = this.getView().getModel("LoginMode");
-
             // Reset LoginMode data (your existing block)
             oModel.setData({
                 Salutation: "",
@@ -3565,8 +3533,6 @@ aPersons.forEach(p => {
                     if (ctrl.setValue) ctrl.setValue("");
                 }
             });
-
-
             // Re-enable STD & Gender
             const STD = $C("signUpSTD");
             const GEN = $C("signUpGender");
@@ -3588,8 +3554,8 @@ aPersons.forEach(p => {
             // Ensure only Sign In panel is visible when dialog opens next time
 
         },
-        onChangeState: function (oEvent) {
 
+        onChangeState: function (oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -3627,8 +3593,8 @@ aPersons.forEach(p => {
                 new sap.ui.model.Filter("countryCode", "EQ", sCountryCode)
             ]);
         },
-        onChangeCity: function (oEvent) {
 
+        onChangeCity: function (oEvent) {
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -3646,7 +3612,6 @@ aPersons.forEach(p => {
 
                 oCity.setValue("");
                 oCity.setSelectedKey("");
-
                 oCity.getBinding("items")?.filter([
                     new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
                 ]);
@@ -3665,6 +3630,7 @@ aPersons.forEach(p => {
 
             oModel.setProperty("/City", sCityText);
         },
+
         FSM_onConfirm: function (oEvent) {
 
             const oInput = oEvent?.getSource();
@@ -3676,14 +3642,14 @@ aPersons.forEach(p => {
             // Required
             if (!confirm) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Confirm Password is Required");
+                oInput.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
                 return false;
             }
 
             // Compare
             if (pass !== confirm) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Passwords do not Match");
+                oInput.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
                 return false;
             }
 
@@ -3693,7 +3659,6 @@ aPersons.forEach(p => {
         },
 
         onChangeSalutation: function (oEvent) {
-
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpGender");
@@ -3711,13 +3676,11 @@ aPersons.forEach(p => {
                 oGender.setEnabled(false);
             }
             // Dr. → user must choose gender manually
-
             // ✅ STRICT validation -- pass CONTROL, not event
             utils._LCstrictValidationSelect(oSalutation);
         },
 
         onChangeDOB: function (oEventOrControl) {
-
             const oDP =
                 (typeof oEventOrControl.getSource === "function")
                     ? oEventOrControl.getSource()
@@ -3729,7 +3692,7 @@ aPersons.forEach(p => {
 
             if (!v) {
                 oDP.setValueState("Error");
-                oDP.setValueStateText("Date of Birth is Required");
+                oDP.setValueStateText(this.i18nModel.getText("dateofBirthisRequired"));
                 return false;
             }
 
@@ -3742,7 +3705,7 @@ aPersons.forEach(p => {
 
             if (age < 10 || age > 100) {
                 oDP.setValueState("Error");
-                oDP.setValueStateText("Age must be between 10 and 100 years");
+                oDP.setValueStateText(this.i18nModel.getText("agemustbebetween10and100years"));
                 return false;
             }
 
@@ -3761,7 +3724,6 @@ aPersons.forEach(p => {
             return true;
         },
         onCityChange: function (oEvent) {
-
             const oCity = oEvent.getSource();
 
             // Sanitize manual typing
@@ -3795,12 +3757,11 @@ aPersons.forEach(p => {
             oModel.setProperty("/City", sCityText);
         },
 
-
         onChangeGender: function (oEvent) {
             utils._LCstrictValidationSelect(oEvent.getSource());
         },
-        onMobileLivechnage: function (oEvent) {
 
+        onMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
 
             // Digits only
@@ -3822,7 +3783,7 @@ aPersons.forEach(p => {
             // If STD not chosen yet
             if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select ISD Code First");
+                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
 
@@ -3831,7 +3792,7 @@ aPersons.forEach(p => {
 
             if (!isValid) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Enter valid Mobile Number");
+                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
             } else {
                 oInput.setValueState("None");
             }
@@ -3840,7 +3801,6 @@ aPersons.forEach(p => {
         onSTDChange: function () {
             const oSTD = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpSTD");
             const oMobile = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPhone");
-
             const std = oSTD.getValue();
 
             oMobile.setValue("");
@@ -3856,15 +3816,14 @@ aPersons.forEach(p => {
         onAddressChange: function () {
             utils._LCvalidateAddress(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpAddress"));
         },
-        onChangeCountry: function (oEvent) {
 
+        onChangeCountry: function (oEvent) {
             const oCountry = oEvent.getSource();
             oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("LoginMode");
-
             const oState = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpState");
             const oCity = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpCity");
             const oSTD = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpSTD");
@@ -3922,10 +3881,9 @@ aPersons.forEach(p => {
         _LCvalidateName: function (oEvent) {
             utils._LCvalidateName(oEvent);
         },
+
         onSwitchToSignIn: function () {
-
             const vm = this.getView().getModel("LoginViewModel");
-
             // -------------------------
             // FLOW RESET
             // -------------------------
@@ -3992,6 +3950,7 @@ aPersons.forEach(p => {
                 ?.getContentMiddle()[0]
                 ?.setText("Hostel Access Portal");
         },
+        
         onSwitchToSignUp: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
@@ -4024,7 +3983,6 @@ aPersons.forEach(p => {
             utils._LCvalidateEmail(oEvent);
         },
 
-
         SM_onTogglePasswordVisibility: function (oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
@@ -4032,9 +3990,6 @@ aPersons.forEach(p => {
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-
-
-
         // SM_onChnageSetAndConfirm: function (oEvent) {
         //     utils._LCvalidatePassword(oEvent);
         // },
@@ -4117,7 +4072,6 @@ aPersons.forEach(p => {
         },
 
         SM_onGenerateForgotPassword: function () {
-
             var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpPasswordStrengthText");
 
@@ -4192,9 +4146,7 @@ aPersons.forEach(p => {
 
         },
 
-
         _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
-
             // LEFT SIDE visibility
             sap.ui.getCore().byId("idUPISection")?.setVisible(isUPI);
             sap.ui.getCore().byId("idCardSection")?.setVisible(isCard);
@@ -4236,13 +4188,13 @@ aPersons.forEach(p => {
 
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Invalid amount");
+                oInput.setValueStateText(this.i18nModel.getText("invalidamount"));
                 return;
             }
 
             if (enteredAmount > grandTotal) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Amount cannot be greater than Grand Total");
+                oInput.setValueStateText(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
             } else {
                 oInput.setValueState("None");
             }
@@ -4315,7 +4267,7 @@ aPersons.forEach(p => {
             const oInput = oEvent.getSource();
             if (!oInput.getValue()) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select Payment Date");
+                oInput.setValueStateText(this.i18nModel.getText("selectPaymentDate"));
             } else {
                 oInput.setValueState("None");
             }
@@ -4336,7 +4288,7 @@ aPersons.forEach(p => {
                 );
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                     return;
                 }
             }
@@ -4347,8 +4299,8 @@ aPersons.forEach(p => {
             /* ================= Decimal Completion Guard ================= */
             if (!rawEntered || rawEntered === "." || rawEntered.endsWith(".")) {
                 oAmountInput.setValueState("Error");
-                oAmountInput.setValueStateText("Please enter a valid amount");
-                sap.m.MessageToast.show("Please enter a valid amount");
+                oAmountInput.setValueStateText(this.i18nModel.getText("pleaseenterValidAmount"));
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseenterValidAmount"));
                 return;
             }
 
@@ -4359,15 +4311,15 @@ aPersons.forEach(p => {
             /* ================= NaN ================= */
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oAmountInput.setValueState("Error");
-                sap.m.MessageToast.show("Invalid Amount Format");
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidAmountFormat"));
                 return;
             }
 
             /* ================= Business Rule ================= */
             if (enteredAmount > grandTotal) {
                 oAmountInput.setValueState("Error");
-                oAmountInput.setValueStateText("Amount cannot be greater than Grand Total");
-                sap.m.MessageToast.show("Amount Cannot be Greater than Grand Total");
+                oAmountInput.setValueStateText(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
+                sap.m.MessageToast.show(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
                 return;
             }
             oAmountInput.setValueState("None");
@@ -4594,8 +4546,6 @@ aPersons.forEach(p => {
                 this._oSelectedStep = null;
 
                 // Optional: destroy old dynamic UI explicitly
-
-
                 this.openProfileDialog();
             }.bind(this), 500);
 
@@ -4604,8 +4554,8 @@ aPersons.forEach(p => {
                 oAvatar.setVisible(true);
             }
         },
-        openProfileDialog: function () {
 
+        openProfileDialog: function () {
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
             this.onPressAvatar()
         },
@@ -4653,6 +4603,7 @@ aPersons.forEach(p => {
                 this.getView().addDependent(this._oProfileActionSheet);
             }
         },
+        
         onPressAvatar: async function (oEvent) {
             const oUser = this._oLoggedInUser
             let fullUserData = {};
@@ -4665,12 +4616,10 @@ aPersons.forEach(p => {
                 }
                 const sUserID = oUser.UserID;
                 if (!sUserID) {
-                    sap.m.MessageToast.show("User not Logged in.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
                     return;
                 }
                 fullUserData = oUser;
-
-
                 // if (!this._isProfileRequested) {
                 //     this.createAvatarActionSheet();
                 //     this._oProfileActionSheet.openBy(oEvent.getSource());
@@ -4888,6 +4837,7 @@ aPersons.forEach(p => {
             oStateCB.setValue(sState);
             oSourceCB.setValue(sSource);
         },
+
         onGlobalSearch: function (oEvent) {
             const sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
 
@@ -4897,7 +4847,6 @@ aPersons.forEach(p => {
 
             const oProfileModel = this._oProfileDialog.getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
-
             const oTable = sap.ui.core.Fragment.byId(
                 "profileFrag",
                 sSelectedTab === "Payment"
@@ -4958,14 +4907,9 @@ aPersons.forEach(p => {
             oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
         },
 
-
-
-
-
         onTableUpdateFinished: function (oEvent) {
             this._updateRowCount(oEvent.getSource());
         },
-
 
         _updateRowCount: function (oTable) {
             if (!oTable || !this._oProfileDialog) {
@@ -4987,10 +4931,8 @@ aPersons.forEach(p => {
             } else {
                 oProfileModel.setProperty("/bookingCount", iCount);
             }
-        }
-        ,
-
-
+        },
+        
         onPressAvatarEdit: function (oEvent) {
             if (!this._oAvatarActionSheet) {
                 this._oAvatarActionSheet = new sap.m.ActionSheet({
@@ -5205,7 +5147,7 @@ aPersons.forEach(p => {
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
                 if (!sUserID) {
-                    sap.m.MessageToast.show("User not Logged in");
+                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
                     return;
                 }
                 const payload = {
@@ -5220,18 +5162,18 @@ aPersons.forEach(p => {
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
 
-                sap.m.MessageToast.show("Profile Photo Updated!");
+                sap.m.MessageToast.show(this.i18nModel.getText("profilePhotoUpdated"));
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Failed to Update Profile Photo");
+                sap.m.MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
 
         onPreviewProfilePhoto: function () {
             const sPhoto = this._oProfileDialog.getModel("profileData").getProperty("/photo");
             if (!sPhoto) {
-                sap.m.MessageToast.show("No Profile Photo Available");
+                sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
                 return;
             }
             if (!this._oPreviewDialog) {
@@ -5256,11 +5198,13 @@ aPersons.forEach(p => {
             sap.ui.getCore().byId("previewProfileImage").setSrc(sPhoto);
             this._oPreviewDialog.open();
         },
+
         onCancelPress: function () {
             this.resetAllBookingData()
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
         },
+
         onFormEdit: async function () {
             var oSaveModel = this.getView().getModel("saveModel");
             var oedit = oSaveModel.getProperty("/isEditMode");
@@ -5283,7 +5227,7 @@ aPersons.forEach(p => {
                     data: oPayload,
                     filters: filter
                 });
-                sap.m.MessageToast.show("Data Saved Successfully ");
+                sap.m.MessageToast.show(this.i18nModel.getText("dataSavedSuccessfully"));
                 oSaveModel.setProperty("/isEditMode", false);
             } catch (error) {
                 sap.m.MessageToast.show("Failed");
@@ -5319,7 +5263,7 @@ aPersons.forEach(p => {
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
             const payload = {
@@ -5344,11 +5288,11 @@ aPersons.forEach(p => {
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
-                sap.m.MessageToast.show("Profile Updated Successfully!");
+                sap.m.MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Error Updating Profile");
+                sap.m.MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
@@ -5358,7 +5302,6 @@ aPersons.forEach(p => {
         },
 
         onPressBookingRow: function (oEvent) {
-
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
 
@@ -5373,17 +5316,16 @@ aPersons.forEach(p => {
             var oProfileModel = this._oProfileDialog.getModel("profileData");
             var aCustomers = oProfileModel.getProperty("/aCustomers");
             var aFacilities = oProfileModel.getProperty("/facility");
-
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show("Customer ID not found for this Booking.");
+                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show("No Customer Details Found for this Booking.");
+                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
             var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
@@ -5435,7 +5377,6 @@ aPersons.forEach(p => {
         },
 
         resetAllBookingData: function () {
-
             const oHostelModel = this.getView().getModel("HostelModel");
 
             // ---- RESET MODEL COMPLETELY ----
@@ -5459,8 +5400,6 @@ aPersons.forEach(p => {
             });
 
             oHostelModel.refresh(true);
-
-
             // ---- RESET UI ELEMENTS ----
             // Personal container (remove all generated forms)
             const oVBox = this.getView().byId("idPersonalContainer1");
@@ -5497,13 +5436,13 @@ aPersons.forEach(p => {
 
             console.log("✔ All booking data fully reset!");
         },
-        onEditBooking: function () {
 
+        onEditBooking: function () {
             var oTable = sap.ui.getCore().byId("IdProfileaTable");
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please Select a Booking to Edit.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectBookingtoEdit"));
                 return;
             }
 
@@ -5517,7 +5456,7 @@ aPersons.forEach(p => {
             var sStatus = (oBookingData.status || "").trim().toLowerCase();
 
             if (sStatus !== "new") {
-                sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
+                sap.m.MessageToast.show(this.i18nModel.getText("onlyBookingswithStatusNewcanbeEdited"));
                 return;  // ❗ STOP — DO NOT NAVIGATE
             }
             // -------------------------------
@@ -5531,14 +5470,14 @@ aPersons.forEach(p => {
             var sCustomerID = oBookingData.cutomerid || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show("Customer ID not found for this Booking.");
+                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             // Find customer
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show("No Customer Details found for this Booking.");
+                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
 
@@ -5584,16 +5523,14 @@ aPersons.forEach(p => {
                 HasFacilities: oTotals.AllSelectedFacilities.length > 0
             };
             // oFullCustomerData.HasFacilities = oTotals.AllSelectedFacilities.length > 0;
-
-
             // Set model & Navigate
             var oHostelModel = new JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
 
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("EditBookingDetails");
-        }
-        ,
+        },
+        
         SectionPress: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) return;
@@ -5618,6 +5555,7 @@ aPersons.forEach(p => {
                 }
             }
         },
+
         onPressEditSave: async function (oEvent) {
             var oButton = oEvent.getSource();
             var oViewModel = this.getView().getModel("viewModel");
@@ -5707,7 +5645,7 @@ aPersons.forEach(p => {
                             CustomerID: custid
                         }
                     });
-                    sap.m.MessageToast.show("Booking Details Updated Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
 
                 } catch (err) {
                     console.error("Error during update:", err);
@@ -5739,13 +5677,16 @@ aPersons.forEach(p => {
                 sap.m.MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
             }
         },
+
         onProfileDialogClose: function () {
             this._oProfileDialog.close()
         },
+
         onProfileclose: function () {
             // Close the dialog and perform logout logic
             if (this._oProfileDialog) this._oProfileDialog.close();
         },
+
         onCancelPress: function () {
             this._isPersonUIInitialized = false;
             this._mustRecreatePersonUI = true;
@@ -5756,19 +5697,20 @@ aPersons.forEach(p => {
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
         },
+
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
         },
+
         onTableSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("key");
             const oModel = this._oProfileDialog.getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
         },
+
         onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "ManageInvoice" });
         },
-
-
     });
 });
