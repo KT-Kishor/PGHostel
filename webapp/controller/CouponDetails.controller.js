@@ -385,7 +385,7 @@ sap.ui.define([
 
                         } catch (err) {
                             console.error("Delete failed:", err);
-                            MessageBox.error("Error while deleting coupons.");
+                            MessageBox.error(this.i18nModel.getText("errorwhiledeletingcoupons"));
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
                         }
@@ -398,7 +398,7 @@ sap.ui.define([
             var oTable = this.getView().byId("couponTable");
             const oModelData = oTable.getModel("CouponModel").getData();
             if (!oModelData || oModelData.length === 0) {
-                sap.m.MessageBox.info("No coupons available to download.");
+                sap.m.MessageBox.info(this.i18nModel.getText("nocouponsavailabledownload"));
                 return;
             }
             const aFormattedData = oModelData.map(item => {
@@ -575,7 +575,7 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("couponcreatedsuccessfully"));
                 } else {
                     if (!oCoupon.CouponId) {
-                        MessageBox.error("Update failed: CouponId missing.");
+                        MessageBox.error(this.i18nModel.getText("updatefailedCouponIdmissing"));
                         return;
                     }
                     await this.ajaxUpdateWithJQuery("HM_Coupon", {

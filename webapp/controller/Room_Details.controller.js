@@ -12,8 +12,9 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteRoomDetails").attachMatched(this._onRouteMatched, this);
         },
-        
+
         _onRouteMatched: async function () {
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.commonLoginFunction();
 
             var model = new JSONModel({
@@ -239,11 +240,11 @@ sap.ui.define([
 
                 // Sum all NoofPerson for rooms with same BranchCode & BedTypeName
                 var iRoomNoOfPerson = aRoomDetails.filter(function (room) {
-                        return (
-                            room.BranchCode === bed.BranchCode &&
-                            room.BedTypeName === bed.Name + " - " + bed.ACType
-                        );
-                    })
+                    return (
+                        room.BranchCode === bed.BranchCode &&
+                        room.BedTypeName === bed.Name + " - " + bed.ACType
+                    );
+                })
                     .reduce(function (sum, room) {
                         return sum + (parseInt("1") || 0);
                     }, 0);
@@ -398,11 +399,11 @@ sap.ui.define([
 
                 // Sum NoofPerson for all matching rooms
                 var iRoomNoOfPerson = aRoomDetails.filter(function (room) {
-                        return (
-                            room.BranchCode === sBranchCode &&
-                            room.BedTypeName === bed.Name + " - " + bed.ACType
-                        );
-                    })
+                    return (
+                        room.BranchCode === sBranchCode &&
+                        room.BedTypeName === bed.Name + " - " + bed.ACType
+                    );
+                })
                     .reduce(function (sum, room) {
                         return sum + (parseInt("1") || 0);
                     }, 0);
@@ -480,7 +481,7 @@ sap.ui.define([
             this.getView().getModel("RoomDetailsModel").setData({});
 
         },
-        
+
         AR_onsavebuttonpress: function () {
             var oView = this.getView();
             var oRoomModel = oView.getModel("RoomModel");
@@ -569,7 +570,7 @@ sap.ui.define([
                     }
                 }
                 if (Payload.Price === 0 && Payload.MonthPrice === 0 && Payload.YearPrice === 0) {
-                    sap.m.MessageToast.show("Please Fill at Least One Price");
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }
 
@@ -611,7 +612,7 @@ sap.ui.define([
                         this.AR_Dialog.close();
                     }.bind(this),
                     error: function (err) {
-                        sap.m.MessageBox.error("Error Saving Room Data (Add/Update).");
+                        sap.m.MessageBox.error(this.i18nModel.getText("errorSavingRoomData"));
                         console.error(err);
                     }
                 });
@@ -679,7 +680,7 @@ sap.ui.define([
 
                         } catch (error) {
                             console.error("Delete Failed:", error);
-                            sap.m.MessageBox.error("Error while Deleting Room(s). Please try again.");
+                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRoomPleasetryagain"));
                         } finally {
                             table.removeSelections(true);
                         }

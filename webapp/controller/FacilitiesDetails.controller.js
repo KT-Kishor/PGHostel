@@ -12,7 +12,7 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             try {
-                 this.commonLoginFunction();
+                this.commonLoginFunction();
                 var Layout = this.byId("FD_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("FD_id_OrderHeaderSection1"));
 
@@ -100,7 +100,7 @@ sap.ui.define([
 
         BI_onButtonPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteFacilitis", {value: "Facilities", });
+            oRouter.navTo("RouteFacilitis", { value: "Facilities", });
         },
 
         onFacilitybranchChange: function (oEvent) {
@@ -262,9 +262,9 @@ sap.ui.define([
                     return;
                 }
 
-                 if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
-                   && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0  && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
-                   && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
+                if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
+                    && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0 && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
+                    && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
                     sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }

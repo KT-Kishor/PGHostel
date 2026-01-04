@@ -323,7 +323,7 @@ sap.ui.define([
 
                     const bookingDetails = oData.data?.BookingData?.[0];
                     if (!bookingDetails) {
-                        sap.m.MessageToast.show("Booking Details not Found");
+                        sap.m.MessageToast.show(this.i18nModel.getText("bookingDetailsnotFound"));
                         return;
                     }
 

@@ -344,7 +344,7 @@ sap.ui.define([
                 await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {
                     data: oData
                 });
-                sap.m.MessageToast.show(this.i18nModel.getText("facilityaddedsuccessfully"));
+                sap.m.MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
                 oView.getModel("UploaderData").setData({
                     attachments: []
                 });

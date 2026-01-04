@@ -573,7 +573,7 @@ sap.ui.define([
 
                         } catch (err) {
                             console.error("Delete failed:", err);
-                            sap.m.MessageBox.error("Error while Deleting Records. Please try again.");
+                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain"));
                         } finally {
                             sap.ui.core.BusyIndicator.hide();
                             oTable.removeSelections(true);

@@ -8,25 +8,26 @@ sap.ui.define([
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
         onInit() {
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var oBtn = this.byId("couponApplyBtn");
             oBtn.setText("Apply Now")
-       var oModel = sap.ui.getCore().getModel("LoginModel");
-    // var userId = oModel.getProperty("/UserID");
-    // var oHBox = this.byId("SummaryCouponid");
+            var oModel = sap.ui.getCore().getModel("LoginModel");
+            // var userId = oModel.getProperty("/UserID");
+            // var oHBox = this.byId("SummaryCouponid");
 
-    // if (userId) {
-    //     oHBox.setVisible(true);   // Show when UserID exists
-    // } else {
-    //     oHBox.setVisible(false);  // Hide when UserID is empty/null
-    // }
+            // if (userId) {
+            //     oHBox.setVisible(true);   // Show when UserID exists
+            // } else {
+            //     oHBox.setVisible(false);  // Hide when UserID is empty/null
+            // }
             var inputID = this.getView().byId("BookingcouponInput")
-             inputID.setShowValueHelp(false)
+            inputID.setShowValueHelp(false)
 
-               var DateModel = new JSONModel({
-                  minstartDate: "",
-                    minEndDate:""
-                });
-                this.getView().setModel(DateModel, "DateRangeModel");
+            var DateModel = new JSONModel({
+                minstartDate: "",
+                minEndDate: ""
+            });
+            this.getView().setModel(DateModel, "DateRangeModel");
         },
 
         onNavBack: function () {
@@ -36,7 +37,7 @@ sap.ui.define([
         onTableSelection: function (oEvent) {
             const oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("No Row Selected");
+                sap.m.MessageToast.show(this.i18nModel.getText("noRowSelected"));
                 return;
             }
 
@@ -44,7 +45,7 @@ sap.ui.define([
 
             const oContext = oSelectedItem.getBindingContext("HostelModel");
             if (!oContext) {
-                sap.m.MessageToast.show("Selection has no Binding Context");
+                sap.m.MessageToast.show(this.i18nModel.getText("selectionhasnoBindingContext"));
                 return;
             }
 
@@ -68,157 +69,150 @@ sap.ui.define([
 
             this._oSelectedIndex = idx;
         },
+        // --- Open edit dialog for selected facility ---
+        onEditFacilityDetails: function () {
+            const oEditModel = this.getView().getModel("HostelModel").getData();
+            this.getView().getModel("DateRangeModel").setProperty("/minstartDate", new Date(oEditModel.StartDate.split("/").reverse().join("-")));
+            this.getView().getModel("DateRangeModel").setProperty("/minEndDate", new Date(oEditModel.EndDate.split("/").reverse().join("-")));
 
-      
-// --- Open edit dialog for selected facility ---
-onEditFacilityDetails: function () {
+            if (!this._oSelectedFacility) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRowEdit"));
+                return;
+            }
 
-    const oEditModel = this.getView().getModel("HostelModel").getData();
-    this.getView().getModel("DateRangeModel").setProperty("/minstartDate", new Date(oEditModel.StartDate.split("/").reverse().join("-")));
-    this.getView().getModel("DateRangeModel").setProperty("/minEndDate", new Date(oEditModel.EndDate.split("/").reverse().join("-")));
+            // 1. Create edit model using selected row exactly
+            const oSafeCopy = JSON.parse(JSON.stringify(this._oSelectedFacility));
 
+            // ✅ Handle Per Hour defaults + total hour binding
+            if (oSafeCopy.UnitText === "Per Hour") {
 
+                const sStart = oSafeCopy.StartTime || "09";
+                const sEnd = oSafeCopy.EndTime || "10";
 
-    if (!this._oSelectedFacility) {
-        sap.m.MessageToast.show("Please Select a Row to Edit.");
-        return;
-    }
+                oSafeCopy.StartTime = sStart;
+                oSafeCopy.EndTime = sEnd;
 
-    // 1. Create edit model using selected row exactly
-    const oSafeCopy = JSON.parse(JSON.stringify(this._oSelectedFacility));
+                // ✅ Calculate Total Hour (HH format difference)
+                const iStart = parseInt(sStart, 10);
+                const iEnd = parseInt(sEnd, 10);
 
-    // ✅ Handle Per Hour defaults + total hour binding
-    if (oSafeCopy.UnitText === "Per Hour") {
+                let iTotal = iEnd - iStart;
+                if (iTotal < 0) {
+                    iTotal += 24; // safety for overnight (optional)
+                }
 
-        const sStart = oSafeCopy.StartTime || "09";
-        const sEnd   = oSafeCopy.EndTime   || "10";
+                // Bind TotalTime as 1.00
+                oSafeCopy.TotalTime = iTotal.toFixed(2); // "1.00"
+            }
 
-        oSafeCopy.StartTime = sStart;
-        oSafeCopy.EndTime   = sEnd;
+            this._oEditModel = new JSONModel(oSafeCopy);
 
-        // ✅ Calculate Total Hour (HH format difference)
-        const iStart = parseInt(sStart, 10);
-        const iEnd   = parseInt(sEnd, 10);
+            // Bind model to view + dialog
+            this.getView().setModel(this._oEditModel, "edit");
 
-        let iTotal = iEnd - iStart;
-        if (iTotal < 0) {
-            iTotal += 24; // safety for overnight (optional)
-        }
+            // Load dialog if not loaded
+            if (!this._oEditDialog) {
+                this._oEditDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "sap.ui.com.project1.fragment.FacilitiTableUpdate",
+                    this
+                );
+                this.getView().addDependent(this._oEditDialog);
+            }
 
-        // Bind TotalTime as 1.00
-        oSafeCopy.TotalTime = iTotal.toFixed(2); // "1.00"
-    }
+            // Assign model to dialog
+            this._oEditDialog.setModel(this._oEditModel, "edit");
 
-    this._oEditModel = new JSONModel(oSafeCopy);
+            // Filter RateType dropdown
+            this._filterRateTypesForEdit(this._oSelectedFacility);
 
-    // Bind model to view + dialog
-    this.getView().setModel(this._oEditModel, "edit");
+            // Open dialog
+            this._oEditDialog.open();
+        },
 
-    // Load dialog if not loaded
-    if (!this._oEditDialog) {
-        this._oEditDialog = sap.ui.xmlfragment(
-            this.getView().getId(),
-            "sap.ui.com.project1.fragment.FacilitiTableUpdate",
-            this
-        );
-        this.getView().addDependent(this._oEditDialog);
-    }
+        _resetEditValueStates: function () {
+            const aControlIds = [
+                "FT_id_editFacilityName",
+                "FT_id_UnitType",
+                "FT_id_editStartTime",
+                "FT_id_editEndTime",
+                "editTotalTime",
+                "FT_id_editPrice",
+                "FT_id_Currency",
+                "FT_id_editStartDate",
+                "FT_id_editEndDate",
+                "FT_id_editDays"
+            ];
 
-    // Assign model to dialog
-    this._oEditDialog.setModel(this._oEditModel, "edit");
+            aControlIds.forEach(sId => {
+                const oControl = sap.ui.core.Fragment.byId(
+                    this.getView().getId(),
+                    sId
+                );
 
-    // Filter RateType dropdown
-    this._filterRateTypesForEdit(this._oSelectedFacility);
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState("None");
+                }
+            });
+        },
 
-    // Open dialog
-    this._oEditDialog.open();
-},
+        onEditDialogAfterOpen: function () {
+            this._resetEditValueStates();
+        },
 
-_resetEditValueStates: function () {
-    const aControlIds = [
-        "FT_id_editFacilityName",
-        "FT_id_UnitType",
-        "FT_id_editStartTime",
-        "FT_id_editEndTime",
-        "editTotalTime",
-        "FT_id_editPrice",
-        "FT_id_Currency",
-        "FT_id_editStartDate",
-        "FT_id_editEndDate",
-        "FT_id_editDays"
-    ];
+        _filterRateTypesForEdit: function () {
+            const sBranchCode = this._oSelectedFacility.BranchCode || this._oSelectedFacility.Branch || "";
+            const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
 
-    aControlIds.forEach(sId => {
-        const oControl = sap.ui.core.Fragment.byId(
-            this.getView().getId(),
-            sId
-        );
+            const oFacilityData = aFacilities.find(f =>
+                f.FacilityName === this._oSelectedFacility.FacilityName &&
+                f.BranchCode === sBranchCode
+            );
 
-        if (oControl && oControl.setValueState) {
-            oControl.setValueState("None");
-        }
-    });
-},
+            if (!oFacilityData) {
+                console.error("Facility not found:", this._oSelectedFacility);
+                sap.m.MessageToast.show(this.i18nModel.getText("facilityDataMissing"));
+                return;
+            }
 
-onEditDialogAfterOpen: function () {
-    this._resetEditValueStates();
-},
+            const oRateTypeModel = this.getOwnerComponent().getModel("RateType");
 
-_filterRateTypesForEdit: function () {
+            if (!this._aOriginalRateTypes) {
+                this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
+            }
 
-    const sBranchCode = this._oSelectedFacility.BranchCode || this._oSelectedFacility.Branch || "";
-    const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+            // 🔹 Booking Duration selection
+            const sSelectedPriceType =
+                this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
 
-    const oFacilityData = aFacilities.find(f =>
-        f.FacilityName === this._oSelectedFacility.FacilityName &&
-        f.BranchCode === sBranchCode
-    );
+            // 🔹 Allowed units based on Booking Duration
+            let aAllowed = [];
 
-    if (!oFacilityData) {
-        console.error("Facility not found:", this._oSelectedFacility);
-        sap.m.MessageToast.show("Facility Data Missing.");
-        return;
-    }
+            if (sSelectedPriceType === "Per Day") {
+                aAllowed = ["Per Hour", "Per Day"];
+            }
+            else if (sSelectedPriceType === "Per Month") {
+                aAllowed = ["Per Hour", "Per Day", "Per Month"];
+            }
+            else if (sSelectedPriceType === "Per Year") {
+                aAllowed = ["Per Hour", "Per Day", "Per Month", "Per Year"];
+            }
 
-    const oRateTypeModel = this.getOwnerComponent().getModel("RateType");
+            // 🔹 Price mapping
+            const priceMapping = {
+                "Per Hour": Number(oFacilityData.PricePerHour),
+                "Per Day": Number(oFacilityData.PricePerDay),
+                "Per Month": Number(oFacilityData.PricePerMonth),
+                "Per Year": Number(oFacilityData.PricePerYear)
+            };
 
-    if (!this._aOriginalRateTypes) {
-        this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
-    }
+            // ✅ FINAL FILTER (Allowed by duration + price > 0)
+            const aFiltered = this._aOriginalRateTypes.filter(rt =>
+                aAllowed.includes(rt.RateType) && priceMapping[rt.RateType] > 0
+            );
 
-    // 🔹 Booking Duration selection
-    const sSelectedPriceType =
-        this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
-
-    // 🔹 Allowed units based on Booking Duration
-    let aAllowed = [];
-
-    if (sSelectedPriceType === "Per Day") {
-        aAllowed = ["Per Hour", "Per Day"];
-    }
-    else if (sSelectedPriceType === "Per Month") {
-        aAllowed = ["Per Hour", "Per Day", "Per Month"];
-    }
-    else if (sSelectedPriceType === "Per Year") {
-        aAllowed = ["Per Hour", "Per Day", "Per Month", "Per Year"];
-    }
-
-    // 🔹 Price mapping
-    const priceMapping = {
-        "Per Hour": Number(oFacilityData.PricePerHour),
-        "Per Day": Number(oFacilityData.PricePerDay),
-        "Per Month": Number(oFacilityData.PricePerMonth),
-        "Per Year": Number(oFacilityData.PricePerYear)
-    };
-
-    // ✅ FINAL FILTER (Allowed by duration + price > 0)
-    const aFiltered = this._aOriginalRateTypes.filter(rt =>
-        aAllowed.includes(rt.RateType) && priceMapping[rt.RateType] > 0
-    );
-
-    oRateTypeModel.setData(aFiltered);
-},
-
+            oRateTypeModel.setData(aFiltered);
+        },
 
         _parsePossibleDateString: function (s) {
             if (!s) return null;
@@ -262,172 +256,172 @@ _filterRateTypesForEdit: function () {
         },
 
         onMonthSelectionChange: function (oEvent) {
-    const oView = this.getView();
-    const oHostelModel = oView.getModel("edit");
+            const oView = this.getView();
+            const oHostelModel = oView.getModel("edit");
 
-    const sUnit = oHostelModel.getProperty("/UnitText");
-    const sStartDate = oHostelModel.getProperty("/StartDate") || "";
+            const sUnit = oHostelModel.getProperty("/UnitText");
+            const sStartDate = oHostelModel.getProperty("/StartDate") || "";
 
-    const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
+            const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
 
-    if (!sStartDate) {
-        sap.m.MessageToast.show("Please Select Start Date First.");
-        return;
-    }
+            if (!sStartDate) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
+                return;
+            }
 
-    const oStart = this._parseDate(sStartDate);
-    if (!(oStart instanceof Date) || isNaN(oStart)) {
-        sap.m.MessageToast.show("Invalid Start Date.");
-        return;
-    }
+            const oStart = this._parseDate(sStartDate);
+            if (!(oStart instanceof Date) || isNaN(oStart)) {
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartDate"));
+                return;
+            }
 
-    let oEnd = new Date(oStart);
+            let oEnd = new Date(oStart);
 
-    // ⭐ REAL CALENDAR LOGIC (INCLUSIVE)
-    if (sUnit === "Per Month") {
-        oEnd.setMonth(oEnd.getMonth() + iSelectedNumber);
-        oEnd.setDate(oEnd.getDate() - 1);
+            // ⭐ REAL CALENDAR LOGIC (INCLUSIVE)
+            if (sUnit === "Per Month") {
+                oEnd.setMonth(oEnd.getMonth() + iSelectedNumber);
+                oEnd.setDate(oEnd.getDate() - 1);
 
-        oHostelModel.setProperty("/TotalMonths", iSelectedNumber);
-        oHostelModel.setProperty("/TotalYears", 0);
-    }
-    else if (sUnit === "Per Year") {
-        oEnd.setFullYear(oEnd.getFullYear() + iSelectedNumber);
-        oEnd.setDate(oEnd.getDate() - 1);
+                oHostelModel.setProperty("/TotalMonths", iSelectedNumber);
+                oHostelModel.setProperty("/TotalYears", 0);
+            }
+            else if (sUnit === "Per Year") {
+                oEnd.setFullYear(oEnd.getFullYear() + iSelectedNumber);
+                oEnd.setDate(oEnd.getDate() - 1);
 
-        oHostelModel.setProperty("/TotalYears", iSelectedNumber);
-        oHostelModel.setProperty("/TotalMonths", 0);
-    }
-    else {
-        return;
-    }
+                oHostelModel.setProperty("/TotalYears", iSelectedNumber);
+                oHostelModel.setProperty("/TotalMonths", 0);
+            }
+            else {
+                return;
+            }
 
-    // 🔢 Calculate total days (inclusive)
-    const iTotalDays =
-        Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+            // 🔢 Calculate total days (inclusive)
+            const iTotalDays =
+                Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
 
-    const sEndDate = this._formatDateToDDMMYYYY(oEnd);
+            const sEndDate = this._formatDateToDDMMYYYY(oEnd);
 
-    oHostelModel.setProperty("/EndDate", sEndDate);
-    oHostelModel.setProperty("/TotalDays", iTotalDays);
-}
-,
-      onEditDateChange: function (oEvent) {
-    utils._LCvalidateMandatoryField(oEvent);
-
-    const oView = this.getView();
-    const oModel = oView.getModel("edit");
-
-    const sUnit = oModel.getProperty("/UnitText");
-    const sStart = oModel.getProperty("/StartDate");
-    let sEnd = oModel.getProperty("/EndDate");
-
-    if (!sStart) return;
-
-    /** STRING → JS DATE (supports DD/MM/YYYY and YYYY-MM-DD) */
-    const toJSDate = (s) => {
-        if (!s) return null;
-        if (s.includes("/")) {
-            const [d, m, y] = s.split("/");
-            return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+            oHostelModel.setProperty("/EndDate", sEndDate);
+            oHostelModel.setProperty("/TotalDays", iTotalDays);
         }
-        return new Date(s);
-    };
+        ,
+        onEditDateChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
 
-    const oStart = toJSDate(sStart);
-    if (!oStart || isNaN(oStart)) return;
+            const oView = this.getView();
+            const oModel = oView.getModel("edit");
 
-    let oEnd = null;
-    let iDays = 0;
-    let bAutoEndDate = false;   // 🔑 FLAG
+            const sUnit = oModel.getProperty("/UnitText");
+            const sStart = oModel.getProperty("/StartDate");
+            let sEnd = oModel.getProperty("/EndDate");
 
-    /* ===============================
-       UNIT-WISE CALCULATION
-    =============================== */
+            if (!sStart) return;
 
-    if (sUnit === "Per Month" || sUnit === "monthly") {
+            /** STRING → JS DATE (supports DD/MM/YYYY and YYYY-MM-DD) */
+            const toJSDate = (s) => {
+                if (!s) return null;
+                if (s.includes("/")) {
+                    const [d, m, y] = s.split("/");
+                    return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                }
+                return new Date(s);
+            };
 
-        let iCount = parseInt(oModel.getProperty("/TotalMonths") || 1, 10);
+            const oStart = toJSDate(sStart);
+            if (!oStart || isNaN(oStart)) return;
 
-        oEnd = new Date(oStart);
-        oEnd.setMonth(oEnd.getMonth() + iCount);
-        oEnd.setDate(oEnd.getDate() - 1);
-        bAutoEndDate = true;
+            let oEnd = null;
+            let iDays = 0;
+            let bAutoEndDate = false;   // 🔑 FLAG
 
-    } else if (sUnit === "Per Year" || sUnit === "yearly") {
+            /* ===============================
+               UNIT-WISE CALCULATION
+            =============================== */
 
-        let iCount = parseInt(oModel.getProperty("/TotalYears") || 1, 10);
+            if (sUnit === "Per Month" || sUnit === "monthly") {
 
-        oEnd = new Date(oStart);
-        oEnd.setFullYear(oEnd.getFullYear() + iCount);
-        oEnd.setDate(oEnd.getDate() - 1);
-        bAutoEndDate = true;
+                let iCount = parseInt(oModel.getProperty("/TotalMonths") || 1, 10);
 
-    } else if (sUnit === "Per Day" || sUnit === "daily" || sUnit === "Per Hour") {
+                oEnd = new Date(oStart);
+                oEnd.setMonth(oEnd.getMonth() + iCount);
+                oEnd.setDate(oEnd.getDate() - 1);
+                bAutoEndDate = true;
 
-        if (sEnd) {
-            oEnd = toJSDate(sEnd);
-        }
+            } else if (sUnit === "Per Year" || sUnit === "yearly") {
 
-        const msPerDay = 1000 * 60 * 60 * 24;
+                let iCount = parseInt(oModel.getProperty("/TotalYears") || 1, 10);
 
-        if (oEnd) {
-            oEnd.setHours(23, 59, 59, 999);
-            iDays = Math.ceil((oEnd - oStart) / msPerDay);
-            iDays = iDays >= 0 ? iDays : 0;
-        } else {
-            iDays = 1;
-            oEnd = new Date(oStart);
-            bAutoEndDate = true;
-        }
-    }
+                oEnd = new Date(oStart);
+                oEnd.setFullYear(oEnd.getFullYear() + iCount);
+                oEnd.setDate(oEnd.getDate() - 1);
+                bAutoEndDate = true;
 
-    /* ===============================
-       TOTAL DAYS (INCLUSIVE)
-    =============================== */
-    if (oEnd && iDays === 0) {
-        const diff = oEnd.getTime() - oStart.getTime();
-        iDays = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
-    }
+            } else if (sUnit === "Per Day" || sUnit === "daily" || sUnit === "Per Hour") {
 
-    oModel.setProperty("/TotalDays", iDays);
+                if (sEnd) {
+                    oEnd = toJSDate(sEnd);
+                }
 
-    /* ===============================
-       FORMAT DATE → DD/MM/YYYY
-    =============================== */
-    const toDDMMYYYY = (d) => {
-        if (!d) return "";
-        const dd = String(d.getDate()).padStart(2, "0");
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-    };
+                const msPerDay = 1000 * 60 * 60 * 24;
 
-    oModel.setProperty("/EndDate", oEnd ? toDDMMYYYY(oEnd) : "");
+                if (oEnd) {
+                    oEnd.setHours(23, 59, 59, 999);
+                    iDays = Math.ceil((oEnd - oStart) / msPerDay);
+                    iDays = iDays >= 0 ? iDays : 0;
+                } else {
+                    iDays = 1;
+                    oEnd = new Date(oStart);
+                    bAutoEndDate = true;
+                }
+            }
 
-    /* ===============================
-       RESET VALUE STATE WHEN AUTO SET
-    =============================== */
-    if (bAutoEndDate) {
-        const oEndDP = sap.ui.getCore().byId(oView.getId() + "--FT_id_editEndDate");
-        if (oEndDP) {
-            oEndDP.setValueState(sap.ui.core.ValueState.None);
-            oEndDP.setValueStateText("");
-        }
-    }
+            /* ===============================
+               TOTAL DAYS (INCLUSIVE)
+            =============================== */
+            if (oEnd && iDays === 0) {
+                const diff = oEnd.getTime() - oStart.getTime();
+                iDays = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            }
 
-    /* ===============================
-       MIN END DATE
-    =============================== */
-    const oEndDP = sap.ui.getCore().byId(oView.getId() + "--FT_id_editEndDate");
-    if (oEndDP) {
-        const oMin = new Date(oStart);
-        oMin.setDate(oMin.getDate() + 1);
-        oEndDP.setMinDate(oMin);
-    }
+            oModel.setProperty("/TotalDays", iDays);
 
-    utils._LCvalidateDate(oEvent);
-},
+            /* ===============================
+               FORMAT DATE → DD/MM/YYYY
+            =============================== */
+            const toDDMMYYYY = (d) => {
+                if (!d) return "";
+                const dd = String(d.getDate()).padStart(2, "0");
+                const mm = String(d.getMonth() + 1).padStart(2, "0");
+                const yyyy = d.getFullYear();
+                return `${dd}/${mm}/${yyyy}`;
+            };
+
+            oModel.setProperty("/EndDate", oEnd ? toDDMMYYYY(oEnd) : "");
+
+            /* ===============================
+               RESET VALUE STATE WHEN AUTO SET
+            =============================== */
+            if (bAutoEndDate) {
+                const oEndDP = sap.ui.getCore().byId(oView.getId() + "--FT_id_editEndDate");
+                if (oEndDP) {
+                    oEndDP.setValueState(sap.ui.core.ValueState.None);
+                    oEndDP.setValueStateText("");
+                }
+            }
+
+            /* ===============================
+               MIN END DATE
+            =============================== */
+            const oEndDP = sap.ui.getCore().byId(oView.getId() + "--FT_id_editEndDate");
+            if (oEndDP) {
+                const oMin = new Date(oStart);
+                oMin.setDate(oMin.getDate() + 1);
+                oEndDP.setMinDate(oMin);
+            }
+
+            utils._LCvalidateDate(oEvent);
+        },
 
         // Utility function to format date
         _formatDateToDDMMYYYY: function (oDate) {
@@ -443,7 +437,7 @@ _filterRateTypesForEdit: function () {
             const oEditModel = oView.getModel("edit");
 
             if (!oHostelModel || !oEditModel) {
-                sap.m.MessageToast.show("Missing Models");
+                sap.m.MessageToast.show(this.i18nModel.getText("missingModels"));
                 return;
             }
 
@@ -452,7 +446,7 @@ _filterRateTypesForEdit: function () {
             const sViewId = oView.getId();
 
             const oStartDate = sap.ui.core.Fragment.byId(sViewId, "FT_id_editStartDate");
-            const oEndDate   = sap.ui.core.Fragment.byId(sViewId, "FT_id_editEndDate");
+            const oEndDate = sap.ui.core.Fragment.byId(sViewId, "FT_id_editEndDate");
 
             // ---- Date validation (sequential) ----
             const isDateValid =
@@ -460,40 +454,40 @@ _filterRateTypesForEdit: function () {
                 utils._LCvalidateDate(oEndDate, "ID");
 
             if (!isDateValid) {
-                sap.m.MessageToast.show("Please Select Start Date and End Date");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateEndDate"));
                 return;
             }
 
             // ---- Per Day validation ----
             if (sUnitText === "Per Day" && iTotalDays < 1) {
-                sap.m.MessageBox.error("Total Days must be at Least 1 for Per Day Booking.");
+                sap.m.MessageBox.error(this.i18nModel.getText("totalDaysmustbeatLeastforPerDayBooking"));
                 return;
             }
 
             // ---- Per Hour validation (SEQUENTIAL) ----
             if (sUnitText === "Per Hour") {
                 const oStartTime = sap.ui.core.Fragment.byId(sViewId, "FT_id_editStartTime");
-                const oEndTime   = sap.ui.core.Fragment.byId(sViewId, "FT_id_editEndTime");
+                const oEndTime = sap.ui.core.Fragment.byId(sViewId, "FT_id_editEndTime");
                 const oTotalTime = sap.ui.core.Fragment.byId(sViewId, "editTotalTime");
-               
+
 
                 const isMandatoryValid =
                     utils._LCvalidateMandatoryField(oStartTime, "ID") &&
                     utils._LCvalidateMandatoryField(oEndTime, "ID") &&
                     utils._LCvalidateMandatoryField(oTotalTime, "ID")
-                  
+
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show("Please Fill all Mandatory Fields.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                     return;
                 }
-                
+
                 // Time comparison AFTER mandatory validation
                 const start = new Date("1970-01-01T" + oStartTime.getValue() + ":00");
-                const end   = new Date("1970-01-01T" + oEndTime.getValue() + ":00");
+                const end = new Date("1970-01-01T" + oEndTime.getValue() + ":00");
 
                 if (start >= end) {
-                    sap.m.MessageToast.show("Start Time should be Less than End Time");
+                    sap.m.MessageToast.show(this.i18nModel.getText("startTimeShouldbeLessthanEndTime"));
                     return;
                 }
             }
@@ -549,7 +543,7 @@ _filterRateTypesForEdit: function () {
                     all: aFacilities,
                     selected: this._oSelectedFacility
                 });
-                sap.m.MessageToast.show("Could not find Selected Facility in Global list. Please re-select the Row and try again.");
+                sap.m.MessageToast.show(this.i18nModel.getText("couldnotfindSelectedFacilityGloballistPleasereselectRowtryagain"));
                 return;
             }
 
@@ -563,29 +557,29 @@ _filterRateTypesForEdit: function () {
             aFacilities[iIndex] = oUpdatedData;
             oHostelModel.setProperty("/AllSelectedFacilities", aFacilities);
             // --- FIX FOR PER HOUR FACILITY (ensures TotalTime goes to payload) ---
-           // --- FIX FOR PER HOUR FACILITY ---
-if (oUpdatedData.UnitText === "Per Hour") {
+            // --- FIX FOR PER HOUR FACILITY ---
+            if (oUpdatedData.UnitText === "Per Hour") {
 
-    const hours = Number(oUpdatedData.TotalTime) || 1;
-    const price = Number(oUpdatedData.Price) || 0;
+                const hours = Number(oUpdatedData.TotalTime) || 1;
+                const price = Number(oUpdatedData.Price) || 0;
 
-    // Global list
-    aFacilities[iIndex].TotalTime = hours;
-    aFacilities[iIndex].TotalDays ;              // ✅ FIX
-    aFacilities[iIndex].TotalAmount = price * hours;
+                // Global list
+                aFacilities[iIndex].TotalTime = hours;
+                aFacilities[iIndex].TotalDays;              // ✅ FIX
+                aFacilities[iIndex].TotalAmount = price * hours;
 
-    // Per-person list
-    if (
-        aPersons[oUpdatedData.ID] &&
-        aPersons[oUpdatedData.ID].AllSelectedFacilities &&
-        aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
-    ) {
-        const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
-        oFac.TotalTime = hours;
-        oFac.TotalDays ;                          // ✅ FIX
-        oFac.TotalAmount = price * hours;
-    }
-}
+                // Per-person list
+                if (
+                    aPersons[oUpdatedData.ID] &&
+                    aPersons[oUpdatedData.ID].AllSelectedFacilities &&
+                    aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
+                ) {
+                    const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
+                    oFac.TotalTime = hours;
+                    oFac.TotalDays;                          // ✅ FIX
+                    oFac.TotalAmount = price * hours;
+                }
+            }
 
             // 3. Apply model refresh
             oHostelModel.refresh(true);
@@ -673,7 +667,7 @@ if (oUpdatedData.UnitText === "Per Hour") {
                 // Reset button
                 if (oBtn) oBtn.setText("Apply Now");
 
-                sap.m.MessageToast.show("Coupon Removed. Total is Less than Minimum Order Value.");
+                sap.m.MessageToast.show(this.i18nModel.getText("couponRemovedTotalLessthanMinimumOrderValue"));
             }
 
             // 6️⃣ Re-apply taxes (India → CGST + SGST)
@@ -691,7 +685,6 @@ if (oUpdatedData.UnitText === "Per Hour") {
             oHostelModel.setProperty("/CGST", cgst);
             oHostelModel.setProperty("/SGST", sgst);
             oHostelModel.setProperty("/FinalTotalCost", finalTotal);
-
 
             let aSummary = oHostelModel.getProperty("/PersonFacilitiesSummary") || [];
 
@@ -738,7 +731,7 @@ if (oUpdatedData.UnitText === "Per Hour") {
             this._oSelectedFacility = null;
             this._oSelectedIndex = null;
             this._sSelectedPath = null;
-            sap.m.MessageToast.show("Facility Updated Successfully!");
+            sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
         },
 
         _formatDateToDDMMYYYY: function (dt) {
@@ -885,8 +878,8 @@ if (oUpdatedData.UnitText === "Per Hour") {
                         Price: fPrice,
                         StartDate: f.StartDate,
                         EndDate: f.EndDate,
-                         StartTime:f.StartTime,
-                        EndTime:f.EndTime,
+                        StartTime: f.StartTime,
+                        EndTime: f.EndTime,
                         // hoursPerDay (user provided) and overallHours
                         HoursPerDay: hoursPerDay,
                         TotalHours: +(hoursPerDay * fDays).toFixed(2),
@@ -931,8 +924,6 @@ if (oUpdatedData.UnitText === "Per Hour") {
                 FinalTotal: +finalTotal.toFixed(2),
                 AllSelectedFacilities: aAllFacilities
             };
-
-
             // return {
             //     TotalFacilityPrice: +totalFacilityPrice.toFixed(2),
             //     GrandTotal: +grandTotal.toFixed(2),
@@ -952,18 +943,18 @@ if (oUpdatedData.UnitText === "Per Hour") {
             }
             return new Date(s);
         },
-   onUnitTextChange: function (oEvent) {
-          
-  const oCombo = oEvent.getSource();
 
-    // 🔴 Typed value (no selectedItem)
-    if (!oCombo.getSelectedItem()) {
-        utils._LCvalidationComboBox(oEvent); // SAFE call
-        sap.m.MessageToast.show("Please select Unit Type from list.");
-        return;
-    }
+        onUnitTextChange: function (oEvent) {
+            const oCombo = oEvent.getSource();
 
-    oCombo.setValueState("None");
+            // 🔴 Typed value (no selectedItem)
+            if (!oCombo.getSelectedItem()) {
+                utils._LCvalidationComboBox(oEvent); // SAFE call
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
+                return;
+            }
+
+            oCombo.setValueState("None");
             const oEditModel = this.getView().getModel("edit");
             const oFacilityModel = this.getView().getModel("FacilityModel");
 
@@ -989,7 +980,7 @@ if (oUpdatedData.UnitText === "Per Hour") {
             );
 
             if (!oMatched) {
-                sap.m.MessageToast.show("Price not Found for Selected Unit Type.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
                 return;
             }
 
@@ -1027,7 +1018,7 @@ if (oUpdatedData.UnitText === "Per Hour") {
             const oDoc = oCtx && oCtx.getObject();
 
             if (!oDoc || !oDoc.Document) {
-                sap.m.MessageToast.show("No Document to Preview.");
+                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
                 return;
             }
 
@@ -1143,61 +1134,61 @@ if (oUpdatedData.UnitText === "Per Hour") {
                 this._oDocPreviewDialog.close();
             }
         },
-    onTimeChange: function (oEvent) {
-    utils._LCvalidateMandatoryField(oEvent);
-    const oEditModel = this.getView().getModel("edit");
-    const oTimePicker = oEvent.getSource(); // StartTime or EndTime field
 
-    const sStart = oEditModel.getProperty("/StartTime");
-    const sEnd = oEditModel.getProperty("/EndTime");
+        onTimeChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+            const oEditModel = this.getView().getModel("edit");
+            const oTimePicker = oEvent.getSource(); // StartTime or EndTime field
 
-    // If one field is missing, clear total and exit
-    if (!sStart || !sEnd) {
-        oEditModel.setProperty("/TotalTime", "");
-        oTimePicker.setValueState("None");
-        return;
-    }
+            const sStart = oEditModel.getProperty("/StartTime");
+            const sEnd = oEditModel.getProperty("/EndTime");
 
-    // Convert to number (same as onEditTimeChange)
-    const startHour = parseFloat(sStart);
-    const endHour = parseFloat(sEnd);
+            // If one field is missing, clear total and exit
+            if (!sStart || !sEnd) {
+                oEditModel.setProperty("/TotalTime", "");
+                oTimePicker.setValueState("None");
+                return;
+            }
 
-    // Validate number format
-    if (isNaN(startHour) || isNaN(endHour)) {
-        sap.m.MessageToast.show("Invalid Hour Format");
-        oEditModel.setProperty("/TotalTime", "");
-        oTimePicker.setValueState("Error");
-        return;
-    }
+            // Convert to number (same as onEditTimeChange)
+            const startHour = parseFloat(sStart);
+            const endHour = parseFloat(sEnd);
 
-    // Validate end > start
-    if (endHour < startHour) {
-        sap.m.MessageToast.show("End Time should be Greater than Start Time");
-        oEditModel.setProperty("/TotalTime", "");
-        oTimePicker.setValueState("Error");
-        oTimePicker.setValueStateText("End Time cannot be earlier than Start Time");
-        return;
-    }
+            // Validate number format
+            if (isNaN(startHour) || isNaN(endHour)) {
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
+                oEditModel.setProperty("/TotalTime", "");
+                oTimePicker.setValueState("Error");
+                return;
+            }
 
-    // Clear error state
-    oTimePicker.setValueState("None");
+            // Validate end > start
+            if (endHour < startHour) {
+                sap.m.MessageToast.show(this.i18nModel.getText("endTimeShouldbeGreaterthanStartTime"));
+                oEditModel.setProperty("/TotalTime", "");
+                oTimePicker.setValueState("Error");
+                oTimePicker.setValueStateText(this.i18nModel.getText("endTimecannotbeearlierthanStartTime"));
+                return;
+            }
 
-    // Calculate difference
-    const totalHours = endHour - startHour;
+            // Clear error state
+            oTimePicker.setValueState("None");
 
-    // Format to 2 decimals (same behavior)
-    const formatted = totalHours.toFixed(2);
+            // Calculate difference
+            const totalHours = endHour - startHour;
 
-    oEditModel.setProperty("/TotalTime", formatted);
-},
+            // Format to 2 decimals (same behavior)
+            const formatted = totalHours.toFixed(2);
 
-
+            oEditModel.setProperty("/TotalTime", formatted);
+        },
 
         _getTimePeriod: function (sTime) {
             if (!sTime) return "";
             const [hour] = sTime.split(":").map(Number);
             return hour < 12 ? "Morning" : "Evening";
         },
+
         _sumGrandTotalOfPersons: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
             const aPersons = oHostelModel.getProperty("/Persons") || [];
@@ -1210,58 +1201,59 @@ if (oUpdatedData.UnitText === "Per Hour") {
 
             return sum;
         },
-       oncancelCoupon: function () {
 
-    var oHostelModel = this.getView().getModel("HostelModel");
-    var inputID = sap.ui.core.Fragment.byId(this.getView().getId(), "BookingcouponInput");
+        oncancelCoupon: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var inputID = sap.ui.core.Fragment.byId(this.getView().getId(), "BookingcouponInput");
 
-    // Clear model
-    oHostelModel.setProperty("/CouponCode", "");
-    oHostelModel.setProperty("/AppliedDiscount", 0);
+            // Clear model
+            oHostelModel.setProperty("/CouponCode", "");
+            oHostelModel.setProperty("/AppliedDiscount", 0);
 
-    // Force UI update
-    oHostelModel.refresh(true);
+            // Force UI update
+            oHostelModel.refresh(true);
 
-    // Reset cost
-    const subTotal = this._sumGrandTotalOfPersons();
-    oHostelModel.setProperty("/OverallTotalCost", subTotal);
+            // Reset cost
+            const subTotal = this._sumGrandTotalOfPersons();
+            oHostelModel.setProperty("/OverallTotalCost", subTotal);
 
-    const isIndia = oHostelModel.getProperty("/IsIndia");
-    let cgst = 0, sgst = 0, finalTotal = subTotal;
+            const isIndia = oHostelModel.getProperty("/IsIndia");
+            let cgst = 0, sgst = 0, finalTotal = subTotal;
 
-    if (isIndia) {
-        cgst = subTotal * 0.09;
-        sgst = subTotal * 0.09;
-        finalTotal = subTotal + cgst + sgst;
-    }
+            if (isIndia) {
+                cgst = subTotal * 0.09;
+                sgst = subTotal * 0.09;
+                finalTotal = subTotal + cgst + sgst;
+            }
 
-    oHostelModel.setProperty("/CGST", cgst);
-    oHostelModel.setProperty("/SGST", sgst);
-    oHostelModel.setProperty("/FinalTotalCost", finalTotal);
+            oHostelModel.setProperty("/CGST", cgst);
+            oHostelModel.setProperty("/SGST", sgst);
+            oHostelModel.setProperty("/FinalTotalCost", finalTotal);
 
-    // Hide icon
-    if (inputID) {
-        inputID.setShowValueHelp(false);
-    }
-    var oBtn = this.byId("couponApplyBtn");
-oBtn.setVisible(true);  
-},
+            // Hide icon
+            if (inputID) {
+                inputID.setShowValueHelp(false);
+            }
+            var oBtn = this.byId("couponApplyBtn");
+            oBtn.setVisible(true);
+        },
 
-           onCouponLiveChange: function(oEvent) {
-    var oInput = oEvent.getSource();
-    var sValue = oInput.getValue();
-  var oBtn = this.byId("couponApplyBtn");
-  
-    // Show icon only if there is value
-    oInput.setShowValueHelp(!!sValue);
+        onCouponLiveChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            var sValue = oInput.getValue();
+            var oBtn = this.byId("couponApplyBtn");
 
-     if (sValue && sValue.trim().length > 0) {
-        oBtn.setVisible(true);
-    } else {
-        oBtn.setVisible(true); // Always show when blank
-    }
-},
-  onChangeCouponCode: async function (oEvent) {
+            // Show icon only if there is value
+            oInput.setShowValueHelp(!!sValue);
+
+            if (sValue && sValue.trim().length > 0) {
+                oBtn.setVisible(true);
+            } else {
+                oBtn.setVisible(true); // Always show when blank
+            }
+        },
+
+        onChangeCouponCode: async function (oEvent) {
             var oHostelModel = this.getView().getModel("HostelModel");
             var oBtn = this.byId("couponApplyBtn");
             //  sap.ui.getCore().byId(this.createId("couponApplyBtn"))
@@ -1269,7 +1261,7 @@ oBtn.setVisible(true);
             var sBranchCode = oHostelModel.getProperty("/BranchCode");
 
             if (sEnteredCode === "") {
-                sap.m.MessageToast.show("Enter Coupon for Discount");
+                sap.m.MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
                 return;
             }
 
@@ -1286,12 +1278,12 @@ oBtn.setVisible(true);
                 oHostelModel.setProperty("/SGST", originalSGST);
                 oHostelModel.setProperty("/FinalTotalCost", originalFinal);
 
-                sap.m.MessageToast.show("Coupon Removed. Prices Restored.");
+                sap.m.MessageToast.show(this.i18nModel.getText("couponRemovedPricesRestored"));
                 return;
             }
 
             if (!sEnteredCode) {
-                sap.m.MessageToast.show("Please Enter Coupon");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
                 return;
             }
 
@@ -1308,26 +1300,25 @@ oBtn.setVisible(true);
                 const aCoupons = response?.data || [];
 
                 if (!aCoupons.length) {
-                    sap.m.MessageToast.show("No Coupons Found");
+                    sap.m.MessageToast.show(this.i18nModel.getText("noCouponsFound"));
                     return;
                 }
-              const CouponCodeEnddate = aCoupons[0].EndDate;
-const couponEndISO = new Date(CouponCodeEnddate).toISOString().split("T")[0];
-const todayISO = new Date().toISOString().split("T")[0];
+                const CouponCodeEnddate = aCoupons[0].EndDate;
+                const couponEndISO = new Date(CouponCodeEnddate).toISOString().split("T")[0];
+                const todayISO = new Date().toISOString().split("T")[0];
 
-// Compare
-if (couponEndISO < todayISO) {
-    sap.m.MessageToast.show("Coupon is Expired.");
-    return;
-}
+                // Compare
+                if (couponEndISO < todayISO) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("couponisExpired"));
+                    return;
+                }
                 // Match coupon
                 const oMatched = aCoupons.find(c =>
                     String(c.CouponCode).toUpperCase() === sEnteredCode.toUpperCase()
                 );
 
-
                 if (!oMatched) {
-                    sap.m.MessageToast.show("Invalid Coupon Code");
+                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                     return;
                 }
                 const couponBranch = String(oMatched.BranchCode || "").trim();
@@ -1335,7 +1326,7 @@ if (couponEndISO < todayISO) {
 
                 if (couponBranch && couponBranch !== selectedBranch) {
                     sap.m.MessageToast.show(
-                        `This Coupon is not Valid for the Selected Branch Room.`
+                        this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
                     );
                     return;
                 }
@@ -1352,7 +1343,7 @@ if (couponEndISO < todayISO) {
                 let subTotal = Number(oHostelModel.getProperty("/OverallTotalCost") || 0);
 
                 if (subTotal <= 0) {
-                    sap.m.MessageToast.show("Subtotal is Zero. Cannot Apply Coupon.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("subtotalisZeroCannotApplyCoupon"));
                     return;
                 }
                 if (subTotal < minOrderValue) {
@@ -1402,14 +1393,14 @@ if (couponEndISO < todayISO) {
                 oHostelModel.setProperty("/FinalTotalCost", finalTotal);
 
                 oHostelModel.refresh(true);
-              oBtn.setVisible(false);
+                oBtn.setVisible(false);
                 sap.m.MessageToast.show(
-                    `Coupon Applied Successfully`
+                    this.i18nModel.getText("couponAppliedSuccessfully")
                 );
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show("Error Applying Coupon");
+                sap.m.MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }

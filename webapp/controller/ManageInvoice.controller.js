@@ -247,7 +247,6 @@ sap.ui.define(
             .finally(function () {
               oSheet.destroy();
             });
-
         }
       }
     );

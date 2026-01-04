@@ -5,16 +5,17 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../utils/validation",
     "../model/formatter"
-], function(BaseController, JSONModel, MessageToast, MessageBox, validation, Formatter) {
+], function (BaseController, JSONModel, MessageToast, MessageBox, validation, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.EditBookingDetails", {
         Formatter: Formatter,
 
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("EditBookingDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function() {
+        _onRouteMatched: function () {
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var oViewModel = new JSONModel({
                 editMode: false
             });
@@ -23,7 +24,7 @@ sap.ui.define([
             this.Facilitidetails()
         },
 
-        BedTypedetails: async function() {
+        BedTypedetails: async function () {
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_BedType", {});
                 const aBedTypes = Array.isArray(oData.data) ?
@@ -37,8 +38,8 @@ sap.ui.define([
                 console.error("Error while fetching Bed Type details:", err);
             }
         },
-        
-        Facilitidetails: async function() {
+
+        Facilitidetails: async function () {
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {});
                 const aBedTypes = Array.isArray(oData.data) ?
@@ -52,8 +53,8 @@ sap.ui.define([
                 console.error("Error while fetching Bed Type details:", err);
             }
         },
-        
-        onPressEditSave: async function(oEvent) {
+
+        onPressEditSave: async function (oEvent) {
             var oButton = oEvent.getSource();
             var oViewModel = this.getView().getModel("viewModel");
             var bEditMode = oViewModel.getProperty("/editMode");
@@ -142,7 +143,7 @@ sap.ui.define([
                             CustomerID: custid
                         }
                     });
-                    sap.m.MessageToast.show("Booking Details Updated Successfully!");
+                    sap.m.MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
 
                 } catch (err) {
                     console.error("Error during update:", err);
@@ -151,7 +152,7 @@ sap.ui.define([
             }
         },
 
-        onPressCancelBooking: async function(oEvent) {
+        onPressCancelBooking: async function (oEvent) {
             var oButton = oEvent.getSource();
             var oViewModel = this.getView().getModel("viewModel")
             var oHostelModel = this.getView().getModel("HostelModel");
@@ -160,70 +161,70 @@ sap.ui.define([
             var that = this;
             sap.m.MessageBox.confirm(
                 "Are you sure you want to Cancel this Booking?", {
-                    title: "Confirm Cancellation",
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    onClose: async function(oAction) {
-                        if (oAction !== sap.m.MessageBox.Action.YES) {
-                            return; // Stop if user presses NO
+                title: "Confirm Cancellation",
+                icon: sap.m.MessageBox.Icon.WARNING,
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                onClose: async function (oAction) {
+                    if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return; // Stop if user presses NO
+                    }
+
+                    // EXIT EDIT MODE
+                    oViewModel.setProperty("/editMode", false);
+                    oButton.setText("Cancel");
+
+                    try {
+                        var today = new Date();
+                        var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
+                        const bookingData = [{
+                            BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
+                            RoomPrice: oData.RoomPrice || "0",
+                            NoOfPersons: oData.noofperson || 1,
+                            Customerid: oData.CustomerId,
+                            StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+                            Status: "Cancelled",
+                            CancelDate: sCancelDate,
+                            PaymentType: oData.PaymentType || "",
+                            BedType: oData.BedType || ""
+                        }];
+
+
+                        const facilityData = [];
+                        if (oData.AllSelectedFacilities?.length > 0) {
+                            oData.AllSelectedFacilities.forEach(fac => {
+                                facilityData.push({
+                                    PaymentID: "",
+                                    FacilityName: fac.FacilityName,
+                                    FacilitiPrice: fac.Price,
+                                    StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                                    EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+                                    PaidStatus: "Pending"
+                                });
+                            });
                         }
 
-                        // EXIT EDIT MODE
-                        oViewModel.setProperty("/editMode", false);
-                        oButton.setText("Cancel");
+                        const personData = [{
+                            Salutation: oData.Salutation || "",
+                            CustomerName: oData.FullName || "",
+                            UserID: oData.UserID || "",
+                            CustomerID: oData.CustomerID || "",
+                            STDCode: oData.STDCode || "",
+                            MobileNo: oData.MobileNo || "",
+                            Gender: oData.Gender || "",
+                            DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                            CustomerEmail: oData.CustomerEmail || "",
+                            Country: oData.Country || "",
+                            State: oData.State || "",
+                            City: oData.City || "",
+                            PermanentAddress: oData.Address || "",
+                            Booking: bookingData,
+                            FacilityItems: facilityData
+                        }];
 
-                        try {
-                            var today = new Date();
-                            var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
-                            const bookingData = [{
-                                BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
-                                RoomPrice: oData.RoomPrice || "0",
-                                NoOfPersons: oData.noofperson || 1,
-                                Customerid: oData.CustomerId,
-                                StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                Status: "Cancelled",
-                                CancelDate: sCancelDate,
-                                PaymentType: oData.PaymentType || "",
-                                BedType: oData.BedType || ""
-                            }];
-
-
-                            const facilityData = [];
-                            if (oData.AllSelectedFacilities?.length > 0) {
-                                oData.AllSelectedFacilities.forEach(fac => {
-                                    facilityData.push({
-                                        PaymentID: "",
-                                        FacilityName: fac.FacilityName,
-                                        FacilitiPrice: fac.Price,
-                                        StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                        EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                        PaidStatus: "Pending"
-                                    });
-                                });
-                            }
-
-                            const personData = [{
-                                Salutation: oData.Salutation || "",
-                                CustomerName: oData.FullName || "",
-                                UserID: oData.UserID || "",
-                                CustomerID: oData.CustomerID || "",
-                                STDCode: oData.STDCode || "",
-                                MobileNo: oData.MobileNo || "",
-                                Gender: oData.Gender || "",
-                                DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
-                                CustomerEmail: oData.CustomerEmail || "",
-                                Country: oData.Country || "",
-                                State: oData.State || "",
-                                City: oData.City || "",
-                                PermanentAddress: oData.Address || "",
-                                Booking: bookingData,
-                                FacilityItems: facilityData
-                            }];
-
-                            sap.ui.core.BusyIndicator.show(0);
-                            var custid = bookingData[0].Customerid; -
+                        sap.ui.core.BusyIndicator.show(0);
+                        var custid = bookingData[0].Customerid; -
                             await that.ajaxUpdateWithJQuery("HM_Customer", {
                                 data: personData,
                                 filters: {
@@ -231,34 +232,34 @@ sap.ui.define([
                                 }
                             });
 
-                            sap.m.MessageToast.show("Booking Cancelled Successfully!");
-                            var oEditButton = that.byId("idEditBtn");
-                            if (oEditButton) {
-                                oEditButton.setVisible(false);
-                            }
-
-                            var oAddfacilityButton = that.byId("id_addfacility");
-                            if (oAddfacilityButton) {
-                                oAddfacilityButton.setVisible(false);
-                            }
-
-                            var oEditFacilityButton = that.byId("id_editfacility");
-                            if (oEditFacilityButton) {
-                                oEditFacilityButton.setVisible(false);
-                            }
-
-                        } catch (err) {
-                            sap.ui.core.BusyIndicator.hide();
-                            sap.m.MessageToast.show(err.message || err.responseText);
-                        } finally {
-                            sap.ui.core.BusyIndicator.hide();
+                        sap.m.MessageToast.show(this.i18nModel.getText("bookingCancelledSuccessfully"));
+                        var oEditButton = that.byId("idEditBtn");
+                        if (oEditButton) {
+                            oEditButton.setVisible(false);
                         }
-                    },
-                }
+
+                        var oAddfacilityButton = that.byId("id_addfacility");
+                        if (oAddfacilityButton) {
+                            oAddfacilityButton.setVisible(false);
+                        }
+
+                        var oEditFacilityButton = that.byId("id_editfacility");
+                        if (oEditFacilityButton) {
+                            oEditFacilityButton.setVisible(false);
+                        }
+
+                    } catch (err) {
+                        sap.ui.core.BusyIndicator.hide();
+                        sap.m.MessageToast.show(err.message || err.responseText);
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                    }
+                },
+            }
             );
         },
 
-        onSelectionChange: function(oEvent) {
+        onSelectionChange: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
 
@@ -268,7 +269,7 @@ sap.ui.define([
             var aBedTypes = oBedTypeModel.getData();
 
             // Find selected bed type object
-            var oSelectedBedType = aBedTypes.find(function(item) {
+            var oSelectedBedType = aBedTypes.find(function (item) {
                 return item.BedTypeID === sSelectedBedTypeID;
             });
 
@@ -283,12 +284,12 @@ sap.ui.define([
             }
         },
 
-        onEditFacilityDetails: async function() {
+        onEditFacilityDetails: async function () {
             const oTable = this.byId("idFacilityRoomTableDetails");
             const oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show("Please Select a Facility to Edit.");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoEdit"));
                 return;
             }
 
@@ -311,7 +312,7 @@ sap.ui.define([
             this._pEditFacilityDialog.open();
         },
 
-        onEditDialogClose: function() {
+        onEditDialogClose: function () {
             var oView = this.getView()
             const oTable = oView.byId("idFacilityRoomTableDetails");
             if (oTable) {
@@ -320,7 +321,7 @@ sap.ui.define([
             this._pEditFacilityDialog.close();
         },
 
-        onEditDateChange: function() {
+        onEditDateChange: function () {
             const oModel = this.getView().getModel("edit");
             const sStart = oModel.getProperty("/StartDate");
             const sEnd = oModel.getProperty("/EndDate");
@@ -334,7 +335,7 @@ sap.ui.define([
             }
         },
 
-        onEditFacilitySave: function() {
+        onEditFacilitySave: function () {
             const oEditModel = this.getView().getModel("edit");
             const oUpdatedData = oEditModel.getData();
 
@@ -357,11 +358,11 @@ sap.ui.define([
             oHostelModel.setProperty("/TotalFacilityPrice", total);
             oHostelModel.setProperty("/GrandTotal", total + parseFloat(oHostelModel.getProperty("/RoomPrice") || 0));
 
-            sap.m.MessageToast.show("Facility Details Updated Successfully!");
+            sap.m.MessageToast.show(this.i18nModel.getText("facilityDetailsUpdatedSuccessfully"));
             this._pEditFacilityDialog.close();
         },
 
-        onPressAddFaciliti: function() {
+        onPressAddFaciliti: function () {
             if (!this._pAddFacilityDialog) {
                 this._pAddFacilityDialog = sap.ui.xmlfragment(
                     "sap.ui.com.project1.fragment.AddFaciliti",
@@ -372,7 +373,7 @@ sap.ui.define([
             this._pAddFacilityDialog.open();
         },
 
-        onFacilitiSelectionChange: function(oEvent) {
+        onFacilitiSelectionChange: function (oEvent) {
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
 
@@ -391,7 +392,7 @@ sap.ui.define([
             }
         },
 
-        onFacilityDateChange: function() {
+        onFacilityDateChange: function () {
             const sStart = sap.ui.getCore().byId("idFacilityStartDate").getValue();
             const sEnd = sap.ui.getCore().byId("idFacilityEndDate").getValue();
 
@@ -402,13 +403,13 @@ sap.ui.define([
                     const diff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                     sap.ui.getCore().byId("idFacilityDays").setValue(diff);
                 } else {
-                    sap.m.MessageToast.show("End Date must be After Start Date");
+                    sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                     sap.ui.getCore().byId("idFacilityDays").setValue("");
                 }
             }
         },
-        
-        onAddFacilitySave: function() {
+
+        onAddFacilitySave: function () {
             const oCombo = sap.ui.getCore().byId("idFacilityCombo")
             const oPrice = sap.ui.getCore().byId("idFacilityPrice")
             const oStart = sap.ui.getCore().byId("idFacilityStartDate")
@@ -450,15 +451,15 @@ sap.ui.define([
             oHostelModel.setProperty("/TotalFacilityPrice", total);
             oHostelModel.setProperty("/GrandTotal", total + parseFloat(oHostelModel.getProperty("/RoomPrice") || 0));
 
-            sap.m.MessageToast.show("Facility Added Successfully!");
+            sap.m.MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
 
             this._pAddFacilityDialog.close();
         },
 
-       onNavBack: function () {
-        const oUIModel = this.getOwnerComponent().getModel("UIModel");
-        oUIModel.setProperty("/isLoggedIn", true);
-    this.getOwnerComponent().getRouter().navTo("RouteHostel");
-}
+        onNavBack: function () {
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            oUIModel.setProperty("/isLoggedIn", true);
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+        }
     })
 })
