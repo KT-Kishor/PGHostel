@@ -277,34 +277,34 @@ sap.ui.define([
             oView.setModel(oFacilityModel, "FacilityModel");
         },
 
-        _checkMandatoryFields: function () {
-            const oModel = this.getView().getModel("HostelModel");
-            const aPersons = oModel.getProperty("/Persons") || [];
-            let bAllValid = true;
+        // _checkMandatoryFields: function () {
+        //     const oModel = this.getView().getModel("HostelModel");
+        //     const aPersons = oModel.getProperty("/Persons") || [];
+        //     let bAllValid = true;
 
-            aPersons.forEach((oPerson, iIndex) => {
-                // List all your required fields here
-                const aFields = [
-                    { key: "FullName", label: "Full Name" },
-                    { key: "DateOfBirth", label: "Date of Birth" },
-                    { key: "Gender", label: "Gender" },
-                    { key: "MobileNo", label: "Mobile" },
-                    { key: "CustomerEmail", label: "Email" },
-                    { key: "Country", label: "Country" },
-                    { key: "State", label: "State" },
-                    { key: "City", label: "City" },
-                    { key: "Address", label: "Address" }
-                ];
-                aFields.forEach(field => {
-                    const sValue = oPerson[field.key];
-                    if (!sValue || sValue.trim() === "") {
-                        bAllValid = false;
-                    }
-                });
-            });
+        //     aPersons.forEach((oPerson, iIndex) => {
+        //         // List all your required fields here
+        //         const aFields = [
+        //             { key: "FullName", label: "Full Name" },
+        //             { key: "DateOfBirth", label: "Date of Birth" },
+        //             { key: "Gender", label: "Gender" },
+        //             { key: "MobileNo", label: "Mobile" },
+        //             { key: "CustomerEmail", label: "Email" },
+        //             { key: "Country", label: "Country" },
+        //             { key: "State", label: "State" },
+        //             { key: "City", label: "City" },
+        //             { key: "Address", label: "Address" }
+        //         ];
+        //         aFields.forEach(field => {
+        //             const sValue = oPerson[field.key];
+        //             if (!sValue || sValue.trim() === "") {
+        //                 bAllValid = false;
+        //             }
+        //         });
+        //     });
 
-            return bAllValid;
-        },
+        //     return bAllValid;
+        // },
 
         onDialogClose: function () {
             this._oLoginAlertDialog.close()
@@ -1556,11 +1556,17 @@ sap.ui.define([
         },
 
         onDialogNextButton: async function () {
+            const oModel1 = this.getView().getModel("HostelModel");
+if (oModel1) {
+    oModel1.refresh(true); // ensure latest input values are in model
+}
+
             const aErrorControls = sap.ui.getCore().byFieldGroupId
                 ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
                 : [];
 
             let bHasError = false;
+       
 
             // Fallback: scan entire view (SAFE for dynamic controls)
             if (aErrorControls.length === 0) {
@@ -1582,14 +1588,29 @@ sap.ui.define([
                 return; // ⛔ STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
-            const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
-            // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
-            if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
-                this._createDynamicPersonsUI();              // builds UI for current count
-                this._isPersonUIInitialized = true;
-                this._lastPersonCount = iPersonCount;
-                this._mustRecreatePersonUI = false;
-            }
+            // const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
+            // // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
+            // if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
+            //     this._createDynamicPersonsUI();              // builds UI for current count
+            //     this._isPersonUIInitialized = true;
+            //     this._lastPersonCount = iPersonCount;
+            //     this._mustRecreatePersonUI = false;
+            // }
+
+            const sCurrentBranch = oModel.getProperty("/BranchCode");
+
+if (
+    !this._isPersonUIInitialized ||
+    this._mustRecreatePersonUI ||
+    this._lastRenderedBranch !== sCurrentBranch
+) {
+    this._createDynamicPersonsUI();
+
+    this._isPersonUIInitialized = true;
+    this._mustRecreatePersonUI = false;
+    this._lastRenderedBranch = sCurrentBranch;
+}
+
 
             // STEP 1: validations
             if (this._iSelectedStepIndex === 1) {
@@ -1605,9 +1626,9 @@ sap.ui.define([
             }
 
             // wizard navigation (unchanged)
-            if (!this._oWizard) {
-                this._oWizard = this.byId("TC_id_wizard");
-            }
+            // if (!this._oWizard) {
+            //     this._oWizard = this.byId("TC_id_wizard");
+            // }
             if (!this._oSelectedStep) {
                 this._oSelectedStep = this._oWizard.getCurrentStep();
             }
@@ -2410,6 +2431,7 @@ sap.ui.define([
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
             const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+         
             if (sRole === "Customer") {
                 this._sLoggedUserID = sEmpID;
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");

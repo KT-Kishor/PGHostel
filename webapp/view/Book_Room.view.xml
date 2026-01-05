@@ -22,6 +22,7 @@
         <content>
            <Bar
         design="Header"
+        visible="true"
     >
        <contentLeft>
 					<Button
