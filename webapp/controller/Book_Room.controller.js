@@ -772,7 +772,7 @@ sap.ui.define([
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
-                                    sap.m.MessageToast.show(this.i18nModel.getText("dateofBirthcannotbeFuture"));
+                                    sap.m.MessageToast.show(that.i18nModel.getText("dateofBirthcannotbeFuture"));
                                     oEvent.getSource().setValue("");
                                 }
                             }
@@ -994,7 +994,7 @@ sap.ui.define([
                                     // exact 10 digits required
                                     if (sValue.length !== 10) {
                                         oInput.setValueState("Error");
-                                        oInput.setValueStateText(this.i18nModel.getText("mobileNomustbeexactlyDigits"));
+                                        oInput.setValueStateText(that.i18nModel.getText("mobileNomustbeexactlyDigits"));
                                     }
                                     // update model value for MobileNo
                                     oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
@@ -1004,7 +1004,7 @@ sap.ui.define([
                                 // Other countries: minimum 4 digits (example rule)
                                 if (sValue.length < 4) {
                                     oInput.setValueState("Error");
-                                    oInput.setValueStateText(this.i18nModel.getText("mobileNumbermustbeatleastDigits"));
+                                    oInput.setValueStateText(that.i18nModel.getText("mobileNumbermustbeatleastDigits"));
                                 }
 
                                 // update model value for MobileNo
@@ -1093,7 +1093,7 @@ sap.ui.define([
 
                                 // 🔴 Validation: Document Type must be selected
                                 if (!sDocType) {
-                                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
+                                    sap.m.MessageBox.error(that.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
 
                                     // Reset FileUploader
                                     oUploader.clear();
@@ -1168,7 +1168,7 @@ sap.ui.define([
                                 }
 
                                 if (!oUploader) {
-                                    sap.m.MessageToast.show(this.i18nModel.getText("unablelocateuploader"));
+                                    sap.m.MessageToast.show(that.i18nModel.getText("unablelocateuploader"));
                                     return;
                                 }
 
@@ -1584,7 +1584,7 @@ if (oModel1) {
             }
 
             if (bHasError) {
-                sap.m.MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
+                sap.m.MessageBox.error(that.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
                 return; // ⛔ STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
