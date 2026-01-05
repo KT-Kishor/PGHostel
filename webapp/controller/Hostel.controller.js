@@ -1917,7 +1917,7 @@ sap.ui.define([
                     }
                     // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
                     return {
-                        customerName: oUser.Salutation + " " + oUser.CustomerName,
+                        customerName: booking.Salutation + " " + booking.CustomerName,
                         room: booking.BedType || "",
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
@@ -3732,10 +3732,10 @@ sap.ui.define([
         updateUserPhoto: async function ({ fileName, fileType, fileContent }) {
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
-                if (!sUserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
-                    return;
-                }
+                // if (!sUserID) {
+                //     sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
+                //     return;
+                // }
                 const payload = {
                     data: {
                         FileName: fileName,
