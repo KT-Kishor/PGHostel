@@ -6,7 +6,7 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-        title="Fill Branch Details"
+        title="{i18n>fillBranchDetails}"
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
@@ -32,7 +32,7 @@
                 <Input
                     id="BD_idBName"
                     value="{MDmodel>/Name}"
-                    placeholder="Enter Branch Name"
+                    placeholder="{i18n>enterBranchName}"
                     maxLength="60"
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
@@ -44,7 +44,7 @@
                 <Input
                     id="BD_idAddress"
                     value="{MDmodel>/Address}"
-                    placeholder="Enter Address"
+                    placeholder="{i18n>enterAddress}"
                     maxLength="60"
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
@@ -56,7 +56,7 @@
                 <Input
                     id="BD_idPin"
                     value="{MDmodel>/Pincode}"
-                    placeholder="Enter Pincode"
+                    placeholder="{i18n>enterPincode}"
                     maxLength="10"
                     liveChange="onPinInputLiveChange"
                     valueStateText="{i18n>enterPincode}"
@@ -68,7 +68,7 @@
                 <ComboBox
                     id="MC_id_Country"
                     change="MC_onChangeCountry"
-                    placeholder="Enter Country"
+                    placeholder="{i18n>enterCountry}"
                     valueStateText="{i18n>selectCountry}"
                     items="{path:'CountryModel>/',length:1000}"
                     selectedKey="{MDmodel>/country}"
@@ -87,7 +87,7 @@
                 <ComboBox
                     id="MC_id_State"
                     change="MC_onChangeState"
-                    placeholder="Enter State"
+                    placeholder="{i18n>enterState}"
                     valueStateText="{i18n>selectState}"
                     items="{path:'StateModel>/',length:1000}"
                     selectedKey="{MDmodel>/state}"
@@ -106,7 +106,7 @@
                     id="MC_id_City"
                     change="MC_onChangeCity"
                     valueStateText="{i18n>cityValueText}"
-                    placeholder="Enter City"
+                    placeholder="{i18n>enterCity}"
                     items="{path:'CityModel>/',length:1000}"
                     selectedKey="{MDmodel>/baseLocation}"
                     value="{MDmodel>/baseLocation}"
@@ -122,7 +122,7 @@
                 <Input
                     value="{MDmodel>/GSTIN}"
                     maxLength="15"
-                    placeholder="Enter GST No"
+                    placeholder="{i18n>enterGSTNo}"
                     id="MC_id_CustomGst"
                     liveChange="MC_ValidateGstNumber"
                     valueStateText="{i18n>gstError}"
@@ -165,7 +165,7 @@
                         <ComboBox
                             change="onSTDChange"
                             id="MC_id_codeModel"
-                            placeholder="Code"
+                            placeholder="{i18n>code}"
                             valueStateText="{i18n>MSselectCode}"
                             showSecondaryValues="true"
                             items="{path:'CountryModel>/', length:1000}"
@@ -183,7 +183,7 @@
                         <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
-                            placeholder="Enter Contact Number"
+                            placeholder="{i18n>enterContactNumber}"
                             maxLength="18"
                             liveChange="onMobileLivechnage"
                             valueStateText="{i18n>enterContactNumber}"
@@ -197,7 +197,7 @@
                 <Input
                     id="BD_idPenalty"
                     value="{MDmodel>/Penalty}"
-                    placeholder="Enter Penalty"
+                    placeholder="{i18n>enterPenalty}"
                     maxLength="10"
                     liveChange="onPenaltyInputLiveChange"
                     valueStateText="{i18n>enterPenalty}"
@@ -255,13 +255,13 @@
                 <Button
                     id="BD_id_saveButoon"
                     text="{i18n>save}"
-                    tooltip="Save"
+                    tooltip="{i18n>save}"
                     class="myUnifiedBtn"
                     press="MD_onSaveButtonPress"
                 />
                 <Button
                     text="{i18n>CancelButton}"
-                    tooltip="Cancel"
+                    tooltip="{i18n>CancelButton}"
                     class="myUnifiedBtn"
                     press="MD_onCancelButtonPress"
                 />

@@ -430,7 +430,7 @@ sap.ui.define([
                             // UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully!"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Branch", {
                         data: oData,
@@ -438,7 +438,7 @@ sap.ui.define([
                             UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully!"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully"));
                 }
 
                 await this.Onsearch();
@@ -567,7 +567,7 @@ sap.ui.define([
                                 });
                             }
 
-                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully!"));
+                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully"));
                             await this.Onsearch();
 
                         } catch (err) {

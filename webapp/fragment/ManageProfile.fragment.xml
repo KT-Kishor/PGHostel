@@ -173,7 +173,7 @@
                             displayFormat="dd/MM/yyyy"
                             valueFormat="dd/MM/yyyy"
                             valueStateText="Enter Date of Birth"
-                            change="onChangeDOB"
+                            change="MP_onChangeDOB"
                         />
 
                         <m:Label
@@ -242,7 +242,7 @@
                             required="{profileData>/isEditMode}"
                         />
 
-                         <ComboBox
+                        <ComboBox
                             change="_onProfileSTDChange"
                             id="id_std"
                             placeholder="Code"

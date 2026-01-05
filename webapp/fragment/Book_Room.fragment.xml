@@ -6,7 +6,7 @@
 >
     <Dialog
         id="idHostelWizardDialog"
-        title="Hostel Booking Form"
+        title="{i18n>hostelBookingForm}"
         type="Message"
        
         class="sapUiContentPadding"
@@ -21,7 +21,7 @@
                 <!--  Step 2: Room Details -->
                 <WizardStep
                     id="idStepRoom"
-                    title="Room Details"
+                    title="{i18n>roomDetails}"
                     validated="false"
                 >
                     <f:SimpleForm
@@ -37,7 +37,7 @@
                     >
                         <f:content>
                             <Label
-                                text="Desired Room Type"
+                                text="{i18n>desiredRoomType}"
                                 required="true"
                             />
                             <Input
@@ -53,7 +53,7 @@
                                 </buttons>
                             </RadioButtonGroup> -->
                             <Label
-                                text="Price"
+                                text="{i18n>placePrice}"
                                 required="true"
                             />
                             <Input
@@ -62,12 +62,12 @@
                                 editable="false"
                             />
                             <Label
-                                text="Payment Method"
+                                text="{i18n>paymentMethod}"
                                 required="true"
                             />
                             <ComboBox
                                 id="idPaymentMethod"
-                                placeholder="Select Payment Method"
+                                placeholder="{i18n>selectPaymentMethod}"
                                 selectedKey="{HostelModel>/PaymentType}"
                             >
                                 <core:ListItem
@@ -84,12 +84,12 @@
                                 />
                             </ComboBox>
                             <Label
-                                text="No of persons"
+                                text="{i18n>noofpersons}"
                                 required="true"
                             />
                             <ComboBox
                                 id="id_Noofperson"
-                                placeholder="Select Person"
+                                placeholder="{i18n>selectPerson}"
                                 selectedKey="{HostelModel>/Person}"
                                 selectionChange=".onNoOfPersonSelect"
                             >
@@ -111,7 +111,7 @@
                                 </buttons>
                             </RadioButtonGroup> -->
                             <Label
-                                text="Start Date"
+                                text="{i18n>startDate}"
                                 required="true"
                             />
                             <DatePicker
@@ -122,7 +122,7 @@
                                 change=".onDateChange"
                             />
                             <Label
-                                text="End Date"
+                                text="{i18n>endDate}"
                                 required="true"
                             />
                             <DatePicker
@@ -137,7 +137,7 @@
                 </WizardStep>
                 <WizardStep
                     id="idStepPersonal"
-                    title="Personal Information"
+                    title="{i18n>personalInformation}"
                     validated="false"
                 >
                     <VBox
@@ -186,7 +186,8 @@
         <buttons>
             <Button
                 id="idWizardBackBtn"
-                text="Previous"
+                text="{i18n>previous}"
+                tooltip="{i18n>previous}"
                 class="myUnifiedBtn"
                 press=".onWizardBack"
                 enabled="false"
@@ -194,21 +195,24 @@
 
             <Button
                 id="idWizardNextBtn"
-                text="Next"
+                text="{i18n>next}"
+                tooltip="{i18n>next}"
                 class="myUnifiedBtn"
                 press=".onWizardNext"
             />
 
             <Button
                 id="idWizardSubmitBtn"
-                text="Submit"
+                text="{i18n>submit}"
+                tooltip="{i18n>submit}"
                 visible="false"
                 class="myUnifiedBtn"
                 press=".onSaveDialog"
             />
 
             <Button
-                text="Cancel"
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
                 class="myUnifiedBtn"
                 press=".onCancelDialog"
             />

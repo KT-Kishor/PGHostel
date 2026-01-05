@@ -5157,10 +5157,8 @@ sap.ui.define([
             utils._LCvalidateName(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
-        onEmailliveChange: function (oEvent) {
-            utils._LCvalidateEmail(oEvent);
-        },
-        onChangeDOB: function (oEvent) {
+        
+        MP_onChangeDOB: function (oEvent) {
             utils._LCvalidateDate(oEvent);
         },
     });
