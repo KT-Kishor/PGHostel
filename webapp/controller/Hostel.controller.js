@@ -1917,7 +1917,7 @@ sap.ui.define([
                     }
                     // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
                     return {
-                        customerName: oUser.Salutation + " " + oUser.UserName,
+                        customerName: oUser.Salutation + " " + oUser.CustomerName,
                         room: booking.BedType || "",
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",

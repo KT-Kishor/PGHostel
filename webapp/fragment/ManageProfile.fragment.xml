@@ -298,6 +298,7 @@
                             id="id_address"
                             value="{profileData>/address}"
                             rows="3"
+                            maxLength="120"
                             liveChange="MPonAddressChange"
                             growing="false"
                             width="100%"

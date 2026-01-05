@@ -8,7 +8,7 @@ sap.ui.define([
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
         onInit() {
-            // this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             var oBtn = this.byId("couponApplyBtn");
             oBtn.setText("Apply Now")
             var oModel = sap.ui.getCore().getModel("LoginModel");
