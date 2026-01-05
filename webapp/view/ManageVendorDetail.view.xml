@@ -420,14 +420,14 @@
         <m:footer>
             <m:Bar id="MV_id_FooterBar">
                 <m:contentRight>
-                    <m:Button
+                   <m:Button
                         id="MV_id_ApproveButton"
                         text="{i18n>MVDapprove}"
                         class="myUnifiedBtn"
                         tooltip="Approve Vendor"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                          || ${AdminSignupModel>/Status} !== 'Active' }"
+                        &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />
                     <m:Button
                         id="MV_id_SendBackButton"
@@ -436,7 +436,7 @@
                         class="myUnifiedBtn"
                         press="MI_onPressButtons"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                           || ${AdminSignupModel>/Status} !== 'Active' }"
+                        &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />
                 </m:contentRight>
             </m:Bar>
