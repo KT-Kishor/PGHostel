@@ -427,7 +427,7 @@
                                 visible="{VisibleModel>/visible}"
                                 id="AD_id_CustomerName"
                                 valueStateText="Enter Customer Name"
-                                change="onChange"
+                                liveChange="onChange"
                                 width="50%"
                             />
 
@@ -628,6 +628,8 @@
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_Address"
                                 valueStateText="Enter Address"
+                                liveChange="onChange"
+
                             />
 
                             <Label
@@ -643,10 +645,9 @@
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="Mobile Number"
                             />
-                            <Input
+                            <!-- <Input
                                 id="CC_id_STDCode"
                                 value="{Bookingmodel>/STDCode}"
-                                editable="false"
                                 visible="{VisibleModel>/visible}"
                             >
                                 <layoutData>
@@ -655,13 +656,36 @@
                                         cellsLarge="1"
                                     />
                                 </layoutData>
-                            </Input>
+                            </Input> -->
+
+                                 <ComboBox
+                            change="onSTDChange"
+                            id="CC_id_STDCode"
+                            placeholder="Code"
+                            valueStateText="{i18n>MSselectCode}"
+                            showSecondaryValues="true"
+                            items="{path:'CountryModel>/', length:1000}"
+                            selectedKey="{Bookingmodel>/STDCode}"
+                            filterSecondaryValues="true"
+                            visible="{VisibleModel>/visible}"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>stdCode}"
+                                text="{CountryModel>stdCode}"
+                                additionalText="{CountryModel>code}"
+                            />
+                                   <layoutData>
+                                    <f:ColumnElementData
+                                        cellsSmall="3"
+                                        cellsLarge="1"
+                                    />
+                                </layoutData>
+                        </ComboBox>
                             <!-- Phone Number -->
                             <Input
                                 id="CD_ID_idPhone"
                                 value="{Bookingmodel>/MobileNo}"
                                 placeholder="Enter Contact Number"
-                                maxLength="10"
                                 liveChange="onmobileChange"
                                 valueStateText="Enter Contact Number"
                                 visible="{VisibleModel>/visible}"

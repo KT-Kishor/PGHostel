@@ -823,10 +823,11 @@ sap.ui.define([
             // ✅ Correct date conversion
             if (sStartDate.includes("/")) {
                 sStartDate = sStartDate.split("/").reverse().join("-");
-                if (sEndDate) {
+           
+            }
+                if (sEndDate.includes("/")) {
                     sEndDate = sEndDate.split("/").reverse().join("-");
                 }
-            }
 
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
@@ -1065,6 +1066,8 @@ sap.ui.define([
 
         onEditBooking: async function () {
             this.applyCountryStateCityFilters()
+            const oMobile = this.byId("CD_ID_idPhone");
+
             sap.ui.core.BusyIndicator.show(0);
             const response = await this.ajaxReadWithJQuery("HM_Customer", "");
             sap.ui.core.BusyIndicator.hide();
@@ -1074,6 +1077,12 @@ sap.ui.define([
             var data = this.getView().getModel("CustomerData").getData()
             var model = this.getView().getModel("Bookingmodel")
             var aAvailableBeds = this.getView().getModel("Availablebeds").getData()
+               if (data.STDCode === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
+            
             var filteredBeds = aAvailableBeds.filter(function (bed) {
 
                 // 1) Count assigned customers for this bed
@@ -1811,6 +1820,20 @@ sap.ui.define([
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
         },
+              onSTDChange: function () {
+            const oSTD = this.byId("CC_id_STDCode");
+            const oMobile = this.byId("CD_ID_idPhone");
+
+            const std = oSTD.getValue();
+            oMobile.setValue("");
+
+            // Dynamic maxLength
+            if (std === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
+        },
 
         CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -1848,10 +1871,34 @@ sap.ui.define([
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onmobileChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            if (oInput.getValue() === "") oInput.setValueState("None");
-        },
+  onmobileChange: function (oEvent) {
+    const oSTD = this.byId("CC_id_STDCode");
+    const oMobile = this.byId("CD_ID_idPhone");
+
+    const std = oSTD.getValue().trim();      // get STD code
+    const mobileValue = oMobile.getValue().trim();
+
+    // Reset value state if empty
+    if (mobileValue === "") {
+        oMobile.setValueState("None");
+        return;
+    }
+
+    // Determine required length
+    let requiredLength = 10;
+
+    // Validate length
+    if (std==="+91" && mobileValue.length === requiredLength) {
+        oMobile.setValueState("None");       // valid
+    } else {
+        oMobile.setValueState("Error");      // invalid
+    }
+    if(std!="+91"){
+        oMobile.setValueState("None");       // valid
+
+    }
+}
+,
 
         onChangemail: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
@@ -1870,24 +1917,29 @@ sap.ui.define([
 
             // Mandatory validation
             const isMandatoryValid = (
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_RoomType"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("idPaymentMethod1"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("Ad_id_RoomType"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("idPaymentMethod1"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("Ad_id_editStartDate"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("AD_id_CustomerName"), "ID") &&
                 utils._LCvalidateDate(this.byId("AD_id_Date"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_gender"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("Ad_id_gender"), "ID") &&
                 utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_Country"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_State"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID")
+                utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("CC_id_City"), "ID") && 
+                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID")
             );
 
-            if (Bookingdata.Country === "India") {
-                if (Bookingdata.MobileNo.length < 10) {
-                    oInput.setValueState("Error");
-                    return;
-                } else {
+         
+              if (Bookingdata.STDCode === "+91") {
+                 if (Bookingdata.MobileNo.length === 10) {
                     oInput.setValueState("None");
+                
+                } else {
+                    oInput.setValueState("Error");
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+
+                        return;
                 }
             }
 
