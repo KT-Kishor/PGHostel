@@ -1146,13 +1146,13 @@ sap.ui.define([
                             }
                         }),
 
-                        new sap.m.Button({
+                        (new sap.m.Button({
                             text: "Clear",
                             type: "Transparent",
                             tooltip: "Clear Document",
                             layoutData: new sap.ui.layout.form.ColumnElementData({
                                 cellsLarge: 1,
-                                cellsSmall: 3 /// 🔴 Mobile par bacha hua 3 cells (25% space)
+                                cellsSmall: 3 /// 
                             }),
                             press: function (oEvent) {
 
@@ -1192,7 +1192,8 @@ sap.ui.define([
                                 // 3️⃣ Refresh model
                                 oModel.refresh(true);
                             }
-                        })
+                        })).addStyleClass("myUnifiedBtn"),
+
                     ]
                 });
 
