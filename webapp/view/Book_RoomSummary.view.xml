@@ -135,7 +135,7 @@
             <HBox justifyContent="End">
                 <Label
                     text="Discount:"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{
@@ -151,7 +151,7 @@
             >
                 <Label
                     text="Sub-Total (Non-Taxable):"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{   parts: [
@@ -169,7 +169,7 @@
             >
                 <Label
                     text="Sub-Total (Taxable):"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{ parts: [
@@ -187,7 +187,7 @@
             >
                 <Label
                     text="CGST (9%):"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{parts:['HostelModel>/CGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
@@ -202,7 +202,7 @@
             >
                 <Label
                     text="SGST (9%):"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{parts:['HostelModel>/SGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
@@ -216,7 +216,7 @@
             >
                 <Label
                     text="Total Cost:"
-                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{parts:['HostelModel>/FinalTotalCost','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"

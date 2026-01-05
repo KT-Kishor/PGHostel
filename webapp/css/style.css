@@ -1464,10 +1464,10 @@ span.sapMBtnInner.sapMBtnEmphasized {
     font-weight: bold;
   
 }
-.totalColumnBold1{
+/* .totalColumnBold1{
   font-weight: bold;
   font-size: 16px;
-}
+} */
 /* NORMAL — make CLEAR text white */
 .sapUiCompFilterBar .sapUiCompFilterBarButtons 
     .sapMBtnTransparent .sapMBtnInner .sapMBtnContent bdi {
