@@ -165,7 +165,7 @@
                     editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
                     value="{path:'edit>/EndDate'}"
                     displayFormat="dd/MM/yyyy"
-                    valueFormat="yyyy-MM-dd"
+                    valueFormat="dd/MM/yyyy"
                     change="onEditDateChange"
                     minDate="{CustomerData>/minStartDate}"
                     maxDate="{CustomerData>/minEndDate}"

@@ -857,7 +857,7 @@ sap.ui.define([
             }
 
             // Update model
-            oModel.setProperty("/EndDate", oEnd ? oEnd.toISOString().split("T")[0] : "");
+            oModel.setProperty("/EndDate", oEnd ? this.Formatter.formatDate(oEnd.toISOString().split("T")[0]) : "");
             oModel.setProperty("/TotalDays", iDays);
         },
 
@@ -902,7 +902,7 @@ sap.ui.define([
             // Format yyyy-MM-dd for DatePicker
             const sFormatted = oEnd.toISOString().split("T")[0];
 
-            oModel.setProperty("/EndDate", sFormatted);
+            oModel.setProperty("/EndDate", this.Formatter.formatDate(sFormatted));
             oModel.setProperty("/TotalDays", iDays);
         },
 
