@@ -29,7 +29,7 @@
                 />
                 <ComboBox
                     id="idRoomType12"
-                    placeholder="Select Branch Code"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKey="{RoomModel>/BranchCode}"
                     selectionChange=".onBranchChange"
                     valueStateText="{i18n>pleaseSelectValidBranchCode}"
@@ -49,7 +49,7 @@
                 />
                 <ComboBox
                     id="idBedType"
-                    placeholder="Select Bed Type"
+                    placeholder="{i18n>selectBedType}"
                     width="100%"
                     visible="false"
                     selectedKey="{RoomModel>/BedTypeName}"
@@ -68,7 +68,7 @@
                 />
                 <ComboBox
                     id="idAcType"
-                    placeholder="Select Bed Type"
+                    placeholder="{i18n>selectBedType}"
                     width="100%"
                     visible="false"
                     selectedKey="{RoomModel>/ACType}"
@@ -88,7 +88,7 @@
                 <Input
                     id="idRoomNumber"
                     value="{RoomModel>/RoomNo}"
-                    placeholder="Enter Room No"
+                    placeholder="{i18n>enterRoomNo}"
                     maxLength="60"
                     liveChange="onRoomNoInputLiveChange"
                     valueStateText="{i18n>roomNocannotbeEmpty}"
@@ -100,7 +100,7 @@
                 <Input
                     id="idExtrabed"
                     value="{RoomModel>/ExtraBed}"
-                    placeholder="Enter No of Extra Bed"
+                    placeholder="{i18n>enterNoofExtraBed}"
                     liveChange="onPriceInputLiveChange"
                     maxLength="2"
                 />
@@ -109,7 +109,7 @@
                 <Input
                     id="idPrice"
                     value="{RoomModel>/Price}"
-                    placeholder="Enter Price"
+                    placeholder="{i18n>enterPrice}"
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
@@ -150,7 +150,7 @@
                 <Input
                     id="id_MonthlyPrice"
                     value="{RoomModel>/MonthPrice}"
-                    placeholder="Enter Month Price"
+                    placeholder="{i18n>enterMonthPrice}"
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
@@ -159,7 +159,7 @@
                 <Input
                     id="id_YearlyPrice"
                     value="{RoomModel>/YearPrice}"
-                    placeholder="Enter Year Price"
+                    placeholder="{i18n>enterYearPrice}"
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
@@ -175,7 +175,7 @@
                     valueStateText="{i18n>selectCurrency}"
                     width="100%"
                     change="onACtypeChange"
-                    placeholder="Select Currency"
+                    placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
                 >
                     <core:ListItem
@@ -191,14 +191,14 @@
                 <ToolbarSpacer />
                 <Button
                     text="{i18n>save}"
-                    tooltip="Save"
+                    tooltip="{i18n>save}"
                     press="AR_onsavebuttonpress"
                     id="AR_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
                     text="{i18n>CancelButton}"
-                    tooltip="Cancel"
+                    tooltip="{i18n>CancelButton}"
                     press="AR_onCancelButtonPress"
                     id="AR_id_CancelButton"
                     class="marginRight myUnifiedBtn"

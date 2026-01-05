@@ -1,5 +1,5 @@
 <core:FragmentDefinition
-     xmlns="sap.m"
+    xmlns="sap.m"
     xmlns:c="sap.ui.core"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
@@ -7,10 +7,10 @@
 >
     <Dialog
         id="editFacilityDialog"
-        title="Edit Facility"
+        title="{i18n>editFacility}"
         afterClose=".onEditDialogClose"
     >
-      <f:SimpleForm
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -21,157 +21,212 @@
             columnsL="2"
             columnsM="1"
         >
-  <f:content>
-    <!-- Facility Name -->
-    <Label text="Facility Name" />
-    <ComboBox
-        id="editFacilityName"
-        placeholder="Select Facility"
-        items="{Facilities>/}"
-        value="{edit>/FacilityName}"
-        change="onFacilityChange"
-        width="100%"
-        valueStateText="Plaese Select Facility Name">
-        <core:Item key="{Facilities>FacilityName}" text="{Facilities>FacilityName}" />
-    </ComboBox>
+            <f:content>
+                <!-- Facility Name -->
+                <Label text="{i18n>facilityname}" />
+                <ComboBox
+                    id="editFacilityName"
+                    placeholder="{i18n>selectFacility}"
+                    items="{Facilities>/}"
+                    value="{edit>/FacilityName}"
+                    change="onFacilityChange"
+                    width="100%"
+                    valueStateText="{i18n>pleaseSelectFacilityName}"
+                >
+                    <core:Item
+                        key="{Facilities>FacilityName}"
+                        text="{Facilities>FacilityName}"
+                    />
+                </ComboBox>
 
-    <!-- Unit Type -->
-    <Label text="Unit Type" required="true" />
-    <ComboBox
-        id="idUnitType"
-        visible="false"
-        placeholder="Select Unit Type"
-        items="{RateType>/}"
-        value="{edit>/UnitText}"
-        change="onUnitTextChange"
-        width="100%"
-        valueStateText="Plaese Select Unit">
-        <core:Item key="{RateType>RateType}" text="{RateType>RateType}" />
-    </ComboBox>
+                <!-- Unit Type -->
+                <Label
+                    text="{i18n>unitType}"
+                    required="true"
+                />
+                <ComboBox
+                    id="idUnitType"
+                    visible="false"
+                    placeholder="{i18n>selectUnitType}"
+                    items="{RateType>/}"
+                    value="{edit>/UnitText}"
+                    change="onUnitTextChange"
+                    width="100%"
+                    valueStateText="{i18n>plaeseSelectUnit}"
+                >
+                    <core:Item
+                        key="{RateType>RateType}"
+                        text="{RateType>RateType}"
+                    />
+                </ComboBox>
 
-    <!-- Facility Price -->
-    <Label text="Facility Price" />
-    <Input
-        id="editPrice"
-        value="{edit>/Price}"
-        type="Number"
-        editable="false" />
+                <!-- Facility Price -->
+                <Label text="{i18n>faciltyprice}" />
+                <Input
+                    id="editPrice"
+                    value="{edit>/Price}"
+                    type="Number"
+                    editable="false"
+                />
 
-    <!-- Currency -->
-    <Label text="Currency" />
-    <ComboBox
-        enabled="false"
-        id="FU_id_Currency"
-        selectedKey="{edit>/Currency}"
-        items="{CurrencyModel>/}"
-        valueStateText="Select Currency"
-        width="100%"
-        change=".onCurrecnyChange"
-        placeholder="Select Currency">
-        <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-    </ComboBox>
-   
-    <!-- Start Date -->
-    <Label text="Start Date" />
-    <DatePicker
-        id="editStartDate"
-        value="{edit>/StartDate}"
-        displayFormat="dd/MM/yyyy"
-        valueFormat="yyyy-MM-dd"
-        change="onEditDateChange"
-        minDate="{CustomerData>/minStartDate}"
-         maxDate="{CustomerData>/minEndDate}"
+                <!-- Currency -->
+                <Label text="{i18n>currency}" />
+                <ComboBox
+                    enabled="false"
+                    id="FU_id_Currency"
+                    selectedKey="{edit>/Currency}"
+                    items="{CurrencyModel>/}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    change=".onCurrecnyChange"
+                    placeholder="{i18n>selectCurrency}"
+                >
+                    <core:Item
+                        key="{CurrencyModel>currency}"
+                        text="{CurrencyModel>currency}"
+                    />
+                </ComboBox>
 
-        valueStateText="Plaese Select Date"
-     />
+                <!-- Start Date -->
+                <Label text="{i18n>startDate}" />
+                <DatePicker
+                    id="editStartDate"
+                    value="{edit>/StartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onEditDateChange"
+                    minDate="{CustomerData>/minStartDate}"
+                    maxDate="{CustomerData>/minEndDate}"
+                    valueStateText="{i18n>plaeseSelectDate}"
+                />
 
-     <Label 
-    text="How many Month/Year"  
-    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }" 
-/>
+                <Label
+                    text="{i18n>howmany}"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                />
 
-        <Select
-        id="idMonthYearSelectFragment"
-    width="100%"
-    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
-    selectedKey="{edit>/TotalHour}"
-       change=".onMonthYearChange"
->
-    <core:Item key="1" text="1" />
-    <core:Item key="2" text="2" />
-    <core:Item key="3" text="3" />
-    <core:Item key="4" text="4" />
-    <core:Item key="5" text="5" />
-    <core:Item key="6" text="6" />
-    <core:Item key="7" text="7" />
-    <core:Item key="8" text="8" />
-    <core:Item key="9" text="9" />
-    <core:Item key="10" text="10" />
-    <core:Item key="11" text="11" />
-</Select>
+                <Select
+                    id="idMonthYearSelectFragment"
+                    width="100%"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                    selectedKey="{edit>/TotalHour}"
+                    change=".onMonthYearChange"
+                >
+                    <core:Item
+                        key="1"
+                        text="1"
+                    />
+                    <core:Item
+                        key="2"
+                        text="2"
+                    />
+                    <core:Item
+                        key="3"
+                        text="3"
+                    />
+                    <core:Item
+                        key="4"
+                        text="4"
+                    />
+                    <core:Item
+                        key="5"
+                        text="5"
+                    />
+                    <core:Item
+                        key="6"
+                        text="6"
+                    />
+                    <core:Item
+                        key="7"
+                        text="7"
+                    />
+                    <core:Item
+                        key="8"
+                        text="8"
+                    />
+                    <core:Item
+                        key="9"
+                        text="9"
+                    />
+                    <core:Item
+                        key="10"
+                        text="10"
+                    />
+                    <core:Item
+                        key="11"
+                        text="11"
+                    />
+                </Select>
 
-    <!-- End Date -->
-    <Label text="End Date" />
-    <DatePicker
-        id="editEndDate"
-        editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
-        value="{path:'edit>/EndDate'}"
-        displayFormat="dd/MM/yyyy"
-        valueFormat="yyyy-MM-dd"
-        change="onEditDateChange"
-        minDate="{CustomerData>/minStartDate}"
-        maxDate="{CustomerData>/minEndDate}"
+                <!-- End Date -->
+                <Label text="{i18n>endDate}" />
+                <DatePicker
+                    id="editEndDate"
+                    editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
+                    value="{path:'edit>/EndDate'}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onEditDateChange"
+                    minDate="{CustomerData>/minStartDate}"
+                    maxDate="{CustomerData>/minEndDate}"
+                    valueStateText="{i18n>plaeseSelectDate}"
+                />
+                <!-- Days -->
+                <Label text="{i18n>days}" />
+                <Input
+                    id="editDays"
+                    value="{edit>/TotalDays}"
+                    editable="false"
+                />
+                <Label
+                    text="{i18n>startTime}"
+                    required="true"
+                />
 
-         valueStateText="Plaese Select Date"
-  />
-    <!-- Days -->
-    <Label text="Days" />
-    <Input
-        id="editDays"
-        value="{edit>/TotalDays}"
-        editable="false" />
-         <Label text="Start Time" required="true" />
+                <TimePicker
+                    id="editStartTime"
+                    value="{edit>/StartTime}"
+                    change="onEditTimeChange"
+                    displayFormat="HH"
+                    valueFormat="HH"
+                    valueStateText="{i18n>pleaseselectTime}"
+                    visible="{= ${edit>/UnitText} === 'Per Hour'}"
+                />
+                <Label
+                    text="{i18n>endTime}"
+                    required="true"
+                />
 
-  <TimePicker
-        id="editStartTime"
-        value="{edit>/StartTime}"
-        change="onEditTimeChange"
-        displayFormat="HH"
-        valueFormat="HH"
-        valueStateText="Please select Time"
-        visible="{= ${edit>/UnitText} === 'Per Hour'}"  
-
-
-     />
-    <Label text="End Time" required="true" />
-
-      <TimePicker
-        id="editEndTime"
-        value="{edit>/EndTime}"
-        displayFormat="HH"
-        valueFormat="HH"
-        change="onEditTimeChange"
-        valueStateText="Please select Time"
-          visible="{= ${edit>/UnitText} === 'Per Hour'}" 
-     />
-      <Label text="Hours" />
-    <Input
-        id="editHours"
-        value="{edit>/TotalHour}"
-        editable="false"
-             visible="{= ${edit>/UnitText} === 'Per Hour'}" 
-  />
-     </f:content>
-</f:SimpleForm>
+                <TimePicker
+                    id="editEndTime"
+                    value="{edit>/EndTime}"
+                    displayFormat="HH"
+                    valueFormat="HH"
+                    change="onEditTimeChange"
+                    valueStateText="{i18n>pleaseselectTime}"
+                    visible="{= ${edit>/UnitText} === 'Per Hour'}"
+                />
+                <Label text="{i18n>hours}" />
+                <Input
+                    id="editHours"
+                    value="{edit>/TotalHour}"
+                    editable="false"
+                    visible="{= ${edit>/UnitText} === 'Per Hour'}"
+                />
+            </f:content>
+        </f:SimpleForm>
         <buttons>
             <Button
-                text="Save"
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
                 press=".onEditFacilitySave"
-                 class="myUnifiedBtn"
+                class="myUnifiedBtn"
             />
             <Button
-                text="Cancel"
-                press="onEditDialogClose"  class="myUnifiedBtn"
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="onEditDialogClose"
+                class="myUnifiedBtn"
             />
         </buttons>
     </Dialog>
