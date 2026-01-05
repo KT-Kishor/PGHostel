@@ -37,7 +37,7 @@
                     items="{BranchModel>/}"
                     change="onbranchChange"
                     showSecondaryValues="true"
-                    placeholder="Select Branch Code"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     valueStateText="{i18n>selectBranchCode}"
                 >
                     <core:ListItem
@@ -54,7 +54,7 @@
                 <Input
                     id="BD_idBedType"
                     value="{BedModel>/Name}"
-                    placeholder="Enter Bed Type"
+                    placeholder="{i18n>enterBedType}"
                     valueStateText="{i18n>enterBedType}"
                     maxLength="50"
                     liveChange="onLivehange"
@@ -68,7 +68,7 @@
                     id="BD_id_Roomtype"
                     selectedKey="{BedModel>/ACType}"
                     change="onbranchChange"
-                    placeholder="Select Room Type"
+                    placeholder="{i18n>selectRoomType}"
                     valueStateText="{i18n>selectRoomType}"
                 >
                     <core:ListItem
@@ -88,7 +88,7 @@
                 <Input
                     id="BD_id_Person"
                     value="{BedModel>/NoOfPerson}"
-                    placeholder="Enter No of Person"
+                    placeholder="{i18n>enterNoofPerson}"
                     valueStateText="{i18n>enterNoofPerson}"
                     liveChange="onNoOfPersonInputLiveChange"
                     maxLength="2"
@@ -101,7 +101,7 @@
                 <Input
                     id="BD_id_MaxBeds"
                     value="{BedModel>/MaxBeds}"
-                    placeholder="Enter No of Rooms"
+                    placeholder="{i18n>enterNoofRooms}"
                     valueStateText="{i18n>enterNoofRooms}"
                     maxLength="3"
                     liveChange="onNoOfPersonInputLiveChange"
@@ -115,7 +115,7 @@
                     id="BD_id_Description"
                     value="{BedModel>/Description}"
                     maxLength="150"
-                    placeholder="Enter Description"
+                    placeholder="{i18n>enterDescription}"
                     valueStateText="{i18n>enterDescription}"
                     liveChange="onLivehange"
                 />
@@ -188,13 +188,13 @@
                 <ToolbarSpacer />
                 <Button
                     text="{i18n>save}"
-                    tooltip="Save"
+                    tooltip="{i18n>save}"
                     press="BT_onsavebuttonpress"
                     class="myUnifiedBtn"
                 />
                 <Button
                     text="{i18n>CancelButton}"
-                    tooltip="Cancel"
+                    tooltip="{i18n>CancelButton}"
                     press="BT_onCancelButtonPress"
                     class="myUnifiedBtn"
                 />

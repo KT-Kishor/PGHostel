@@ -1,95 +1,226 @@
-	<core:FragmentDefinition 
-		xmlns="sap.m" 
-		xmlns:core="sap.ui.core" 
-		xmlns:f="sap.ui.layout.form" 
-		xmlns:u="sap.ui.unified">
-		<Dialog  id="adminSignupDialog" initialFocus="adminSalutation" contentWidth="28rem" stretch="{= ${device>/system/phone} }" draggable="true" resizable="true">
-			
-			<customHeader>
-	<Bar class="barheader">
-		<contentMiddle>
-			<Title text="Admin / Vendor Registration" />
-		</contentMiddle>
-		<contentRight>
-			<Button type="Transparent" icon="sap-icon://decline" tooltip="Close" press="onCloseAdminSignup" />
-		</contentRight>
-	</Bar>
-</customHeader>
-<!-- <f:SimpleForm editable="true" layout="ResponsiveGridLayout"> -->
-			<f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1">
-				<!-- (keep your existing fields as-is) -->
-				<HBox width="100%" alignItems="Center" class="isdMobileRow">
-	<!-- Salutation : 30% -->
-	<VBox width="25%">
-		<Label text="Salutation" required="true"/>
-		<ComboBox id="adminSalutation" 
-		selectedKey="{AdminSignupModel>/Salutation}" 
-		change="onAdminChangeSalutation" 
-		placeholder="Mr." 
-		valueStateText="Select Salutation">
-			<core:ListItem key="Mr." text="Mr."/>
-			<core:ListItem key="Ms." text="Ms."/>
-			<core:ListItem key="Mrs." text="Mrs."/>
-			<core:ListItem key="Dr." text="Dr."/>
-		</ComboBox>
-	</VBox>
-	<!-- Vendor Name : 70% -->
-	<VBox width="75%" >
-		<Label text="Vendor Name" required="true"/>
-		<Input id="adminVendorName" 
-		value="{AdminSignupModel>/VendorName}" 
-		placeholder="Enter your name" 
-		liveChange="onAdminLiveValidate" 
-		valueStateText="Enter Valid Name"/>
-	</VBox>
-</HBox>		<!-- DOB -->
-				<Label text="Date of Birth" required="true"/>
-				<DatePicker id="adminDOB" value="{AdminSignupModel>/DOB}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" valueStateText="Age must be between 18 and 70" change="ADMIN_onChangeDOB" />
-				<!-- Gender -->
-				<Label text="Gender" required="true"/>
-				<Select  id="adminGender" selectedKey="{AdminSignupModel>/Gender}" forceSelection="false" change="ADMIN_onChangeGender" valueStateText="Please select a Gender">
-					<core:Item key="Male" text="Male" />
-					<core:Item key="Female" text="Female" />
-					<core:Item key="Other" text="Other" />
-				</Select>
-				<!-- Email -->
-				<Label text="Email" required="true"/>
-				<Input placeholder="Enter your Email" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="Enter valid Email"/>
-				<!-- Country -->
-				<Label text="Country" required="true"/>
-				<ComboBox id="adminsignUpCountry" selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry" selectionChange="ADMIN_onChangeCountry" placeholder="Select Country" valueStateText="Select a valid Country" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
-					<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="adminSignupDialog"
+        initialFocus="adminSalutation"
+        contentWidth="28rem"
+        stretch="{= ${device>/system/phone} }"
+        draggable="true"
+        resizable="true"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>adminVendorRegistration}" />
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        type="Transparent"
+                        icon="sap-icon://decline"
+                        tooltip="{i18n>close}"
+                        press="onCloseAdminSignup"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <!-- <f:SimpleForm editable="true" layout="ResponsiveGridLayout"> -->
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="4"
+            labelSpanM="4"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="0"
+            emptySpanL="0"
+            emptySpanM="0"
+            emptySpanS="0"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+        >
+            <!-- (keep your existing fields as-is) -->
+            <HBox
+                width="100%"
+                alignItems="Center"
+                class="isdMobileRow"
+            >
+                <!-- Salutation : 30% -->
+                <VBox width="25%">
+                    <Label
+                        text="{i18n>MSsalutation}"
+                        required="true"
+                    />
+                    <ComboBox
+                        id="adminSalutation"
+                        selectedKey="{AdminSignupModel>/Salutation}"
+                        change="onAdminChangeSalutation"
+                        placeholder="Mr."
+                        valueStateText="{i18n>MVDsalutation}"
+                    >
+                        <core:ListItem
+                            key="Mr."
+                            text="Mr."
+                        />
+                        <core:ListItem
+                            key="Ms."
+                            text="Ms."
+                        />
+                        <core:ListItem
+                            key="Mrs."
+                            text="Mrs."
+                        />
+                        <core:ListItem
+                            key="Dr."
+                            text="Dr."
+                        />
+                    </ComboBox>
+                </VBox>
+                <!-- Vendor Name : 70% -->
+                <VBox
+                    width="75%"
+                    class="sapUiTinyMarginBegin"
+                >
+                    <Label
+                        text="{i18n>MVDname}"
+                        required="true"
+                    />
+                    <Input
+                        id="adminVendorName"
+                        value="{AdminSignupModel>/VendorName}"
+                        placeholder="{i18n>enteryourname}"
+                        liveChange="onAdminLiveValidate"
+                        valueStateText="{i18n>MSenterValidName}"
+                    />
+                </VBox>
+            </HBox>
+            <!-- DOB -->
+            <Label
+                text="{i18n>MVDDOB}"
+                required="true"
+            />
+            <DatePicker
+                id="adminDOB"
+                value="{AdminSignupModel>/DOB}"
+                displayFormat="dd/MM/yyyy"
+                valueFormat="yyyy-MM-dd"
+                valueStateText="{i18n>agediff}"
+                change="ADMIN_onChangeDOB"
+            />
+            <!-- Gender -->
+            <Label
+                text="{i18n>MVgender}"
+                required="true"
+            />
+            <Select
+                id="adminGender"
+                selectedKey="{AdminSignupModel>/Gender}"
+                forceSelection="false"
+                change="ADMIN_onChangeGender"
+                valueStateText="{i18n>pleaseselectGender}"
+            >
+                <core:Item
+                    key="Male"
+                    text="Male"
+                />
+                <core:Item
+                    key="Female"
+                    text="Female"
+                />
+                <core:Item
+                    key="Other"
+                    text="Other"
+                />
+            </Select>
+            <!-- Email -->
+            <Label
+                text="{i18n>email}"
+                required="true"
+            />
+            <Input
+                placeholder="{i18n>enteryourEmail}"
+                value="{AdminSignupModel>/Email}"
+                id="adminEmail"
+                type="Email"
+                liveChange="onAdminLiveValidate"
+                valueStateText="{i18n>MSenterValidEmail}"
+            />
+            <!-- Country -->
+            <Label
+                text="{i18n>MVDcountry}"
+                required="true"
+            />
+            <ComboBox
+                id="adminsignUpCountry"
+                selectedKey="{AdminSignupModel>/Country}"
+                change="ADMIN_onChangeCountry"
+                selectionChange="ADMIN_onChangeCountry"
+                placeholder="{i18n>selectCountry}"
+                valueStateText="{i18n>MVDselectcountry}"
+                items="{path:'CountryModel>/', length:1000}"
+                showSecondaryValues="true"
+            >
+                <core:ListItem
+                    key="{CountryModel>countryName}"
+                    text="{CountryModel>countryName}"
+                    additionalText="{CountryModel>code}"
+                />
+            </ComboBox>
+            <!-- State -->
+            <Label
+                text="{i18n>MVDstate}"
+                required="true"
+            />
+            <ComboBox
+                id="adminsignUpState"
+                selectedKey="{AdminSignupModel>/State}"
+                change="ADMIN_onChangeState"
+                selectionChange="ADMIN_onChangeState"
+                placeholder="{i18n>selectState}"
+                valueStateText="{i18n>MSselectState}"
+                items="{path: 'StateModel>/filtered', length: 1000}"
+                showSecondaryValues="true"
+            >
+                <core:ListItem
+                    key="{StateModel>stateName}"
+                    text="{StateModel>stateName}"
+                />
+            </ComboBox>
+            <!-- City -->
+            <Label
+                text="{i18n>city}"
+                required="true"
+            />
+            <ComboBox
+                id="adminsignUpCity"
+                selectedKey="{AdminSignupModel>/City}"
+                change="ADMIN_onChangeCity"
+                selectionChange="ADMIN_onChangeCity"
+                placeholder="{i18n>cityValueText}"
+                valueStateText="{i18n>MSselectCity}"
+                items="{path:'CityModel>/filtered', length:1000}"
+                showSecondaryValues="true"
+            >
+                <core:ListItem
+                    key="{CityModel>cityName}"
+                    text="{CityModel>cityName}"
+                    additionalText="{CityModel>branchCode}"
+                />
+            </ComboBox>
+            <!-- ISD Code -->
+            <!-- <Label text="ISD Code" required="true"/>
+				<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="Code" valueStateText="Select Code" showSecondaryValues="true" items="{path:'CountryModel>/', length:1000}">
+					<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 				</ComboBox>
-				<!-- State -->
-				<Label text="State" required="true"/>
-				<ComboBox id="adminsignUpState" selectedKey="{AdminSignupModel>/State}" change="ADMIN_onChangeState" selectionChange="ADMIN_onChangeState" placeholder="Select State" valueStateText="Select a valid State" items="{path: 'StateModel>/filtered', length: 1000}" showSecondaryValues="true">
-					<core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
-				</ComboBox>
-				<!-- City -->
-				<Label text="City" required="true"/>
-				<ComboBox id="adminsignUpCity" selectedKey="{AdminSignupModel>/City}" change="ADMIN_onChangeCity" selectionChange="ADMIN_onChangeCity" placeholder="Select City" valueStateText="Select a valid City" items="{path:'CityModel>/filtered', length:1000}" showSecondaryValues="true">
-					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}"/>
-				</ComboBox>
-			
-			
-<!-- <Label text="Mobile Number" required="true"/>
-<HBox width="100%" alignItems="Center" class="isdMobileRow">
-	<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true"> 
-		<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
-		<layoutData>
-			<FlexItemData baseSize="24%" growFactor="0" />
-		</layoutData>
-	</ComboBox>
-<Input class="sapUiTinyMarginBegin" id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid mobile number">
-	<layoutData>
-		<FlexItemData baseSize="65%" growFactor="1" />
-	</layoutData>
-	</Input>
-</HBox> -->
+				<Label text="Mobile Number" required="true"/>
+				<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" valueStateText="Enter valid mobile number" /> -->
 
-
-
-<Label text="" />
+           <Label text="" />
 <HBox width="100%" justifyContent="Start" alignItems="Center">
 	<VBox width="30%">
 		<Label text="ISD Code" required="true" />
@@ -111,81 +242,140 @@ width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues=
 			</VBox>
 </HBox>
 
+            <!-- Address -->
+            <Label
+                text="{i18n>address}"
+                required="true"
+            />
+            <TextArea
+                placeholder="{i18n>enteryouraddress}"
+                id="adminAddress"
+                value="{AdminSignupModel>/Address}"
+                rows="3"
+                liveChange="onAdminLiveValidate"
+                valueStateText="{i18n>entervalidAddress}"
+            />
+        </f:SimpleForm>
+        <!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
+        <!-- DOCUMENTS SECTION -->
+        <VBox
+            class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop "
+        >
+            <!-- Informational Message Strip -->
+            <MessageStrip
+                text="{i18n>messageStrip}"
+                showIcon="true"
+                type="Warning"
+                class="sapUiTinyMarginBottom"
+            />
+        </VBox>
 
-
-
-
-
-
-
-
-
-
-
-				<!-- Address -->
-				<Label text="Address" required="true"/>
-				<TextArea placeholder="Enter your address" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="Enter a valid Address" />
-			</f:SimpleForm>
-			<!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
-			<!-- DOCUMENTS SECTION -->
-			<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
-	<!-- Informational Message Strip -->
-	<MessageStrip text="Upload clear and valid documents only. Max size: 5 MB per file" showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
-</VBox>
-			
-	        <Table id="adminAttachmentTable" items="{AdminSignupModel>/Documents}" mode="Delete" delete="onAdminDeleteDoc" sticky="ColumnHeaders,HeaderToolbar" width="100%">
-		<headerToolbar>
-			<OverflowToolbar>
-				<Title text="Documents" />
-				<Text text="*" class="requiredStar" />
-				<ToolbarSpacer />
-				<!-- Dropdown for choosing type -->
-	<ComboBox change="onAdminDocTypeChange" id="adminDocType" selectedKey="{AdminSignupModel>/CurrentDocType}" enabled="{AdminSignupModel>/DocTypeEnabled}" placeholder="Select Document" width="200px">				
-					<core:ListItem key="Aadhaar" text="Aadhar Card"/>
-					<core:ListItem key="PAN" text="PAN Card"/>
-					<core:ListItem key="Driving License" text="Driving License"/>
-					<core:ListItem key="Bank" text="Bank Account Proof"/>
-					<!-- <core:ListItem key="Resume" text="Resume"/> -->
-					<core:ListItem key="Other" text="Other"/>
-				</ComboBox>
-				<!-- Upload button -->
-				<VBox id="adminUploaderWrapper">
-	<u:FileUploader enabled="{= ${AdminSignupModel>/CurrentDocType} !== '' }" id="adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" />
-	</VBox>
-		</OverflowToolbar>
-		</headerToolbar>
-		<columns>
-			<Column>
-				<Text text="File Name" />
-			</Column>
-			<Column>
-				<Text text="Document" />
-			</Column>
-			<!-- <Column>
+        <Table
+            id="adminAttachmentTable"
+            items="{AdminSignupModel>/Documents}"
+            mode="Delete"
+            delete="onAdminDeleteDoc"
+            sticky="ColumnHeaders,HeaderToolbar"
+            width="100%"
+        >
+            <headerToolbar>
+                <OverflowToolbar>
+                    <Title text="{i18n>MVDdocument}" />
+                    <Text
+                        text="*"
+                        class="requiredStar"
+                    />
+                    <ToolbarSpacer />
+                    <!-- Dropdown for choosing type -->
+                    <ComboBox
+                        change="onAdminDocTypeChange"
+                        id="adminDocType"
+                        selectedKey="{AdminSignupModel>/CurrentDocType}"
+                        enabled="{AdminSignupModel>/DocTypeEnabled}"
+                        placeholder="{i18n>selectDocument}"
+                        width="200px"
+                    >
+                        <core:ListItem
+                            key="Aadhaar"
+                            text="Aadhar Card"
+                        />
+                        <core:ListItem
+                            key="PAN"
+                            text="PAN Card"
+                        />
+                        <core:ListItem
+                            key="Driving License"
+                            text="Driving License"
+                        />
+                        <core:ListItem
+                            key="Bank"
+                            text="Bank Account Proof"
+                        />
+                        <!-- <core:ListItem key="Resume" text="Resume"/> -->
+                        <core:ListItem
+                            key="Other"
+                            text="Other"
+                        />
+                    </ComboBox>
+                    <!-- Upload button -->
+                    <VBox id="adminUploaderWrapper">
+                        <u:FileUploader
+                            enabled="{= ${AdminSignupModel>/CurrentDocType} !== '' }"
+                            id="adminFileUploader"
+                            buttonOnly="true"
+                            buttonText="Upload"
+                            uploadOnChange="false"
+                            change="onAdminFileSelect"
+                            fileType="jpg,jpeg,png,pdf,doc,docx"
+                        />
+                    </VBox>
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column>
+                    <Text text="{i18n>filename}" />
+                </Column>
+                <Column>
+                    <Text text="{i18n>document}" />
+                </Column>
+                <!-- <Column>
 				<Text text="File Type" />
 			</Column> -->
-			<Column>
-				<Text text="Size" />
-			</Column>
-		</columns>
-		<items>
-			<ColumnListItem>
-				<cells>
-					<!-- FILE NAME WITH ICON + PREVIEW LINK -->
-							<Link text="{AdminSignupModel>FileName}" press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}" />
-					<!-- DOCUMENT TYPE (VdocType = Aadhaar/PAN/Resume) -->
-					<Text text="{AdminSignupModel>VdocType}" />
-					<!-- FILE TYPE SHORT (jpg/pdf/docx/etc) -->
-					<!-- <Text text="{path:'AdminSignupModel>DocumentType', formatter:'.Formatter.formatShortFileType'}" /> -->
-					<!-- SIZE -->
-					<Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}" />
-				</cells>
-			</ColumnListItem>
-		</items>
-	</Table>
-			<!-- ACTIONS -->
-			<beginButton >
-				<Button text="Register" type="Emphasized" press="onSubmitAdminSignup" class="myUnifiedBtn sapUiSmallMargin" width="120px" />
-			</beginButton>
-		</Dialog>
-	</core:FragmentDefinition>
+                <Column>
+                    <Text text="{i18n>size}" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <!-- FILE NAME WITH ICON + PREVIEW LINK -->
+                        <Link
+                            text="{AdminSignupModel>FileName}"
+                            press="onAdminPreviewDoc"
+                            tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
+                        />
+                        <!-- DOCUMENT TYPE (VdocType = Aadhaar/PAN/Resume) -->
+                        <Text text="{AdminSignupModel>VdocType}" />
+                        <!-- FILE TYPE SHORT (jpg/pdf/docx/etc) -->
+                        <!-- <Text text="{path:'AdminSignupModel>DocumentType', formatter:'.Formatter.formatShortFileType'}" /> -->
+                        <!-- SIZE -->
+                        <Text
+                            text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <!-- ACTIONS -->
+        <beginButton>
+            <Button
+                text="{i18n>register}"
+				tooltip="{i18n>register}"
+                type="Emphasized"
+                press="onSubmitAdminSignup"
+                class="myUnifiedBtn sapUiSmallMargin"
+                width="120px"
+            />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

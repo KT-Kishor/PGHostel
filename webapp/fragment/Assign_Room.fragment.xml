@@ -6,7 +6,7 @@
 >
     <Dialog
         id="sds"
-        title="Assign Room"
+        title="{i18n>assignRoom}"
         type="Message"
         class="sapUiContentPadding"
     >
@@ -23,7 +23,7 @@
         >
             <f:content>
                 <Label
-                    text="Customer Name"
+                    text="{i18n>customerName}"
                     required="true"
                 />
                 <Text
@@ -31,15 +31,15 @@
                     text="{HostelModel>/CustomerName}"
                 />
                 <Label
-                    text="Room No"
+                    text="{i18n>roomNo}"
                     required="true"
                 />
                 <ComboBox
                     id="idRoomNumber1"
-                    placeholder="Select Room Number"
+                    placeholder="{i18n>selectRoomNumber}"
                     selectedKey="{HostelModel>/RoomNumber}"
                     items="{AvailableRoomsModel>/}"
-                    valueStateText="Select Room No"
+                    valueStateText="{i18n>selectRoomNo}"
                     change="onRoomNoChange"
                 >
                     <core:ListItem
@@ -49,19 +49,18 @@
                 </ComboBox>
 
                 <Label
-                    text="Branch Code"
+                    text="{i18n>MSbranchCode}"
                     required="true"
                 />
                 <ComboBox
                     id="id_BranchCode"
-                    placeholder="Select Branch Code"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKey="{RoomModel>/BranchCode}"
                     selectionChange=".onBranchChange"
-                    valueStateText="Please select a valid Branch Code"
+                    valueStateText="{i18n>pleaseSelectValidBranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     visible="{Visiblemodel>/Visible}"
-
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -70,19 +69,18 @@
                     />
                 </ComboBox>
                 <Label
-                    text="Bed Type"
+                    text="{i18n>bedType}"
                     required="true"
                 />
                 <ComboBox
                     id="idBedType"
-                    placeholder="Select Bed Type"
+                    placeholder="{i18n>selectBedType}"
                     width="100%"
                     selectedKey="{HostelModel>/BedTypeName}"
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"
-                    valueStateText="Please select a valid Bed Type"
+                    valueStateText="{i18n>pleaseSelectValidBedType}"
                     visible="{Visiblemodel>/Visible}"
-
                 >
                     <core:ListItem
                         key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
@@ -90,39 +88,36 @@
                     />
                 </ComboBox>
 
-                <Label text="Start Date" />
+                <Label text="{i18n>startDate}" />
                 <DatePicker
                     id="AR_id_StartDate"
                     value="{HostelModel>/StartDate}"
                     change="FCIA_ondatechange"
-                    valueStateText="Select date"
+                    valueStateText="{i18n>selectdate}"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     visible="{Visiblemodel>/Visible}"
-
                 />
 
-                <Label text="End Date" />
+                <Label text="{i18n>endDate}" />
                 <DatePicker
                     id="AR_id_EndDate"
                     value="{HostelModel>/EndDate}"
                     change="FCIA_ondatechange"
-                    valueStateText="Select date"
+                    valueStateText="{i18n>selectdate}"
                     valueFormat="dd/MM/yyyy"
                     displayFormat="dd/MM/yyyy"
                     visible="{Visiblemodel>/Visible}"
-
                 />
-                <Label text="Add Facility" />
+                <Label text="{i18n>addFacility}" />
                 <MultiComboBox
                     id="id_facility"
-                    placeholder="Select Facility"
+                    placeholder="{i18n>selectFacility}"
                     selectedKey="{HostelModel>/Facility}"
                     items="{facilitymodel>/}"
-                    valueStateText="Select Room No"
+                    valueStateText="{i18n>selectRoomNo}"
                     showSecondaryValues="true"
                     visible="{Visiblemodel>/Visible}"
-
                 >
                     <core:ListItem
                         key="{facilitymodel>FacilityName}"
@@ -136,14 +131,16 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="{i18n>save}"
                     press="ARNO_onsavebuttonpress"
                     type="Accept"
                     id="HM_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="{i18n>CancelButton}"
                     press="HM_onCancelButtonPress"
                     type="Reject"
                     id="HM_id_CancelButton"

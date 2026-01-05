@@ -8,128 +8,152 @@
 >
     <Dialog
         id="FDD_id_FacilitiesDialog"
-        title="Add Room Image"
+        title="{i18n>addRoomImage}"
         type="Message"
-      class="sapUiContentPadding"
+        class="sapUiContentPadding"
     >
-      <f:SimpleForm
-    editable="true"
-    layout="ResponsiveGridLayout"
-    labelSpanXL="3"
-    labelSpanL="3"
-    labelSpanM="12"
-    labelSpanS="12"
-    columnsXL="1"
-    columnsL="1"
-    columnsM="1"
->
-    <f:content>
-        <Label text="Branch Code" required="true" />
-        <ComboBox
-            id="BD_id_Branchcode"
-            placeholder="Select Branch Code"
-            selectedKey="{BedModel>/BranchCode}"
-            items="{BranchModel>/}"
-            showSecondaryValues="true"
-            change=".onFacilitybranchChange"
-            valueStateText="{i18n>selectBranchCode}"
-            width="50%"
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="3"
+            labelSpanL="3"
+            labelSpanM="12"
+            labelSpanS="12"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
         >
-            <core:ListItem
-                key="{BranchModel>BranchID}"
-                text="{BranchModel>BranchID}"
-                additionalText="{BranchModel>Name}"
-            />
-        </ComboBox>
-
-        <Label text="Bed Type" required="true" />
-        <Input
-            id="BD_id_BedType"
-            value="{BedModel>/Name}"
-            placeholder="Enter Bed Type"
-            maxLength="60"
-            liveChange=".onFacilityNameChange"
-            valueStateText="{i18n>enterFacilityName}"
-            width="50%"
-
-        />
-
-        <Label text="Room Type" required="true" />
-        <ComboBox
-            id="BD_Roomtype"
-            placeholder="Select Room Type"
-            selectedKey="{BedModel>/ACType}"
-            width="50%"
-
-        >
-            <core:Item key="AC" text="AC" />
-            <core:Item key="Non-AC" text="Non-AC" />
-        </ComboBox>
-
-        <Label text="Attachment" />
-        <Table
-            id="FDD_id_AttachmentsTable"
-            sticky="ColumnHeaders,HeaderToolbar"
-            items="{UploaderData>/attachments}"
-            inset="false"
-            mode="Delete"
-            delete="onAttachmentsTableDelete"
-            popinLayout="Block"
-            busyIndicatorDelay="0"
-            width="100%"
-        >
-            <headerToolbar>
-                <OverflowToolbar>
-                    <ToolbarSpacer />
-                    <u:FileUploader
-                        id="FDD_id_FileUploader"
-                        fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt"
-                        name="myFileUpload"
-                        multiple="true"
-                        uploadUrl=""
-                        tooltip="{i18n>toolTipMsgSM}"
-                        change="onFileSelected"
-                        buttonOnly="true"
-                        buttonText="Upload Attachment"
+            <f:content>
+                <Label
+                    text="{i18n>MSbranchCode}"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_id_Branchcode"
+                    placeholder="{i18n>placeSelectBranchCode}"
+                    selectedKey="{BedModel>/BranchCode}"
+                    items="{BranchModel>/}"
+                    showSecondaryValues="true"
+                    change=".onFacilitybranchChange"
+                    valueStateText="{i18n>selectBranchCode}"
+                    width="50%"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID}"
+                        additionalText="{BranchModel>Name}"
                     />
-                </OverflowToolbar>
-            </headerToolbar>
-            <columns>
-                <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
-                    <Text text="File name" />
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" popinDisplay="Inline">
-                    <Text text="File Type" />
-                </Column>
-                <!-- <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" popinDisplay="Inline">
+                </ComboBox>
+
+                <Label
+                    text="{i18n>bedType}"
+                    required="true"
+                />
+                <Input
+                    id="BD_id_BedType"
+                    value="{BedModel>/Name}"
+                    placeholder="{i18n>enterBedType}"
+                    maxLength="60"
+                    liveChange=".onFacilityNameChange"
+                    valueStateText="{i18n>enterFacilityName}"
+                    width="50%"
+                />
+
+                <Label
+                    text="{i18n>roomtype}"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_Roomtype"
+                    placeholder="{i18n>selectRoomType}"
+                    selectedKey="{BedModel>/ACType}"
+                    width="50%"
+                >
+                    <core:Item
+                        key="AC"
+                        text="AC"
+                    />
+                    <core:Item
+                        key="Non-AC"
+                        text="Non-AC"
+                    />
+                </ComboBox>
+
+                <Label text="{i18n>MVDattachments}" />
+                <Table
+                    id="FDD_id_AttachmentsTable"
+                    sticky="ColumnHeaders,HeaderToolbar"
+                    items="{UploaderData>/attachments}"
+                    inset="false"
+                    mode="Delete"
+                    delete="onAttachmentsTableDelete"
+                    popinLayout="Block"
+                    busyIndicatorDelay="0"
+                    width="100%"
+                >
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <ToolbarSpacer />
+                            <u:FileUploader
+                                id="FDD_id_FileUploader"
+                                fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt"
+                                name="myFileUpload"
+                                multiple="true"
+                                uploadUrl=""
+                                tooltip="{i18n>toolTipMsgSM}"
+                                change="onFileSelected"
+                                buttonOnly="true"
+                                buttonText="Upload Attachment"
+                            />
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                        >
+                            <Text text="{i18n>filename}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                            hAlign="Center"
+                            popinDisplay="Inline"
+                        >
+                            <Text text="{i18n>FileType}" />
+                        </Column>
+                        <!-- <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" popinDisplay="Inline">
                     <Text text="File Size" />
                 </Column> -->
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{UploaderData>filename}" />
-                        <Text text="{UploaderData>fileType}" />
-                        <!-- <Text text="{path:'UploaderData>size', formatter: '.Formatter.bytesToMB'}" /> -->
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-    </f:content>
-</f:SimpleForm>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{UploaderData>filename}" />
+                                <Text text="{UploaderData>fileType}" />
+                                <!-- <Text text="{path:'UploaderData>size', formatter: '.Formatter.bytesToMB'}" /> -->
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </f:content>
+        </f:SimpleForm>
 
         <footer>
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="{i18n>save}"
                     press="FD_onsavebuttonpress"
                     type="Accept"
                     id="FDD_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
+                    tooltip="{i18n>CancelButton}"
                     press="BD_onCancelButtonPress"
                     type="Reject"
                     id="BD_id_CancelBtn"
