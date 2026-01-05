@@ -1075,6 +1075,10 @@ sap.ui.define([
                             fileType: ["jpg", "jpeg", "png"],
                             mimeType: ["image/jpeg", "image/png"],
                             multiple: false,
+                            layoutData: new sap.ui.layout.form.ColumnElementData({
+                                cellsLarge: 8,
+                                cellsSmall: 9 ///
+                            }),
                             customData: [new sap.ui.core.CustomData({
                                 key: "index",
                                 value: i
@@ -1146,6 +1150,10 @@ sap.ui.define([
                             text: "Clear",
                             type: "Transparent",
                             tooltip: "Clear Document",
+                            layoutData: new sap.ui.layout.form.ColumnElementData({
+                                cellsLarge: 1,
+                                cellsSmall: 3 /// 🔴 Mobile par bacha hua 3 cells (25% space)
+                            }),
                             press: function (oEvent) {
 
                                 const oButton = oEvent.getSource();

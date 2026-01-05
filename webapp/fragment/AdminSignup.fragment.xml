@@ -20,9 +20,13 @@
 				<!-- (keep your existing fields as-is) -->
 				<HBox width="100%" alignItems="Center" class="isdMobileRow">
 	<!-- Salutation : 30% -->
-	<VBox width="23%">
+	<VBox width="25%">
 		<Label text="Salutation" required="true"/>
-		<ComboBox id="adminSalutation" selectedKey="{AdminSignupModel>/Salutation}" change="onAdminChangeSalutation" placeholder="Mr." valueStateText="Select Salutation">
+		<ComboBox id="adminSalutation" 
+		selectedKey="{AdminSignupModel>/Salutation}" 
+		change="onAdminChangeSalutation" 
+		placeholder="Mr." 
+		valueStateText="Select Salutation">
 			<core:ListItem key="Mr." text="Mr."/>
 			<core:ListItem key="Ms." text="Ms."/>
 			<core:ListItem key="Mrs." text="Mrs."/>
@@ -30,9 +34,13 @@
 		</ComboBox>
 	</VBox>
 	<!-- Vendor Name : 70% -->
-	<VBox width="73%" class="sapUiTinyMarginBegin">
+	<VBox width="75%" >
 		<Label text="Vendor Name" required="true"/>
-		<Input id="adminVendorName" value="{AdminSignupModel>/VendorName}" placeholder="Enter your name" liveChange="onAdminLiveValidate" valueStateText="Enter Valid Name"/>
+		<Input id="adminVendorName" 
+		value="{AdminSignupModel>/VendorName}" 
+		placeholder="Enter your name" 
+		liveChange="onAdminLiveValidate" 
+		valueStateText="Enter Valid Name"/>
 	</VBox>
 </HBox>		<!-- DOB -->
 				<Label text="Date of Birth" required="true"/>
@@ -62,32 +70,58 @@
 				<ComboBox id="adminsignUpCity" selectedKey="{AdminSignupModel>/City}" change="ADMIN_onChangeCity" selectionChange="ADMIN_onChangeCity" placeholder="Select City" valueStateText="Select a valid City" items="{path:'CityModel>/filtered', length:1000}" showSecondaryValues="true">
 					<core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}" additionalText="{CityModel>branchCode}"/>
 				</ComboBox>
-				<!-- ISD Code -->
-				<!-- <Label text="ISD Code" required="true"/>
-				<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="Code" valueStateText="Select Code" showSecondaryValues="true" items="{path:'CountryModel>/', length:1000}">
-					<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
-				</ComboBox>
-				<Label text="Mobile Number" required="true"/>
-				<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" valueStateText="Enter valid mobile number" /> -->
 			
 			
-<Label text="Mobile Number" required="true"/>
+<!-- <Label text="Mobile Number" required="true"/>
 <HBox width="100%" alignItems="Center" class="isdMobileRow">
-	<!-- ISD: 30% -->
 	<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true"> 
 		<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 		<layoutData>
-			<FlexItemData baseSize="30%" growFactor="0" />
+			<FlexItemData baseSize="24%" growFactor="0" />
 		</layoutData>
 	</ComboBox>
-	<!-- Mobile: 70% -->
 <Input class="sapUiTinyMarginBegin" id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid mobile number">
 	<layoutData>
-		<FlexItemData baseSize="70%" growFactor="1" />
+		<FlexItemData baseSize="65%" growFactor="1" />
 	</layoutData>
 	</Input>
+</HBox> -->
+
+
+
+<Label text="" />
+<HBox width="100%" justifyContent="Start" alignItems="Center">
+	<VBox width="30%">
+		<Label text="ISD Code" required="true" />
+<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" 
+change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" 
+width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true">
+	<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}"
+	 additionalText="{CountryModel>code}" />
+
+</ComboBox>
+	</VBox>
+	<VBox width="70%">
+		<Label text="Mobile Number" required="true" />
+		<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" 
+		liveChange="ADMIN_onMobileLiveChange" maxLength="18" 
+		placeholder="Enter Mobile Number" width="100%" 
+		valueStateText="Enter valid mobile number"/>
+
+			</VBox>
 </HBox>
-			
+
+
+
+
+
+
+
+
+
+
+
+
 				<!-- Address -->
 				<Label text="Address" required="true"/>
 				<TextArea placeholder="Enter your address" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="Enter a valid Address" />
