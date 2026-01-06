@@ -1601,8 +1601,8 @@ sap.ui.define([
                             item.Particulars,
                             (item.StartDate) || "",
                             (item.EndDate) || "",
-                            item.UnitText,
                             Formatter.fromatNumber(item.GrossPrice) || "0.00",
+                            item.UnitText,
                             Formatter.fromatNumber(item.Total) || "0.00"
                         ];
                         if (showSAC) row.splice(2, 0, item.SAC);
