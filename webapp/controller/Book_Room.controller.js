@@ -4764,8 +4764,8 @@ sap.ui.define([
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
                         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
                         amount: (
-                            (Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) +
-                            ((Number(booking.RoomPrice || 0) + Number(booking.FacilityPrice || 0)) * 0.09 * 2)
+                            (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) +
+                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * 0.09 * 2)
                         ).toString() || "",
                         status: booking.Status,
                         customerID: booking.CustomerID,

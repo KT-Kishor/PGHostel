@@ -10,7 +10,10 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+
             try {
+                this.commonLoginFunction();
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Main form model
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
@@ -394,7 +397,7 @@ sap.ui.define([
                             // Wait for all deletions to complete
                             await Promise.all(aDeletePromises);
 
-                            sap.m.MessageToast.show(this.i18nModel.getText("hostelFeatureDeletedSuccessfully!"));
+                            sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully!"));
                             await that.Onsearch("true"); // refresh table
                         } catch (err) {
                             sap.ui.core.BusyIndicator.hide();
