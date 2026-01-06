@@ -558,28 +558,31 @@ sap.ui.define([
             oHostelModel.setProperty("/AllSelectedFacilities", aFacilities);
             // --- FIX FOR PER HOUR FACILITY (ensures TotalTime goes to payload) ---
             // --- FIX FOR PER HOUR FACILITY ---
-            if (oUpdatedData.UnitText === "Per Hour") {
+           if (oUpdatedData.UnitText === "Per Hour") {
 
-                const hours = Number(oUpdatedData.TotalTime) || 1;
-                const price = Number(oUpdatedData.Price) || 0;
+    const hours = Number(oUpdatedData.TotalTime) || 1;
+    const price = Number(oUpdatedData.Price) || 0;
 
-                // Global list
-                aFacilities[iIndex].TotalTime = hours;
-                aFacilities[iIndex].TotalDays;              // ✅ FIX
-                aFacilities[iIndex].TotalAmount = price * hours;
+    // Global list
+    aFacilities[iIndex].TotalTime = hours;
+    aFacilities[iIndex].StartTime = oUpdatedData.StartTime;   // ✅ ADD
+    aFacilities[iIndex].EndTime = oUpdatedData.EndTime;       // ✅ ADD
+    aFacilities[iIndex].TotalAmount = price * hours;
 
-                // Per-person list
-                if (
-                    aPersons[oUpdatedData.ID] &&
-                    aPersons[oUpdatedData.ID].AllSelectedFacilities &&
-                    aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
-                ) {
-                    const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
-                    oFac.TotalTime = hours;
-                    oFac.TotalDays;                          // ✅ FIX
-                    oFac.TotalAmount = price * hours;
-                }
-            }
+    // Per-person list
+    if (
+        aPersons[oUpdatedData.ID] &&
+        aPersons[oUpdatedData.ID].AllSelectedFacilities &&
+        aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
+    ) {
+        const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
+        oFac.TotalTime = hours;
+        oFac.StartTime = oUpdatedData.StartTime;               // ✅ ADD
+        oFac.EndTime = oUpdatedData.EndTime;                   // ✅ ADD
+        oFac.TotalAmount = price * hours;
+    }
+}
+
 
             // 3. Apply model refresh
             oHostelModel.refresh(true);

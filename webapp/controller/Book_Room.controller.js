@@ -228,75 +228,75 @@ sap.ui.define([
         },
 
         _LoadFacilities: async function () {
-    const oView = this.getView();
-
-    try {
-        // ✅ SHOW busy immediately
-        sap.ui.core.BusyIndicator.show(0);
-
-        const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
-        const oBranch = oHostelModel.BranchCode;
-
-        const filter = {
-            Brach: oBranch
-        };
-
-        const Response = await this.ajaxReadWithJQuery("HM_Facilities", filter);
-
-        const aFacilities = Response?.data || [];
-
-        // Helper: Base64 → Image URL
-        const convertBase64ToImage = (base64String, fileType) => {
-            if (!base64String) {
-                return "./image/Fallback.png";
-            }
-
-            let sBase64 = base64String.replace(/\s/g, "");
+            const oView = this.getView();
 
             try {
-                if (!sBase64.startsWith("data:image")) {
-                    atob(sBase64.substring(0, 40)); // validate only
-                }
-            } catch (e) {
-                console.warn("Invalid base64 image", e);
-                return "./image/Fallback.png";
+                // ✅ SHOW busy immediately
+                sap.ui.core.BusyIndicator.show(0);
+
+                const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
+                const oBranch = oHostelModel.BranchCode;
+
+                const filter = {
+                    Brach: oBranch
+                };
+
+                const Response = await this.ajaxReadWithJQuery("HM_Facilities", filter);
+
+                const aFacilities = Response?.data || [];
+
+                // Helper: Base64 → Image URL
+                const convertBase64ToImage = (base64String, fileType) => {
+                    if (!base64String) {
+                        return "./image/Fallback.png";
+                    }
+
+                    let sBase64 = base64String.replace(/\s/g, "");
+
+                    try {
+                        if (!sBase64.startsWith("data:image")) {
+                            atob(sBase64.substring(0, 40)); // validate only
+                        }
+                    } catch (e) {
+                        console.warn("Invalid base64 image", e);
+                        return "./image/Fallback.png";
+                    }
+
+                    const mimeType = fileType || "image/jpeg";
+                    return sBase64.startsWith("data:image")
+                        ? sBase64
+                        : `data:${mimeType};base64,${sBase64}`;
+                };
+
+                const aFinalFacilities = aFacilities.map(f => ({
+                    FacilityID: f.ID,
+                    FacilityName: f.FacilityName,
+                    Image: convertBase64ToImage(f.Photo1, f.Photo1Type),
+                    PricePerHour: f.PerHourPrice,
+                    PricePerDay: f.PerDayPrice,
+                    PricePerMonth: f.PerMonthPrice,
+                    PricePerYear: f.PerYearPrice,
+                    UnitText: f.UnitText,
+                    Currency: f.Currency,
+                    BranchCode: f.BranchCode
+                }));
+
+                const oFacilityModel = new sap.ui.model.json.JSONModel({
+                    Facilities: aFinalFacilities
+                });
+
+                oView.setModel(oFacilityModel, "FacilityModel");
+
+            } catch (error) {
+                console.error("Failed to load facilities", error);
+                sap.m.MessageBox.error("Unable to load facilities. Please try again.");
+
+            } finally {
+                // ✅ ALWAYS hide busy
+                sap.ui.core.BusyIndicator.hide();
             }
-
-            const mimeType = fileType || "image/jpeg";
-            return sBase64.startsWith("data:image")
-                ? sBase64
-                : `data:${mimeType};base64,${sBase64}`;
-        };
-
-        const aFinalFacilities = aFacilities.map(f => ({
-            FacilityID: f.ID,
-            FacilityName: f.FacilityName,
-            Image: convertBase64ToImage(f.Photo1, f.Photo1Type),
-            PricePerHour: f.PerHourPrice,
-            PricePerDay: f.PerDayPrice,
-            PricePerMonth: f.PerMonthPrice,
-            PricePerYear: f.PerYearPrice,
-            UnitText: f.UnitText,
-            Currency: f.Currency,
-            BranchCode: f.BranchCode
-        }));
-
-        const oFacilityModel = new sap.ui.model.json.JSONModel({
-            Facilities: aFinalFacilities
-        });
-
-        oView.setModel(oFacilityModel, "FacilityModel");
-
-    } catch (error) {
-        console.error("Failed to load facilities", error);
-        sap.m.MessageBox.error("Unable to load facilities. Please try again.");
-
-    } finally {
-        // ✅ ALWAYS hide busy
-        sap.ui.core.BusyIndicator.hide();
-    }
-}
-,
+        }
+        ,
 
         // _checkMandatoryFields: function () {
         //     const oModel = this.getView().getModel("HostelModel");
@@ -1587,16 +1587,16 @@ sap.ui.define([
 
         onDialogNextButton: async function () {
             const oModel1 = this.getView().getModel("HostelModel");
-if (oModel1) {
-    oModel1.refresh(true); // ensure latest input values are in model
-}
+            if (oModel1) {
+                oModel1.refresh(true); // ensure latest input values are in model
+            }
 
             const aErrorControls = sap.ui.getCore().byFieldGroupId
                 ? sap.ui.getCore().byFieldGroupId("HostelValidationGroup") || []
                 : [];
 
             let bHasError = false;
-       
+
 
             // Fallback: scan entire view (SAFE for dynamic controls)
             if (aErrorControls.length === 0) {
@@ -1629,17 +1629,17 @@ if (oModel1) {
 
             const sCurrentBranch = oModel.getProperty("/BranchCode");
 
-if (
-    !this._isPersonUIInitialized ||
-    this._mustRecreatePersonUI ||
-    this._lastRenderedBranch !== sCurrentBranch
-) {
-    this._createDynamicPersonsUI();
+            if (
+                !this._isPersonUIInitialized ||
+                this._mustRecreatePersonUI ||
+                this._lastRenderedBranch !== sCurrentBranch
+            ) {
+                this._createDynamicPersonsUI();
 
-    this._isPersonUIInitialized = true;
-    this._mustRecreatePersonUI = false;
-    this._lastRenderedBranch = sCurrentBranch;
-}
+                this._isPersonUIInitialized = true;
+                this._mustRecreatePersonUI = false;
+                this._lastRenderedBranch = sCurrentBranch;
+            }
 
 
             // STEP 1: validations
@@ -2043,7 +2043,7 @@ if (
             oHostelModel.updateBindings(true);
             oHostelModel.refresh(true);
         },
-        
+
         // Separated calculation function
         // signature now: calculateTotals(aPersons, sStartDate, sEndDate, roomRentPrice, sPaymentType, iSelectedMonths)
         calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice) {
@@ -2142,7 +2142,7 @@ if (
                 AllSelectedFacilities: aAllFacilities
             };
         },
-        
+
         // Helper function to parse date
         _parseDate: function (sDate) {
 
@@ -2326,7 +2326,7 @@ if (
             const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
             oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
         },
-        
+
         SM_onGeneratePassword: function () {
             var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword");
             var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "passwordStrengthText"); // signup label
@@ -2461,7 +2461,7 @@ if (
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
             const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-         
+
             if (sRole === "Customer") {
                 this._sLoggedUserID = sEmpID;
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
@@ -2723,7 +2723,7 @@ if (
                 input.setValueState("None");
             }
         },
-        
+
         onSignIn: async function () {
             var oLoginModel = this.getView().getModel("LoginModel");
             var vm = this.getView().getModel("LoginViewModel");
@@ -2756,7 +2756,7 @@ if (
                     // but we'll set explicitly to be safe
                     if (ctrlPassword) {
                         ctrlPassword.setValueState("Error");
-                        ctrlPassword.setValueStateText(this.i18nModel,getText("enterValidPassword"));
+                        ctrlPassword.setValueStateText(this.i18nModel, getText("enterValidPassword"));
                     }
                     sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                     return;
@@ -4002,7 +4002,7 @@ if (
                 ?.getContentMiddle()[0]
                 ?.setText("Hostel Access Portal");
         },
-        
+
         onSwitchToSignUp: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
@@ -4443,23 +4443,25 @@ if (
                     const aSelectedFacilities = p.AllSelectedFacilities || [];
 
                     aSelectedFacilities.forEach(fac => {
+
                         let facilityPrice = fac.TotalAmount || 0;
+
+                        let startTime = "";
+                        let endTime = "";
                         let facilityHour = "";
-                        let startTime = fac.StartTime || "09";
-                        let endTime = fac.EndTime || "10";
 
-                        if (fac.SelectedPriceType === "Per Hour") {
+                        if (fac.UnitText === "Per Hour") {
 
-                            if (!fac.TotalHours || Number(fac.TotalHours) <= 0) {
-                                facilityHour = "1";      // default
-                                startTime = "09";
-                                endTime = "10";
-                            } else {
-                                facilityHour = Number(fac.TotalTime) || "1";
-                            }
+                            // ✔ Preserve edited values, fallback to defaults
+                            startTime = fac.StartTime ? fac.StartTime : "09";
+                            endTime = fac.EndTime ? fac.EndTime : "10";
+                            facilityHour = fac.TotalTime ? String(fac.TotalTime) : "1";
 
                         } else {
-                            facilityHour = Number(fac.TotalTime) || "1";
+
+                            startTime = "";
+                            endTime = "";
+                            facilityHour = "";
                         }
 
                         facilityData.push({
@@ -4470,13 +4472,15 @@ if (
                             EndDate: fac.EndDate ? fac.EndDate.split("/").reverse().join("-") : "",
                             PaidStatus: "Pending",
                             UnitText: fac.UnitText,
-                            StartTime: startTime,     // ✔ local copy
-                            EndTime: endTime,         // ✔ local copy
+                            StartTime: startTime,
+                            EndTime: endTime,
                             TotalHour: facilityHour,
                             Currency: fac.Currency,
                             BasicFacilityPrice: fac.Price
                         });
                     });
+
+
 
                     // Return formatted entry
                     return {
@@ -4655,7 +4659,7 @@ if (
                 this.getView().addDependent(this._oProfileActionSheet);
             }
         },
-        
+
         onPressAvatar: async function (oEvent) {
             const oUser = this._oLoggedInUser
             let fullUserData = {};
@@ -4984,7 +4988,7 @@ if (
                 oProfileModel.setProperty("/bookingCount", iCount);
             }
         },
-        
+
         onPressAvatarEdit: function (oEvent) {
             if (!this._oAvatarActionSheet) {
                 this._oAvatarActionSheet = new sap.m.ActionSheet({
@@ -5582,7 +5586,7 @@ if (
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("EditBookingDetails");
         },
-        
+
         SectionPress: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) return;
@@ -5751,7 +5755,7 @@ if (
         },
 
         onHome: function () {
-             this.CommonLogoutFunction();
+            this.CommonLogoutFunction();
         },
 
         onTableSelect: async function (oEvent) {
