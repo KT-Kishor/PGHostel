@@ -6,7 +6,7 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-        title="Manage Room Details"
+        title="{i18n>manageRoomDetails}"
         type="Message"
         class="sapUiContentPadding"
     >
@@ -22,44 +22,46 @@
             columnsM="1"
         >
             <f:content>
-               <Label
-                                text="Start Date"
-                                required="true"
-                            />
-                         
-                            <DatePicker
-                                id="Ck_id_editStartDate"
-                                editable="false"
-                                value="{Bookingmodel>/StartDate}"
-                                displayFormat="dd/MM/yyyy"
-                                valueFormat="dd/MM/yyyy"
-                                change="onBookingEditDateChange"
-                                valueStateText="Select Star Date"
-                            />
-                              <Label
-                                text="End Date"
-                                required="true"
-                            />
-                            <DatePicker
-                                id="Ck_id_editEndDate"
-                                value="{Bookingmodel>/EndDate}"
-                                displayFormat="dd/MM/yyyy"
-                                valueFormat="dd/MM/yyyy"
-                            />
+                <Label
+                    text="{i18n>startDate}"
+                    required="true"
+                />
+
+                <DatePicker
+                    id="Ck_id_editStartDate"
+                    editable="false"
+                    value="{Bookingmodel>/StartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onBookingEditDateChange"
+                    valueStateText="{i18n>selectStartDate}"
+                />
+                <Label
+                    text="{i18n>endDate}"
+                    required="true"
+                />
+                <DatePicker
+                    id="Ck_id_editEndDate"
+                    value="{Bookingmodel>/EndDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                />
             </f:content>
         </f:SimpleForm>
         <footer>
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Save"
+                    text="{i18n>save}"
+                    tooltip="{i18n>save}"
                     press="Ck_onsavebuttonpress"
                     type="Accept"
                     id="Ck_id_saveButton"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>ancelButton}"
+                    tooltip="{i18n>CancelButton}"
                     press="Ck_onCancelButtonPress"
                     type="Reject"
                     id="Ck_id_CancelButton"

@@ -1,60 +1,210 @@
-<core:FragmentDefinition xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-    <Dialog id="FT_id_editFacilityDialog" title="Edit Facility" afterClose=".onEditDialogClose" afterOpen=".onEditDialogAfterOpen">
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="FT_id_editFacilityDialog"
+        title="{i18n>editFacility}"
+        afterClose=".onEditDialogClose"
+        afterOpen=".onEditDialogAfterOpen"
+    >
         <content>
             <VBox class="sapUiSmallMargin">
-                <Label text="Facility Name"/>
-                <Input id="FT_id_editFacilityName" value="{edit>/FacilityName}" editable="false" />
+                <Label text="{i18n>facilityname}" />
+                <Input
+                    id="FT_id_editFacilityName"
+                    value="{edit>/FacilityName}"
+                    editable="false"
+                />
 
-                <Label text="Unit Type" required="true" />
-                <ComboBox editable="true" id="FT_id_UnitType" placeholder="Select Unit Type" items="{RateType>/}" value="{edit>/UnitText}" change="onUnitTextChange" width="100%" valueStateText="{i18n>selectRateType}">
-                    <core:Item key="{RateType>ID}" text="{RateType>RateType}" />
+                <Label
+                    text="{i18n>unitType}"
+                    required="true"
+                />
+                <ComboBox
+                    editable="true"
+                    id="FT_id_UnitType"
+                    placeholder="{i18n>selectUnitType}"
+                    items="{RateType>/}"
+                    value="{edit>/UnitText}"
+                    change="onUnitTextChange"
+                    width="100%"
+                    valueStateText="{i18n>selectRateType}"
+                >
+                    <core:Item
+                        key="{RateType>ID}"
+                        text="{RateType>RateType}"
+                    />
                 </ComboBox>
 
-                <Label text="Start Time" visible="{= ${edit>/UnitText} === 'Per Hour' }" />
-                <TimePicker id="FT_id_editStartTime" value="{edit>/StartTime}" displayFormat="HH" valueFormat="HH" change=".onTimeChange" visible="{= ${edit>/UnitText} === 'Per Hour' }" valueStateText="Select Start Time" />
+                <Label
+                    text="{i18n>startTime}"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                />
+                <TimePicker
+                    id="FT_id_editStartTime"
+                    value="{edit>/StartTime}"
+                    displayFormat="HH"
+                    valueFormat="HH"
+                    change=".onTimeChange"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                    valueStateText="{i18n>selectStartTime}"
+                />
 
-                <Label text="End Time" visible="{= ${edit>/UnitText} === 'Per Hour' }" />
-                <TimePicker id="FT_id_editEndTime" value="{edit>/EndTime}" displayFormat="HH" valueFormat="HH" change=".onTimeChange" visible="{= ${edit>/UnitText} === 'Per Hour' }" valueStateText="Select End Time" />
+                <Label
+                    text="{i18n>endTime}"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                />
+                <TimePicker
+                    id="FT_id_editEndTime"
+                    value="{edit>/EndTime}"
+                    displayFormat="HH"
+                    valueFormat="HH"
+                    change=".onTimeChange"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                    valueStateText="{i18n>selectEndTime}"
+                />
 
-                <Label text="Total Time (HH:MM)" visible="{= ${edit>/UnitText} === 'Per Hour' }" />
-                <Input id="editTotalTime" value="{edit>/TotalTime}" editable="false" visible="{= ${edit>/UnitText} === 'Per Hour' }" />
+                <Label
+                    text="{i18n>totalTime}"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                />
+                <Input
+                    id="editTotalTime"
+                    value="{edit>/TotalTime}"
+                    editable="false"
+                    visible="{= ${edit>/UnitText} === 'Per Hour' }"
+                />
 
-                <Label text="Facility Price" />
-                <Input id="FT_id_editPrice" value="{edit>/Price}" type="Number" editable="false" />
+                <Label text="{i18n>faciltyprice}" />
+                <Input
+                    id="FT_id_editPrice"
+                    value="{edit>/Price}"
+                    type="Number"
+                    editable="false"
+                />
 
-                <Label text="Currency" required="true" />
-                <ComboBox enabled="false" id="FT_id_Currency" selectedKey="{edit>/Currency}" items="{CurrencyModel>/}" valueStateText="Select Currency" width="100%" change=".onCurrecnyChange" placeholder="Select Currency">
-                    <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
+                <Label
+                    text="{i18n>currency}"
+                    required="true"
+                />
+                <ComboBox
+                    enabled="false"
+                    id="FT_id_Currency"
+                    selectedKey="{edit>/Currency}"
+                    items="{CurrencyModel>/}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    change=".onCurrecnyChange"
+                    placeholder="{i18n>selectCurrency}"
+                >
+                    <core:Item
+                        key="{CurrencyModel>currency}"
+                        text="{CurrencyModel>currency}"
+                    />
                 </ComboBox>
-                <Label text="Start Date" />
-                <DatePicker id="FT_id_editStartDate" value="{edit>/StartDate}" maxDate="{DateRangeModel>/minEndDate}" minDate="{DateRangeModel>/minstartDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="onEditDateChange" valueStateText="Select Start Date" />
-                <Label text="How many Month/Year" visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }" />
+                <Label text="{i18n>startDate}" />
+                <DatePicker
+                    id="FT_id_editStartDate"
+                    value="{edit>/StartDate}"
+                    maxDate="{DateRangeModel>/minEndDate}"
+                    minDate="{DateRangeModel>/minstartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onEditDateChange"
+                    valueStateText="{i18n>selectStartDate}"
+                />
+                <Label
+                    text="{i18n>howmany}"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                />
 
-                <Select width="100%" visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }" selectedKey="{= ${edit>/UnitText} === 'Per Month' ? ${edit>/TotalMonths}  : ${edit>/TotalYears}}" change="onMonthSelectionChange">
-                    <core:Item key="1" text="1" />
-                    <core:Item key="2" text="2" />
-                    <core:Item key="3" text="3" />
-                    <core:Item key="4" text="4" />
-                    <core:Item key="5" text="5" />
-                    <core:Item key="6" text="6" />
-                    <core:Item key="7" text="7" />
-                    <core:Item key="8" text="8" />
-                    <core:Item key="9" text="9" />
-                    <core:Item key="10" text="10" />
-                    <core:Item key="11" text="11" />
+                <Select
+                    width="100%"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                    selectedKey="{= ${edit>/UnitText} === 'Per Month' ? ${edit>/TotalMonths}  : ${edit>/TotalYears}}"
+                    change="onMonthSelectionChange"
+                >
+                    <core:Item
+                        key="1"
+                        text="1"
+                    />
+                    <core:Item
+                        key="2"
+                        text="2"
+                    />
+                    <core:Item
+                        key="3"
+                        text="3"
+                    />
+                    <core:Item
+                        key="4"
+                        text="4"
+                    />
+                    <core:Item
+                        key="5"
+                        text="5"
+                    />
+                    <core:Item
+                        key="6"
+                        text="6"
+                    />
+                    <core:Item
+                        key="7"
+                        text="7"
+                    />
+                    <core:Item
+                        key="8"
+                        text="8"
+                    />
+                    <core:Item
+                        key="9"
+                        text="9"
+                    />
+                    <core:Item
+                        key="10"
+                        text="10"
+                    />
+                    <core:Item
+                        key="11"
+                        text="11"
+                    />
                 </Select>
 
-                <Label text="End Date" />
-                <DatePicker id="FT_id_editEndDate" editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }" value="{path:'edit>/EndDate'}" maxDate="{DateRangeModel>/minEndDate}" minDate="{DateRangeModel>/minstartDate}" displayFormat="dd/MM/yyyy" valueFormat="dd/MM/yyyy" change="onEditDateChange" valueStateText="Select End Date" />
+                <Label text="{i18n>endDate}" />
+                <DatePicker
+                    id="FT_id_editEndDate"
+                    editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
+                    value="{path:'edit>/EndDate'}"
+                    maxDate="{DateRangeModel>/minEndDate}"
+                    minDate="{DateRangeModel>/minstartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onEditDateChange"
+                    valueStateText="{i18n>selectEndDate}"
+                />
 
-                <Label text="Days" />
-                <Input id="FT_id_editDays" value="{edit>/TotalDays}" editable="false" />
+                <Label text="{i18n>days}" />
+                <Input
+                    id="FT_id_editDays"
+                    value="{edit>/TotalDays}"
+                    editable="false"
+                />
             </VBox>
         </content>
         <buttons>
-            <Button text="Save" press=".onEditFacilitySave" class="myUnifiedBtn" />
-            <Button text="Cancel" press="onEditDialogClose" class="myUnifiedBtn" />
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press=".onEditFacilitySave"
+                class="myUnifiedBtn"
+            />
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="onEditDialogClose"
+                class="myUnifiedBtn"
+            />
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

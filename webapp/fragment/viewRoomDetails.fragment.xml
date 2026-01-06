@@ -1,117 +1,260 @@
-<core:FragmentDefinition 
-	xmlns="sap.m" 
-	xmlns:m="sap.m" 
-	xmlns:core="sap.ui.core" 
-	xmlns:l="sap.ui.layout" 
-	xmlns:f="sap.f" 
-	xmlns:et="sap.m" 
-	xmlns:card="sap.ui.integration.widgets">
-	<!-- <Dialog draggable="true" afterOpen=".onRoomDetailOpened" resizable="true" contentHeight="auto" contentWidth="{= ${device>/system/phone} ? '100%' : '70%' }" id="roomDetailID" title="Room Details" type="Message" class="sapUiContentPadding" afterClose=".onDialogAfterClose"> -->
-	<Dialog id="roomDetailID" initialFocus="focus" draggable="true" resizable="true" stretch="{= ${device>/system/phone} }" class="sapUiContentPadding" contentWidth="70%" afterOpen=".onRoomDetailOpened" afterClose=".onDialogAfterClose">
-		<customHeader>
-			<Bar class="barheader">
-				<contentMiddle>
-					<Title text="{HostelModel>/BedType}" />
-				</contentMiddle>
-				<contentRight>
-					<Button icon="sap-icon://decline" class="myUnifiedBtn" press=".onCloseRoomDetail" tooltip="Close"/>
-				</contentRight>
-			</Bar>
-		</customHeader>
-		<content>
-			<VBox width="100%" class="roomTopAligned" renderType="Bare">
-				<l:Grid width="100%" hSpacing="1" vSpacing="1">
-					<l:content>
-						<VBox width="100%">
-							<layoutData>
-								<l:GridData span="L8 M6 S12"/>
-							</layoutData>
-							<Carousel id="roomImageCarousel" width="100%" class="roomCarouselImage" backgroundDesign="Transparent" showPageIndicator="true" arrowsPlacement="Content" loop="true" visible="{= ${HostelModel>/ImageList} &amp;&amp; ${HostelModel>/ImageList}.length > 0 }" />
-							<HBox alignItems="Center" visible="{= !${HostelModel>/ImageList} || ${HostelModel>/ImageList}.length === 0 }" class="noImagePlaceholder">
-								<core:Icon src="sap-icon://camera" size="1.8rem" class="sapUiTinyMarginEnd"/>
-								<Text text="No Image Available"/>
-							</HBox>
-						</VBox>
-					</l:content>
-					<l:content>
-						<VBox width="100%" class="roomTopAligned">
-							<layoutData>
-								<l:GridData span="L4 M6 S12"/>
-							</layoutData>
-							<card:Card manifest="./cards/roomDetailsCard.json" class="roomDetailsCard " manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'/>
-							<VBox class="descriptionBox sapUiSmallMarginTop" alignItems="Start">
-								<core:Icon src="sap-icon://ui-notifications" size="1.5rem" class="sapUiTinyMarginBegin descIcon"/>
-								<ExpandableText maxCharacters="330" text="{HostelModel>/Description}" class="descTextLarge" />
-							</VBox>
-							<!-- sap-icon://along-stacked-chart -->
-						</VBox>
-					</l:content>
-				</l:Grid>
-				<FlexBox id="priceFlex" class="priceFlex sapUiSmallMarginTop" wrap="Wrap">
-					<items>
-						<GenericTile header="Per Day" subheader="{ parts:['HostelModel>/Price','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }" class=" defaultTile priceItem" frameType="OneByHalf" press=".onSelectPricePlan" visible="{= parseInt(${HostelModel>/Price}.trim()) !== 0 }">
-							<customData>
-								<core:CustomData key="type" value="daily"/>
-							</customData>
-						</GenericTile>
-						<GenericTile header="Per Month" subheader="{ parts:['HostelModel>/MonthPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }" class=" defaultTile priceItem" frameType="OneByHalf" press=".onSelectPricePlan" visible="{= parseInt(${HostelModel>/MonthPrice}.trim()) !== 0 }">
-							<customData>
-								<core:CustomData key="type" value="monthly"/>
-							</customData>
-						</GenericTile>
-						<GenericTile header="Per Year" subheader="{ parts:['HostelModel>/YearPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }" class=" defaultTile priceItem" frameType="OneByHalf" press=".onSelectPricePlan" visible="{= parseInt(${HostelModel>/YearPrice}.trim()) !== 0 }">
-							<customData>
-								<core:CustomData key="type" value="yearly"/>
-							</customData>
-						</GenericTile>
-						<!-- <GenericTile header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="{= ${HostelModel>/Visible} ? 'Loaded' : 'Disabled' }" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" press=".onConfirmBooking"/> -->
-						<GenericTile id="bookTile" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="Loaded" press=".onConfirmBooking" />
-					</items>
-				</FlexBox>
-				<!-- Facilities Header -->
-				<VBox visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }">
-					<Bar id="focus" design="Header" class="sapUiMediumMarginTop">
-						<contentLeft>
-							<Title text="Available Facilities" />
-						</contentLeft>
-					</Bar>
-					<HBox justifyContent="Center" visible="{FacilityModel>/loading}">
-						<BusyIndicator size="0.8rem" />
-					</HBox>
-					<!-- REAL Responsive Grid -->
-					<HBox class="facilityGrid" wrap="Wrap" items="{FacilityModel>/Facilities}">
-						<items>
-							<VBox class="unifiedCard">
-								<Image src="{FacilityModel>Image}" class="unifiedCardImg" />
-								<Text text="{FacilityModel>FacilityName}" class="unifiedCardTitle" />
-								<Text class="unifiedCardText" text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"/>
-							</VBox>
-						</items>
-					</HBox>
-				</VBox>
-				<VBox visible="{= ${AmenityModel>/Amenities}.length > 0 || ${AmenityModel>/loading} }">
-					<!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
-					<Bar design="Header" class="sapUiMediumMarginTop">
-						<contentLeft>
-							<Title text="Amenities" />
-						</contentLeft>
-					</Bar>
-					<!-- Content -->
-					<HBox class="facilityGrid" wrap="Wrap" items="{AmenityModel>/Amenities}">
-						<items>
-							<VBox class="unifiedCard">
-								<Image src="{AmenityModel>ImageSrc}" class="unifiedCardImg" />
-								<Text text="{AmenityModel>FacilityName}" class="unifiedCardTitle" />
-								<Text text="{AmenityModel>Description}" class="amenityDesc expandableAmenityText" />
-							</VBox>
-						</items>
-					</HBox>
-				</VBox>
-				<!-- Loader outside so it shows only while loading -->
-				<HBox justifyContent="Center" visible="{AmenityModel>/loading}">
-					<BusyIndicator size="0.8rem" />
-				</HBox>
-			</VBox>
-		</content>
-	</Dialog>
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.f"
+    xmlns:et="sap.m"
+    xmlns:card="sap.ui.integration.widgets"
+>
+    <!-- <Dialog draggable="true" afterOpen=".onRoomDetailOpened" resizable="true" contentHeight="auto" contentWidth="{= ${device>/system/phone} ? '100%' : '70%' }" id="roomDetailID" title="Room Details" type="Message" class="sapUiContentPadding" afterClose=".onDialogAfterClose"> -->
+    <Dialog
+        id="roomDetailID"
+        initialFocus="focus"
+        draggable="true"
+        resizable="true"
+        stretch="{= ${device>/system/phone} }"
+        class="sapUiContentPadding"
+        contentWidth="70%"
+        afterOpen=".onRoomDetailOpened"
+        afterClose=".onDialogAfterClose"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{HostelModel>/BedType}" />
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://decline"
+                        class="myUnifiedBtn"
+                        press=".onCloseRoomDetail"
+                        tooltip="{i18n>close}"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <VBox
+                width="100%"
+                class="roomTopAligned"
+                renderType="Bare"
+            >
+                <l:Grid
+                    width="100%"
+                    hSpacing="1"
+                    vSpacing="1"
+                >
+                    <l:content>
+                        <VBox width="100%">
+                            <layoutData>
+                                <l:GridData span="L8 M6 S12" />
+                            </layoutData>
+                            <Carousel
+                                id="roomImageCarousel"
+                                width="100%"
+                                class="roomCarouselImage"
+                                backgroundDesign="Transparent"
+                                showPageIndicator="true"
+                                arrowsPlacement="Content"
+                                loop="true"
+                                visible="{= ${HostelModel>/ImageList} &amp;&amp; ${HostelModel>/ImageList}.length > 0 }"
+                            />
+                            <HBox
+                                alignItems="Center"
+                                visible="{= !${HostelModel>/ImageList} || ${HostelModel>/ImageList}.length === 0 }"
+                                class="noImagePlaceholder"
+                            >
+                                <core:Icon
+                                    src="sap-icon://camera"
+                                    size="1.8rem"
+                                    class="sapUiTinyMarginEnd"
+                                />
+                                <Text text="{i18n>noImageAvailable}" />
+                            </HBox>
+                        </VBox>
+                    </l:content>
+                    <l:content>
+                        <VBox
+                            width="100%"
+                            class="roomTopAligned"
+                        >
+                            <layoutData>
+                                <l:GridData span="L4 M6 S12" />
+                            </layoutData>
+                            <card:Card
+                                manifest="./cards/roomDetailsCard.json"
+                                class="roomDetailsCard "
+                                manifestChanges='{ "sap.card": { "data": { "json": { "BedType": "{HostelModel>/BedType}", "Capacity": "{HostelModel>/Capacity}", "ACType": "{HostelModel>/ACType}", } } } }'
+                            />
+                            <VBox
+                                class="descriptionBox sapUiSmallMarginTop"
+                                alignItems="Start"
+                            >
+                                <core:Icon
+                                    src="sap-icon://ui-notifications"
+                                    size="1.5rem"
+                                    class="sapUiTinyMarginBegin descIcon"
+                                />
+                                <ExpandableText
+                                    maxCharacters="330"
+                                    text="{HostelModel>/Description}"
+                                    class="descTextLarge"
+                                />
+                            </VBox>
+                            <!-- sap-icon://along-stacked-chart -->
+                        </VBox>
+                    </l:content>
+                </l:Grid>
+                <FlexBox
+                    id="priceFlex"
+                    class="priceFlex sapUiSmallMarginTop"
+                    wrap="Wrap"
+                >
+                    <items>
+                        <GenericTile
+                            header="{i18n>perDay}"
+                            subheader="{ parts:['HostelModel>/Price','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            class=" defaultTile priceItem"
+                            frameType="OneByHalf"
+                            press=".onSelectPricePlan"
+                            visible="{= parseInt(${HostelModel>/Price}.trim()) !== 0 }"
+                        >
+                            <customData>
+                                <core:CustomData
+                                    key="type"
+                                    value="daily"
+                                />
+                            </customData>
+                        </GenericTile>
+                        <GenericTile
+                            header="{i18n>perMonth}"
+                            subheader="{ parts:['HostelModel>/MonthPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            class=" defaultTile priceItem"
+                            frameType="OneByHalf"
+                            press=".onSelectPricePlan"
+                            visible="{= parseInt(${HostelModel>/MonthPrice}.trim()) !== 0 }"
+                        >
+                            <customData>
+                                <core:CustomData
+                                    key="type"
+                                    value="monthly"
+                                />
+                            </customData>
+                        </GenericTile>
+                        <GenericTile
+                            header="{i18n>perYear}"
+                            subheader="{ parts:['HostelModel>/YearPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            class=" defaultTile priceItem"
+                            frameType="OneByHalf"
+                            press=".onSelectPricePlan"
+                            visible="{= parseInt(${HostelModel>/YearPrice}.trim()) !== 0 }"
+                        >
+                            <customData>
+                                <core:CustomData
+                                    key="type"
+                                    value="yearly"
+                                />
+                            </customData>
+                        </GenericTile>
+                        <!-- <GenericTile header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="{= ${HostelModel>/Visible} ? 'Loaded' : 'Disabled' }" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" press=".onConfirmBooking"/> -->
+                        <GenericTile
+                            id="bookTile"
+                            class="priceItem defaultTile bookNowTile"
+                            frameType="OneByHalf"
+                            header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }"
+                            state="Loaded"
+                            press=".onConfirmBooking"
+                        />
+                    </items>
+                </FlexBox>
+                <!-- Facilities Header -->
+                <VBox
+                    visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }"
+                >
+                    <Bar
+                        id="focus"
+                        design="Header"
+                        class="sapUiMediumMarginTop"
+                    >
+                        <contentLeft>
+                            <Title text="{i18n>availableFacilities}" />
+                        </contentLeft>
+                    </Bar>
+                    <HBox
+                        justifyContent="Center"
+                        visible="{FacilityModel>/loading}"
+                    >
+                        <BusyIndicator size="0.8rem" />
+                    </HBox>
+                    <!-- REAL Responsive Grid -->
+                    <HBox
+                        class="facilityGrid"
+                        wrap="Wrap"
+                        items="{FacilityModel>/Facilities}"
+                    >
+                        <items>
+                            <VBox class="unifiedCard">
+                                <Image
+                                    src="{FacilityModel>Image}"
+                                    class="unifiedCardImg"
+                                />
+                                <Text
+                                    text="{FacilityModel>FacilityName}"
+                                    class="unifiedCardTitle"
+                                />
+                                <Text
+                                    class="unifiedCardText"
+                                    text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"
+                                />
+                            </VBox>
+                        </items>
+                    </HBox>
+                </VBox>
+                <VBox
+                    visible="{= ${AmenityModel>/Amenities}.length > 0 || ${AmenityModel>/loading} }"
+                >
+                    <!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
+                    <Bar
+                        design="Header"
+                        class="sapUiMediumMarginTop"
+                    >
+                        <contentLeft>
+                            <Title text="{i18n>amenities}" />
+                        </contentLeft>
+                    </Bar>
+                    <!-- Content -->
+                    <HBox
+                        class="facilityGrid"
+                        wrap="Wrap"
+                        items="{AmenityModel>/Amenities}"
+                    >
+                        <items>
+                            <VBox class="unifiedCard">
+                                <Image
+                                    src="{AmenityModel>ImageSrc}"
+                                    class="unifiedCardImg"
+                                />
+                                <Text
+                                    text="{AmenityModel>FacilityName}"
+                                    class="unifiedCardTitle"
+                                />
+                                <Text
+                                    text="{AmenityModel>Description}"
+                                    class="amenityDesc expandableAmenityText"
+                                />
+                            </VBox>
+                        </items>
+                    </HBox>
+                </VBox>
+                <!-- Loader outside so it shows only while loading -->
+                <HBox
+                    justifyContent="Center"
+                    visible="{AmenityModel>/loading}"
+                >
+                    <BusyIndicator size="0.8rem" />
+                </HBox>
+            </VBox>
+        </content>
+    </Dialog>
 </core:FragmentDefinition>

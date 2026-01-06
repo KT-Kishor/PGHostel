@@ -1,14 +1,14 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core">
-
+    xmlns:core="sap.ui.core"
+>
     <!-- Renders ONE person (context comes from the List item) -->
     <Panel
         headerText="{= 'Personal Information - ' + (${HostelModel>FullName} || 'Person') }"
         expandable="false"
-        class="customPanelHeader">
-
+        class="customPanelHeader"
+    >
         <!-- Personal Info -->
         <f:SimpleForm
             editable="false"
@@ -19,7 +19,8 @@
             labelSpanXL="4"
             labelSpanL="3"
             labelSpanM="4"
-            labelSpanS="12">
+            labelSpanS="12"
+        >
             <f:content>
                 <Label text="{i18n>fullname}" />
                 <Text text="{HostelModel>Salutation} {HostelModel>FullName}" />
@@ -41,104 +42,150 @@
                 <Text text="{HostelModel>Address}" />
             </f:content>
         </f:SimpleForm>
-        
-
-
-
-<VBox
-    visible="{= ${HostelModel>Documents}.length > 0 }"
-    class="sapUiSmallMargin">
-
-    <Toolbar>
-        <Title text="{i18n>uploadeddocument}" level="H4" />
-    </Toolbar>
-
-    <!-- Wrap cards like facility layout -->
-    <FlexBox
-        wrap="Wrap"
-        justifyContent="Start"
-        class="sapUiSmallMarginTop"
-        alignItems="Start"
-        items="{
-            path: 'HostelModel>Documents'
-        }">
 
         <VBox
-            width="200px"
-            height="200px"
-            class="serviceCard"
-            alignItems="Center"
-            justifyContent="Center">
+            visible="{= ${HostelModel>Documents}.length > 0 }"
+            class="sapUiSmallMargin"
+        >
+            <Toolbar>
+                <Title
+                    text="{i18n>uploadeddocument}"
+                    level="H4"
+                />
+            </Toolbar>
 
-            <!-- Image / PDF Thumbnail -->
-            <Image
-                src="{HostelModel>Thumbnail}"
-                width="180px"
-                height="140px"
-                densityAware="false"
-                press="onOpenDocumentPreview" />
+            <!-- Wrap cards like facility layout -->
+            <FlexBox
+                wrap="Wrap"
+                justifyContent="Start"
+                class="sapUiSmallMarginTop"
+                alignItems="Start"
+                items="{
+            path: 'HostelModel>Documents'
+        }"
+            >
+                <VBox
+                    width="200px"
+                    height="200px"
+                    class="serviceCard"
+                    alignItems="Center"
+                    justifyContent="Center"
+                >
+                    <!-- Image / PDF Thumbnail -->
+                    <Image
+                        src="{HostelModel>Thumbnail}"
+                        width="180px"
+                        height="140px"
+                        densityAware="false"
+                        press="onOpenDocumentPreview"
+                    />
+                </VBox>
+            </FlexBox>
         </VBox>
 
-    </FlexBox>
-
-</VBox>
-
-<VBox visible="{= ${HostelModel>AllSelectedFacilities}.length > 0 }">
-        <!-- Selected Facilities for THIS person -->
-        <Toolbar >
-            <Title text="{i18n>selectedfacilities}" level="H4" />
-        </Toolbar>
-        <FlexBox
-       
-             wrap= "Wrap"   
-            alignItems="Start"
-            justifyContent="Start"
-            class="sapUiSmallMarginTop"
-         
-            items="{
-                path: 'HostelModel>AllSelectedFacilities'
-            }">
-            <VBox width="200px" height="200px" class="sapUiSmallMargin serviceCard"
-                  alignItems="Center" justifyContent="Center"
-                  visible="{= !!${HostelModel>FacilityName} }">
-                <Image src="{HostelModel>Image}" width="180px" height="140px" />
-                <Text text="{HostelModel>FacilityName}" />
-                <Text text="{= ${HostelModel>Price} ? ${HostelModel>Price}+ ' ' + ${HostelModel>Currency} + ' ' + ${HostelModel>UnitText} : '' }"/>
-            </VBox>
-        </FlexBox>
-
-        <!-- Booking Details for THIS person -->
-        <Table id="idFacilitySummaryTable"
-            class="sapUiSmallMarginTop"
-            items="{
+        <VBox visible="{= ${HostelModel>AllSelectedFacilities}.length > 0 }">
+            <!-- Selected Facilities for THIS person -->
+            <Toolbar>
+                <Title
+                    text="{i18n>selectedfacilities}"
+                    level="H4"
+                />
+            </Toolbar>
+            <FlexBox
+                wrap="Wrap"
+                alignItems="Start"
+                justifyContent="Start"
+                class="sapUiSmallMarginTop"
+                items="{
                 path: 'HostelModel>AllSelectedFacilities'
             }"
-            mode="SingleSelectLeft"
-            inset="false"
-            selectionChange="onTableSelection">
-            <headerToolbar>
-                <Toolbar>
-                    <Title text="{i18n>bookingDetailsTitle}" level="H5" />
-                    <ToolbarSpacer />
-                    <Button  text="{i18n>MSedit}" press="onEditFacilityDetails" class="myUnifiedBtn" />
-                </Toolbar>
-            </headerToolbar>
+            >
+                <VBox
+                    width="200px"
+                    height="200px"
+                    class="sapUiSmallMargin serviceCard"
+                    alignItems="Center"
+                    justifyContent="Center"
+                    visible="{= !!${HostelModel>FacilityName} }"
+                >
+                    <Image
+                        src="{HostelModel>Image}"
+                        width="180px"
+                        height="140px"
+                    />
+                    <Text text="{HostelModel>FacilityName}" />
+                    <Text
+                        text="{= ${HostelModel>Price} ? ${HostelModel>Price}+ ' ' + ${HostelModel>Currency} + ' ' + ${HostelModel>UnitText} : '' }"
+                    />
+                </VBox>
+            </FlexBox>
 
-            <columns>
-                <Column demandPopin="true" ><Text text="{i18n>facilityname}" /></Column>
-                <Column demandPopin="true"><Text text="{i18n>faciltyprice}" /></Column>
-                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="{i18n>startDate}" /></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>endDate}" /></Column>
-                <Column minScreenWidth="Desktop" demandPopin="true" ><Text text="{i18n>days}" /></Column>
-                <Column demandPopin="true" ><Text class="sapUiSmallBold" text="{i18n>total}" /></Column>
-            </columns>
+            <!-- Booking Details for THIS person -->
+            <Table
+                id="idFacilitySummaryTable"
+                class="sapUiSmallMarginTop"
+                items="{
+                path: 'HostelModel>AllSelectedFacilities'
+            }"
+                mode="SingleSelectLeft"
+                inset="false"
+                selectionChange="onTableSelection"
+            >
+                <headerToolbar>
+                    <Toolbar>
+                        <Title
+                            text="{i18n>bookingDetailsTitle}"
+                            level="H5"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>MSedit}"
+                            press="onEditFacilityDetails"
+                            class="myUnifiedBtn"
+                        />
+                    </Toolbar>
+                </headerToolbar>
 
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{HostelModel>FacilityName}" />
-                     <Text
-    text="{
+                <columns>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>facilityname}" />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>faciltyprice}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>startDate}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>endDate}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>days}" />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text
+                            class="sapUiSmallBold"
+                            text="{i18n>total}"
+                        />
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{HostelModel>FacilityName}" />
+                            <Text
+                                text="{
         parts: [
             'HostelModel>Price',
             'HostelModel>Currency',
@@ -147,43 +194,47 @@
         ],
         formatter: '.Formatter.formatFacilityPrice'
     }"
-/>
+                            />
 
-                        <Text text="{HostelModel>StartDate}" />
-                        <Text text="{HostelModel>EndDate}" />
-                        <Text text="{HostelModel>TotalDays}" />
-                       <Text 
-    class="totalColumnBold"
-    text="{
+                            <Text text="{HostelModel>StartDate}" />
+                            <Text text="{HostelModel>EndDate}" />
+                            <Text text="{HostelModel>TotalDays}" />
+                            <Text
+                                class="totalColumnBold"
+                                text="{
         parts: [
             'HostelModel>TotalAmount',
             'HostelModel>Currency'
         ],
         formatter: '.Formatter.formatCurrency'
     }"
-/>
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
 
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-   
-        <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
-       
-            <HBox justifyContent="End" class="sapUiSmallMarginTop">
-                <Label text="{i18n>totalfacilitycost}" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-                <Text text="{
+            <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
+
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+            >
+                <Label
+                    text="{i18n>totalfacilitycost}"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
+                <Text
+                    text="{
                    parts: [
         'HostelModel>TotalFacilityPrice',
         'HostelModel>/Currency'
     ], formatter: '.Formatter.formatCurrency'
-                }" class="totalColumnBold1 sapUiSmallMarginEnd"/>
-              
+                }"
+                    class="totalColumnBold1 sapUiSmallMarginEnd"
+                />
             </HBox>
-              </VBox>
-
+        </VBox>
     </Panel>
     <!-- Grand Total section -->
-   
-
 </core:FragmentDefinition>

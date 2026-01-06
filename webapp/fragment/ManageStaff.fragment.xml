@@ -47,7 +47,7 @@
                             id="MS_id_signUpSalutation"
                             selectedKey="{MDmodel>/Salutation}"
                             change="onChangeSalutation"
-                            placeholder="Mr."
+                            placeholder="{i18n>mr}"
                             valueStateText="{i18n>MVDsalutation}"
                         >
                             <core:ListItem
@@ -76,7 +76,7 @@
                         <Input
                             id="MS_id_signUpName"
                             value="{MDmodel>/UserName}"
-                            placeholder="Full Name"
+                            placeholder="{i18n>fullname}"
                             required="true"
                             liveChange="_LCvalidateName"
                             valueStateText="{i18n>MSenterValidName}"
@@ -132,7 +132,7 @@
                 <Input
                     id="MS_id_signUpEmail"
                     value="{MDmodel>/Email}"
-                    placeholder="Enter Email ID"
+                    placeholder="{i18n>enterEmailId}"
                     type="Email"
                     required="true"
                     liveChange="onEmailliveChange"
@@ -144,7 +144,7 @@
                 />
                 <MultiComboBox
                     id="MS_id_Branchcode"
-                    placeholder="Select Branch Code"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKeys="{MDmodel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
@@ -167,7 +167,7 @@
                     items="{path: 'Role>/'}"
                     selectedKey="{MDmodel>/Role}"
                     change=".onRoleChange"
-                    placeholder="Select Role"
+                    placeholder="{i18n>selectRole}"
                     valueStateText="{i18n>selectRole}"
                 >
                     <core:Item
@@ -183,7 +183,7 @@
                     id="MS_id_signUpCountry"
                     change="onChangeCountry"
                     selectionChange="onChangeCountry"
-                    placeholder="Select Country"
+                    placeholder="{i18n>selectCountry}"
                     valueStateText="{i18n>MVDselectcountry}"
                     items="{path:'CountryModel>/', length:1000}"
                     showSecondaryValues="true"
@@ -203,7 +203,7 @@
                     id="MS_id_signUpState"
                     change="onChangeState"
                     selectionChange="onChangeState"
-                    placeholder="Select State"
+                    placeholder="{i18n>selectState}"
                     valueStateText="{i18n>MSselectState}"
                     items="{path:'StateModel>/', length:1000}"
                     showSecondaryValues="true"
@@ -222,7 +222,7 @@
                     selectionChange="onCitySelect"
                     id="MS_id_signUpCity"
                     change="onChangeCity"
-                    placeholder="Select City"
+                    placeholder="{i18n>cityValueText}"
                     valueStateText="{i18n>MSselectCity}"
                     items="{path:'CityModel>/', length:1000}"
                     showSecondaryValues="true"
@@ -248,7 +248,7 @@
                         <ComboBox
                             change="onSTDChange"
                             id="MS_id_signUpSTD"
-                            placeholder="Code"
+                            placeholder="{i18n>code}"
                             valueStateText="{i18n>MSselectCode}"
                             showSecondaryValues="true"
                             items="{path:'CountryModel>/', length:1000}"
@@ -271,7 +271,7 @@
                             id="MS_id_signUpPhone"
                             type="Tel"
                             value="{MDmodel>/MobileNo}"
-                            placeholder="Enter Mobile Number"
+                            placeholder="{i18n>enterMobileNumber}"
                             maxLength="18"
                             liveChange="onMobileLivechnage"
                             valueStateText="{i18n>MSmobileNoValueState}"
@@ -288,7 +288,7 @@
                     maxLength="500"
                     value="{MDmodel>/Address}"
                     liveChange="onAddressChange"
-                    placeholder="Address"
+                    placeholder="{i18n>address}"
                 />
                 <HBox width="100%">
                     <Label
@@ -301,7 +301,7 @@
                     id="MS_id_passwordHelpStrip"
                     type="Information"
                     showIcon="false"
-                    text="Minimum 6 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character"
+                    text="{i18n>msgStrip}"
                 />
                 <Label
                     text="{i18n>MScreatePassword}"
@@ -312,7 +312,7 @@
                         showValueStateMessage="false"
                         id="MS_id_signUpPassword"
                         width="100%"
-                        placeholder="Enter Password"
+                        placeholder="{i18n>enterPassword}"
                         value="{MDmodel>/password}"
                         type="Password"
                         liveChange="SM_onChnageSetAndConfirm"
@@ -337,7 +337,7 @@
                     <Button
                         text="{i18n>MSgeneratePassword}"
                         type="Transparent"
-                        tooltip="Generate Password"
+                        tooltip="{i18n>MSgeneratePassword}"
                         icon="sap-icon://refresh"
                         press="SM_onGeneratePassword"
                     />
@@ -348,7 +348,7 @@
                 />
                 <Input
                     id="MS_id_signUpConfirmPassword"
-                    placeholder="Enter Confirm Password"
+                    placeholder="{i18n>MSenterConfirmPassword}"
                     value="{MDmodel>/comfirmpass}"
                     type="Password"
                     change="FSM_onConfirm"
@@ -366,13 +366,13 @@
                 <ToolbarSpacer />
                 <Button
                     text="{i18n>MSsignUp}"
-                    tooltip="Sign Up"
+                    tooltip="{i18n>MSsignUp}"
                     class="myUnifiedBtn"
                     press="onSignUp"
                 />
                 <Button
                     text="{i18n>CancelButton}"
-                    tooltip="Close"
+                    tooltip="{i18n>close}"
                     class="myUnifiedBtn"
                     press="FD_onCancelButtonPress"
                 />

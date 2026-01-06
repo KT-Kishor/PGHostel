@@ -8,7 +8,7 @@
 >
     <Dialog
         id="FacilitiesDialog"
-        title="Add facilities"
+        title="{i18n>addfacilities}"
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
@@ -34,7 +34,7 @@
                 />
                 <ComboBox
                     id="idRoomType123"
-                    placeholder="Select Branch Code"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKey="{FacilitiesModel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
@@ -55,7 +55,7 @@
                 <Input
                     id="idFacilityName"
                     value="{FacilitiesModel>/FacilityName}"
-                    placeholder="Enter Facility Name"
+                    placeholder="{i18n>placeEnterFacilityName}"
                     valueStateText="{i18n>enterFacilityName}"
                     liveChange="onFacilityNameChange"
                 />
@@ -68,7 +68,7 @@
                     id="idFacilityName1"
                     items="{FacilityType>/}"
                     value="{FacilitiesModel>/Type}"
-                    placeholder="Enter Type"
+                    placeholder="{i18n>enterType}"
                     valueStateText="{i18n>enterType}"
                     change="onFacilityTypeChange"
                 >
@@ -81,7 +81,7 @@
                 <Label text="{i18n>hourlyPrice}" />
                 <Input
                     id="idPerHourPrice"
-                    placeholder="Enter Per Hour Price"
+                    placeholder="{i18n>enterPerHourPrice}"
                     value="{FacilitiesModel>/PerHourPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
@@ -91,7 +91,7 @@
                 <Label text="{i18n>dailyPrice}" />
                 <Input
                     id="idPerDayPrice"
-                    placeholder="Enter Per Day Price"
+                    placeholder="{i18n>enterPerDayPrice}"
                     value="{FacilitiesModel>/PerDayPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
@@ -101,7 +101,7 @@
                 <Label text="{i18n>monthlyPrice}" />
                 <Input
                     id="idPerMonthPrice"
-                    placeholder="Enter Per Month Price"
+                    placeholder="{i18n>enterPerMonthPrice}"
                     value="{FacilitiesModel>/PerMonthPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
@@ -111,7 +111,7 @@
                 <Label text="{i18n>yearlyPrice}" />
                 <Input
                     id="idPerYearPrice"
-                    placeholder="Enter Per Year Price"
+                    placeholder="{i18n>enterPerYearPrice}"
                     value="{FacilitiesModel>/PerYearPrice}"
                     maxLength="10"
                     liveChange="onPriceChange"
@@ -126,7 +126,7 @@
                     id="FL_id_Currency"
                     selectedKey="{FacilitiesModel>/Currency}"
                     items="{path:'CountryModel>/',length:1000}"
-                    placeholder="Select Currency"
+                    placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
                     valueStateText="{i18n>selectCurrency}"
                     change="onChangeCurrency"
@@ -206,13 +206,13 @@
                 <ToolbarSpacer />
                 <Button
                     text="{i18n>save}"
-                    tooltip="Save"
+                    tooltip="{i18n>save}"
                     class="myUnifiedBtn"
                     press="FD_onsavebuttonpress"
                 />
                 <Button
                     text="{i18n>CancelButton}"
-                    tooltip="Cancel"
+                    tooltip="{i18n>CancelButton}"
                     class="myUnifiedBtn"
                     press="FD_onCancelButtonPress"
                 />

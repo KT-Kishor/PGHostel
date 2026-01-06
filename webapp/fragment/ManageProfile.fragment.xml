@@ -20,7 +20,7 @@
             <Bar class="barheader">
                 <contentMiddle>
                     <Title
-                        text="My Account"
+                        text="{i18n>myAccount}"
                         level="H4"
                     />
                 </contentMiddle>
@@ -28,13 +28,13 @@
                     <m:Button
                         text="{= ${profileData>/isEditMode} ? 'Save' : 'Edit'}"
                         class="myUnifiedBtn"
-                        tooltip="Edit"
+                        tooltip="{i18n>MSedit}"
                         press="onEditSaveProfile"
                     />
                     <m:Button
                         icon="sap-icon://decline"
                         type="Transparent"
-                        tooltip="Close"
+                        tooltip="{i18n>close}"
                         press="onProfileDialogClose"
                     />
                 </contentRight>
@@ -57,7 +57,7 @@
                 />
                 <Button
                     icon="sap-icon://edit"
-                    tooltip="Set Profile Photo"
+                    tooltip="{i18n>setProfilePhoto}"
                     press="onPressAvatarEdit"
                     class="avatarEditIcon"
                 />
@@ -81,34 +81,34 @@
                     visible="{= !${profileData>/isEditMode}}"
                 >
                     <f:content>
-                        <m:Label text="Full Name" />
+                        <m:Label text="{i18n>fullname}" />
                         <m:Text
                             text="{= ${profileData>/Salutation} + ' ' + ${profileData>/name}}"
                         />
 
-                        <m:Label text="Email" />
+                        <m:Label text="{i18n>email}" />
                         <Text text="{profileData>/email}" />
 
-                        <m:Label text="Date of Birth" />
+                        <m:Label text="{i18n>MVDDOB}" />
                         <Text text="{profileData>/dob}" />
 
-                        <m:Label text="Country" />
+                        <m:Label text="{i18n>MVDcountry}" />
                         <Text text="{profileData>/Country}" />
 
-                        <m:Label text="State" />
+                        <m:Label text="{i18n>MVDstate}" />
                         <Text text="{profileData>/State}" />
 
-                        <m:Label text="City" />
+                        <m:Label text="{i18n>city}" />
                         <Text text="{profileData>/City}" />
 
-                        <m:Label text="Mobile Number" />
+                        <m:Label text="{i18n>MSmobileNo}" />
                         <m:Text
                             text="{= ${profileData>/STDCode} + ' ' + ${profileData>/phone}}"
                         />
 
-                        <m:Label text="Gender" />
+                        <m:Label text="{i18n>MVgender}" />
                         <Text text="{profileData>/gender}" />
-                        <m:Label text="Address" />
+                        <m:Label text="{i18n>address}" />
                         <Text
                             text="{profileData>/address}"
                             wrapping="true"
@@ -125,7 +125,7 @@
                 >
                     <f:content>
                         <m:Label
-                            text="Full Name"
+                            text="{i18n>fullname}"
                             required="{profileData>/isEditMode}"
                         />
                         <Select selectedKey="{profileData>/Salutation}">
@@ -146,12 +146,12 @@
                             id="id_Name"
                             maxLength="20"
                             value="{profileData>/name}"
-                            valueStateText="Enter Customer Name"
+                            valueStateText="{i18n>enterCustomerName}"
                             liveChange="onNameInputLiveChange"
                         />
 
                         <m:Label
-                            text="Email"
+                            text="{i18n>email}"
                             required="{profileData>/isEditMode}"
                         />
                         <m:Input
@@ -159,12 +159,12 @@
                             value="{profileData>/email}"
                             type="Email"
                             maxLength="30"
-                            valueStateText="Enter Email Id"
+                            valueStateText="{i18n>enterEmailId}"
                             liveChange="onEmailliveChange"
                         />
 
                         <m:Label
-                            text="Date of Birth"
+                            text="{i18n>MVDDOB}"
                             required="{profileData>/isEditMode}"
                         />
                         <DatePicker
@@ -172,12 +172,12 @@
                             value="{profileData>/dob}"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="dd/MM/yyyy"
-                            valueStateText="Enter Date of Birth"
+                            valueStateText="{i18n>enterDateofBirth}"
                             change="MP_onChangeDOB"
                         />
 
                         <m:Label
-                            text="Country"
+                            text="{i18n>MVDcountry}"
                             required="{profileData>/isEditMode}"
                         />
                         <ComboBox
@@ -187,8 +187,8 @@
                             showSecondaryValues="true"
                             selectionChange="onCountrySelectionChange"
                             change="MC_onChangeCountry"
-                            placeholder="Enter Country"
-                            valueStateText="Select Country"
+                            placeholder="{i18n>enterCountry}"
+                            valueStateText="{i18n>selectCountry}"
                         >
                             <core:ListItem
                                 key="{CountryModel>countryName}"
@@ -198,14 +198,14 @@
                         </ComboBox>
 
                         <m:Label
-                            text="State"
+                            text="{i18n>MVDstate}"
                             required="{profileData>/isEditMode}"
                         />
                         <ComboBox
                             id="id_state"
                             change="CC_onChangeState"
-                            placeholder="Enter State"
-                            valueStateText="Select State"
+                            placeholder="{i18n>enterState}"
+                            valueStateText="{i18n>selectState}"
                             showSecondaryValues="true"
                             items="{path:'StateModel>/',length:1000}"
                             selectedKey="{profileData>/State}"
@@ -217,14 +217,14 @@
                         </ComboBox>
 
                         <m:Label
-                            text="City"
+                            text="{i18n>city}"
                             required="{profileData>/isEditMode}"
                         />
                         <ComboBox
                             id="id_city"
                             change="onChange"
-                            valueStateText="Select City"
-                            placeholder="Enter City"
+                            valueStateText="{i18n>cityValueText}"
+                            placeholder="{i18n>enterCity}"
                             showSecondaryValues="true"
                             items="{path:'CityModel>/',length:1000}"
                             selectedKey="{profileData>/City}"
@@ -238,14 +238,14 @@
                         </ComboBox>
 
                         <m:Label
-                            text="Mobile Number"
+                            text="{i18n>MSmobileNo}"
                             required="{profileData>/isEditMode}"
                         />
 
                         <ComboBox
                             change="_onProfileSTDChange"
                             id="id_std"
-                            placeholder="Code"
+                            placeholder="{i18n>code}"
                             valueStateText="{i18n>MSselectCode}"
                             showSecondaryValues="true"
                             items="{path:'CountryModel>/', length:1000}"
@@ -261,20 +261,20 @@
                         <Input
                             id="id_phone"
                             value="{profileData>/phone}"
-                            placeholder="Enter Contact Number"
+                            placeholder="{i18n>enterContactNumber}"
                             maxLength="18"
                             liveChange="MPonMobileLivechnage"
-                            valueStateText="Enter Contact Number"
+                            valueStateText="{i18n>enterContactNumber}"
                         />
 
                         <m:Label
-                            text="Gender"
+                            text="{i18n>MVgender}"
                             required="{profileData>/isEditMode}"
                         />
                         <ComboBox
                             id="id_gender"
                             selectedKey="{profileData>/gender}"
-                            valueStateText="Select Gender"
+                            valueStateText="{i18n>selectGender}"
                             change="onChange"
                         >
                             <core:Item
@@ -291,7 +291,7 @@
                             />
                         </ComboBox>
                         <m:Label
-                            text="Address"
+                            text="{i18n>address}"
                             required="{profileData>/isEditMode}"
                         />
                         <TextArea
@@ -336,7 +336,7 @@
                 width="auto"
                 class="sapUiSmallMargin searchField"
                 liveChange="onGlobalSearch"
-                placeholder="Search"
+                placeholder="{i18n>search}"
             />
         </FlexBox>
         <Table
@@ -356,25 +356,25 @@
         >
             <columns>
                 <Column demandPopin="true">
-                    <Text text="Customer Name" />
+                    <Text text="{i18n>customerName}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Booking Date" />
+                    <Text text="{i18n>bookingDate}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Room" />
+                    <Text text="{i18n>room}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Amount" />
+                    <Text text="{i18n>amount}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Status" />
+                    <Text text="{i18n>status}" />
                 </Column>
             </columns>
 
@@ -412,28 +412,28 @@
         >
             <columns>
                 <Column demandPopin="true">
-                    <Text text="Booking ID" />
+                    <Text text="{i18n>bookingID}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Invoice No" />
+                    <Text text="{i18n>invoiceNo}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Invoice Date" />
+                    <Text text="{i18n>invoiceDate}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Customer Name" />
+                    <Text text="{i18n>customerName}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Total Amount" />
+                    <Text text="{i18n>totalAmount}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Due Amount" />
+                    <Text text="{i18n>invoiceDueAmount}" />
                 </Column>
             </columns>
 

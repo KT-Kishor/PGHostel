@@ -95,8 +95,6 @@
                     press="TC_onServiceSelect"
                 />
             </VBox>
-
-            
         </FlexBox>
     </VBox>
 </core:FragmentDefinition>

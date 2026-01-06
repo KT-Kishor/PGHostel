@@ -7,15 +7,15 @@
 >
     <Dialog
         id="sds1"
-        title="Uplaod Documents"
+        title="{i18n>uploadDocuments}"
         type="Standard"
         class="sapUiContentPadding"
     >
-        <customHeader >
-            <Bar >
+        <customHeader>
+            <Bar>
                 <contentLeft>
                     <Title
-                        text="Upload Documents"
+                        text="{i18n>uploadDocuments}"
                         class="sapUiSmallMarginBegin"
                     />
                 </contentLeft>
@@ -43,15 +43,15 @@
         >
             <f:content>
                 <Label
-                    text="ID Proof Type"
+                    text="{i18n>iDProofType}"
                     required="true"
                 />
                 <ComboBox
                     id="idProofType"
-                    placeholder="Select ID Proof"
+                    placeholder="{i18n>selectIDProof}"
                     value="{Bookingmodel>/DocumentType}"
                     visible="{VisibleModel>/visible}"
-                    valueStateText="Select ID Proof"
+                    valueStateText="{i18n>selectIDProof}"
                     change="onidproofchange"
                 >
                     <core:ListItem
@@ -72,7 +72,7 @@
                     />
                 </ComboBox>
                 <Label
-                    text="Upload Document"
+                    text="{i18n>uploadDocument}"
                     required="true"
                 />
                 <u:FileUploader

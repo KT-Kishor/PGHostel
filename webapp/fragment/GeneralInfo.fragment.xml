@@ -17,94 +17,143 @@
             columnsXL="6"
         >
             <f:content>
-                
-           
-              <!-- <Input id="idUserID" value="{HostelModel>/UserID}" visible="true" /> -->
-               <Label text="{i18n>roomtype}" />
-                            <Text id="GI_Roomtype"  text="{=${HostelModel>/BedType} + ' - ' + ${HostelModel>/ACType}}"  width="100%" /> 
-             <Label text="{i18n>rentprice}" />
-                            <Text  text="{HostelModel>/FinalPrice} {HostelModel>/Currency}" width="100%" />     
-                <Label text="{i18n>roomplan}" required="true" />
-<ComboBox
-    id="idPaymentMethod1"
-    items="{HostelModel>/AvailablePaymentMethods}"
-    selectedKey="{HostelModel>/SelectedPriceType}"
-    width="100%"
-    selectionChange="onRoomDurationChange">
+                <!-- <Input id="idUserID" value="{HostelModel>/UserID}" visible="true" /> -->
+                <Label text="{i18n>roomtype}" />
+                <Text
+                    id="GI_Roomtype"
+                    text="{=${HostelModel>/BedType} + ' - ' + ${HostelModel>/ACType}}"
+                    width="100%"
+                />
+                <Label text="{i18n>rentprice}" />
+                <Text
+                    text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"
+                    width="100%"
+                />
+                <Label
+                    text="{i18n>roomplan}"
+                    required="true"
+                />
+                <ComboBox
+                    id="idPaymentMethod1"
+                    items="{HostelModel>/AvailablePaymentMethods}"
+                    selectedKey="{HostelModel>/SelectedPriceType}"
+                    width="100%"
+                    selectionChange="onRoomDurationChange"
+                >
+                    <core:Item
+                        key="{HostelModel>key}"
+                        text="{HostelModel>text}"
+                    />
+                </ComboBox>
 
-    <core:Item key="{HostelModel>key}" text="{HostelModel>text}" />
-</ComboBox>
-
-                               
-              
-     <Label text="{i18n>noofperson}" required="true" />
-<Select
-    id="id_Noofperson1"
-    width="100%"
-    selectedKey="{HostelModel>/SelectedPerson}"
-    change="onNoOfPersonSelect"
-    items="{
+                <Label
+                    text="{i18n>noofperson}"
+                    required="true"
+                />
+                <Select
+                    id="id_Noofperson1"
+                    width="100%"
+                    selectedKey="{HostelModel>/SelectedPerson}"
+                    change="onNoOfPersonSelect"
+                    items="{
         path: 'HostelModel>/NoOfPersonsList'
     }"
->   
-    <core:Item key="{HostelModel>key}" text="{HostelModel>text}" />
-</Select>
+                >
+                    <core:Item
+                        key="{HostelModel>key}"
+                        text="{HostelModel>text}"
+                    />
+                </Select>
                 <!-- Site Contact -->
-                <Label text="{i18n>startDate}" required="true" />
-                            <DatePicker
-                                id="idStartDate1"
-                                value="{HostelModel>/StartDate}"
-                                valueFormat="dd/MM/yyyy"
-                                displayFormat="dd/MM/yyyy"
-                                change="onFieldValidation"
-                                width="100%"
-                                minDate="{path: 'HostelModel>/TodayDate'}"
-                                valueStateText="Enter Start Date"
-                            />
-                          <Label text="{i18n>howmanymonthyears}" />
-<Select
-    id="idMonthsSelect"
-    width="100%"
-    selectedKey="{HostelModel>/SelectedMonths}"
-    change="onMonthSelectionChange"
-    visible="{OBTNModel>/Month}"
-    forceSelection="true"
->
-    <core:Item key="1" text="1" />
-    <core:Item key="2" text="2" />
-    <core:Item key="3" text="3" />
-    <core:Item key="4" text="4" />
-    <core:Item key="5" text="5" />
-    <core:Item key="6" text="6" />
-    <core:Item key="7" text="7" />
-    <core:Item key="8" text="8" />
-    <core:Item key="9" text="9" />
-    <core:Item key="10" text="10" />
-    <core:Item key="11" text="11" />
-</Select>
+                <Label
+                    text="{i18n>startDate}"
+                    required="true"
+                />
+                <DatePicker
+                    id="idStartDate1"
+                    value="{HostelModel>/StartDate}"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                    change="onFieldValidation"
+                    width="100%"
+                    minDate="{path: 'HostelModel>/TodayDate'}"
+                    valueStateText="{i18n>enterStartDate}"
+                />
+                <Label text="{i18n>howmanymonthyears}" />
+                <Select
+                    id="idMonthsSelect"
+                    width="100%"
+                    selectedKey="{HostelModel>/SelectedMonths}"
+                    change="onMonthSelectionChange"
+                    visible="{OBTNModel>/Month}"
+                    forceSelection="true"
+                >
+                    <core:Item
+                        key="1"
+                        text="1"
+                    />
+                    <core:Item
+                        key="2"
+                        text="2"
+                    />
+                    <core:Item
+                        key="3"
+                        text="3"
+                    />
+                    <core:Item
+                        key="4"
+                        text="4"
+                    />
+                    <core:Item
+                        key="5"
+                        text="5"
+                    />
+                    <core:Item
+                        key="6"
+                        text="6"
+                    />
+                    <core:Item
+                        key="7"
+                        text="7"
+                    />
+                    <core:Item
+                        key="8"
+                        text="8"
+                    />
+                    <core:Item
+                        key="9"
+                        text="9"
+                    />
+                    <core:Item
+                        key="10"
+                        text="10"
+                    />
+                    <core:Item
+                        key="11"
+                        text="11"
+                    />
+                </Select>
 
-<Label text="{i18n>endDate}" required="true" />
-<DatePicker
-    id="idEndDate1"
-    value="{HostelModel>/EndDate}"
-    valueFormat="dd/MM/yyyy"
-    displayFormat="dd/MM/yyyy"
-    change="onFieldValidation"
-    width="100%"
-    editable="false"
-/>
-<!-- <Label text="CheckIn Time"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Hour' }"/>
+                <Label
+                    text="{i18n>endDate}"
+                    required="true"
+                />
+                <DatePicker
+                    id="idEndDate1"
+                    value="{HostelModel>/EndDate}"
+                    valueFormat="dd/MM/yyyy"
+                    displayFormat="dd/MM/yyyy"
+                    change="onFieldValidation"
+                    width="100%"
+                    editable="false"
+                />
+                <!-- <Label text="CheckIn Time"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Hour' }"/>
 				<TimePicker id="Id_checkintime" value="{HostelModel>/CheckInTime}" displayFormat="HH" valueFormat="HH"
                 change=".onTimeChange" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Hour' }" valueStateText="Select End Time"/>
 
                 <Label text="CheckOut Time"  visible="{= ${edit>/UnitText} === 'Per Hour' }"/>
 				<TimePicker id="Id_checkouttime" value="{edit>/EndTime}" displayFormat="HH" valueFormat="HH"
                 change=".onTimeChange" visible="{= ${edit>/UnitText} === 'Per Hour' }" valueStateText="Select End Time"/> -->
-
-
-
-
-    
             </f:content>
         </f:SimpleForm>
     </Panel>

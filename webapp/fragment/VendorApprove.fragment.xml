@@ -31,7 +31,7 @@
                     liveChange="MIF_liveChangeForAdminComments"
                     rows="4"
                     id="MIF_id_remark"
-                    placeholder="Enter Remarks"
+                    placeholder="{i18n>enterRemarks}"
                     maxLength="2000"
                 />
             </f:content>
@@ -47,7 +47,7 @@
         <endButton>
             <Button
                 text="{i18n>close}"
-				tooltip="Close"
+                tooltip="{i18n>close}"
                 class="myUnifiedBtn"
                 press="MIF_onPressClose"
             />

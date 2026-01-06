@@ -999,7 +999,7 @@ sap.ui.define([
             // Invalid GST
             if (!GST_REGEX.test(sValue)) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
+                oInput.setValueStateText(this.i18nModel.getText("gstError "));
                 visiModel.setProperty("/CC_id_CustInput", false);
                 visiModel.setProperty("/selectedIndex", -1);
                 return false;
@@ -1023,46 +1023,5 @@ sap.ui.define([
 
             return true;
         }
-
-        // MC_ValidateGstNumber: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     const sInputValue = oInput.getValue();
-        //     const dataModel = this.getView().getModel("MDmodel");
-        //     const visiModel = this.getView().getModel("visiblePlay");
-
-        //     // GST regex
-        //     const testPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]{1}Z[0-9A-Z]{1}$/;
-
-        //     if (testPattern.test(sInputValue) && sInputValue) {
-        //         visiModel.setProperty("/CC_id_CustInput", true);
-
-        //         // Extract first 2 digits (state code)
-        //         const stateCode = sInputValue.substring(0, 2);
-
-        //         // If state code is 29 (Karnataka)
-        //         if (stateCode === "29") {
-        //             sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(0);
-        //             // visiModel.setProperty("/isRadioEditable", false); // Make radios non-editable
-        //             dataModel.setProperty("/value", "9");
-        //             dataModel.setProperty("/type", "CGST/SGST");
-        //         } else {
-        //             sap.ui.getCore().byId("MC_id_groupCustGst").setSelectedIndex(1);
-        //             dataModel.setProperty("/value", "18");
-        //             dataModel.setProperty("/type", "IGST");
-        //         }
-        //         oInput.setValueState("None");
-        //     } else if (!sInputValue) {
-        //         // Empty input
-        //         dataModel.setProperty("/value", "0");
-        //         dataModel.setProperty("/type", "");
-        //         oInput.setValueState("None");
-        //         visiModel.setProperty("/CC_id_CustInput", false);
-        //     } else {
-        //         // Invalid GST
-        //         visiModel.setProperty("/CC_id_CustInput", false);
-        //         oInput.setValueState("Error");
-        //         oInput.setValueStateText(this.i18nModel.getText("gstNoValueState"));
-        //     }
-        // },
     })
 });

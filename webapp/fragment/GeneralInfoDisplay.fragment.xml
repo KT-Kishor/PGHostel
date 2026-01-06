@@ -4,10 +4,8 @@
     xmlns:core="sap.ui.core"
     xmlns:smartField="sap.ui.comp.smartfield"
 >
-    <Panel
-        expandable="false"
-    >
-     <f:SimpleForm
+    <Panel expandable="false">
+        <f:SimpleForm
             editable="false"
             layout="ColumnLayout"
             columnsM="1"
@@ -16,32 +14,50 @@
             labelSpanXL="4"
             labelSpanL="3"
             labelSpanM="4"
-            labelSpanS="12">
+            labelSpanS="12"
+        >
             <f:content>
-             <core:Title text="{i18n>bookingDetailsTitle}" />
-               <Label text="{i18n>roomtype}" />
-                            <Text id="idRoomType2" text="{HostelModel>/BedType}"  />
-                            <Label text="Rent Price" /> 
-                            <Text id="idPrice3" text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"   />
+                <core:Title text="{i18n>bookingDetailsTitle}" />
+                <Label text="{i18n>roomtype}" />
+                <Text
+                    id="idRoomType2"
+                    text="{HostelModel>/BedType}"
+                />
+                <Label text="{i18n>rentprice}" />
+                <Text
+                    id="idPrice3"
+                    text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"
+                />
 
-                 <Label text="{i18n>roomplan}" />
-                            <Text text="{HostelModel>/SelectedPriceType}"/>
+                <Label text="{i18n>roomplan}" />
+                <Text text="{HostelModel>/SelectedPriceType}" />
                 <!-- Project Address -->
-              
-               <Label text="{i18n>noofperson}"/>
-               <Text text="{HostelModel>/SelectedPerson}"/>
+
+                <Label text="{i18n>noofperson}" />
+                <Text text="{HostelModel>/SelectedPerson}" />
 
                 <!-- Site Contact -->
-             
+
                 <Label text="{i18n>startDate}" />
-                           <Text text="{HostelModel>/StartDate}"/>
-                            <Label text="{i18n>endDate}" />
-                           <Text text="{HostelModel>/EndDate}"/>
-                            <Label text="{i18n>monthyear}"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"/>
-                           <Text text="{HostelModel>/SelectedMonths}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }" />
-                            <Label text="{i18n>totaldays}"   visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"/>
-                           <Text text="{HostelModel>/TotalDays}" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }" />
-             
+                <Text text="{HostelModel>/StartDate}" />
+                <Label text="{i18n>endDate}" />
+                <Text text="{HostelModel>/EndDate}" />
+                <Label
+                    text="{i18n>monthyear}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"
+                />
+                <Text
+                    text="{HostelModel>/SelectedMonths}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }"
+                />
+                <Label
+                    text="{i18n>totaldays}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
+                />
+                <Text
+                    text="{HostelModel>/TotalDays}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
+                />
             </f:content>
         </f:SimpleForm>
         <!-- <f:SimpleForm
@@ -56,9 +72,9 @@
             labelSpanS="12"
         >
             <f:content> -->
-                <!-- Booking Details -->
-               
-               <!-- <Label text="Room Type" />
+        <!-- Booking Details -->
+
+        <!-- <Label text="Room Type" />
                             <Text id="idRoomType2" text="{HostelModel>/BedType}"  />
                             <Label text="Rent Price" /> 
                             <Text id="idPrice3" text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"   />
@@ -78,8 +94,8 @@
                            <Text text="{HostelModel>/EndDate}"/>
                             <Label text="Month/Year"  />
                            <Text text="{HostelModel>/SelectedMonths}" /> -->
-             
-            <!-- </f:content>
+
+        <!-- </f:content>
         </f:SimpleForm> -->
     </Panel>
 </core:FragmentDefinition>

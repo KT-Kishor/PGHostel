@@ -35,7 +35,7 @@
         <ComboBox
             id="cbRole"
             width="100%"
-            placeholder="Select a Role"
+            placeholder="{i18n>selectrole}"
             items="{RoleModel>/}"
             selectionChange="onRoleChange"
             change="onRoleLiveChange"
@@ -70,7 +70,7 @@
         <Input
             id="inpManualEmail"
             width="100%"
-            placeholder="Enter Email Addresses Separated by Commas"
+            placeholder="{i18n>checkEmail}"
             liveChange="onManualEmailLiveChange"
             valueStateText="{i18n>checkEmail}"
         />
@@ -78,7 +78,7 @@
     <beginButton>
         <Button
             text="{i18n>sendCoupon}"
-			tooltip="Send Coupon"
+            tooltip="{i18n>sendCoupon}"
             class="myUnifiedBtn"
             press="onConfirmShareCoupon"
         />
@@ -86,7 +86,7 @@
     <endButton>
         <Button
             text="{i18n>CancelButton}"
-			tooltip="Cancel"
+            tooltip="{i18n>CancelButton}"
             class="myUnifiedBtn"
             press="onCloseShareDialog"
         />

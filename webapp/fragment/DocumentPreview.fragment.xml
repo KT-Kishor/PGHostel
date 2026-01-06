@@ -1,16 +1,33 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog id="DocumentPreviewDialog"
-            title="Document Preview"
-            contentWidth="80%"
-            contentHeight="80%"
-             horizontalScrolling="false"
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="DocumentPreviewDialog"
+        title="{i18n>documentPreview}"
+        contentWidth="80%"
+        contentHeight="80%"
+        horizontalScrolling="false"
         verticalScrolling="false"
-          >          
-        <VBox height="100%" fitContainer="true" width="100%"  class="fullHeightBox">
-            <core:HTML id="pdfViewer" content="" />
+    >
+        <VBox
+            height="100%"
+            fitContainer="true"
+            width="100%"
+            class="fullHeightBox"
+        >
+            <core:HTML
+                id="pdfViewer"
+                content=""
+            />
         </VBox>
         <endButton>
-            <Button text="Close" press="onClosePreview" class="myUnifiedBtn"/>
+            <Button
+                text="{i18n>close}"
+                tooltip="{i18n>close}"
+                press="onClosePreview"
+                class="myUnifiedBtn"
+            />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>
