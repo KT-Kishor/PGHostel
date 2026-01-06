@@ -4,13 +4,18 @@ sap.ui.define([
     "../model/formatter",
     "../utils/validation",
     "sap/ui/core/BusyIndicator",
-    "sap/m/MessageToast"
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
+    "sap/ui/model/FilterOperator"
 ], function (
     BaseController,
     JSONModel,
     Formatter, utils,
     BusyIndicator,
-    MessageToast
+    MessageToast,
+    MessageBox,
+    FilterOperator
+    
 ) {
     "use strict";
 
@@ -116,7 +121,6 @@ sap.ui.define([
             }
 
             if (oData.SelectedPriceType.includes(oData.SelectedPriceType)) {
-
                 const map = {
                     "Per Day": "Per Day",
                     "Per Month": "Per Month",
@@ -164,18 +168,6 @@ sap.ui.define([
             setTimeout(() => {
                 this.Roomdetails();
             }, 100);
-            this._fetchCommonData("Country", "CountryModel", "");
-            this._fetchCommonData("State", "StateModel");
-            this._fetchCommonData("City", "CityModel");
-
-            this.ajaxReadWithJQuery("Currency", "").then((oData) => {
-                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                var model = new JSONModel(oFCIAerData);
-                this.getView().setModel(model, "CurrencyModel");
-            }).catch((err) => {
-                console.error("Error fetching currency data:", err);
-            });
-
             const oToday = new Date();
             // Strip time (set hours to 0) to avoid timezone offset issues
             oToday.setHours(0, 0, 0, 0);
@@ -290,7 +282,7 @@ sap.ui.define([
 
             } catch (error) {
                 console.error("Failed to load facilities", error);
-                sap.m.MessageBox.error("Unable to load facilities. Please try again.");
+                MessageBox.error("Unable to load facilities. Please try again.");
 
             } finally {
                 // ✅ ALWAYS hide busy
@@ -444,7 +436,7 @@ sap.ui.define([
                 const oStateCombo = sap.ui.getCore().byId(this.createId("ID_State_" + i));
                 if (oStateCombo) {
                     oStateCombo.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
                     ]);
                     oStateCombo.setValue(p.State || "");
                 }
@@ -454,8 +446,8 @@ sap.ui.define([
                     const oCityCombo = sap.ui.getCore().byId(this.createId("ID_City_" + i));
                     if (oCityCombo) {
                         oCityCombo.getBinding("items")?.filter([
-                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, p.State),
-                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            new sap.ui.model.Filter("stateName", FilterOperator.EQ, p.State),
+                            new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
                         ]);
                         oCityCombo.setValue(p.City || "");
                     }
@@ -489,7 +481,7 @@ sap.ui.define([
                     oStateCombo.getBinding("items")?.filter([
                         new sap.ui.model.Filter(
                             "countryCode",
-                            sap.ui.model.FilterOperator.EQ,
+                           FilterOperator.EQ,
                             sCountryCode
                         )
                     ]);
@@ -505,12 +497,12 @@ sap.ui.define([
                         oCityCombo.getBinding("items")?.filter([
                             new sap.ui.model.Filter(
                                 "stateName",
-                                sap.ui.model.FilterOperator.EQ,
+                               FilterOperator.EQ,
                                 p.State
                             ),
                             new sap.ui.model.Filter(
                                 "countryCode",
-                                sap.ui.model.FilterOperator.EQ,
+                                FilterOperator.EQ,
                                 sCountryCode
                             )
                         ]);
@@ -861,7 +853,7 @@ sap.ui.define([
                                 // Filter states (existing logic)
                                 const oStateCombo = sap.ui.getCore().byId(that.createId("ID_State_" + i));
                                 oStateCombo.getBinding("items").filter([
-                                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                                    new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
                                 ]);
 
                                 // Also set UI input maxLength for immediate UX feedback if input exists
@@ -914,8 +906,8 @@ sap.ui.define([
                                 // Filter cities
                                 const oCityCombo = sap.ui.getCore().byId(that.createId("ID_City_" + i));
                                 oCityCombo.getBinding("items").filter([
-                                    new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
-                                    new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, oCountryObj?.code)
+                                    new sap.ui.model.Filter("stateName", FilterOperator.EQ, sStateName),
+                                    new sap.ui.model.Filter("countryCode", FilterOperator.EQ, oCountryObj?.code)
                                 ]);
                                 oModel.refresh(true);
                             }
@@ -1090,7 +1082,7 @@ sap.ui.define([
 
                                 // 🔴 Validation: Document Type must be selected
                                 if (!sDocType) {
-                                    sap.m.MessageBox.error(that.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
+                                   MessageBox.error(that.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
 
                                     // Reset FileUploader
                                     oUploader.clear();
@@ -1100,7 +1092,7 @@ sap.ui.define([
                                 // 🔴 File size validation (2 MB)
                                 const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
                                 if (oFile.size > MAX_SIZE) {
-                                    sap.m.MessageBox.error(
+                                    MessageBox.error(
                                         "File size must be less than 2 MB.\nSelected file size: " +
                                         (oFile.size / 1024 / 1024).toFixed(2) + " MB"
                                     );
@@ -1306,7 +1298,7 @@ sap.ui.define([
                                 filters: [
                                     new sap.ui.model.Filter(
                                         "BranchCode",
-                                        sap.ui.model.FilterOperator.EQ,
+                                        FilterOperator.EQ,
                                         oModel.getProperty("/BranchCode")
                                     )
                                 ],
@@ -1514,7 +1506,7 @@ sap.ui.define([
             };
 
             if (selectedType === "Per Hour") {
-                sap.m.MessageBox.information(
+               MessageBox.information(
                     "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
                     { title: "Default Time Applied" }
                 );
@@ -1580,7 +1572,7 @@ sap.ui.define([
             }
 
             if (bHasError) {
-                sap.m.MessageBox.error(that.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
+               MessageBox.error(that.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
                 return; // ⛔ STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
@@ -1614,7 +1606,7 @@ sap.ui.define([
                 this._resetCouponAndDiscount();
                 const aMissing = this._checkMandatoryFields();
                 if (aMissing.length > 0) {
-                    sap.m.MessageBox.error(
+                   MessageBox.error(
                         "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
                     );
                     return;
@@ -2271,7 +2263,7 @@ sap.ui.define([
                         "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
                         "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
 
-                    sap.m.MessageBox.information(sMessage, {
+                    MessageBox.information(sMessage, {
                         title: "Check-in / Check-out Information"
                     });
 
@@ -2934,7 +2926,7 @@ sap.ui.define([
                     data: { Password: btoa(pass) },
                     filters: { UserID: this._oResetUser?.UserID }
                 });
-                sap.m.MessageBox.success("Password Updated Successfully", {
+               MessageBox.success("Password Updated Successfully", {
                     title: "Success",
                     onClose: () => {
 
@@ -3427,7 +3419,7 @@ sap.ui.define([
                     return;
                 }
 
-                sap.m.MessageBox.success("Registration Successful", {
+               MessageBox.success("Registration Successful", {
                     title: "Success",
                     onClose: () => {
 
@@ -3498,7 +3490,7 @@ sap.ui.define([
                     }
                 }
 
-                sap.m.MessageBox.error(sMsg, {
+                MessageBox.error(sMsg, {
                     title: "Registration Failed"
                 });
 
@@ -3889,7 +3881,7 @@ sap.ui.define([
                 oState.getBinding("items")?.filter([
                     new sap.ui.model.Filter(
                         "countryCode",
-                        sap.ui.model.FilterOperator.EQ,
+                        FilterOperator.EQ,
                         sCountryCode
                     )
                 ]);
@@ -4488,9 +4480,6 @@ sap.ui.define([
                 // Extract BookingDetails array
                 const aBookingDetails = oResponse.BookingDetails || [];
                 BusyIndicator.hide()
-                // Prepare message text
-                //    var oBtn = this.byId("couponApplyBtn");
-                //       oBtn.setText("Apply Now")
                 oModel.setProperty("/CouponCode", "")
                 let sMessage = "Booking Successful!\n\n";
 
@@ -4499,20 +4488,20 @@ sap.ui.define([
                 });
 
                 // Show success box
-                sap.m.MessageBox.success(sMessage, {
+               MessageBox.success(sMessage, {
                     title: "Success",
-                    actions: [sap.m.MessageBox.Action.OK],
+                    actions: [MessageBox.Action.OK],
                     onClose: function () {
                         // Check login status
                         const oLoginModel = sap.ui.getCore().getModel("LoginModel");
                         const isLoggedIn = oLoginModel && oLoginModel.getProperty("/UserID");
 
                         if (!isLoggedIn) {
-                            sap.m.MessageBox.warning(
+                            MessageBox.warning(
                                 "You are Booking as a guest and you will not be able to see the Booking History.",
                                 {
                                     title: "Guest Booking",
-                                    actions: [sap.m.MessageBox.Action.OK],
+                                    actions: [MessageBox.Action.OK],
                                     onClose: function () {
                                         // Continue navigation after warning
                                         this._navigateAfterBooking();
@@ -4549,7 +4538,7 @@ sap.ui.define([
                 }
 
                 MessageToast.show(errorMsg);
-                sap.m.MessageBox.error(errorMsg);
+                MessageBox.error(errorMsg);
             }
         },
 
@@ -4839,14 +4828,14 @@ sap.ui.define([
 
                     // Filter States by Country
                     oStateCB.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
                     ]);
 
                     if (sState) {
                         // Filter Cities by State + Country
                         const aFilters = [
-                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
-                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            new sap.ui.model.Filter("stateName", FilterOperator.EQ, sState),
+                            new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
                         ];
                         oSourceCB.getBinding("items")?.filter(aFilters);
                     }
@@ -5662,7 +5651,7 @@ sap.ui.define([
 
                 } catch (err) {
                     console.error("Error during update:", err);
-                    sap.m.MessageBox.error("Failed to Update Booking Details: " + err.message);
+                    MessageBox.error("Failed to Update Booking Details: " + err.message);
                 }
             }
         },

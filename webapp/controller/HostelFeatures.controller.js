@@ -108,7 +108,8 @@ sap.ui.define([
             const oSelected = oTable.getSelectedItem();
 
             if (!oSelected) {
-                return sap.m.MessageToast.show(this.i18nModel.getText("MSediterr."));
+                sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
+                 return ;
             }
 
             const oData = oSelected.getBindingContext("HostelFeatures").getObject();
@@ -144,6 +145,7 @@ sap.ui.define([
 
         HF_onCancelButtonPress: function() {
             this.ARD_Dialog.close();
+          this.byId("HFF_id_BranchCode").setValueState("None");
             this.byId("HF_HostelFeatureTable").removeSelections(true);
         },
 
@@ -185,7 +187,8 @@ sap.ui.define([
             }
 
             if (!oUpload.Photo1Name) {
-                return sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage."));
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+                return;
             }
 
             //  Duplicate check
