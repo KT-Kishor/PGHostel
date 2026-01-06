@@ -307,8 +307,9 @@ sap.ui.define([
             filters.Type = oExistingModel.EmployeeID;
 
             // BranchCode applied based on role
-            if (oExistingModel.Role !== "") {
+            if (oExistingModel.Role === "Admin") {
                 filters.BranchCode = aBranchCodes;
+                filters.Role = "Admin";
             }
 
             // Apply UserID filter
