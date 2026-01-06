@@ -23,7 +23,7 @@
         >
             <f:content>
                 <!-- Facility Name -->
-                <Label text="{i18n>facilityname}" />
+                <Label text="{i18n>facilityname}" required="true"/>
                 <ComboBox
                     id="editFacilityName"
                     placeholder="{i18n>selectFacility}"
@@ -88,7 +88,7 @@
                 </ComboBox>
 
                 <!-- Start Date -->
-                <Label text="{i18n>startDate}" />
+                <Label text="{i18n>startDate}" required="true"/>
                 <DatePicker
                     id="editStartDate"
                     value="{edit>/StartDate}"
@@ -159,7 +159,7 @@
                 </Select>
 
                 <!-- End Date -->
-                <Label text="{i18n>endDate}" />
+                <Label text="{i18n>endDate}" required="true"/>
                 <DatePicker
                     id="editEndDate"
                     editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
