@@ -4,11 +4,13 @@ sap.ui.define([
     "../model/formatter",
     "../utils/validation",
     "sap/ui/core/BusyIndicator",
+    "sap/m/MessageToast"
 ], function (
     BaseController,
     JSONModel,
     Formatter, utils,
-    BusyIndicator
+    BusyIndicator,
+    MessageToast
 ) {
     "use strict";
 
@@ -231,7 +233,7 @@ sap.ui.define([
 
             try {
                 // ✅ SHOW busy immediately
-               BusyIndicator.show(0);
+                BusyIndicator.show(0);
 
                 const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
                 const oBranch = oHostelModel.BranchCode;
@@ -292,7 +294,7 @@ sap.ui.define([
 
             } finally {
                 // ✅ ALWAYS hide busy
-               BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         }
         ,
@@ -763,7 +765,7 @@ sap.ui.define([
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
-                                    sap.m.MessageToast.show(that.i18nModel.getText("dateofBirthcannotbeFuture"));
+                                    MessageToast.show(that.i18nModel.getText("dateofBirthcannotbeFuture"));
                                     oEvent.getSource().setValue("");
                                 }
                             }
@@ -1167,7 +1169,7 @@ sap.ui.define([
                                 }
 
                                 if (!oUploader) {
-                                    sap.m.MessageToast.show(that.i18nModel.getText("unablelocateuploader"));
+                                    MessageToast.show(that.i18nModel.getText("unablelocateuploader"));
                                     return;
                                 }
 
@@ -1710,9 +1712,9 @@ sap.ui.define([
                 oHostelModel.getProperty("/SelectedPerson")
             );
 
-            // ❌ BLOCK HEADER JUMP IF STEP 1 INVALID
+            //  BLOCK HEADER JUMP IF STEP 1 INVALID
             if (iTargetIndex > 0 && !bStep1Valid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleasecompleteBookingInformationbeforeproceeding"));
+                MessageToast.show(this.i18nModel.getText("pleasecompleteBookingInformationbeforeproceeding"));
 
                 this._resetWizardFromStep1();
                 return;
@@ -1900,7 +1902,7 @@ sap.ui.define([
             let iDays = Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;
 
             if (iDays <= 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return;
             }
 
@@ -2024,7 +2026,7 @@ sap.ui.define([
             const diffHours = 1; // keep your logic unchanged
 
             if (iDays <= 0 && diffHours <= 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
 
@@ -2251,7 +2253,7 @@ sap.ui.define([
                 if (diffDays <= 0) {
                     oEndDatePicker.setValueState("Error");
                     oEndDatePicker.setValueStateText(this.i18nModel.getText("endDateCannotbeforeStartDate"));
-                    sap.m.MessageToast.show(this.i18nModel.getText("endDateCannotbeforeStartDate"));
+                    MessageToast.show(this.i18nModel.getText("endDateCannotbeforeStartDate"));
                     oHostelModel.setProperty("/EndDate", "");
                     oBtnModel.setProperty("/Next", false);
                     return;
@@ -2337,13 +2339,13 @@ sap.ui.define([
             const pwd = oInput.getValue();
 
             if (!pwd) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
+                MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
                 return;
             }
 
             navigator.clipboard.writeText(pwd)
                 .then(() => {
-                    sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
+                    MessageToast.show(this.i18nModel.getText("passwordCopied"));
                 })
                 .catch(() => {
 
@@ -2355,10 +2357,10 @@ sap.ui.define([
                         document.execCommand("copy");
                         document.body.removeChild(oTemp);
 
-                        sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
+                        MessageToast.show(this.i18nModel.getText("passwordCopied"));
 
                     } catch (err) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("copyFailed"));
+                        MessageToast.show(this.i18nModel.getText("copyFailed"));
                     }
                 });
         },
@@ -2377,21 +2379,21 @@ sap.ui.define([
             const sStartDate = oView.byId("idStartDate1")?.getValue() || "";
 
             if (!sStartDate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
                 return;
             }
 
             // Convert dd/MM/yyyy → Date object
             const oStart = this._parseDate(sStartDate);
             if (!(oStart instanceof Date) || isNaN(oStart)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartDate"));
+                MessageToast.show(this.i18nModel.getText("invalidStartDate"));
                 return;
             }
 
             // Work on a copy
             let oEnd = new Date(oStart);
 
-            // ⭐ REAL DATE LOGIC (CALENDAR ACCURATE)
+            //  REAL DATE LOGIC (CALENDAR ACCURATE)
             if (sDuration === "Per Month") {
                 oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
                 oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
@@ -2401,7 +2403,7 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
             }
             else if (sDuration === "Per Day") {
-                sap.m.MessageToast.show(this.i18nModel.getText("durationperdayNoSelectionNeeded"));
+                MessageToast.show(this.i18nModel.getText("durationperdayNoSelectionNeeded"));
                 return;
             }
 
@@ -2709,7 +2711,7 @@ sap.ui.define([
             // Always validate UserID and UserName
             if (!utils._LCvalidateMandatoryField(ctrlUserId, "ID") ||
                 !utils._LCvalidateMandatoryField(ctrlUserName, "ID")) {
-                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
 
@@ -2722,7 +2724,7 @@ sap.ui.define([
                         ctrlPassword.setValueState("Error");
                         ctrlPassword.setValueStateText(this.i18nModel, getText("enterValidPassword"));
                     }
-                    sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
+                    MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                     return;
                 } else if (ctrlPassword) {
                     ctrlPassword.setValueState("None");
@@ -2745,7 +2747,7 @@ sap.ui.define([
 
                     // 1️⃣ OTP has NOT been generated
                     if (!showOTPField) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
+                        MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
                         return;
                     }
 
@@ -2753,7 +2755,7 @@ sap.ui.define([
                     if (!isOtpEntered) {
                         otpCtrl.setValueState("Error");
                         otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                         return;
                     }
 
@@ -2761,14 +2763,14 @@ sap.ui.define([
                     if (!/^\d{6}$/.test(sOTP)) {
                         otpCtrl.setValueState("Error");
                         otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                         return;
                     }
 
                     // 4️⃣ Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
                     if (!isValid) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+                        MessageToast.show(this.i18nModel.getText("incorrectOTP"));
                         return;
                     }
 
@@ -2785,7 +2787,7 @@ sap.ui.define([
                             passCtrl.setValueState("Error");
                             passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
                         }
-                        sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
+                        MessageToast.show(this.i18nModel.getText("passwordRequired"));
                         return;
                     }
 
@@ -2795,7 +2797,7 @@ sap.ui.define([
                             passCtrl.setValueState("Error");
                             passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
                         }
-                        sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
+                        MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                         return;
                     }
 
@@ -2813,7 +2815,7 @@ sap.ui.define([
                 const oMatchedUser = oResponse?.data?.[0];
 
                 if (!oMatchedUser || !oMatchedUser.UserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentials"));
+                    MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
 
@@ -2876,7 +2878,7 @@ sap.ui.define([
                 oHostelModel.refresh(true);
 
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Invalid Credentials, Please try again");
+                MessageToast.show(err.message || "Invalid Credentials, Please try again");
             } finally {
                 BusyIndicator.hide();
             }
@@ -2897,7 +2899,7 @@ sap.ui.define([
             if (!pass) {
                 oNew.setValueState("Error");
                 oNew.setValueStateText(this.i18nModel.getText("passwordRequired"));
-                sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
+                MessageToast.show(this.i18nModel.getText("passwordRequired"));
                 return;
             }
 
@@ -2912,7 +2914,7 @@ sap.ui.define([
             if (!confirm) {
                 oConf.setValueState("Error");
                 oConf.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
-                sap.m.MessageToast.show(this.i18nModel.getText("confirmPasswordRequired"));
+                MessageToast.show(this.i18nModel.getText("confirmPasswordRequired"));
                 return;
             }
 
@@ -2920,7 +2922,7 @@ sap.ui.define([
             if (pass !== confirm) {
                 oConf.setValueState("Error");
                 oConf.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
-                sap.m.MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
+                MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
                 return;
             }
             //  PASSED ALL VALIDATIONS → SUCCESS STATE
@@ -2957,7 +2959,7 @@ sap.ui.define([
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
+                MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
                 BusyIndicator.hide();  // ALWAYS stop
@@ -3035,7 +3037,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName"), "ID");
 
             if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
@@ -3057,7 +3059,7 @@ sap.ui.define([
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
 
                 if (oResp?.success) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
+                    MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -3067,11 +3069,11 @@ sap.ui.define([
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
                 } else {
-                    sap.m.MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
+                    MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show("Record not found\nPlease check your\nUser ID / User Name");
+                MessageToast.show("Record not found\nPlease check your\nUser ID / User Name");
             } finally {
                 BusyIndicator.hide();
             }
@@ -3110,7 +3112,7 @@ sap.ui.define([
             // Validate inputs
             if (!utils._LCvalidateMandatoryField(oUserIdCtrl, "ID") ||
                 !utils._LCvalidateMandatoryField(oUserNameCtrl, "ID")) {
-                sap.m.MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
+                MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
                 return;
             }
 
@@ -3127,7 +3129,7 @@ sap.ui.define([
 
                 if (oResp?.success) {
 
-                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
+                    MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
@@ -3149,11 +3151,11 @@ sap.ui.define([
 
                 }
                 else {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
+                    MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
+                MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
             } finally {
                 BusyIndicator.hide();
             }
@@ -3179,14 +3181,14 @@ sap.ui.define([
             if (!otp) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
                 oOtpInput.setValueStateText(this.i18nModel.getText("pleaseEnterOTP"));
-                sap.m.MessageToast.show(this.i18nModel.getText("enterOTP"));
+                MessageToast.show(this.i18nModel.getText("enterOTP"));
                 return;
             }
 
             if (!/^\d{6}$/.test(otp)) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
                 oOtpInput.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidOTP"));
+                MessageToast.show(this.i18nModel.getText("invalidOTP"));
                 return;
             }
 
@@ -3200,20 +3202,20 @@ sap.ui.define([
             try {
                 isValid = await this._verifyOTPWithBackend(otp);
             } catch (e) {
-                sap.m.MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
+                MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
                 return;
             }
 
             if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+                MessageToast.show(this.i18nModel.getText("incorrectOTP"));
                 return;
             }
 
-            // ✅ OTP accepted: reset resend cooldown state
+            //  OTP accepted: reset resend cooldown state
             this._resetOtpCooldown();
 
             // --------------------------
-            // 📌 Forgot Password Flow
+            //  Forgot Password Flow
             // --------------------------
             if (flow === "forgot") {
                 vm.setProperty("/forgotStep", 3);
@@ -3231,14 +3233,14 @@ sap.ui.define([
                     OTP: otp
                 });
 
-                sap.m.MessageToast.show(this.i18nModel.getText("loginSuccessful"));
+                MessageToast.show(this.i18nModel.getText("loginSuccessful"));
                 this._setLoggedInUser(resp.data[0]);
                 this._resetAllAuthFields();
                 this._oSignDialog.close();
 
             } catch (e) {
 
-                sap.m.MessageToast.show(this.i18nModel.getText("loginFailed"));
+                MessageToast.show(this.i18nModel.getText("loginFailed"));
                 console.error("OTP login error:", e);
 
             }
@@ -3384,7 +3386,7 @@ sap.ui.define([
             );
 
             if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+                MessageToast.show(this.i18nModel.getText("MSfillallfields"));
                 return;
             }
             // ---- PAYLOAD BUILD ----
@@ -3420,7 +3422,7 @@ sap.ui.define([
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
                 if (!oResp || oResp.success !== true) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("registrationFailedPleasetryagain"));
+                    MessageToast.show(this.i18nModel.getText("registrationFailedPleasetryagain"));
                     console.error("SignUp Error Response:", oResp);
                     return;
                 }
@@ -4304,7 +4306,7 @@ sap.ui.define([
                 );
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                    MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                     return;
                 }
             }
@@ -4316,7 +4318,7 @@ sap.ui.define([
             if (!rawEntered || rawEntered === "." || rawEntered.endsWith(".")) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText(this.i18nModel.getText("pleaseenterValidAmount"));
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseenterValidAmount"));
+                MessageToast.show(this.i18nModel.getText("pleaseenterValidAmount"));
                 return;
             }
 
@@ -4327,7 +4329,7 @@ sap.ui.define([
             /* ================= NaN ================= */
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oAmountInput.setValueState("Error");
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidAmountFormat"));
+                MessageToast.show(this.i18nModel.getText("invalidAmountFormat"));
                 return;
             }
 
@@ -4335,7 +4337,7 @@ sap.ui.define([
             if (enteredAmount > grandTotal) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
-                sap.m.MessageToast.show(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
+                MessageToast.show(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
                 return;
             }
             oAmountInput.setValueState("None");
@@ -4546,7 +4548,7 @@ sap.ui.define([
                     errorMsg = e.message;
                 }
 
-                sap.m.MessageToast.show(errorMsg);
+                MessageToast.show(errorMsg);
                 sap.m.MessageBox.error(errorMsg);
             }
         },
@@ -4582,7 +4584,6 @@ sap.ui.define([
 
         _onLogout: function () {
             this._oProfileActionSheet.close();
-            // sap.m.MessageToast.show("Logging out...");
             this._oLoggedInUser = null;
             if (this._oProfileDialog) {
                 this._oProfileDialog.destroy();
@@ -4636,7 +4637,7 @@ sap.ui.define([
                 }
                 const sUserID = oUser.UserID;
                 if (!sUserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
+                    MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
                     return;
                 }
                 fullUserData = oUser;
@@ -5167,7 +5168,7 @@ sap.ui.define([
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
                 if (!sUserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
+                    MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
                     return;
                 }
                 const payload = {
@@ -5182,18 +5183,18 @@ sap.ui.define([
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
 
-                sap.m.MessageToast.show(this.i18nModel.getText("profilePhotoUpdated"));
+                MessageToast.show(this.i18nModel.getText("profilePhotoUpdated"));
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
+                MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
 
         onPreviewProfilePhoto: function () {
             const sPhoto = this._oProfileDialog.getModel("profileData").getProperty("/photo");
             if (!sPhoto) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
+                MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
                 return;
             }
             if (!this._oPreviewDialog) {
@@ -5247,10 +5248,10 @@ sap.ui.define([
                     data: oPayload,
                     filters: filter
                 });
-                sap.m.MessageToast.show(this.i18nModel.getText("dataSavedSuccessfully"));
+                MessageToast.show(this.i18nModel.getText("dataSavedSuccessfully"));
                 oSaveModel.setProperty("/isEditMode", false);
             } catch (error) {
-                sap.m.MessageToast.show("Failed");
+                MessageToast.show("Failed");
             }
         },
 
@@ -5283,7 +5284,7 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
             const payload = {
@@ -5308,15 +5309,15 @@ sap.ui.define([
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
-                sap.m.MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
+                MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
+                MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
-                
+
             }
         },
 
@@ -5331,13 +5332,13 @@ sap.ui.define([
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
             var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
@@ -5454,7 +5455,7 @@ sap.ui.define([
             var oSelectedItem = oTable.getSelectedItem();
 
             if (!oSelectedItem) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectBookingtoEdit"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectBookingtoEdit"));
                 return;
             }
 
@@ -5468,7 +5469,7 @@ sap.ui.define([
             var sStatus = (oBookingData.status || "").trim().toLowerCase();
 
             if (sStatus !== "new") {
-                sap.m.MessageToast.show(this.i18nModel.getText("onlyBookingswithStatusNewcanbeEdited"));
+                MessageToast.show(this.i18nModel.getText("onlyBookingswithStatusNewcanbeEdited"));
                 return;  // ❗ STOP — DO NOT NAVIGATE
             }
             // -------------------------------
@@ -5482,14 +5483,14 @@ sap.ui.define([
             var sCustomerID = oBookingData.cutomerid || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             // Find customer
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
 
@@ -5657,7 +5658,7 @@ sap.ui.define([
                             CustomerID: custid
                         }
                     });
-                    sap.m.MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
+                    MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
 
                 } catch (err) {
                     console.error("Error during update:", err);
@@ -5686,7 +5687,7 @@ sap.ui.define([
                 oHostelModel.setProperty("/RoomType", oSelectedBedType.BedTypeName);
                 oHostelModel.setProperty("/RoomPrice", oSelectedBedType.Price);
 
-                sap.m.MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
+                MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
             }
         },
 

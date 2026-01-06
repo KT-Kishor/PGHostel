@@ -3,7 +3,10 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
     "../utils/validation",
-], (Controller, JSONModel, Formatter, utils) => {
+    "sap/ui/core/BusyIndicator",
+    "sap/m/MessageToast"
+
+], (Controller, JSONModel, Formatter, utils,BusyIndicator,MessageToast) => {
     "use strict";
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
@@ -11,15 +14,6 @@ sap.ui.define([
             this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             var oBtn = this.byId("couponApplyBtn");
             oBtn.setText("Apply Now")
-            var oModel = sap.ui.getCore().getModel("LoginModel");
-            // var userId = oModel.getProperty("/UserID");
-            // var oHBox = this.byId("SummaryCouponid");
-
-            // if (userId) {
-            //     oHBox.setVisible(true);   // Show when UserID exists
-            // } else {
-            //     oHBox.setVisible(false);  // Hide when UserID is empty/null
-            // }
             var inputID = this.getView().byId("BookingcouponInput")
             inputID.setShowValueHelp(false)
 
@@ -37,7 +31,7 @@ sap.ui.define([
         onTableSelection: function (oEvent) {
             const oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noRowSelected"));
+                MessageToast.show(this.i18nModel.getText("noRowSelected"));
                 return;
             }
 
@@ -45,7 +39,7 @@ sap.ui.define([
 
             const oContext = oSelectedItem.getBindingContext("HostelModel");
             if (!oContext) {
-                sap.m.MessageToast.show(this.i18nModel.getText("selectionhasnoBindingContext"));
+                MessageToast.show(this.i18nModel.getText("selectionhasnoBindingContext"));
                 return;
             }
 
@@ -76,7 +70,7 @@ sap.ui.define([
             this.getView().getModel("DateRangeModel").setProperty("/minEndDate", new Date(oEditModel.EndDate.split("/").reverse().join("-")));
 
             if (!this._oSelectedFacility) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRowEdit"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRowEdit"));
                 return;
             }
 
@@ -171,7 +165,7 @@ sap.ui.define([
 
             if (!oFacilityData) {
                 console.error("Facility not found:", this._oSelectedFacility);
-                sap.m.MessageToast.show(this.i18nModel.getText("facilityDataMissing"));
+                MessageToast.show(this.i18nModel.getText("facilityDataMissing"));
                 return;
             }
 
@@ -265,13 +259,13 @@ sap.ui.define([
             const iSelectedNumber = parseInt(oEvent.getSource().getSelectedKey() || "1", 10);
 
             if (!sStartDate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
                 return;
             }
 
             const oStart = this._parseDate(sStartDate);
             if (!(oStart instanceof Date) || isNaN(oStart)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartDate"));
+                MessageToast.show(this.i18nModel.getText("invalidStartDate"));
                 return;
             }
 
@@ -437,7 +431,7 @@ sap.ui.define([
             const oEditModel = oView.getModel("edit");
 
             if (!oHostelModel || !oEditModel) {
-                sap.m.MessageToast.show(this.i18nModel.getText("missingModels"));
+                MessageToast.show(this.i18nModel.getText("missingModels"));
                 return;
             }
 
@@ -454,7 +448,7 @@ sap.ui.define([
                 utils._LCvalidateDate(oEndDate, "ID");
 
             if (!isDateValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateEndDate"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateEndDate"));
                 return;
             }
 
@@ -478,7 +472,7 @@ sap.ui.define([
 
 
                 if (!isMandatoryValid) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                    MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                     return;
                 }
 
@@ -487,20 +481,11 @@ sap.ui.define([
                 const end = new Date("1970-01-01T" + oEndTime.getValue() + ":00");
 
                 if (start >= end) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("startTimeShouldbeLessthanEndTime"));
+                    MessageToast.show(this.i18nModel.getText("startTimeShouldbeLessthanEndTime"));
                     return;
                 }
             }
-
-            // const oUnitText = sap.ui.core.Fragment.byId(sViewId, "FT_id_UnitType");
-
-            //  BLOCK SAVE if ComboBox invalid
-            // if (oUnitText.getValueState() === sap.ui.core.ValueState.Error || !oUnitText.getSelectedItem()) {
-            //     utils._LCvalidationComboBox(oUnitText, "ID");
-            //     sap.m.MessageBox.error("Please select a valid Unit Type.");
-            //     return;
-            // }
-
+            // 1. Update global facility list
             const oUpdatedData = Object.assign({}, oEditModel.getData()); // shallow copy
             let aFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
 
@@ -543,12 +528,10 @@ sap.ui.define([
                     all: aFacilities,
                     selected: this._oSelectedFacility
                 });
-                sap.m.MessageToast.show(this.i18nModel.getText("couldnotfindSelectedFacilityGloballistPleasereselectRowtryagain"));
+                MessageToast.show(this.i18nModel.getText("couldnotfindSelectedFacilityGloballistPleasereselectRowtryagain"));
                 return;
             }
 
-            // Replace the facility entry at the found index
-            //aFacilities[iIndex] = oUpdatedData;
             // After updating aFacilities and setting it globally:
             const aPersons = oHostelModel.getProperty("/Persons") || [];
             aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex] = oUpdatedData;
@@ -556,32 +539,32 @@ sap.ui.define([
             // 2. Update global list so table refreshes
             aFacilities[iIndex] = oUpdatedData;
             oHostelModel.setProperty("/AllSelectedFacilities", aFacilities);
-            // --- FIX FOR PER HOUR FACILITY (ensures TotalTime goes to payload) ---
+
             // --- FIX FOR PER HOUR FACILITY ---
-           if (oUpdatedData.UnitText === "Per Hour") {
+            if (oUpdatedData.UnitText === "Per Hour") {
 
-    const hours = Number(oUpdatedData.TotalTime) || 1;
-    const price = Number(oUpdatedData.Price) || 0;
+                const hours = Number(oUpdatedData.TotalTime) || 1;
+                const price = Number(oUpdatedData.Price) || 0;
 
-    // Global list
-    aFacilities[iIndex].TotalTime = hours;
-    aFacilities[iIndex].StartTime = oUpdatedData.StartTime;   // ✅ ADD
-    aFacilities[iIndex].EndTime = oUpdatedData.EndTime;       // ✅ ADD
-    aFacilities[iIndex].TotalAmount = price * hours;
+                // Global list
+                aFacilities[iIndex].TotalTime = hours;
+                aFacilities[iIndex].StartTime = oUpdatedData.StartTime;  
+                aFacilities[iIndex].EndTime = oUpdatedData.EndTime;      
+                aFacilities[iIndex].TotalAmount = price * hours;
 
-    // Per-person list
-    if (
-        aPersons[oUpdatedData.ID] &&
-        aPersons[oUpdatedData.ID].AllSelectedFacilities &&
-        aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
-    ) {
-        const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
-        oFac.TotalTime = hours;
-        oFac.StartTime = oUpdatedData.StartTime;               // ✅ ADD
-        oFac.EndTime = oUpdatedData.EndTime;                   // ✅ ADD
-        oFac.TotalAmount = price * hours;
-    }
-}
+                // Per-person list
+                if (
+                    aPersons[oUpdatedData.ID] &&
+                    aPersons[oUpdatedData.ID].AllSelectedFacilities &&
+                    aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex]
+                ) {
+                    const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
+                    oFac.TotalTime = hours;
+                    oFac.StartTime = oUpdatedData.StartTime;              
+                    oFac.EndTime = oUpdatedData.EndTime;                  
+                    oFac.TotalAmount = price * hours;
+                }
+            }
 
 
             // 3. Apply model refresh
@@ -655,10 +638,10 @@ sap.ui.define([
                 oHostelModel.setProperty("/AppliedDiscount", recalculatedDiscount);
             }
 
-            // 🔥 CHECK MIN ORDER VALUE AFTER FACILITY UPDATE
+            //  CHECK MIN ORDER VALUE AFTER FACILITY UPDATE
             if (couponCode && updatedSubtotal < minOrderValue) {
 
-                // ❌ Coupon invalid now → remove it completely
+                //  Coupon invalid now → remove it completely
                 oHostelModel.setProperty("/CouponCode", "");
                 oHostelModel.setProperty("/AppliedDiscount", 0);
                 oHostelModel.setProperty("/AppliedDiscountType", "");
@@ -670,10 +653,10 @@ sap.ui.define([
                 // Reset button
                 if (oBtn) oBtn.setText("Apply Now");
 
-                sap.m.MessageToast.show(this.i18nModel.getText("couponRemovedTotalLessthanMinimumOrderValue"));
+                MessageToast.show(this.i18nModel.getText("couponRemovedTotalLessthanMinimumOrderValue"));
             }
 
-            // 6️⃣ Re-apply taxes (India → CGST + SGST)
+            // 6 Re-apply taxes (India → CGST + SGST)
             const isIndia = oHostelModel.getProperty("/IsIndia");
             let cgst = 0, sgst = 0, finalTotal = updatedSubtotal;
 
@@ -734,7 +717,7 @@ sap.ui.define([
             this._oSelectedFacility = null;
             this._oSelectedIndex = null;
             this._sSelectedPath = null;
-            sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
+            MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
         },
 
         _formatDateToDDMMYYYY: function (dt) {
@@ -808,7 +791,7 @@ sap.ui.define([
 
                     if (!fStartDate || !fEndDate) {
                         // Skip invalid dates
-                        sap.m.MessageToast.show("Invalid Facility Start/End Date for " + (f.FacilityName || ""));
+                      MessageToast.show("Invalid Facility Start/End Date for " + (f.FacilityName || ""));
                         return;
                     }
                     // USE the user-calculated dialog value directly
@@ -816,7 +799,7 @@ sap.ui.define([
 
 
                     if (fDays <= 0) {
-                        sap.m.MessageToast.show("Facility End Date must be Same or after Start Date for " + (f.FacilityName || ""));
+                       MessageToast.show("Facility End Date must be Same or after Start Date for " + (f.FacilityName || ""));
                         return;
                     }
 
@@ -824,7 +807,6 @@ sap.ui.define([
                     const fPrice = parseFloat(f.Price || 0) || 0;
                     let fTotal = 0;
 
-                    // For per-hour calculation: use the user-provided TotalTime (hours per day)
                     // Prefer f.TotalTime (string like "02:00" or "2") or fallback to f.TotalHours if set
                     const hoursPerDayFromTotalTime = parseTotalTimeToHours(f.TotalTime);
                     const hoursPerDayFallback = Number(f.TotalHours || 0); // older field maybe exist
@@ -927,11 +909,7 @@ sap.ui.define([
                 FinalTotal: +finalTotal.toFixed(2),
                 AllSelectedFacilities: aAllFacilities
             };
-            // return {
-            //     TotalFacilityPrice: +totalFacilityPrice.toFixed(2),
-            //     GrandTotal: +grandTotal.toFixed(2),
-            //     AllSelectedFacilities: aAllFacilities
-            // };
+           
         },
 
         _parseDate: function (s) {
@@ -950,10 +928,10 @@ sap.ui.define([
         onUnitTextChange: function (oEvent) {
             const oCombo = oEvent.getSource();
 
-            // 🔴 Typed value (no selectedItem)
+            //  Typed value (no selectedItem)
             if (!oCombo.getSelectedItem()) {
                 utils._LCvalidationComboBox(oEvent); // SAFE call
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
+                MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
                 return;
             }
 
@@ -983,7 +961,7 @@ sap.ui.define([
             );
 
             if (!oMatched) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
+               MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
                 return;
             }
 
@@ -1021,7 +999,7 @@ sap.ui.define([
             const oDoc = oCtx && oCtx.getObject();
 
             if (!oDoc || !oDoc.Document) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
+               MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
                 return;
             }
 
@@ -1159,7 +1137,7 @@ sap.ui.define([
 
             // Validate number format
             if (isNaN(startHour) || isNaN(endHour)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
+               MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
                 oEditModel.setProperty("/TotalTime", "");
                 oTimePicker.setValueState("Error");
                 return;
@@ -1167,7 +1145,7 @@ sap.ui.define([
 
             // Validate end > start
             if (endHour < startHour) {
-                sap.m.MessageToast.show(this.i18nModel.getText("endTimeShouldbeGreaterthanStartTime"));
+                MessageToast.show(this.i18nModel.getText("endTimeShouldbeGreaterthanStartTime"));
                 oEditModel.setProperty("/TotalTime", "");
                 oTimePicker.setValueState("Error");
                 oTimePicker.setValueStateText(this.i18nModel.getText("endTimecannotbeearlierthanStartTime"));
@@ -1259,12 +1237,11 @@ sap.ui.define([
         onChangeCouponCode: async function (oEvent) {
             var oHostelModel = this.getView().getModel("HostelModel");
             var oBtn = this.byId("couponApplyBtn");
-            //  sap.ui.getCore().byId(this.createId("couponApplyBtn"))
             var sEnteredCode = oHostelModel.getProperty("/CouponCode")?.trim();
             var sBranchCode = oHostelModel.getProperty("/BranchCode");
 
             if (sEnteredCode === "") {
-                sap.m.MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
+               MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
                 return;
             }
 
@@ -1281,17 +1258,17 @@ sap.ui.define([
                 oHostelModel.setProperty("/SGST", originalSGST);
                 oHostelModel.setProperty("/FinalTotalCost", originalFinal);
 
-                sap.m.MessageToast.show(this.i18nModel.getText("couponRemovedPricesRestored"));
+                MessageToast.show(this.i18nModel.getText("couponRemovedPricesRestored"));
                 return;
             }
 
             if (!sEnteredCode) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
+               MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
                 return;
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
 
                 const filter = {
                     CouponCode: sEnteredCode,
@@ -1303,7 +1280,7 @@ sap.ui.define([
                 const aCoupons = response?.data || [];
 
                 if (!aCoupons.length) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("noCouponsFound"));
+                    MessageToast.show(this.i18nModel.getText("noCouponsFound"));
                     return;
                 }
                 const CouponCodeEnddate = aCoupons[0].EndDate;
@@ -1312,7 +1289,7 @@ sap.ui.define([
 
                 // Compare
                 if (couponEndISO < todayISO) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("couponisExpired"));
+                    MessageToast.show(this.i18nModel.getText("couponisExpired"));
                     return;
                 }
                 // Match coupon
@@ -1321,14 +1298,14 @@ sap.ui.define([
                 );
 
                 if (!oMatched) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+                    MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                     return;
                 }
                 const couponBranch = String(oMatched.BranchCode || "").trim();
                 const selectedBranch = String(sBranchCode || "").trim();
 
                 if (couponBranch && couponBranch !== selectedBranch) {
-                    sap.m.MessageToast.show(
+                   MessageToast.show(
                         this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
                     );
                     return;
@@ -1346,11 +1323,11 @@ sap.ui.define([
                 let subTotal = Number(oHostelModel.getProperty("/OverallTotalCost") || 0);
 
                 if (subTotal <= 0) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("subtotalisZeroCannotApplyCoupon"));
+                    MessageToast.show(this.i18nModel.getText("subtotalisZeroCannotApplyCoupon"));
                     return;
                 }
                 if (subTotal < minOrderValue) {
-                    sap.m.MessageToast.show(
+                    MessageToast.show(
                         `Minimum Order Value ₹${minOrderValue} required to Apply this Coupon.`
                     );
                     return;
@@ -1379,7 +1356,7 @@ sap.ui.define([
                 oHostelModel.setProperty("/AppliedDiscount", discountAmount);
 
                 // ------------------------------------------
-                // ⭐ APPLY TAX CALCULATIONS AGAIN
+                //  APPLY TAX CALCULATIONS AGAIN
                 // ------------------------------------------
                 let finalTotal = discountedSubtotal;
                 let cgst = 0, sgst = 0;
@@ -1397,15 +1374,15 @@ sap.ui.define([
 
                 oHostelModel.refresh(true);
                 oBtn.setVisible(false);
-                sap.m.MessageToast.show(
+                MessageToast.show(
                     this.i18nModel.getText("couponAppliedSuccessfully")
                 );
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
+                MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
     });
