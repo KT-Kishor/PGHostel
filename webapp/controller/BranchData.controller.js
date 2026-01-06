@@ -103,7 +103,7 @@ sap.ui.define([
             this.ajaxReadWithJQuery("HM_Branch", filters).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(oFCIAerData);
-                this.getView().setModel(model, "mainModel")
+                this.getOwnerComponent().setModel(model, "mainModel")
                 sap.ui.core.BusyIndicator.hide();
             })
         },
@@ -453,13 +453,11 @@ sap.ui.define([
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
-
         },
 
         onHome: function () {
             this.CommonLogoutFunction();
             this.getView().getModel("mainModel").setData({});
-
         },
 
         MD_onCancelButtonPress: function () {

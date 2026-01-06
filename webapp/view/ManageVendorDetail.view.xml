@@ -62,7 +62,7 @@
                                                 text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
                                                 press="onEditOrSavePress"
                                                 visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                                                 || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                                             />
                                         </m:Toolbar>
                                     </f:toolbar>
@@ -335,7 +335,7 @@
                                                 <m:VBox
                                                     id="MV_id_adminUploaderWrapper"
                                                     visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                                                    || ${AdminSignupModel>/Status} !== 'Active' }"
+                                                    &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                                                 >
                                                     <u:FileUploader
                                                         id="MV_id_adminFileUploader"

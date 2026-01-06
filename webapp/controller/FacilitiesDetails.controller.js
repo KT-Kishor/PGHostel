@@ -101,6 +101,8 @@ sap.ui.define([
         BI_onButtonPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteFacilitis", { value: "Facilities", });
+            this.getView().getModel("Facilities").setData({});
+            this.getView().getModel("DisplayImagesModel").setData({});
         },
 
         onFacilitybranchChange: function (oEvent) {

@@ -302,9 +302,10 @@ sap.ui.define([
                 return;
             }
 
-            if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
-                && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0 && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
-                && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
+            if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) 
+                && (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0)
+                && (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0)
+                && (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                 return;
             }
@@ -566,7 +567,7 @@ sap.ui.define([
                 return;
             }
 
-            var that = this;
+            var that = this;  // Keep the correct reference to the controller
             var sNames = aSelectedItems.map(item => {
                 var oData = item.getBindingContext("Facilities").getObject();
                 return oData.FacilityName;
@@ -592,7 +593,7 @@ sap.ui.define([
                             });
 
                             await Promise.all(aDeletePromises);
-                            sap.m.MessageToast.show(this.i18nModel.getText("facilitiesdeletedsuccessfully"));
+                            sap.m.MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
                             return that.readCallForFacilities("Initial");
                         } catch (err) {
                             sap.ui.core.BusyIndicator.hide();
@@ -605,8 +606,7 @@ sap.ui.define([
                         oTable.removeSelections(true);
                     }
                 }
-            }
-            );
+            });
         },
 
         createTableSheet: function () {
