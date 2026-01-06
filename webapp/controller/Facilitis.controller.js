@@ -89,12 +89,15 @@ sap.ui.define([
         readCallForFacilities: async function (filter) {
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = [];
-            if (oExistingModel.BranchCode) {
+               if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
+            }else if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             // Normalize filter
@@ -110,6 +113,8 @@ sap.ui.define([
                 !filter.BranchCode
             ) {
                 filter.BranchCode = aBranchCodes;
+                filter.Role ="Admin";
+
             }
 
             console.log("FINAL FILTER →", filter);

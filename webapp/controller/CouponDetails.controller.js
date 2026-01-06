@@ -67,6 +67,8 @@ sap.ui.define([
         },
 
         onCouponSearch: async function () {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+
             try {
                 sap.ui.core.BusyIndicator.show(0);
                 const oFilterBar = this.byId("couponFilterBar");
@@ -77,6 +79,10 @@ sap.ui.define([
 
                 // ================= Branch Logic =================
                 params.BranchCode = this._allowedBranches;
+
+                if( oExistingModel.Role === "Admin"){
+                    params.Role ="Admin";
+                }
 
                 // ================= Date Format =================
                 const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
@@ -193,11 +199,15 @@ sap.ui.define([
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
-
+        
             let filters = {};
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
+            }
+                 if (oExistingModel.Role === "Admin") {
+                 filters.BranchID = aBranchCodes;
+                filters.Role ="Admin";
             }
             try {
                 const oView = this.getView();

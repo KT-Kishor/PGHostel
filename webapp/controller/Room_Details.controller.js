@@ -692,6 +692,7 @@ sap.ui.define([
 
         Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             var oView = this.getView();
 
@@ -705,14 +706,20 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
+               if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
+            }else if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
+                filters.Role ="Admin";
+
             }
 
             if (sRoomNo) {

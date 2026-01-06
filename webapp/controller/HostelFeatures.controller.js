@@ -278,8 +278,9 @@ sap.ui.define([
             });
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             var oView = this.getView();
             var oTable = oView.byId("HF_HostelFeatureTable");
@@ -290,18 +291,20 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
+               if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
+            }else if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
-                filters = {
-                    BranchCode: aBranchCodes
-                };
+                filters = { BranchCode: aBranchCodes };
+                filters.Role ="Admin";
+
             }
             if (sFacilityName) filters.FacilityName = sFacilityName;
 
@@ -324,12 +327,14 @@ sap.ui.define([
                 const model = new sap.ui.model.json.JSONModel(filteredData);
                 this.getView().setModel(model, "HostelFeatures");
                 this._populateUniqueFilterValues(this._originalBedData);
-            }).catch((err) => {
-                sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show(err.message || err.responseText);
-            }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
-            });
+            })
+                .catch((err) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show(err.message || err.responseText);
+                })
+                .finally(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                });
         },
 
         _populateUniqueFilterValues: function(data) {

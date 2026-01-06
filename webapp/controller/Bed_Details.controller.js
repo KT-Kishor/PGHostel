@@ -58,6 +58,8 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
+                filters.Role ="Admin";
+
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -355,6 +357,8 @@ sap.ui.define([
 
         Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
 
             var oView = this.getView();
             var oTable = oView.byId("id_BedTable");
@@ -367,16 +371,22 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
+
+
             if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
+            }else if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
+                filters.Role ="Admin";
+
             }
 
             if (sCustomerName) filters.Name = sCustomerName;

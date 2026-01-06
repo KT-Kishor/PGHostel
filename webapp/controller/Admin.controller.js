@@ -34,7 +34,7 @@ sap.ui.define([
                 dateRangeControl.setDateValue(fyStart);
                 dateRangeControl.setSecondDateValue(fyEnd);
             }
-            this._loadHostelMasterData();
+            // this._loadHostelMasterData();
             await this.Cust_read(true)
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
@@ -58,16 +58,16 @@ sap.ui.define([
             // this.BedTypedetails();
         },
 
-        _loadHostelMasterData: function () {
-            this.ajaxReadWithJQuery("HM_Customer", {})
-                .then((response) => {
-                    const oMasterModel = new sap.ui.model.json.JSONModel(response.Customers);
-                    this.getView().setModel(oMasterModel, "HostelMasterModel");
+        // _loadHostelMasterData: function () {
+        //     this.ajaxReadWithJQuery("HM_Customer", {})
+        //         .then((response) => {
+        //             const oMasterModel = new sap.ui.model.json.JSONModel(response.Customers);
+        //             this.getView().setModel(oMasterModel, "HostelMasterModel");
 
-                    // Keep original reference if needed
-                    this._originalRoomdata = response.Customers;
-                });
-        },
+        //             // Keep original reference if needed
+        //             this._originalRoomdata = response.Customers;
+        //         });
+        // },
 
         BedTypedetails: function () {
             this.ajaxReadWithJQuery("HM_BedType", "").then((oData) => {
@@ -129,7 +129,12 @@ sap.ui.define([
                 let filters = {};
                 if (oExistingModel.Role === "Admin" && aBranchCodes) {
                     filters.BranchCode = aBranchCodes;
-                }
+                  }
+                     if (oExistingModel.Role === "Admin"){
+                          filters.Role ="Admin";
+                        filters.BranchCode = aBranchCodes;
+
+                     }
 
                 if (sbookID) filters.BookingID = sbookID;
                 if (sRoomNo) filters.RoomNo = sRoomNo;

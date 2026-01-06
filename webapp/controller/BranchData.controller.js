@@ -82,7 +82,9 @@ sap.ui.define([
             //     filters.City = oExistingModel.City;
             // }
             if (oLoginmodel.Role === "Admin") {
-                filters.BranchID = Branch === "" ? oExistingModel.BranchCode : Branch;;
+                filters.BranchID = Branch === "" ? oExistingModel.BranchCode : Branch;
+                filters.Role ="Admin";
+
             } else {
                 filters.BranchID = Branch
             }
