@@ -13,7 +13,6 @@ sap.ui.define([
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.Book_Room", {
-        // _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
@@ -232,7 +231,7 @@ sap.ui.define([
 
             try {
                 // ✅ SHOW busy immediately
-                sap.ui.core.BusyIndicator.show(0);
+               BusyIndicator.show(0);
 
                 const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
                 const oBranch = oHostelModel.BranchCode;
@@ -281,7 +280,7 @@ sap.ui.define([
                     BranchCode: f.BranchCode
                 }));
 
-                const oFacilityModel = new sap.ui.model.json.JSONModel({
+                const oFacilityModel = new JSONModel({
                     Facilities: aFinalFacilities
                 });
 
@@ -293,39 +292,10 @@ sap.ui.define([
 
             } finally {
                 // ✅ ALWAYS hide busy
-                sap.ui.core.BusyIndicator.hide();
+               BusyIndicator.hide();
             }
         }
         ,
-
-        // _checkMandatoryFields: function () {
-        //     const oModel = this.getView().getModel("HostelModel");
-        //     const aPersons = oModel.getProperty("/Persons") || [];
-        //     let bAllValid = true;
-
-        //     aPersons.forEach((oPerson, iIndex) => {
-        //         // List all your required fields here
-        //         const aFields = [
-        //             { key: "FullName", label: "Full Name" },
-        //             { key: "DateOfBirth", label: "Date of Birth" },
-        //             { key: "Gender", label: "Gender" },
-        //             { key: "MobileNo", label: "Mobile" },
-        //             { key: "CustomerEmail", label: "Email" },
-        //             { key: "Country", label: "Country" },
-        //             { key: "State", label: "State" },
-        //             { key: "City", label: "City" },
-        //             { key: "Address", label: "Address" }
-        //         ];
-        //         aFields.forEach(field => {
-        //             const sValue = oPerson[field.key];
-        //             if (!sValue || sValue.trim() === "") {
-        //                 bAllValid = false;
-        //             }
-        //         });
-        //     });
-
-        //     return bAllValid;
-        // },
 
         onDialogClose: function () {
             this._oLoginAlertDialog.close()
@@ -1455,12 +1425,6 @@ sap.ui.define([
                         }
                     }
                 });
-                //                 const oBinding = oFacilityFlex.getBinding("items");
-                // if (oBinding) {
-                //     oBinding.attachEventOnce("dataReceived", function () {
-                //         sap.ui.core.BusyIndicator.hide();   // ✅ HIDE HERE
-                //     });
-                // }
 
                 // Add sections for each person
                 oVBox.addItem(oForm);
@@ -1471,7 +1435,7 @@ sap.ui.define([
             }
             if (oFacilityModel) oFacilityModel.refresh(true);
             setTimeout(() => {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }, 2000);
 
             if (oModel) oModel.refresh(true);
@@ -2766,7 +2730,7 @@ sap.ui.define([
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
                 let payload, oResponse;
 
                 if (isOTP) {
@@ -2914,7 +2878,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || "Invalid Credentials, Please try again");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
@@ -2959,10 +2923,10 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
                 return;
             }
-            // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
+            //  PASSED ALL VALIDATIONS → SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
-            sap.ui.core.BusyIndicator.show(0);
+            BusyIndicator.show(0);
             try {
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: { Password: btoa(pass) },
@@ -2996,7 +2960,7 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
-                sap.ui.core.BusyIndicator.hide();  // ALWAYS stop
+                BusyIndicator.hide();  // ALWAYS stop
                 this._resetOtpState();
             }
         },
@@ -3087,7 +3051,7 @@ sap.ui.define([
                 Type: "OTP"
             };
 
-            sap.ui.core.BusyIndicator.show(0);
+            BusyIndicator.show(0);
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
@@ -3109,12 +3073,12 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show("Record not found\nPlease check your\nUser ID / User Name");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
         _verifyOTPWithBackend: async function (otp) {
-            sap.ui.core.BusyIndicator.show(0);
+            BusyIndicator.show(0);
 
             try {
                 const oPayload = {
@@ -3133,7 +3097,7 @@ sap.ui.define([
                 return false;
 
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
@@ -3156,7 +3120,7 @@ sap.ui.define([
                 Type: "OTP"
             };
 
-            sap.ui.core.BusyIndicator.show(0);
+            BusyIndicator.show(0);
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
@@ -3191,7 +3155,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
@@ -3451,7 +3415,7 @@ sap.ui.define([
             };
 
             console.log("SignUp Payload:", payload);
-            sap.ui.core.BusyIndicator.show(0);
+            BusyIndicator.show(0);
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
@@ -3539,7 +3503,7 @@ sap.ui.define([
                 console.error("SignUp Error:", err);
 
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
@@ -4842,7 +4806,7 @@ sap.ui.define([
                 this._oProfileDialog.open();
 
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
             }
         },
 
@@ -5300,9 +5264,9 @@ sap.ui.define([
                 oModel.setProperty("/Country", data.Country);
                 this._applyCountryStateCityFilters();
                 // this._oProfileDialog.close();
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
 
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
                 // this._oProfileEditDialog.open();
                 return;
             }
@@ -5340,7 +5304,7 @@ sap.ui.define([
             };
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                BusyIndicator.show(0);
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
@@ -5350,23 +5314,15 @@ sap.ui.define([
                 console.error(err);
                 sap.m.MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
-                // this._oProfileEditDialog.close();
-                // this._oProfileDialog.open();
+                
             }
         },
 
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-
-            // Status check (optional)
-            var sStatus = (oBookingData.status || "").trim().toLowerCase();
-            // if (sStatus !== "new") {
-            //     sap.m.MessageToast.show("Only Bookings with Status 'New' can be Edited.");
-            //     return;
-            // }
 
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this._oProfileDialog.getModel("profileData");
