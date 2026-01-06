@@ -678,9 +678,10 @@
                                    <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"
-                                        cellsLarge="1"
+                                        cellsLarge="2"
                                     />
                                 </layoutData>
+                                
                         </ComboBox>
                             <!-- Phone Number -->
                             <Input
