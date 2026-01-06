@@ -1097,8 +1097,8 @@ sap.ui.define([
                             mimeType: ["image/jpeg", "image/png"],
                             multiple: false,
                             layoutData: new sap.ui.layout.form.ColumnElementData({
-                                cellsLarge: 8,
-                                cellsSmall: 9 ///
+                                cellsLarge: 7, ///8
+                                cellsSmall: 8 ///9
                             }),
                             customData: [new sap.ui.core.CustomData({
                                 key: "index",
@@ -1172,8 +1172,8 @@ sap.ui.define([
                             type: "Transparent",
                             tooltip: "Clear Document",
                             layoutData: new sap.ui.layout.form.ColumnElementData({
-                                cellsLarge: 1,
-                                cellsSmall: 3 /// 
+                                cellsLarge: 2, ///1
+                                cellsSmall: 4 /// 3
                             }),
                             press: function (oEvent) {
 
