@@ -228,54 +228,75 @@ sap.ui.define([
         },
 
         _LoadFacilities: async function () {
-            const oView = this.getView();
-            let oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
-            let oBranch = oHostelModel.BranchCode
-            const filter = {
-                Brach: oBranch
-            };
-            const Response = await this.ajaxReadWithJQuery("HM_Facilities", filter);
+    const oView = this.getView();
 
-            // Extract array safely
-            const aFacilities = Response?.data || [];
+    try {
+        // ✅ SHOW busy immediately
+        sap.ui.core.BusyIndicator.show(0);
 
-            // Helper function to convert Base64 → data:image URL
-            const convertBase64ToImage = (base64String, fileType) => {
-                if (!base64String) return "./image/Fallback.png";
-                let sBase64 = base64String.replace(/\s/g, "");
-                try {
-                    if (!sBase64.startsWith("iVB") && !sBase64.startsWith("data:image")) {
-                        const decoded = atob(sBase64);
-                        if (decoded.startsWith("iVB")) sBase64 = decoded;
-                    }
-                } catch (e) {
-                    console.warn("Base64 decode error:", e);
+        const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
+        const oBranch = oHostelModel.BranchCode;
+
+        const filter = {
+            Brach: oBranch
+        };
+
+        const Response = await this.ajaxReadWithJQuery("HM_Facilities", filter);
+
+        const aFacilities = Response?.data || [];
+
+        // Helper: Base64 → Image URL
+        const convertBase64ToImage = (base64String, fileType) => {
+            if (!base64String) {
+                return "./image/Fallback.png";
+            }
+
+            let sBase64 = base64String.replace(/\s/g, "");
+
+            try {
+                if (!sBase64.startsWith("data:image")) {
+                    atob(sBase64.substring(0, 40)); // validate only
                 }
-                const mimeType = fileType || "image/jpeg";
-                if (sBase64.startsWith("data:image")) return sBase64;
-                return `data:${mimeType};base64,${sBase64}`;
-            };
+            } catch (e) {
+                console.warn("Invalid base64 image", e);
+                return "./image/Fallback.png";
+            }
 
-            // Convert images and prepare data
-            const aFinalFacilities = aFacilities.map(f => ({
-                FacilityID: f.ID,
-                FacilityName: f.FacilityName,
-                Image: convertBase64ToImage(f.Photo1, f.Photo1Type),
-                PricePerHour: f.PerHourPrice,
-                PricePerDay: f.PerDayPrice,
-                PricePerMonth: f.PerMonthPrice,
-                PricePerYear: f.PerYearPrice,
-                UnitText: f.UnitText,
-                Currency: f.Currency,
-                BranchCode: f.BranchCode
-            }));
+            const mimeType = fileType || "image/jpeg";
+            return sBase64.startsWith("data:image")
+                ? sBase64
+                : `data:${mimeType};base64,${sBase64}`;
+        };
 
-            //  Wrap in object for proper binding
-            const oFacilityModel = new JSONModel({
-                Facilities: aFinalFacilities
-            });
-            oView.setModel(oFacilityModel, "FacilityModel");
-        },
+        const aFinalFacilities = aFacilities.map(f => ({
+            FacilityID: f.ID,
+            FacilityName: f.FacilityName,
+            Image: convertBase64ToImage(f.Photo1, f.Photo1Type),
+            PricePerHour: f.PerHourPrice,
+            PricePerDay: f.PerDayPrice,
+            PricePerMonth: f.PerMonthPrice,
+            PricePerYear: f.PerYearPrice,
+            UnitText: f.UnitText,
+            Currency: f.Currency,
+            BranchCode: f.BranchCode
+        }));
+
+        const oFacilityModel = new sap.ui.model.json.JSONModel({
+            Facilities: aFinalFacilities
+        });
+
+        oView.setModel(oFacilityModel, "FacilityModel");
+
+    } catch (error) {
+        console.error("Failed to load facilities", error);
+        sap.m.MessageBox.error("Unable to load facilities. Please try again.");
+
+    } finally {
+        // ✅ ALWAYS hide busy
+        sap.ui.core.BusyIndicator.hide();
+    }
+}
+,
 
         // _checkMandatoryFields: function () {
         //     const oModel = this.getView().getModel("HostelModel");

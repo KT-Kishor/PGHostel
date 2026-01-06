@@ -15,7 +15,7 @@
     >
         <ScrollContainer id="idMainScroll">
             <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
+                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
             />
             <content>
@@ -202,6 +202,7 @@
                                 text="Room Plan"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
+                            
                             <Text
                                 text="{CustomerData>/PaymentType}"
                                 visible="{= !${VisibleModel>/visible} }"
