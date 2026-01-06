@@ -1303,11 +1303,11 @@ sap.ui.define([
                                     )
                                 ],
                                 template: new sap.m.VBox({
-                                    width: "264px",
-                                    height: "230px",
+                                    width: "290px",
+                                    height: "auto",
                                     alignItems: "Center",
-                                    justifyContent: "Center",
-                                    styleClass: "serviceCard",
+                                    justifyContent: "Center", //Center
+                                    // styleClass: "serviceCard",
                                     items: [
                                         // Facility Image + Overlay Name
                                         new sap.m.VBox({
@@ -1319,7 +1319,7 @@ sap.ui.define([
                                                     src: "{FacilityModel>Image}",
                                                     width: "264px",
                                                     height: "178px",
-                                                    class: "serviceImage",
+                                                    // class: "serviceImage",
                                                     densityAware: false,
                                                     wrap: true,
                                                     press: function (oEvent) {
@@ -1372,8 +1372,8 @@ sap.ui.define([
                                                         // If NOT selected → open popover to choose price
                                                         const oActionSheet = that._createFacilityActionSheet(facility, iPersonIndex, oCard);
                                                         oActionSheet.openBy(oEvent.getSource());
-                                                    }
-                                                }),
+                                                                                    }
+                                                }).addStyleClass("serviceImage"),
 
 
                                                 // Replace HTML formatter with:
@@ -1389,25 +1389,32 @@ sap.ui.define([
 
                                         // Facility Price (below the image)
                                         new sap.m.Text({
+                                            visible: {
+                                                parts: [
+                                                    { path: "FacilityModel>FacilityName" },
+                                                    { path: "HostelModel>/Persons/" + i + "/Facilities/SelectedFacilities" }
+                                                ],
+                                                formatter: function (name, selected) {
+                                                    // Agar selected nahi hai toh text hide kar do, taaki space na le
+                                                    return !!(selected && selected.find(f => f.FacilityName === name));
+                                                }
+                                            },
                                             text: {
                                                 parts: [
                                                     { path: "FacilityModel>FacilityName" },
                                                     { path: "HostelModel>/Persons/" + i + "/Facilities/SelectedFacilities" }
                                                 ],
                                                 formatter: function (facilityName, aSelectedFacilities) {
-
                                                     if (!aSelectedFacilities || !facilityName) return "";
-
                                                     const found = aSelectedFacilities.find(f => f.FacilityName === facilityName);
-                                                    if (!found) return "";
-
-                                                    return found.SelectedPriceType + " " + found.SelectedPrice + " " + (found.Currency || "");
+                                                    return found ? (found.SelectedPriceType + " " + found.SelectedPrice + " " + (found.Currency || "")) : "";
                                                 }
                                             }
-                                        }).addStyleClass("sapUiTinyMarginTop facilityPriceText")
+                                        }).addStyleClass("facilityPriceText")
+                                        
 
                                     ]
-                                })
+                                }).addStyleClass("serviceCard"),
                             }
                         })
                     ],

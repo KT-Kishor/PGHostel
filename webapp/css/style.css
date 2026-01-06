@@ -433,207 +433,6 @@
   font-size: 1.1em;
 }
 
-/* Facilities Section */
-.facilityDynamicBox {
-  position: relative;
-  margin: 10px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  background-size: cover;
-  background-position: center;
-}
-
-.facilityDynamicBox .sapMBtn {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white !important;
-  border-radius: 8px;
-}
-/* header */
-.customRedBar {
-  background-color: #1bb2bf !important;
-  color: white !important;
-  height: 40px !important;
-  /* Set your desired height */
-  min-height: 40px !important;
-  line-height: 40px !important;
-  /* Vertically center text/icons if needed */
-}
-.customRedBar .sapMBtnIcon {
-  color: white !important;
-  fill: white !important;
-}
-.customPanelHeader .sapMPanelHdr {
-  background-color: #1bb2bf !important;
-  color: white !important;
-  font-weight: bold !important;
-  border-radius: 0 !important;
-}
-
-.customPanelHeader {
-  border-radius: 0 !important;
-}
-.sapMWizardStep .sapMWizardStepTitle {
-  background-color: #1bb2bf !important;
-  color: white !important;
-  font-weight: bold !important;
-  border-radius: 0 !important;
-  padding: 5px !important;
-}
-
-/* Image + Label container */
-/* .imageContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-} */
-/* Image Container */
-
-/* Container wrapping image and overlay */
-/* .imageContainer {
-  position: relative;
-  width: 264px;
-  height: 178px;
-  border-radius: 8px;
-  overflow: hidden;
-} */
-/* .imageContainer {
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-} */
-
-.imageContainer {
-  position: relative;          /* key: parent for absolute child */
-  width: 100%;
-  max-width: 264px;
-  height: auto;
-  overflow: hidden;
-   border-radius: 8px;
-}
-
-.serviceImage {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-  display: block;
-}
-.serviceImage:hover {
-  transform: scale(1.05);
-}
-
-/* Red banner overlay at the bottom */
-.imageContainer {
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-/* Bottom banner – ALWAYS visible */
-.facility-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  min-height: 36px;
-  background-color: #1bb2bf;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.facility-overlay-text {
-  color: black;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 6px 8px;
-  text-align: center;
-}
-.facilityOverlayText {
-    position: absolute;
-    bottom: 8px;
-    left: 4px;
-    right: 4px;
-    background: linear-gradient(transparent, rgba(27,178,191,0.9));
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
- 
-@media only screen and (max-width: 768px) {
-  .facilityOverlayText {
-    font-size: 13px;
-    padding: 4px 2px;
-    margin-top: 20px !important;
-  }
-}
-/* .sapMFlexBox{
-  margin: 0;
-} */
-   /* @media only screen and (max-width: 730px) {
-    
-        .sapMFlexBox {
-      justify-content: space-around; 
-  }
-    
-} */
-
-
-
-.facility-overlay:hover {
-  cursor: pointer;
-  background-color: #050808;
-  color: white;
-  transform: scale(1.05);
-}
-
-/* Clickable white text */
-.facility-overlay-link {
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.facility-overlay-link:hover {
-  text-decoration: underline;
-}
-
-/* Highlight selected cards */
-.serviceCardSelected {
-  border: 3px solid #007aff;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 122, 255, 0.5);
-}
-
-.serviceCard {
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-  cursor: pointer;
-}
-
-.serviceCard:hover {
-  transform: scale(1.05);
-}
-
-.facilityNameText {
-  font-weight: bold;
-  text-align: center;
-}
 .card-style {
   width: 140px;
   padding: 0.5rem;
@@ -3008,7 +2807,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 
 
-/* /////////////////////////////////////////////////////////////////////// */
+/* ///// */
 
 .heroTextBox {
   margin-top: 2.5rem;
@@ -3036,4 +2835,322 @@ span.sapMBtnInner.sapMBtnEmphasized {
     padding-right: 1.5rem;
     margin-top: 1.2rem;
   }
+}
+/* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ */
+
+                
+
+
+/* Facilities Section */
+.facilityDynamicBox {
+  position: relative;
+  margin: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-size: cover;
+  background-position: center;
+}
+
+.facilityDynamicBox .sapMBtn {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white !important;
+  border-radius: 8px;
+}
+/* header */
+.customRedBar {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  height: 40px !important;
+  /* Set your desired height */
+  min-height: 40px !important;
+  line-height: 40px !important;
+  /* Vertically center text/icons if needed */
+}
+.customRedBar .sapMBtnIcon {
+  color: white !important;
+  fill: white !important;
+}
+.customPanelHeader .sapMPanelHdr {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 0 !important;
+}
+
+.customPanelHeader {
+  border-radius: 0 !important;
+}
+.sapMWizardStep .sapMWizardStepTitle {
+  background-color: #1bb2bf !important;
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
+}
+
+
+
+
+
+
+/* Bottom banner – ALWAYS visible */
+.facility-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  min-height: 36px;
+  background-color: #1bb2bf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.facility-overlay-text {
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.facilityOverlayText {
+    position: absolute;
+    bottom: 8px;
+    left: 4px;
+    right: 4px;
+    background: linear-gradient(transparent, rgba(27,178,191,0.9));
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.facilityNameText {
+  font-weight: bold;
+  text-align: center;
+}
+
+
+
+.facility-overlay:hover {
+  cursor: pointer;
+  background-color: #050808;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Clickable white text */
+.facility-overlay-link {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.facility-overlay-link:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+/* =========================================
+   SERVICE CARD – TEAL BORDER, ROUNDED IMAGE
+   ========================================= */
+
+/* ---------- Base Card ---------- */
+.serviceCard,
+.serviceCard.sapMVBox {
+  box-sizing: border-box !important;
+  background: #ffffff !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 15px !important;
+  padding: 12px !important;
+  position: relative !important;
+  overflow: visible !important;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+  
+}
+
+/* ---------- Hover (non-selected) ---------- */
+.serviceCard:not(.serviceCardSelected):hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(0,121,132,0.35) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.14) !important;
+}
+
+/* ---------- Selected Card ---------- */
+.serviceCard.serviceCardSelected,
+.sapMVBox.serviceCard.serviceCardSelected,
+.sapMFlexBox .serviceCard.serviceCardSelected {
+  background: #ffffff !important;
+  border: 3px solid #007984 !important;
+  border-radius: 15px !important;
+  padding: 10px !important; /* compensate for thicker border */
+  transform: scale(1.02) !important;
+  z-index: 5 !important;
+  box-shadow: 0 12px 28px rgba(0,121,132,0.14) !important;
+}
+
+/* ---------- Image Container (IMPORTANT FIX) ---------- */
+.imageContainer {
+  width: 100% !important;
+  position: relative !important;
+
+  border-radius: 12px !important;  /* ✅ rounding restored */
+  overflow: hidden !important;     /* ✅ clips image corners */
+
+  border: 2px solid transparent !important;
+  transition: border-color 0.25s ease !important;
+  background: #ffffff !important;
+}
+
+/* ✅ Rounded image with teal outline (NO radius loss) */
+.serviceCard.serviceCardSelected .imageContainer {
+  outline: 3px solid #007984 !important;   /* does not affect radius */
+  outline-offset: -3px !important;         /* sits flush on edge */
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* ---------- Image ---------- */
+.serviceImage,
+.imageContainer img {
+  width: 100% !important;
+  height: 180px !important;
+  object-fit: cover !important;
+  display: block !important;
+
+  border-radius: 12px !important;  /* ✅ keeps curvature */
+}
+
+/* ---------- Price Text ---------- */
+.facilityPriceText {
+  margin-top: 16px !important;
+  min-height: 20px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #007984 !important;
+  text-align: center !important;
+}
+
+/* ---------- Remove Focus Artifacts ---------- */
+.serviceCard *,
+.serviceCard *:focus,
+.serviceCard *:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- SAP Flex Safety ---------- */
+.sapMFlexBox .serviceCard {
+  flex-shrink: 0 !important;
+}
+/* ----- Minimal override: restore rounded image corners ----- */
+.serviceCard.serviceCardSelected .imageContainer,
+.sapMVBox.serviceCard.serviceCardSelected .imageContainer {
+  background: #ffffff !important;               /* keep inner bg white */
+  border-radius: 12px !important;               /* slightly smaller than card */
+  overflow: hidden !important;                  /* clip the image to the radius */
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  -webkit-background-clip: padding-box !important;
+  background-clip: padding-box !important;
+}
+
+/* ensure the image itself is clipped and rounded */
+.serviceCard.serviceCardSelected .serviceImage,
+.serviceCard.serviceCardSelected .imageContainer img,
+.serviceCard .imageContainer .serviceImage,
+.serviceCard .imageContainer img {
+  width: 100% !important;
+  height: 180px !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 12px !important;               /* same radius as container */
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+
+/* ---------- Robust rounding + teal outline (final) ---------- */
+
+/* ensure container is rounded and clips children */
+.imageContainer {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+/* selected image container: teal outline sitting outside rounded shape */
+.serviceCard.serviceCardSelected .imageContainer,
+.sapMVBox.serviceCard.serviceCardSelected .imageContainer {
+  outline: 3px solid #007984 !important;
+  outline-offset: -3px !important; /* sits flush to edge without changing geometry */
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* force-round the actual rendered image element(s)
+   - target plain <img>, UI5 img class, and any nested img-like element */
+.imageContainer img,
+.imageContainer .sapMImg,
+.imageContainer .sapMImg img,
+.imageContainer .sapMImgImg {
+  border-radius: 12px !important;
+  display: block !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+
+  /* clipping fallback for stubborn renderers */
+  -webkit-clip-path: inset(0 round 12px) !important;
+  clip-path: inset(0 round 12px) !important;
+}
+
+/* keep your image sizing and object-fit */
+.serviceImage,
+.imageContainer img {
+  width: 100% !important;
+  height: 180px !important;
+  object-fit: cover !important;
+}
+
+/* remove any square background that might peek through */
+.imageContainer .sapMImg,
+.imageContainer .sapMImg img {
+  background: transparent !important;
+}
+
+/* keep card outline and shadow behavior (your previous rules) */
+.serviceCard,
+.serviceCard.sapMVBox {
+  border-radius: 15px !important;
+}
+
+/* If outer card uses border (not outline), ensure inner container radius is slightly smaller */
+.serviceCard.serviceCardSelected .imageContainer {
+  /* slightly smaller to reveal the card rim */
+  border-radius: 11px !important;
 }
