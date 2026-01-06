@@ -35,8 +35,7 @@ sap.ui.define([
             oRouter.navTo("RouteAdmin");
         },
         Tile_onLogPress: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
+            this.CommonLogoutFunction();
         },
         TileV_onpressroomdetails: function () {
             var oRouter = this.getOwnerComponent().getRouter();

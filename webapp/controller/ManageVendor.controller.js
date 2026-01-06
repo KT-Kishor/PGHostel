@@ -167,8 +167,7 @@ sap.ui.define([
         },
 
         onHome: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
+            this.CommonLogoutFunction();
         },
 
         HM_OnPressManageStaffItem: function (oEvent) {

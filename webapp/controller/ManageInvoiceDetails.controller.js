@@ -267,8 +267,7 @@ sap.ui.define([
             },
 
             onHome: function () {
-                var oRouter = this.getOwnerComponent().getRouter();
-                oRouter.navTo("RouteHostel");
+                this.CommonLogoutFunction();
             },
 
             onChangeAddCustomer: async function (oEvent) {

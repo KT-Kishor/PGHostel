@@ -703,7 +703,7 @@ sap.ui.define([
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/EmployeeName", "");
       }
-      this.getRouter().navTo("RouteHostel");
+      this.getOwnerComponent().getRouter().navTo("RouteHostel");
     },
 
     commonLoginFunction: function (value) {
