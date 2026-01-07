@@ -2838,6 +2838,7 @@ sap.ui.define([
                 oLoginModel.setProperty("/EmailID", oMatchedUser.EmailID);
                 oLoginModel.setProperty("/MobileNo", oMatchedUser.MobileNo);
                 oLoginModel.setProperty("/Status", oMatchedUser.Status);
+                oLoginModel.setProperty("/Role", oMatchedUser.Role);
                 oLoginModel.setProperty("/DateOfBirth", oMatchedUser.DateOfBirth);
                 oLoginModel.setProperty("/Gender", oMatchedUser.Gender);
                 oLoginModel.setProperty("/Country", oMatchedUser.Country);
