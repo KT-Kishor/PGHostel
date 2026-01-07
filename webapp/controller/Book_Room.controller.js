@@ -2437,19 +2437,26 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-            const oLoginModel = this.getView().getModel("LoginModel");
-            const sRole = oLoginModel?.getProperty("/Role") || "";
-            const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+    const oUser = this._oLoggedInUser;
+    const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
-            if (sRole === "Customer") {
-                this._sLoggedUserID = sEmpID;
-                const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                oUIModel.setProperty("/isLoggedIn", true);
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            } else {
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            }
-        },
+    if (oUser && oUser.UserID) {
+        oUIModel.setProperty("/isLoggedIn", true);
+    } else {
+        oUIModel.setProperty("/isLoggedIn", false);
+    }
+
+    const oLoginModel = this.getView().getModel("LoginModel");
+    const sRole = oLoginModel?.getProperty("/Role") || "";
+    const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+
+    if (sRole === "Customer") {
+        this._sLoggedUserID = sEmpID;
+        this.getOwnerComponent().getRouter().navTo("RouteHostel");
+    } else {
+        this.getOwnerComponent().getRouter().navTo("RouteHostel");
+    }
+},
 
         onRoomDurationChange: function (oEvent) {
             this._resetWizardFromStep1();
@@ -4653,11 +4660,7 @@ sap.ui.define([
                     return;
                 }
                 fullUserData = oUser;
-                // if (!this._isProfileRequested) {
-                //     this.createAvatarActionSheet();
-                //     this._oProfileActionSheet.openBy(oEvent.getSource());
-                //     return;
-                // }
+               
                 this._isProfileRequested = false;
 
                 if (!this._oProfileDialog) {
