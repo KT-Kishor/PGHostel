@@ -6,7 +6,8 @@ sap.ui.define([
     "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "sap/ui/model/Filter"
 ], function (
     BaseController,
     JSONModel,
@@ -14,7 +15,8 @@ sap.ui.define([
     BusyIndicator,
     MessageToast,
     MessageBox,
-    FilterOperator
+    FilterOperator,
+    Filter
     
 ) {
     "use strict";
@@ -225,7 +227,7 @@ sap.ui.define([
 
             try {
                 // ✅ SHOW busy immediately
-                BusyIndicator.show(0);
+                // BusyIndicator.show(0);
 
                 const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
                 const oBranch = oHostelModel.BranchCode;
@@ -286,7 +288,7 @@ sap.ui.define([
 
             } finally {
                 // ✅ ALWAYS hide busy
-                BusyIndicator.hide();
+                // BusyIndicator.hide();
             }
         }
         ,
@@ -437,7 +439,7 @@ sap.ui.define([
                 const oStateCombo = sap.ui.getCore().byId(this.createId("ID_State_" + i));
                 if (oStateCombo) {
                     oStateCombo.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
+                        new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                     ]);
                     oStateCombo.setValue(p.State || "");
                 }
@@ -447,8 +449,8 @@ sap.ui.define([
                     const oCityCombo = sap.ui.getCore().byId(this.createId("ID_City_" + i));
                     if (oCityCombo) {
                         oCityCombo.getBinding("items")?.filter([
-                            new sap.ui.model.Filter("stateName", FilterOperator.EQ, p.State),
-                            new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
+                            new Filter("stateName", FilterOperator.EQ, p.State),
+                            new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                         ]);
                         oCityCombo.setValue(p.City || "");
                     }
@@ -480,7 +482,7 @@ sap.ui.define([
                 );
                 if (oStateCombo) {
                     oStateCombo.getBinding("items")?.filter([
-                        new sap.ui.model.Filter(
+                        new Filter(
                             "countryCode",
                            FilterOperator.EQ,
                             sCountryCode
@@ -496,12 +498,12 @@ sap.ui.define([
                     );
                     if (oCityCombo) {
                         oCityCombo.getBinding("items")?.filter([
-                            new sap.ui.model.Filter(
+                            new Filter(
                                 "stateName",
                                FilterOperator.EQ,
                                 p.State
                             ),
-                            new sap.ui.model.Filter(
+                            new Filter(
                                 "countryCode",
                                 FilterOperator.EQ,
                                 sCountryCode
@@ -855,7 +857,7 @@ sap.ui.define([
                                 // Filter states (existing logic)
                                 const oStateCombo = sap.ui.getCore().byId(that.createId("ID_State_" + i));
                                 oStateCombo.getBinding("items").filter([
-                                    new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
+                                    new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                                 ]);
 
                                 // Also set UI input maxLength for immediate UX feedback if input exists
@@ -909,8 +911,8 @@ sap.ui.define([
                                 // Filter cities
                                 const oCityCombo = sap.ui.getCore().byId(that.createId("ID_City_" + i));
                                 oCityCombo.getBinding("items").filter([
-                                    new sap.ui.model.Filter("stateName", FilterOperator.EQ, sStateName),
-                                    new sap.ui.model.Filter("countryCode", FilterOperator.EQ, oCountryObj?.code)
+                                    new Filter("stateName", FilterOperator.EQ, sStateName),
+                                    new Filter("countryCode", FilterOperator.EQ, oCountryObj?.code)
                                 ]);
                                 oModel.refresh(true);
                             }
@@ -1312,7 +1314,7 @@ sap.ui.define([
                             items: {
                                 path: "FacilityModel>/Facilities",
                                 filters: [
-                                    new sap.ui.model.Filter(
+                                    new Filter(
                                         "BranchCode",
                                         FilterOperator.EQ,
                                         oModel.getProperty("/BranchCode")
@@ -3608,7 +3610,7 @@ sap.ui.define([
             oCity.setValue("").setSelectedKey("");
 
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                new Filter("cityName", "EQ", "__NONE__")
             ]);
 
             // release cities only if country is valid
@@ -3619,8 +3621,8 @@ sap.ui.define([
             if (!sCountryCode || !sStateText) return;
 
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", "EQ", sStateText),
-                new sap.ui.model.Filter("countryCode", "EQ", sCountryCode)
+                new Filter("stateName", "EQ", sStateText),
+                new Filter("countryCode", "EQ", sCountryCode)
             ]);
         },
 
@@ -3643,7 +3645,7 @@ sap.ui.define([
                 oCity.setValue("");
                 oCity.setSelectedKey("");
                 oCity.getBinding("items")?.filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                    new Filter("cityName", "EQ", "__NONE__")
                 ]);
 
                 oCity.setValueState("None");
@@ -3771,7 +3773,7 @@ sap.ui.define([
                 oCity.setSelectedKey("");
 
                 oCity.getBinding("items")?.filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                    new Filter("cityName", "EQ", "__NONE__")
                 ]);
 
                 oCity.setValueState("None");
@@ -3870,10 +3872,10 @@ sap.ui.define([
 
             // Block all child lists until prerequisites
             oState.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
+                new Filter("stateName", "EQ", "__NONE__")
             ]);
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                new Filter("cityName", "EQ", "__NONE__")
             ]);
 
             const oItem = oCountry.getSelectedItem();
@@ -3899,7 +3901,7 @@ sap.ui.define([
             // 🚀 RELEASE states only after country valid
             if (sCountryCode) {
                 oState.getBinding("items")?.filter([
-                    new sap.ui.model.Filter(
+                    new Filter(
                         "countryCode",
                         FilterOperator.EQ,
                         sCountryCode
@@ -4848,14 +4850,14 @@ sap.ui.define([
 
                     // Filter States by Country
                     oStateCB.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
+                        new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                     ]);
 
                     if (sState) {
                         // Filter Cities by State + Country
                         const aFilters = [
-                            new sap.ui.model.Filter("stateName", FilterOperator.EQ, sState),
-                            new sap.ui.model.Filter("countryCode", FilterOperator.EQ, sCountryCode)
+                            new Filter("stateName", FilterOperator.EQ, sState),
+                            new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                         ];
                         oSourceCB.getBinding("items")?.filter(aFilters);
                     }
@@ -4902,30 +4904,30 @@ sap.ui.define([
 
                 if (sSelectedTab === "Payment") {
                     aFilters = [
-                        new sap.ui.model.Filter({
+                        new Filter({
                             filters: [
-                                new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "InvNo", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "InvoiceDate", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "CustomerName", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "TotalAmount", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "DueAmount", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                                new Filter({ path: "BookingID", test: fnContains }),
+                                new Filter({ path: "InvNo", test: fnContains }),
+                                new Filter({ path: "InvoiceDate", test: fnContains }),
+                                new Filter({ path: "CustomerName", test: fnContains }),
+                                new Filter({ path: "TotalAmount", test: fnContains }),
+                                new Filter({ path: "DueAmount", test: fnContains }),
+                                new Filter({ path: "currency", test: fnContains })
                             ],
                             and: false
                         })
                     ];
                 } else {
                     aFilters = [
-                        new sap.ui.model.Filter({
+                        new Filter({
                             filters: [
-                                new sap.ui.model.Filter({ path: "customerName", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "BookingID", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "BookingDate", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "room", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "status", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "amount", test: fnContains }),
-                                new sap.ui.model.Filter({ path: "currency", test: fnContains })
+                                new Filter({ path: "customerName", test: fnContains }),
+                                new Filter({ path: "BookingID", test: fnContains }),
+                                new Filter({ path: "BookingDate", test: fnContains }),
+                                new Filter({ path: "room", test: fnContains }),
+                                new Filter({ path: "status", test: fnContains }),
+                                new Filter({ path: "amount", test: fnContains }),
+                                new Filter({ path: "currency", test: fnContains })
                             ],
                             and: false
                         })
@@ -4934,7 +4936,7 @@ sap.ui.define([
             }
 
             //  IMPORTANT: Application-level filter
-            oBinding.filter(aFilters, sap.ui.model.FilterType.Application);
+            oBinding.filter(aFilters, FilterType.Application);
         },
 
         onTableUpdateFinished: function (oEvent) {
@@ -5733,5 +5735,6 @@ sap.ui.define([
         onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "ManageInvoice" });
         },
+       
     });
 });

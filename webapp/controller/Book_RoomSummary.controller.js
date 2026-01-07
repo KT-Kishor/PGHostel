@@ -4,9 +4,9 @@ sap.ui.define([
     "../model/formatter",
     "../utils/validation",
     "sap/ui/core/BusyIndicator",
-    "sap/m/MessageToast"
-
-], (Controller, JSONModel, Formatter, utils,BusyIndicator,MessageToast) => {
+    "sap/m/MessageToast",
+    "sap/m/MessageBox"
+], (Controller, JSONModel, Formatter, utils,BusyIndicator,MessageToast,MessageBox) => {
     "use strict";
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
@@ -454,7 +454,7 @@ sap.ui.define([
 
             // ---- Per Day validation ----
             if (sUnitText === "Per Day" && iTotalDays < 1) {
-                sap.m.MessageBox.error(this.i18nModel.getText("totalDaysmustbeatLeastforPerDayBooking"));
+                MessageBox.error(this.i18nModel.getText("totalDaysmustbeatLeastforPerDayBooking"));
                 return;
             }
 
