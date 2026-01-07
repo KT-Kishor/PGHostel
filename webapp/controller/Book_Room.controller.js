@@ -310,6 +310,7 @@ sap.ui.define([
                 if (!person.Country) aMissingFields.push(prefix + "Country");
                 if (!person.State) aMissingFields.push(prefix + "State");
                 if (!person.City) aMissingFields.push(prefix + "City");
+                if (!person.STDCode) aMissingFields.push(prefix + "STD Code");
                 if (!person.MobileNo) aMissingFields.push(prefix + "Mobile No");
                 if (!person.Address) aMissingFields.push(prefix + "Address");
             });
@@ -599,7 +600,7 @@ sap.ui.define([
                                                 vm.setProperty("/showOTPField", false);
                                                 vm.setProperty("/isOtpEntered", false);
 
-                                                // 🔥 FIX: You forgot these
+                                                //  FIX: You forgot these
                                                 vm.setProperty("/isOtpSelected", false);
                                                 vm.setProperty("/isPasswordSelected", true);
 
@@ -812,6 +813,7 @@ sap.ui.define([
                             placeholder: "Select Country",
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Country}",
+                            showSecondaryValues: true,
                             items: {
                                 path: "CountryModel>/",
                                 length: 1000, showSecondaryValues: true,
@@ -879,6 +881,7 @@ sap.ui.define([
                             width: "100%",
                             id: that.createId("ID_State_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/State}",
+                            showSecondaryValues: true,
                             items: {
                                 path: "StateModel>/", length: 1000, showSecondaryValues: true,
                                 template: new sap.ui.core.ListItem({
@@ -923,6 +926,7 @@ sap.ui.define([
                             width: "100%",
                             id: that.createId("ID_City_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/City}",
+                            showSecondaryValues: true,
                             items: {
                                 path: "CityModel>/", length: 1000, showSecondaryValues: true,
                                 template: new sap.ui.core.ListItem({
@@ -944,9 +948,21 @@ sap.ui.define([
                             required: true,
                         }),
 
-                        new sap.m.Input({
-
+                        new sap.m.ComboBox({
+                            placeholder: "STD Code",
                             value: "{HostelModel>/Persons/" + i + "/STDCode}",
+                             id: that.createId("ID_STDCode_" + i),
+                            selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
+                            showSecondaryValues: true,
+                            items: {
+                                path: "CountryModel>/",
+                                length: 1000, showSecondaryValues: true,
+                                template: new sap.ui.core.ListItem({
+                                    key: "{CountryModel>stdCode}",
+                                    text: "{CountryModel>stdCode}",
+                                    additionalText: "{CountryModel>code}"  // country name
+                                })
+                            },
                         }),
 
                         new sap.m.Input({
@@ -1407,7 +1423,7 @@ sap.ui.define([
                                                 formatter: function (facilityName, aSelectedFacilities) {
                                                     if (!aSelectedFacilities || !facilityName) return "";
                                                     const found = aSelectedFacilities.find(f => f.FacilityName === facilityName);
-                                                    return found ? (found.SelectedPriceType + " " + found.SelectedPrice + " " + (found.Currency || "")) : "";
+                                                    return found ? (found.SelectedPriceType + " - " + found.SelectedPrice + " " + (found.Currency || "")) : "";
                                                 }
                                             }
                                         }).addStyleClass("facilityPriceText")
@@ -1620,10 +1636,7 @@ sap.ui.define([
                 }
             }
 
-            // wizard navigation (unchanged)
-            // if (!this._oWizard) {
-            //     this._oWizard = this.byId("TC_id_wizard");
-            // }
+           
             if (!this._oSelectedStep) {
                 this._oSelectedStep = this._oWizard.getCurrentStep();
             }
@@ -1782,7 +1795,6 @@ sap.ui.define([
 
         handleButtonsVisibility: function () {
             var oModel = this.getView().getModel("OBTNModel");
-            const oHostelModel = this.getView().getModel("HostelModel")
             oModel.setProperty("/Submit", false);
             oModel.setProperty("/Cancel", false);
             switch (this._iSelectedStepIndex) {
@@ -2395,11 +2407,11 @@ sap.ui.define([
             //  REAL DATE LOGIC (CALENDAR ACCURATE)
             if (sDuration === "Per Month") {
                 oEnd.setMonth(oEnd.getMonth() + iSelectedMonths);
-                oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+                oEnd.setDate(oEnd.getDate() - 1); //  FIX
             }
             else if (sDuration === "Per Year") {
                 oEnd.setFullYear(oEnd.getFullYear() + iSelectedMonths);
-                oEnd.setDate(oEnd.getDate() - 1); // ⭐ FIX
+                oEnd.setDate(oEnd.getDate() - 1); //  FIX
             }
             else if (sDuration === "Per Day") {
                 MessageToast.show(this.i18nModel.getText("durationperdayNoSelectionNeeded"));
@@ -2855,6 +2867,7 @@ sap.ui.define([
                     p.Salutation = oMatchedUser.Salutation || "";
                     p.FullName = oMatchedUser.UserName || "";
                     p.CustomerEmail = oMatchedUser.EmailID || "";
+                    p.STDCode = oMatchedUser.STDCode || "";
                     p.MobileNo = oMatchedUser.MobileNo || "";
                     p.UserID = oMatchedUser.UserID || "";
                     p.DateOfBirth = DOB || "";
