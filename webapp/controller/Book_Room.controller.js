@@ -5287,15 +5287,15 @@ sap.ui.define([
                 return;
             }
             const isMandatoryValid = (
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_Name"), "ID") &&
-                utils._LCvalidateDate(sap.ui.getCore().byId("id_dob"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_gender"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_mail"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_country"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_state"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_city"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_phone"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("id_address"), "ID")
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_Name"), "ID") &&
+                utils._LCvalidateDate(sap.ui.getCore().byId("profileFrag--id_dob"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_gender"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_mail"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_country"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_state"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_city"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_phone"), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("profileFrag--id_address"), "ID")
             );
 
             if (!isMandatoryValid) {
@@ -5738,6 +5738,150 @@ sap.ui.define([
 
         onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "ManageInvoice" });
+        },
+         onCountrySelectionChange: function (oEvent) {
+            const oCountry = oEvent.getSource();
+            const oModel = this._oProfileDialog.getModel("profileData");
+
+            utils._LCvalidateMandatoryField(oEvent);
+
+           const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
+const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
+const oStateCB = sap.ui.getCore().byId("profileFrag--id_state");
+const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
+
+
+
+            // Clear value state
+            oCountry.setValueState("None");
+
+            /* ---------------- Reset Model ---------------- */
+            ["State", "City", "STDCode", "phone"].forEach(p =>
+                oModel.setProperty("/" + p, "")
+            );
+
+            /* ---------------- Reset UI ---------------- */
+            oStateCB?.setSelectedKey("");
+            oCityCB?.setSelectedKey("");
+            oCityCB?.setValue("");
+            oSTD?.setValue("");
+            oMobile?.setValue("");
+
+            oStateCB?.getBinding("items")?.filter([]);
+            oCityCB?.getBinding("items")?.filter([]);
+
+            const oItem = oCountry.getSelectedItem();
+            if (!oItem) {
+                oModel.setProperty("/Country", "");
+                return;
+            }
+
+            const sCountryName = oItem.getText();
+            const sCountryCode = oItem.getAdditionalText()?.trim();
+
+            oModel.setProperty("/Country", sCountryName);
+
+            /* ---------------- STD Handling (Same as MC_onChangeCountry) ---------------- */
+            const aCountries = this.getOwnerComponent()
+                .getModel("CountryModel")
+                .getData();
+
+            const oCountryData = aCountries.find(c => c.countryName === sCountryName);
+
+            if (oCountryData?.stdCode) {
+                oModel.setProperty("/STDCode", oCountryData.stdCode);
+                oSTD.setValue(oCountryData.stdCode);
+
+                this._onProfileSTDChange(); // ⬅ same behavior
+            }
+
+            /* ---------------- Filter States ---------------- */
+            if (sCountryCode) {
+                oStateCB?.getBinding("items")?.filter([
+                    new sap.ui.model.Filter(
+                        "countryCode",
+                        sap.ui.model.FilterOperator.EQ,
+                        sCountryCode
+                    )
+                ]);
+            }
+        },
+         CC_onChangeState: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const oModel = this._oProfileDialog.getModel("profileData");
+            const oItem = oEvent.getSource().getSelectedItem();
+
+            const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
+
+            const oCountryCB = sap.ui.getCore().byId("profileFrag--id_country");
+
+            // Clear value state on state
+            oEvent.getSource().setValueState("None");
+
+            // Reset city-related things
+            oModel.setProperty("/City", "");
+            // if you have a separate city property:
+            // oModel.setProperty("/city", "");
+
+            oCityCB?.setSelectedKey("");
+            oCityCB?.setValue("");
+            oCityCB?.getBinding("items")?.filter([]);
+
+            // No state selected → clear state in model and exit
+            if (!oItem) {
+                oModel.setProperty("/State", "");
+                return;
+            }
+
+            const sStateName = oItem.getKey(); // or getText(), depending on your binding
+            const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+            // Save state in model
+            oModel.setProperty("/State", sStateName);
+
+            // Filter cities by state + country
+            oCityCB?.getBinding("items")?.filter([
+                new Filter("stateName", FilterOperator.EQ, sStateName),
+                new Filter("countryCode", FilterOperator.EQ, sCountryCode)
+            ]);
+        },
+          CC_onChangeCity: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const oModel = this._oProfileDialog.getModel("profileData");
+            const oItem = oEvent.getSource().getSelectedItem();
+
+            // Clear value state on city
+            oEvent.getSource().setValueState("None");
+
+            if (!oItem) {
+                oModel.setProperty("/City", "");
+                // oModel.setProperty("/city", "");
+                return;
+            }
+
+            const sCityName = oItem.getKey(); // or getText(), as per your binding
+
+            // Save in model
+            oModel.setProperty("/City", sCityName);
+            // If you also track explicit city:
+            // oModel.setProperty("/city", sCityName);
+        },
+          _onProfileSTDChange: function () {
+           
+              const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
+const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
+
+            const std = oSTD.getValue();
+            oMobile.setValue("");
+
+            // Dynamic mobile length
+            if (std === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
         },
        
     });
