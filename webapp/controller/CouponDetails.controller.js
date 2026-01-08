@@ -138,9 +138,26 @@ sap.ui.define([
                         }
 
                         case "BranchCode": {
+                            const sValue = ctrl.getValue()?.trim();
                             const sSelectedKey = ctrl.getSelectedKey();
-                            if (sSelectedKey && this._allowedBranches) {
-                                params.BranchCode = this._allowedBranches.split(",").includes(sSelectedKey) ? sSelectedKey : params.BranchCode;
+
+                            // 🟢 Case 1: user did NOT touch the field at all
+                            if (!sValue && !sSelectedKey) {
+                                // keep default allowed branches
+                                break;
+                            }
+
+                            // 🔴 Case 3: user typed something but did NOT select a valid branch
+                            if (sValue && !sSelectedKey) {
+                                params.BranchCode = "__INVALID__"; // force no data
+                                break;
+                            }
+
+                            // 🟢 Case 2: valid branch selected
+                            if (this._allowedBranches?.split(",").includes(sSelectedKey)) {
+                                params.BranchCode = sSelectedKey;
+                            } else {
+                                params.BranchCode = "__INVALID__";
                             }
                             break;
                         }

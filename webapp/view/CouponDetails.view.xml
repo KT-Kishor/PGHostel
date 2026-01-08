@@ -115,7 +115,7 @@
                         <fb:control>
                             <DateRangeSelection
                                 id="fEndRange"
-                                delimiter=" to "
+                                delimiter=" - "
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
                                 width="100%"
