@@ -219,6 +219,7 @@
                                                 tooltip="Add Image"
                                                 placeholder=" "
                                                 buttonOnly="true"
+                                                fileType="jpg,jpeg,png"
                                                 sameFilenameAllowed="true"
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
                                                 change=".onFileSelected"

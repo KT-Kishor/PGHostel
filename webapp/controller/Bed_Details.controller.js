@@ -410,7 +410,7 @@ sap.ui.define([
                         return;
                     }
 
-                    if (!this._originalBedData || flag === "true" || flag === undefined) {
+                    if (!this._originalBedData || flag === "true" || flag === undefined || this._originalBedData.length === 0) {
                         this._originalBedData = response;
                     }
 

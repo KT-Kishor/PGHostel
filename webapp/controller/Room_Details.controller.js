@@ -208,7 +208,8 @@ sap.ui.define([
                 "idBedType",
                 "idRoomNumber",
                 "idRoomNumber13",
-                "idPrice"
+                "idPrice",
+                "FO_id_Currency"
             ];
 
             aInputIds.forEach(function (sId) {

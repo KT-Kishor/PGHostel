@@ -49,12 +49,34 @@ sap.ui.define([
             }
         },
 
-        _loadBranchCode: async function () {
+     _loadBranchCode: async function () {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+            let filters = {};
+
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
+                filters.Role ="Admin";
+
+            }else{
+                filters.BranchID = aBranchCodes;
+            }
             sap.ui.core.BusyIndicator.show(0);
             try {
+                 this.commonLoginFunction();
+
                 const oView = this.getView();
 
-                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {});
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
 
                 const aBranches = Array.isArray(oResponse?.data) ?
                     oResponse.data :

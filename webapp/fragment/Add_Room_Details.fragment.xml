@@ -89,7 +89,7 @@
                     id="idRoomNumber"
                     value="{RoomModel>/RoomNo}"
                     placeholder="{i18n>enterRoomNo}"
-                    maxLength="60"
+                    maxLength="36"
                     liveChange="onRoomNoInputLiveChange"
                     valueStateText="{i18n>roomNocannotbeEmpty}"
                 />
