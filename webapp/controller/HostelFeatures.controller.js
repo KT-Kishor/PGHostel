@@ -294,10 +294,10 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
-            } else if (Array.isArray(omainModel) && omainModel.length) {
+         if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            }else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
 
             let filters = {};

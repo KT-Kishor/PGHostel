@@ -92,12 +92,12 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = [];
-               if (oExistingModel.BranchCode) {
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            }else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
-            }else if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             // Normalize filter
