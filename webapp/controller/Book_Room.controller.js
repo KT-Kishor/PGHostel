@@ -27,6 +27,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
+            // this.commonLoginFunction();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1","ID_DOB_"], this.getView());
             var oView = this.getView()
@@ -304,6 +305,7 @@ sap.ui.define([
             aPersons.forEach((person, index) => {
                 let prefix = "Person " + (index + 1) + ": ";
 
+                if (!person.Salutation) aMissingFields.push(prefix + "Salutation");
                 if (!person.FullName) aMissingFields.push(prefix + "Full Name");
                 if (!person.DateOfBirth) aMissingFields.push(prefix + "Date of Birth");
                 if (!person.Gender) aMissingFields.push(prefix + "Gender");
@@ -803,7 +805,18 @@ sap.ui.define([
                         new sap.m.Input({
                             placeholder: "Enter Email",
                             width: "100%",
-                            value: "{HostelModel>/Persons/" + i + "/CustomerEmail}"
+                            value: "{HostelModel>/Persons/" + i + "/CustomerEmail}",
+                             liveChange: function (oEvent) {
+                                const sValue = oEvent.getParameter("value");
+                                const oInput = oEvent.getSource();
+                                const oEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                if (sValue && !oEmailRegex.test(sValue)) {
+                                    oInput.setValueState("Error");
+                                    oInput.setValueStateText("Please enter a valid email address.");
+                                } else {
+                                    oInput.setValueState("None");
+                                }
+                            }
                         }),
 
                         new sap.m.Label({
@@ -1023,6 +1036,7 @@ sap.ui.define([
                             liveChange: function (oEv) {
                                 const oInput = oEv.getSource();
                                 let sValue = oInput.getValue() || "";
+                                
                                 sValue = sValue.replace(/\D/g, ""); // allow only digits
 
                                 const aPersons = oModel.getProperty("/Persons") || [];
@@ -1627,7 +1641,6 @@ sap.ui.define([
                 : [];
 
             let bHasError = false;
-
 
             // Fallback: scan entire view (SAFE for dynamic controls)
             if (aErrorControls.length === 0) {
@@ -3451,13 +3464,10 @@ sap.ui.define([
                     Salutation: C("signUpSalutation").getSelectedKey(),
                     UserName: data.fullname.trim(),
                     Role: "Customer",
-
                     EmailID: data.Email.trim(),
                     Password: btoa(data.password),
-
                     STDCode: data.STDCode || std,
                     MobileNo: data.Mobileno,
-
                     Status: "Active",
                     TimeDate,
                     DateOfBirth: data.DateOfBirth || "",

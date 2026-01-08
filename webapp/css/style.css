@@ -1173,59 +1173,6 @@
     color: #ffffff !important;
 }
 
-
-
-
-/* 
- .authDialog .sapMBtnInner {
-    background: linear-gradient(135deg, #00b7c7, #007984) !important;
-} 
- .authDialog button,
-.authDialog .sapMBtnInner,
-.authDialog .sapMBtnIcon {
-    color: #fff !important;
-} 
- .authDialog .sapMBtnInner {
-  background-color: #1bb2bf !important;
-    color: #ffffff !important;
-    border: 2px solid #007984 !important;  
-    border-radius: 10px !important;
-    font-size: medium;
-    font-weight: bold;
-    padding:  0.2rem 0 0 0;
-    width: 100px;
-    height: 35px;
-} 
- .authDialog .sapMBtn:hover .sapMBtnInner,
-.authDialog .sapMBtn.sapMBtnHover .sapMBtnInner {
-    background: #ffffff !important;
-    color: #005bbf !important;      
-     border-color: #005bbf !important;
-}
- .authDialog .sapMBtn.sapMBtnActive .sapMBtnInner {
-    background: #e6f0ff !important; 
-    color: #005bbf !important;
-     border-color: #005bbf !important;
-}
-.authDialog .sapUiIcon {
-  background-color: #007984 !important;
-    color: #ffffff !important;
-}
-.authDialog .sapUiIcon :hover{
-  background-color: #ffffff !important;
-    color: #005bbf !important;
-}  */
-
-
-
-
-
-
-
-
-
-
-
 span.sapMBtnInner.sapMBtnEmphasized {
     background-color: #00ACC1 !important; /* light teal */
     color: #FFFFFF !important;
@@ -1247,7 +1194,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 } */
 
 .sapMBtn:hover>.sapMBtnHoverable {
-    color: #fff;
+    color: #ffffff;
     background-color: #ffffff;
     border-color: #ffffff;
 }
@@ -1263,10 +1210,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
     font-weight: bold;
   
 }
-/* .totalColumnBold1{
-  font-weight: bold;
-  font-size: 16px;
-} */
+
 /* NORMAL — make CLEAR text white */
 .sapUiCompFilterBar .sapUiCompFilterBarButtons 
     .sapMBtnTransparent .sapMBtnInner .sapMBtnContent bdi {
@@ -1276,7 +1220,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 /* HOVER — when mouse enters the button */
 .sapUiCompFilterBar .sapUiCompFilterBarButtons 
     .sapMBtnTransparent.sapMBtnHover .sapMBtnInner {
-    background-color: #ffffff !important; /* white background */
+    background-color: #ffffff !important; 
 }
 
 /* HOVER — change text to BLUE */
