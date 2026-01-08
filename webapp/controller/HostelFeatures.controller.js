@@ -229,14 +229,14 @@ sap.ui.define([
                         }
                     });
 
-                    sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("amenitiesUpdatedSuccessfully"));
                 } else {
                     // CREATE
                     await this.ajaxCreateWithJQuery("HM_HostelFeatures", {
                         data: oPayload
                     });
 
-                    sap.m.MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("amenitiesAddedSuccessfully"));
                 }
 
                 this.ARD_Dialog.close();

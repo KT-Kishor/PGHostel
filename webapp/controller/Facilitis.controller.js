@@ -292,7 +292,7 @@ sap.ui.define([
             // File validation
             var Attachment = oView.getModel("tokenModel").getData();
             if (!Attachment.tokens || Attachment.tokens.length === 0) {
-                return sap.m.MessageBox.error(this.i18nModel.getText("uploadFile"));
+                return sap.m.MessageToast.show(this.i18nModel.getText("uploadFile"));
             }
 
             //  Duplicate check
@@ -310,12 +310,12 @@ sap.ui.define([
             }
 
             if (attachments.length === 0) {
-                sap.m.MessageBox.error(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                 return;
             }
 
             if (attachments.length > 3) {
-                sap.m.MessageBox.error(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+                sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
                 return;
             }
 
@@ -653,21 +653,32 @@ sap.ui.define([
         },
 
         MD_onDownload: function () {
-            const oModel = this.byId("id_facilityTable").getModel("Facilities").getData();
+            const oTable = this.byId("id_facilityTable");
+            const oModel = oTable.getModel("Facilities")?.getData();
+
+            // No data validation
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;
             }
-            const adjustedData = oModel.map(item => ({
-                ...item,
-                PerHourPrice: item.PerHourPrice + " " + item.Currency,
-                PerDayPrice: item.PerDayPrice + " " + item.Currency,
-                PerMonthPrice: item.PerMonthPrice + " " + item.Currency,
-                PerYearPrice: item.PerYearPrice + " " + item.Currency
-                // Pincode: item.Pincode ? String(item.Pincode) : "",
-                // Contact: item.Contact ? String(item.Contact) : ""
-            }));
+
+            // Show busy indicator during download
+            sap.ui.core.BusyIndicator.show(0);
+
+            // Adjust data (price + currency)
+            const adjustedData = oModel.map(function (item) {
+                return {
+                    ...item,
+                    PerHourPrice: item.PerHourPrice + " " + item.Currency,
+                    PerDayPrice: item.PerDayPrice + " " + item.Currency,
+                    PerMonthPrice: item.PerMonthPrice + " " + item.Currency,
+                    PerYearPrice: item.PerYearPrice + " " + item.Currency
+                };
+            });
+
+            // Excel column configuration
             const aCols = this.createTableSheet();
+
             const oSettings = {
                 workbook: {
                     columns: aCols,
@@ -677,14 +688,19 @@ sap.ui.define([
                 fileName: "Facilities_Details.xlsx",
                 worker: false
             };
-            MessageToast.show(this.i18nModel.getText("downloadingFacilitiesDetails"));
-            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
 
+            // Create Spreadsheet
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
             oSheet.build().then(() => {
-                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
-            }).finally(() => {
-                oSheet.destroy();
-            });
-        },
+                    MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+                }).catch((oError) => {
+                    MessageToast.show(
+                        this.i18nModel.getText("MSdownloadfailed") || "Download failed"
+                    );
+                }).finally(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                    oSheet.destroy();
+                });
+        }
     });
 });
