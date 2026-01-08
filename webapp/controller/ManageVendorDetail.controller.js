@@ -4,11 +4,11 @@ sap.ui.define([
     "../model/formatter",
     "sap/collaboration/components/fiori/sharing/attachment/Attachment",
     "sap/m/MessageToast",
-], function (BaseController, utils, Formatter, Attachment, MessageToast) {
+], function(BaseController, utils, Formatter, Attachment, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageVendorDetail", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -21,7 +21,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendorDetail").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             try {
                 // this.commonLoginFunction();
                 var Layout = this.byId("MV_id_ObjectPageLayout");
@@ -39,6 +39,7 @@ sap.ui.define([
                 this.sUserID = oEvent.getParameter("arguments").UserID;
                 await this._loadVendorDetails(this.sUserID);
                 this._applyCountryStateCityFilters();
+                this._makeDatePickersReadOnly(["MV_id_VendorDOB"]);
                 sap.ui.core.BusyIndicator.hide();
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
@@ -48,7 +49,7 @@ sap.ui.define([
             }
         },
 
-        _initAdminSignupModel: function () {
+        _initAdminSignupModel: function() {
             const oModel = new sap.ui.model.json.JSONModel({
                 Salutation: "",
                 VendorName: "",
@@ -70,7 +71,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: function () {
+        _applyCountryStateCityFilters: function() {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCountryCB = this.byId("MV_id_Country");
             const oStateCB = this.byId("MV_id_State");
@@ -114,7 +115,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-        _loadVendorDetails: async function (sUserID) {
+        _loadVendorDetails: async function(sUserID) {
             try {
                 sap.ui.core.BusyIndicator.show(0);
 
@@ -165,11 +166,11 @@ sap.ui.define([
             }
         },
 
-        onDocumentTypeChange: function (oEvent) {
+        onDocumentTypeChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onAdminFileSelect: function (oEvent) {
+        onAdminFileSelect: function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             const oModel = this.getView().getModel("AdminSignupModel");
             const sDocType = oModel.getProperty("/CurrentDocType");
@@ -195,7 +196,7 @@ sap.ui.define([
 
             const reader = new FileReader();
             const that = this;
-            reader.onload = async function (e) {
+            reader.onload = async function(e) {
                 try {
                     const sBase64 = e.target.result.split(",")[1];
                     const oPayload = {
@@ -224,20 +225,20 @@ sap.ui.define([
             reader.readAsDataURL(oFile);
         },
 
-        onFileSizeExceeds: function () {
+        onFileSizeExceeds: function() {
             sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
         },
 
-        BI_onEditButtonPress: function () {
+        BI_onEditButtonPress: function() {
             this.getView().getModel("editable").setProperty("/Edit", true);
         },
 
-        BI_onButtonPress: function () {
+        BI_onButtonPress: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageVendor");
         },
 
-        onEditOrSavePress: async function () {
+        onEditOrSavePress: async function() {
             const oEditableModel = this.getView().getModel("editable");
             const bEditMode = oEditableModel.getProperty("/Edit");
 
@@ -255,7 +256,7 @@ sap.ui.define([
             }
         },
 
-        BT_onsavebuttonpress: async function () {
+        BT_onsavebuttonpress: async function() {
             try {
                 const C = this.byId.bind(this);
                 const oModel = this.getView().getModel("AdminSignupModel");
@@ -314,12 +315,12 @@ sap.ui.define([
             }
         },
 
-        onAdminSelectionChange: function () {
+        onAdminSelectionChange: function() {
             this.byId("AdminDeleteButton").setEnabled(true);
             this.byId("AdminDownloadButton").setEnabled(true);
         },
 
-        onAdminDeleteFiles: function () {
+        onAdminDeleteFiles: function() {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oSelectedItem = oTable.getSelectedItem();
 
@@ -341,33 +342,33 @@ sap.ui.define([
                 "Confirm",
                 "Are you sure you want to delete this document?",
                 async () => {
-                    try {
-                        sap.ui.core.BusyIndicator.show(0);
+                        try {
+                            sap.ui.core.BusyIndicator.show(0);
 
-                        await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
-                            filters: {
-                                DocumentID: oContext.getProperty("DocumentID"),
-                                CustomerID: sUserID
-                            }
-                        });
+                            await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
+                                filters: {
+                                    DocumentID: oContext.getProperty("DocumentID"),
+                                    CustomerID: sUserID
+                                }
+                            });
 
-                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
-                        this._loadVendorDetails(sUserID); // refresh attachment list
+                            sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                            this._loadVendorDetails(sUserID); // refresh attachment list
+                            fnResetSelection();
+                        } catch (err) {
+                            sap.m.MessageToast.show(err.message || "Delete failed");
+                        } finally {
+                            sap.ui.core.BusyIndicator.hide();
+                        }
+                    },
+                    () => {
+                        // Cancel callback
                         fnResetSelection();
-                    } catch (err) {
-                        sap.m.MessageToast.show(err.message || "Delete failed");
-                    } finally {
-                        sap.ui.core.BusyIndicator.hide();
                     }
-                },
-                () => {
-                    // Cancel callback
-                    fnResetSelection();
-                }
             );
         },
 
-        onAdminDownloadFiles: function () {
+        onAdminDownloadFiles: function() {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oContext = oTable.getSelectedItem()?.getBindingContext("AdminSignupModel");
 
@@ -408,7 +409,7 @@ sap.ui.define([
             this.byId("AdminDownloadButton").setEnabled(false);
         },
 
-        onAdminPreviewDoc: function (oEvent) {
+        onAdminPreviewDoc: function(oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -577,7 +578,7 @@ sap.ui.define([
             sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
         },
 
-        MTF_onPressOk: async function () {
+        MTF_onPressOk: async function() {
             const btnText = sap.ui.getCore().byId("MIF_id_OkBtn").getText();
             const i18n = this.getView().getModel("i18n").getResourceBundle();
             const remark = sap.ui.getCore().byId("MIF_id_remark").getValue().trim();
@@ -623,8 +624,8 @@ sap.ui.define([
 
                 sap.m.MessageToast.show(
                     btnText === "Approve" ?
-                        i18n.getText("approveMessageSuccess") :
-                        i18n.getText("resendMessageSuccess")
+                    i18n.getText("approveMessageSuccess") :
+                    i18n.getText("resendMessageSuccess")
                 );
 
                 this.oDialog.close();
@@ -635,15 +636,15 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageBox.error(
                     btnText === "Approve" ?
-                        i18n.getText("erroApproveMessage") :
-                        i18n.getText("errorResendMessage")
+                    i18n.getText("erroApproveMessage") :
+                    i18n.getText("errorResendMessage")
                 );
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
 
-        MIF_onPressClose: function () {
+        MIF_onPressClose: function() {
             this.oDialog.close();
         },
 
@@ -658,7 +659,7 @@ sap.ui.define([
             return true;
         },
 
-        onAdminChangeSalutation: function (oEvent) {
+        onAdminChangeSalutation: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.byId("MV_id_Gender");
@@ -682,7 +683,7 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onAdminLiveValidate: function (oEvent) {
+        onAdminLiveValidate: function(oEvent) {
             const id = oEvent.getSource().getId();
 
             if (id.includes("MV_id_VendorName")) { // Vendor name
@@ -701,218 +702,158 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeGender: function (oEvent) {
+        ADMIN_onChangeGender: function(oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
             this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-        ADMIN_onChangeCountry: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
+        ADMIN_onChangeCountry: function(oEvent) {
             const oCountry = oEvent.getSource();
-            const oModel = this.getView().getModel("AdminSignupModel");
+            const oView = this.getView();
+            const oModel = oView.getModel("AdminSignupModel");
 
-            const oStateModel = this.getView().getModel("StateModel");
-            const oCityModel = this.getView().getModel("CityModel");
             const oState = this.byId("MV_id_State");
             const oCity = this.byId("MV_id_City");
             const oSTD = this.byId("MV_id_StdCode");
             const oMobile = this.byId("MV_id_MobileNo");
 
-            // --- 1) SANITIZE TYPED COUNTRY TEXT ---
-            const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
-            oCountry.setValue(val);
+            // sanitize
+            oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
 
-            // If typed text diverges from auto-selected item → clear selection
-            if (oCountry.getSelectedItem() &&
-                val !== oCountry.getSelectedItem().getText()) {
-                oCountry.setSelectedKey(null);
-                oCountry.setSelectionItem(null);
-            }
+            // reset model
+            ["State", "City", "STDCode", "Mobile"].forEach(p =>
+                oModel.setProperty("/" + p, "")
+            );
 
-            // --- 2) RESET dependent model properties ---
-            oModel.setProperty("/State", "");
-            oModel.setProperty("/City", "");
-            oModel.setProperty("/STDCode", "");
-
-            // Reset UI fields
+            // reset UI
             oState.setValue("").setSelectedKey("");
             oCity.setValue("").setSelectedKey("");
             oSTD.setValue("").setSelectedKey("");
             oMobile.setValue("");
 
-            // Always clear local filtered lists
-            oStateModel.setProperty("/filtered", []);
-            oCityModel.setProperty("/filtered", []);
+            // block dependent dropdowns
+            oState.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
+            ]);
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+            ]);
             oSTD.getBinding("items")?.filter([]);
 
-            // Determine selected item
-            const selected = oCountry.getSelectedItem();
-
-            oCountry.setValueState("None");
-
-            // CASE B — MANUAL COUNTRY TYPED (no selection)
-            if (!selected) {
-                // ONLY clear country error — DO NOT set errors on others
-                oModel.setProperty("/Country", val);
+            const oItem = oCountry.getSelectedItem();
+            if (!oItem) {
+                oModel.setProperty("/Country", oCountry.getValue());
                 return;
             }
 
-            // CASE A — COUNTRY SELECTED
-            oModel.setProperty("/Country", selected.getText());
+            const sCountry = oItem.getText();
+            const sCode = oItem.getAdditionalText().trim();
+            oModel.setProperty("/Country", sCountry);
 
-            // Clear ALL dependent errors (valid selection now)
-            oCountry.setValueState("None");
-            oState.setValueState("None");
-            oCity.setValueState("None");
-            oSTD.setValueState("None");
-            oMobile.setValueState("None");
-
-            const sCountryCode = selected.getAdditionalText().trim();
-
-            // Mobile length rule
-            oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
-
-            // Filter states
-            const allStates = oStateModel.getData();
-            const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
-            oStateModel.setProperty("/filtered", filteredStates);
-
-            // Filter STD codes
-            oSTD.getBinding("items")?.filter([
-                new sap.ui.model.Filter("code", "EQ", sCountryCode)
+            // release states
+            oState.getBinding("items")?.filter([
+                new sap.ui.model.Filter("countryCode", "EQ", sCode)
             ]);
 
-            // Auto-select first STD item
-            setTimeout(() => {
-                const items = oSTD.getItems();
-                if (items.length > 0) {
-                    const key = items[0].getKey();
-                    oSTD.setSelectedKey(key);
-                    oModel.setProperty("/STDCode", key);
-                }
-            }, 30);
+            // STD filter
+            oSTD.getBinding("items")?.filter([
+                new sap.ui.model.Filter("code", "EQ", sCode)
+            ]);
 
-            // If no states exist → empty city list
-            if (filteredStates.length === 0) {
-                oCityModel.setProperty("/filtered", []);
-            }
+            setTimeout(() => {
+                const aItems = oSTD.getItems();
+                if (aItems.length) {
+                    oSTD.setSelectedKey(aItems[0].getKey());
+                    oModel.setProperty("/STDCode", aItems[0].getKey());
+                    this.ADMIN_onChangeSTD();
+                }
+            }, 20);
         },
 
-        ADMIN_onChangeState: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-
+        ADMIN_onChangeState: function(oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
 
-            const oCountry = this.byId("adminsignUpCountry");
+            oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const sState =
+                oState.getSelectedItem()?.getText() ||
+                oState.getValue() || "";
+
+            oModel.setProperty("/State", sState);
+
             const oCity = this.byId("MV_id_City");
-            const oCityModel = this.getView().getModel("CityModel");
+            oCity.setValue("").setSelectedKey("");
+            oModel.setProperty("/City", "");
 
-            const val = (oState.getValue() || "").replace(/[^a-zA-Z\s]/g, "");
-            oState.setValue(val);
-            oState.setValueState("None");
+            // block city
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+            ]);
 
-            oModel.setProperty("/City", "");   // Clear dependent city
-            oCity.setSelectedKey("").setValue("");
-            oCityModel.setProperty("/filtered", []);
+            const oCountry = this.byId("MV_id_Country");
+            const sCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
+            if (!sCode || !sState) return;
 
-            const selected = (typeof oState.getSelectedItem === "function") ?
-                oState.getSelectedItem() :
-                null;
-
-            if (selected && val !== selected.getText()) {
-                oState.setSelectedKey(null);
-                oState.setSelectionItem(null);
-            }
-
-            const selectedCountry = (typeof oCountry.getSelectedItem === "function") ?
-                oCountry.getSelectedItem() :
-                null;
-
-            if (!selected || !selectedCountry) {
-                oModel.setProperty("/State", val);
-                return;
-            }
-
-            const sStateText = selected.getText();
-            oModel.setProperty("/State", sStateText);
-            const sCountryCode = selectedCountry.getAdditionalText().trim();
-
-            const allCities = oCityModel.getData();
-            const filteredCities = allCities.filter(c =>
-                c.countryCode === sCountryCode &&
-                c.stateName === sStateText
-            );
-
-            oCityModel.setProperty("/filtered", filteredCities);
+            // release cities
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", "EQ", sState),
+                new sap.ui.model.Filter("countryCode", "EQ", sCode)
+            ]);
         },
 
-        ADMIN_onChangeCity: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-
-            const oCityCtrl = oEvent.getSource();
+        ADMIN_onChangeCity: function(oEvent) {
+            const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
-            const val = oCityCtrl.getValue().replace(/[^a-zA-Z\s]/g, "");
-            oCityCtrl.setValue(val);
-            oCityCtrl.setValueState("None");
 
-            const selected = oCityCtrl.getSelectedItem();
-            if (selected) {
-                oModel.setProperty("/City", selected.getText());
-                return;
-            }
-            oModel.setProperty("/City", val);
+            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const sCity =
+                oCity.getSelectedItem()?.getText() ||
+                oCity.getValue() || "";
+
+            oModel.setProperty("/City", sCity);
         },
 
-        ADMIN_onChangeSTD: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-
-            const oSTD = oEvent.getSource(); // easier than getCore()
+        ADMIN_onChangeSTD: function() {
+            const oSTD = this.byId("MV_id_StdCode");
             const oMobile = this.byId("MV_id_MobileNo");
-            const oModel = this.getView().getModel("AdminSignupModel");
-            oSTD.setValueState("None");
+
+            const std = oSTD.getValue();
+
+            // Reset mobile field
             oMobile.setValue("");
-            oMobile.setMaxLength(oSTD.getValue() === "+91" ? 10 : 18);
-            oModel.setProperty("/STDCode", oSTD.getValue());
+            oMobile.setMaxLength(std === "+91" ? 10 : 18);
+
+            // Clear value states
+            oSTD.setValueState("None");
+            oMobile.setValueState("None");
         },
 
-        onChangeDOB: function (oEvent) {
-            utils._LCvalidateDate(oEvent);
-        },
 
-        ADMIN_onMobileLiveChange: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
+        ADMIN_onMobileLiveChange: function(oEvent) {
             const oInput = oEvent.getSource();
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
-
-            const oSTD = this.byId("MV_id_StdCode");
-            const stdRaw = oSTD?.getValue() || "";
-            const std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
 
             if (!val) {
                 oInput.setValueState("None");
                 return;
             }
 
-            if (!std || std === "+") {
-                oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
-                return;
-            }
+            const std = this.byId("MV_id_StdCode").getValue();
+            const isValid = utils._LCvalidateISDmobile(oInput, std);
 
-            const valid = utils._LCvalidateISDmobile(oInput, std);
-            oInput.setValueState(valid ? "None" : "Error");
-            if (!valid) {
-                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
-            }
+            oInput.setValueState(isValid ? "None" : "Error");
+        },
+
+        onChangeDOB: function(oEvent) {
+            utils._LCvalidateDate(oEvent);
         }
     });
 });
