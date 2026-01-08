@@ -79,6 +79,8 @@
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                                 press="onEditBooking"
                                 visible="{=
+                                    ${CustomerData>/Status} !== 'Cancelled'
+                                     &amp;&amp;
                                     (
                                         ${CustomerData>/Status} === 'New' ||
                                         (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin')

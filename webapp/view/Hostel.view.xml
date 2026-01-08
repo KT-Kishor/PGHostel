@@ -258,11 +258,11 @@
                         > -->
                     <VBox class="">
 	<l:Grid id="idBedTypeFlex" defaultSpan="XL3 L4 M6 S12" containerQuery="true" 
-    hSpacing="2" vSpacing="2" content="{path: 'VisibilityModel>/BedTypes'}">     
-    <VBox class="bedCard">
+    hSpacing="2" vSpacing="2" content="{path: 'VisibilityModel>/BedTypes'}" >     
+    <VBox class="bedCard" visible="{VisibilityModel>Visible}">
                                 <!-- ===== IMAGE CAROUSEL ===== -->
                                 <Carousel
-                                    height="300px"
+                                    height="300px"  
                                     width="100%"
                                     loop="true"
                                     showPageIndicator="false"

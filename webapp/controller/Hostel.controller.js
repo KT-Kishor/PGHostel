@@ -2849,7 +2849,9 @@ sap.ui.define([
 
                     // var AvailbleBeds = totalCapacity - totalBooked
                     // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-                    const isVisible = room?.Status === "Available";
+            const isVisible = room?.Status === "Available" &&   price !== "";
+                
+
                     const oBranchInfo = aBranchData.find(b =>
                         b.BranchID?.toLowerCase() === room.BranchCode?.toLowerCase()
                     );
@@ -2902,10 +2904,11 @@ sap.ui.define([
 
                 this.sBranchCode = sBranchCode
 
+                const bHasVisibleItems = aFinal.some(item => item.Visible === true)
+
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
-                oVisibilityModel.setProperty("/NoData", aFinal.length === 0);
                 oVisibilityModel.setProperty("/ShowViewMore", aBedTypes.length === this.iTop);
-                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
+                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0 || !bHasVisibleItems) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
