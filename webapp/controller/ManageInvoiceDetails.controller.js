@@ -862,11 +862,11 @@ sap.ui.define([
                         oSelectedCustomerModel.setProperty("/CustomerName", CustomerName)
                         that.closeBusyDialog();
                         var oDialog = new sap.m.Dialog({
-                            title: this.i18nModel.getText("success"),
+                            title: that.i18nModel.getText("success"),
                             type: sap.m.DialogType.Message,
                             state: sap.ui.core.ValueState.Success,
                             content: new sap.m.Text({
-                                text: this.i18nModel.getText("invoiceCreatemsg")
+                                text: that.i18nModel.getText("invoiceCreatemsg")
                             }),
                             beginButton: new sap.m.Button({
                                 text: "OK",
