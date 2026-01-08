@@ -62,12 +62,16 @@ sap.ui.define([
 
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
+          if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            }else   if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
             }
-
             let filters = {};
             if (oExistingModel.Role !== "") {
                 filters = {
@@ -285,6 +289,7 @@ sap.ui.define([
 
         Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
 
             // Read FilterBar inputs
@@ -296,8 +301,13 @@ sap.ui.define([
 
             // Branch Codes (from login)
             let aBranchCodes = [];
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
+       
+          if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            }else   if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
             }
 
             // Build Filters for backend
