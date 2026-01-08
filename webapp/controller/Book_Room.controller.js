@@ -28,7 +28,7 @@ sap.ui.define([
 
         _onRouteMatched: function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1"], this.getView());
+            this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1","ID_DOB_"], this.getView());
             var oView = this.getView()
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
@@ -746,6 +746,7 @@ sap.ui.define([
                         new sap.m.DatePicker({
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/DateOfBirth}",
+                            id: that.createId("ID_DOB_" + i),
                             formatter: that.DateFormat,
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
@@ -850,7 +851,7 @@ sap.ui.define([
                                 if (oCountryObj.countryName === "India") {
                                     aPersons[i].MobileMax = 10;
                                 } else {
-                                    aPersons[i].MobileMax = 20; // or any other rule
+                                    aPersons[i].MobileMax = 18; // or any other rule
                                 }
 
                                 // Filter states (existing logic)
@@ -955,6 +956,7 @@ sap.ui.define([
                             id: that.createId("ID_STDCode_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
                             showSecondaryValues: true,
+                            filterSecondaryValues: true,
                             items: {
                                 path: "CountryModel>/",
                                 length: 1000, showSecondaryValues: true,
@@ -964,6 +966,52 @@ sap.ui.define([
                                     additionalText: "{CountryModel>code}"  // country name
                                 })
                             },
+                           change: function (oEv) {
+    const oCombo = oEv.getSource();
+    const oSel = oCombo.getSelectedItem();
+
+    if (!oSel) {
+        return;
+    }
+
+    const aPersons = oModel.getProperty("/Persons") || [];
+
+    const oSTDObj = oSel.getBindingContext("CountryModel").getObject();
+    const sSTDCode = oSTDObj.stdCode;
+
+    // Decide Mobile Max Length
+    let iMobileMax;
+    if (sSTDCode === "+91") {
+        iMobileMax = 10;
+    } else {
+        iMobileMax = 18;
+    }
+
+    // Update model properly
+    aPersons[i].STDCode = sSTDCode;
+    aPersons[i].MobileMax = iMobileMax;
+
+    oModel.setProperty("/Persons", aPersons);
+    oModel.refresh(true);
+
+    // Update UI Input immediately (same as country logic)
+    const oMobileInput = sap.ui.getCore().byId(
+        that.createId("ID_Mobile_" + i)
+    );
+
+    if (oMobileInput) {
+        oMobileInput.setMaxLength(iMobileMax);
+
+        // Trim existing value if longer than allowed
+        let sValue = oMobileInput.getValue() || "";
+        if (sValue.length > iMobileMax) {
+            sValue = sValue.substring(0, iMobileMax);
+            oMobileInput.setValue(sValue);
+            oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
+        }
+    }
+}
+
                         }),
 
                         new sap.m.Input({
@@ -994,10 +1042,10 @@ sap.ui.define([
                                 // Country-specific validations
                                 if (sCountry === "India") {
                                     // exact 10 digits required
-                                    if (sValue.length !== 10) {
-                                        oInput.setValueState("Error");
-                                        oInput.setValueStateText(that.i18nModel.getText("mobileNomustbeexactlyDigits"));
-                                    }
+                                    // if (sValue.length !== 10) {
+                                    //     oInput.setValueState("Error");
+                                    //     oInput.setValueStateText(that.i18nModel.getText("mobileNomustbeexactlyDigits"));
+                                    // }
                                     // update model value for MobileNo
                                     oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
                                     return;
@@ -1048,6 +1096,7 @@ sap.ui.define([
                         new sap.m.ComboBox({
                             placeholder: "Select Document Type",
                             width: "100%",
+                            maxLength: 30,
                             selectedKey: "{HostelModel>/Persons/" + i + "/DocumentType}",
                             items: [
                                 new sap.ui.core.ListItem({
@@ -5687,6 +5736,14 @@ sap.ui.define([
         },
 
         onCancelPress: function () {
+              const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
             this._isPersonUIInitialized = false;
             this._mustRecreatePersonUI = true;
             this._lastPersonCount = null;
