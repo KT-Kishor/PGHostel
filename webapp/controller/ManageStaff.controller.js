@@ -77,6 +77,8 @@ sap.ui.define([
                 filters = {
                     BranchID: aBranchCodes
                 };
+            }else{
+                filters.BranchID = aBranchCodes;
             }
 
             sap.ui.core.BusyIndicator.show(0);
@@ -320,6 +322,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
+            }else{
+                filters.BranchCode = aBranchCodes;
             }
 
             // Apply UserID filter

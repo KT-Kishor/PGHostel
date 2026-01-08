@@ -50,6 +50,8 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
+            }else{
+                filters.BranchID = aBranchCodes;
             }
             try {
                 const oView = this.getView();
@@ -720,6 +722,8 @@ sap.ui.define([
                 filters = { BranchCode: aBranchCodes };
                 filters.Role ="Admin";
 
+            }else{
+                filters.BranchCode = aBranchCodes;
             }
 
             if (sRoomNo) {

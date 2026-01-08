@@ -60,6 +60,8 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
+            }else{
+                filters.BranchID = aBranchCodes;
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -305,6 +307,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes};
                 filters.Role = "Admin";
+            }else{
+                filters.BranchCode = aBranchCodes;
             }
 
             if (sFacilityName) filters.FacilityName = sFacilityName;
