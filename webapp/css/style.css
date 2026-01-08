@@ -2919,16 +2919,20 @@ span.sapMBtnInner.sapMBtnEmphasized {
   text-align: center;
 }
 .facilityOverlayText {
+
+  font-weight: bold !important;
+  font-size: 15px !important;
+  letter-spacing: 0.2px;
+
     position: absolute;
     bottom: 4px;
     left: 4px;
     right: 4px;
-    background: linear-gradient(transparent, rgba(27,178,191,0.9));
+    /* background: linear-gradient(transparent, #1bb2bf ); */
+ background: rgba(27,178,191,0.5) !important;
     color: white;
-    font-weight: bold;
-    font-size: 16px;
     padding: 4px 8px;
-    border-radius:0 0 12px 12px !important;
+    border-radius:6px 6px 6px 6px !important;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -2996,20 +3000,21 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .serviceCard:not(.serviceCardSelected):hover {
   transform: translateY(-4px) !important;
   border-color: rgba(0,121,132,0.35) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.14) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
 }
+
 
 /* ---------- Selected Card ---------- */
 .serviceCard.serviceCardSelected,
 .sapMVBox.serviceCard.serviceCardSelected,
 .sapMFlexBox .serviceCard.serviceCardSelected {
   background: #ffffff !important;
-  border: 3px solid #007984 !important;
+  border: 2.5px solid #1bb2bf !important;
   border-radius: 15px !important;
   padding: 10px !important; /* compensate for thicker border */
   transform: scale(1.02) !important;
   z-index: 5 !important;
-  box-shadow: 0 12px 28px rgba(0,121,132,0.14) !important;
+  box-shadow: 0 12px 30px rgba(0, 121, 132, 0.22) !important;
 }
 
 /* ---------- Image Container (IMPORTANT FIX) ---------- */
@@ -3027,7 +3032,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* ✅ Rounded image with teal outline (NO radius loss) */
 .serviceCard.serviceCardSelected .imageContainer {
-  outline: 3px solid #007984 !important;   /* does not affect radius */
+  outline: 3px solid #1bb2bf !important;   /* does not affect radius */
   outline-offset: -3px !important;         /* sits flush on edge */
   border-radius: 12px !important;
   overflow: hidden !important;
@@ -3037,7 +3042,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .serviceImage,
 .imageContainer img {
   width: 100% !important;
-  height: 180px !important;
+  /* height: 180px !important; */
   object-fit: cover !important;
   display: block !important;
 
@@ -3051,6 +3056,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   font-size: 14px !important;
   font-weight: 600 !important;
   color: #007984 !important;
+  /* color: #0064d9 !important; */
   text-align: center !important;
 }
 
@@ -3133,7 +3139,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .serviceImage,
 .imageContainer img {
   width: 100% !important;
-  height: 180px !important;
+  /* height: 180px !important; */
   object-fit: cover !important;
 }
 
@@ -3154,3 +3160,5 @@ span.sapMBtnInner.sapMBtnEmphasized {
   /* slightly smaller to reveal the card rim */
   border-radius: 11px !important;
 }
+
+
