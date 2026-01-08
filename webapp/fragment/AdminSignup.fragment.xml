@@ -33,13 +33,14 @@
 					</ComboBox>
 				</VBox>
 				<!-- Vendor Name : 70% -->
-				<VBox width="75%" >
+				<VBox width="75%" class="sapUiTinyMarginBegin">
 					<Label text="{i18n>MVDname}" required="true" />
 					<Input id="adminVendorName" 
                     value="{AdminSignupModel>/VendorName}" 
                     placeholder="{i18n>enteryourname}" 
                     liveChange="onAdminLiveValidate" 
-                    valueStateText="{i18n>MSenterValidName}" />
+                    valueStateText="{i18n>MSenterValidName}" 
+					maxLength="50"/>
 				</VBox>
 			</HBox>
 			<!-- DOB -->
@@ -54,7 +55,7 @@
 			</Select>
 			<!-- Email -->
 			<Label text="{i18n>email}" required="true" />
-			<Input placeholder="{i18n>enteryourEmail}" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="{i18n>MSenterValidEmail}" />
+			<Input maxLength="50" placeholder="{i18n>enteryourEmail}" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="{i18n>MSenterValidEmail}" />
 			<!-- Country -->
 			<Label text="{i18n>MVDcountry}" required="true" />
 			<ComboBox id="adminsignUpCountry" selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry" selectionChange="ADMIN_onChangeCountry" placeholder="{i18n>selectCountry}" valueStateText="{i18n>MVDselectcountry}" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
@@ -76,18 +77,18 @@
 			<HBox width="100%" justifyContent="Start" alignItems="Center">
 				<VBox width="30%">
 					<Label text="ISD Code" required="true" />
-					<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true">
+					<ComboBox id="adminsignUpSTD" selectedKey="{AdminSignupModel>/STDCode}" change="ADMIN_onChangeSTD" placeholder="ISD" showSecondaryValues="true" width="100%" items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true" valueStateText="Select ISD Code" >
 						<core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}" />
 					</ComboBox>
 				</VBox>
-				<VBox width="70%">
+				<VBox width="70%" class="sapUiTinyMarginBegin">
 					<Label text="Mobile Number" required="true" />
 					<Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" liveChange="ADMIN_onMobileLiveChange" maxLength="18" placeholder="Enter Mobile Number" width="100%" valueStateText="Enter valid mobile number"/>
 				</VBox>
 			</HBox>
 			<!-- Address -->
 			<Label text="{i18n>address}" required="true" />
-			<TextArea placeholder="{i18n>enteryouraddress}" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="{i18n>entervalidAddress}" />
+			<TextArea maxLength="120" placeholder="{i18n>enteryouraddress}" id="adminAddress" value="{AdminSignupModel>/Address}" rows="3" liveChange="onAdminLiveValidate" valueStateText="{i18n>entervalidAddress}" />
 		</f:SimpleForm>
 		<!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
 		<!-- DOCUMENTS SECTION -->

@@ -83,6 +83,7 @@
                         valueLiveUpdate="true"
                         liveChange="onUserlivechange"
                         valueStateText="{i18n>pleaseentervalidUserID}"
+                        maxLength="6"
                     />
                     <Label
                         text="{i18n>MVusername}"
@@ -94,6 +95,7 @@
                         valueLiveUpdate="true"
                         liveChange="onUserlivechange"
                         valueStateText="{i18n>pleaseenteravalidUserName}"
+                        maxLength="40"
                     />
                     <Label text="{i18n>loginwith}" />
                     <HBox
@@ -139,6 +141,7 @@
                         valueHelpRequest="SM_onTogglePasswordVisibility"
                         liveChange="onSigninPasswordLive"
                         valueStateText="{i18n>pleaseEntervalidPassword}"
+                        maxLength="40"
                     />
                     <!-- REUSED OTP FIELD FOR LOGIN -->
                     <VBox
@@ -211,6 +214,7 @@
                             liveChange="onUserlivechange"
                             valueStateText="{i18n>pleaseentervalidUserID}"
                             enabled="{= ${LoginViewModel>/forgotStep} === 1 }"
+                            maxLength="6"
                         />
                         <Label
                             class="sapUiSmallMarginTop"
@@ -223,6 +227,7 @@
                             liveChange="onUserlivechange"
                             valueStateText="{i18n>pleaseenteravalidUserName}"
                             enabled="{= ${LoginViewModel>/forgotStep} === 1 }"
+                            maxLength="40"
                         />
                         <HBox justifyContent="End">
                             <Button
@@ -294,6 +299,7 @@
                             maxLength="50"
                             valueHelpRequest=".SM_onTogglePasswordVisibility"
                             enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
+
                         />
                         <HBox
                             width="100%"
@@ -423,6 +429,7 @@
                                     required="true"
                                     liveChange="_LCvalidateName"
                                     valueStateText="{i18n>MSenterValidName}"
+                                    maxLength="50"
                                 />
                                 <layoutData>
                                     <FlexItemData
@@ -483,6 +490,7 @@
                             required="true"
                             liveChange="onEmailliveChange"
                             valueStateText="{i18n>MSenterValidEmail}"
+                            maxLength="50"
                         />
                         <Label
                             text="{i18n>MVDcountry}"
@@ -605,10 +613,10 @@
                         <TextArea
                             id="signUpAddress"
                             rows="3"
-                            maxLength="500"
                             value="{LoginMode>/Address}"
                             liveChange="onAddressChange"
                             placeholder="{i18n>address}"
+                            maxLength="120"
                         />
                         <HBox width="100%">
                             <Label
@@ -641,6 +649,7 @@
                                 showValueHelp="true"
                                 valueHelpIconSrc="sap-icon://show"
                                 valueHelpRequest="SM_onTogglePasswordVisibility"
+                                maxLength="50"
                             >
                                 <layoutData>
                                     <FlexItemData growFactor="1" />

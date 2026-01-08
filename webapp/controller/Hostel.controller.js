@@ -1142,6 +1142,9 @@ sap.ui.define([
             const oSignInPanel = sap.ui.getCore().byId("signInPanel");
             const oSignUpPanel = sap.ui.getCore().byId("signUpPanel");
 
+            // 🔒 MAKE DOB READ-ONLY (calendar-only)
+            this._FragmentDatePickersReadOnly(["signUpDOB"]);
+
             oSignInPanel?.setVisible(false);
             oSignUpPanel?.setVisible(true);
 
@@ -1729,22 +1732,41 @@ sap.ui.define([
                 oInput.setValueState("None");
             }
         },
-
-        onSTDChange: function () {
-            const oSTD = sap.ui.getCore().byId("signUpSTD");
+        onSTDChange: function (oEvent) {
+            const oSTD = oEvent.getSource();
+            const sValue = (oSTD.getValue() || "").trim();
             const oMobile = sap.ui.getCore().byId("signUpPhone");
 
-            const std = oSTD.getValue();
+            // Mandatory check
+            if (!utils._LCvalidateMandatoryField(oEvent)) {
+                return;
+            }
 
+            // + followed by digits, no leading zero
+            const STD_REGEX = /^\+[1-9][0-9]*$/;
+
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText(
+                    "STD must start with + and contain only numbers (no leading zero)"
+                );
+
+                // Reset dependent field safely
+                oMobile.setValue("");
+                oMobile.setMaxLength(18);
+                return;
+            }
+
+            // Clean state
+            oSTD.setValueState("None");
+
+            // Reset mobile on valid STD change
             oMobile.setValue("");
 
             // Dynamic maxLength
-            if (std === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
+            oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
         },
+
 
         onAddressChange: function () {
             utils._LCvalidateAddress(sap.ui.getCore().byId("signUpAddress"));
@@ -4380,6 +4402,9 @@ sap.ui.define([
                 );
                 this.getView().addDependent(this._oAdminSignup);
 
+                // 🔒 MAKE DOB READ-ONLY (calendar-only)
+                this._FragmentDatePickersReadOnly(["adminDOB"]);
+
                 // 🔐 CACHE ORIGINAL DOC TYPES (ONCE)
                 const oDocType = sap.ui.getCore().byId("adminDocType");
                 this._adminDocTypeBackup = oDocType.getItems().map(i => ({
@@ -4589,25 +4614,37 @@ sap.ui.define([
         },
 
         ADMIN_onChangeSTD: function (oEvent) {
-
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-
-            const oSTD = oEvent.getSource(); // easier than getCore()
+            const oSTD = oEvent.getSource();
+            const sValue = (oSTD.getValue() || "").trim();
             const oMobile = sap.ui.getCore().byId("adminMobileNo");
             const oModel = this.getView().getModel("AdminSignupModel");
 
-            // Clean its own state
+            // Mandatory check
+            if (!utils._LCvalidateMandatoryField(oEvent)) {
+                return;
+            }
+
+            // ✅ + followed by digits, but NOT +0 / +09 / +01
+            const STD_REGEX = /^\+[1-9][0-9]*$/;
+
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
+                oModel.setProperty("/STDCode", "");
+                return;
+            }
+
+            // Clean state
             oSTD.setValueState("None");
 
             // Reset mobile on STD change
             oMobile.setValue("");
 
-            // Max length logic
-            oMobile.setMaxLength(oSTD.getValue() === "+91" ? 10 : 18);
+            // Length logic
+            oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
 
             // Update model
-            oModel.setProperty("/STDCode", oSTD.getValue());
+            oModel.setProperty("/STDCode", sValue);
         },
 
         ADMIN_onMobileLiveChange: function (oEvent) {
@@ -4696,8 +4733,8 @@ sap.ui.define([
             oDatePicker.setValueState("None");
 
             // Save to model in yyyy-MM-dd format for payload
-            oModel.setProperty("/DOB", oDatePicker.getDateValue().toISOString().split("T")[0]);
-        },
+            oModel.setProperty("/DOB", oDatePicker.getValue());
+         },
 
         onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
