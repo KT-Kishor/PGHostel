@@ -4380,6 +4380,7 @@ sap.ui.define([
             this._updateRowCount();
         },
 
+
         _updateRowCount: function () {
             const oProfileModel = this._oProfileDialog.getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
@@ -4802,7 +4803,7 @@ sap.ui.define([
             const file = oEvent.getParameter("files")?.[0];
             if (!file) return;
 
-            const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+            const MAX_SIZE = 2 * 1024 * 1024; // 5 MB
             if (file.size > MAX_SIZE) {
                 sap.m.MessageToast.show(this.i18nModel.getText("filesizemustnotexceed5MB"));
                 oUploader.clear();
