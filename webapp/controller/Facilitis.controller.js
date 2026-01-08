@@ -277,6 +277,14 @@ sap.ui.define([
                 return;
             }
 
+            if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) 
+                && (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0)
+                && (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0)
+                && (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
+                return;
+            }
+
             // File validation
             var Attachment = oView.getModel("tokenModel").getData();
             if (!Attachment.tokens || Attachment.tokens.length === 0) {
@@ -304,14 +312,6 @@ sap.ui.define([
 
             if (attachments.length > 3) {
                 sap.m.MessageBox.error(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
-                return;
-            }
-
-            if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) 
-                && (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0)
-                && (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0)
-                && (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                 return;
             }
 

@@ -264,9 +264,10 @@ sap.ui.define([
                     return;
                 }
 
-                if (Payload.PerHourPrice === "" || Payload.PerHourPrice === 0
-                    && Payload.PerDayPrice === "" || Payload.PerDayPrice === 0 && Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0
-                    && Payload.PerYearPrice === "" || Payload.PerYearPrice === 0) {
+                if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0)  &&
+                    (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0) &&
+                    (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0) &&
+                    (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
                     sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }

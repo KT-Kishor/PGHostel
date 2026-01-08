@@ -17,7 +17,7 @@
                 clear="FC_onPressClear" showClearOnFB="true" search="Onsearch" filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad" showFilterConfiguration="false" filterContainerWidth="auto">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="FacilityName" label="{i18n>facilityname}" groupName="Group" visibleInFilterBar="true">
+					<fb:FilterGroupItem name="FacilityName" label="{i18n>hostelFeatures}" groupName="Group" visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox id="HF_id_FacilityName" items="{HostelFeatures>/}" showClearIcon="true">
 								<core:Item key="{HostelFeatures>FacilityName}" text="{HostelFeatures>FacilityName}"/>
@@ -33,16 +33,16 @@
 					<OverflowToolbar>
 						<Title text="{i18n>hostelFeatures} ({= ${HostelFeatures>/}.length})"/>
 						<ToolbarSpacer />
-						<Button text="{i18n>addHostelFeatures}" tooltip="Add Hostel Features" press="HM_AddHostelFeature"
+						<Button text="{i18n>addHostelFeatures}" tooltip="Add Amenities" press="HM_AddHostelFeature"
                         class="myUnifiedBtn"/>
-						<Button text="{i18n>MSedit}" tooltip="Edit Hostel Feature" press="HM_EditHostelFeature"
+						<Button text="{i18n>MSedit}" tooltip="Edit Amenities" press="HM_EditHostelFeature"
                         class="myUnifiedBtn"/>
-						<Button text="{i18n>MSdelete}" tooltip="Delete Hostel Feature" press="HM_DeleteHostelFeature" class="myUnifiedBtn"/>
+						<Button text="{i18n>MSdelete}" tooltip="Delete Amenities" press="HM_DeleteHostelFeature" class="myUnifiedBtn"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="{i18n>facilityname}" tooltip="Facility Name"/>
+						<Text text="{i18n>amenitiesName}" tooltip="Amenities Name"/>
 					</Column>
 					<Column demandPopin="true">
 						<Text text="{i18n>description}" tooltip="Description"/>

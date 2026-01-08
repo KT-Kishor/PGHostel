@@ -109,7 +109,7 @@ sap.ui.define([
 
             if (!oSelected) {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
-                 return ;
+                return;
             }
 
             const oData = oSelected.getBindingContext("HostelFeatures").getObject();
@@ -145,7 +145,7 @@ sap.ui.define([
 
         HF_onCancelButtonPress: function() {
             this.ARD_Dialog.close();
-          this.byId("HFF_id_BranchCode").setValueState("None");
+            this.byId("HFF_id_BranchCode").setValueState("None");
             this.byId("HF_HostelFeatureTable").removeSelections(true);
         },
 
@@ -281,7 +281,7 @@ sap.ui.define([
             });
         },
 
-        Onsearch: function (flag) {
+        Onsearch: function(flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -294,48 +294,43 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-               if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
-            }else if (Array.isArray(omainModel) && omainModel.length) {
+            if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
+            } else if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }
 
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
-                filters = { BranchCode: aBranchCodes };
-                filters.Role ="Admin";
-
+                filters = { BranchCode: aBranchCodes};
+                filters.Role = "Admin";
             }
-            if (sFacilityName) filters.FacilityName = sFacilityName;
 
+            if (sFacilityName) filters.FacilityName = sFacilityName;
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_HostelFeatures", filters).then((oData) => {
-                const response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                if (!this._originalBedData || flag === "true") {
-                    this._originalBedData = response;
-                }
+                    if (!this._originalBedData || flag === "true") {
+                        this._originalBedData = response;
+                    }
 
-                if (Object.keys(filters).length === 0) {
-                    const model = new sap.ui.model.json.JSONModel(this._originalBedData);
+                    if (Object.keys(filters).length === 0) {
+                        const model = new sap.ui.model.json.JSONModel(this._originalBedData);
+                        this.getView().setModel(model, "HostelFeatures");
+                        this._populateUniqueFilterValues(this._originalBedData);
+                        return;
+                    }
+
+                    const filteredData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    const model = new sap.ui.model.json.JSONModel(filteredData);
                     this.getView().setModel(model, "HostelFeatures");
                     this._populateUniqueFilterValues(this._originalBedData);
-                    return;
-                }
-
-                const filteredData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                const model = new sap.ui.model.json.JSONModel(filteredData);
-                this.getView().setModel(model, "HostelFeatures");
-                this._populateUniqueFilterValues(this._originalBedData);
-            })
-                .catch((err) => {
+                }).catch((err) => {
                     sap.ui.core.BusyIndicator.hide();
                     sap.m.MessageToast.show(err.message || err.responseText);
-                })
-                .finally(() => {
+                }).finally(() => {
                     sap.ui.core.BusyIndicator.hide();
                 });
         },
@@ -380,7 +375,7 @@ sap.ui.define([
             }).join(", ");
 
             MessageBox.confirm(
-                `Are you sure you want to Delete the Selected Hostel Features: ${sNames}?`, {
+                `Are you sure you want to Delete the Selected Amenities: ${sNames}?`, {
                     icon: MessageBox.Icon.WARNING,
                     title: "Confirm Deletion",
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
