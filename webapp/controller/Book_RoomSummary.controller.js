@@ -6,7 +6,7 @@ sap.ui.define([
     "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
     "sap/m/MessageBox"
-], (Controller, JSONModel, Formatter, utils,BusyIndicator,MessageToast,MessageBox) => {
+], (Controller, JSONModel, Formatter, utils, BusyIndicator, MessageToast, MessageBox) => {
     "use strict";
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
@@ -77,7 +77,7 @@ sap.ui.define([
             // 1. Create edit model using selected row exactly
             const oSafeCopy = JSON.parse(JSON.stringify(this._oSelectedFacility));
 
-            // ✅ Handle Per Hour defaults + total hour binding
+            //  Handle Per Hour defaults + total hour binding
             if (oSafeCopy.UnitText === "Per Hour") {
 
                 const sStart = oSafeCopy.StartTime || "09";
@@ -86,7 +86,7 @@ sap.ui.define([
                 oSafeCopy.StartTime = sStart;
                 oSafeCopy.EndTime = sEnd;
 
-                // ✅ Calculate Total Hour (HH format difference)
+                //  Calculate Total Hour (HH format difference)
                 const iStart = parseInt(sStart, 10);
                 const iEnd = parseInt(sEnd, 10);
 
@@ -548,8 +548,8 @@ sap.ui.define([
 
                 // Global list
                 aFacilities[iIndex].TotalTime = hours;
-                aFacilities[iIndex].StartTime = oUpdatedData.StartTime;  
-                aFacilities[iIndex].EndTime = oUpdatedData.EndTime;      
+                aFacilities[iIndex].StartTime = oUpdatedData.StartTime;
+                aFacilities[iIndex].EndTime = oUpdatedData.EndTime;
                 aFacilities[iIndex].TotalAmount = price * hours;
 
                 // Per-person list
@@ -560,8 +560,8 @@ sap.ui.define([
                 ) {
                     const oFac = aPersons[oUpdatedData.ID].AllSelectedFacilities[iIndex];
                     oFac.TotalTime = hours;
-                    oFac.StartTime = oUpdatedData.StartTime;              
-                    oFac.EndTime = oUpdatedData.EndTime;                  
+                    oFac.StartTime = oUpdatedData.StartTime;
+                    oFac.EndTime = oUpdatedData.EndTime;
                     oFac.TotalAmount = price * hours;
                 }
             }
@@ -791,7 +791,7 @@ sap.ui.define([
 
                     if (!fStartDate || !fEndDate) {
                         // Skip invalid dates
-                      MessageToast.show("Invalid Facility Start/End Date for " + (f.FacilityName || ""));
+                        MessageToast.show("Invalid Facility Start/End Date for " + (f.FacilityName || ""));
                         return;
                     }
                     // USE the user-calculated dialog value directly
@@ -799,7 +799,7 @@ sap.ui.define([
 
 
                     if (fDays <= 0) {
-                       MessageToast.show("Facility End Date must be Same or after Start Date for " + (f.FacilityName || ""));
+                        MessageToast.show("Facility End Date must be Same or after Start Date for " + (f.FacilityName || ""));
                         return;
                     }
 
@@ -909,7 +909,7 @@ sap.ui.define([
                 FinalTotal: +finalTotal.toFixed(2),
                 AllSelectedFacilities: aAllFacilities
             };
-           
+
         },
 
         _parseDate: function (s) {
@@ -927,7 +927,6 @@ sap.ui.define([
 
         onUnitTextChange: function (oEvent) {
             const oCombo = oEvent.getSource();
-
             //  Typed value (no selectedItem)
             if (!oCombo.getSelectedItem()) {
                 utils._LCvalidationComboBox(oEvent); // SAFE call
@@ -961,7 +960,7 @@ sap.ui.define([
             );
 
             if (!oMatched) {
-               MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
+                MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
                 return;
             }
 
@@ -999,7 +998,7 @@ sap.ui.define([
             const oDoc = oCtx && oCtx.getObject();
 
             if (!oDoc || !oDoc.Document) {
-               MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
+                MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
                 return;
             }
 
@@ -1137,7 +1136,7 @@ sap.ui.define([
 
             // Validate number format
             if (isNaN(startHour) || isNaN(endHour)) {
-               MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
+                MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
                 oEditModel.setProperty("/TotalTime", "");
                 oTimePicker.setValueState("Error");
                 return;
@@ -1241,7 +1240,7 @@ sap.ui.define([
             var sBranchCode = oHostelModel.getProperty("/BranchCode");
 
             if (sEnteredCode === "") {
-               MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
+                MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
                 return;
             }
 
@@ -1263,7 +1262,7 @@ sap.ui.define([
             }
 
             if (!sEnteredCode) {
-               MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
+                MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
                 return;
             }
 
@@ -1305,7 +1304,7 @@ sap.ui.define([
                 const selectedBranch = String(sBranchCode || "").trim();
 
                 if (couponBranch && couponBranch !== selectedBranch) {
-                   MessageToast.show(
+                    MessageToast.show(
                         this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
                     );
                     return;

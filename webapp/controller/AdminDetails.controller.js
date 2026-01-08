@@ -2125,7 +2125,7 @@ sap.ui.define([
                         that.AD_onSearch();
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
-                        sap.m.MessageToast.show(this.i18nModel.getText("bookingCancelledSuccessfully"));
+                        sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));
 
                         // Hide Extra Buttons after Cancel
                         that.byId("idedit")?.setVisible(false);

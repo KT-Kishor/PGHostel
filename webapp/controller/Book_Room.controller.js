@@ -17,7 +17,6 @@ sap.ui.define([
     MessageBox,
     FilterOperator,
     Filter
-    
 ) {
     "use strict";
 
@@ -484,7 +483,7 @@ sap.ui.define([
                     oStateCombo.getBinding("items")?.filter([
                         new Filter(
                             "countryCode",
-                           FilterOperator.EQ,
+                            FilterOperator.EQ,
                             sCountryCode
                         )
                     ]);
@@ -500,7 +499,7 @@ sap.ui.define([
                         oCityCombo.getBinding("items")?.filter([
                             new Filter(
                                 "stateName",
-                               FilterOperator.EQ,
+                                FilterOperator.EQ,
                                 p.State
                             ),
                             new Filter(
@@ -953,7 +952,7 @@ sap.ui.define([
                         new sap.m.ComboBox({
                             placeholder: "STD Code",
                             value: "{HostelModel>/Persons/" + i + "/STDCode}",
-                             id: that.createId("ID_STDCode_" + i),
+                            id: that.createId("ID_STDCode_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
                             showSecondaryValues: true,
                             items: {
@@ -1100,7 +1099,7 @@ sap.ui.define([
 
                                 // 🔴 Validation: Document Type must be selected
                                 if (!sDocType) {
-                                   MessageBox.error(that.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
+                                    MessageBox.error(that.i18nModel.getText("pleaseselectDocumentTypebeforeuploading"));
 
                                     // Reset FileUploader
                                     oUploader.clear();
@@ -1390,7 +1389,7 @@ sap.ui.define([
                                                         // If NOT selected → open popover to choose price
                                                         const oActionSheet = that._createFacilityActionSheet(facility, iPersonIndex, oCard);
                                                         oActionSheet.openBy(oEvent.getSource());
-                                                                                    }
+                                                    }
                                                 }).addStyleClass("serviceImage"),
 
 
@@ -1429,7 +1428,7 @@ sap.ui.define([
                                                 }
                                             }
                                         }).addStyleClass("facilityPriceText")
-                                        
+
 
                                     ]
                                 }).addStyleClass("serviceCard"),
@@ -1531,7 +1530,7 @@ sap.ui.define([
             };
 
             if (selectedType === "Per Hour") {
-               MessageBox.information(
+                MessageBox.information(
                     "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
                     { title: "Default Time Applied" }
                 );
@@ -1597,19 +1596,10 @@ sap.ui.define([
             }
 
             if (bHasError) {
-               MessageBox.error(that.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
+                MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
                 return; // ⛔ STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
-            // const iPersonCount = oModel.getProperty("/SelectedPerson") || 1;
-            // // ALWAYS recreate when SelectedPerson changed (flag set in onNoOfPersonSelect)
-            // if (!this._isPersonUIInitialized || this._mustRecreatePersonUI) {
-            //     this._createDynamicPersonsUI();              // builds UI for current count
-            //     this._isPersonUIInitialized = true;
-            //     this._lastPersonCount = iPersonCount;
-            //     this._mustRecreatePersonUI = false;
-            // }
-
             const sCurrentBranch = oModel.getProperty("/BranchCode");
 
             if (
@@ -1631,14 +1621,14 @@ sap.ui.define([
                 this._resetCouponAndDiscount();
                 const aMissing = this._checkMandatoryFields();
                 if (aMissing.length > 0) {
-                   MessageBox.error(
+                    MessageBox.error(
                         "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
                     );
                     return;
                 }
             }
 
-           
+
             if (!this._oSelectedStep) {
                 this._oSelectedStep = this._oWizard.getCurrentStep();
             }
@@ -2437,26 +2427,26 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-    const oUser = this._oLoggedInUser;
-    const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
-    if (oUser && oUser.UserID) {
-        oUIModel.setProperty("/isLoggedIn", true);
-    } else {
-        oUIModel.setProperty("/isLoggedIn", false);
-    }
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
 
-    const oLoginModel = this.getView().getModel("LoginModel");
-    const sRole = oLoginModel?.getProperty("/Role") || "";
-    const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+            const oLoginModel = this.getView().getModel("LoginModel");
+            const sRole = oLoginModel?.getProperty("/Role") || "";
+            const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
 
-    if (sRole === "Customer") {
-        this._sLoggedUserID = sEmpID;
-        this.getOwnerComponent().getRouter().navTo("RouteHostel");
-    } else {
-        this.getOwnerComponent().getRouter().navTo("RouteHostel");
-    }
-},
+            if (sRole === "Customer") {
+                this._sLoggedUserID = sEmpID;
+                this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            } else {
+                this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            }
+        },
 
         onRoomDurationChange: function (oEvent) {
             this._resetWizardFromStep1();
@@ -2472,13 +2462,13 @@ sap.ui.define([
                 this._iSelectedStepIndex = 0;
             }
 
-            // 🔒 LOCK PERSONAL INFO STEP
+            //  LOCK PERSONAL INFO STEP
             oHostelModel.setProperty("/IsGeneralInfoValid", false);
             oBTN.setProperty("/Next", false);
             oBTN.setProperty("/Submit", false);
             oBTN.setProperty("/Cancel", false);
 
-            // 🔒 FORCE INTERNAL WIZARD STATE
+            //  FORCE INTERNAL WIZARD STATE
             this._iSelectedStepIndex = 0;
             this._oSelectedStep = this._oWizard.getSteps()[0];
 
@@ -2742,7 +2732,7 @@ sap.ui.define([
                     // but we'll set explicitly to be safe
                     if (ctrlPassword) {
                         ctrlPassword.setValueState("Error");
-                        ctrlPassword.setValueStateText(this.i18nModel, getText("enterValidPassword"));
+                        ctrlPassword.setValueStateText(this.i18nModel.getText("enterValidPassword"));
                     }
                     MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                     return;
@@ -2956,7 +2946,7 @@ sap.ui.define([
                     data: { Password: btoa(pass) },
                     filters: { UserID: this._oResetUser?.UserID }
                 });
-               MessageBox.success("Password Updated Successfully", {
+                MessageBox.success("Password Updated Successfully", {
                     title: "Success",
                     onClose: () => {
 
@@ -3188,7 +3178,6 @@ sap.ui.define([
         },
 
         _onVerifyOTP: async function () {
-
             const vm = this.getView().getModel("LoginViewModel");
             const flow = vm.getProperty("/authFlow");
 
@@ -3236,17 +3225,12 @@ sap.ui.define([
             //  OTP accepted: reset resend cooldown state
             this._resetOtpCooldown();
 
-            // --------------------------
             //  Forgot Password Flow
-            // --------------------------
+
             if (flow === "forgot") {
                 vm.setProperty("/forgotStep", 3);
                 return;
             }
-
-            // --------------------------
-            // 📌 Normal OTP Login Flow
-            // --------------------------
             try {
 
                 const resp = await this.ajaxReadWithJQuery("HM_Login", {
@@ -3261,7 +3245,6 @@ sap.ui.define([
                 this._oSignDialog.close();
 
             } catch (e) {
-
                 MessageToast.show(this.i18nModel.getText("loginFailed"));
                 console.error("OTP login error:", e);
 
@@ -3449,7 +3432,7 @@ sap.ui.define([
                     return;
                 }
 
-               MessageBox.success("Registration Successful", {
+                MessageBox.success("Registration Successful", {
                     title: "Success",
                     onClose: () => {
 
@@ -3672,7 +3655,6 @@ sap.ui.define([
         },
 
         FSM_onConfirm: function (oEvent) {
-
             const oInput = oEvent?.getSource();
             if (!oInput) return false;
 
@@ -4518,7 +4500,7 @@ sap.ui.define([
                 });
 
                 // Show success box
-               MessageBox.success(sMessage, {
+                MessageBox.success(sMessage, {
                     title: "Success",
                     actions: [MessageBox.Action.OK],
                     onClose: function () {
@@ -4660,7 +4642,7 @@ sap.ui.define([
                     return;
                 }
                 fullUserData = oUser;
-               
+
                 this._isProfileRequested = false;
 
                 if (!this._oProfileDialog) {
@@ -5632,17 +5614,6 @@ sap.ui.define([
                             });
                         });
                     }
-
-                    //  Build Payment data (optional)
-                    // const paymentDetails = {
-                    //     BankName: sap.ui.getCore().byId("idBankName")?.getValue() || "",
-                    //     Amount: sap.ui.getCore().byId("idAmount")?.getValue() || oData.GrandTotal,
-                    //     PaymentType: oData.PaymentType || "",
-                    //     BankTransactionID: sap.ui.getCore().byId("idTransactionID")?.getValue() || "",
-                    //     Date: sap.ui.getCore().byId("idPaymentDate")?.getValue() || "",
-                    //     Currency: sap.ui.getCore().byId("idCurrency")?.getValue() || "INR"
-                    // };
-
                     //  Build Personal Information
                     const personData = [{
                         Salutation: oData.Salutation || "",
@@ -5739,16 +5710,16 @@ sap.ui.define([
         onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "ManageInvoice" });
         },
-         onCountrySelectionChange: function (oEvent) {
+        onCountrySelectionChange: function (oEvent) {
             const oCountry = oEvent.getSource();
             const oModel = this._oProfileDialog.getModel("profileData");
 
             utils._LCvalidateMandatoryField(oEvent);
 
-           const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
-const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
-const oStateCB = sap.ui.getCore().byId("profileFrag--id_state");
-const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
+            const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
+            const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
+            const oStateCB = sap.ui.getCore().byId("profileFrag--id_state");
+            const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
 
 
 
@@ -5806,7 +5777,7 @@ const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
                 ]);
             }
         },
-         CC_onChangeState: function (oEvent) {
+        CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this._oProfileDialog.getModel("profileData");
@@ -5846,7 +5817,7 @@ const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
                 new Filter("countryCode", FilterOperator.EQ, sCountryCode)
             ]);
         },
-          CC_onChangeCity: function (oEvent) {
+        CC_onChangeCity: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this._oProfileDialog.getModel("profileData");
@@ -5868,10 +5839,10 @@ const oCityCB = sap.ui.getCore().byId("profileFrag--id_city");
             // If you also track explicit city:
             // oModel.setProperty("/city", sCityName);
         },
-          _onProfileSTDChange: function () {
-           
-              const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
-const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
+        _onProfileSTDChange: function () {
+
+            const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
+            const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
 
             const std = oSTD.getValue();
             oMobile.setValue("");
@@ -5883,6 +5854,6 @@ const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
                 oMobile.setMaxLength(18);
             }
         },
-       
+
     });
 });
