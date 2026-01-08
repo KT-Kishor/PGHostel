@@ -408,7 +408,7 @@ sap.ui.define([
                                 }
                             });
 
-                            MessageToast.show(this.i18nModel.getText("MSdeletemsg"));
+                            MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
                             await that.Onsearch("true"); // refresh table
                         } catch (err) {
                             sap.m.MessageToast.show(err.message || err.responseText);

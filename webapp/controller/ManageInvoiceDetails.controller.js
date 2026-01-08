@@ -843,7 +843,7 @@ sap.ui.define([
                     const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bOptionalValid && bConversionRateValid;
                     if (!bIsValid) {
-                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                        return MessageToast.show(that.i18nModel.getText("mandatoryFieldsError"));
                     }
                     sap.ui.core.BusyIndicator.show(0);
                     const oPayload = await this.SubmitPayload("Create");
@@ -1271,8 +1271,8 @@ sap.ui.define([
                 var aData = oModel.getData().ManageInvoiceItem;
                 if (oContext.getObject().ItemID) {
                     this.showConfirmationDialog(
-                        this.i18nModel.getText("msgBoxConfirm"),
-                        this.i18nModel.getText("msgBoxConfirmDelete"),
+                        that.i18nModel.getText("msgBoxConfirm"),
+                        that.i18nModel.getText("msgBoxConfirmDelete"),
                         function () {
                             that.getBusyDialog();
                             that.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
