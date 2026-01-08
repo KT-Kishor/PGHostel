@@ -104,7 +104,7 @@
                 />
                 <ComboBox
                     id="MC_id_City"
-                    change="MC_onChangeCity"
+                    selectionChange="MC_onChangeCity"
                     valueStateText="{i18n>cityValueText}"
                     placeholder="{i18n>enterCity}"
                     items="{path:'CityModel>/',length:1000}"
@@ -221,7 +221,7 @@
                             sameFilenameAllowed="true"
                             iconFirst="true"
                             buttonText="Upload Images"
-                            multiple="true"
+                            multiple="false"
                             uploadOnChange="false"
                             tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
                         />

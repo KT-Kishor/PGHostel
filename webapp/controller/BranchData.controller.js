@@ -240,7 +240,7 @@ sap.ui.define([
         MD_onDownload: function () {
             const oModel = this.byId("id_MD_Table").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
-                MessageToast.show(this.i18nModel.getText("MSnodata."));
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;
             }
             const adjustedData = oModel.map(item => ({
@@ -844,7 +844,6 @@ sap.ui.define([
                 oCity.getSelectedItem()?.getText() ||
                 oCity.getValue() ||
                 "";
-
             oModel.setProperty("/baseLocation", sCityText);
         },
 
