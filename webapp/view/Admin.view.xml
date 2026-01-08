@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Booking ID"
-                        label="Booking ID"
+                        label="{i18n>bookingID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -57,7 +57,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room No"
-                        label="Room No"
+                        label="{i18n>roomNo}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -79,7 +79,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Status"
-                        label="Status"
+                        label="{i18n>status}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -101,7 +101,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="StartDate"
-                        label="Date"
+                        label="{i18n>date}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -130,17 +130,17 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="Booking List ({HostelModel>/count})" />
+                        <Title text="{i18n>bookingList} ({HostelModel>/count})" />
                         <ToolbarSpacer />
                         <Button
-                            text="Assign Room"
-                            tooltip="Assign Room"
+                            text="{i18n>assignRoom}"
+                            tooltip="{i18n>assignRoom}"
                             press="HM_AssignRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Download"
-                            tooltip="Download Admin Data"
+                            text="{i18n>download}"
+                            tooltip="{i18n>downloadAdminData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -149,8 +149,8 @@
                 <columns>
                     <Column demandPopin="true">
                         <Text
-                            text="Customer"
-                            tooltip="Customer"
+                            text="{i18n>customer}"
+                            tooltip="{i18n>customer}"
                         />
                     </Column>
                     <Column
@@ -158,8 +158,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Booking ID"
-                            tooltip="Booking ID"
+                            text="{i18n>bookingID}"
+                            tooltip="{i18n>bookingID}"
                         />
                     </Column>
                     <Column
@@ -167,8 +167,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Booking Date"
-                            tooltip="Booking Date"
+                            text="{i18n>bookingDate}"
+                            tooltip="{i18n>bookingDate}"
                         />
                     </Column>
                     <Column
@@ -176,8 +176,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Gender"
-                            tooltip="Gender"
+                            text="{i18n>MVgender}"
+                            tooltip="{i18n>MVgender}"
                         />
                     </Column>
                     <Column
@@ -185,8 +185,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Contact Information"
-                            tooltip="Contact Information"
+                            text="{i18n>contactInformation}"
+                            tooltip="{i18n>contactInformation}"
                         />
                     </Column>
                     <Column
@@ -194,20 +194,20 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Start/End Date"
-                            tooltip="Start/End Date"
+                            text="{i18n>startEndDate}"
+                            tooltip="{i18n>startEndDate}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="Room Number"
-                            tooltip="Room Number"
+                            text="{i18n>roomNumber}"
+                            tooltip="{i18n>roomNumber}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="Bed Type"
-                            tooltip="Bed Type"
+                            text="{i18n>bedType}"
+                            tooltip="{i18n>bedType}"
                         />
                     </Column>
                     <Column
@@ -215,8 +215,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="Status"
-                            tooltip="Status"
+                            text="{i18n>status}"
+                            tooltip="{i18n>status}"
                         />
                     </Column>
                 </columns>
@@ -240,7 +240,7 @@
                             <Text text="{HostelModel>Gender}" />
                             <VBox>
                                 <Text
-                                   text="{= ${HostelModel>STDCode} + ' ' + ${HostelModel>MobileNo} }"
+                                    text="{= ${HostelModel>STDCode} + ' ' + ${HostelModel>MobileNo} }"
                                     class="sapUiTinyMarginBottom"
                                 />
                                 <Text text="{HostelModel>CustomerEmail}" />

@@ -21,7 +21,7 @@
             <content>
                 <VBox class="sapUiSmallMargin">
                     <Title
-                        text="Hostel Booking"
+                        text="{i18n>hostelBooking}"
                         class="boldBlackText sapUiSmallMarginBottom"
                     />
                     <!-- Responsive Booking Status and Buttons -->
@@ -35,7 +35,7 @@
                         <FlexBox direction="Row">
                             <VBox class="sapUiSmallMarginEnd">
                                 <Text
-                                    text="Status"
+                                    text="{i18n>status}"
                                     class="sapUiSmallMarginBottom"
                                 />
                                 <ObjectStatus
@@ -46,7 +46,7 @@
 
                             <VBox class="sapUiSmallMarginEnd">
                                 <Text
-                                    text="Booking Date"
+                                    text="{i18n>bookingDate}"
                                     class="sapUiSmallMarginBottom"
                                 />
                                 <ObjectStatus
@@ -59,12 +59,10 @@
                                 visible="{= ${CustomerData>/RoomNo} ? true : false }"
                             >
                                 <Text
-                                    text="Room No"
+                                    text="{i18n>roomNo}"
                                     class="sapUiSmallMarginBottom"
                                 />
-                                <Text text="{CustomerData>/RoomNo}"
-
-                                 />
+                                <Text text="{CustomerData>/RoomNo}" />
                             </VBox>
                         </FlexBox>
                         <!-- RIGHT SIDE BUTTONS -->
@@ -75,9 +73,9 @@
                             alignItems="End"
                         >
                             <Button
-                                text="Edit"
+                                text="{i18n>MSedit}"
                                 id="idedit"
-                                tooltip="Edit Booking"
+                                tooltip="{i18n>MSedit}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                                 press="onEditBooking"
                                 visible="{=
@@ -91,17 +89,17 @@
 
                             <Button
                                 id="idcancel"
-                                tooltip="Cancel Booking"
-                                text="Cancel Booking"
+                                tooltip="{i18n>cancelBooking}"
+                                text="{i18n>cancelBooking}"
                                 press="onPressCancelBooking"
                                 visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} }"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
 
                             <Button
-                                text="CheckOut"
+                                text="{i18n>checkOut}"
                                 id="idCheckout"
-                                tooltip="CheckOut Booking"
+                                tooltip="{i18n>checkOut}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                                 press="onChekout"
                                 visible="{= ${CustomerData>/Status} === 'Assigned' 
@@ -110,9 +108,9 @@
                             />
 
                             <Button
-                                text="Save"
+                                text="{i18n>save}"
                                 id="idsave"
-                                tooltip="Save Booking"
+                                tooltip="{i18n>save}"
                                 press="onSaveBooking"
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
@@ -120,8 +118,8 @@
 
                             <Button
                                 id="idcancelbtn"
-                                text="Cancel"
-                                tooltip="Cancel"
+                                text="{i18n>CancelButton}"
+                                tooltip="{i18n>CancelButton}"
                                 press="onCancelBooking"
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
@@ -159,7 +157,7 @@
                             <!-- Booking Details -->
                             <!-- Room Type -->
                             <Label
-                                text="Desired Room Type"
+                                text="{i18n>desiredRoomType}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <ComboBox
@@ -169,7 +167,7 @@
                                 visible="{VisibleModel>/visible}"
                                 selectedKey="{Bookingmodel>/BedTypeName}"
                                 selectionChange="onRoomBedChange"
-                                valueStateText="Select Room Type"
+                                valueStateText="{i18n>selectRoomType}"
                                 width="40%"
                             >
                                 <core:ListItem
@@ -179,7 +177,7 @@
                             </ComboBox>
 
                             <Label
-                                text="Desired Room Type"
+                                text="{i18n>desiredRoomType}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
@@ -189,9 +187,7 @@
                             />
 
                             <!-- Price -->
-                            <Label
-                                text="Price"
-                            />
+                            <Label text="{i18n>placePrice}" />
                             <Text
                                 id="Ad_id_idPrice4"
                                 text="{=${CustomerData>/OrginalRentPrice} +' ' + ${CustomerData>/Currency}}"
@@ -199,28 +195,28 @@
 
                             <!-- Payment -->
                             <Label
-                                text="Room Plan"
+                                text="{i18n>roomplan}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
-                            
+
                             <Text
                                 text="{CustomerData>/PaymentType}"
                                 visible="{= !${VisibleModel>/visible} }"
                             />
 
                             <Label
-                                text="Room Plan"
+                                text="{i18n>roomplan}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <ComboBox
                                 id="idPaymentMethod1"
                                 showClearIcon="true"
-                                placeholder="Select Payment Method"
+                                placeholder="{i18n>selectPaymentMethod}"
                                 selectedKey="{Bookingmodel>/UnitText}"
                                 width="40%"
                                 selectionChange="onRoomDurationChange"
                                 visible="{VisibleModel>/visible}"
-                                valueStateText="Select Payment Type"
+                                valueStateText="{i18n>selectPaymentType}"
                                 change="onChange"
                             >
                                 <core:ListItem
@@ -243,7 +239,7 @@
 
                             <!-- Start Date -->
                             <Label
-                                text="Start Date"
+                                text="{i18n>startDate}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
@@ -252,7 +248,7 @@
                             />
 
                             <Label
-                                text="Start Date"
+                                text="{i18n>startDate}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <DatePicker
@@ -262,13 +258,13 @@
                                 displayFormat="dd/MM/yyyy"
                                 valueFormat="dd/MM/yyyy"
                                 change="onBookingEditDateChange"
-                                valueStateText="Select Star Date"
+                                valueStateText="{i18n>selectStartDate}"
                                 width="40%"
                             />
 
                             <!-- Month/Year Select -->
                             <Label
-                                text="How many Month/Year"
+                                text="{i18n>howmany}"
                                 visible="{= ${Bookingmodel>/UnitText} !== 'daily' }"
                             />
                             <Select
@@ -326,7 +322,7 @@
 
                             <!-- End Date -->
                             <Label
-                                text="End Date"
+                                text="{i18n>endDate}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
@@ -335,7 +331,7 @@
                             />
 
                             <Label
-                                text="End Date"
+                                text="{i18n>endDate}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <DatePicker
@@ -350,7 +346,7 @@
                             />
 
                             <Label
-                                text="Duration"
+                                text="{i18n>duration}"
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                             />
                             <Text
@@ -391,7 +387,7 @@
                             <core:Title text="" />
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Full Name"
+                                text="{i18n>fullname}"
                             />
                             <Text
                                 text="{= ${CustomerData>/Salutation} + ' ' + ${CustomerData>/CustomerName} }"
@@ -400,7 +396,7 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Full Name"
+                                text="{i18n>fullname}"
                             />
                             <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
                             <Select
@@ -427,14 +423,14 @@
                                 maxLength="50"
                                 visible="{VisibleModel>/visible}"
                                 id="AD_id_CustomerName"
-                                valueStateText="Enter Customer Name"
+                                valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
                                 width="50%"
                             />
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Date of Birth"
+                                text="{i18n>MVDDOB}"
                             />
                             <Text
                                 text="{CustomerData>/DateOfBirth}"
@@ -443,7 +439,7 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Date of Birth"
+                                text="{i18n>MVDDOB}"
                             />
                             <DatePicker
                                 width="40%"
@@ -452,13 +448,13 @@
                                 valueFormat="dd/MM/yyyy"
                                 visible="{VisibleModel>/visible}"
                                 id="AD_id_Date"
-                                valueStateText="Enter Date of Birth"
+                                valueStateText="{i18n>enterDateofBirth}"
                                 change="onDateChange"
                             />
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Gender"
+                                text="{i18n>MVgender}"
                             />
                             <Text
                                 text="{CustomerData>/Gender}"
@@ -467,14 +463,14 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Gender"
+                                text="{i18n>MVgender}"
                             />
                             <ComboBox
                                 width="40%"
                                 selectedKey="{Bookingmodel>/Gender}"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_gender"
-                                valueStateText="Select Gender"
+                                valueStateText="{i18n>selectGender}"
                                 change="onChange"
                             >
                                 <core:Item
@@ -493,7 +489,7 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Email"
+                                text="{i18n>email}"
                             />
                             <Text
                                 text="{CustomerData>/CustomerEmail}"
@@ -502,7 +498,7 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Email"
+                                text="{i18n>email}"
                             />
                             <Input
                                 width="40%"
@@ -511,13 +507,13 @@
                                 maxLength="50"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_CustomerEmail"
-                                valueStateText="Enter Email Id"
+                                valueStateText="{i18n>enterEmailId}"
                                 change="onChangemail"
                             />
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Country"
+                                text="{i18n>MVDcountry}"
                             />
                             <Text
                                 text="{CustomerData>/Country}"
@@ -526,14 +522,14 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Country"
+                                text="{i18n>MVDcountry}"
                             />
                             <ComboBox
                                 width="40%"
                                 id="CC_id_Country"
                                 change="MC_onChangeCountry"
-                                placeholder="Enter Country"
-                                valueStateText="Select Country"
+                                placeholder="{i18n>enterCountry}"
+                                valueStateText="{i18n>selectCountry}"
                                 items="{path:'CountryModel>/',length:1000}"
                                 selectedKey="{Bookingmodel>/Country}"
                                 showSecondaryValues="true"
@@ -549,7 +545,7 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="State"
+                                text="{i18n>MVDstate}"
                             />
                             <Text
                                 text="{CustomerData>/State}"
@@ -557,14 +553,14 @@
                             />
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="State"
+                                text="{i18n>MVDstate}"
                             />
                             <ComboBox
                                 width="40%"
                                 id="CC_id_State"
                                 change="CC_onChangeState"
-                                placeholder="Enter State"
-                                valueStateText="Select State"
+                                placeholder="{i18n>enterState}"
+                                valueStateText="{i18n>selectState}"
                                 items="{path:'StateModel>/',length:1000}"
                                 selectedKey="{Bookingmodel>/State}"
                                 showSecondaryValues="true"
@@ -577,7 +573,7 @@
                             </ComboBox>
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="City"
+                                text="{i18n>city}"
                             />
                             <Text
                                 text="{CustomerData>/City}"
@@ -585,14 +581,14 @@
                             />
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="City"
+                                text="{i18n>city}"
                             />
                             <ComboBox
                                 width="40%"
                                 id="CC_id_City"
                                 change="onChange"
-                                valueStateText="Select City"
-                                placeholder="Enter City"
+                                valueStateText="{i18n>cityValueText}"
+                                placeholder="{i18n>enterCity}"
                                 items="{
                                         path:'CityModel>/',
                                         length:1000
@@ -608,11 +604,9 @@
                                 />
                             </ComboBox>
 
-
-                            
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Address"
+                                text="{i18n>address}"
                             />
                             <Text
                                 text="{CustomerData>/Address}"
@@ -621,21 +615,20 @@
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Address"
+                                text="{i18n>address}"
                             />
                             <TextArea
                                 value="{Bookingmodel>/Address}"
                                 maxLength="150"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_Address"
-                                valueStateText="Enter Address"
+                                valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
-
                             />
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Mobile Number"
+                                text="{i18n>MSmobileNo}"
                             />
                             <Text
                                 text="{= ${CustomerData>/STDCode} + ' ' + ${CustomerData>/MobileNo} }"
@@ -644,7 +637,7 @@
                             <!-- <Text text="{CustomerData>/MobileNo}" visible="{= !${VisibleModel>/visible} }" /> -->
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="Mobile Number"
+                                text="{i18n>MSmobileNo}"
                             />
                             <!-- <Input
                                 id="CC_id_STDCode"
@@ -659,37 +652,36 @@
                                 </layoutData>
                             </Input> -->
 
-                                 <ComboBox
-                            change="onSTDChange"
-                            id="CC_id_STDCode"
-                            placeholder="Code"
-                            valueStateText="{i18n>MSselectCode}"
-                            showSecondaryValues="true"
-                            items="{path:'CountryModel>/', length:1000}"
-                            selectedKey="{Bookingmodel>/STDCode}"
-                            filterSecondaryValues="true"
-                            visible="{VisibleModel>/visible}"
-                        >
-                            <core:ListItem
-                                key="{CountryModel>stdCode}"
-                                text="{CountryModel>stdCode}"
-                                additionalText="{CountryModel>code}"
-                            />
-                                   <layoutData>
+                            <ComboBox
+                                change="onSTDChange"
+                                id="CC_id_STDCode"
+                                placeholder="Code"
+                                valueStateText="{i18n>MSselectCode}"
+                                showSecondaryValues="true"
+                                items="{path:'CountryModel>/', length:1000}"
+                                selectedKey="{Bookingmodel>/STDCode}"
+                                filterSecondaryValues="true"
+                                visible="{VisibleModel>/visible}"
+                            >
+                                <core:ListItem
+                                    key="{CountryModel>stdCode}"
+                                    text="{CountryModel>stdCode}"
+                                    additionalText="{CountryModel>code}"
+                                />
+                                <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"
                                         cellsLarge="2"
                                     />
                                 </layoutData>
-                                
-                        </ComboBox>
+                            </ComboBox>
                             <!-- Phone Number -->
                             <Input
                                 id="CD_ID_idPhone"
                                 value="{Bookingmodel>/MobileNo}"
-                                placeholder="Enter Contact Number"
+                                placeholder="{i18n>enterContactNumber}"
                                 liveChange="onmobileChange"
-                                valueStateText="Enter Contact Number"
+                                valueStateText="{i18n>enterContactNumber}"
                                 visible="{VisibleModel>/visible}"
                                 width="50%"
                             />
@@ -737,7 +729,7 @@
                     </FlexBox>
                     <VBox class="sapUiMediumMarginBottom">
                         <Panel
-                            headerText="Customer Documents"
+                            headerText="{i18n>customerDocuments}"
                             expandable="false"
                             class="customPanelHeader"
                         >
@@ -757,12 +749,12 @@
                                 <headerToolbar>
                                     <Toolbar>
                                         <Title
-                                            text="Document Details ({=${CustomerData>/Documents}.length})"
+                                            text="{i18n>documentDetails} ({= ${CustomerData>/Documents}.length})"
                                         />
                                         <ToolbarSpacer />
                                         <Button
-                                            text="Upload Documents"
-                                            tooltip="Upload Documents"
+                                            text="{i18n>uploadDocuments}"
+                                            tooltip="{i18n>uploadDocuments}"
                                             press="onUploadDocumentFile"
                                             class="myUnifiedBtn"
                                             visible="{VisibleModel>/visible}"
@@ -771,16 +763,25 @@
                                 </headerToolbar>
                                 <columns>
                                     <Column demandPopin="true">
-                                        <Text text="File Name" tooltip="File Name" />
+                                        <Text
+                                            text="{i18n>filename}"
+                                            tooltip="{i18n>filename}"
+                                        />
                                     </Column>
                                     <Column demandPopin="true">
-                                        <Text text="Document Type" tooltip="Document Type" />
+                                        <Text
+                                            text="{i18n>MVDdocumenttype}"
+                                            tooltip="{i18n>MVDdocumenttype}"
+                                        />
                                     </Column>
                                     <Column
                                         demandPopin="true"
                                         minScreenWidth="Tablet"
                                     >
-                                        <Text text="File Type" tooltip="File Type" />
+                                        <Text
+                                            text="{i18n>FileType}"
+                                            tooltip="{i18n>FileType}"
+                                        />
                                     </Column>
                                 </columns>
                                 <items>
@@ -814,26 +815,26 @@
                         <headerToolbar>
                             <Toolbar>
                                 <Title
-                                    text="Facility Details ({=${CustomerData>/AllSelectedFacilities}.length})"
+                                    text="{i18n>facilityDetails} ({=${CustomerData>/AllSelectedFacilities}.length})"
                                 />
                                 <ToolbarSpacer />
                                 <Button
-                                    text="Add"
-                                    tooltip="Add Facility"
+                                    text="{i18n>MSadd}"
+                                    tooltip="{i18n>addFacility}"
                                     press="onAddFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
                                 />
                                 <Button
-                                    text="Edit"
-                                    tooltip="Edit Facility"
+                                    text="{i18n>MSedit}"
+                                    tooltip="{i18n>editFacility}"
                                     press="onEditFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
                                 />
                                 <Button
-                                    text="Delete"
-                                    tooltip="Delete Facility"
+                                    text="{i18n>MSdelete}"
+                                    tooltip="{i18n>deleteFacility}"
                                     press="onDeleteFacilityDetails"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
@@ -842,40 +843,61 @@
                         </headerToolbar>
                         <columns>
                             <Column demandPopin="true">
-                                <Text text="Facility Name" tooltip="Facility Name" />
+                                <Text
+                                    text="{i18n>facilityname}"
+                                    tooltip="{i18n>facilityname}"
+                                />
                             </Column>
                             <Column demandPopin="true">
-                                <Text text="Facility Price" tooltip="Facility Price" />
+                                <Text
+                                    text="{i18n>faciltyprice}"
+                                    tooltip="{i18n>faciltyprice}"
+                                />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Start Date" tooltip="Start Date" />
+                                <Text
+                                    text="{i18n>startDate}"
+                                    tooltip="{i18n>startDate}"
+                                />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="End Date" tooltip="End Date" />
+                                <Text
+                                    text="{i18n>endDate}"
+                                    tooltip="{i18n>endDate}"
+                                />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Unit" tooltip="Unit" />
+                                <Text
+                                    text="{i18n>unit}"
+                                    tooltip="{i18n>unit}"
+                                />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Days" tooltip="Days" />
+                                <Text
+                                    text="{i18n>Tooldays}"
+                                    tooltip="{i18n>Tooldays}"
+                                />
                             </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Total Price" tooltip="Total Price" />
+                                <Text
+                                    text="{i18n>totalPrice}"
+                                    tooltip="{i18n>totalPrice}"
+                                />
                             </Column>
                         </columns>
                         <items>
@@ -930,7 +952,7 @@
                             <!-- Total Facility Cost -->
                             <HBox justifyContent="SpaceBetween">
                                 <Label
-                                    text="Total Facility Cost:"
+                                    text="{i18n>totalfacilitycost}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -948,7 +970,7 @@
                             <!-- Room Rent -->
                             <HBox justifyContent="SpaceBetween">
                                 <Label
-                                    text="Room Rent:"
+                                    text="{i18n>roomRent}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -972,7 +994,7 @@
                             >
                                 <!-- Coupon Label -->
                                 <Label
-                                    text="Coupon Code:"
+                                    text="{i18n>couponCode}"
                                     class="totalColumnBold1 sapUiTinyMarginEnd"
                                     width="120px"
                                 />
@@ -980,20 +1002,20 @@
                                 <Input
                                     id="couponInput"
                                     value="{Bookingmodel>/CouponCode}"
-                                    placeholder="Enter Coupon"
+                                    placeholder="{i18n>enterCoupon}"
                                     width="150px"
                                     class="sapUiTinyMarginEnd"
                                     showValueHelp="true"
                                     valueHelpIconSrc="sap-icon://decline"
-                                    tooltip="Cancel Coupon"
+                                    tooltip="{i18n>cancelCoupon}"
                                     valueHelpRequest="oncancelCoupon"
                                     liveChange="onCouponLiveChange"
                                 />
                                 <!-- Apply Now Button -->
                                 <Button
                                     id="idApplyNowButton"
-                                    text="Apply Now"
-                                    tooltip="Apply Coupon"
+                                    text="{i18n>applyNow}"
+                                    tooltip="{i18n>applyCoupon}"
                                     type="Emphasized"
                                     press=".onApplyCoupon"
                                     class="sapUiTinyMarginEnd"
@@ -1005,7 +1027,7 @@
                                 visible="{= ${CustomerData>/CouponCode} ? true : false }"
                             >
                                 <Label
-                                    text="Coupon Code:"
+                                    text="{i18n>couponCode}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
