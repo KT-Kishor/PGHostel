@@ -76,7 +76,7 @@
                         <Input
                             id="MS_id_signUpName"
                             value="{MDmodel>/UserName}"
-                            placeholder="{i18n>fullname}"
+                            placeholder="{i18n>enterFullName}"
                             required="true"
                             liveChange="_LCvalidateName"
                             valueStateText="{i18n>MSenterValidName}"

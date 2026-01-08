@@ -141,7 +141,7 @@
                                         text="Shah Hostel"
                                     />
                                     <Text
-                                        text="Your New Home Away from Home"
+                                        text="Your New Home Away From Home"
                                         class="custom-tagline s apUiTinyMarginTop "
                                     />
                                 </VBox>

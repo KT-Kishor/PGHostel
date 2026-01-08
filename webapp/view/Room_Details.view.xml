@@ -148,7 +148,7 @@
                     >
                         <Text
                             text="{i18n>monthPrice}"
-                            tooltip="Month Price"
+                            tooltip="Monthly Price"
                         />
                     </Column>
                     <Column
@@ -157,7 +157,7 @@
                     >
                         <Text
                             text="{i18n>yearPrice}"
-                            tooltip="Year Price"
+                            tooltip="Yearly Price"
                         />
                     </Column>
                 </columns>
