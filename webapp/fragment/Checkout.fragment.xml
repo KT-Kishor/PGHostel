@@ -60,7 +60,7 @@
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="{i18n>ancelButton}"
+                    text="{i18n>CancelButton}"
                     tooltip="{i18n>CancelButton}"
                     press="Ck_onCancelButtonPress"
                     type="Reject"

@@ -49,7 +49,7 @@
                 <Button
                     id="signupvisible"
                     text="{i18n>CapsIGNUP}"
-					tooltip="{i18n>CapsIGN}"
+					tooltip="{i18n>CapsIGNUP}"
                     type="Transparent"
                     class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} "
                     press="onSwitchToSignUp"

@@ -118,7 +118,7 @@
                         additionalText="{CityModel>branchCode}"
                     />
                 </ComboBox>
-                <Label text="{i18n>gstNo}" />
+                <Label text="{i18n>gstNo}" visible="{visiblePlay>/isIndia}"/>
                 <Input
                     value="{MDmodel>/GSTIN}"
                     maxLength="15"
@@ -126,6 +126,7 @@
                     id="MC_id_CustomGst"
                     liveChange="MC_ValidateGstNumber"
                     valueStateText="{i18n>gstError}"
+                    visible="{visiblePlay>/isIndia}"
                 />
                 <Label
                     text="{i18n>type}"
