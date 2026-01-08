@@ -28,11 +28,11 @@
                 />
                 <TextArea
                     value=""
-                    liveChange="MIF_liveChangeForAdminComments"
+                    liveChange="MIF_liveChangeForMangerComments"
                     rows="4"
                     id="MIF_id_remark"
                     placeholder="{i18n>enterRemarks}"
-                    maxLength="2000"
+                    maxLength="2000" valueStateText="{i18n>enterRemarks}"
                 />
             </f:content>
         </f:SimpleForm>
