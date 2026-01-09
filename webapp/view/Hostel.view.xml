@@ -292,7 +292,6 @@
                                         >
                                             <VBox
                                                 class="bedCard"
-                                                visible="{VisibilityModel>Visible}"
                                             >
                                                 <!-- ===== IMAGE CAROUSEL ===== -->
                                                 <Carousel

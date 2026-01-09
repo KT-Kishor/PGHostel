@@ -2923,11 +2923,11 @@ sap.ui.define([
 
                 this.sBranchCode = sBranchCode
 
-                const bHasVisibleItems = aFinal.some(item => item.Visible === true)
+                aFinal = aFinal.filter(b => b.Visible !== false);
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
                 oVisibilityModel.setProperty("/ShowViewMore", aBedTypes.length === this.iTop);
-                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0 || !bHasVisibleItems) {
+                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
