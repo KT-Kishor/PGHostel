@@ -24,12 +24,22 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+
+            // Detect browser refresh
+            if (performance && performance.getEntriesByType) {
+                var aEntries = performance.getEntriesByType("navigation");
+                if (aEntries.length && aEntries[0].type === "reload") {
+                    oRouter.navTo("RouteHostel", {}, true); // true = replace history
+                }
+            }
         },
 
         _onRouteMatched: function () {
+
             // this.commonLoginFunction();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1","ID_DOB_"], this.getView());
+            this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1", "ID_DOB_"], this.getView());
             var oView = this.getView()
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
@@ -806,7 +816,7 @@ sap.ui.define([
                             placeholder: "Enter Email",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/CustomerEmail}",
-                             liveChange: function (oEvent) {
+                            liveChange: function (oEvent) {
                                 const sValue = oEvent.getParameter("value");
                                 const oInput = oEvent.getSource();
                                 const oEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -979,51 +989,51 @@ sap.ui.define([
                                     additionalText: "{CountryModel>code}"  // country name
                                 })
                             },
-                           change: function (oEv) {
-    const oCombo = oEv.getSource();
-    const oSel = oCombo.getSelectedItem();
+                            change: function (oEv) {
+                                const oCombo = oEv.getSource();
+                                const oSel = oCombo.getSelectedItem();
 
-    if (!oSel) {
-        return;
-    }
+                                if (!oSel) {
+                                    return;
+                                }
 
-    const aPersons = oModel.getProperty("/Persons") || [];
+                                const aPersons = oModel.getProperty("/Persons") || [];
 
-    const oSTDObj = oSel.getBindingContext("CountryModel").getObject();
-    const sSTDCode = oSTDObj.stdCode;
+                                const oSTDObj = oSel.getBindingContext("CountryModel").getObject();
+                                const sSTDCode = oSTDObj.stdCode;
 
-    // Decide Mobile Max Length
-    let iMobileMax;
-    if (sSTDCode === "+91") {
-        iMobileMax = 10;
-    } else {
-        iMobileMax = 18;
-    }
+                                // Decide Mobile Max Length
+                                let iMobileMax;
+                                if (sSTDCode === "+91") {
+                                    iMobileMax = 10;
+                                } else {
+                                    iMobileMax = 18;
+                                }
 
-    // Update model properly
-    aPersons[i].STDCode = sSTDCode;
-    aPersons[i].MobileMax = iMobileMax;
+                                // Update model properly
+                                aPersons[i].STDCode = sSTDCode;
+                                aPersons[i].MobileMax = iMobileMax;
 
-    oModel.setProperty("/Persons", aPersons);
-    oModel.refresh(true);
+                                oModel.setProperty("/Persons", aPersons);
+                                oModel.refresh(true);
 
-    // Update UI Input immediately (same as country logic)
-    const oMobileInput = sap.ui.getCore().byId(
-        that.createId("ID_Mobile_" + i)
-    );
+                                // Update UI Input immediately (same as country logic)
+                                const oMobileInput = sap.ui.getCore().byId(
+                                    that.createId("ID_Mobile_" + i)
+                                );
 
-    if (oMobileInput) {
-        oMobileInput.setMaxLength(iMobileMax);
+                                if (oMobileInput) {
+                                    oMobileInput.setMaxLength(iMobileMax);
 
-        // Trim existing value if longer than allowed
-        let sValue = oMobileInput.getValue() || "";
-        if (sValue.length > iMobileMax) {
-            sValue = sValue.substring(0, iMobileMax);
-            oMobileInput.setValue(sValue);
-            oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
-        }
-    }
-}
+                                    // Trim existing value if longer than allowed
+                                    let sValue = oMobileInput.getValue() || "";
+                                    if (sValue.length > iMobileMax) {
+                                        sValue = sValue.substring(0, iMobileMax);
+                                        oMobileInput.setValue(sValue);
+                                        oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
+                                    }
+                                }
+                            }
 
                         }),
 
@@ -1036,7 +1046,7 @@ sap.ui.define([
                             liveChange: function (oEv) {
                                 const oInput = oEv.getSource();
                                 let sValue = oInput.getValue() || "";
-                                
+
                                 sValue = sValue.replace(/\D/g, ""); // allow only digits
 
                                 const aPersons = oModel.getProperty("/Persons") || [];
@@ -5760,7 +5770,7 @@ sap.ui.define([
         },
 
         onCancelPress: function () {
-              const oUser = this._oLoggedInUser;
+            const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
             if (oUser && oUser.UserID) {
@@ -5779,7 +5789,7 @@ sap.ui.define([
         },
 
         onHome: function () {
-              const oUser = this._oLoggedInUser;
+            const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
             if (oUser && oUser.UserID) {
@@ -5928,11 +5938,8 @@ sap.ui.define([
 
             // Save in model
             oModel.setProperty("/City", sCityName);
-            // If you also track explicit city:
-            // oModel.setProperty("/city", sCityName);
         },
         _onProfileSTDChange: function () {
-
             const oSTD = sap.ui.getCore().byId("profileFrag--id_std");
             const oMobile = sap.ui.getCore().byId("profileFrag--id_phone");
 
