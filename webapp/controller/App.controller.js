@@ -1,8 +1,9 @@
 sap.ui.define(
     [
-        "sap/ui/core/mvc/Controller"
+        "sap/ui/core/mvc/Controller",
+        "sap/m/MessageBox"
     ],
-    function(BaseController) {
+    function(BaseController, MessageBox) {
       "use strict";
   
       return BaseController.extend("sap.ui.com.project1.controller.App", {

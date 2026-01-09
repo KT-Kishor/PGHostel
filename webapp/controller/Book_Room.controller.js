@@ -3228,7 +3228,7 @@ sap.ui.define([
                 if (oResp?.success) {
 
                     MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    alert(oResp.OTP);
+                    // alert(oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
 

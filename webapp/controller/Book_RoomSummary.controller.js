@@ -22,6 +22,15 @@ sap.ui.define([
                 minEndDate: ""
             });
             this.getView().setModel(DateModel, "DateRangeModel");
+             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+
+            // Detect browser refresh
+            if (performance && performance.getEntriesByType) {
+                var aEntries = performance.getEntriesByType("navigation");
+                if (aEntries.length && aEntries[0].type === "reload") {
+                    oRouter.navTo("RouteHostel", {}, true); // true = replace history
+                }
+            }
         },
 
         onNavBack: function () {
