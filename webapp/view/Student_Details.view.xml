@@ -12,8 +12,11 @@
 >
     <Page>
         <headerContent>
-	     <core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
         <content>
             <!-- <fb:FilterBar
                 id="PO_id_FilterbarEmployee"
@@ -118,41 +121,40 @@
                 id="idPOTable"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
-                width="auto" busyIndicatorDelay="0"
+                width="auto"
+                busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
                 items="{path: 'POModel>/', sorter: {path: 'PoNumber', descending: true}}"
             >
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="Hostel Student Details ({=${POModel>/}.length})"
+                            text="{i18n>hostelStudentDetails} ({= ${POModel>/}.length})"
                         />
                         <ToolbarSpacer />
                         <Button
-                            text="Assign Rooms"
-                            tooltip="Assign Rooms"
+                            text="{i18n>assignRooms}"
+                            tooltip="{i18n>assignRooms}"
                             press="PO_onCreatePurchaseOrder"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Delete"
-                            tooltip="Delete"
+                            text="{i18n>MSdelete}"
+                            tooltip="{i18n>MSdelete}"
                             press="PO_onDeleteButtonPress"
                             class="myUnifiedBtn"
                         />
-                   
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text
-                            text=""
-                        />
+                        <Text text="" />
                     </Column>
-					
+
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>customerName}" tooltip="{i18n>customerName}"
+                            text="{i18n>customerName}"
+                            tooltip="{i18n>customerName}"
                         />
                     </Column>
                     <Column
@@ -160,7 +162,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>customerAddress}" tooltip="{i18n>customerAddress}"
+                            text="{i18n>customerAddress}"
+                            tooltip="{i18n>customerAddress}"
                         />
                     </Column>
                     <Column
@@ -168,7 +171,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>type}" tooltip="{i18n>type}"
+                            text="{i18n>type}"
+                            tooltip="{i18n>type}"
                         />
                     </Column>
                     <Column
@@ -176,7 +180,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>pan}" tooltip="{i18n>pan}"
+                            text="{i18n>pan}"
+                            tooltip="{i18n>pan}"
                         />
                     </Column>
                     <Column
@@ -214,8 +219,8 @@
                     >
                         <cells>
                             <Text text="{POModel>PoNumber}" />
-							<Text text="{POModel>CompanyName}" />
-							
+                            <Text text="{POModel>CompanyName}" />
+
                             <Text text="{POModel>CustomerName}" />
                             <Text text="{POModel>Address}" />
                             <Text text="{POModel>Type}" />

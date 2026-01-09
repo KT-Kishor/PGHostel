@@ -111,7 +111,7 @@
                     <OverflowToolbar>
                         <Title
                             id="CI_id_Title"
-                            text="Manage Invoice ({= ${ManageInvoiceModel>/}.length})"
+                            text="{i18n>invoiceapp} ({= ${ManageInvoiceModel>/}.length})"
                         />
                         <ToolbarSpacer />
                         <Button
@@ -143,8 +143,8 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="Customer"
-                            tooltip="Customer"
+                            text="{i18n>customer}"
+                            tooltip="{i18n>customer}"
                         />
                     </Column>
                     <Column

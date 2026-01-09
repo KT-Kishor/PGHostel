@@ -88,23 +88,25 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>facilities} ({= ${Facilities>/}.length})" />
+                        <Title
+                            text="{i18n>facilities} ({= ${Facilities>/}.length})"
+                        />
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>addFacility}"
-                            tooltip="Add a new Facility"
+                            tooltip="{i18n>addFacility}"
                             press="FD_RoomDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-                            tooltip="Delete Selected Facilities"
+                            tooltip="{i18n>MSdelete}"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>download}"
-                            tooltip="Download Facilities Data"
+                            tooltip="{i18n>download}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -114,13 +116,13 @@
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>facilityname}"
-                            tooltip="Facility Name"
+                            tooltip="{i18n>facilityname}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>type}"
-                            tooltip="Type"
+                            tooltip="{i18n>type}"
                         />
                     </Column>
                     <Column
@@ -129,7 +131,7 @@
                     >
                         <Text
                             text="{i18n>hourlyPrice}"
-                            tooltip="Hourly Price"
+                            tooltip="{i18n>hourlyPrice}"
                         />
                     </Column>
                     <Column
@@ -138,7 +140,7 @@
                     >
                         <Text
                             text="{i18n>dailyPrice}"
-                            tooltip="Daily Price"
+                            tooltip="{i18n>dailyPrice}"
                         />
                     </Column>
                     <Column
@@ -147,7 +149,7 @@
                     >
                         <Text
                             text="{i18n>monthlyPrice}"
-                            tooltip="Monthly Price"
+                            tooltip="{i18n>monthlyPrice}"
                         />
                     </Column>
                     <Column
@@ -156,7 +158,7 @@
                     >
                         <Text
                             text="{i18n>yearlyPrice}"
-                            tooltip="Yearly Price"
+                            tooltip="{i18n>yearlyPrice}"
                         />
                     </Column>
                 </columns>

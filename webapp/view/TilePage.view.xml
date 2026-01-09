@@ -17,7 +17,7 @@
             <ToolbarSpacer />
             <Button
                 press="Tile_onLogPress"
-                tooltip="Logout"
+                tooltip="{i18n>logoutTooltip}"
                 icon="sap-icon://log"
             />
         </headerContent>
@@ -31,10 +31,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Customer Details"
+                    header="{i18n>manageCustomerDetails}"
                     press="TileV_onpressInbox"
                 >
-                    <TileContent unit="Assign Rooms">
+                    <TileContent unit="{i18n>assignRooms}">
                         <ImageContent src="sap-icon://building" />
                     </TileContent>
                 </GenericTile>
@@ -42,10 +42,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageRooms}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Room Details"
+                    header="{i18n>tileManageRoomDetails}"
                     press="TileV_onpressroomdetails"
                 >
-                    <TileContent unit="Room Details">
+                    <TileContent unit="{i18n>tileRoomDetails}">
                         <ImageContent src="sap-icon://detail-view" />
                     </TileContent>
                 </GenericTile>
@@ -53,10 +53,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageBedType}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Bed Details"
+                    header="{i18n>manageBedDetails}"
                     press="TileV_onpressbeddetails"
                 >
-                    <TileContent unit="Bed Details">
+                    <TileContent unit="{i18n>tileBedDetails}">
                         <ImageContent src="sap-icon://bed" />
                     </TileContent>
                 </GenericTile>
@@ -64,10 +64,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageFacility}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Extra Facilities"
+                    header="{i18n>manageExtraFacilities}"
                     press="TileV_onpressextrafacilities"
                 >
-                    <TileContent unit="Extra Facilities">
+                    <TileContent unit="{i18n>extraFacilities}">
                         <ImageContent src="sap-icon://activities" />
                     </TileContent>
                 </GenericTile>
@@ -75,10 +75,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageBranch}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Branch Details"
+                    header="{i18n>manageBranchDetails}"
                     press="TileV_onpressBranchdata"
                 >
-                    <TileContent unit="Branch Details">
+                    <TileContent unit="{i18n>branchDetails}">
                         <ImageContent src="sap-icon://building" />
                     </TileContent>
                 </GenericTile>
@@ -86,10 +86,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageAmenities}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Maintain Hostel Features"
+                    header="{i18n>maintainHostelFeatures}"
                     press="TileV_onpresshostelfeatures"
                 >
-                    <TileContent unit="Hostel Features">
+                    <TileContent unit="{i18n>TileHostelFeatures}">
                         <ImageContent src="sap-icon://home-share" />
                     </TileContent>
                 </GenericTile>
@@ -97,10 +97,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Invoice Details"
+                    header="{i18n>invoiceDetails}"
                     press="TileV_onpressManageInvoice"
                 >
-                    <TileContent unit="Invoice Details">
+                    <TileContent unit="{i18n>TileinvoiceDetails}">
                         <ImageContent src="sap-icon://expense-report" />
                     </TileContent>
                 </GenericTile>
@@ -108,10 +108,10 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageCoupon}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Coupon Details"
+                    header="{i18n>manageCouponDetails}"
                     press="TileV_onpressCouponDetails"
                 >
-                    <TileContent unit="Coupon Details">
+                    <TileContent unit="{i18n>couponDetails}">
                         <ImageContent src="sap-icon://tags" />
                     </TileContent>
                 </GenericTile>
@@ -119,21 +119,21 @@
                 <GenericTile
                     visible="{= ${TileVisibility>/ManageStaff} !== 0 }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Staff"
+                    header="{i18n>manageStaff}"
                     press="TileV_onpressManageStaff"
                 >
-                    <TileContent unit="Staff Directory">
+                    <TileContent unit="{i18n>staffDirectory}">
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
 
-                 <GenericTile
+                <GenericTile
                     visible="{= ${TileVisibility>/ManageVendor} !== 0 }"
                     class="sapUiMediumMargin glassTile"
-                    header="Manage Vendors"
+                    header="{i18n>manageVendors}"
                     press="TileV_onpressManageVendor"
                 >
-                    <TileContent unit="Vendor Directory">
+                    <TileContent unit="{i18n>vendorDirectory}">
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>

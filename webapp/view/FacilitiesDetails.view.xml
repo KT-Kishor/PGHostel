@@ -31,7 +31,7 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="FD_id_OrderHeaderSection1"
-                    title="Facility Information"
+                    title="{i18n>facilityInformation}"
                 >
                     <subSections>
                         <ObjectPageSubSection id="FD_id_dsd1">
@@ -63,7 +63,7 @@
                                         />
                                         <m:ComboBox
                                             id="FD_id_RoomType123"
-                                            placeholder="Select Branch Code"
+                                            placeholder="{i18n>placeSelectBranchCode}"
                                             selectedKey="{FacilitiesModel>/BranchCode}"
                                             items="{BranchModel>/}"
                                             showSecondaryValues="true"
@@ -85,7 +85,7 @@
                                         <m:Input
                                             id="FD_id_FacilityName"
                                             value="{FacilitiesModel>/FacilityName}"
-                                            placeholder="Enter Facility Name"
+                                            placeholder="{i18n>placeEnterFacilityName}"
                                             maxLength="60"
                                             liveChange=".onFacilityNameChange"
                                             valueStateText="{i18n>enterFacilityName}"
@@ -99,7 +99,7 @@
                                         <m:ComboBox
                                             id="FD_id_FacilityName1"
                                             items="{FacilityType>/}"
-                                            placeholder="Enter Type"
+                                            placeholder="{i18n>enterType}"
                                             value="{FacilitiesModel>/Type}"
                                             change=".onFacilityTypeChange"
                                             width="100%"
@@ -114,7 +114,7 @@
                                         <m:Label text="{i18n>hourlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerHourPrice"
-                                            placeholder="Enter Per Hour Price"
+                                            placeholder="{i18n>enterPerHourPrice}"
                                             value="{FacilitiesModel>/PerHourPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
@@ -123,7 +123,7 @@
                                         <m:Label text="{i18n>dailyPrice}" />
                                         <m:Input
                                             id="FD_id_PerDayPrice"
-                                            placeholder="Enter Per Day Price"
+                                            placeholder="{i18n>enterPerDayPrice}"
                                             value="{FacilitiesModel>/PerDayPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
@@ -132,7 +132,7 @@
                                         <m:Label text="{i18n>monthlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerMonthPrice"
-                                            placeholder="Enter Per Month Price"
+                                            placeholder="{i18n>enterPerMonthPrice}"
                                             value="{FacilitiesModel>/PerMonthPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
@@ -141,7 +141,7 @@
                                         <m:Label text="{i18n>yearlyPrice}" />
                                         <m:Input
                                             id="FD_id_PerYearPrice"
-                                            placeholder="Enter Per Year Price"
+                                            placeholder="{i18n>enterPerYearPrice}"
                                             value="{FacilitiesModel>/PerYearPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
@@ -159,7 +159,7 @@
                                             valueStateText="{i18n>selectCurrency}"
                                             width="100%"
                                             change=".onFacilitybranchChange"
-                                            placeholder="Select Currency"
+                                            placeholder="{i18n>selectCurrency}"
                                             editable="{editable>/Edit}"
                                         >
                                             <c:Item
@@ -176,7 +176,7 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="FD_id_rderSection"
-                    title="Images"
+                    title="{i18n>images}"
                 >
                     <subSections>
                         <ObjectPageSubSection id="FD_id_ordersection">
@@ -216,7 +216,7 @@
                                                 icon="sap-icon://add"
                                                 width="120px"
                                                 style="Transparent"
-                                                tooltip="Add Image"
+                                                tooltip="{i18n>addImage}"
                                                 placeholder=" "
                                                 buttonOnly="true"
                                                 fileType="jpg,jpeg,png"
@@ -231,7 +231,7 @@
                                             visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
                                             press=".onDeleteImage"
                                             type="Reject"
-                                            tooltip="Delete Image"
+                                            tooltip="{i18n>deleteImage}"
                                             width="100%"
                                         />
                                     </m:VBox>
@@ -249,7 +249,7 @@
                         id="FD_id_editButton"
                         visible="{= !${editable>/Edit} }"
                         text="{i18n>MSedit}"
-                        tooltip="Edit Facility Details"
+                        tooltip="{i18n>MSedit}"
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
                     />
@@ -257,7 +257,7 @@
                         id="FD_id_SaveButton"
                         visible="{=${editable>/Edit}}"
                         text="{i18n>save}"
-                        tooltip="Save Facility Details"
+                        tooltip="{i18n>save}"
                         class="myUnifiedBtn"
                         press="BT_onsavebuttonpress"
                     />

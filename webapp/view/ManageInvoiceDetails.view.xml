@@ -414,7 +414,7 @@
                                                 <m:ToolbarSpacer />
                                                 <m:Button
                                                     class="myUnifiedBtn"
-													tooltip="{i18n>btnTransaction}"
+                                                    tooltip="{i18n>btnTransaction}"
                                                     text="{i18n>btnTransaction}"
                                                     press="CID_onPressDisplayPaymentDetail"
                                                     visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"
@@ -423,7 +423,7 @@
                                                     id="AddItem"
                                                     visible="{visiablityPlay>/addInvBtn}"
                                                     text="{i18n>addInvItems}"
-													tooltip="{i18n>addInvItems}"
+                                                    tooltip="{i18n>addInvItems}"
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressAddInvoiceItems"
                                                 />
@@ -435,14 +435,18 @@
                                                 width="3rem"
                                                 minScreenWidth="Tablet"
                                             >
-                                                <m:Text text="{i18n>itemID}" tooltip="{i18n>itemID}" />
+                                                <m:Text
+                                                    text="{i18n>itemID}"
+                                                    tooltip="{i18n>itemID}"
+                                                />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 width="12rem"
                                             >
                                                 <m:Text
-                                                    text="{i18n>particulars}" tooltip="{i18n>particulars}"
+                                                    text="{i18n>particulars}"
+                                                    tooltip="{i18n>particulars}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -451,7 +455,10 @@
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
-                                                <m:Text text="{i18n>SAC}" tooltip="{i18n>SAC}" />
+                                                <m:Text
+                                                    text="{i18n>SAC}"
+                                                    tooltip="{i18n>SAC}"
+                                                />
                                             </m:Column>
                                             <m:Column
                                                 id="idGSTCalculation"
@@ -460,7 +467,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="{i18n>GSTCalculation}" tooltip="{i18n>GSTCalculation}"
+                                                    text="{i18n>GSTCalculation}"
+                                                    tooltip="{i18n>GSTCalculation}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -469,7 +477,8 @@
                                                 width="7rem"
                                             >
                                                 <m:Text
-                                                    text="{i18n>startDate}" tooltip="{i18n>startDate}"
+                                                    text="{i18n>startDate}"
+                                                    tooltip="{i18n>startDate}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -477,7 +486,10 @@
                                                 demandPopin="true"
                                                 width="7rem"
                                             >
-                                                <m:Text text="{i18n>endDate}" tooltip="{i18n>endDate}" />
+                                                <m:Text
+                                                    text="{i18n>endDate}"
+                                                    tooltip="{i18n>endDate}"
+                                                />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
@@ -485,21 +497,29 @@
                                                 width="7rem"
                                             >
                                                 <m:Text
-                                                    text="{i18n>grossPrice}" tooltip="{i18n>grossPrice}" />
+                                                    text="{i18n>grossPrice}"
+                                                    tooltip="{i18n>grossPrice}"
+                                                />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                                 width="7rem"
                                             >
-                                                <m:Text text="{i18n>Unit}" tooltip="{i18n>Unit}" />
+                                                <m:Text
+                                                    text="{i18n>Unit}"
+                                                    tooltip="{i18n>Unit}"
+                                                />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                                 width="8rem"
                                             >
-                                                <m:Text text="{i18n>total}" tooltip="{i18n>total}" />
+                                                <m:Text
+                                                    text="{i18n>total}"
+                                                    tooltip="{i18n>total}"
+                                                />
                                             </m:Column>
                                         </m:columns>
                                         <m:items>
@@ -774,7 +794,7 @@
                     <m:Button
                         visible="{= ${visiablityPlay>/createVisi} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
                         text="{i18n>submit}"
-						tooltip="{i18n>submit}"
+                        tooltip="{i18n>submit}"
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
@@ -782,7 +802,7 @@
                         visible="{= ${visiablityPlay>/payByDate} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
                         text="{i18n>companyInvoiceSendEmail}"
                         press="CID_onPressSendEmail"
-						tooltip="{i18n>companyInvoiceSendEmail}"
+                        tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
                     />
                     <m:Button
@@ -794,14 +814,14 @@
                     <m:Button
                         visible="{= ${visiablityPlay>/MultiEmail} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
                         text="{i18n>sendInvoiceText}"
-						tooltip="{i18n>sendInvoiceText}"
+                        tooltip="{i18n>sendInvoiceText}"
                         press="CID_onPressSendMultipalEmail"
                         class="myUnifiedBtn"
                     />
                     <m:Button
                         visible="{visiablityPlay>/merge}"
                         text="{i18n>GeneratePDF}"
-						tooltip="{i18n>GeneratePDF}"
+                        tooltip="{i18n>GeneratePDF}"
                         press="CID_onPressGeneratePdf"
                         class="myUnifiedBtn"
                     />

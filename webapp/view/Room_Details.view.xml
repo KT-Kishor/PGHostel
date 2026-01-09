@@ -91,24 +91,24 @@
                         <Button
                             text="{i18n>createRoom}"
                             press="HM_AddRoom"
-                            tooltip="Add New Room"
+                            tooltip="{i18n>createRoom}"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSedit}"
-                            tooltip="Edit Selected Room"
+                            tooltip="{i18n>MSedit}"
                             press="HM_EditRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-                            tooltip="Delete Selected Room"
+                            tooltip="{i18n>MSdelete}"
                             press="HM_DeleteRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>download}"
-                            tooltip="Download Room List"
+                            tooltip="{i18n>download}"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -118,19 +118,19 @@
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>roomNo}"
-                            tooltip="Room Number"
+                            tooltip="{i18n>roomNo}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>bedType}"
-                            tooltip="Bed Type"
+                            tooltip="{i18n>bedType}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>extraBed}"
-                            tooltip="Extra Bed"
+                            tooltip="{i18n>extraBed}"
                         />
                     </Column>
                     <Column
@@ -139,7 +139,7 @@
                     >
                         <Text
                             text="{i18n>dailyPrice}"
-                            tooltip="Daily Price"
+                            tooltip="{i18n>dailyPrice}"
                         />
                     </Column>
                     <Column
@@ -148,7 +148,7 @@
                     >
                         <Text
                             text="{i18n>monthPrice}"
-                            tooltip="Monthly Price"
+                            tooltip="{i18n>monthPrice}"
                         />
                     </Column>
                     <Column
@@ -157,7 +157,7 @@
                     >
                         <Text
                             text="{i18n>yearPrice}"
-                            tooltip="Yearly Price"
+                            tooltip="{i18n>yearPrice}"
                         />
                     </Column>
                 </columns>
