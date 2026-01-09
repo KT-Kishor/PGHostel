@@ -446,7 +446,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisRoom!"));
+                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisRoom"));
                 return;
             }
 

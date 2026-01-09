@@ -39,22 +39,37 @@
     >
         <headerToolbar>
             <Toolbar>
-                <Title text="Grand Total Summary" tooltip="Grand Total Summary" />
+                <Title
+                    text="Grand Total Summary"
+                    tooltip="Grand Total Summary"
+                />
             </Toolbar>
         </headerToolbar>
 
         <columns>
             <Column>
-                <Text text="Person Name" tooltip="Person Name" />
+                <Text
+                    text="Person Name"
+                    tooltip="Person Name"
+                />
             </Column>
             <Column>
-                <Text text="Facility Cost" tooltip="Facility Cost" />
-            </Column> 
-            <Column>
-                <Text text="Room Rent" tooltip="Room Rent" />
+                <Text
+                    text="Facility Cost"
+                    tooltip="Facility Cost"
+                />
             </Column>
             <Column>
-                <Text text="Total" tooltip="Total" />
+                <Text
+                    text="Room Rent"
+                    tooltip="Room Rent"
+                />
+            </Column>
+            <Column>
+                <Text
+                    text="Total"
+                    tooltip="Total"
+                />
             </Column>
         </columns>
 
@@ -98,7 +113,7 @@
                 justifyContent="End"
                 alignItems="Center"
                 class="sapUiSmallMarginBottom"
-               visible="{= (${LoginModel>/UserID} ? true : false)
+                visible="{= (${LoginModel>/UserID} ? true : false)
         || (${LoginModel>/EmployeeID} ? true : false) }"
             >
                 <!-- Coupon Label -->

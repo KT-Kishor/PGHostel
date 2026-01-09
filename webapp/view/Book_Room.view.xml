@@ -11,14 +11,13 @@
         enableScrolling="false"
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
     >
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
-                type="XML"
-            />
+        <core:Fragment
+            fragmentName="sap.ui.com.project1.fragment.BookingHeader"
+            type="XML"
+        />
 
-         
         <content>
-           <!-- <Bar
+            <!-- <Bar
         design="Header"
         visible="true"
     >
@@ -57,8 +56,8 @@
                     <!-- Step 1: General Information -->
                     <WizardStep
                         id="TC_id_stepGeneralInfo"
-                        title="Booking Information"
-                       validated="{HostelModel>/IsGeneralInfoValid}"
+                        title="{i18n>bookingInformation}"
+                        validated="{HostelModel>/IsGeneralInfoValid}"
                         class="customPanelHeader"
                     >
                         <core:Fragment
@@ -69,7 +68,7 @@
                     <!-- Step 2: Service Selection -->
                     <WizardStep
                         id="idStepPersonal1"
-                        title="Personal Information"
+                        title="{i18n>personalInformation}"
                         validated="{HostelModel>/IsGeneralInfoValid}"
                     >
                         <ScrollContainer
@@ -83,21 +82,19 @@
                                 width="100%"
                                 alignItems="Center"
                                 justifyContent="SpaceBetween"
-                               visible="{= !${LoginModel>/UserID} &amp;&amp; !${LoginModel>/EmployeeID} }"
-
-
+                                visible="{= !${LoginModel>/UserID} &amp;&amp; !${LoginModel>/EmployeeID} }"
                             >
                                 <MessageStrip
-                                    text="Login to prefill personal details and get access to secret deals"
+                                    text="{i18n>bookRoomMsg}"
                                     showIcon="true"
                                     showCloseButton="false"
                                 />
-                                
+
                                 <!--  LOGIN BUTTON HERE -->
                                 <Button
-                                    text="LOGIN"
+                                    text="{i18n>login}"
                                     type="Emphasized"
-									tooltip="Click to Login"
+                                    tooltip="{i18n>clickLogin}"
                                     class="loginBannerButton"
                                     press="onPressLoginBanner"
                                 />
@@ -105,7 +102,6 @@
                             <!-- Your dynamic content container -->
                             <VBox
                                 id="idPersonalContainer1"
-                                
                                 width="100%"
                             />
                         </ScrollContainer>
@@ -113,9 +109,8 @@
                     <!-- Step 3: Work Scope -->
                     <WizardStep
                         id="id_Summary"
-                        title="Summary"
+                        title="{i18n>summary}"
                     >
-                    
                         <mvc:XMLView
                             id="TC_id_childView"
                             viewName="sap.ui.com.project1.view.Book_RoomSummary"
@@ -128,30 +123,30 @@
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Proceed To Pay"
-					tooltip="Click to Proceed to Payment"
+                    text="{i18n>proceedToPay}"
+                    tooltip="{i18n>proceedToPay}"
                     visible="{OBTNModel>/Submit}"
                     class="myUnifiedBtn"
                     press="onOpenProceedtoPay"
                 />
                 <Button
-                    text="Cancel Booking"
-					tooltip="Click to Cancel Booking"
+                    text="{i18n>cancelBooking}"
+                    tooltip="{i18n>cancelBooking}"
                     visible="{OBTNModel>/Cancel}"
                     class="myUnifiedBtn"
                     press="onCancelPress"
                 />
                 <Button
-                    text="Previous"
-					tooltip="Click to go to Previous Step"
+                    text="{i18n>previous}"
+                    tooltip="{i18n>previous}"
                     visible="{OBTNModel>/PERVIOUSVIS}"
                     class="myUnifiedBtn"
                     press="onDialogBackButton"
                 />
                 <Button
                     id="IdNextBtn"
-                    text="Next"
-					tooltip="Click to go to Next Step"
+                    text="{i18n>next}"
+                    tooltip="{i18n>next}"
                     class="myUnifiedBtn"
                     enabled="{OBTNModel>/Next}"
                     visible="{OBTNModel>/NXTVis}"

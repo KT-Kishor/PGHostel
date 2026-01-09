@@ -88,19 +88,19 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>addBed}"
-                            tooltip="Add Bed"
+                            tooltip="{i18n>addBed}"
                             press="HM_RoomDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-                            tooltip="Delete Selected Beds"
+                            tooltip="{i18n>deleteSelectedBeds}"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>download}"
-                            tooltip="Download Bed Details"
+                            tooltip="{i18n>downloadBedDetails}"
                             press="BD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -110,19 +110,19 @@
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>bedType}"
-                            tooltip="Bed Type"
+                            tooltip="{i18n>bedType}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>roomtype}"
-                            tooltip="Room Type"
+                            tooltip="{i18n>roomtype}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>noofRooms}"
-                            tooltip="Number of Rooms"
+                            tooltip="{i18n>noofRooms}"
                         />
                     </Column>
                     <Column
@@ -131,7 +131,7 @@
                     >
                         <Text
                             text="{i18n>noofPerson}"
-                            tooltip="Number of Person"
+                            tooltip="{i18n>noofPerson}"
                         />
                     </Column>
                     <Column
@@ -140,7 +140,7 @@
                     >
                         <Text
                             text="{i18n>description}"
-                            tooltip="Description"
+                            tooltip="{i18n>description}"
                         />
                     </Column>
                 </columns>

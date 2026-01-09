@@ -212,6 +212,7 @@
                     <HBox width="25%">
                         <u:FileUploader
                             id="BD_id_FileUploader"
+                            width="120px"
                             fileSizeExceed="onFileSizeExceeds"
                             maximumFileSize="5MB"
                             typeMissmatch="onFileTypeMissmatch"
