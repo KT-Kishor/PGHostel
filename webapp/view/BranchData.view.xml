@@ -61,7 +61,7 @@
                                 id="MD_id_SearchField"
                                 width="250px"
                                 liveChange="onGlobalSearch"
-                                placeholder="Search"
+                                placeholder="{i18n>search}"
                             />
                         </fb:control>
                     </fb:FilterGroupItem>
@@ -82,29 +82,31 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>branchDetails} ({mainModel>/count})" />
+                        <Title
+                            text="{i18n>branchDetails} ({mainModel>/count})"
+                        />
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>MSadd}"
-                            tooltip="Add New Branch"
+                            tooltip="{i18n>MSadd}"
                             press="MD_AddButtonPress"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSedit}"
-                            tooltip="Edit Selected Branch"
+                            tooltip="{i18n>MSedit}"
                             press="MD_UpdateTableRow"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-                            tooltip="Delete Selected Branch"
+                            tooltip="{i18n>deleteSelectedBranch}"
                             press="MD_DeleteRow"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>download}"
-                            tooltip="Download Branch Data"
+                            tooltip="{i18n>downloadBranchData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
                         />
@@ -114,7 +116,7 @@
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>MSbranchCode}"
-                            tooltip="Branch Code"
+                            tooltip="{i18n>MSbranchCode}"
                         />
                     </Column>
                     <Column
@@ -123,7 +125,7 @@
                     >
                         <Text
                             text="{i18n>branchName}"
-                            tooltip="Branch Name"
+                            tooltip="{i18n>branchName}"
                         />
                     </Column>
                     <Column
@@ -132,7 +134,7 @@
                     >
                         <Text
                             text="{i18n>address}"
-                            tooltip="Address"
+                            tooltip="{i18n>address}"
                         />
                     </Column>
                     <Column
@@ -141,7 +143,7 @@
                     >
                         <Text
                             text="{i18n>pinCode}"
-                            tooltip="Pin Code"
+                            tooltip="{i18n>pinCode}"
                         />
                     </Column>
                     <Column
@@ -150,25 +152,25 @@
                     >
                         <Text
                             text="{i18n>contactNumber}"
-                            tooltip="Contact Number"
+                            tooltip="{i18n>contactNumber}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>MVDcountry}"
-                            tooltip="Country"
+                            tooltip="{i18n>MVDcountry}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>MVDstate}"
-                            tooltip="State"
+                            tooltip="{i18n>MVDstate}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>city}"
-                            tooltip="City"
+                            tooltip="{i18n>city}"
                         />
                     </Column>
                     <Column
@@ -177,13 +179,13 @@
                     >
                         <Text
                             text="{i18n>penalty}"
-                            tooltip="Penalty"
+                            tooltip="{i18n>penalty}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>image}"
-                            tooltip="Image"
+                            tooltip="{i18n>image}"
                         />
                     </Column>
                 </columns>

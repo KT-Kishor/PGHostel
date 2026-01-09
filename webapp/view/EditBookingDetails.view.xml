@@ -18,7 +18,7 @@
             />
             <VBox class="sapUiMediumMarginBottom">
                 <Panel
-                    headerText="General Information"
+                    headerText="{i18n>generalInformation}"
                     expandable="false"
                     class="customPanelHeader"
                 >
@@ -28,14 +28,14 @@
                     >
                         <Button
                             id="idEditBtn"
-                            text="Edit"
-                            tooltip="Edit Booking Details"
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>MSedit}"
                             press="onPressEditSave"
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="Cancel"
-                            tooltip="Cancel Booking"
+                            text="{i18n>CancelButton}"
+                            tooltip="{i18n>CancelButton}"
                             press="onPressCancelBooking"
                             class="myUnifiedBtn"
                         />
@@ -53,7 +53,7 @@
                             <!-- Booking Details -->
                             <core:Title text="{i18n>bookingDetailsTitle}" />
                             <Label
-                                text="Room Type"
+                                text="{i18n>roomtype}"
                                 required="true"
                             />
                             <Text
@@ -74,13 +74,13 @@
                             </ComboBox>
 
                             <Label
-                                text="Price"
+                                text="{i18n>placePrice}"
                                 required="true"
                             />
                             <Text text="{HostelModel>/RoomPrice}" />
 
                             <Label
-                                text="Payment Method"
+                                text="{i18n>paymentMethod}"
                                 required="true"
                             />
                             <Text
@@ -109,9 +109,9 @@
                             <!-- <Input value="{HostelModel>/noofperson}" visible="{viewModel>/editMode}"/> -->
 
                             <!-- Site Contact -->
-                            <core:Title text="Dates" />
+                            <core:Title text="{i18n>dates}" />
                             <Label
-                                text="Start Date"
+                                text="{i18n>startDate}"
                                 required="true"
                             />
                             <Text
@@ -128,7 +128,7 @@
                             />
 
                             <Label
-                                text="End Date"
+                                text="{i18n>endDate}"
                                 required="true"
                             />
                             <Text
@@ -149,7 +149,7 @@
             </VBox>
             <VBox>
                 <Panel
-                    headerText="Personal Information "
+                    headerText="{i18n>personalInformation} "
                     expandable="false"
                     class="customPanelHeader"
                 >
@@ -167,7 +167,7 @@
                     >
                         <f:content>
                             <core:Title text="" />
-                            <Label text="Full Name" />
+                            <Label text="{i18n>fullname}" />
                             <Text
                                 text="{HostelModel>/FullName}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -177,7 +177,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="Date of Birth" />
+                            <Label text="{i18n>MVDDOB}" />
                             <Text
                                 text="{path:'HostelModel>/DateOfBirth',  formatter: '.Formatter.formatDate'}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -187,7 +187,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="Gender" />
+                            <Label text="{i18n>MVgender}" />
                             <Text
                                 text="{HostelModel>/Gender}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -197,7 +197,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="Mobile Number" />
+                            <Label text="{i18n>MSmobileNo}" />
                             <Text
                                 text="{HostelModel>/MobileNo}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -207,7 +207,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="Email" />
+                            <Label text="{i18n>email}" />
                             <Text
                                 text="{HostelModel>/CustomerEmail}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -217,7 +217,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="Country" />
+                            <Label text="{i18n>MVDcountry}" />
                             <Text
                                 text="{HostelModel>/Country}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -227,7 +227,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="State" />
+                            <Label text="{i18n>MVDstate}" />
                             <Text
                                 text="{HostelModel>/State}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -237,7 +237,7 @@
                                 visible="{viewModel>/editMode}"
                             />
 
-                            <Label text="City" />
+                            <Label text="{i18n>city}" />
                             <Text
                                 text="{HostelModel>/City}"
                                 visible="{= !${viewModel>/editMode} }"
@@ -260,22 +260,22 @@
                         <headerToolbar>
                             <Toolbar>
                                 <Title
-                                    text="Booking Details"
+                                    text="{i18n>bookingDetailsTitle}"
                                     level="H5"
                                 />
                                 <ToolbarSpacer />
                                 <Button
                                     icon=""
                                     id="id_addfacility"
-                                    text="Add Facility"
-                                    tooltip="Add Facility"
+                                    text="{i18n>addFacility}"
+                                    tooltip="{i18n>addFacility}"
                                     press="onPressAddFaciliti"
                                     class="myUnifiedBtn"
                                 />
                                 <Button
                                     icon="sap-icon://edit"
-                                    text="Edit"
-                                    tooltip="Edit Facility"
+                                    text="{i18n>MSedit}"
+                                    tooltip="{i18n>editFacility}"
                                     press="onEditFacilityDetails"
                                     class="myUnifiedBtn"
                                     id="id_editfacility"
@@ -285,22 +285,22 @@
 
                         <columns>
                             <Column>
-                                <Text text="Facility Name" />
+                                <Text text="{i18n>facilityname}" />
                             </Column>
                             <Column>
-                                <Text text="Facility Price" />
+                                <Text text="{i18n>faciltyprice}" />
                             </Column>
                             <Column>
-                                <Text text="Start Date" />
+                                <Text text="{i18n>startDate}" />
                             </Column>
                             <Column>
-                                <Text text="End Date" />
+                                <Text text="{i18n>endDate}" />
                             </Column>
                             <Column>
-                                <Text text="Days" />
+                                <Text text="{i18n>Tooldays}" />
                             </Column>
                             <Column>
-                                <Text text="Total" />
+                                <Text text="{i18n>total}" />
                             </Column>
                         </columns>
 
@@ -309,8 +309,12 @@
                                 <cells>
                                     <Text text="{HostelModel>FacilityName}" />
                                     <Text text="{HostelModel>Price}" />
-                                    <Text text="{ path: 'HostelModel>StartDate'}" />
-                                    <Text text="{ path: 'HostelModel>EndDate', formatter: '.Formatter.formatDate'}" />
+                                    <Text
+                                        text="{ path: 'HostelModel>StartDate'}"
+                                    />
+                                    <Text
+                                        text="{ path: 'HostelModel>EndDate', formatter: '.Formatter.formatDate'}"
+                                    />
                                     <Text text="{HostelModel>TotalDays}" />
                                     <Text
                                         text="{=(${HostelModel>Price} * ${HostelModel>TotalDays}).toFixed(2) }"
@@ -325,11 +329,12 @@
                             class="sapUiSmallMarginTop"
                         >
                             <Label
-                                text="Total Facility Cost:"
+                                text="{i18n>totalfacilitycost}"
                                 design="Bold"
                                 class="sapUiSmallMarginEnd"
                             />
-                            <Text text="{ path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.formatCurrency'}"
+                            <Text
+                                text="{ path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.formatCurrency'}"
                                 class="sapUiSmallMarginEnd"
                             />
                         </HBox>
@@ -338,7 +343,7 @@
                             class="sapUiSmallMarginTop"
                         >
                             <Label
-                                text="Room Rent:"
+                                text="{i18n>roomRent}"
                                 design="Bold"
                                 class="sapUiSmallMarginEnd"
                             />
@@ -352,12 +357,13 @@
                             class="sapUiSmallMarginTop"
                         >
                             <Label
-                                text="Grand Total:"
+                                text="{i18n>grandTotal}"
                                 design="Bold"
                                 class="sapUiSmallMarginEnd"
                             />
-                            <Text text="{ path: 'HostelModel>/GrandTotal',formatter: '.Formatter.formatCurrency'  }"
-                            class="sapUiSmallMarginEnd"
+                            <Text
+                                text="{ path: 'HostelModel>/GrandTotal',formatter: '.Formatter.formatCurrency'  }"
+                                class="sapUiSmallMarginEnd"
                             />
                         </HBox>
                     </VBox>
@@ -368,9 +374,9 @@
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Proceed to pay"
+                    text="{i18n>proceedToPay}"
                     visible="false"
-                    tooltip="Proceed to Pay"
+                    tooltip="{i18n>proceedToPay}"
                     class="myUnifiedBtn"
                     press="onOpenProceedtoPay"
                 />

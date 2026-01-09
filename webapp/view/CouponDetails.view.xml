@@ -39,7 +39,7 @@
                                 id="fBranch"
                                 width="100%"
                                 items="{Branchmodel>/}"
-                                placeholder="Select Branch"
+                                placeholder="{i18n>selectBranch}"
                                 selectedKey=""
                                 showSecondaryValues="true"
                             >
@@ -62,7 +62,7 @@
                             <ComboBox
                                 id="fStatus"
                                 width="100%"
-                                placeholder="Select Status"
+                                placeholder="{i18n>selectStatus}"
                             >
                                 <!-- <core:Item key="" text="All"/> -->
                                 <core:Item
@@ -91,7 +91,7 @@
                             <ComboBox
                                 id="fDiscountType"
                                 width="100%"
-                                placeholder="Select Discount Type"
+                                placeholder="{i18n>selectDiscountType}"
                             >
                                 <!-- <core:Item key="" text="All"/> -->
                                 <core:Item
@@ -138,37 +138,39 @@
                 <!-- Header with actions -->
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>CDtitle} ({= ${CouponModel>/}.length })" />
+                        <Title
+                            text="{i18n>CDtitle} ({= ${CouponModel>/}.length })"
+                        />
                         <ToolbarSpacer />
                         <Button
                             id="btnShareCoupon"
                             text="{i18n>CDShareCoupons}"
-							tooltip="Share Coupon"
+                            tooltip="{i18n>CDShareCoupons}"
                             enabled="false"
                             press="onShareCoupon"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSadd}"
-							tooltip="Add New Coupon"
+                            tooltip="{i18n>MSadd}"
                             press="onAddCoupon"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSedit}"
-							tooltip="Edit Selected Coupon"
+                            tooltip="{i18n>MSedit}"
                             press="onEditCoupon"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>MSdelete}"
-							tooltip="Delete Selected Coupons"
+                            tooltip="{i18n>MSdelete}"
                             press="onDeleteCoupon"
                             class="myUnifiedBtn"
                         />
                         <Button
                             text="{i18n>download}"
-							tooltip="Download Coupon Details"
+                            tooltip="{i18n>download}"
                             press="onDownloadCoupons"
                             class="myUnifiedBtn"
                         />
@@ -180,60 +182,90 @@
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDBranch}" tooltip="Branch"/>
+                        <Text
+                            text="{i18n>CDBranch}"
+                            tooltip="{i18n>CDBranch}"
+                        />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>CDCouponCode}" tooltip="Coupon Code"/>
+                        <Text
+                            text="{i18n>CDCouponCode}"
+                            tooltip="{i18n>CDCouponCode}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDDiscountType}" tooltip="Discount Type"/>
+                        <Text
+                            text="{i18n>CDDiscountType}"
+                            tooltip="{i18n>CDDiscountType}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDDiscountValue}" tooltip="Discount Value"/>
+                        <Text
+                            text="{i18n>CDDiscountValue}"
+                            tooltip="{i18n>CDDiscountValue}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDMaxUses}" tooltip="Max Uses"/>
+                        <Text
+                            text="{i18n>CDMaxUses}"
+                            tooltip="{i18n>CDMaxUses}"
+                        />
                     </Column>
                     <!-- <Column demandPopin="true"><Text text="Used Count"/></Column><Column minScreenWidth="Tablet" demandPopin="true"><Text text="Per User Limit"/></Column> -->
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDMinOrderValue}" tooltip="Min Order Value"/>
+                        <Text
+                            text="{i18n>CDMinOrderValue}"
+                            tooltip="{i18n>CDMinOrderValue}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>startDate}" tooltip="Start Date"/>
+                        <Text
+                            text="{i18n>startDate}"
+                            tooltip="{i18n>startDate}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>endDate}" tooltip="End Date"/>
+                        <Text
+                            text="{i18n>endDate}"
+                            tooltip="{i18n>endDate}"
+                        />
                     </Column>
                     <!-- <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Status"/></Column> -->
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDCreatedAt}" tooltip="Created At"/>
+                        <Text
+                            text="{i18n>CDCreatedAt}"
+                            tooltip="{i18n>CDCreatedAt}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>CDCreatedBy}" tooltip="Created By"/>
+                        <Text
+                            text="{i18n>CDCreatedBy}"
+                            tooltip="{i18n>CDCreatedBy}"
+                        />
                     </Column>
                 </columns>
                 <!-- Row template -->

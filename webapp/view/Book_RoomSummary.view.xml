@@ -40,8 +40,8 @@
         <headerToolbar>
             <Toolbar>
                 <Title
-                    text="Grand Total Summary"
-                    tooltip="Grand Total Summary"
+                    text="{i18n>grandTotalSummary}"
+                    tooltip="{i18n>grandTotalSummary}"
                 />
             </Toolbar>
         </headerToolbar>
@@ -49,26 +49,26 @@
         <columns>
             <Column>
                 <Text
-                    text="Person Name"
-                    tooltip="Person Name"
+                    text="{i18n>personName}"
+                    tooltip="{i18n>personName}"
                 />
             </Column>
             <Column>
                 <Text
-                    text="Facility Cost"
-                    tooltip="Facility Cost"
+                    text="{i18n>facilityCost}"
+                    tooltip="{i18n>facilityCost}"
                 />
             </Column>
             <Column>
                 <Text
-                    text="Room Rent"
-                    tooltip="Room Rent"
+                    text="{i18n>placeRoomRent}"
+                    tooltip="{i18n>placeRoomRent}"
                 />
             </Column>
             <Column>
                 <Text
-                    text="Total"
-                    tooltip="Total"
+                    text="{i18n>total}"
+                    tooltip="{i18n>total}"
                 />
             </Column>
         </columns>
@@ -118,7 +118,7 @@
             >
                 <!-- Coupon Label -->
                 <Label
-                    text="Coupon Code:"
+                    text="{i18n>couponCode}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                     width="120px"
                 />
@@ -126,22 +126,22 @@
                 <!-- Coupon Input -->
                 <Input
                     value="{HostelModel>/CouponCode}"
-                    placeholder="Enter Coupon"
+                    placeholder="{i18n>enterCoupon}"
                     width="150px"
                     class="sapUiTinyMarginEnd"
                     id="BookingcouponInput"
                     showValueHelp="true"
                     valueHelpIconSrc="sap-icon://decline"
-                    tooltip="Cancel Coupon"
+                    tooltip="{i18n>cancelCoupon}"
                     valueHelpRequest="oncancelCoupon"
                     change="onCouponLiveChange"
                 />
 
                 <!-- Apply Now Button -->
                 <Button
-                    text="Apply Now"
+                    text="{i18n>applyNow}"
                     type="Emphasized"
-                    tooltip="Apply Coupon"
+                    tooltip="{i18n>applyCoupon}"
                     press="onChangeCouponCode"
                     class="sapUiTinyMarginEnd"
                     id="couponApplyBtn"
@@ -230,7 +230,7 @@
                 class="sapUiSmallMarginTop"
             >
                 <Label
-                    text="Total Cost:"
+                    text="{i18n>totalCost}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
