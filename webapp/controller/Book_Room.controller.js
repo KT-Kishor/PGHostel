@@ -24,15 +24,15 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
-            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            // var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
-            // Detect browser refresh
-            if (performance && performance.getEntriesByType) {
-                var aEntries = performance.getEntriesByType("navigation");
-                if (aEntries.length && aEntries[0].type === "reload") {
-                    oRouter.navTo("RouteHostel", {}, true); // true = replace history
-                }
-            }
+            // // Detect browser refresh
+            // if (performance && performance.getEntriesByType) {
+            //     var aEntries = performance.getEntriesByType("navigation");
+            //     if (aEntries.length && aEntries[0].type === "reload") {
+            //         oRouter.navTo("RouteHostel", {}, true); // true = replace history
+            //     }
+            // }
         },
 
         _onRouteMatched: function () {
