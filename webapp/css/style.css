@@ -3105,4 +3105,49 @@ span.sapMBtnInner.sapMBtnEmphasized {
   border-radius: 11px !important;
 }
 
+/* ---------- Selected Badge ---------- */
+.selectedBadge {
+  position: absolute;
+  top: 8px;
+  left: 12px;         
+  right: auto; 
+  background: #1bb2bf;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  z-index: 3;
+    transform: translateX(-4px);
+}
+
+.selectedBadge::before {
+  content: "✓";
+  font-weight: 900;
+}
+
+  @keyframes selectPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1.02); }
+}
+
+.serviceCardSelected {
+  animation: selectPulse 0.25s ease-out;
+}
+/* Base spacing for all screens */
+.serviceCard {
+  margin-bottom: 20px;
+}
+
+/* Extra spacing for larger screens */
+@media screen and (min-width: 1024px) {
+  .serviceCard {
+    margin-bottom: 24px;
+  }
+}
 

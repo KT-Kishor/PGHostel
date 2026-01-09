@@ -48,7 +48,7 @@
                     <l:content>
                         <VBox width="100%">
                             <layoutData>
-                                <l:GridData span="L8 M6 S12" />
+                                <l:GridData span="L8 M12 S12" />
                             </layoutData>
                             <Carousel
                                 id="roomImageCarousel"
@@ -80,7 +80,7 @@
                             class="roomTopAligned"
                         >
                             <layoutData>
-                                <l:GridData span="L4 M6 S12" />
+                                <l:GridData span="L4 M12 S12" />
                             </layoutData>
                             <card:Card
                                 manifest="./cards/roomDetailsCard.json"

@@ -1395,6 +1395,20 @@ sap.ui.define([
                                             height: "178px",
                                             styleClass: "imageContainer",
                                             items: [
+                                                new sap.m.HBox({
+                                                    visible: {
+                                                        parts: [
+                                                            { path: "FacilityModel>FacilityName" },
+                                                            { path: "HostelModel>/Persons/" + i + "/Facilities/SelectedFacilities" }
+                                                        ],
+                                                        formatter: function (name, selected) {
+                                                            return !!selected?.find(f => f.FacilityName === name);
+                                                        }
+                                                    },
+                                                    items: [
+                                                        new sap.m.Text({ text: "ADDED" })
+                                                    ]
+                                                }).addStyleClass("selectedBadge"),  
                                                 new sap.m.Image({
                                                     src: "{FacilityModel>Image}",
                                                     width: "264px",
