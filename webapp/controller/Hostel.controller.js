@@ -1733,16 +1733,19 @@ sap.ui.define([
             }
         },
         onSTDChange: function (oEvent) {
-            const oSTD = oEvent.getSource();
+
+            // 🔑 Support BOTH UI-triggered and manual calls
+            const oSTD = oEvent?.getSource?.() || sap.ui.getCore().byId("signUpSTD");
+            if (!oSTD) return;
+
             const sValue = (oSTD.getValue() || "").trim();
             const oMobile = sap.ui.getCore().byId("signUpPhone");
 
-            // Mandatory check
-            if (!utils._LCvalidateMandatoryField(oEvent)) {
+            // Mandatory check (only if event exists)
+            if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) {
                 return;
             }
 
-            // + followed by digits, no leading zero
             const STD_REGEX = /^\+[1-9][0-9]*$/;
 
             if (!STD_REGEX.test(sValue)) {
@@ -1751,19 +1754,13 @@ sap.ui.define([
                     "STD must start with + and contain only numbers (no leading zero)"
                 );
 
-                // Reset dependent field safely
                 oMobile.setValue("");
                 oMobile.setMaxLength(18);
                 return;
             }
 
-            // Clean state
             oSTD.setValueState("None");
-
-            // Reset mobile on valid STD change
             oMobile.setValue("");
-
-            // Dynamic maxLength
             oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
         },
 
