@@ -2148,6 +2148,14 @@ sap.ui.define([
             var DocumentType = this.getView().getModel("Bookingmodel").getData().DocumentType;
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
+            aDocs.find((item)=>{
+                if(item.DocumentType?.replace(/\s+/g, '').toLowerCase() ===DocumentType?.replace(/\s+/g, '').toLowerCase()){
+                    sap.m.MessageToast.show("Document of type '" + DocumentType + "' is Already Uploaded.");
+                    oFileUploader.clear();
+                    return;
+                }
+            })
+             
             if (!DocumentType) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 oFileUploader.clear();

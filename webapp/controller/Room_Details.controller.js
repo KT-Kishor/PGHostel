@@ -51,7 +51,7 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }else{
-                filters.BranchID = aBranchCodes;
+                filters.BranchID = "";
             }
             try {
                 const oView = this.getView();
@@ -517,7 +517,7 @@ sap.ui.define([
 
             ) {
 
-                Payload.NoofPerson = parseInt(Noofper.NoOfPerson) * parseInt(Noofper.MaxBeds) || 0;
+                Payload.NoofPerson = parseInt(Noofper.NoOfPerson)  || 0;
                 Payload.ExtraBed = parseInt(Payload.ExtraBed) || 0;
                 Payload.Price = parseInt(Payload.Price) || 0;
                 Payload.MonthPrice = parseInt(Payload.MonthPrice) || 0;
@@ -724,7 +724,7 @@ sap.ui.define([
                 filters.Role ="Admin";
 
             }else{
-                filters.BranchCode = aBranchCodes;
+                filters.BranchCode = "";
             }
 
             if (sRoomNo) {

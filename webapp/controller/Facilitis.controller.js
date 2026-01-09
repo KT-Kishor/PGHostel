@@ -116,7 +116,7 @@ sap.ui.define([
                 filter.Role ="Admin";
 
             }else{
-                filter.BranchCode = aBranchCodes;
+                filter.BranchCode = "";
             }
 
             console.log("FINAL FILTER →", filter);
@@ -184,7 +184,7 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }else{
-                filters.BranchID = aBranchCodes;
+                filters.BranchID = "";
             }
             sap.ui.core.BusyIndicator.show(0);
             try {

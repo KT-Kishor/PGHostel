@@ -60,7 +60,7 @@ sap.ui.define([
                 filters.BranchID = aBranchCodes;
                 filters.Role ="Admin";
             }else{
-                filters.BranchID = aBranchCodes;
+                filters.BranchID = "";
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -389,7 +389,7 @@ sap.ui.define([
                 filters.Role ="Admin";
 
             }else{
-                filters = { BranchCode: aBranchCodes };
+                filters = { BranchCode: "" };
 
             }
 

@@ -225,6 +225,9 @@ sap.ui.define([
                  if (oExistingModel.Role === "Admin") {
                  filters.BranchID = aBranchCodes;
                 filters.Role ="Admin";
+            }else{
+                 filters.BranchID = "";
+
             }
             try {
                 const oView = this.getView();
