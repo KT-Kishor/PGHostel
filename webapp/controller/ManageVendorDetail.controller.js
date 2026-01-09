@@ -272,7 +272,7 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(C("MV_id_Country"), "ID") === true &&
                     utils._LCvalidateMandatoryField(C("MV_id_State"), "ID") === true &&
                     utils._LCvalidateMandatoryField(C("MV_id_City"), "ID") === true &&
-                    utils._LCvalidateMandatoryField(C("MV_id_StdCode"), "ID") === true &&
+                    utils._LCstrictValidationComboBox(C("MV_id_StdCode"), "ID") === true &&
                     utils._LCvalidateISDmobile(C("MV_id_MobileNo"), std) === true &&
                     utils._LCvalidateAddress(C("MV_id_Address")) === true;
 
@@ -302,10 +302,9 @@ sap.ui.define([
 
                 sap.ui.core.BusyIndicator.show(0);
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
-
-                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
                 await this._loadVendorDetails(oData.UserID);
                 sap.ui.core.BusyIndicator.hide();
+                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
                 return true;
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
@@ -758,19 +757,14 @@ sap.ui.define([
                 new sap.ui.model.Filter("countryCode", "EQ", sCode)
             ]);
 
-            // STD filter
-            oSTD.getBinding("items")?.filter([
-                new sap.ui.model.Filter("code", "EQ", sCode)
-            ]);
-
-            setTimeout(() => {
-                const aItems = oSTD.getItems();
-                if (aItems.length) {
-                    oSTD.setSelectedKey(aItems[0].getKey());
-                    oModel.setProperty("/STDCode", aItems[0].getKey());
-                    this.ADMIN_onChangeSTD();
-                }
-            }, 20);
+            // STD handling
+            const countries = this.getOwnerComponent().getModel("CountryModel").getData();
+            const data = countries.find(c => c.countryName === sCountry);
+            if (data?.stdCode) {
+                oModel.setProperty("/STDCode", data.stdCode);
+                oSTD.setValue(data.stdCode);
+                this.ADMIN_onChangeSTD();
+            }
         },
 
         ADMIN_onChangeState: function(oEvent) {
