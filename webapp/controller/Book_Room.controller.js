@@ -5765,7 +5765,18 @@ sap.ui.define([
         },
 
         onHome: function () {
-            this.CommonLogoutFunction();
+              const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+            var oRouter = this.getOwnerComponent().getRouter()
+            oRouter.navTo("RouteHostel")
+
+            // this.CommonLogoutFunction();
         },
 
         onTableSelect: async function (oEvent) {

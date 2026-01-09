@@ -6,7 +6,7 @@
         <contentLeft>
             <Button
                 icon="sap-icon://nav-back"
-                press=".onNavBack"
+                press="onNavBack"
             />
             <Title
                 text="{i18n>companynameKT}"
@@ -16,7 +16,7 @@
         <contentRight>
             <Button
                 icon="sap-icon://home"
-                press=".onHome"
+                press="onHome"
             />
         </contentRight>
     </Bar>
