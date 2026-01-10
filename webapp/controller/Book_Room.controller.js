@@ -26,17 +26,24 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
             // var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
-            // // Detect browser refresh
-            // if (performance && performance.getEntriesByType) {
-            //     var aEntries = performance.getEntriesByType("navigation");
-            //     if (aEntries.length && aEntries[0].type === "reload") {
-            //         oRouter.navTo("RouteHostel", {}, true); // true = replace history
-            //     }
-            // }
+    // oRouter.initialize();
+
+    // if (performance.getEntriesByType) {
+    //     var aEntries = performance.getEntriesByType("navigation");
+    //     if (aEntries.length && aEntries[0].type === "reload") {
+    //         setTimeout(function () {
+    //             oRouter.navTo("RouteHostel", {}, true);
+    //         }, 0);
+    //     }
+    // }
+    
         },
 
         _onRouteMatched: function () {
-
+ if (performance.navigation && performance.navigation.type === 1) {
+        var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+        oRouter.navTo("RouteHostel", {}, true);
+    }
             // this.commonLoginFunction();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1", "ID_DOB_"], this.getView());
@@ -4662,7 +4669,14 @@ sap.ui.define([
         },
 
         openProfileDialog: function () {
-            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
+             const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
             this.onPressAvatar()
         },
 
