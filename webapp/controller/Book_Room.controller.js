@@ -4417,8 +4417,8 @@ sap.ui.define([
             }
 
             /* ================= Parse After Validation ================= */
-            const enteredAmount = parseFloat(rawEntered);
-            const grandTotal = parseFloat(rawGrand);
+           const enteredAmount = Number(parseFloat(rawEntered).toFixed(2));
+           const grandTotal  = Number(parseFloat(rawGrand).toFixed(2));
 
             /* ================= NaN ================= */
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
