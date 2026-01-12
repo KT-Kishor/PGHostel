@@ -4282,7 +4282,15 @@ sap.ui.define([
                 "idPaymentDate", "idCardNumber", "idCardExpiry", "idCardCVV"
             ];
 
-            aFields.forEach(id => sap.ui.getCore().byId(id)?.setValue(""));
+           aFields.forEach(function (sId) {
+        const oControl = sap.ui.getCore().byId(sId);
+        if (oControl) {
+            oControl.setValue("");
+            oControl.setValueState(sap.ui.core.ValueState.None);
+            oControl.setValueStateText("");
+        }
+    });
+    
         },
 
         onAmountChange: function (oEvent) {

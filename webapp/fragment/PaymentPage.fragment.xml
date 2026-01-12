@@ -47,7 +47,7 @@
                 <RadioButtonGroup
                     id="idPaymentTypeGroup"
                     columns="2"
-                    select=".onPaymentTypeSelect"
+                    select="onPaymentTypeSelect"
                     selectedIndex="0"
                     class="paymentTypeGroup"
                 >
