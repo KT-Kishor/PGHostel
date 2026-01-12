@@ -181,6 +181,15 @@
                     <subSections>
                         <ObjectPageSubSection id="FD_id_ordersection">
                             <blocks>
+                                <m:VBox>
+                                    <m:HBox width="100%" visible="{=${editable>/Edit}}">
+                                        <m:MessageStrip
+                                            text="Only JPG, JPEG and PNG image formats are allowed."
+                                            type="Warning"
+                                            showIcon="true"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                    </m:HBox>
                                 <m:HBox
                                     id="FD_id_ImagesContainer"
                                     wrap="Wrap"
@@ -236,6 +245,7 @@
                                         />
                                     </m:VBox>
                                 </m:HBox>
+                                  </m:VBox>
                             </blocks>
                         </ObjectPageSubSection>
                     </subSections>

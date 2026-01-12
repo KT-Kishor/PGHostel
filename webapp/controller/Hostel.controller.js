@@ -2700,6 +2700,9 @@ sap.ui.define([
 
             // If locality is empty, keep it empty (search by city only)
             var finalBranch = validArea ? validArea.BranchID : "";
+              if(finalBranch===""){
+                this.byId("id_Area").setValueState("None");
+            }
             try {
                 await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
             } catch (e) {

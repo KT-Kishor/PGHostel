@@ -168,62 +168,73 @@
                     <subSections>
                         <ObjectPageSubSection id="POO_Purchaseordersection">
                             <blocks>
-                                <m:HBox
-                                    id="idImagesContainer"
-                                    wrap="Wrap"
-                                    justifyContent="Start"
-                                    alignItems="Start"
-                                    class="sapUiSmallMargin"
-                                    items="{DisplayImagesModel>/DisplayImages}"
-                                >
-                                    <m:VBox
-                                        class="sapUiSmallMarginEnd"
-                                        width="150px"
-                                        alignItems="Center"
-                                        justifyContent="Center"
-                                    >
-                                        <!-- Normal Image Display -->
-                                        <m:Image
-                                            src="{DisplayImagesModel>src}"
-                                            width="120px"
-                                            height="120px"
-                                            press="onImagePress"
-                                            visible="{= ${DisplayImagesModel>isPlaceholder} === false }"
+                                <m:VBox>
+                                    <m:HBox width="100%" visible="{=${editable>/Edit}}">
+                                        <m:MessageStrip
+                                            text="Only JPG, JPEG and PNG image formats are allowed."
+                                            type="Warning"
+                                            showIcon="true"
+                                            class="sapUiSmallMarginBottom"
                                         />
-                                        <!-- Placeholder Box (visible only when no image) -->
+                                    </m:HBox>
+
+                                    <m:HBox
+                                        id="idImagesContainer"
+                                        wrap="Wrap"
+                                        justifyContent="Start"
+                                        alignItems="Start"
+                                        class="sapUiSmallMargin"
+                                        items="{DisplayImagesModel>/DisplayImages}"
+                                    >
                                         <m:VBox
-                                            visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
-                                            width="120px"
-                                            height="120px"
+                                            class="sapUiSmallMarginEnd"
+                                            width="150px"
                                             alignItems="Center"
                                             justifyContent="Center"
-                                            class="placeholderBox"
                                         >
-                                            <u:FileUploader
-                                                id="fileUploader"
-                                                icon="sap-icon://add"
+                                            <!-- Normal Image Display -->
+                                            <m:Image
+                                                src="{DisplayImagesModel>src}"
                                                 width="120px"
-                                                style="Transparent"
-                                                tooltip="{i18n>addImage}"
-                                                placeholder=" "
-                                                buttonOnly="true"
-                                                fileType="jpg,jpeg,png"
-                                                sameFilenameAllowed="true"
+                                                height="120px"
+                                                press="onImagePress"
+                                                visible="{= ${DisplayImagesModel>isPlaceholder} === false }"
+                                            />
+                                            <!-- Placeholder Box (visible only when no image) -->
+                                            <m:VBox
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
-                                                change=".onFileSelected"
+                                                width="120px"
+                                                height="120px"
+                                                alignItems="Center"
+                                                justifyContent="Center"
+                                                class="placeholderBox"
+                                            >
+                                                <u:FileUploader
+                                                    id="fileUploader"
+                                                    icon="sap-icon://add"
+                                                    width="120px"
+                                                    style="Transparent"
+                                                    tooltip="{i18n>addImage}"
+                                                    placeholder=" "
+                                                    buttonOnly="true"
+                                                    fileType="jpg,jpeg,png"
+                                                    sameFilenameAllowed="true"
+                                                    visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
+                                                    change=".onFileSelected"
+                                                />
+                                            </m:VBox>
+                                            <!-- Delete icon -->
+                                            <m:Button
+                                                icon="sap-icon://delete"
+                                                visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
+                                                press=".onDeleteImage"
+                                                type="Reject"
+                                                tooltip="{i18n>deleteImage}"
+                                                width="100%"
                                             />
                                         </m:VBox>
-                                        <!-- Delete icon -->
-                                        <m:Button
-                                            icon="sap-icon://delete"
-                                            visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
-                                            press=".onDeleteImage"
-                                            type="Reject"
-                                            tooltip="{i18n>deleteImage}"
-                                            width="100%"
-                                        />
-                                    </m:VBox>
-                                </m:HBox>
+                                    </m:HBox>
+                                </m:VBox>
                             </blocks>
                         </ObjectPageSubSection>
                     </subSections>

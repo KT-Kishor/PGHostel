@@ -56,6 +56,12 @@
 					<core:ListItem key="{CountryModel>currency}" text="{CountryModel>currency}"
                         additionalText="{CountryModel>countryName}"/>
 				</ComboBox>
+					</f:content>
+		</f:SimpleForm>
+				<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
+			<!-- Informational Message Strip -->
+			<MessageStrip text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB." showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
+		</VBox>
 				<Label text="" />
 				<VBox width="100%">
 					<HBox justifyContent="End" width="100%">
@@ -94,8 +100,7 @@
 						</items>
 					</Table>
 				</VBox>
-			</f:content>
-		</f:SimpleForm>
+		
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer />
