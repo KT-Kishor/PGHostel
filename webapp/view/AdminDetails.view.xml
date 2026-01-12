@@ -428,6 +428,7 @@
                                 valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
                                 width="50%"
+                                 placeholder="Enter Full Name"
                             />
 
                             <Label
@@ -474,6 +475,7 @@
                                 id="Ad_id_gender"
                                 valueStateText="{i18n>selectGender}"
                                 change="onChange"
+                                placeholder="Select Gender"
                             >
                                 <core:Item
                                     key="Male"
@@ -511,6 +513,7 @@
                                 id="Ad_id_CustomerEmail"
                                 valueStateText="{i18n>enterEmailId}"
                                 change="onChangemail"
+                                placeholder="Enter Email ID"
                             />
 
                             <Label
@@ -626,6 +629,7 @@
                                 id="Ad_id_Address"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
+                                 placeholder="Enter Address"
                             />
 
                             <Label
