@@ -119,8 +119,6 @@ sap.ui.define([
                 filter.BranchCode = "";
             }
 
-            console.log("FINAL FILTER →", filter);
-
             sap.ui.core.BusyIndicator.show(0);
 
             try {

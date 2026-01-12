@@ -3511,7 +3511,6 @@ sap.ui.define([
                 }
             };
 
-            console.log("SignUp Payload:", payload);
             BusyIndicator.show(0);
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
@@ -5548,8 +5547,6 @@ sap.ui.define([
                 oWizard.discardProgress(oWizard.getSteps()[0]);
                 oWizard.goToStep(oWizard.getSteps()[0]);
             }
-
-            console.log("✔ All booking data fully reset!");
         },
 
         onEditBooking: function () {

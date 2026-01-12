@@ -513,7 +513,6 @@ sap.ui.define([
                 BranchCode: sBranchCode
             })
                 .then((Response) => {
-                    console.log("Facility Response:", Response);
                     const aFacilities = (Response && Response.data) ? Response.data : [];
 
                     const convert = (base64, type) => {
@@ -1398,8 +1397,6 @@ sap.ui.define([
                             sPassword
                         );
 
-                        /// console.log("✅ credentials fired");
-
                         // ✅ ALWAYS use oCtrl – never this
                         const vm = oCtrl.getView().getModel("LoginViewModel");
 
@@ -1903,7 +1900,6 @@ sap.ui.define([
 
                 const filter = { UserID: sUserID }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
-                console.log("Profile Response:", response);
                 const aBookings = response?.BookingData || [];
                 const aPayments = response?.PaymentData || [];
 
@@ -2217,7 +2213,6 @@ sap.ui.define([
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             if (oLoginModel) {
                 oLoginModel.setData({});
-                console.log("LoginModel after logout:", oLoginModel.getData());
             }
             this._oLoggedInUser = null;
             this._isProfileRequested = false;
