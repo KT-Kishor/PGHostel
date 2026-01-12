@@ -119,7 +119,7 @@
                                             text="{i18n>yourNewHomeAwayFromHome}"
                                         />
                                     </VBox>
-                                </l:Grid>
+                            
 
                                 <!-- <Button  
                             text="Explore Now"
@@ -130,7 +130,7 @@
                                 <HBox
                                     id="exploreWrapper"
                                     width="100%"
-                                    class="exploreBtnWrapper"
+                                    class="exploreBtnWrapper explore-enter"
                                 >
                                     <Button
                                         text="{i18n>exploreNow}"
@@ -138,6 +138,7 @@
                                         press="onpressBookrooms"
                                     />
                                 </HBox>
+                                    </l:Grid>
                             </ScrollContainer>
                             <Page
                                 id="idRooms"

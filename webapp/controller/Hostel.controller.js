@@ -1784,7 +1784,9 @@ sap.ui.define([
             const oCountry = oEvent.getSource();
             oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
-            utils._LCvalidateMandatoryField(oEvent);
+            if (!utils._LCvalidateMandatoryField(oEvent)) {
+                return;
+            }
 
             const oModel = this.getView().getModel("LoginMode");
 
@@ -1792,20 +1794,16 @@ sap.ui.define([
             const oCity = sap.ui.getCore().byId("signUpCity");
             const oSTD = sap.ui.getCore().byId("signUpSTD");
 
-            // Model reset
             ["State", "City", "Mobileno", "STDCode"].forEach(p =>
                 oModel.setProperty("/" + p, "")
             );
-
-            // UI reset
-            oState.setValue("").setSelectedKey("");
-            oCity.setValue("").setSelectedKey("");
-            oSTD.setValue("");
-
-            // Block all child lists until prerequisites
+            oState.setSelectedKey("");
+            oCity.setSelectedKey("");
+            oSTD.setSelectedKey("");  
             oState.getBinding("items")?.filter([
                 new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
             ]);
+
             oCity.getBinding("items")?.filter([
                 new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
             ]);
@@ -1813,24 +1811,24 @@ sap.ui.define([
             const oItem = oCountry.getSelectedItem();
             if (!oItem) return;
 
-            const sCountry = oItem.getText();
+            const sCountryName = oItem.getText();
             const sCountryCode = oItem.getAdditionalText()?.trim();
 
-            oModel.setProperty("/Country", sCountry);
+            oModel.setProperty("/Country", sCountryName);
 
-            // STD handling
-            const countries = this.getOwnerComponent()
+
+            const aCountries = this.getOwnerComponent()
                 .getModel("CountryModel")
-                .getData();
+                .getProperty("/");
 
-            const data = countries.find(c => c.countryName === sCountry);
-            if (data?.stdCode) {
-                oModel.setProperty("/STDCode", data.stdCode);
-                oSTD.setValue(data.stdCode);
+            const oMatch = aCountries?.find(c => c.countryName === sCountryName);
+
+            if (oMatch?.stdCode) {
+                oModel.setProperty("/STDCode", oMatch.stdCode);
+                oSTD.setSelectedKey(oMatch.stdCode); //  correct
                 this.onSTDChange();
             }
 
-            // 🚀 RELEASE states only after country valid
             if (sCountryCode) {
                 oState.getBinding("items")?.filter([
                     new sap.ui.model.Filter(
@@ -2226,6 +2224,7 @@ sap.ui.define([
             if (oLoginModel) {
                 oLoginModel.setData({});
             }
+            this.CommonLogoutFunction();
             this._oLoggedInUser = null;
             this._isProfileRequested = false;
 
@@ -4444,9 +4443,11 @@ sap.ui.define([
             }
         },
 
+
         ADMIN_onChangeCountry: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
+
             const oCountry = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
 
@@ -4458,13 +4459,10 @@ sap.ui.define([
             const oSTD = sap.ui.getCore().byId("adminsignUpSTD");
             const oMobile = sap.ui.getCore().byId("adminMobileNo");
 
-
             // --- 1) SANITIZE TYPED COUNTRY TEXT ---
             const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
             oCountry.setValue(val);
 
-
-            // If typed text diverges from auto-selected item → clear selection
             if (oCountry.getSelectedItem() &&
                 val !== oCountry.getSelectedItem().getText()) {
                 oCountry.setSelectedKey(null);
@@ -4476,26 +4474,19 @@ sap.ui.define([
             oModel.setProperty("/City", "");
             oModel.setProperty("/STDCode", "");
 
-            // Reset UI fields
             oState.setValue("").setSelectedKey("");
             oCity.setValue("").setSelectedKey("");
             oSTD.setValue("").setSelectedKey("");
             oMobile.setValue("");
 
-            // Always clear local filtered lists
             oStateModel.setProperty("/filtered", []);
             oCityModel.setProperty("/filtered", []);
-            oSTD.getBinding("items")?.filter([]);
 
-            // Determine selected item
             const selected = oCountry.getSelectedItem();
-
             oCountry.setValueState("None");
 
-            // CASE B — MANUAL COUNTRY TYPED (no selection)
+            // CASE B — MANUAL COUNTRY TYPED
             if (!selected) {
-
-                // ONLY clear country error — DO NOT set errors on others
                 oModel.setProperty("/Country", val);
                 return;
             }
@@ -4503,8 +4494,6 @@ sap.ui.define([
             // CASE A — COUNTRY SELECTED
             oModel.setProperty("/Country", selected.getText());
 
-            // Clear ALL dependent errors (valid selection now)
-            oCountry.setValueState("None");
             oState.setValueState("None");
             oCity.setValueState("None");
             oSTD.setValueState("None");
@@ -4520,27 +4509,30 @@ sap.ui.define([
             const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
             oStateModel.setProperty("/filtered", filteredStates);
 
-            // Filter STD codes
-            oSTD.getBinding("items")?.filter([
-                new sap.ui.model.Filter("code", "EQ", sCountryCode)
-            ]);
-
-            // Auto-select first STD item
-            setTimeout(() => {
-                const items = oSTD.getItems();
-                if (items.length > 0) {
-                    const key = items[0].getKey();
-                    oSTD.setSelectedKey(key);
-                    oModel.setProperty("/STDCode", key);
+            //  AUTO-SELECT STD WITHOUT FILTERING LIST
+            let matchedKey = null;
+            oSTD.getItems().some(item => {
+                if (item.getAdditionalText().trim() === sCountryCode) {
+                    matchedKey = item.getKey();
+                    return true;
                 }
-            }, 30);
+                return false;
+            });
+
+            if (matchedKey) {
+                oSTD.setSelectedKey(matchedKey);
+                oModel.setProperty("/STDCode", matchedKey);
+            } else {
+                oSTD.setSelectedKey("");
+                oModel.setProperty("/STDCode", "");
+            }
 
             // If no states exist → empty city list
             if (filteredStates.length === 0) {
                 oCityModel.setProperty("/filtered", []);
             }
-
         },
+
 
         ADMIN_onChangeState: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
@@ -4775,6 +4767,7 @@ sap.ui.define([
                     }))
                 }
             };
+            sap.ui.core.BusyIndicator.show(0);
 
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
@@ -4799,6 +4792,8 @@ sap.ui.define([
 
             } catch (err) {
                 sap.m.MessageToast.show(this.i18nModel.getText("registrationFailed"));
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 

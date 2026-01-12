@@ -58,7 +58,7 @@
 			<Input maxLength="50" placeholder="{i18n>enteryourEmail}" value="{AdminSignupModel>/Email}" id="adminEmail" type="Email" liveChange="onAdminLiveValidate" valueStateText="{i18n>MSenterValidEmail}" />
 			<!-- Country -->
 			<Label text="{i18n>MVDcountry}" required="true" />
-			<ComboBox id="adminsignUpCountry" selectedKey="{AdminSignupModel>/Country}" change="ADMIN_onChangeCountry" selectionChange="ADMIN_onChangeCountry" placeholder="{i18n>selectCountry}" valueStateText="{i18n>MVDselectcountry}" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
+			<ComboBox id="adminsignUpCountry" selectedKey="{AdminSignupModel>/Country}" selectionChange="ADMIN_onChangeCountry" placeholder="{i18n>selectCountry}" valueStateText="{i18n>MVDselectcountry}" items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
 				<core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}" additionalText="{CountryModel>code}" />
 			</ComboBox>
 			<!-- State -->
