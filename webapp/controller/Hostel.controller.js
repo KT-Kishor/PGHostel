@@ -58,6 +58,18 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+
+
+             var oNavContainer = this.byId("pageContainer");
+    var oTabHeader = this.byId("mainTabHeader");
+
+    if (oNavContainer) {
+        oNavContainer.to(this.byId("idHome"));
+    }
+
+    if (oTabHeader) {
+        oTabHeader.setSelectedKey("idHome");
+    }
             
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.iTop = 4; // records per load
