@@ -1398,11 +1398,30 @@ sap.ui.define([
             var oContext = oSelectedItem.getBindingContext("CustomerData");
             var oSelectedData = oContext.getObject();
 
+            var sStartDate = oSelectedData.StartDate.split("/").reverse().join("-"); // e.g. "2025-01-15"
+var sEndDate   = oSelectedData.EndDate.split("/").reverse().join("-");   // e.g. "2025-06-14"
+
+if (sStartDate && sEndDate) {
+    var oStart = new Date(sStartDate);
+    var oEnd = new Date(sEndDate);
+
+    var iMonths =
+        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+        (oEnd.getMonth() - oStart.getMonth());
+
+    // Optional: include partial month logic
+    if (oEnd.getDate() >= oStart.getDate()) {
+        iMonths += 1;
+    }
+
+}
+
             // 👉 STORE INDEX for update later
             this._editIndex = Number(oContext.getPath().split("/").pop());
 
             // Load data into edit model
             this.getView().getModel("edit").setData(Object.assign({}, oSelectedData));
+            this.getView().getModel("edit").setProperty("/TotalUnits", iMonths)
             // Open dialog
             if (!this.HM_Dialog) {
                 var oView = this.getView();

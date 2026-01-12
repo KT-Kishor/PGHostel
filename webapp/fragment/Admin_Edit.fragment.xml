@@ -109,7 +109,7 @@
                     id="idMonthYearSelectFragment"
                     width="100%"
                     visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
-                    selectedKey="{edit>/TotalHour}"
+                    selectedKey="{edit>/TotalUnits}"
                     change=".onMonthYearChange"
                 >
                     <core:Item
