@@ -2986,11 +2986,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .serviceImage,
 .imageContainer img {
   width: 100% !important;
-  /* height: 180px !important; */
+ 
   object-fit: cover !important;
   display: block !important;
 
-  border-radius: 12px !important;  /* ✅ keeps curvature */
+  border-radius: 12px !important;  
 }
 
 /* ---------- Price Text ---------- */
@@ -3073,17 +3073,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
   display: block !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
-
   /* clipping fallback for stubborn renderers */
   -webkit-clip-path: inset(0 round 12px) !important;
   clip-path: inset(0 round 12px) !important;
 }
-
 /* keep your image sizing and object-fit */
 .serviceImage,
 .imageContainer img {
   width: 100% !important;
-  /* height: 180px !important; */
+  
   object-fit: cover !important;
 }
 

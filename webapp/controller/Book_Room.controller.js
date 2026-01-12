@@ -982,6 +982,7 @@ sap.ui.define([
 
                         new sap.m.ComboBox({
                             placeholder: "STD Code",
+                            forceSelection: true,
                             value: "{HostelModel>/Persons/" + i + "/STDCode}",
                             id: that.createId("ID_STDCode_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
@@ -998,15 +999,20 @@ sap.ui.define([
                             },
                             change: function (oEv) {
                                 const oCombo = oEv.getSource();
-                                const oSel = oCombo.getSelectedItem();
+                                const oItem = oCombo.getSelectedItem();
 
-                                if (!oSel) {
-                                    return;
-                                }
+                                  if (!oItem) {
+            oCombo.setValue("");
+            oCombo.setSelectedKey("");
+            oCombo.setValueState("Error");
+            oCombo.setValueStateText("Please select a valid STD Code");
+            return;
+        }
+         oCombo.setValueState("None");
 
                                 const aPersons = oModel.getProperty("/Persons") || [];
 
-                                const oSTDObj = oSel.getBindingContext("CountryModel").getObject();
+                                const oSTDObj = oItem.getBindingContext("CountryModel").getObject();
                                 const sSTDCode = oSTDObj.stdCode;
 
                                 // Decide Mobile Max Length
@@ -1992,9 +1998,9 @@ sap.ui.define([
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
-            // =========================================================
+         
             // FIX 1 — Per Day INCLUSIVE calculation  (End - Start + 1)
-            // =========================================================
+            
             let iDays = Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;
 
             if (iDays <= 0) {
@@ -4415,7 +4421,7 @@ sap.ui.define([
             const rawEntered = (oAmountInput.getValue() || "").replace(/,/g, "").trim();
             const rawGrand = (this.getView().getModel("HostelModel").getProperty("/FinalTotalCost") || "").toString().replace(/,/g, "").trim();
 
-            /* ================= Decimal Completion Guard ================= */
+            /*  Decimal Completion Guard  */
             if (!rawEntered || rawEntered === "." || rawEntered.endsWith(".")) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText(this.i18nModel.getText("pleaseenterValidAmount"));
@@ -4423,18 +4429,18 @@ sap.ui.define([
                 return;
             }
 
-            /* ================= Parse After Validation ================= */
+            /* Parse After Validation */
            const enteredAmount = Number(parseFloat(rawEntered).toFixed(2));
            const grandTotal  = Number(parseFloat(rawGrand).toFixed(2));
 
-            /* ================= NaN ================= */
+            /*  NaN  */
             if (isNaN(enteredAmount) || isNaN(grandTotal)) {
                 oAmountInput.setValueState("Error");
                 MessageToast.show(this.i18nModel.getText("invalidAmountFormat"));
                 return;
             }
 
-            /* ================= Business Rule ================= */
+            /*  Business Rule  */
             if (enteredAmount > grandTotal) {
                 oAmountInput.setValueState("Error");
                 oAmountInput.setValueStateText(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));

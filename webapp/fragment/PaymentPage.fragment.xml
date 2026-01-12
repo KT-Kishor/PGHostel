@@ -187,7 +187,6 @@
 
                         <Label
                             text="{i18n>date}"
-                            required="true"
                         />
                         <DatePicker
                             id="idPaymentDate"
@@ -196,6 +195,7 @@
                             value="{PaymentModel>/PaymentDate}"
                             change=".onPaymentDateChange"
                             valueStateText="{i18n>selectPaymentDate}"
+                            editable="false"
                         />
                     </VBox>
                 </l:Grid>
