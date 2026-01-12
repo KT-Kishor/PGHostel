@@ -138,7 +138,7 @@ sap.ui.define([
 
         },
 
-        Ck_onsavebuttonpress: function () {
+        Ck_onsavebuttonpress:async function () {
             // Get edited data from Bookingmodel
             var oBookingData = this.getView().getModel("Bookingmodel").getData();
 
@@ -155,7 +155,7 @@ sap.ui.define([
             };
 
             // Send payload
-            this.ajaxUpdateWithJQuery("HM_Customer", {
+          await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
                     CustomerID: oCustomerModel.CustomerID
@@ -1967,7 +1967,8 @@ if (sStartDate && sEndDate) {
                 utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_City"), "ID") && 
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID")
+                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") && 
+                utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
 
          

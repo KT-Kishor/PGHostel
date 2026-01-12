@@ -2877,7 +2877,9 @@ sap.ui.define([
 
                     // var AvailbleBeds = totalCapacity - totalBooked
                     // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-                   const isVisible = room?.Status === "Available" &&   price !== "";
+                   const isVisible = room?.Status === "Available";
+
+                     const PriceVisible= price !== "" || MonthPrice !== "" || YearPrice !== ""
                 
 
                     const oBranchInfo = aBranchData.find(b =>
@@ -2911,6 +2913,7 @@ sap.ui.define([
                         BranchCode: room.BranchCode,
                         Images: aImages,
                         Country: sCountry,
+                        PriceVisible: PriceVisible,
                         Visible: isVisible,
                         AvailbleBeds: room.AvailableRooms
                     };
@@ -2932,7 +2935,7 @@ sap.ui.define([
 
                 this.sBranchCode = sBranchCode
 
-                aFinal = aFinal.filter(b => b.Visible !== false);
+                aFinal = aFinal.filter(b => b.PriceVisible !== false);
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
