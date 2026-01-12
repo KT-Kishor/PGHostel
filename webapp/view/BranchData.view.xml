@@ -200,7 +200,9 @@
                             <Text text="{mainModel>Country}" />
                             <Text text="{mainModel>State}" />
                             <Text text="{mainModel>City}" />
-                            <Text text="{mainModel>Penalty}" />
+                            <Text
+                                text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
+                            />
                             <Button
                                 text="{i18n>view}"
                                 press="HF_viewroom"

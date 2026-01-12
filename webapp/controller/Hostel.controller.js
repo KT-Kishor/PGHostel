@@ -2102,7 +2102,7 @@ sap.ui.define([
             const isMandatoryValid = (
                 utils._LCvalidateMandatoryField(this.byId("id_Name"), "ID") &&
                 utils._LCvalidateEmail(this.byId("id_mail"), "ID") &&
-                utils._LCvalidateDate(this.byId("id_dob"), "ID") &&
+                this.onChangeDOB(this.byId("id_dob"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_country"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_state"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_city"), "ID") &&
@@ -2239,7 +2239,7 @@ sap.ui.define([
                             press: this._onLogout.bind(this)
                         }).addStyleClass("myUnifiedBtn")
                     ]
-                });
+                }).addStyleClass("profileActionSheet");
                 this.getView().addDependent(this._oProfileActionSheet);
             }
         },
@@ -5194,8 +5194,8 @@ sap.ui.define([
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
         
-        MP_onChangeDOB: function (oEvent) {
-            utils._LCvalidateDate(oEvent);
-        },
+        // MP_onChangeDOB: function (oEvent) {
+        //     utils._LCvalidateDate(oEvent);
+        // },
     });
 });

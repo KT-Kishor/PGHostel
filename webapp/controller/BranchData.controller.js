@@ -3,10 +3,12 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast",
-    "../utils/validation"
-], function (BaseController, MessageBox, Spreadsheet, MessageToast, utils) {
+    "../utils/validation",
+    "../model/formatter"
+], function (BaseController, MessageBox, Spreadsheet, MessageToast, utils,Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Branch", {
+        Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBranchData").attachMatched(this._onRouteMatched, this);
         },

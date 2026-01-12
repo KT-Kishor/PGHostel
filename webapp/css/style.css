@@ -3151,3 +3151,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   }
 }
 
+.profileActionSheet .sapMBtn {
+    padding-left: 8px;
+    padding-right: 8px;
+}
