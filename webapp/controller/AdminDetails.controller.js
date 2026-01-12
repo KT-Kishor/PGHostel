@@ -19,7 +19,13 @@ sap.ui.define([
             this.getView().setModel(model, "LoginModel");
             var oRateTypeModel = this.getView().getModel("RateType");
             this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
-
+            
+             const oUserModel = sap.ui.getCore().getModel("LoginModel");
+            if (oUserModel) {
+                this._oLoggedInUser = oUserModel.getData();
+            } else {
+                this._oLoggedInUser = {}; // fallback
+            }
             this.Code = ""
             var model = new JSONModel({
                 FacilityName: "",
@@ -235,8 +241,16 @@ sap.ui.define([
         },
 
         onHome: function () {
-            this.CommonLogoutFunction();
-            this.getView().getModel("CustomerData").setData({});
+             const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+            var oRouter = this.getOwnerComponent().getRouter()
+            oRouter.navTo("RouteHostel")
         },
 
         AD_onSearch: async function () {
