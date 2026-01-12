@@ -2782,7 +2782,7 @@ sap.ui.define([
                 await this.model(response)
 
                 let matchedRooms = response.data.HM_BedType || [];
-
+                   let HM_RoomCount=response.data.HM_RoomCount
 
                 // if (sACType) {
                 //     matchedRooms = matchedRooms.filter(
@@ -2868,7 +2868,7 @@ sap.ui.define([
 
                     // var AvailbleBeds = totalCapacity - totalBooked
                     // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-            const isVisible = room?.Status === "Available" &&   price !== "";
+                   const isVisible = room?.Status === "Available" &&   price !== "";
                 
 
                     const oBranchInfo = aBranchData.find(b =>
@@ -2926,7 +2926,7 @@ sap.ui.define([
                 aFinal = aFinal.filter(b => b.Visible !== false);
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
-                oVisibilityModel.setProperty("/ShowViewMore", aBedTypes.length === this.iTop);
+                oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
                 if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
