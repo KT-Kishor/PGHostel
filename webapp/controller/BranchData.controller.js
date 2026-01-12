@@ -5,7 +5,7 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../utils/validation",
     "../model/formatter"
-], function (BaseController, MessageBox, Spreadsheet, MessageToast, utils,Formatter) {
+], function (BaseController, MessageBox, Spreadsheet, MessageToast, utils, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Branch", {
         Formatter: Formatter,
@@ -293,6 +293,7 @@ sap.ui.define([
             const oPin = sap.ui.getCore().byId(oView.createId("BD_idPin"));
             const oCountry = sap.ui.getCore().byId(oView.createId("MC_id_Country"));
             const oState = sap.ui.getCore().byId(oView.createId("MC_id_State"));
+            const oSTD = sap.ui.getCore().byId(oView.createId("MC_id_codeModel"));
             const oCity = sap.ui.getCore().byId(oView.createId("MC_id_City"));
             const oPhone = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
             const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
@@ -311,6 +312,7 @@ sap.ui.define([
             oCountry.setSelectedKey("");
             oState.setSelectedKey("");
             oCity.setSelectedKey("");
+            oSTD.setSelectedKey("");
             oPhone.setValue("");
             // oBranch.setValueState("None");
             // oBranch.setValueStateText("");
@@ -326,6 +328,8 @@ sap.ui.define([
             oState.setValueStateText("");
             oCity.setValueState("None");
             oCity.setValueStateText("");
+            oSTD.setValueState("None");
+            oSTD.setValueStateText("");
             oPhone.setValueState("None");
             oPhone.setValueStateText("");
             // oBranch.setValueStateText("Enter Branch Code");
@@ -373,6 +377,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 // utils._LCvalidateGstNumber(sap.ui.getCore().byId(oView.createId("MC_id_CustomGst"))) &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPenalty")), "ID")
 
@@ -852,12 +857,16 @@ sap.ui.define([
         onSTDChange: function () {
             const oSTD = this.byId("MC_id_codeModel");
             const oMobile = this.byId("BD_idPhone");
-
-            const std = oSTD.getValue();
+            const sKey = oSTD.getSelectedKey();
+            if (sKey) {
+                oSTD.setValueState("None");
+                oSTD.setValueStateText(this.i18nModel.getText("MSselectCode"));
+            }
+            // const std = oSTD.getValue();
             oMobile.setValue("");
 
             // Dynamic maxLength
-            if (std === "+91") {
+            if (sKey === "+91") {
                 oMobile.setMaxLength(10);
             } else {
                 oMobile.setMaxLength(18);
