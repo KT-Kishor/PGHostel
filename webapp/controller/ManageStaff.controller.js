@@ -74,9 +74,10 @@ sap.ui.define([
                     .map(code => code.trim());
             }
             let filters = {};
-            if (oExistingModel.Role !== "") {
+            if (oExistingModel.Role === "Admin") {
                 filters = {
-                    BranchID: aBranchCodes
+                    BranchID: aBranchCodes,
+                    Role: "Admin"
                 };
             } else {
                 filters.BranchID = aBranchCodes;

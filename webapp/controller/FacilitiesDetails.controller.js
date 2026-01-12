@@ -244,7 +244,6 @@ sap.ui.define([
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(oFCIAerData);
                 this.getView().setModel(model, "Facilities")
-                sap.ui.core.BusyIndicator.hide();
             })
         },
 
@@ -262,13 +261,19 @@ sap.ui.define([
             ) {
                 var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
 
-                // Image validations
-                if (attachments.length === 0) {
-                    sap.m.MessageBox.error(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+                var uploadedImages = attachments.filter(function (item) {
+                    return !item.isPlaceholder;
+                });
+
+                // Validation: at least one image required
+                if (uploadedImages.length === 0) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                     return;
                 }
-                if (attachments.length > 3) {
-                    sap.m.MessageBox.error(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+
+                // Validation: maximum 3 images
+                if (uploadedImages.length > 3) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
                     return;
                 }
 
@@ -398,7 +403,7 @@ sap.ui.define([
                     DisplayImages: aDisplayImages,
                     CanAddMore: bCanAddMore
                 }), "DisplayImagesModel");
-
+                sap.ui.core.BusyIndicator.hide();
             } catch (err) {
                 sap.m.MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
             } finally {
