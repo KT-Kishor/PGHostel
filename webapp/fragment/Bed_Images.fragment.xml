@@ -8,10 +8,18 @@
 >
     <Dialog
         id="FDD_id_FacilitiesDialog"
-        title="{i18n>addRoomImage}"
+    
         type="Message"
         class="sapUiContentPadding"
     >
+      <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>addRoomImage}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"

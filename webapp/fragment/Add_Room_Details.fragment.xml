@@ -7,10 +7,18 @@
 >
     <Dialog
         id="sds1"
-        title="{i18n>manageRoomDetails}"
+     
         type="Message"
         class="sapUiContentPadding"
     >
+      <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>manageRoomDetails}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"

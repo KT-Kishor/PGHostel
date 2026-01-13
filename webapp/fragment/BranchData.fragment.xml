@@ -6,13 +6,21 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-        title="{i18n>fillBranchDetails}"
+
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
         contentWidth="30%"
         draggable="true"
     >
+      <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>fillBranchDetails}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"

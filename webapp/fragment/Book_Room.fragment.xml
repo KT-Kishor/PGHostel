@@ -11,6 +11,14 @@
        
         class="sapUiContentPadding"
     >
+       <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>hostelBookingForm}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <content>
             <Wizard
                 id="idHostelWizard"

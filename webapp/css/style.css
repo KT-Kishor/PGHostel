@@ -3234,3 +3234,16 @@ span.sapMBtnInner.sapMBtnEmphasized {
     padding: 0 1rem 1rem 1rem !important;
   }
 }
+
+.cssNoDataMessage{
+    font-size: 1.2rem !important;
+    font-weight: 500 !important;
+    color: #555555 !important;
+    text-align: center !important;
+    margin-bottom: 120px;
+}
+
+.fragheader{
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    color: white !important;
+}

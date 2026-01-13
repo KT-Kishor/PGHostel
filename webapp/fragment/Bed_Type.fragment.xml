@@ -7,14 +7,24 @@
 >
     <Dialog
         id="sds12"
-        title="{i18n>bedDetails}"
+     
         type="Message"
-        class="sapUiContentPadding"
+        class="sapUiContentPadding fragheader"
         resizable="true"
         draggable="true"
         contentWidth="40%"
         contentHeight="auto"
+    
     >
+    <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>bedDetails}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
+            <content>
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -121,6 +131,7 @@
                 />
                       </f:content>
         </f:SimpleForm>
+              </content>
 	<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
 			<!-- Informational Message Strip -->
 			<MessageStrip text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB." showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
