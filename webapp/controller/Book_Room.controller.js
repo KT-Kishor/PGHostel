@@ -673,20 +673,34 @@ sap.ui.define([
                                             oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth || oUser.DateofBirth);
                                             const DOB = that.Formatter.DateFormat(oUser.DateOfBirth)
                                             // Already logged in → auto-fill
-                                            aPersons.forEach(p => {
-                                                p.Salutation = oUser.Salutation || "";
-                                                p.FullName = oUser.UserName || "";
-                                                p.CustomerEmail = oUser.EmailID || "";
-                                                p.MobileNo = oUser.MobileNo || "";
-                                                p.UserID = oUser.UserID || "";
-                                                p.DateOfBirth = oUser.DateofBirth;
-                                                p.Gender = oUser.Gender || "";
-                                                p.Country = oUser.Country || "";
-                                                p.State = oUser.State || "";
-                                                p.City = oUser.City || "";
-                                                p.Address = oUser.Address || "";
-                                                p.STDCode = oUser.STDCode || "";
-                                            });
+                                           aPersons.forEach((p, index) => {
+
+    // ---------- COMMON FIELDS (ALL PERSONS) ----------
+    p.CustomerEmail = oUser.EmailID || "";
+    p.MobileNo = oUser.MobileNo || "";
+    p.UserID = oUser.UserID || "";
+    p.Country = oUser.Country || "";
+    p.State = oUser.State || "";
+    p.City = oUser.City || "";
+    p.Address = oUser.Address || "";
+    p.STDCode = oUser.STDCode || "";
+
+    // ---------- FIRST PERSON ONLY ----------
+    if (index === 0) {
+        p.Salutation = oUser.Salutation || "";
+        p.FullName = oUser.EmployeeName || oUser.UserName || "";
+        p.DateOfBirth = that.Formatter.DateFormat(oUser.DateOfBirth) || "";
+        p.Gender = oUser.Gender || "";
+    } 
+    // ---------- REST PERSONS ----------
+    else {
+        p.Salutation = "";
+        p.FullName = "";
+        p.DateOfBirth = "";
+        p.Gender = "";
+    }
+});
+
                                         } else {
                                             aPersons.forEach(p => {
                                                 p.Salutation = "";
@@ -2848,8 +2862,6 @@ sap.ui.define([
                     const vm = this.getView().getModel("LoginViewModel");
                     const showOTPField = vm.getProperty("/showOTPField");
                     const isOtpEntered = vm.getProperty("/isOtpEntered");
-                    // const otpCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP").getValue();
-
                     // OTP control may not exist if not rendered — guard it
                     const otpCtrl = ctrlOTP || { setValueState: function () { }, setValueStateText: function () { } };
 
@@ -2926,6 +2938,17 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
+                //BLOCK ADMIN LOGIN
+                if (oMatchedUser.Role === "Admin") {
+    MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed") || 
+        "Admin users are not allowed to sign in here.");
+
+    // Optional: clear sensitive inputs
+    if (ctrlPassword) ctrlPassword.setValue("");
+    if (ctrlOTP) ctrlOTP.setValue("");
+
+    return;
+}
 
                 // ---------- rest of your existing success logic (unchanged) ----------
                 oLoginModel.setProperty("/EmployeeID", oMatchedUser.UserID);
@@ -2961,21 +2984,34 @@ sap.ui.define([
 
                 const DOB = this.Formatter.DateFormat(oMatchedUser.DateOfBirth);
 
-                aPersons.forEach((p) => {
-                    p.Salutation = oMatchedUser.Salutation || "";
-                    p.FullName = oMatchedUser.UserName || "";
-                    p.CustomerEmail = oMatchedUser.EmailID || "";
-                    p.STDCode = oMatchedUser.STDCode || "";
-                    p.MobileNo = oMatchedUser.MobileNo || "";
-                    p.UserID = oMatchedUser.UserID || "";
-                    p.DateOfBirth = DOB || "";
-                    p.Gender = oMatchedUser.Gender || "";
-                    p.Country = oMatchedUser.Country || "";
-                    p.State = oMatchedUser.State || "";
-                    p.City = oMatchedUser.City || "";
-                    p.Address = oMatchedUser.Address || "";
-                    p.STDCode = oMatchedUser.STDCode || "";
-                });
+               aPersons.forEach((p, index) => {
+
+    // ---------- COMMON FIELDS (ALL PERSONS) ----------
+    p.CustomerEmail = oMatchedUser.EmailID || "";
+    p.MobileNo = oMatchedUser.MobileNo || "";
+    p.UserID = oMatchedUser.UserID || "";
+    p.Country = oMatchedUser.Country || "";
+    p.State = oMatchedUser.State || "";
+    p.City = oMatchedUser.City || "";
+    p.Address = oMatchedUser.Address || "";
+    p.STDCode = oMatchedUser.STDCode || "";
+
+    // ---------- FIRST PERSON ONLY ----------
+    if (index === 0) {
+        p.Salutation = oMatchedUser.Salutation || "";
+        p.FullName = oMatchedUser.EmployeeName || oMatchedUser.UserName || "";
+        p.DateOfBirth = DOB || "";
+        p.Gender = oMatchedUser.Gender || "";
+    } 
+    // ---------- REST PERSONS ----------
+    else {
+        p.Salutation = "";
+        p.FullName = "";
+        p.DateOfBirth = "";
+        p.Gender = "";
+    }
+});
+
 
                 // Auto-check the "Fill Yourself" checkbox
                 const oCheck = sap.ui.getCore().byId(this.createId("IDSelfCheck_0"));
@@ -3240,7 +3276,7 @@ sap.ui.define([
                 if (oResp?.success) {
 
                     MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    // alert(oResp.OTP);
+                   
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
 
@@ -4829,7 +4865,7 @@ sap.ui.define([
                     }
                     // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
                     return {
-                        customerName: oUser.Salutation + " " + oUser.UserName,
+                        customerName: booking.Salutation + " " + booking.CustomerName,
                         room: booking.BedType || "",
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
