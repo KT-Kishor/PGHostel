@@ -679,7 +679,7 @@ sap.ui.define([
                                                 p.CustomerEmail = oUser.EmailID || "";
                                                 p.MobileNo = oUser.MobileNo || "";
                                                 p.UserID = oUser.UserID || "";
-                                                p.DateOfBirth = DOB;
+                                                p.DateOfBirth = oUser.DateofBirth;
                                                 p.Gender = oUser.Gender || "";
                                                 p.Country = oUser.Country || "";
                                                 p.State = oUser.State || "";
@@ -894,7 +894,6 @@ sap.ui.define([
                                 const oMobileInput = sap.ui.getCore().byId(that.createId("ID_Mobile_" + i));
                                 if (oMobileInput) {
                                     oMobileInput.setMaxLength(aPersons[i].MobileMax);
-                                    // applyChanges is optional — not relied on by liveChange because we read from model
                                     sap.ui.getCore().applyChanges();
                                 }
 
@@ -994,7 +993,7 @@ sap.ui.define([
                                 template: new sap.ui.core.ListItem({
                                     key: "{CountryModel>stdCode}",
                                     text: "{CountryModel>stdCode}",
-                                    additionalText: "{CountryModel>code}"  // country name
+                                    additionalText: "{CountryModel>code}"  
                                 })
                             },
                             change: function (oEv) {
@@ -4477,7 +4476,7 @@ sap.ui.define([
                             Currency: oData.Currency,
                             Discount: oData.AppliedDiscount.toString() || "0",
                             CouponCode: oData.CouponCode || "",
-                            TotalRoomprice: p.RoomRentPerPerson || "0",
+                            TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID
                         });
                     }
