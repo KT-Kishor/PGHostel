@@ -1,5 +1,5 @@
 <Dialog
-    title="{i18n>CDShareCoupons}"
+
     contentWidth="420px"
     id="couponShareDialog"
     xmlns="sap.m"
@@ -7,6 +7,14 @@
     xmlns:f="sap.ui.layout.form"
     afterClose="onShareDialogAfterClose"
 >
+    <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>CDShareCoupons}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
     <f:SimpleForm
         editable="true"
         layout="ResponsiveGridLayout"

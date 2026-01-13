@@ -5,10 +5,14 @@
     xmlns:core="sap.ui.core"
 >
     <Dialog>
-        <customHeader>
-            <Toolbar>
+    
+          <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
                 <Title text="{i18n>invoicePaymentTitle}" />
-            </Toolbar>
+            </contentMiddle>
+              
+            </Bar>
         </customHeader>
         <VBox visible="{visiablityPlay>/Form}">
             <f:SimpleForm

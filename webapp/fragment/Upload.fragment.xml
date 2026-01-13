@@ -12,7 +12,7 @@
         class="sapUiContentPadding"
     >
         <customHeader>
-            <Bar>
+            <Bar class="barheader">
                 <contentLeft>
                     <Title
                         text="{i18n>uploadDocuments}"

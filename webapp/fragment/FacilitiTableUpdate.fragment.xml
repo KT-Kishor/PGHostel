@@ -4,10 +4,18 @@
 >
     <Dialog
         id="FT_id_editFacilityDialog"
-        title="{i18n>editFacility}"
+      
         afterClose=".onEditDialogClose"
         afterOpen=".onEditDialogAfterOpen"
     >
+        <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>editFacility}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <content>
             <VBox class="sapUiSmallMargin">
                 <Label text="{i18n>facilityname}" />

@@ -10,11 +10,19 @@
 >
     <Dialog
         id="idPaymentDialog"
-        title="{i18n>proceedtoPayment}"
+       
         draggable="true"
         resizable="true"
         class="paymentDialogRoot"
     >
+        <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>proceedtoPayment}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <f:SimpleForm
             id="Exp_id_SimpleFrom"
             editable="true"

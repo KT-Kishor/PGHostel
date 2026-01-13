@@ -4,12 +4,20 @@
 >
     <Dialog
         id="DocumentPreviewDialog"
-        title="{i18n>documentPreview}"
+      
         contentWidth="80%"
         contentHeight="80%"
         horizontalScrolling="false"
         verticalScrolling="false"
     >
+        <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>documentPreview}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
         <VBox
             height="100%"
             fitContainer="true"

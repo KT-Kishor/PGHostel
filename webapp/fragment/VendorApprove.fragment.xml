@@ -4,6 +4,7 @@
     xmlns:core="sap.ui.core"
 >
     <Dialog id="MIF_id_DialogManRemark">
+    
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
