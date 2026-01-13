@@ -1649,11 +1649,8 @@ sap.ui.define([
                 oDP.setValueStateText(this.i18nModel.getText("agemustbebetween10and100years"));
                 return false;
             }
-
-            // ✅ Valid DOB
             oDP.setValueState("None");
 
-            // 🔥 push to model (LoginMode>/DateOfBirth) in yyyy-MM-dd
             const sDob =
                 v.getFullYear() + "-" +
                 String(v.getMonth() + 1).padStart(2, "0") + "-" +
@@ -2131,7 +2128,7 @@ sap.ui.define([
                     Salutation: oModel.getProperty("/Salutation"),
                     MobileNo: oModel.getProperty("/phone"),
                     EmailID: oModel.getProperty("/email"),
-                    DateOfBirth: oModel.getData().DateOfBirth ? oModel.getData().DateOfBirth.split("/").reverse().join("-") : "",
+                    DateOfBirth: oModel.getData().dob ? oModel.getData().dob.split("/").reverse().join("-") : "",
                     Gender: oModel.getProperty("/gender"),
                     Address: oModel.getProperty("/address"),
                     City: oModel.getProperty("/City"),
