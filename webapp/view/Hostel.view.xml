@@ -143,13 +143,27 @@
                             <Page
                                 id="idRooms"
                                 showHeader="false"
+                                enableScrolling="false"
                             >
-                                <VBox>
-                                    <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
+                                <VBox height="100%" renderType="Bare">
                                     <ScrollContainer
-                                        horizontal="false"
+                                        height="100%"
                                         vertical="true"
-                                        height="70%"
+                                        horizontal="false"
+                                        class="stickyPageContent"
+                                    >
+                                        <layoutData>
+                                            <FlexItemData growFactor="1" baseSize="0%" />
+                                        </layoutData>
+                                        <content>
+                                    <VBox
+                                        class="minHeight100 flexGrow1"
+                                        justifyContent="SpaceBetween"
+                                    >
+                                        <VBox width="100%">
+                                    <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
+                                    <VBox
+                                        height="350px"
                                         class="sapUiContentPadding HostelRooms sapUiTinyMargin"
                                     >
                                         <l:Grid
@@ -177,7 +191,7 @@
                                                 alignItems="Center"
                                             />
                                         </l:Grid>
-                                    </ScrollContainer>
+                                    </VBox>
 
                                     <fb:FilterBar
                                         id="filterbar"
@@ -386,6 +400,7 @@
                                         />
                                         <VBox height="2rem" />
                                     </VBox>
+                                        </VBox>
                                     <VBox
                                         visible="{FooterModel>/showRoomsFooter}"
                                     >
@@ -395,6 +410,9 @@
                                             type="XML"
                                         />
                                     </VBox>
+                                    </VBox>
+                                        </content>
+                                    </ScrollContainer>
                                 </VBox>
                             </Page>
                             <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">

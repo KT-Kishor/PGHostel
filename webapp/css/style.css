@@ -1166,81 +1166,91 @@
 .fullHeightBox {
   height: 100% !important;
 }
-.sapUiCompFilterBar{
-    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
-}
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+
+
+
+
+
+
+
+
+
+.sapUiCompFilterBar {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+} 
+/* Label Colors */
 .sapUiCompFilterBar .sapMLabel {
-    color: #ffffff !important;
-}
+  color: #ffffff !important;
+} 
 
 span.sapMBtnInner.sapMBtnEmphasized {
-    background-color: #00ACC1 !important; /* light teal */
-    color: #FFFFFF !important;
-    border-radius: 8px !important;
-    border: none !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  background-color: #00acc1 !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: none !important;
 }
-/* span.sapMBtnInner.sapMBtnEmphasized:hover {
-    background-color: #0097A7 !important; /* primary teal */
-/* } */ 
+.sapMBtnEmphasized:hover > .sapMBtnHoverable {
+  background-color: #008b96 !important;
+} 
 
-/* Pressed (active) */
-/* .sapMBtnEmphasized.sapMBtnActive > .sapMBtnInner {
-    background-color: #007E8A !important; /* deep teal */
-/* } */ 
-
-/* .sapMBtn > .sapMBtnInner > .sapMBtnContent {
-    color: #FFFFFF !important;
-} */
-
-.sapMBtn:hover>.sapMBtnHoverable {
-    color: #ffffff;
-    background-color: #ffffff;
-    border-color: #ffffff;
-}
-/* Make ONLY FilterBar CLEAR button text white (normal) */
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnInner,
 .sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnContent bdi {
-    color: #ffffff !important;
+  transition: none !important;
+} 
+
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnInner {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
-/* Make ONLY FilterBar CLEAR button text white (normal) */
-.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnContent bdi:hover {
-    color: #0e57bf !important;
-}
-.totalColumnBold {
-    font-weight: bold;
-  
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent .sapMBtnContent bdi {
+  color: #ffffff !important;
+  background-color: transparent !important;
+} 
+
+
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent:hover .sapMBtnInner, 
+
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent.sapMBtnActive .sapMBtnInner, 
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent:active .sapMBtnInner, 
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent.sapMBtnFocus .sapMBtnInner {
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
+} 
+
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent:hover .sapMBtnContent bdi,
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent.sapMBtnActive .sapMBtnContent bdi,
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent:active .sapMBtnContent bdi,
+.sapUiCompFilterBar .sapUiCompFilterBarButtons .sapMBtnTransparent.sapMBtnFocus .sapMBtnContent bdi {
+  color: #0e57bf !important;
 }
 
-/* NORMAL — make CLEAR text white */
-.sapUiCompFilterBar .sapUiCompFilterBarButtons 
-    .sapMBtnTransparent .sapMBtnInner .sapMBtnContent bdi {
-    color: #ffffff !important;
-}
 
-/* HOVER — when mouse enters the button */
-.sapUiCompFilterBar .sapUiCompFilterBarButtons 
-    .sapMBtnTransparent.sapMBtnHover .sapMBtnInner {
-    background-color: #ffffff !important; 
-}
 
-/* HOVER — change text to BLUE */
-.sapUiCompFilterBar .sapUiCompFilterBarButtons 
-    .sapMBtnTransparent.sapMBtnHover .sapMBtnInner .sapMBtnContent bdi {
-    color: #0e57bf !important; /* blue text */
-}
 
-/* ACTIVE (click) — keep same as hover */
-.sapUiCompFilterBar .sapUiCompFilterBarButtons 
-    .sapMBtnTransparent.sapMBtnActive .sapMBtnInner {
-    background-color: #ffffff !important;
-}
 
-.sapUiCompFilterBar .sapUiCompFilterBarButtons 
-    .sapMBtnTransparent.sapMBtnActive .sapMBtnInner .sapMBtnContent bdi {
-    color: #0e57bf !important;
-}
+
+
+
+
+
+
+
+
+
 
 /* /////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+.totalColumnBold {
+    font-weight: bold;
+}
+
 .priceGrid .sapUiRespGridSpan,
 .priceGrid .sapUiRespGridSpanXL,
 .priceGrid .sapUiRespGridSpanL,
@@ -3202,4 +3212,25 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .profileActionSheet .sapMBtn {
     padding-left: 8px;
     padding-right: 8px;
+}
+
+.minHeight100 {
+    min-height: 100% !important;
+}
+
+/* Force ScrollContainer's internal scroll area to fill height */
+.stickyPageContent .sapMScrollContScroll {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.flexGrow1 {
+    flex-grow: 1 !important;
+}
+
+@media (max-width: 768px) {
+  .sapUiCompFilterBar {
+    padding: 0 1rem 1rem 1rem !important;
+  }
 }
