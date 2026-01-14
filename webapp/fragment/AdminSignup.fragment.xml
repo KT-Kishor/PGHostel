@@ -109,25 +109,20 @@
 		</VBox>
 			</HBox>
 
-		</f:content>
-	</f:SimpleForm>
+
 
 <Label text="{i18n>address}" required="true" />
 
 <TextArea
     id="adminAddress"
     value="{AdminSignupModel>/Address}"
-    rows="2"
+    rows="3"
     width="100%"
     placeholder="Enter your full address">
-    <layoutData>
-        <l:GridData
-            spanXL="9"
-            spanL="9"
-            spanM="9"
-            spanS="12" />
-    </layoutData>
 </TextArea>
+		</f:content>
+	</f:SimpleForm>
+
 
 			<!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
 			<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
