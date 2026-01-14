@@ -984,7 +984,7 @@ sap.ui.define([
                 width: "100%",
                 height: "100%",
                 style: "object-fit: cover; display:block; margin:0; padding:0;"
-            });
+            })
 
             var oDialog = new sap.m.Dialog({
                 title: sPhotoName,
@@ -998,11 +998,11 @@ sap.ui.define([
                     press: function () {
                         oDialog.close();
                     }
-                }),
+                }).addStyleClass("myUnifiedBtn"),
                 afterClose: function () {
                     oDialog.destroy();
                 }
-            });
+            }).addStyleClass("barheader");
 
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();

@@ -211,8 +211,9 @@
                     maxLength="10"
                     liveChange="onPenaltyInputLiveChange"
                     valueStateText="{i18n>enterPenalty}"
+                    class="sapUiSmallMarginBottom"
                 />
-                <Label text="{i18n>addLogo}" />
+                
                 <MessageStrip
                     text="{i18n>Branchdatalogomsg}"
                     type="Warning"
@@ -221,6 +222,7 @@
                     visible="{editableModel>/isEdit}"
                     class="sapUiSmallMarginBottom"
                 />
+                <Label text="{i18n>addLogo}" />
 
                 <VBox
                     alignItems="Start"

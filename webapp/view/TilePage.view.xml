@@ -7,7 +7,7 @@
 >
     <Page
         id="idPageTile"
-        class="service-background"
+        class="service-background Tilehome"
     >
         <headerContent>
             <Text
@@ -149,16 +149,16 @@
                 </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
-        <footer>
+        <!-- <footer>
             <Bar>
                 <contentRight />
             </Bar>
-        </footer>
+        </footer> -->
         <Button
             text="Steps Guide"
             icon="sap-icon://learning-assistant"
             press="onStartGuide"
-            class="guideButtonLarge"
+            class="guideButtonLarge myunifiedBtn"
         />
     </Page>
 </mvc:View>

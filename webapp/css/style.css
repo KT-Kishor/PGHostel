@@ -3616,3 +3616,77 @@ span.sapMBtnInner.sapMBtnEmphasized {
   box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.6);
   border-radius: 12px;
 }
+.Tilehome {
+  position: relative;
+  overflow: hidden;
+}
+
+.Tilehome::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: blur(8px);
+  /* 👈 blur strength */
+  transform: scale(1.08);
+  /* avoids edge cut */
+  z-index: 0;
+}
+
+.Tilehome::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  z-index: 0;
+}
+
+/* Keep content sharp */
+.Tilehome>* {
+  position: relative;
+  z-index: 1;
+}
+
+.myUnifiedBtn .sapMBtnInner,
+.guideButtonLarge .sapMBtnInner {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+
+  transform: scale(1.1);
+  transform-origin: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.myUnifiedBtn:hover .sapMBtnInner,
+.myUnifiedBtn.sapMBtnHover .sapMBtnInner,
+.guideButtonLarge:hover .sapMBtnInner,
+.guideButtonLarge.sapMBtnHover .sapMBtnInner {
+  background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+.myUnifiedBtn.sapMBtnActive .sapMBtnInner,
+.guideButtonLarge.sapMBtnActive .sapMBtnInner {
+  background: linear-gradient(135deg, #1fb7c5, #0f99a6) !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+.guideButtonLarge .sapUiIcon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.myUnifiedBtn .sapMBtnIcon {
+  color: #ffffff !important;
+}
