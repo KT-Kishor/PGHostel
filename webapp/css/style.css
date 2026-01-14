@@ -3690,3 +3690,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .myUnifiedBtn .sapMBtnIcon {
   color: #ffffff !important;
 }
+
+.sapUiSizeCompact.sapMDialog .sapMDialogTitleGroup .sapMHeader-CTX, .sapUiSizeCompact .sapMDialog .sapMDialogTitleGroup .sapMHeader-CTX, .sapUiSizeCompact.sapMDialog .sapMDialogTitleGroup .sapMSubHeader-CTX, .sapUiSizeCompact .sapMDialog .sapMDialogTitleGroup .sapMSubHeader-CTX {
+    height: 2.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+}
