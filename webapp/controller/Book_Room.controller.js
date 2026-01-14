@@ -26,6 +26,7 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBookRoom").attachMatched(this._onRouteMatched, this);
+          
             // var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
     // oRouter.initialize();
@@ -42,6 +43,20 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
+
+             var oMessageManager = sap.ui.getCore().getMessageManager();
+
+    // Register view
+    oMessageManager.registerObject(this.getView(), true);
+
+    // ❗ CLEAR old messages (CRITICAL)
+    oMessageManager.removeAllMessages();
+
+    // Expose MessageModel
+    this.getOwnerComponent().setModel(
+        oMessageManager.getMessageModel(),
+        "message"
+    );
  if (performance.navigation && performance.navigation.type === 1) {
         var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
         oRouter.navTo("RouteHostel", {}, true);
@@ -3086,8 +3101,7 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
                 }
                 //BLOCK ADMIN LOGIN
                 if (oMatchedUser.Role !== "Customer") {
-    MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed") || 
-        "Admin users are not allowed to sign in here.");
+    MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed") );
 
     // Optional: clear sensitive inputs
     if (ctrlPassword) ctrlPassword.setValue("");

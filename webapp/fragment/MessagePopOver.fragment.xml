@@ -2,12 +2,25 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 	<MessagePopover
+        id="idMessagePopover"
 		items="{message>/}"
 		initiallyExpanded="true">
+         <headerButton>
+           <Button text="Error Messages" 
+                    type="Emphasized" 
+                    class="popoverHeaderBtn">
+                <layoutData>
+                    <OverflowToolbarLayoutData 
+                        priority="NeverOverflow"
+                       />
+                </layoutData>
+            </Button>
+        </headerButton>
 		<MessageItem
 			type="{message>type}"
 			title="{message>message}"
 			subtitle="{message>additionalText}"
 			description="{message>description}"/>
+   
 	</MessagePopover>
 </core:FragmentDefinition>

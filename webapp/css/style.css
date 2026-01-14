@@ -3608,3 +3608,51 @@ span.sapMBtnInner.sapMBtnEmphasized {
         letter-spacing: 1.5px;
     }
 }
+.Popoverclass {
+   position: absolute !important;
+    left: 1rem !important;
+    transform: none !important;
+}
+
+
+/* Title styling */
+.customErrorPopover .sapMPopoverTitle {
+    color: #ffffff !important;  /* Red */
+    font-weight: bold !important;
+    font-size: 1.1rem !important;
+}
+
+/* Close button text styling */
+.customCloseBtn{
+    color: #ffffff !important;  /* Blue */
+    font-weight: 600 !important;
+}
+
+.customCloseBtn:hover .sapMBtnInner {
+    color: #2c5aa0 !important;  /* Darker blue on hover */
+}
+.popoverHeaderBtn {
+  margin-right: 260px !important;
+}
+
+
+/* Title styling */
+.customErrorPopover .sapMPopoverTitle {
+    color: #ffffff !important;  /* Red */
+    font-weight: bold !important;
+    font-size: 1.1rem !important;
+}
+
+/* Close button text styling */
+.customCloseBtn{
+    color: #ffffff !important;  /* Blue */
+    font-weight: 600 !important;
+}
+
+.customCloseBtn:hover .sapMBtnInner {
+    color: #2c5aa0 !important;  /* Darker blue on hover */
+}
+.sapUiSizeCompact.sapMMsgPopover .sapMMsgPopoverCloseBtn .sapMBtnIcon{
+  color: #ffffff !important;
+}
+
