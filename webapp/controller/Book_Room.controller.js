@@ -7,7 +7,8 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/model/FilterOperator",
-    "sap/ui/model/Filter"
+    "sap/ui/model/Filter",
+    "sap/ui/core/Messaging",
 ], function (
     BaseController,
     JSONModel,
@@ -16,7 +17,8 @@ sap.ui.define([
     MessageToast,
     MessageBox,
     FilterOperator,
-    Filter
+    Filter,
+    Messaging
 ) {
     "use strict";
 
@@ -218,7 +220,11 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             this._perDayInfoShown = false;
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
-
+// 🔥 MessageManager setup
+this.oMessageManager = sap.ui.getCore().getMessageManager();
+    this.oMessageManager.registerObject(this.getView(), true);
+    this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
+    this.oMessageManager.addMessageProcessor(new sap.ui.core.message.ControlMessageProcessor());
         },
 
         Roomdetails: async function () {
@@ -314,29 +320,163 @@ sap.ui.define([
             this._oLoginAlertDialog.close()
         },
 
-        _checkMandatoryFields: function () {
-            const oModel = this.getView().getModel("HostelModel");
-            const aPersons = oModel.getProperty("/Persons") || [];
-            let aMissingFields = [];
+        // _checkMandatoryFields: function () {
+        //     const oModel = this.getView().getModel("HostelModel");
+        //     const aPersons = oModel.getProperty("/Persons") || [];
+        //     let aMissingFields = [];
 
-            aPersons.forEach((person, index) => {
-                let prefix = "Person " + (index + 1) + ": ";
+        //     aPersons.forEach((person, index) => {
+        //         let prefix = "Person " + (index + 1) + ": ";
 
-                if (!person.Salutation) aMissingFields.push(prefix + "Salutation");
-                if (!person.FullName) aMissingFields.push(prefix + "Full Name");
-                if (!person.DateOfBirth) aMissingFields.push(prefix + "Date of Birth");
-                if (!person.Gender) aMissingFields.push(prefix + "Gender");
-                if (!person.CustomerEmail) aMissingFields.push(prefix + "Email");
-                if (!person.Country) aMissingFields.push(prefix + "Country");
-                if (!person.State) aMissingFields.push(prefix + "State");
-                if (!person.City) aMissingFields.push(prefix + "City");
-                if (!person.STDCode) aMissingFields.push(prefix + "STD Code");
-                if (!person.MobileNo) aMissingFields.push(prefix + "Mobile No");
-                if (!person.Address) aMissingFields.push(prefix + "Address");
+        //         if (!person.Salutation) aMissingFields.push(prefix + "Salutation");
+        //         if (!person.FullName) aMissingFields.push(prefix + "Full Name");
+        //         if (!person.DateOfBirth) aMissingFields.push(prefix + "Date of Birth");
+        //         if (!person.Gender) aMissingFields.push(prefix + "Gender");
+        //         if (!person.CustomerEmail) aMissingFields.push(prefix + "Email");
+        //         if (!person.Country) aMissingFields.push(prefix + "Country");
+        //         if (!person.State) aMissingFields.push(prefix + "State");
+        //         if (!person.City) aMissingFields.push(prefix + "City");
+        //         if (!person.STDCode) aMissingFields.push(prefix + "STD Code");
+        //         if (!person.MobileNo) aMissingFields.push(prefix + "Mobile No");
+        //         if (!person.Address) aMissingFields.push(prefix + "Address");
+        //     });
+
+        //     return aMissingFields;
+        // },
+
+      _checkMandatoryFields: function () {
+    const oModel = this.getView().getModel("HostelModel");
+    const aPersons = oModel.getProperty("/Persons") || [];
+    
+    // 🔥 Clear previous messages FIRST
+    const oMessageManager = sap.ui.getCore().getMessageManager();
+    oMessageManager.removeAllMessages();
+    
+    let aMissingFields = [];
+    
+    aPersons.forEach((person, index) => {
+        let prefix = "Person " + (index + 1) + ": ";
+        
+        if (!person.Salutation) {
+            aMissingFields.push(prefix + "Salutation");
+            // 🔥 CORRECT WAY: Create Message instance
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Salutation is required",
+                additionalText: "Please select a salutation"
             });
+            oMessageManager.addMessages(oMessage);  // Note: addMessages() plural
+        }
+        
+        if (!person.FullName) {
+            aMissingFields.push(prefix + "Full Name");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Full Name is required",
+                additionalText: "Please enter full name"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        
+        if (!person.DateOfBirth) {
+            aMissingFields.push(prefix + "Date of Birth");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing", 
+                message: prefix + "Date of Birth is required",
+                additionalText: "Please select date of birth"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.Gender) {
+            aMissingFields.push(prefix + "Gender");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing", 
+                message: prefix + "Gender is required",
+                additionalText: "Please select gender"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+              
+        if (!person.CustomerEmail) {
+            aMissingFields.push(prefix + "Email");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Email is required",
+                additionalText: "Please enter email"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.Country) {
+            aMissingFields.push(prefix + "Country");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Country is required",
+                additionalText: "Please select country"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.State) {
+            aMissingFields.push(prefix + "State");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "State is required",
+                additionalText: "Please select state"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.City) {
+            aMissingFields.push(prefix + "City");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "City is required",
+                additionalText: "Please select city"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.STDCode) {
+            aMissingFields.push(prefix + "STD Code");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "STD Code is required",
+                additionalText: "Please enter STD code"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.MobileNo) {
+            aMissingFields.push(prefix + "Mobile No");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Mobile No is required",
+                additionalText: "Please enter mobile number"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
+        if (!person.Address) {
+            aMissingFields.push(prefix + "Address");
+            const oMessage = new sap.ui.core.message.Message({
+                type: sap.ui.core.MessageType.Error,
+                title: "Required Field Missing",
+                message: prefix + "Address is required",
+                additionalText: "Please enter address"
+            });
+            oMessageManager.addMessages(oMessage);
+        }
 
-            return aMissingFields;
-        },
+        // Add other fields similarly...
+    });
+    
+    return aMissingFields;
+},
 
         onNoOfPersonSelect: function (oEvent) {
             const oModel = this.getView().getModel("HostelModel");
@@ -1290,7 +1430,7 @@ sap.ui.define([
                                 // 2️⃣ Clear uploader UI
                                 oUploader.clear();
 
-                                // 3️⃣ Refresh model
+                                // 3 Refresh model
                                 oModel.refresh(true);
                             }
                         })).addStyleClass("myUnifiedBtn"),
@@ -1312,10 +1452,7 @@ sap.ui.define([
                                     const bSel = e.getParameter("selected");
                                     const aPersons = oData.Persons || [];
                                     oData.ForBothSelected = bSel;
-
-                                    // -------------------------
                                     // CHECKBOX CHECKED (Copy Person 1 -> All)
-                                    // -------------------------
                                     if (bSel) {
 
                                         const master = aPersons[0].Facilities.SelectedFacilities.map(f => ({ ...f }));
@@ -1709,7 +1846,7 @@ sap.ui.define([
 
             if (bHasError) {
                 MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
-                return; // ⛔ STOP wizard navigation
+                return; //  STOP wizard navigation
             }
             const oModel = this.getView().getModel("HostelModel");
             const sCurrentBranch = oModel.getProperty("/BranchCode");
@@ -1728,17 +1865,17 @@ sap.ui.define([
 
 
             // STEP 1: validations
-            if (this._iSelectedStepIndex === 1) {
-
-                this._resetCouponAndDiscount();
-                const aMissing = this._checkMandatoryFields();
-                if (aMissing.length > 0) {
-                    MessageBox.error(
-                        "Please Fill the following Mandatory Fields:\n\n" + aMissing.join("\n")
-                    );
-                    return;
-                }
-            }
+          if (this._iSelectedStepIndex === 1) {
+        this._resetCouponAndDiscount();
+        const aMissing = this._checkMandatoryFields();
+        
+        //  Check MessageModel for errors (no need to count manually)
+        if (aMissing.length > 0 || this.getView().getModel("message")?.getProperty("/").length > 0) {
+            // Button becomes visible automatically via binding
+            MessageToast.show("Please review the errors and fix them");
+            return;
+        }
+    }
 
 
             if (!this._oSelectedStep) {
@@ -1764,6 +1901,15 @@ sap.ui.define([
 
             this.handleButtonsVisibility();
         },
+        onMessagePopoverPress: function(oEvent) {
+    if (!this._oMessagePopover) {
+        this._oMessagePopover = sap.ui.xmlfragment(this.getView().getId(), "sap.ui.com.project1.fragment.MessagePopOver", this);
+        this.getView().addDependent(this._oMessagePopover);
+    }
+    
+    this._oMessagePopover.toggle(oEvent.getSource());
+},
+
 
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
@@ -2939,7 +3085,7 @@ sap.ui.define([
                     return;
                 }
                 //BLOCK ADMIN LOGIN
-                if (oMatchedUser.Role === "Admin") {
+                if (oMatchedUser.Role !== "Customer") {
     MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed") || 
         "Admin users are not allowed to sign in here.");
 

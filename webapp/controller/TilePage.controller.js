@@ -84,6 +84,57 @@ sap.ui.define([
         TileV_onpressManageVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageVendor");
+        },
+
+        onStartGuide: function () {
+            var oGuideModel = this.getOwnerComponent().getModel("guideModel");
+            var aSteps = oGuideModel.getData().steps;
+            this._highlightAllTiles(aSteps);
+
+            if (!this._oGuideDialog) {
+                this._oGuideDialog = new sap.m.Dialog({
+                    title: "Steps to Know",
+                    contentWidth: "900px",
+                    contentHeight: "600px",
+                    resizable: true,
+                    draggable: true,
+                    content: [
+                        new sap.m.Image({
+                            src: "image/PG1.png",
+                            width: "100%",
+                            densityAware: false
+                        })
+                    ],
+                    endButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            this._oGuideDialog.close();
+                            this._clearHighlights(aSteps);
+                        }.bind(this)
+                    })
+                });
+                this.getView().addDependent(this._oGuideDialog);
+            }
+
+            this._oGuideDialog.open();
+        },
+
+        _highlightAllTiles: function (aSteps) {
+            aSteps.forEach(function (step) {
+                var oTile = this.byId(step.tileId);
+                if (oTile) {
+                    oTile.addStyleClass("highlightTile");
+                }
+            }.bind(this));
+        },
+
+        _clearHighlights: function (aSteps) {
+            aSteps.forEach(function (step) {
+                var oTile = this.byId(step.tileId);
+                if (oTile) {
+                    oTile.removeStyleClass("highlightTile");
+                }
+            }.bind(this));
         }
     })
 })

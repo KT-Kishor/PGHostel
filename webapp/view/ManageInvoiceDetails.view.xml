@@ -792,27 +792,27 @@
             <m:Bar>
                 <m:contentRight>
                     <m:Button
-                        visible="{= ${visiablityPlay>/createVisi} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
+                        visible="{= ${visiablityPlay>/createVisi} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{i18n>submit}"
                         tooltip="{i18n>submit}"
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
                     <m:Button
-                        visible="{= ${visiablityPlay>/payByDate} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
+                        visible="{= ${visiablityPlay>/payByDate} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{i18n>companyInvoiceSendEmail}"
                         press="CID_onPressSendEmail"
                         tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
                     />
                     <m:Button
-                        visible="{= ${visiablityPlay>/Edit} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
+                        visible="{= ${visiablityPlay>/Edit} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
                         press="CID_onPressEdit"
                         class="sendMail myUnifiedBtn"
                     />
                     <m:Button
-                        visible="{= ${visiablityPlay>/MultiEmail} &amp;&amp; ${LoginModel>/Role} === 'Admin'}"
+                        visible="{= ${visiablityPlay>/MultiEmail} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{i18n>sendInvoiceText}"
                         tooltip="{i18n>sendInvoiceText}"
                         press="CID_onPressSendMultipalEmail"

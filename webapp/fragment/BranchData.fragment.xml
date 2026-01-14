@@ -15,7 +15,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="{i18n>fillBranchDetails}" />
+                    <Title text="{i18n>branchDetails}" />
                 </contentMiddle>
             </Bar>
         </customHeader>
@@ -217,6 +217,7 @@
                     text="{i18n>Branchdatalogomsg}"
                     type="Warning"
                     showIcon="true"
+                    enableFormattedText="true"
                     visible="{editableModel>/isEdit}"
                     class="sapUiSmallMarginBottom"
                 />
