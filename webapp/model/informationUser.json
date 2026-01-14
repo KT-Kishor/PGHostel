@@ -1,0 +1,54 @@
+{
+  "steps": [
+    {
+      "step": 1,
+      "title": "Manage Branch Details",
+      "tileId": "branchTile"
+    },
+    {
+      "step": 2,
+      "title": "Manage Bed Details",
+      "tileId": "bedTile"
+    },
+    {
+      "step": 3,
+      "title": "Manage Room Details",
+      "tileId": "roomTile"
+    },
+    {
+      "step": 4,
+      "title": "Manage Extra Facilities",
+      "tileId": "customerTile"
+    },
+    {
+      "step": 5,
+      "title": "Maintain Hostel Features",
+      "tileId": "id1roomTile"
+    },
+     {
+      "step": 6,
+      "title": "Manage Coupon Details",
+      "tileId": "id2roomTile"
+    },
+     {
+      "step": 7,
+      "title": "Manage Customer Details",
+      "tileId": "id3roomTile"
+    },
+     {
+      "step": 8,
+      "title": "Manage Invoice Details",
+      "tileId": "id4roomTile"
+    },
+     {
+      "step": 9,
+      "title": "Manage Staff",
+      "tileId": "id5roomTile"
+    },
+     {
+      "step": 10,
+      "title": "Manage Vendor",
+      "tileId": "id6roomTile"
+    }
+  ]
+}

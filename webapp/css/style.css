@@ -1995,7 +1995,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
     }
 } */
 
-/* Glassy tile */
 .glassTile {
   background: linear-gradient(
     135deg,
@@ -2008,7 +2007,13 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
   border-radius: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.25);
+ box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.25),     /* bottom depth */
+    0 6px 12px rgba(0, 0, 0, 0.15),      /* mid shadow */
+    inset 0 1px 1px rgba(255, 255, 255, 0.45); /* top light */
 
+  transform-style: preserve-3d;
+  transition: all 0.25s ease;
   /* box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.35); */
@@ -2019,20 +2024,45 @@ span.sapMBtnInner.sapMBtnEmphasized {
   background: transparent !important;
 }
 
+.glassTile:active {
+  transform: translateY(-2px) scale(0.99);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.25),
+    inset 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
 /* Header text color */
-.glassTile .sapMGTHdrTxt {
+.glassTile .sapMGTHdrTxt,
+.glassTile .sapMGTTitle {
   color: #ffffff !important;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Sub text (unit) */
-.glassTile .sapMGTSubHdrTxt {
+.glassTile .sapMGTSubHdrTxt,
+.glassTile .sapMGTContentTxt {
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Icon color */
 .glassTile .sapMImg {
   filter: brightness(0) invert(1);
+}
+
+.glassTile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.05) 40%
+  );
+
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* .glassTile::before {
@@ -2048,12 +2078,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
   pointer-events: none;
 } */
 
-/* Header text */
-.glassTile .sapMGTHdrTxt {
-  color: #ffffff !important;
-  font-weight: 600;
-}
-
 /* Unit / sub text */
 .glassTile .sapMGTSubHdrTxt,
 .glassTile .sapMGTContentTxt {
@@ -2065,11 +2089,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 
 /* Icons inside tile */
-.glassTile .sapMImg,
+/* .glassTile .sapMImg,
 .glassTile .sapUiIcon {
   color: #ffffff !important;
   fill: #ffffff !important;
-}
+} */
 
 /* Remove default gray backgrounds */
 .glassTile .sapMGTContent {
@@ -2082,15 +2106,25 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 /* class="sapMTileCntFtrTxt sapMTileCntFooterTextColorNeutral" */
 .glassTile:hover {
-  transform: translateY(-3px);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 28px 50px rgba(0, 0, 0, 0.35),
+    0 10px 18px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45);
   transition: 0.25s ease;
 }
 
-.glassTile .sapMImg,
+/* .glassTile .sapMImg,
 .glassTile .sapUiIcon {
   color: #ffffff !important;
   top: -1px;
   fill: #ffffff !important;
+} */
+.glassTile .sapUiIcon,
+.glassTile .sapMImg {
+  color: #ffffff !important;
+  top: -1px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }
 
 /* Header (actual clickable text) */
@@ -3262,3 +3296,20 @@ span.sapMBtnInner.sapMBtnEmphasized {
     background-repeat: no-repeat;
 }
 
+.guideButtonLarge {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  height: 56px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 28px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.highlightTile {
+  box-shadow: 0 0 0 4px rgba(33,150,243,0.6);
+  border-radius: 12px;
+}

@@ -29,6 +29,7 @@
                 class="tileContainer"
             >
                 <GenericTile
+                    id="branchTile"
                     visible="{= ${TileVisibility>/ManageBranch}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageBranchDetails}"
@@ -40,6 +41,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="bedTile"
                     visible="{= ${TileVisibility>/ManageBedType}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageBedDetails}"
@@ -51,6 +53,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="roomTile"
                     visible="{= ${TileVisibility>/ManageRooms}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>tileManageRoomDetails}"
@@ -62,6 +65,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="customerTile"
                     visible="{= ${TileVisibility>/ManageFacility}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageExtraFacilities}"
@@ -73,6 +77,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id1roomTile"
                     visible="{= ${TileVisibility>/ManageAmenities}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>maintainHostelFeatures}"
@@ -84,6 +89,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id2roomTile"
                     visible="{= ${TileVisibility>/ManageCoupon}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageCouponDetails}"
@@ -95,6 +101,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id3roomTile"
                     visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageCustomerDetails}"
@@ -106,6 +113,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id4roomTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>invoiceDetails}"
@@ -117,6 +125,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id5roomTile"
                     visible="{= ${TileVisibility>/ManageStaff} !== 0 }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageStaff}"
@@ -128,6 +137,7 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id6roomTile"
                     visible="{= ${TileVisibility>/ManageVendor} !== 0 }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageVendors}"
@@ -137,6 +147,12 @@
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
+                <Button
+                    text="Steps Guide"
+                    icon="sap-icon://learning-assistant"
+                    press="onStartGuide"
+                    class="guideButtonLarge"
+                />
             </FlexBox>
         </layout:VerticalLayout>
         <footer>
