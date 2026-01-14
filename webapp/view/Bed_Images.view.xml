@@ -108,8 +108,8 @@
                                                 text="AC"
                                             />
                                             <core:ListItem
-                                                key="Non-Ac"
-                                                text="Non-Ac"
+                                                key="Non-AC"
+                                                text="Non-AC"
                                             />
                                         </m:ComboBox>
 

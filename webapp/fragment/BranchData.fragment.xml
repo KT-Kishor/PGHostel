@@ -9,7 +9,7 @@
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
-        contentWidth="30%"
+        contentWidth="34%"
         draggable="true"
     >
         <customHeader>

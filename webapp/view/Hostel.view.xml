@@ -119,33 +119,30 @@
                                             text="{i18n>yourNewHomeAwayFromHome}"
                                         />
                                     </VBox>
-                            
 
-                                <!-- <Button  
-                            text="Explore Now"
-                            tooltip="Book Room"
-                            class="exploreBtn  sapUiLargeMarginBegin "
-                            press="onpressBookrooms"
-                        /> -->
-                                <HBox
-                                    id="exploreWrapper"
-                                    width="100%"
-                                    class="exploreBtnWrapper explore-enter"
-                                >
-                                    <Button
-                                        text="{i18n>exploreNow}"
-                                        class="exploreBtn"
-                                        press="onpressBookrooms"
-                                    />
-                                </HBox>
-                                    </l:Grid>
+                                    <!-- <Button text="Explore Now" tooltip="Book Room" class="exploreBtn  sapUiLargeMarginBegin " press="onpressBookrooms" /> -->
+                                    <HBox
+                                        id="exploreWrapper"
+                                        width="100%"
+                                        class="exploreBtnWrapper explore-enter"
+                                    >
+                                        <Button
+                                            text="{i18n>exploreNow}"
+                                            class="exploreBtn"
+                                            press="onpressBookrooms"
+                                        />
+                                    </HBox>
+                                </l:Grid>
                             </ScrollContainer>
                             <Page
                                 id="idRooms"
                                 showHeader="false"
                                 enableScrolling="false"
                             >
-                                <VBox height="100%" renderType="Bare">
+                                <VBox
+                                    height="100%"
+                                    renderType="Bare"
+                                >
                                     <ScrollContainer
                                         height="100%"
                                         vertical="true"
@@ -153,268 +150,276 @@
                                         class="stickyPageContent"
                                     >
                                         <layoutData>
-                                            <FlexItemData growFactor="1" baseSize="0%" />
+                                            <FlexItemData
+                                                growFactor="1"
+                                                baseSize="0%"
+                                            />
                                         </layoutData>
                                         <content>
-                                    <VBox
-                                        class="minHeight100 flexGrow1"
-                                        justifyContent="SpaceBetween"
-                                    >
-                                        <VBox width="100%">
-                                    <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
-                                    <VBox
-                                        height="350px"
-                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
-                                    >
-                                        <l:Grid
-                                            defaultSpan="XL12 L12 M12 S12"
-                                            width="100%"
-                                            class="position-welcome"
-                                        >
-                                            <VBox class=" sapUiLargeMarginTop">
-                                                <Text
-                                                    class="custom-welcome sapUiTinyMarginTopBottom"
-                                                    text="{i18n>bookYourRoom} "
-                                                />
-                                                <Text
-                                                    class="custom-welcome  sapUiTinyMarginTopBottom "
-                                                    text="{i18n>companynameKT}"
-                                                />
-                                                <Text
-                                                    text="{i18n>yourNewHomeAwayFromHome}"
-                                                    class="custom-tagline s apUiTinyMarginTop "
-                                                />
-                                            </VBox>
-                                            <HBox
-                                                width="100%"
-                                                justifyContent="End"
-                                                alignItems="Center"
-                                            />
-                                        </l:Grid>
-                                    </VBox>
-
-                                    <fb:FilterBar
-                                        id="filterbar"
-                                        persistencyKey="myPersKey"
-                                        useToolbar="false"
-                                        clear="FC_onPressClear"
-                                        showClearOnFB="true"
-                                        search="onSearchRooms"
-                                        filterChange="IA_.onFilterChange"
-                                        afterVariantLoad="IA_.onAfterVariantLoad"
-                                        showFilterConfiguration="false"
-                                        filterContainerWidth="auto"
-                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
-                                        busyIndicatorDelay="0"
-                                    >
-                                        <fb:filterGroupItems>
-                                            <!--  Branch Name -->
-                                            <fb:FilterGroupItem
-                                                name="Branch"
-                                                label="{i18n>city}"
-                                                groupName="Group1"
-                                                visibleInFilterBar="true"
-                                            >
-                                                <fb:control>
-                                                    <ComboBox
-                                                        id="id_Branch"
-                                                        placeholder="{i18n>cityValueText}"
-                                                        showClearIcon="true"
-                                                        busyIndicatorDelay="0"
-                                                        enabled="true"
-                                                        items="{sBRModel>/}"
-                                                        selectionChange=".onBranchSelectionChange"
-                                                    >
-                                                        <core:ListItem
-                                                            key="{sBRModel>City}"
-                                                            text="{sBRModel>City}"
-                                                        />
-                                                    </ComboBox>
-                                                </fb:control>
-                                            </fb:FilterGroupItem>
-                                            <!-- Area -->
-                                            <fb:FilterGroupItem
-                                                name="Area"
-                                                label="{i18n>locality}"
-                                                groupName="Group1"
-                                                visibleInFilterBar="true"
-                                            >
-                                                <fb:control>
-                                                    <ComboBox
-                                                        id="id_Area"
-                                                        placeholder="{i18n>selectLocality}"
-                                                        showClearIcon="true"
-                                                        enabled="false"
-                                                        valueStateText="{i18n>selectArea}"
-                                                        items="{AreaModel>/}"
-                                                        selectionChange=".onAreaSelectionChange"
-                                                        busyIndicatorDelay="0"
-                                                    >
-                                                        <core:ListItem
-                                                            key="{AreaModel>BranchID}"
-                                                            text="{AreaModel>Address}"
-                                                        />
-                                                    </ComboBox>
-                                                </fb:control>
-                                            </fb:FilterGroupItem>
-                                            <!--  Room Type -->
-                                            <fb:FilterGroupItem
-                                                name="RoomType"
-                                                label="{i18n>roomtype}"
-                                                groupName="Group1"
-                                                visibleInFilterBar="true"
-                                            >
-                                                <fb:control>
-                                                    <ComboBox
-                                                        id="id_Roomtype"
-                                                        placeholder="{i18n>selectRoomType}"
-                                                        showClearIcon="true"
-                                                        busyIndicatorDelay="0"
-                                                    >
-                                                        <core:Item
-                                                            key="AC"
-                                                            text="AC"
-                                                        />
-                                                        <core:Item
-                                                            key="Non-Ac"
-                                                            text="Non-Ac"
-                                                        />
-                                                        <core:Item
-                                                            key="All"
-                                                            text="All"
-                                                        />
-                                                    </ComboBox>
-                                                </fb:control>
-                                            </fb:FilterGroupItem>
-                                        </fb:filterGroupItems>
-                                    </fb:FilterBar>
-                                    <!-- <l:Grid
-                            id="idBedTypeFlex"
-                            defaultSpan="XL3 L4 M6 S12"
-                            containerQuery="true"
-                            hSpacing="2"
-                            vSpacing="2"
-                            content="{path: 'VisibilityModel>/BedTypes'}"
-                        > -->
-                                    <VBox height="100%"
-                                      
-                                    >
-                                        <l:Grid
-                                            id="idBedTypeFlex"
-                                            defaultSpan="XL3 L4 M6 S12"
-                                            containerQuery="true"
-                                            hSpacing="2"
-                                            vSpacing="2"
-                                            content="{path: 'VisibilityModel>/BedTypes'}"
-                                        >
                                             <VBox
-                                                class="bedCard"
+                                                class="minHeight100 flexGrow1"
+                                                justifyContent="SpaceBetween"
                                             >
-                                                <!-- ===== IMAGE CAROUSEL ===== -->
-                                                <Carousel
-                                                    height="300px"
-                                                    width="100%"
-                                                    loop="true"
-                                                    showPageIndicator="false"
-                                                    backgroundDesign="Transparent"
-                                                    pages="{path: 'VisibilityModel>Images', templateShareable: false}"
-                                                >
-                                                    <pages>
-                                                        <VBox
-                                                            class="imageWrapper"
+                                                <VBox width="100%">
+                                                    <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
+                                                    <VBox
+                                                        height="350px"
+                                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
+                                                    >
+                                                        <l:Grid
+                                                            defaultSpan="XL12 L12 M12 S12"
+                                                            width="100%"
+                                                            class="position-welcome"
                                                         >
-                                                            <!-- Area Tag -->
-                                                            <HBox
-                                                                class="areaTagBox"
+                                                            <VBox
+                                                                class=" sapUiLargeMarginTop"
                                                             >
-                                                                <core:Icon
-                                                                    src="sap-icon://map-fill"
-                                                                    size="0.9rem"
-                                                                    color="black"
-                                                                    class="sapUiTinyMarginEnd"
+                                                                <Text
+                                                                    class="custom-welcome sapUiTinyMarginTopBottom"
+                                                                    text="{i18n>bookYourRoom} "
                                                                 />
                                                                 <Text
-                                                                    text="{VisibilityModel>Area}"
+                                                                    class="custom-welcome  sapUiTinyMarginTopBottom "
+                                                                    text="{i18n>companynameKT}"
                                                                 />
-                                                            </HBox>
-                                                            <!-- Image -->
-                                                            <Image
-                                                                src="{VisibilityModel>src}"
+                                                                <Text
+                                                                    text="{i18n>yourNewHomeAwayFromHome}"
+                                                                    class="custom-tagline s apUiTinyMarginTop "
+                                                                />
+                                                            </VBox>
+                                                            <HBox
                                                                 width="100%"
-                                                                height="300px"
-                                                                class="bedCardImage"
-                                                                decorative="false"
+                                                                justifyContent="End"
+                                                                alignItems="Center"
+                                                            />
+                                                        </l:Grid>
+                                                    </VBox>
+
+                                                    <fb:FilterBar
+                                                        id="filterbar"
+                                                        persistencyKey="myPersKey"
+                                                        useToolbar="false"
+                                                        clear="FC_onPressClear"
+                                                        showClearOnFB="true"
+                                                        search="onSearchRooms"
+                                                        filterChange="IA_.onFilterChange"
+                                                        afterVariantLoad="IA_.onAfterVariantLoad"
+                                                        showFilterConfiguration="false"
+                                                        filterContainerWidth="auto"
+                                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
+                                                        busyIndicatorDelay="0"
+                                                    >
+                                                        <fb:filterGroupItems>
+                                                            <!--  Branch Name -->
+                                                            <fb:FilterGroupItem
+                                                                name="Branch"
+                                                                label="{i18n>city}"
+                                                                groupName="Group1"
+                                                                visibleInFilterBar="true"
+                                                            >
+                                                                <fb:control>
+                                                                    <ComboBox
+                                                                        id="id_Branch"
+                                                                        placeholder="{i18n>cityValueText}"
+                                                                        showClearIcon="true"
+                                                                        busyIndicatorDelay="0"
+                                                                        enabled="true"
+                                                                        items="{sBRModel>/}"
+                                                                        selectionChange=".onBranchSelectionChange"
+                                                                    >
+                                                                        <core:ListItem
+                                                                            key="{sBRModel>City}"
+                                                                            text="{sBRModel>City}"
+                                                                        />
+                                                                    </ComboBox>
+                                                                </fb:control>
+                                                            </fb:FilterGroupItem>
+                                                            <!-- Area -->
+                                                            <fb:FilterGroupItem
+                                                                name="Area"
+                                                                label="{i18n>locality}"
+                                                                groupName="Group1"
+                                                                visibleInFilterBar="true"
+                                                            >
+                                                                <fb:control>
+                                                                    <ComboBox
+                                                                        id="id_Area"
+                                                                        placeholder="{i18n>selectLocality}"
+                                                                        showClearIcon="true"
+                                                                        enabled="false"
+                                                                        valueStateText="{i18n>selectArea}"
+                                                                        items="{AreaModel>/}"
+                                                                        selectionChange=".onAreaSelectionChange"
+                                                                        busyIndicatorDelay="0"
+                                                                    >
+                                                                        <core:ListItem
+                                                                            key="{AreaModel>BranchID}"
+                                                                            text="{AreaModel>Address}"
+                                                                        />
+                                                                    </ComboBox>
+                                                                </fb:control>
+                                                            </fb:FilterGroupItem>
+                                                            <!--  Room Type -->
+                                                            <fb:FilterGroupItem
+                                                                name="RoomType"
+                                                                label="{i18n>roomtype}"
+                                                                groupName="Group1"
+                                                                visibleInFilterBar="true"
+                                                            >
+                                                                <fb:control>
+                                                                    <ComboBox
+                                                                        id="id_Roomtype"
+                                                                        placeholder="{i18n>selectRoomType}"
+                                                                        showClearIcon="true"
+                                                                        busyIndicatorDelay="0"
+                                                                    >
+                                                                        <core:Item
+                                                                            key="AC"
+                                                                            text="AC"
+                                                                        />
+                                                                        <core:Item
+                                                                            key="NON-AC"
+                                                                            text="NON-AC"
+                                                                        />
+                                                                        <core:Item
+                                                                            key="All"
+                                                                            text="All"
+                                                                        />
+                                                                    </ComboBox>
+                                                                </fb:control>
+                                                            </fb:FilterGroupItem>
+                                                        </fb:filterGroupItems>
+                                                    </fb:FilterBar>
+
+                                                    <VBox
+                                                        height="100%"
+                                                        justifyContent="Start"
+                                                    >
+                                                        <l:Grid
+                                                            id="idBedTypeFlex"
+                                                            defaultSpan="XL3 L4 M6 S12"
+                                                            containerQuery="true"
+                                                            hSpacing="2"
+                                                            vSpacing="2"
+                                                            content="{path: 'VisibilityModel>/BedTypes'}"
+                                                        >
+                                                            <VBox
+                                                                class="bedCard"
+                                                            >
+                                                                <!-- ===== IMAGE CAROUSEL ===== -->
+                                                                <Carousel
+                                                                    height="300px"
+                                                                    width="100%"
+                                                                    loop="true"
+                                                                    showPageIndicator="false"
+                                                                    backgroundDesign="Transparent"
+                                                                    pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+                                                                >
+                                                                    <pages>
+                                                                        <VBox
+                                                                            class="imageWrapper"
+                                                                        >
+                                                                            <!-- Area Tag -->
+                                                                            <HBox
+                                                                                class="areaTagBox"
+                                                                            >
+                                                                                <core:Icon
+                                                                                    src="sap-icon://map-fill"
+                                                                                    size="0.9rem"
+                                                                                    color="black"
+                                                                                    class="sapUiTinyMarginEnd"
+                                                                                />
+                                                                                <Text
+                                                                                    text="{VisibilityModel>Area}"
+                                                                                />
+                                                                            </HBox>
+                                                                            <!-- Image -->
+                                                                            <Image
+                                                                                src="{VisibilityModel>src}"
+                                                                                width="100%"
+                                                                                height="300px"
+                                                                                class="bedCardImage"
+                                                                                decorative="false"
+                                                                            />
+                                                                        </VBox>
+                                                                    </pages>
+                                                                </Carousel>
+                                                                <!-- ===== CARD CONTENT ===== -->
+                                                                <VBox
+                                                                    class="bedCardContent"
+                                                                >
+                                                                    <Text
+                                                                        text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+                                                                        class="bedCardTitle"
+                                                                    />
+                                                                    <Text
+                                                                        text="{VisibilityModel>Description}"
+                                                                        class="bedCardDesc"
+                                                                        maxLines="4"
+                                                                        wrapping="true"
+                                                                    />
+                                                                    <Text
+                                                                        text="{parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+                                    formatter: '.Formatter.formatStartingPrice'}"
+                                                                        class="bedCardPrice"
+                                                                    />
+                                                                    <HBox
+                                                                        justifyContent="Center"
+                                                                        alignItems="Center"
+                                                                        class="sapUiTinyMarginTop"
+                                                                    >
+                                                                        <!-- <Button text="View Details" press=".viewDetails" class="btnViewDetails" /> -->
+                                                                        <Link
+                                                                            text="{i18n>viewDetails}"
+                                                                            tooltip="{i18n>viewDetails}"
+                                                                            press="viewDetails"
+                                                                            class="btnViewDetails"
+                                                                        />
+                                                                    </HBox>
+                                                                </VBox>
+                                                            </VBox>
+                                                        </l:Grid>
+                                                        <VBox
+                                                            height="400px"
+                                                            justifyContent="Center"
+                                                            alignItems="Center"
+                                                            visible="{VisibilityModel>/NoData}"
+                                                        >
+                                                            <Text
+                                                                text="{i18n>noRoomsFound}"
+                                                                class="cssNoDataMessage"
+                                                            />
+                                                            <Text
+                                                                text="{i18n>pleaseselectanotherCity}"
+                                                                class="cssNoDataSubMessage"
                                                             />
                                                         </VBox>
-                                                    </pages>
-                                                </Carousel>
-                                                <!-- ===== CARD CONTENT ===== -->
-                                                <VBox class="bedCardContent">
-                                                    <Text
-                                                        text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
-                                                        class="bedCardTitle"
-                                                    />
-                                                    <Text
-                                                        text="{VisibilityModel>Description}"
-                                                        class="bedCardDesc"
-                                                        maxLines="4"
-                                                        wrapping="true"
-                                                    />
-                                                    <Text
-                                                        text="{parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-                                    formatter: '.Formatter.formatStartingPrice'}"
-                                                        class="bedCardPrice"
-                                                    />
-                                                    <HBox
-                                                        justifyContent="Center"
+                                                    </VBox>
+
+                                                    <VBox
                                                         alignItems="Center"
-                                                        class="sapUiTinyMarginTop"
+                                                        class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                                        visible="{VisibilityModel>/ShowViewMore}"
                                                     >
-                                                        <!-- <Button text="View Details" press=".viewDetails" class="btnViewDetails" /> -->
                                                         <Link
-                                                            text="{i18n>viewDetails}"
-                                                            tooltip="{i18n>viewDetails}"
-                                                            press="viewDetails"
+                                                            id="idViewMoreBusy"
+                                                            text="{i18n>viewmorerooms}"
+                                                            press="onViewMoreRooms"
                                                             class="btnViewDetails"
                                                         />
-                                                    </HBox>
+                                                        <VBox height="2rem" />
+                                                    </VBox>
+                                                </VBox>
+                                                <VBox
+                                                    visible="{FooterModel>/showRoomsFooter}"
+                                                >
+                                                    <core:Fragment
+                                                        id="roomsFooter"
+                                                        fragmentName="sap.ui.com.project1.fragment.Footer"
+                                                        type="XML"
+                                                    />
                                                 </VBox>
                                             </VBox>
-                                        </l:Grid>
-                                           <IllustratedMessage
-                                        visible="{VisibilityModel>/NoData}"
-                                        illustrationType="sap.m.IllustratedMessageType.NoData"
-                                        title="{i18n>noRoomsFound}"
-                                        description="{i18n>pleaseselectanotherCity}"
-                                        class="cssNoDataMessage"
-                                    />
-                                    </VBox>
-
-                                 
-                                    <VBox
-                                        alignItems="Center"
-                                        class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-                                        visible="{VisibilityModel>/ShowViewMore}"
-                                    >
-                                        <Link
-                                            id="idViewMoreBusy"
-                                            text="{i18n>viewmorerooms}"
-                                            press="onViewMoreRooms"
-                                            class="btnViewDetails"
-                                        />
-                                        <VBox height="2rem" />
-                                    </VBox>
-                                        </VBox>
-                                    <VBox
-                                        visible="{FooterModel>/showRoomsFooter}"
-                                    >
-                                        <core:Fragment
-                                            id="roomsFooter"
-                                            fragmentName="sap.ui.com.project1.fragment.Footer"
-                                            type="XML"
-                                        />
-                                    </VBox>
-                                    </VBox>
                                         </content>
                                     </ScrollContainer>
                                 </VBox>

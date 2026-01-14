@@ -84,8 +84,8 @@
                         text="AC"
                     />
                     <core:Item
-                        key="Non-AC"
-                        text="Non-AC"
+                        key="NON-AC"
+                        text="NON-AC"
                     />
                 </ComboBox>
 

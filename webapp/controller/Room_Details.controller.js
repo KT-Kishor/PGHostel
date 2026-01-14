@@ -488,6 +488,7 @@ sap.ui.define([
             delete Payload.AcType;
             delete Payload.File;
             delete Payload.Description;
+            delete Payload.editable
 
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
