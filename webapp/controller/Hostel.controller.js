@@ -2236,7 +2236,7 @@ sap.ui.define([
                     placement: sap.m.PlacementType.Bottom,
                     buttons: [
                         new sap.m.Button({
-                            text: "Enter into Profile",
+                            text: "View Profile",
                             icon: "sap-icon://customer",
                             press: this._onEnterProfile.bind(this)
                         }).addStyleClass("myUnifiedBtn"),

@@ -3324,7 +3324,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 } */
 .guideButtonLarge {
   position: fixed;
-  bottom: 32px;
+  bottom: 60px;
   right: 32px;
   z-index: 1000;
   height: 56px;
@@ -3333,6 +3333,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
   font-weight: 600;
   border-radius: 28px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.guideButtonLarge:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
 }
 
 .highlightTile {

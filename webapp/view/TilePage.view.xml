@@ -147,12 +147,6 @@
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
-                <Button
-                    text="Steps Guide"
-                    icon="sap-icon://learning-assistant"
-                    press="onStartGuide"
-                    class="guideButtonLarge"
-                />
             </FlexBox>
         </layout:VerticalLayout>
         <footer>
@@ -160,5 +154,11 @@
                 <contentRight />
             </Bar>
         </footer>
+        <Button
+            text="Steps Guide"
+            icon="sap-icon://learning-assistant"
+            press="onStartGuide"
+            class="guideButtonLarge"
+        />
     </Page>
 </mvc:View>
