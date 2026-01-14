@@ -107,14 +107,18 @@ sap.ui.define([
 
         HM_EditHostelFeature: function() {
             const oTable = this.byId("HF_HostelFeatureTable");
-            const oSelected = oTable.getSelectedItem();
+            const oSelected = oTable.getSelectedItems();
 
             if (!oSelected) {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
                 return;
             }
+              if (oSelected.length > 1) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
+                return;
+            }
 
-            const oData = oSelected.getBindingContext("HostelFeatures").getObject();
+            const oData = oSelected[0].getBindingContext("HostelFeatures").getObject();
 
             if (!this.ARD_Dialog) {
                 this.ARD_Dialog = sap.ui.xmlfragment(this.getView().getId(),

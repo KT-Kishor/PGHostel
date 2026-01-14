@@ -592,6 +592,9 @@ sap.ui.define([
             sap.ui.getCore().byId("MIF_id_RemarkLabel").setText(oValue);
             sap.ui.getCore().byId("MIF_id_remark").setValue("");
             sap.ui.getCore().byId("MIF_id_DialogManRemark").setTitle(oDialogTitle);
+          sap.ui.getCore().byId("MIF_id_DialogManRemark").addStyleClass("barheader");
+
+
             sap.ui.getCore().byId("MIF_id_remark").setValueState("None");
         },
 

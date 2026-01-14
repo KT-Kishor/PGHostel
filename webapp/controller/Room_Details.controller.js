@@ -306,26 +306,32 @@ sap.ui.define([
 
         },
 
-        onBedTypeChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            var oInput = oEvent.getSource().getValue()
-            var oModel = this.getView().getModel("RoomModel")
-            var data = this.getView().getModel("RoomDetailsModel").getData()
+      onBedTypeChange: function (oEvent) {
+    utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
-            data.forEach((item) => {
-                if (item.BedTypeName === oInput) {
-                    oModel.setProperty("/Price", item.Price)
-                    oModel.setProperty("/MonthPrice", item.MonthPrice)
-                    oModel.setProperty("/YearPrice", item.YearPrice)
-                    oModel.setProperty("/Currency", item.Currency)
-                    oModel.setProperty("/editable", false)
-                }else{
-                     oModel.setProperty("/editable", true)
-                } 
-            })
+    var oInput = oEvent.getSource().getValue();
+    var oModel = this.getView().getModel("RoomModel");
+    var BranchCode = oModel.getProperty("/BranchCode");
+    var data = this.getView().getModel("RoomDetailsModel").getData();
 
-        },
+    var oMatch = data.find(item =>
+        item.BedTypeName === oInput &&
+        item.BranchCode === BranchCode
+    );
 
+    if (oMatch) {
+        oModel.setProperty("/Price", oMatch.Price);
+        oModel.setProperty("/MonthPrice", oMatch.MonthPrice);
+        oModel.setProperty("/YearPrice", oMatch.YearPrice);
+        oModel.setProperty("/Currency", oMatch.Currency);
+        oModel.setProperty("/editable", false);
+    } else {
+        oModel.setProperty("/Price", "");
+        oModel.setProperty("/MonthPrice", "");
+        oModel.setProperty("/YearPrice", "");
+        oModel.setProperty("/editable", true);
+    }
+},
         HM_EditRoom: function (oEvent) {
             var oView = this.getView();
             var oTable = this.byId("id_ARD_Table");

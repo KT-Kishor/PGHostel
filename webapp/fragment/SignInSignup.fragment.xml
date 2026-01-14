@@ -10,7 +10,7 @@
         draggable="true"
         resizable="true"
         class="authDialog"
-       contentWidth="34%"
+       contentWidth="30%"
         contentHeight="auto"
     >
         <!--stretch="{= ${device>/system/phone} }"-->
