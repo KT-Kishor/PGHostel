@@ -24,7 +24,7 @@
             </Bar>
         </customHeader>
         
-               <VBox class="dialogContentBox">
+          
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -131,13 +131,13 @@
                 />
                       </f:content>
         </f:SimpleForm>
-           	</VBox>
+          
 	<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
 			<!-- Informational Message Strip -->
 			<MessageStrip text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB." showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
 		</VBox>
                 <Label text="" />
-                <VBox width="100%" class="dialogContentBox">
+                <VBox width="100%" >
                     <HBox
                         justifyContent="End"
                         width="100%"

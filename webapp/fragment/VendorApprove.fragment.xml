@@ -5,7 +5,7 @@
 >
     <Dialog id="MIF_id_DialogManRemark"  contentWidth="34%"
         contentHeight="auto">
-       <VBox class="dialogContentBox">
+ 
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -38,7 +38,7 @@
                 />
             </f:content>
         </f:SimpleForm>
-        	</VBox>
+       
         <beginButton>
             <Button
                 class="myUnifiedBtn"

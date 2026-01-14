@@ -16,7 +16,7 @@
               
             </Bar>
         </customHeader>
-		   <VBox class="dialogContentBox">
+		  
 		<f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -74,7 +74,7 @@
 				</VBox>
 			</f:content>
 		</f:SimpleForm>
-			</VBox>
+		
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer />

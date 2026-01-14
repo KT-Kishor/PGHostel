@@ -22,7 +22,7 @@
               
             </Bar>
         </customHeader>
-        <VBox class="dialogContentBox">
+   
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -203,7 +203,6 @@
                 </ComboBox>
             </f:content>
         </f:SimpleForm>
-        </VBox>
         <footer>
             <Toolbar>
                 <ToolbarSpacer />
