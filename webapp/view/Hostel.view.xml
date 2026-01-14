@@ -297,8 +297,8 @@
                             content="{path: 'VisibilityModel>/BedTypes'}"
                         > -->
                                     <VBox height="100%"
-                                        justifyContent="Center"
-                                        alignItems="Center">
+                                      
+                                    >
                                         <l:Grid
                                             id="idBedTypeFlex"
                                             defaultSpan="XL3 L4 M6 S12"
@@ -386,6 +386,7 @@
                                         illustrationType="sap.m.IllustratedMessageType.NoData"
                                         title="{i18n>noRoomsFound}"
                                         description="{i18n>pleaseselectanotherCity}"
+                                        class="cssNoDataMessage"
                                     />
                                     </VBox>
 

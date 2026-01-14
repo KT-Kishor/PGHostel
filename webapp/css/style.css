@@ -3236,11 +3236,14 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 
 .cssNoDataMessage{
-    font-size: 1.2rem !important;
+    font-size: 1.5rem !important;
     font-weight: 500 !important;
     color: #555555 !important;
     text-align: center !important;
     margin-bottom: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .fragheader{

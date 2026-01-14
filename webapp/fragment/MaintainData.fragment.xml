@@ -9,6 +9,8 @@
        
         type="Message"
         class="sapUiContentPadding"
+         contentWidth="34%"
+        contentHeight="auto"
     >
         <customHeader>
             <Bar class="barheader">

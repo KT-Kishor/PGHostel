@@ -6,7 +6,8 @@
 	xmlns:u="sap.ui.unified"
 	xmlns:mvc="sap.ui.core.mvc">
 	<Dialog id="FacilitiesDialog"  type="Message" class="sapUiContentPadding"
-    resizable="true" draggable="true" contentWidth="40%" contentHeight="auto">
+    resizable="true" draggable="true"  contentWidth="34%"
+        contentHeight="auto">
 	    <customHeader>
             <Bar class="barheader">
                     <contentMiddle>

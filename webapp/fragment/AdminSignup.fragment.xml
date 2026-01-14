@@ -3,7 +3,8 @@
 	xmlns:core="sap.ui.core" 
 	xmlns:f="sap.ui.layout.form" 
 	xmlns:u="sap.ui.unified">
-	<Dialog id="adminSignupDialog" initialFocus="adminSalutation" contentWidth="28rem" stretch="{= ${device>/system/phone} }" draggable="true" resizable="true">
+	<Dialog id="adminSignupDialog" initialFocus="adminSalutation"   contentWidth="34%"
+        contentHeight="auto" stretch="{= ${device>/system/phone} }" draggable="true" resizable="true">
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>

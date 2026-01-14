@@ -10,6 +10,8 @@
      
         type="Message"
         class="sapUiContentPadding"
+        contentWidth="34%"
+        contentHeight="auto"
     >
       <customHeader>
             <Bar class="barheader">
@@ -121,6 +123,7 @@
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
+                    editable="{RoomModel>/editable}"
                 />
                 <!-- <HBox
                     width="100%"
@@ -162,6 +165,7 @@
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
+                     editable="{RoomModel>/editable}"
                 />
                 <Label text="{i18n>yearlyPrice}" />
                 <Input
@@ -171,6 +175,7 @@
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
+                     editable="{RoomModel>/editable}"
                 />
                 <Label
                     text="{i18n>currency}"
@@ -185,6 +190,7 @@
                     change="onACtypeChange"
                     placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
+                    editable="{RoomModel>/editable}"
                 >
                     <core:ListItem
                         key="{CountryModel>currency}"

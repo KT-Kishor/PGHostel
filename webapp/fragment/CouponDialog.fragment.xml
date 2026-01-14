@@ -9,6 +9,8 @@
         draggable="true"
         resizable="true"
         afterClose="onDialogAfterClose"
+          contentWidth="34%"
+        contentHeight="auto"
     >
         <customHeader>
             <Bar class="barheader">

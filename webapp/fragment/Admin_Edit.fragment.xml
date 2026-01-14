@@ -9,6 +9,8 @@
         id="editFacilityDialog"
       
         afterClose=".onEditDialogClose"
+          contentWidth="34%"
+        contentHeight="auto"
     >
       <customHeader>
             <Bar class="barheader">

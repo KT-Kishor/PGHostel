@@ -7,12 +7,11 @@
 >
     <Dialog
         id="sds12"
-     
         type="Message"
-        class="sapUiContentPadding fragheader"
+        class="sapUiContentPadding"
         resizable="true"
         draggable="true"
-        contentWidth="40%"
+        contentWidth="30%"
         contentHeight="auto"
     
     >

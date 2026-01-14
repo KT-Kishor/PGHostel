@@ -21,7 +21,7 @@ sap.ui.define([
                 BranchCode: "",
                 RoomNo: "",
                 Price: "",
-
+                editable: true
             });
             this.getView().setModel(model, "RoomModel")
             this.onClearAndSearch("RD_id_FilterbarEmployee");
@@ -50,8 +50,8 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-                filters.Role ="Admin";
-            }else{
+                filters.Role = "Admin";
+            } else {
                 filters.BranchID = "";
             }
             try {
@@ -308,44 +308,22 @@ sap.ui.define([
 
         onBedTypeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            var oInput = oEvent.getSource().getValue()
+            var oModel = this.getView().getModel("RoomModel")
+            var data = this.getView().getModel("RoomDetailsModel").getData()
 
-            // var sSelectedBedType = oEvent.getParameter("selectedItem").getKey();
-            // var oView = this.getView();
+            data.forEach((item) => {
+                if (item.BedTypeName === oInput) {
+                    oModel.setProperty("/Price", item.Price)
+                    oModel.setProperty("/MonthPrice", item.MonthPrice)
+                    oModel.setProperty("/YearPrice", item.YearPrice)
+                    oModel.setProperty("/Currency", item.Currency)
+                    oModel.setProperty("/editable", false)
+                }else{
+                     oModel.setProperty("/editable", true)
+                } 
+            })
 
-            // // var oAcComboBox = oView.byId("idAcType");
-
-            // // if (sSelectedBedType) {
-            // //     oAcComboBox.setVisible(true);
-            // // } else {
-            // //     oAcComboBox.setVisible(false);
-            // //     return;
-            // // }
-
-            // var oBedTypeModel = oView.getModel("BedTypeModel");
-            // var aData = oBedTypeModel.getProperty("/");
-            // var sBranchCode = oView.byId("idRoomType12").getSelectedKey();
-
-            // var oSelected = aData.find(function (item) {
-            //     return item.Name === sSelectedBedType;
-            // });
-
-            // if (oSelected) {
-            //     var aFilteredAC = aData.filter(function (item) {
-            //         return item.Name === sSelectedBedType;
-            //     });
-
-            //     // Bind this filtered data directly to AC ComboBox (no model overwrite)
-            //     oAcComboBox.bindItems({
-            //         path: "/",
-            //         template: new sap.ui.core.Item({
-            //             key: "{ACType}",
-            //             text: "{ACType}"
-            //         }),
-            //         templateShareable: false
-            //     });
-            //     oAcComboBox.setModel(new sap.ui.model.json.JSONModel(aFilteredAC));
-            //     oAcComboBox.setSelectedKey("");
-            // }
         },
 
         HM_EditRoom: function (oEvent) {
@@ -518,7 +496,7 @@ sap.ui.define([
 
             ) {
 
-                Payload.NoofPerson = parseInt(Noofper.NoOfPerson)  || 0;
+                Payload.NoofPerson = parseInt(Noofper.NoOfPerson) || 0;
                 Payload.ExtraBed = parseInt(Payload.ExtraBed) || 0;
                 Payload.Price = parseInt(Payload.Price) || 0;
                 Payload.MonthPrice = parseInt(Payload.MonthPrice) || 0;
@@ -710,9 +688,9 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-             if (Array.isArray(omainModel) && omainModel.length) {
+            if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
-            }else if (oExistingModel.BranchCode) {
+            } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
@@ -722,9 +700,9 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
-                filters.Role ="Admin";
+                filters.Role = "Admin";
 
-            }else{
+            } else {
                 filters.BranchCode = "";
             }
 

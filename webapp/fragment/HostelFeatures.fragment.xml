@@ -5,7 +5,8 @@
 	xmlns:core="sap.ui.core"
 	xmlns:u="sap.ui.unified"
 	xmlns:mvc="sap.ui.core.mvc">
-	<Dialog id="HF_id_HostelFeaturesDialog"  type="Message" class="sapUiContentPadding"
+	<Dialog id="HF_id_HostelFeaturesDialog"  type="Message" class="sapUiContentPadding"    contentWidth="34%"
+        contentHeight="auto"
     resizable="true" draggable="true">
 	    <customHeader>
             <Bar class="barheader">

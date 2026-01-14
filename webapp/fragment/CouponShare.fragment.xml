@@ -1,11 +1,13 @@
 <Dialog
 
-    contentWidth="420px"
+  
     id="couponShareDialog"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:f="sap.ui.layout.form"
     afterClose="onShareDialogAfterClose"
+       contentWidth="34%"
+        contentHeight="auto"
 >
     <customHeader>
             <Bar class="barheader">

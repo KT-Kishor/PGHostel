@@ -940,14 +940,14 @@ sap.ui.define([
                 const oModelData = await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
-                const sCity = this.City ? this.City : "Kalaburagi";
+                const sCity = this.City ? this.City : oModelData[0].City;
 
                 const aFiltered = oModelData.filter(
                     item => item.City === sCity
                 );
 
-                if (aFiltered.length === 0 || sCity === "Kalaburagi") {
-                    await this._loadFilteredData("Kalaburagi", "", "");
+                if (aFiltered.length === 0 || sCity) {
+                    await this._loadFilteredData(sCity, "", "");
                 } else {
                     await this._loadFilteredData(this.City, "", "");
                 }
@@ -955,7 +955,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(aFiltered), "AreaModel");
 
                 // Default selections
-                this.byId("id_Branch").setSelectedKey("Kalaburagi");
+                this.byId("id_Branch").setSelectedKey(sCity);
                 this.byId("id_Area").setEnabled(true).setSelectedKey("");
                 if (this.roomtype !== true) {
                     this.byId("id_Roomtype").setEnabled(true).setSelectedKey("All");
