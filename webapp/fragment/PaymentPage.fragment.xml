@@ -23,6 +23,7 @@
               
             </Bar>
         </customHeader>
+            <VBox class="dialogContentBox">
         <f:SimpleForm
             id="Exp_id_SimpleFrom"
             editable="true"
@@ -209,6 +210,7 @@
                 </l:Grid>
             </VBox>
         </f:SimpleForm>
+         </VBox>
         <footer>
             <Toolbar>
                 <ToolbarSpacer />
