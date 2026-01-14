@@ -3295,7 +3295,13 @@ span.sapMBtnInner.sapMBtnEmphasized {
     background-position: Start;
     background-repeat: no-repeat;
 }
-
+.sapMPopover .sapMIBar {
+    background: linear-gradient(135deg, #00b7c7, #007984) !important;
+   color: white !important;
+}
+.sapMBtnIcon{
+  color: white !important;
+}
 .guideButtonLarge {
   position: fixed;
   bottom: 32px;

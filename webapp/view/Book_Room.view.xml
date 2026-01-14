@@ -104,7 +104,14 @@
         </content>
         <footer>
             <OverflowToolbar>
-                <ToolbarSpacer />
+                <Button
+    id="messagePopoverBtn"
+    icon="sap-icon://alert"
+    text="{= ${message>/}.length }"
+    visible="{=${message>/}.length > 0}"
+    type="Emphasized"
+    press="onMessagePopoverPress"/>
+                 <ToolbarSpacer />
                 <Button
                     text="{i18n>proceedToPay}"
                     tooltip="{i18n>proceedToPay}"

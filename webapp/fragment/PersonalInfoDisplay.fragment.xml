@@ -144,6 +144,12 @@
                             press="onEditFacilityDetails"
                             class="myUnifiedBtn"
                         />
+                        <Button
+                            text="{i18n>MSdelete}"
+                            tooltip="{i18n>MSdelete}"
+                            press="onDeleteFacility"
+                            class="myUnifiedBtn"
+                        />
                     </Toolbar>
                 </headerToolbar>
 
