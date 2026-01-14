@@ -61,7 +61,7 @@
                                 id="MD_id_SearchField"
                                 width="250px"
                                 liveChange="onGlobalSearch"
-                                placeholder="{i18n>search}"
+                                placeholder="{i18n>placeholderSearch}"
                             />
                         </fb:control>
                     </fb:FilterGroupItem>

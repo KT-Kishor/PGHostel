@@ -29,24 +29,13 @@
                 class="tileContainer"
             >
                 <GenericTile
-                    visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/ManageBranch}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="{i18n>manageCustomerDetails}"
-                    press="TileV_onpressInbox"
+                    header="{i18n>manageBranchDetails}"
+                    press="TileV_onpressBranchdata"
                 >
-                    <TileContent unit="{i18n>assignRooms}">
+                    <TileContent unit="{i18n>branchDetails}">
                         <ImageContent src="sap-icon://building" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
-                    visible="{= ${TileVisibility>/ManageRooms}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>tileManageRoomDetails}"
-                    press="TileV_onpressroomdetails"
-                >
-                    <TileContent unit="{i18n>tileRoomDetails}">
-                        <ImageContent src="sap-icon://detail-view" />
                     </TileContent>
                 </GenericTile>
 
@@ -62,6 +51,17 @@
                 </GenericTile>
 
                 <GenericTile
+                    visible="{= ${TileVisibility>/ManageRooms}!== 0?true:false }"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>tileManageRoomDetails}"
+                    press="TileV_onpressroomdetails"
+                >
+                    <TileContent unit="{i18n>tileRoomDetails}">
+                        <ImageContent src="sap-icon://detail-view" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
                     visible="{= ${TileVisibility>/ManageFacility}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageExtraFacilities}"
@@ -69,17 +69,6 @@
                 >
                     <TileContent unit="{i18n>extraFacilities}">
                         <ImageContent src="sap-icon://activities" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
-                    visible="{= ${TileVisibility>/ManageBranch}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>manageBranchDetails}"
-                    press="TileV_onpressBranchdata"
-                >
-                    <TileContent unit="{i18n>branchDetails}">
-                        <ImageContent src="sap-icon://building" />
                     </TileContent>
                 </GenericTile>
 
@@ -95,13 +84,13 @@
                 </GenericTile>
 
                 <GenericTile
-                    visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
-                    header="{i18n>invoiceDetails}"
-                    press="TileV_onpressManageInvoice"
+                    header="{i18n>manageCustomerDetails}"
+                    press="TileV_onpressInbox"
                 >
-                    <TileContent unit="{i18n>TileinvoiceDetails}">
-                        <ImageContent src="sap-icon://expense-report" />
+                    <TileContent unit="{i18n>assignRooms}">
+                        <ImageContent src="sap-icon://building" />
                     </TileContent>
                 </GenericTile>
 
@@ -113,6 +102,17 @@
                 >
                     <TileContent unit="{i18n>couponDetails}">
                         <ImageContent src="sap-icon://tags" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
+                    visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>invoiceDetails}"
+                    press="TileV_onpressManageInvoice"
+                >
+                    <TileContent unit="{i18n>TileinvoiceDetails}">
+                        <ImageContent src="sap-icon://expense-report" />
                     </TileContent>
                 </GenericTile>
 
