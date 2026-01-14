@@ -3250,3 +3250,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
     background: linear-gradient(135deg, #00b7c7, #008b96) !important;
     color: white !important;
 }
+
+
+
+.dialogContentBox {
+    padding: 2rem 1rem;
+    gap: 1rem;
+    background-image: url("../image/Hostel_BG.png");
+    background-size: cover;
+    background-position: Start;
+    background-repeat: no-repeat;
+}
+

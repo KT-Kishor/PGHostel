@@ -329,15 +329,21 @@ sap.ui.define([
         HM_EditRoom: function (oEvent) {
             var oView = this.getView();
             var oTable = this.byId("id_ARD_Table");
-            var oSelected = oTable.getSelectedItem();
+            var oSelected = oTable.getSelectedItems();
 
             if (!oSelected) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordEditRoom"));
                 return;
             }
+             if (oSelected.length > 1) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
+                return;
+            }
 
-            var oContext = oSelected.getBindingContext("RoomDetailsModel");
+            var oContext = oSelected[0].getBindingContext("RoomDetailsModel");
             var oData = oContext.getObject();
+
+           
 
             // Create dialog if not already initialized
             if (!this.AR_Dialog) {

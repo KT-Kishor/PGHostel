@@ -12,6 +12,7 @@
         class="sapUiContentPadding"
         contentWidth="34%"
         contentHeight="auto"
+       
     >
       <customHeader>
             <Bar class="barheader">
@@ -21,6 +22,7 @@
               
             </Bar>
         </customHeader>
+        <VBox class="dialogContentBox">
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -31,6 +33,7 @@
             columnsXL="2"
             columnsL="2"
             columnsM="1"
+
         >
             <f:content>
                 <Label
@@ -200,6 +203,7 @@
                 </ComboBox>
             </f:content>
         </f:SimpleForm>
+        </VBox>
         <footer>
             <Toolbar>
                 <ToolbarSpacer />

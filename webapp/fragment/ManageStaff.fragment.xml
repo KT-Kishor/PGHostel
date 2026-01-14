@@ -20,6 +20,7 @@
 			</Bar>
 		</customHeader>
 		<content>
+           <VBox class="dialogContentBox">
 			<f:SimpleForm
                 id="MS_id_signUpForm"
                 editable="true"
@@ -343,6 +344,7 @@
                     maxLength="50"
                 /> -->
 			</f:SimpleForm>
+            	</VBox>
 		</content>
 		<footer>
 			<Toolbar>
