@@ -593,14 +593,19 @@ sap.ui.define([
         MD_UpdateTableRow: function () {
             var oView = this.getView();
             var oTable = this.byId("id_MD_Table");
-            var oSelected = oTable.getSelectedItem();
+            var oSelected = oTable.getSelectedItems();
             oView.getModel("editableModel").setProperty("/isEdit", true);
-            if (!oSelected) {
+            if (oSelected.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
                 return;
             }
 
-            var oContext = oSelected.getBindingContext("mainModel");
+            if (oSelected.length > 1) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
+                return;
+            }
+            const oSelectedItem = oSelected[0];
+            var oContext = oSelectedItem.getBindingContext("mainModel");
             var oData = oContext.getObject();
             const aAllStates = this.getOwnerComponent().getModel("StateModel").getData();
             const aFilteredStates = aAllStates.filter(s => s.countryCode === oData.countryCode);

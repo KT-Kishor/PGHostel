@@ -6,19 +6,17 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-
         type="Message"
         class="sapUiContentPadding"
         resizable="true"
         contentWidth="30%"
         draggable="true"
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>fillBranchDetails}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>fillBranchDetails}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
         <f:SimpleForm
@@ -126,7 +124,10 @@
                         additionalText="{CityModel>branchCode}"
                     />
                 </ComboBox>
-                <Label text="{i18n>gstNo}" visible="{visiblePlay>/isIndia}"/>
+                <Label
+                    text="{i18n>gstNo}"
+                    visible="{visiblePlay>/isIndia}"
+                />
                 <Input
                     value="{MDmodel>/GSTIN}"
                     maxLength="15"
@@ -212,6 +213,14 @@
                     valueStateText="{i18n>enterPenalty}"
                 />
                 <Label text="{i18n>addLogo}" />
+                <MessageStrip
+                    text="{i18n>Branchdatalogomsg}"
+                    type="Warning"
+                    showIcon="true"
+                    visible="{editableModel>/isEdit}"
+                    class="sapUiSmallMarginBottom"
+                />
+
                 <VBox
                     alignItems="Start"
                     width="100%"
