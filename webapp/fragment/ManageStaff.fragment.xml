@@ -346,8 +346,8 @@
 			<Toolbar>
 				<ToolbarSpacer />
 				<Button
-                    text="{i18n>MSsignUp}"
-                    tooltip="{i18n>MSsignUp}"
+                    text="Save"
+                    tooltip="Save"
                     class="myUnifiedBtn"
                     press="onSignUp"
                 />
