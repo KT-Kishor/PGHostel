@@ -69,7 +69,7 @@
                             />
 						</ComboBox>
 					</VBox>
-					<VBox width="75%">
+					<VBox width="75%" class="sapUiTinyMarginBegin">
 						<Label
                             text="{i18n>fullname}"
                             required="true"
@@ -236,11 +236,7 @@
                     />
 				</ComboBox>
 				<Label text="" />
-				<HBox
-                    width="100%"
-                    justifyContent="Start"
-                    alignItems="Center"
-                >
+				<HBox width="100%">
 					<VBox width="25%">
 						<Label
                             text="{i18n>MSisdCode}"
@@ -263,7 +259,7 @@
                             />
 						</ComboBox>
 					</VBox>
-					<VBox width="75%">
+						<VBox width="75%" class="sapUiTinyMarginBegin">
 						<Label
                             text="{i18n>MSmobileNo}"
                             required="true"
