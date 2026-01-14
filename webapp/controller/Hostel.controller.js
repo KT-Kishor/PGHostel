@@ -4774,18 +4774,15 @@ sap.ui.define([
 
                 sap.m.MessageBox.success(
                     "Thank you for signing up.\n\n" +
-                    "Our team will review your details and uploaded documents.\n" +
-                    "Once the verification is complete, \n  you will receive an email containing:\n\n" +
-                    "• Your User ID and User Name\n\n\n" +
-
+                    "Our team will review your details and documents. You will receive an email with your User ID and User Name once the verification is complete.\n\n" +
                     "Please check your inbox (and spam folder) for further updates.",
                     {
                         title: "Registration Submitted Successfully",
+                        contentWidth: "500px", // Try adding this directly here
+                        // styleClass: "myCustomMessageBoxSize",
                         emphasizedAction: sap.m.MessageBox.Action.OK,
                         onClose: () => {
-                            // ✅ CLOSE ONLY AFTER USER CONFIRMS
                             this._oAdminSignup.close();
-
                         }
                     }
                 );
