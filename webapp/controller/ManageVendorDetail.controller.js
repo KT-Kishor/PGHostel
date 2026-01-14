@@ -408,7 +408,7 @@ sap.ui.define([
             this.byId("AdminDownloadButton").setEnabled(false);
         },
 
-        onAdminPreviewDoc: function(oEvent) {
+        onAdminPreviewDoc: function (oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -455,8 +455,9 @@ sap.ui.define([
                     draggable: true,
                     resizable: true,
                     contentWidth: "50%",
-                    contentHeight: "auto",
-                    horizontalScrolling: false,
+                    contentHeight: "50%",
+                    horizontalScrolling: true,
+                    verticalScrolling: false,
                     contentPadding: "0rem",
                     endButton: new sap.m.Button({
                         text: "Close",
@@ -480,13 +481,30 @@ sap.ui.define([
 
                 const oImage = new sap.m.Image({
                     src: sImageUri,
-                    densityAware: false
+                    densityAware: false,
+                    decorative: false,
+                    width: "400px",
+                    height: "auto",
+                    style: "max-width:100%; max-height:100%; object-fit:contain;"
                 });
 
-                oImage.addStyleClass("imagePreviewFit");
+                const oFlexBox = new sap.m.FlexBox({
+                    width: "100%",
+                    height: "100%",
+                    justifyContent: "Center",
+                    alignItems: "Center",
+                    items: [oImage]
+                });
 
-                this._oAdminPreviewDialog.addContent(oImage);
+                const oScrollContainer = new sap.m.ScrollContainer({
+                    width: "100%",
+                    height: "100%",
+                    horizontal: true,
+                    vertical: true,
+                    content: [oFlexBox]
+                });
 
+                this._oAdminPreviewDialog.addContent(oScrollContainer);
             } else if (sMimeType === "application/pdf") {
 
                 const byteCharacters = atob(sBase64);

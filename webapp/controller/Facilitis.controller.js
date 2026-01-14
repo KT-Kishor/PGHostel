@@ -198,6 +198,10 @@ sap.ui.define([
         },
 
         FD_RoomDetails: function (oEvent) {
+            if (this.ARD_Dialog) {
+                this.ARD_Dialog.destroy();
+                this.ARD_Dialog = null;
+            }
             this.byId("id_facilityTable").removeSelections();
             var oView = this.getView();
 
@@ -257,6 +261,10 @@ sap.ui.define([
             var oTable = this.byId("id_facilityTable");
             oTable.removeSelections();
             this.ARD_Dialog.close();
+            if (this.ARD_Dialog) {
+                this.ARD_Dialog.destroy();
+                this.ARD_Dialog = null;
+            }
         },
 
         FD_onsavebuttonpress: async function () {
@@ -361,6 +369,10 @@ sap.ui.define([
                     tokens: []
                 });
                 this.ARD_Dialog.close();
+                if (this.ARD_Dialog) {
+                    this.ARD_Dialog.destroy();
+                    this.ARD_Dialog = null;
+                }
                 return this.readCallForFacilities("Initial");
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
