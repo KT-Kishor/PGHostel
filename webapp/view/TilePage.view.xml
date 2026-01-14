@@ -84,17 +84,6 @@
                 </GenericTile>
 
                 <GenericTile
-                    visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>manageCustomerDetails}"
-                    press="TileV_onpressInbox"
-                >
-                    <TileContent unit="{i18n>assignRooms}">
-                        <ImageContent src="sap-icon://building" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
                     visible="{= ${TileVisibility>/ManageCoupon}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageCouponDetails}"
@@ -102,6 +91,17 @@
                 >
                     <TileContent unit="{i18n>couponDetails}">
                         <ImageContent src="sap-icon://tags" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
+                    visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>manageCustomerDetails}"
+                    press="TileV_onpressInbox"
+                >
+                    <TileContent unit="{i18n>assignRooms}">
+                        <ImageContent src="sap-icon://building" />
                     </TileContent>
                 </GenericTile>
 
