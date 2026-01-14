@@ -82,6 +82,10 @@ sap.ui.define([
         },
 
         HM_RoomDetails: function (oEvent) {
+            if (this.ARD_Dialog) {
+                this.ARD_Dialog.destroy();
+                this.ARD_Dialog = null;
+            }
             this.byId("id_BedTable").removeSelections();
             var oView = this.getView();
 
@@ -213,6 +217,10 @@ sap.ui.define([
                     await this.Onsearch("true");
                     sap.m.MessageToast.show(this.i18nModel.getText("bedsavedsuccessfully"));
                     this.ARD_Dialog.close();
+                    if (this.ARD_Dialog) {
+                        this.ARD_Dialog.destroy();
+                        this.ARD_Dialog = null;
+                    }
                 } catch (err) {
                     sap.ui.core.BusyIndicator.hide();
                     sap.m.MessageToast.show(err.message || err.responseText);
@@ -340,20 +348,21 @@ sap.ui.define([
 
         BT_onCancelButtonPress: function () {
             this.ARD_Dialog.close();
+            if (this.ARD_Dialog) {
+                this.ARD_Dialog.destroy();
+                this.ARD_Dialog = null;
+            }
         },
 
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("BedDetails").setData({});
-
-
         },
 
         onHome: function () {
             this.CommonLogoutFunction();
             this.getView().getModel("BedDetails").setData({});
-
         },
 
         Onsearch: function (flag) {
