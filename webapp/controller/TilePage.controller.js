@@ -87,10 +87,6 @@ sap.ui.define([
         },
 
         onStartGuide: function () {
-            var oGuideModel = this.getOwnerComponent().getModel("guideModel");
-            var aSteps = oGuideModel.getData().steps;
-            this._highlightAllTiles(aSteps);
-
             if (!this._oGuideDialog) {
                 this._oGuideDialog = new sap.m.Dialog({
                     title: "Steps to Know",
@@ -100,9 +96,12 @@ sap.ui.define([
                     draggable: true,
                     content: [
                         new sap.m.Image({
-                            src: "image/PG1.png",
+                            src: "image/PG I1 BETTER.png",
                             width: "100%",
-                            densityAware: false
+                            height: "100%",
+                            decorative: false,
+                            densityAware: false,
+                            style: "object-fit: cover; display:block; margin:0; padding:0;"
                         })
                     ],
                     endButton: new sap.m.Button({
@@ -111,30 +110,11 @@ sap.ui.define([
                             this._oGuideDialog.close();
                             this._clearHighlights(aSteps);
                         }.bind(this)
-                    })
-                });
+                    }).addStyleClass("myUnifiedBtn")
+                }).addStyleClass("barheader");
                 this.getView().addDependent(this._oGuideDialog);
             }
-
             this._oGuideDialog.open();
         },
-
-        _highlightAllTiles: function (aSteps) {
-            aSteps.forEach(function (step) {
-                var oTile = this.byId(step.tileId);
-                if (oTile) {
-                    oTile.addStyleClass("highlightTile");
-                }
-            }.bind(this));
-        },
-
-        _clearHighlights: function (aSteps) {
-            aSteps.forEach(function (step) {
-                var oTile = this.byId(step.tileId);
-                if (oTile) {
-                    oTile.removeStyleClass("highlightTile");
-                }
-            }.bind(this));
-        }
     })
 })

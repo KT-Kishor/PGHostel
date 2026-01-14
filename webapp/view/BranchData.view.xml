@@ -52,7 +52,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Pincode"
-                        label="{i18n>pinCode}"
+                        label="{i18n>placeholderSearch}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -61,7 +61,7 @@
                                 id="MD_id_SearchField"
                                 width="250px"
                                 liveChange="onGlobalSearch"
-                                placeholder="{i18n>placeholderSearch}"
+                                placeholder="{i18n>pinCode}"
                             />
                         </fb:control>
                     </fb:FilterGroupItem>
