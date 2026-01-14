@@ -24,6 +24,7 @@
                 >
                     <Button
                         press="onAdminSIGNUP"
+                        text="{i18n>adminVendorRegistration}"
                         tooltip="{i18n>adminVendorRegistration}"
                         type="Transparent"
                         icon="sap-icon://employee"

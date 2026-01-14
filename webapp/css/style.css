@@ -1914,6 +1914,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
     width: 20px;
     height: 20px;
     line-height: 1.6rem !important ;
+      margin-right: 6px;            /* spacing before text */
 }
 
 /* FontAwesome icon */
@@ -1921,7 +1922,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
     content: "\f505";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    font-size: 20px;
+    font-size: 18px;
     color: #fff;
     display: inline-block;
     width: 20px;
@@ -1937,10 +1938,29 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* remove UI5 built-in hover background */
 .fa-admin-btn .sapMBtnInner {
+    display: flex;
+    align-items: center;
+    gap: 8px;                 /* space between icon & text */
     background: none !important;
     border: none !important;
 }
+/* Force button text white */
+.fa-admin-btn .sapMBtnContent bdi {
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+.fa-admin-btn:hover .sapMBtnContent bdi {
+    text-shadow: 0 0 6px rgba(255,255,255,0.35);
+}
 
+/* CENTER icon + text perfectly */
+.fa-admin-btn .sapMBtnContent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
 
 .fileErrorHighlight {
     border: 2px solid red !important;
