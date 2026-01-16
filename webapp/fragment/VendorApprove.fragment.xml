@@ -35,6 +35,7 @@
                     id="MIF_id_remark"
                     placeholder="{i18n>enterRemarks}"
                     maxLength="2000"
+                    valueStateText="{i18n>commentsValueState}"
                 />
             </f:content>
         </f:SimpleForm>

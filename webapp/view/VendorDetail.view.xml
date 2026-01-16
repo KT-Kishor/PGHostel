@@ -1,5 +1,4 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.ManageVendorDetail"
+<mvc:View controllerName="sap.ui.com.project1.controller.VendorDetail"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:m="sap.m"
     xmlns:suite="sap.suite.ui.commons"
@@ -13,31 +12,20 @@
     height="100%"
     xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
-    xmlns:u="sap.ui.unified"
->
-    <m:Page
-        navButtonPress="BI_onButtonPress"
-        showNavButton="true"
-        title="{i18n>MVDtitle}"
-    >
-        <m:headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </m:headerContent>
-        <ObjectPageLayout id="MV_id_ObjectPageLayout">
+    xmlns:u="sap.ui.unified">
+    <m:Page  title="{i18n>MVDtitle}">
+        <ObjectPageLayout id="V_id_ObjectPageLayout">
             <sections>
                 <ObjectPageSection
                     titleUppercase="false"
-                    id="MV_id_OrderHeaderSection1"
+                    id="V_id_OrderHeaderSection1"
                     title="{i18n>MVDpersonalDetails}"
                 >
                     <subSections>
-                        <ObjectPageSubSection id="MV_id_dsd1">
+                        <ObjectPageSubSection id="V_id_dsd1">
                             <blocks>
                                 <f:SimpleForm
-                                    id="Exp_Det_id_DimpleForm"
+                                    id="V_id_DimpleForm"
                                     editable="true"
                                     layout="ColumnLayout"
                                     labelSpanXL="4"
@@ -70,7 +58,7 @@
                                             required="true"
                                         />
                                         <m:ComboBox
-                                            id="MV_id_adminSalutation"
+                                            id="V_id_adminSalutation"
                                             selectedKey="{AdminSignupModel>/Salutation}"
                                             editable="{editable>/Edit}"
                                             change="onAdminChangeSalutation"
@@ -98,7 +86,7 @@
                                             value="{AdminSignupModel>/VendorName}"
                                             liveChange="onAdminLiveValidate"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_VendorName"
+                                            id="V_id_VendorName"
                                             valueStateText="{i18n>enterMVDname}"
                                             maxLength="50"
                                         />
@@ -113,7 +101,7 @@
                                             valueFormat="dd/MM/yyyy"
                                             change="onChangeDOB"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_VendorDOB"
+                                            id="V_id_VendorDOB"
                                             initialFocusedDateValue="{controller>/focusedDate}"
                                             minDate="{controller>/minDate}"
                                         />
@@ -125,7 +113,7 @@
                                             selectedKey="{AdminSignupModel>/Gender}"
                                             change="ADMIN_onChangeGender"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_Gender"
+                                            id="V_id_Gender"
                                             valueStateText="{i18n>MVgender}"
                                         >
                                             <core:Item
@@ -152,7 +140,7 @@
                                             placeholder="{i18n>enterEmailId}"
                                             liveChange="onAdminLiveValidate"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_Email"
+                                            id="V_id_Email"
                                             valueStateText="{i18n>MSenterValidEmail}"
                                         />
                                         <m:Label
@@ -162,7 +150,7 @@
                                         <m:ComboBox
                                             selectedKey="{AdminSignupModel>/Country}"
                                             change="ADMIN_onChangeCountry"
-                                            id="MV_id_Country"
+                                            id="V_id_Country"
                                             selectionChange="ADMIN_onChangeCountry"
                                             placeholder="{i18n>selectCountry}"
                                             valueStateText="{i18n>MVDselectcountry}"
@@ -188,7 +176,7 @@
                                             placeholder="{i18n>selectState}"
                                             valueStateText="{i18n>MSselectState}"
                                             showSecondaryValues="true"
-                                            id="MV_id_State"
+                                            id="V_id_State"
                                         >
                                             <core:ListItem
                                                 key="{StateModel>stateName}"
@@ -205,7 +193,7 @@
                                             selectionChange="ADMIN_onChangeCity"
                                             placeholder="{i18n>cityValueText}"
                                             valueStateText="{i18n>MSselectCity}"
-                                            id="MV_id_City"
+                                            id="V_id_City"
                                             items="{path:'CityModel>/', length:1000}"
                                             showSecondaryValues="true"
                                             editable="{editable>/Edit}"
@@ -230,7 +218,7 @@
                                             items="{path:'CountryModel>/', length:1000}"
                                             filterSecondaryValues="true"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_StdCode"
+                                            id="V_id_StdCode"
                                         >
                                             <core:ListItem
                                                 key="{CountryModel>stdCode}"
@@ -243,7 +231,7 @@
                                             maxLength="18"
                                             liveChange="ADMIN_onMobileLiveChange"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_MobileNo"
+                                            id="V_id_MobileNo"
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
                                         <m:Label
@@ -256,7 +244,7 @@
                                             rows="3"
                                             liveChange="onAdminLiveValidate"
                                             editable="{editable>/Edit}"
-                                            id="MV_id_Address"
+                                            id="V_id_Address"
                                             valueStateText="{i18n>enterMVDAddress}"
                                         />
                                     </f:content>
@@ -267,12 +255,12 @@
                 </ObjectPageSection>
                 <ObjectPageSection
                     titleUppercase="false"
-                    id="connections1"
+                    id="connections"
                     title="{i18n>MVDattachments}"
                 >
                     <subSections>
                         <ObjectPageSubSection
-                            id="connectionsSS4"
+                            id="connectionsSS"
                             titleUppercase="false"
                         >
                             <blocks>
@@ -288,7 +276,7 @@
                                         />
                                     </m:VBox>
                                     <m:Table
-                                        id="MV_id_adminAttachmentTable"
+                                        id="V_id_adminAttachmentTable"
                                         items="{AdminSignupModel>/Documents}"
                                         mode="SingleSelectLeft"
                                         sticky="ColumnHeaders,HeaderToolbar"
@@ -305,7 +293,7 @@
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:ComboBox
-                                                    id="MV_id_adminDocType"
+                                                    id="V_id_adminDocType"
                                                     selectedKey="{AdminSignupModel>/CurrentDocType}"
                                                     placeholder="{i18n>selectDocument}"
                                                     width="200px"
@@ -334,9 +322,11 @@
                                                     />
                                                 </m:ComboBox>
                                                 <!-- Upload button -->
-                                                <m:VBox id="MV_id_adminUploaderWrapper">
+                                                <m:VBox
+                                                    id="V_id_adminUploaderWrapper"
+                                                >
                                                     <u:FileUploader
-                                                        id="MV_id_adminFileUploader"
+                                                        id="V_id_adminFileUploader"
                                                         buttonOnly="true"
                                                         buttonText="{i18n>MVDupload}"
                                                         tooltip="{i18n>MVDupload}"
@@ -351,7 +341,7 @@
                                                     />
                                                 </m:VBox>
                                                 <m:Button
-                                                    id="AdminDeleteButton"
+                                                    id="V_id_AdminDeleteButton"
                                                     text="{i18n>MSdelete}"
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>MSdelete}"
@@ -359,7 +349,7 @@
                                                     enabled="false"
                                                 />
                                                 <m:Button
-                                                    id="AdminDownloadButton"
+                                                    id="V_id_AdminDownloadButton"
                                                     text="{i18n>download}"
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>download}"
@@ -413,29 +403,5 @@
                 </ObjectPageSection>
             </sections>
         </ObjectPageLayout>
-        <m:footer>
-            <m:Bar id="MV_id_FooterBar">
-                <m:contentRight>
-                    <m:Button
-                        id="MV_id_ApproveButton"
-                        text="{i18n>MVDapprove}"
-                        class="myUnifiedBtn"
-                        tooltip="{i18n>MVDapprove}"
-                        press="MI_onPressButtons"
-                        visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                        &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
-                    />
-                    <m:Button
-                        id="MV_id_SendBackButton"
-                        text="{i18n>sendBackRemark}"
-                        tooltip="{i18n>sendBackRemark}"
-                        class="myUnifiedBtn"
-                        press="MI_onPressButtons"
-                        visible="{= ${AdminSignupModel>/Status} !== 'Approved'
-                        &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
-                    />
-                </m:contentRight>
-            </m:Bar>
-        </m:footer>
     </m:Page>
 </mvc:View>

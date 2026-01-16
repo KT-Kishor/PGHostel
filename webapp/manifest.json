@@ -267,6 +267,13 @@
           "target": [
             "TargetManageVendorDetail"
           ]
+        },
+        {
+          "name": "RouteVendorDetail",
+          "pattern": "VendorDetail/{UserID}",
+          "target": [
+            "TargetVendorDetail"
+          ]
         }
       ],
       "targets": {
@@ -416,6 +423,13 @@
           "clearControlAggregation": false,
           "viewId": "ManageVendorDetail",
           "viewName": "ManageVendorDetail"
+      },
+      "TargetVendorDetail": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "VendorDetail",
+          "viewName": "VendorDetail"
       }
     }
     },

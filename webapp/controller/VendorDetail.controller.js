@@ -1,0 +1,756 @@
+sap.ui.define([
+    "./BaseController",
+    "../utils/validation",
+    "../model/formatter",
+    "sap/m/MessageToast",
+], function(BaseController, utils, Formatter, MessageToast) {
+    "use strict";
+    return BaseController.extend("sap.ui.com.project1.controller.VendorDetail", {
+        Formatter: Formatter,
+        onInit: function() {
+            this.getOwnerComponent().getRouter().getRoute("RouteVendorDetail").attachMatched(this._onRouteMatched, this);
+        },
+
+        _onRouteMatched: async function(oEvent) {
+            try {
+                var Layout = this.byId("V_id_ObjectPageLayout");
+                Layout.setSelectedSection(this.byId("V_id_OrderHeaderSection1"));
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                // Editable control model
+                const oEditableModel = new sap.ui.model.json.JSONModel({
+                    Edit: false,
+                    Save: false
+                });
+                this.getView().setModel(oEditableModel, "editable");
+                this._initAdminSignupModel();
+                this.sUserID = oEvent.getParameter("arguments").UserID;
+                await this._loadVendorDetails(this.sUserID);
+                this._applyCountryStateCityFilters();
+                this._makeDatePickersReadOnly(["V_id_VendorDOB"]);
+                sap.ui.core.BusyIndicator.hide();
+            } catch (err) {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        _initAdminSignupModel: function() {
+            const oModel = new sap.ui.model.json.JSONModel({
+                Salutation: "",
+                VendorName: "",
+                DateOfBirth: "",
+                Gender: "",
+                Email: "",
+                Country: "",
+                State: "",
+                City: "",
+                STDCode: "",
+                Mobile: "",
+                Address: "",
+                CurrentDocType: "",
+                Status: "",
+                Documents: [],
+                UploadEnabled: false,
+                DocTypeEnabled: true
+            });
+            this.getView().setModel(oModel, "AdminSignupModel");
+        },
+
+        _applyCountryStateCityFilters: function() {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const oCountryCB = this.byId("V_id_Country");
+            const oStateCB = this.byId("V_id_State");
+            const oSourceCB = this.byId("V_id_City");
+
+            const sCountry = oModel.getProperty("/Country"); // e.g. "Australia"
+            const sState = oModel.getProperty("/State"); // e.g. "Queensland"
+            const sSource = oModel.getProperty("/City"); // e.g. "Bongaree"
+
+            // Reset all filters
+            oStateCB.getBinding("items")?.filter([]);
+            oSourceCB.getBinding("items")?.filter([]);
+
+            if (sCountry) {
+                // Find countryCode by name
+                const aCountryData = this.getView().getModel("CountryModel").getData();
+                const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+
+                if (oCountryObj) {
+                    const sCountryCode = oCountryObj.code;
+
+                    // Filter States by Country
+                    oStateCB.getBinding("items")?.filter([
+                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                    ]);
+
+                    if (sState) {
+                        // Filter Cities by State + Country
+                        const aFilters = [
+                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
+                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        ];
+                        oSourceCB.getBinding("items")?.filter(aFilters);
+                    }
+                }
+            }
+
+            // Ensure values are set back in UI
+            oCountryCB.setValue(sCountry || "");
+            oStateCB.setValue(sState || "");
+            oSourceCB.setValue(sSource || "");
+        },
+
+        _loadVendorDetails: async function(sUserID) {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
+                    UserID: sUserID
+                });
+
+                const oData = oResponse.data;
+
+                // Normalize model structure
+                const oAdminData = {
+                    UserID: oData[0].UserID,
+                    Salutation: oData[0].Salutation,
+                    VendorName: oData[0].UserName,
+                    Email: oData[0].EmailID,
+                    Gender: oData[0].Gender,
+                    STDCode: oData[0].STDCode,
+                    Mobile: oData[0].MobileNo,
+                    Address: oData[0].Address,
+                    Country: oData[0].Country,
+                    State: oData[0].State,
+                    City: oData[0].City,
+                    Status: oData[0].Status,
+                    DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
+                    Documents: (oData[0].Documents || []).map(doc => ({
+                        FileName: doc.FileName,
+                        DocumentType: doc.DocumentType,
+                        size: doc.File ? atob(doc.File).length : 0,
+                        File: doc.File,
+                        FileType: doc.FileType,
+                        DocumentID: doc.DocumentID
+                    })),
+
+                    CurrentDocType: "",
+                    DocTypeEnabled: true
+                };
+
+                let oModel = this.getView().getModel("AdminSignupModel");
+                if (!oModel) {
+                    oModel = new sap.ui.model.json.JSONModel();
+                    this.getView().setModel(oModel, "AdminSignupModel");
+                }
+                oModel.setData(oAdminData);
+            } catch (err) {
+                MessageToast.show(this.i18nModel.getText("vendorLoadError"));
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        onDocumentTypeChange: function(oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onAdminFileSelect: function(oEvent) {
+            const oFile = oEvent.getParameter("files")[0];
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const sDocType = oModel.getProperty("/CurrentDocType");
+
+            if (!sDocType) {
+                MessageToast.show(this.i18nModel.getText("selectDocType"));
+                this.byId("V_id_adminFileUploader").clear();
+                return;
+            }
+
+            if (!oFile) {
+                return;
+            }
+
+            const aDocs = oModel.getProperty("/Documents") || [];
+            const bDuplicate = aDocs.some(oDoc => oDoc.DocumentType === sDocType);
+
+            if (bDuplicate) {
+                MessageToast.show(this.i18nModel.getText("reuploadDocType"));
+                this.byId("V_id_adminFileUploader").clear();
+                return;
+            }
+
+            const reader = new FileReader();
+            const that = this;
+            reader.onload = async function(e) {
+                try {
+                    const sBase64 = e.target.result.split(",")[1];
+                    const oPayload = {
+                        data: {
+                            CustomerID: oModel.getProperty("/UserID"),
+                            DocumentType: sDocType,
+                            File: sBase64,
+                            FileName: oFile.name,
+                            FileType: oFile.type
+                        }
+                    };
+
+                    sap.ui.core.BusyIndicator.show(0);
+                    await that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
+                    MessageToast.show(that.i18nModel.getText("docUploadSuccess"));
+                    await that._loadVendorDetails(oModel.getProperty("/UserID"));
+                    oModel.setProperty("/CurrentDocType", "");
+                    that.byId("V_id_adminFileUploader").clear();
+                } catch (err) {
+                    MessageToast.show(that.i18nModel.getText("docUploadError"));
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                }
+            };
+
+            reader.readAsDataURL(oFile);
+        },
+
+        onFileSizeExceeds: function() {
+            sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+        },
+
+        BI_onEditButtonPress: function() {
+            this.getView().getModel("editable").setProperty("/Edit", true);
+        },
+
+        onEditOrSavePress: async function() {
+            const oEditableModel = this.getView().getModel("editable");
+            const bEditMode = oEditableModel.getProperty("/Edit");
+
+            if (!bEditMode) {
+                // === EDIT MODE ===
+                oEditableModel.setProperty("/Edit", true);
+                oEditableModel.setProperty("/Save", true);
+            } else {
+                // === SAVE MODE ===
+                const bSaved = await this.BT_onsavebuttonpress(); // ✅ await result
+                if (bSaved === true) {
+                    oEditableModel.setProperty("/Edit", false);
+                    oEditableModel.setProperty("/Save", false);
+                }
+            }
+        },
+
+        BT_onsavebuttonpress: async function() {
+            try {
+                const C = this.byId.bind(this);
+                const oModel = this.getView().getModel("AdminSignupModel");
+                const oData = oModel.getData();
+                const std = (C("V_id_StdCode").getValue() || "").trim();
+
+                const isValid =
+                    utils._LCstrictValidationSelect(C("V_id_adminSalutation")) === true &&
+                    utils._LCvalidateName(C("V_id_VendorName"), "ID") === true &&
+                    utils._LCvalidateDate(C("V_id_VendorDOB"), "ID") === true &&
+                    utils._LCstrictValidationSelect(C("V_id_Gender")) === true &&
+                    utils._LCvalidateEmail(C("V_id_Email"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("V_id_Country"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("V_id_State"), "ID") === true &&
+                    utils._LCvalidateMandatoryField(C("V_id_City"), "ID") === true &&
+                    utils._LCstrictValidationComboBox(C("V_id_StdCode"), "ID") === true &&
+                    utils._LCvalidateISDmobile(C("V_id_MobileNo"), std) === true &&
+                    utils._LCvalidateAddress(C("V_id_Address")) === true;
+
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+                    return false;
+                }
+
+                const payload = {
+                    data: {
+                        UserID: oData.UserID,
+                        UserName: oData.VendorName,
+                        EmailID: oData.Email,
+                        Gender: oData.Gender,
+                        STDCode: oData.STDCode,
+                        MobileNo: oData.Mobile,
+                        Address: oData.Address,
+                        Country: oData.Country,
+                        State: oData.State,
+                        City: oData.City,
+                        DateOfBirth: oData.DOB
+                    },
+                    filters: {
+                        UserID: oData.UserID
+                    }
+                };
+
+                sap.ui.core.BusyIndicator.show(0);
+                await this.ajaxUpdateWithJQuery("HM_Login", payload);
+                await this._loadVendorDetails(oData.UserID);
+                sap.ui.core.BusyIndicator.hide();
+                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
+                return true;
+            } catch (err) {
+                MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
+                return false;
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        onAdminSelectionChange: function() {
+            this.byId("V_id_AdminDeleteButton").setEnabled(true);
+            this.byId("V_id_AdminDownloadButton").setEnabled(true);
+        },
+
+        onAdminDeleteFiles: function() {
+            const oTable = this.byId("V_id_adminAttachmentTable");
+            const oSelectedItem = oTable.getSelectedItem();
+
+            if (!oSelectedItem) {
+                return;
+            }
+
+            const oContext = oSelectedItem.getBindingContext("AdminSignupModel");
+            const sUserID = oContext.getModel().getProperty("/UserID");
+
+            // Common UI reset logic (used for confirm & cancel)
+            const fnResetSelection = () => {
+                oTable.removeSelections(true);
+                this.byId("V_id_AdminDeleteButton").setEnabled(false);
+                this.byId("V_id_AdminDownloadButton").setEnabled(false);
+            };
+
+            this.showConfirmationDialog(
+                "Confirm",
+                "Are you sure you want to delete this document?",
+                async () => {
+                        try {
+                            sap.ui.core.BusyIndicator.show(0);
+
+                            await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
+                                filters: {
+                                    DocumentID: oContext.getProperty("DocumentID"),
+                                    CustomerID: sUserID
+                                }
+                            });
+
+                            sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                            this._loadVendorDetails(sUserID); // refresh attachment list
+                            fnResetSelection();
+                        } catch (err) {
+                            sap.m.MessageToast.show(err.message || "Delete failed");
+                        } finally {
+                            sap.ui.core.BusyIndicator.hide();
+                        }
+                    },
+                    () => {
+                        // Cancel callback
+                        fnResetSelection();
+                    }
+            );
+        },
+
+        onAdminDownloadFiles: function() {
+            const oTable = this.byId("V_id_adminAttachmentTable");
+            const oContext = oTable.getSelectedItem()?.getBindingContext("AdminSignupModel");
+
+            if (!oContext) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectadoc"));
+                return;
+            }
+
+            const oData = oContext.getObject();
+
+            const sBase64 = oData.File;
+            const sMimeType = oData.FileType || "application/octet-stream";
+            const sFileName = oData.FileName || "document";
+
+            const byteCharacters = atob(sBase64);
+            const byteNumbers = new Array(byteCharacters.length);
+
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            const blob = new Blob([new Uint8Array(byteNumbers)], {
+                type: sMimeType
+            });
+            const sUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = sUrl;
+            link.download = sFileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(sUrl);
+
+            oTable.removeSelections(true);
+            this.byId("V_id_AdminDeleteButton").setEnabled(false);
+            this.byId("V_id_AdminDownloadButton").setEnabled(false);
+        },
+
+        onAdminPreviewDoc: function(oEvent) {
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") || // PNG
+                            last.startsWith("/9j") || // JPG
+                            last.startsWith("JVBER") // PDF
+                        ) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return last;
+            }
+
+            const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel")?.getObject();
+
+            if (!oDoc || !oDoc.File) {
+                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
+                return;
+            }
+
+            const sBase64 = autoDecodeBase64(oDoc.File);
+
+            let sMimeType = "application/octet-stream";
+            if (sBase64.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sBase64.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            }
+
+            if (sMimeType.startsWith("image/")) {
+
+                let sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+
+                if (!this._oAdminPreviewDialog) {
+
+                    const oFlex = new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        renderType: "Div",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [
+                            new sap.m.Image({
+                                id: this.createId("adminDocPreviewImage"),
+                                densityAware: false,
+                                width: "100%",
+                                height: "100%",
+                                style: "object-fit: contain; display:block;"
+                            })
+                        ]
+                    });
+
+                    this._oAdminPreviewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Image",
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        horizontalScrolling: false,
+                        verticalScrolling: true,
+                        content: [oFlex],
+
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: function() {
+                                this._oAdminPreviewDialog.close();
+                            }.bind(this)
+                        }),
+
+                        afterClose: function() {
+                            this._oAdminPreviewDialog.destroy();
+                            this._oAdminPreviewDialog = null;
+                        }.bind(this)
+                    });
+
+                    this.getView().addDependent(this._oAdminPreviewDialog);
+                } else {
+                    this._oAdminPreviewDialog.setTitle(oDoc.FileName || "Document Image");
+                }
+
+                this.byId("adminDocPreviewImage").setSrc(sImageSrc);
+                this._oAdminPreviewDialog.open();
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+
+                if (!this._oAdminPreviewDialog) {
+                    this._oAdminPreviewDialog = new sap.m.Dialog({
+                        title: "Document Preview",
+                        stretch: true,
+                        draggable: true,
+                        resizable: true,
+                        contentWidth: "50%",
+                        contentHeight: "50%",
+                        horizontalScrolling: true,
+                        verticalScrolling: false,
+                        contentPadding: "0rem",
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => {
+                                if (this._previewUrl) {
+                                    URL.revokeObjectURL(this._previewUrl);
+                                    this._previewUrl = null;
+                                }
+                                this._oAdminPreviewDialog.close();
+                            }
+                        }),
+                        afterClose: function() {
+                            this._oAdminPreviewDialog.destroy();
+                            this._oAdminPreviewDialog = null;
+                        }.bind(this)
+                    });
+
+                    this.getView().addDependent(this._oAdminPreviewDialog);
+                }
+
+                this._oAdminPreviewDialog.removeAllContent();
+
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, {
+                    type: sMimeType
+                });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._oAdminPreviewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                            <iframe
+                                src="${this._previewUrl}"
+                                style="width:100%; height:600px; border:none; display:block;">
+                            </iframe>
+                        `
+                    })
+                );
+
+                this._oAdminPreviewDialog.open();
+                return;
+            }
+
+            sap.m.MessageToast.show("Preview not supported.");
+        },
+
+        onAdminChangeSalutation: function(oEvent) {
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+            const oGender = this.byId("V_id_Gender");
+            oSalutation.setValueState("None");
+
+            if (!oGender) return;
+
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+
+            utils._LCstrictValidationSelect(oSalutation);
+        },
+
+        onAdminLiveValidate: function(oEvent) {
+            const id = oEvent.getSource().getId();
+
+            if (id.includes("V_id_VendorName")) { // Vendor name
+                utils._LCvalidateName(oEvent);
+                return;
+            }
+
+            if (id.includes("V_id_Email")) { // Email
+                utils._LCvalidateEmail(oEvent);
+                return;
+            }
+
+            if (id.includes("V_id_Address")) { // Address
+                utils._LCvalidateMandatoryField(oEvent);
+                return;
+            }
+        },
+
+        ADMIN_onChangeGender: function(oEvent) {
+            const oSelect = oEvent.getSource();
+            const key = oSelect.getSelectedKey();
+            this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
+            oSelect.setValueState(key ? "None" : "Error");
+        },
+
+        ADMIN_onChangeCountry: function(oEvent) {
+            const oCountry = oEvent.getSource();
+            const oView = this.getView();
+            const oModel = oView.getModel("AdminSignupModel");
+
+            const oState = this.byId("V_id_State");
+            const oCity = this.byId("V_id_City");
+            const oSTD = this.byId("V_id_StdCode");
+            const oMobile = this.byId("V_id_MobileNo");
+
+            // sanitize
+            oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
+
+            // reset model
+            ["State", "City", "STDCode", "Mobile"].forEach(p =>
+                oModel.setProperty("/" + p, "")
+            );
+
+            // reset UI
+            oState.setValue("").setSelectedKey("");
+            oCity.setValue("").setSelectedKey("");
+            oSTD.setValue("").setSelectedKey("");
+            oMobile.setValue("");
+
+            // block dependent dropdowns
+            oState.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
+            ]);
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+            ]);
+            oSTD.getBinding("items")?.filter([]);
+
+            const oItem = oCountry.getSelectedItem();
+            if (!oItem) {
+                oModel.setProperty("/Country", oCountry.getValue());
+                return;
+            }
+
+            const sCountry = oItem.getText();
+            const sCode = oItem.getAdditionalText().trim();
+            oModel.setProperty("/Country", sCountry);
+
+            // release states
+            oState.getBinding("items")?.filter([
+                new sap.ui.model.Filter("countryCode", "EQ", sCode)
+            ]);
+
+            // STD handling
+            const countries = this.getOwnerComponent().getModel("CountryModel").getData();
+            const data = countries.find(c => c.countryName === sCountry);
+            if (data?.stdCode) {
+                oModel.setProperty("/STDCode", data.stdCode);
+                oSTD.setValue(data.stdCode);
+                this.ADMIN_onChangeSTD();
+            }
+        },
+
+        ADMIN_onChangeState: function(oEvent) {
+            const oState = oEvent.getSource();
+            const oModel = this.getView().getModel("AdminSignupModel");
+
+            oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const sState =
+                oState.getSelectedItem()?.getText() ||
+                oState.getValue() || "";
+
+            oModel.setProperty("/State", sState);
+
+            const oCity = this.byId("V_id_City");
+            oCity.setValue("").setSelectedKey("");
+            oModel.setProperty("/City", "");
+
+            // block city
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+            ]);
+
+            const oCountry = this.byId("V_id_Country");
+            const sCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
+            if (!sCode || !sState) return;
+
+            // release cities
+            oCity.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", "EQ", sState),
+                new sap.ui.model.Filter("countryCode", "EQ", sCode)
+            ]);
+        },
+
+        ADMIN_onChangeCity: function(oEvent) {
+            const oCity = oEvent.getSource();
+            const oModel = this.getView().getModel("AdminSignupModel");
+
+            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const sCity =
+                oCity.getSelectedItem()?.getText() ||
+                oCity.getValue() || "";
+
+            oModel.setProperty("/City", sCity);
+        },
+
+        ADMIN_onChangeSTD: function() {
+            const oSTD = this.byId("V_id_StdCode");
+            const oMobile = this.byId("V_id_MobileNo");
+
+            const std = oSTD.getValue();
+
+            // Reset mobile field
+            oMobile.setValue("");
+            oMobile.setMaxLength(std === "+91" ? 10 : 18);
+
+            // Clear value states
+            oSTD.setValueState("None");
+            oMobile.setValueState("None");
+        },
+
+        ADMIN_onMobileLiveChange: function(oEvent) {
+            const oInput = oEvent.getSource();
+            let val = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(val);
+
+            if (!val) {
+                oInput.setValueState("None");
+                return;
+            }
+
+            const std = this.byId("V_id_StdCode").getValue();
+            const isValid = utils._LCvalidateISDmobile(oInput, std);
+
+            oInput.setValueState(isValid ? "None" : "Error");
+        },
+
+        onChangeDOB: function(oEvent) {
+            utils._LCvalidateDate(oEvent);
+        }
+    });
+});
