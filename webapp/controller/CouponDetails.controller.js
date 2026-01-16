@@ -678,7 +678,7 @@ sap.ui.define([
                 const oCtrl = sap.ui.getCore().byId(oView.createId(id));
                 if (oCtrl) {
                     oCtrl.setValueState(sap.ui.core.ValueState.None);
-                    oCtrl.setValueStateText("");
+                    // oCtrl.setValueStateText(""); ////
                 }
             });
         },

@@ -4774,7 +4774,7 @@ sap.ui.define([
 
                 sap.m.MessageBox.success(
                     "Thank you for signing up.\n\n" +
-                    "The team will review all submitted details and documents. Once verification is finished, an email containing the User ID and User Name will be sent.\n\n" +
+                    "The team will review all submitted details and documents. Once verification is finished, an email will be shared along with the user credentials.\n\n" +
                     "Please check your inbox (and spam folder) for further updates.",
                     {
                         title: "Registration Submitted Successfully",
@@ -5187,6 +5187,9 @@ sap.ui.define([
 
             // ✅ Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
+        },
+        ADMIN_onAddressChange: function (oEvent) {
+            utils._LCvalidateAddress(oEvent.getSource());
         },
 
         MPonAddressChange: function (oEvent) {

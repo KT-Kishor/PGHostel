@@ -118,7 +118,9 @@
     value="{AdminSignupModel>/Address}"
     rows="3"
     width="100%"
-    placeholder="Enter your full address">
+    placeholder="Enter your full address" 
+	maxLength="120"
+	change="ADMIN_onAddressChange">
 </TextArea>
 		</f:content>
 	</f:SimpleForm>
