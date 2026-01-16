@@ -947,7 +947,7 @@ sap.ui.define([
                 );
 
                 if (aFiltered.length === 0 || sCity) {
-                    await this._loadFilteredData(sCity, "", "");
+                    await this._loadFilteredData(sCity, "", "All");
                 } else {
                     await this._loadFilteredData(this.City, "", "");
                 }
