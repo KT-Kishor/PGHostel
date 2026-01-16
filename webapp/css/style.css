@@ -3656,3 +3656,50 @@ span.sapMBtnInner.sapMBtnEmphasized {
   color: #ffffff !important;
 }
 
+
+
+
+@media screen and (max-width: 850px) {
+    /* 1. Container: Fixed height hatao taaki faltu scroll na aaye */
+    #idHome .sapMScrollContScroll {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important; /* Auto height sabse zaroori hai */
+        min-height: 100vh !important; /* Kam se kam screen jitni height */
+        padding: 0 !important;
+        overflow-y: auto !important;
+    } 
+
+    /* 2. Grid Fix: SAP ke default containers ko stretch hone se roko */
+    .fullHeightGrid {
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
+    }
+
+    /* 3. Hero Text Box: Exact 5% gap from top */
+    .heroTextBox {
+        margin-top: 2vh !important; 
+        margin-left: -2vh !important;
+        margin-right: auto !important;
+        width: 100% !important;
+        position: relative !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* 4. Button Wrapper: Margin-top se 50% position */
+    .exploreBtnWrapper {
+        /* Hum margin-top use karenge jo text ke niche se space banayega */
+        /* 28vh + HeroText height (~15vh) + Top 5vh = ~48-50% position */
+        margin-top: 15vh !important; 
+        
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-bottom: 20px !important; /* Niche thodi jagah */
+        position: relative !important;
+    }
+    .exploreBtn{
+      margin-left: -5% !important;
+    }
+}

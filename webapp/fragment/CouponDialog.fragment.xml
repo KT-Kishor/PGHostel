@@ -19,15 +19,6 @@
                         text="{= ${CouponView>/DialogMode} === 'Add' ? 'Add Coupon' : 'Edit Coupon'}"
                     />
                 </contentMiddle>
-                <contentRight>
-                    <Button
-                        class="myUnifiedBtn"
-                        icon="sap-icon://decline"
-                        tooltip="{i18n>close}"
-                        type="Transparent"
-                        press="onDialogClose"
-                    />
-                </contentRight>
             </Bar>
         </customHeader>
         <content>
@@ -187,5 +178,15 @@
                 press="onSaveCoupon"
             />
         </beginButton>
+        <endButton>
+    <Button
+        type="Emphasized"
+        class="myUnifiedBtn"
+        text="{i18n>CancelButton}"
+        tooltip="{i18n>CancelButton}"
+        press="onDialogClose"
+    />
+</endButton>
+
     </Dialog>
 </core:FragmentDefinition>
