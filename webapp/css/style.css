@@ -2197,9 +2197,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
   position: relative;
   overflow: hidden;
   transition: all 0.25s ease;
-  /* box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.35); */
 }
 
 /* Remove default white tile background */
@@ -2258,40 +2255,13 @@ span.sapMBtnInner.sapMBtnEmphasized {
       transparent 70%);
 
   transform: translateX(-120%);
-  animation: glassShimmer 3.8s ease-in-out infinite;
+  /* animation: glassShimmer 3.8s ease-in-out infinite; */
 
   pointer-events: none;
   z-index: 2;
   /* above glass, below content */
 }
 
-@keyframes glassShimmer {
-
-  0%,
-  60% {
-    transform: translateX(-120%);
-  }
-
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-
-/* .glassTile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.35),
-    rgba(255,255,255,0.05)
-  );
-  pointer-events: none;
-} */
-
-/* Unit / sub text */
 .glassTile .sapMGTSubHdrTxt,
 .glassTile .sapMGTContentTxt {
   color: rgba(255, 255, 255, 0.9) !important;
@@ -2300,13 +2270,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .glassTile .sapMGTValue {
   color: #ffffff !important;
 }
-
-/* Icons inside tile */
-/* .glassTile .sapMImg,
-.glassTile .sapUiIcon {
-  color: #ffffff !important;
-  fill: #ffffff !important;
-} */
 
 /* Remove default gray backgrounds */
 .glassTile .sapMGTContent {
@@ -2319,21 +2282,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 
 /* class="sapMTileCntFtrTxt sapMTileCntFooterTextColorNeutral" */
-.glassTile:hover {
+/* .glassTile:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow:
     0 28px 50px rgba(0, 0, 0, 0.35),
     0 10px 18px rgba(0, 0, 0, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.45);
   transition: 0.25s ease;
-}
-
-/* .glassTile .sapMImg,
-.glassTile .sapUiIcon {
-  color: #ffffff !important;
-  top: -1px;
-  fill: #ffffff !important;
 } */
+
 .glassTile .sapUiIcon,
 .glassTile .sapMImg {
   color: #ffffff !important;
@@ -3307,14 +3264,9 @@ span.sapMBtnInner.sapMBtnEmphasized {
   }
 }
 
-
-
-
-
 .explore-enter {
   animation: screenEdgeSlide 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-
 
 /* Butter-smooth, premium motion */
 @keyframes screenEdgeSlide {
@@ -3434,7 +3386,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
     animation-play-state: paused;
   }
 }
-
 
 @media screen and (max-width: 1024px) {
     .exploreBtnWrapper {
