@@ -90,15 +90,15 @@ sap.ui.define([
             if (!this._oGuideDialog) {
                 this._oGuideDialog = new sap.m.Dialog({
                     title: "Steps to Know",
-                    contentWidth: "900px",
-                    contentHeight: "600px",
+                    contentWidth: "40vw",
+                    contentHeight: "auto",
                     resizable: true,
                     draggable: true,
                     content: [
                         new sap.m.Image({
-                            src: "image/PG I1 BETTER.png",
+                            src: "image/perfect for steps guide PG.png",
                             width: "100%",
-                            height: "100%",
+                            height: "1000%",
                             decorative: false,
                             densityAware: false,
                             style: "object-fit: cover; display:block; margin:0; padding:0;"
@@ -108,7 +108,6 @@ sap.ui.define([
                         text: "Close",
                         press: function () {
                             this._oGuideDialog.close();
-                            this._clearHighlights(aSteps);
                         }.bind(this)
                     }).addStyleClass("myUnifiedBtn")
                 }).addStyleClass("barheader");
