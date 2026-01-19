@@ -92,6 +92,21 @@
                     />
                     <Label
                         required="true"
+                        text="{i18n>UptoValue}"
+                    />
+                    <Input
+                        id="inUptoValue"
+                        placeholder="{i18n>enterMaxDiscountValue}"
+                        value="{CouponView>/CurrentCoupon/UptoValue}"
+                        type="Number"
+                        liveChange="onLiveChange_UptoValue"
+                        maxLength="10"
+                        valueStateText="{i18n>enterMaxDiscountValue}"
+                        enabled="{CouponView>/isUptoEnabled}"
+                    />
+
+                    <Label
+                        required="true"
                         text="{i18n>CDMaxUses}"
                     />
                     <Input
@@ -139,6 +154,16 @@
                             text="Expired"
                         />
                     </ComboBox>
+                    <Label required="true" text="{i18n>CDDescription}" />
+                    <TextArea 
+                        placeholder="{i18n>CDDescription}"
+                        id="inDescription"
+                        value="{CouponView>/CurrentCoupon/Description}"
+                        liveChange="onLiveChange_Description" 
+                        maxLength="200"
+                        rows="3"
+                        valueStateText="{i18n>enterCouponDescription}"
+                    ></TextArea>
                     <Label
                         required="true"
                         text="{i18n>startDate}"
