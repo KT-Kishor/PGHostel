@@ -273,10 +273,10 @@ sap.ui.define([
                 const oData = {
                     data: {
                         BranchCode: Payload.BranchCode,
-                        Name: Payload.Name,
+                        Name: Payload.Name.trim(),
                         ACType: Payload.ACType,
-                        NoOfPerson: Payload.NoOfPerson,
-                        MaxBeds: Payload.MaxBeds,
+                        NoOfPerson: Payload.NoOfPerson.trim(),
+                        MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
                         Description: Payload.Description    
 
