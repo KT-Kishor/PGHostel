@@ -211,6 +211,15 @@
                             tooltip="{i18n>CDDiscountValue}"
                         />
                     </Column>
+                                        <Column
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text
+                            text="{i18n>UptoValue}"
+                            tooltip="{i18n>UptoValue}"
+                        />
+                    </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
@@ -278,6 +287,8 @@
                             <Text
                                 text="{   parts: [      { path: 'CouponModel>DiscountValue' },      { path: 'CouponModel>DiscountType' }   ],   formatter: '.Formatter.formatDiscountValue'		}"
                             />
+                            <Text
+                                text="{CouponModel>UptoValue}"/>
                             <Text text="{CouponModel>MaxUses}" />
                             <!-- <Text text="{CouponModel>UsedCount}" /> -->
                             <!-- <Text text="{CouponModel>PerUserLimit}" /> -->
