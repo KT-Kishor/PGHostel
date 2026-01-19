@@ -647,90 +647,122 @@ sap.ui.define([
                 return;
             }
         },
-        HM_DeleteRoom: function () {
-            var CustData = this.getView().getModel("HostelModel").getData()
-            var table = this.byId("id_ARD_Table");
-            var aSelectedItems = table.getSelectedItems();
+      HM_DeleteRoom: function () {
+    var CustData = this.getView().getModel("HostelModel").getData();
+    var table = this.byId("id_ARD_Table");
+    var aSelectedItems = table.getSelectedItems();
 
-            if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
-                return;
-            }
+    // No selection
+    if (aSelectedItems.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
+        );
+        return;
+    }
 
-            // Get all selected room numbers for display
-            var sRoomNos = aSelectedItems.map(item => {
-                return item.getBindingContext("RoomDetailsModel").getObject().RoomNo;
-            }).join(", ");
+    var aAssignedRooms = [];
+    var aDeletableRooms = [];
 
-            var bAssignedExists = aSelectedItems.some(item => {
-                var oBed = item.getBindingContext("RoomDetailsModel").getObject();
+    // Split assigned & non-assigned rooms
+    aSelectedItems.forEach(item => {
+        var oRoom = item
+            .getBindingContext("RoomDetailsModel")
+            .getObject();
 
-                return CustData.some(cust =>
-                    cust.BranchCode === oBed.BranchCode &&
-                    cust.BedType === oBed.BedTypeName &&
-                    cust.Status === "Assigned"
-                );
+        var bAssigned = CustData.some(cust =>
+            cust.BranchCode === oRoom.BranchCode &&
+            cust.BedType === oRoom.BedTypeName &&
+            cust.Status === "Assigned"
+        );
+
+        if (bAssigned) {
+            aAssignedRooms.push(oRoom.RoomNo);
+        } else {
+            aDeletableRooms.push({
+                roomNo: oRoom.RoomNo,
+                item: item
             });
+        }
+    });
 
-            if (bAssignedExists) {
-                sap.m.MessageBox.warning("Cannot delete! Selected bed is already assigned.");
-                return;
-            }
+    // Single selection & assigned → stop
+    if (aSelectedItems.length === 1 && aAssignedRooms.length === 1) {
+        sap.m.MessageBox.warning(
+            "Cannot delete! Selected room is already assigned."
+        );
+        return;
+    }
 
-            sap.m.MessageBox.confirm(
-                `Are you sure you want to Delete the Selected Room(s): ${sRoomNos}?`, {
-                title: "Confirm Deletion",
-                icon: sap.m.MessageBox.Icon.WARNING,
-                actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                onClose: async function (sAction) {
-                    if (sAction === sap.m.MessageBox.Action.OK) {
+    // All selected rooms are assigned
+    if (aDeletableRooms.length === 0) {
+        sap.m.MessageBox.warning(
+            "All selected rooms are already assigned and cannot be deleted."
+        );
+        return;
+    }
 
+    // Show only non-assigned room numbers
+    var sRoomNos = aDeletableRooms
+        .map(room => room.roomNo)
+        .join(", ");
 
-                        try {
-                            // Create delete requests for all selected rooms
-                            const deletePromises = aSelectedItems.map((item) => {
-                                var data = item.getBindingContext("RoomDetailsModel").getObject();
-                                var oBody = {
+    sap.m.MessageBox.confirm(
+        `Are you sure you want to delete the following room(s): ${sRoomNos}?`,
+        {
+            title: "Confirm Deletion",
+            icon: sap.m.MessageBox.Icon.WARNING,
+            actions: [
+                sap.m.MessageBox.Action.OK,
+                sap.m.MessageBox.Action.CANCEL
+            ],
+            onClose: async function (sAction) {
+                if (sAction === sap.m.MessageBox.Action.OK) {
+                    sap.ui.core.BusyIndicator.show(0);
+                    try {
+                        const deletePromises = aDeletableRooms.map(roomObj => {
+                            var data = roomObj.item
+                                .getBindingContext("RoomDetailsModel")
+                                .getObject();
+
+                            return $.ajax({
+                                url: "https://rest.kalpavrikshatechnologies.com/HM_Rooms",
+                                method: "DELETE",
+                                contentType: "application/json",
+                                data: JSON.stringify({
                                     filters: {
                                         RoomNo: data.RoomNo
                                     }
-                                };
-
-                                return $.ajax({
-                                    url: "https://rest.kalpavrikshatechnologies.com/HM_Rooms",
-                                    method: "DELETE",
-                                    contentType: "application/json",
-                                    data: JSON.stringify(oBody),
-                                    headers: {
-                                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-                                    }
-                                });
+                                }),
+                                headers: {
+                                    name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                                    password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+                                }
                             });
-                            sap.ui.core.BusyIndicator.show(0);
-                            // Wait for all deletions to finish
-                            await Promise.all(deletePromises);
+                        });
 
+                        await Promise.all(deletePromises);
 
-                            // Refresh table + bed details after delete
+                        // Refresh data
+                        await this.BedTypedetails();
+                        await this.Onsearch("true");
 
-                            await this.BedTypedetails();
-                            await this.Onsearch("true");
-                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRoomDeletedSuccessfully"));
-
-                            //  sap.ui.core.BusyIndicator.hide();
-
-                        } catch (error) {
-                            console.error("Delete Failed:", error);
-                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRoomPleasetryagain"));
-                        } finally {
-                            table.removeSelections(true);
-                        }
+                        sap.m.MessageToast.show(
+                            this.i18nModel.getText("selectedRoomDeletedSuccessfully")
+                        );
+                    } catch (error) {
+                        console.error("Delete Failed:", error);
+                        sap.m.MessageBox.error(
+                            this.i18nModel.getText("errorwhileDeletingRoomPleasetryagain")
+                        );
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                        table.removeSelections(true);
                     }
-                }.bind(this)
-            }
-            );
-        },
+                }
+            }.bind(this)
+        }
+    );
+},
 
         Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();

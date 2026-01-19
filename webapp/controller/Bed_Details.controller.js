@@ -551,82 +551,116 @@ sap.ui.define([
             })
         },
 
-        HM_DeleteDetails: function () {
-            var CustData=this.getView().getModel("HostelModel").getData()
-            var table = this.byId("id_BedTable");
-            var aSelectedItems = table.getSelectedItems();
+       HM_DeleteDetails: function () {
+    var CustData = this.getView().getModel("HostelModel").getData();
+    var table = this.byId("id_BedTable");
+    var aSelectedItems = table.getSelectedItems();
 
-            if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
-                return;
-            }
+    // No selection
+    if (aSelectedItems.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
+        );
+        return;
+    }
 
-            // Collect bed names for confirmation display
-            var sBedNames = aSelectedItems.map(item => {
-                return item.getBindingContext("BedDetails").getObject().Name;
-            }).join(", ");
-           var bAssignedExists = aSelectedItems.some(item => {
-    var oBed = item.getBindingContext("BedDetails").getObject();
-    return CustData.some(cust => 
-        cust.BranchCode === oBed.BranchCode &&
-        cust.BedType === oBed.Name +" - "+ oBed.ACType &&
-        cust.Status === "Assigned"
-    );
-});
+    var aAssignedBeds = [];
+    var aDeletableBeds = [];
 
-if (bAssignedExists) {
-    sap.m.MessageBox.warning("Cannot delete! Selected bed is already assigned.");
-    return;
-}
-            
+    // Split assigned & non-assigned beds
+    aSelectedItems.forEach(item => {
+        var oBed = item.getBindingContext("BedDetails").getObject();
 
-            sap.m.MessageBox.confirm(
-                `Are you sure you want to Delete the Selected Bed(s): ${sBedNames}?`, {
-                title: "Confirm Deletion",
-                icon: sap.m.MessageBox.Icon.WARNING,
-                actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                onClose: async function (sAction) {
-                    if (sAction === sap.m.MessageBox.Action.OK) {
-                        sap.ui.core.BusyIndicator.show(0);
-                        try {
-                            // Create array of delete promises
-                            const deletePromises = aSelectedItems.map((item) => {
-                                const data = item.getBindingContext("BedDetails").getObject();
-                                const oBody = {
-                                    filters: {
-                                        ID: data.ID
-                                    }
-                                };
+        var bAssigned = CustData.some(cust =>
+            cust.BranchCode === oBed.BranchCode &&
+            cust.BedType === (oBed.Name + " - " + oBed.ACType) &&
+            cust.Status === "Assigned"
+        );
 
-                                return $.ajax({
-                                    url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
-                                    method: "DELETE",
-                                    contentType: "application/json",
-                                    data: JSON.stringify(oBody),
-                                    headers: {
-                                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-                                    }
-                                });
+        if (bAssigned) {
+            aAssignedBeds.push(oBed.Name);
+        } else {
+            aDeletableBeds.push({
+                name: oBed.Name,
+                item: item
+            });
+        }
+    });
+
+    // Single selection & assigned → stop
+    if (aSelectedItems.length === 1 && aAssignedBeds.length === 1) {
+        sap.m.MessageBox.warning(
+            "Cannot delete! Selected bed is already assigned."
+        );
+        return;
+    }
+
+    // All selected beds are assigned
+    if (aDeletableBeds.length === 0) {
+        sap.m.MessageBox.warning(
+            "All selected beds are already assigned and cannot be deleted."
+        );
+        return;
+    }
+
+    // Show only non-assigned bed names in confirm dialog
+    var sBedNames = aDeletableBeds
+        .map(bed => bed.name)
+        .join(", ");
+
+    sap.m.MessageBox.confirm(
+        `Are you sure you want to delete the following bed(s): ${sBedNames}?`,
+        {
+            title: "Confirm Deletion",
+            icon: sap.m.MessageBox.Icon.WARNING,
+            actions: [
+                sap.m.MessageBox.Action.OK,
+                sap.m.MessageBox.Action.CANCEL
+            ],
+            onClose: async function (sAction) {
+                if (sAction === sap.m.MessageBox.Action.OK) {
+                    sap.ui.core.BusyIndicator.show(0);
+                    try {
+                        const deletePromises = aDeletableBeds.map(bedObj => {
+                            const data = bedObj.item
+                                .getBindingContext("BedDetails")
+                                .getObject();
+
+                            return $.ajax({
+                                url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+                                method: "DELETE",
+                                contentType: "application/json",
+                                data: JSON.stringify({
+                                    filters: { ID: data.ID }
+                                }),
+                                headers: {
+                                    name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                                    password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+                                }
                             });
+                        });
 
-                            // Wait for all deletions to complete
-                            await Promise.all(deletePromises);
-                            await this.Onsearch("true");
-                            sap.m.MessageToast.show(this.i18nModel.getText("selectedBedDeletedSuccessfully"));
+                        await Promise.all(deletePromises);
+                        await this.Onsearch("true");
 
-                        } catch (error) {
-                            console.error("Delete failed:", error);
-                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain"));
-                        } finally {
-                            sap.ui.core.BusyIndicator.hide();
-                            table.removeSelections(true);
-                        }
+                        sap.m.MessageToast.show(
+                            this.i18nModel.getText("selectedBedDeletedSuccessfully")
+                        );
+                    } catch (error) {
+                        console.error("Delete failed:", error);
+                        sap.m.MessageBox.error(
+                            this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain")
+                        );
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                        table.removeSelections(true);
                     }
-                }.bind(this)
-            }
-            );
-        },
+                }
+            }.bind(this)
+        }
+    );
+}
+,
 
         BD_onDownload: function () {
             const oModel = this.byId("id_BedTable").getModel("BedDetails").getData();

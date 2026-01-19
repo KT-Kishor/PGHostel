@@ -59,12 +59,40 @@ sap.ui.define([
                 await this.onClearAndSearch("MD_id_Filterbar");
                 await this.Onsearch();
                 this.commonLoginFunction();
+                await this.Customerdata()
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
+  Customerdata: function () {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+            let filters = {};
+
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchCode = aBranchCodes;
+                filters.Role = "Admin";
+            } else {
+                filters.BranchCode = "";
+            }
+            this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
+
+                const oModel = new sap.ui.model.json.JSONModel(response.Customers);
+                this.getView().setModel(oModel, "HostelModel");
+
+                sap.ui.core.BusyIndicator.hide();
+            }).catch(() => sap.ui.core.BusyIndicator.hide());
+        },
         Onsearch: async function () {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
 
@@ -591,59 +619,114 @@ sap.ui.define([
         },
 
         MD_DeleteRow: function () {
-            var oTable = this.byId("id_MD_Table");
-            var aSelectedItems = oTable.getSelectedItems();
+    var oTable = this.byId("id_MD_Table");
+    var aSelectedItems = oTable.getSelectedItems();
+    var CustData = this.getView().getModel("HostelModel").getData();
 
-            if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"));
-                return;
-            }
+    // No selection
+    if (aSelectedItems.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
+        );
+        return;
+    }
 
-            var sRoomNos = aSelectedItems.map(item => {
-                return item.getBindingContext("mainModel").getObject().BranchID;
-            }).join(", ");
-            sap.m.MessageBox.confirm(
-                `Are you sure you want to Delete the Selected Room(s): ${sRoomNos}?`, {
-                icon: sap.m.MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
-                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                emphasizedAction: sap.m.MessageBox.Action.NO,
+    var aAssignedBranches = [];
+    var aDeletableBranches = [];
 
-                onClose: async (sAction) => {
-                    if (sAction === sap.m.MessageBox.Action.YES) {
+    // Split assigned & non-assigned branches
+    aSelectedItems.forEach(oItem => {
+        var oData = oItem.getBindingContext("mainModel").getObject();
 
-                        sap.ui.core.BusyIndicator.show(0);
+        var bAssigned = CustData.some(cust =>
+            cust.BranchCode === oData.BranchID &&
+            cust.Status === "Assigned"
+        );
 
-                        try {
-                            // let oContext = oItem.getBindingContext("mainModel");
-                            // let oData = oContext.getObject();
-                            var sUserID = this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID;
-                            for (let oItem of aSelectedItems) {
-                                const oContext = oItem.getBindingContext("mainModel");
-                                const oData = oContext.getObject();
-                                await this.ajaxDeleteWithJQuery("HM_Branch", {
-                                    filters: {
-                                        UserID: sUserID,
-                                        BranchID: oData.BranchID
-                                    }
-                                });
-                            }
+        if (bAssigned) {
+            aAssignedBranches.push(oData.BranchID);
+        } else {
+            aDeletableBranches.push({
+                branchId: oData.BranchID,
+                item: oItem
+            });
+        }
+    });
 
-                            sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully"));
-                            await this.Onsearch();
+    // Single selection & assigned → stop
+    if (aSelectedItems.length === 1 && aAssignedBranches.length === 1) {
+        sap.m.MessageBox.warning(
+            "Cannot delete! Selected branch is already assigned."
+        );
+        return;
+    }
 
-                        } catch (err) {
-                            console.error("Delete failed:", err);
-                            sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain"));
-                        } finally {
-                            sap.ui.core.BusyIndicator.hide();
-                            oTable.removeSelections(true);
+    // All selected branches are assigned
+    if (aDeletableBranches.length === 0) {
+        sap.m.MessageBox.warning(
+            "All selected branches are already assigned and cannot be deleted."
+        );
+        return;
+    }
+
+    // Show only non-assigned branch IDs
+    var sBranchIds = aDeletableBranches
+        .map(b => b.branchId)
+        .join(", ");
+
+    sap.m.MessageBox.confirm(
+        `Are you sure you want to delete the following branch(es): ${sBranchIds}?`,
+        {
+            icon: sap.m.MessageBox.Icon.WARNING,
+            title: "Confirm Deletion",
+            actions: [
+                sap.m.MessageBox.Action.YES,
+                sap.m.MessageBox.Action.NO
+            ],
+            emphasizedAction: sap.m.MessageBox.Action.NO,
+
+            onClose: async (sAction) => {
+                if (sAction === sap.m.MessageBox.Action.YES) {
+                    sap.ui.core.BusyIndicator.show(0);
+
+                    try {
+                        var sUserID = this
+                            .getOwnerComponent()
+                            .getModel("LoginModel")
+                            .getData()
+                            .EmployeeID;
+
+                        // Delete only non-assigned branches
+                        for (let oBranch of aDeletableBranches) {
+                            await this.ajaxDeleteWithJQuery("HM_Branch", {
+                                filters: {
+                                    UserID: sUserID,
+                                    BranchID: oBranch.branchId
+                                }
+                            });
                         }
+
+                        sap.m.MessageToast.show(
+                            this.i18nModel.getText("selectedRecordsDeletedSuccessfully")
+                        );
+
+                        await this.Onsearch();
+
+                    } catch (err) {
+                        console.error("Delete failed:", err);
+                        sap.m.MessageBox.error(
+                            this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
+                        );
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                        oTable.removeSelections(true);
                     }
                 }
             }
-            );
-        },
+        }
+    );
+},
+
 
         MD_UpdateTableRow: function () {
             var oView = this.getView();
