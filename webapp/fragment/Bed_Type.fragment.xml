@@ -128,6 +128,26 @@
                     maxLength="7"
                     liveChange="onNoOfPersonInputLiveChange"
                 />
+                  <Label
+                    text="{i18n>currency}"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_id_DepositCurrency"
+                    selectedKey="{BedModel>/DepositCurrency}"
+                    items="{path:'CountryModel>/',length:1000}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    change="onDepositCurrency"
+                    placeholder="{i18n>selectCurrency}"
+                    showSecondaryValues="true"
+                >
+                    <core:ListItem
+                        key="{CountryModel>currency}"
+                        text="{CountryModel>currency}"
+                        additionalText="{CountryModel>countryName}"
+                    />
+                </ComboBox>
 
                 <Label
                     text="{i18n>description}"

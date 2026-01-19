@@ -65,8 +65,12 @@
                                 showClearIcon="true"
                             >
                                 <core:ListItem
-                                    key="{BedDetails>ACType}"
-                                    text="{BedDetails>ACType}"
+                                    key="AC"
+                                    text="AC"
+                                />
+                                <core:ListItem
+                                    key="NON-AC"
+                                    text="NON-AC"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -84,7 +88,9 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>bedList} ({= ${BedDetails>/}.length})" />
+                        <Title
+                            text="{i18n>bedList} ({= ${BedDetails>/}.length})"
+                        />
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>addBed}"
@@ -134,7 +140,7 @@
                             tooltip="{i18n>noofPerson}"
                         />
                     </Column>
-                     <Column
+                    <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
@@ -163,8 +169,10 @@
                             <Text text="{BedDetails>ACType}" />
                             <Text text="{BedDetails>MaxBeds}" />
                             <Text text="{BedDetails>NoOfPerson}" />
-                            <Text text="{BedDetails>Deposit}" />
-
+                             <Text
+                                text="{parts: ['BedDetails>Deposit','BedDetails>DepositCurrency'],
+									formatter: '.Formatter.formatPrice'}"
+                            />
                             <ExpandableText
                                 text="{BedDetails>Description}"
                                 maxCharacters="20"

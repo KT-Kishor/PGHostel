@@ -153,7 +153,27 @@
                                             valueStateText="Enter Deposit Amount"
                                             editable="{editable>/Edit}"
                                         />
-
+ <m:Label
+                    text="{i18n>currency}"
+                    required="true"
+                />
+                <m:ComboBox
+                    id="id_DepositCurrency"
+                    selectedKey="{BedImageModel>/DepositCurrency}"
+                    items="{path:'CountryModel>/',length:1000}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    change="onDepositCurrency"
+                    placeholder="{i18n>selectCurrency}"
+                    editable="{editable>/Edit}"
+                    showSecondaryValues="true"
+                >
+                    <core:ListItem
+                        key="{CountryModel>currency}"
+                        text="{CountryModel>currency}"
+                        additionalText="{CountryModel>countryName}"
+                    />
+                </m:ComboBox>
                                         <m:Label
                                             text="{i18n>description}"
                                             required="true"

@@ -108,10 +108,7 @@ sap.ui.define([
 
             // IMPORTANT FIX
             // Apply LoginModel BranchCode only if user did not select BranchCode in filter
-            if (
-                oExistingModel.Role === "Admin" &&
-                !filter.BranchCode
-            ) {
+            if (  oExistingModel.Role === "Admin" && aBranchCodes) {
                 filter.BranchCode = aBranchCodes;
                 filter.Role ="Admin";
 

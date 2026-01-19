@@ -110,6 +110,9 @@ sap.ui.define([
                 this.getView().setModel(model, "BedDetails")
             })
         },
+          onDepositCurrency: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
 
         refershModel: function(BEdID) {
             var that = this;
@@ -278,6 +281,7 @@ sap.ui.define([
                         NoOfPerson: Payload.NoOfPerson.trim(),
                         MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
+                        DepositCurrency: Payload.DepositCurrency,
                         Description: Payload.Description    
 
                     },

@@ -2,11 +2,13 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "sap/m/MessageToast",
-    "sap/ui/export/Spreadsheet"
+    "sap/ui/export/Spreadsheet",
+      "../model/formatter"
 ], function (BaseController, utils, MessageToast,
-    Spreadsheet) {
+    Spreadsheet,Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Bed_Details", {
+          Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
@@ -170,7 +172,7 @@ sap.ui.define([
                 utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_DepositAmount"), "ID") &&
-
+                utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID")&&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
             ) {
                 var Attachment = oView.getModel("tokenModel").getData();
@@ -216,6 +218,7 @@ sap.ui.define([
                         NoOfPerson: Payload.NoOfPerson.trim(),
                         MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
+                        DepositCurrency: Payload.DepositCurrency,
                         Description: Payload.Description
                     },
                     Attachment: {}
@@ -659,8 +662,10 @@ sap.ui.define([
             }.bind(this)
         }
     );
-}
-,
+},
+  onDepositCurrency: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
 
         BD_onDownload: function () {
             const oModel = this.byId("id_BedTable").getModel("BedDetails").getData();
