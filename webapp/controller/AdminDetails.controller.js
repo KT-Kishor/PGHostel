@@ -2480,8 +2480,8 @@ if (sStartDate && sEndDate) {
             // Check discount type
             if (oCoupon.DiscountType === "Percentage") {
                 discountAmount = (subtotal* Number(oCoupon.DiscountValue || 0)) / 100;
-                    if (oCoupon.uptoValue > 0 && discountAmount > oCoupon.uptoValue) {
-                       discountAmount = uptoValue;
+                    if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
+                       discountAmount = Number(oCoupon.UptoValue);
                     }
                 newSubtotal = subtotal - discountAmount;
             } else if (oCoupon.DiscountType === "Fixed Amount") {
