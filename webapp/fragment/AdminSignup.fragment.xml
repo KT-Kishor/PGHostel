@@ -120,7 +120,7 @@
     width="100%"
     placeholder="Enter your full address" 
 	maxLength="120"
-	change="ADMIN_onAddressChange">
+	liveChange="ADMIN_onAddressChange">
 </TextArea>
 		</f:content>
 	</f:SimpleForm>
@@ -153,7 +153,8 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column>
+					<Column minScreenWidth="Tablet"
+                        demandPopin="true" >
 						<Text text="{i18n>filename}" />
 					</Column>
 					<Column>

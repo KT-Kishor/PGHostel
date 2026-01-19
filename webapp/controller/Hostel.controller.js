@@ -340,8 +340,15 @@ sap.ui.define([
                 AvailbleBeds: parseInt(oData.AvailbleBeds, 10) || 0,
                 Price: oData.Price,
                 MonthPrice: oData.MonthPrice,
-                YearPrice: oData.YearPrice
+                YearPrice: oData.YearPrice,
+                CheckInTime: oData.CheckInTime,
+                CheckOutTime: oData.CheckOutTime,
+                Deopsit: oData.Deposit
             };
+            
+            console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
+            console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
+
 
             // -------------------------
             // MERGE WITH GLOBAL MODEL
@@ -606,7 +613,10 @@ sap.ui.define([
                     SelectedPriceValue: "",
                     Country: oSelected.Country,
                     Visible: oSelected.Visible,
-                    AvailbleBeds: oSelected.AvailbleBeds
+                    AvailbleBeds: oSelected.AvailbleBeds,
+                    CheckInTime: oSelected.CheckInTime,
+                    CheckOutTime: oSelected.CheckOutTime,
+                    Deposit: oSelected.Deposit  
                 };
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
@@ -2953,6 +2963,12 @@ sap.ui.define([
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
                 }
+                // console.log("VisibilityModel (excluding images):", JSON.stringify(Object.keys(oVisibilityModel.getData())
+                //     .filter(key => key !== "Images")
+                //     .reduce((obj, key) => {
+                //         obj[key] = oVisibilityModel.getData()[key];
+                //         return obj;
+                //     }, {}), null, 4));
                 // console.log("VisibilityModel:", JSON.stringify(oVisibilityModel.getData(), null, 4));
             } catch (err) {
                 console.error("Error loading data:", err);
