@@ -31,6 +31,8 @@ sap.ui.define([
                     GSTIN: "",
                     Type: "",
                     Value: "",
+                    CheckinTime: "",
+                    CheckoutTime: "",
                     Penalty: "",
                 });
                 this.getView().setModel(oMDmodel, "MDmodel");
@@ -287,7 +289,6 @@ sap.ui.define([
             oView.getModel("tokenModel").setData({
                 tokens: []
             });
-            // const oBranch = sap.ui.getCore().byId(oView.createId("BD_idBranch"));
             const oName = sap.ui.getCore().byId(oView.createId("BD_idBName"));
             const oAddress = sap.ui.getCore().byId(oView.createId("BD_idAddress"));
             const oPin = sap.ui.getCore().byId(oView.createId("BD_idPin"));
@@ -296,6 +297,8 @@ sap.ui.define([
             const oSTD = sap.ui.getCore().byId(oView.createId("MC_id_codeModel"));
             const oCity = sap.ui.getCore().byId(oView.createId("MC_id_City"));
             const oPhone = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
+            const oCheckInTime = sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime"));
+            const oCheckOutTime = sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime"));
             const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
 
             oCountry.getBinding("items").filter([]);
@@ -304,7 +307,6 @@ sap.ui.define([
 
             const cityBinding = oCity.getBinding("items");
             if (cityBinding) cityBinding.filter([]);
-            // oBranch.setSelectedKey("");
             oName.setSelectedKey("");
             oAddress.setSelectedKey("");
             oPin.setSelectedKey("");
@@ -314,8 +316,6 @@ sap.ui.define([
             oCity.setSelectedKey("");
             oSTD.setSelectedKey("");
             oPhone.setValue("");
-            // oBranch.setValueState("None");
-            // oBranch.setValueStateText("");
             oName.setValueState("None");
             oName.setValueStateText("");
             oAddress.setValueState("None");
@@ -332,7 +332,10 @@ sap.ui.define([
             oSTD.setValueStateText("");
             oPhone.setValueState("None");
             oPhone.setValueStateText("");
-            // oBranch.setValueStateText("Enter Branch Code");
+            oCheckInTime.setValueState("None");
+            oCheckInTime.setValueStateText("");
+            oCheckOutTime.setValueState("None");
+            oCheckOutTime.setValueStateText("");
             oName.setValueStateText(this.i18nModel.getText("enterBranchName"));
             oAddress.setValueStateText(this.i18nModel.getText("enterAddress"));
             oPin.setValueStateText(this.i18nModel.getText("enterPincode"));
@@ -340,9 +343,10 @@ sap.ui.define([
             oState.setValueStateText(this.i18nModel.getText("selectState"));
             oCity.setValueStateText(this.i18nModel.getText("cityValueText"));
             oPhone.setValueStateText(this.i18nModel.getText("enterContactNumber"));
+            oCheckInTime.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
+            oCheckOutTime.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
             this._resetFacilityValueStates();
             oView.getModel("MDmodel").setData({
-                // BranchID: "",
                 Name: "",
                 Address: "",
                 Pincode: "",
@@ -354,7 +358,9 @@ sap.ui.define([
                 GSTIN: "",
                 Type: "",
                 Value: "",
-                Penalty: ""
+                Penalty: "",
+                CheckinTime: "",
+                CheckoutTime: ""
             });
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
             this.isEdit = false;
@@ -376,9 +382,10 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
-                // utils._LCvalidateGstNumber(sap.ui.getCore().byId(oView.createId("MC_id_CustomGst"))) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPenalty")), "ID")
 
             if (!isMandatoryValid) {
@@ -426,7 +433,9 @@ sap.ui.define([
                 Type: Payload.Type,
                 Value: Payload.Value,
                 Photo1Type: oUpload.Photo1Type,
-                Photo1Name: oUpload.Photo1Name
+                Photo1Name: oUpload.Photo1Name,
+                CheckinTime: Payload.CheckinTime,
+                CheckoutTime: Payload.CheckoutTime
             };
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -530,6 +539,18 @@ sap.ui.define([
         },
 
         onBNameInputLiveChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+
+        onCheckOutTimeChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+
+        onCheckInTimeChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
@@ -649,6 +670,8 @@ sap.ui.define([
                 GSTIN: oData.GSTIN,
                 Type: oData.Type,
                 Value: oData.Value,
+                CheckinTime: oData.CheckinTime,
+                CheckoutTime: oData.CheckoutTime,
                 Penalty: oData.Penalty
             });
             this.isEdit = true;

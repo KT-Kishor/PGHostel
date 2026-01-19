@@ -201,6 +201,24 @@
                     </VBox>
                 </HBox>
                 <Label
+                    text="{i18n>bdCheckIntime}"
+                    required="true"
+                />
+                <TimePicker
+                    id="BD_id_CheckInTime"
+                    value="{MDmodel>/CheckinTime}"
+                    liveChange="onCheckInTimeChange"
+                />
+                <Label
+                    text="{i18n>bdCheckouttime}"
+                    required="true"
+                />
+                <TimePicker
+                    id="BD_id_CheckOutTime"
+                    value="{MDmodel>/CheckoutTime}"
+                    liveChange="onCheckOutTimeChange"
+                />
+                <Label
                     text="{i18n>penalty}"
                     required="true"
                 />
@@ -213,7 +231,7 @@
                     valueStateText="{i18n>enterPenalty}"
                     class="sapUiSmallMarginBottom"
                 />
-                
+
                 <MessageStrip
                     text="{i18n>Branchdatalogomsg}"
                     type="Warning"
