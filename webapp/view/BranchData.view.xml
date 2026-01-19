@@ -119,10 +119,7 @@
                             tooltip="{i18n>MSbranchCode}"
                         />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
+                    <Column demandPopin="true">
                         <Text
                             text="{i18n>branchName}"
                             tooltip="{i18n>branchName}"
@@ -155,19 +152,28 @@
                             tooltip="{i18n>contactNumber}"
                         />
                     </Column>
-                    <Column demandPopin="true">
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
                         <Text
                             text="{i18n>MVDcountry}"
                             tooltip="{i18n>MVDcountry}"
                         />
                     </Column>
-                    <Column demandPopin="true">
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
                         <Text
                             text="{i18n>MVDstate}"
                             tooltip="{i18n>MVDstate}"
                         />
                     </Column>
-                    <Column demandPopin="true">
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
                         <Text
                             text="{i18n>city}"
                             tooltip="{i18n>city}"

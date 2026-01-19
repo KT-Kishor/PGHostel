@@ -289,17 +289,9 @@ sap.ui.define([
             oView.getModel("tokenModel").setData({
                 tokens: []
             });
-            const oName = sap.ui.getCore().byId(oView.createId("BD_idBName"));
-            const oAddress = sap.ui.getCore().byId(oView.createId("BD_idAddress"));
-            const oPin = sap.ui.getCore().byId(oView.createId("BD_idPin"));
             const oCountry = sap.ui.getCore().byId(oView.createId("MC_id_Country"));
             const oState = sap.ui.getCore().byId(oView.createId("MC_id_State"));
-            const oSTD = sap.ui.getCore().byId(oView.createId("MC_id_codeModel"));
             const oCity = sap.ui.getCore().byId(oView.createId("MC_id_City"));
-            const oPhone = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
-            const oCheckInTime = sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime"));
-            const oCheckOutTime = sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime"));
-            const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
 
             oCountry.getBinding("items").filter([]);
             const stateBinding = oState.getBinding("items");
@@ -307,44 +299,45 @@ sap.ui.define([
 
             const cityBinding = oCity.getBinding("items");
             if (cityBinding) cityBinding.filter([]);
-            oName.setSelectedKey("");
-            oAddress.setSelectedKey("");
-            oPin.setSelectedKey("");
-            oPenalty.setValue("");
-            oCountry.setSelectedKey("");
-            oState.setSelectedKey("");
-            oCity.setSelectedKey("");
-            oSTD.setSelectedKey("");
-            oPhone.setValue("");
-            oName.setValueState("None");
-            oName.setValueStateText("");
-            oAddress.setValueState("None");
-            oAddress.setValueStateText("");
-            oPin.setValueState("None");
-            oPin.setValueStateText("");
-            oCountry.setValueState("None");
-            oCountry.setValueStateText("");
-            oState.setValueState("None");
-            oState.setValueStateText("");
-            oCity.setValueState("None");
-            oCity.setValueStateText("");
-            oSTD.setValueState("None");
-            oSTD.setValueStateText("");
-            oPhone.setValueState("None");
-            oPhone.setValueStateText("");
-            oCheckInTime.setValueState("None");
-            oCheckInTime.setValueStateText("");
-            oCheckOutTime.setValueState("None");
-            oCheckOutTime.setValueStateText("");
-            oName.setValueStateText(this.i18nModel.getText("enterBranchName"));
-            oAddress.setValueStateText(this.i18nModel.getText("enterAddress"));
-            oPin.setValueStateText(this.i18nModel.getText("enterPincode"));
-            oCountry.setValueStateText(this.i18nModel.getText("selectCountry"));
-            oState.setValueStateText(this.i18nModel.getText("selectState"));
-            oCity.setValueStateText(this.i18nModel.getText("cityValueText"));
-            oPhone.setValueStateText(this.i18nModel.getText("enterContactNumber"));
-            oCheckInTime.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
-            oCheckOutTime.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
+            // oName.setSelectedKey("");
+            // oAddress.setSelectedKey("");
+            // oPin.setSelectedKey("");
+            // oPenalty.setValue("");
+            // oCountry.setSelectedKey("");
+            // oState.setSelectedKey("");
+            // oCity.setSelectedKey("");
+            // oSTD.setSelectedKey("");
+            // oPhone.setValue("");
+            // oName.setValueState("None");
+            // oName.setValueStateText("");
+            // oAddress.setValueState("None");
+            // oAddress.setValueStateText("");
+            // oPin.setValueState("None");
+            // oPin.setValueStateText("");
+            // oCountry.setValueState("None");
+            // oCountry.setValueStateText("");
+            // oState.setValueState("None");
+            // oState.setValueStateText("");
+            // oCity.setValueState("None");
+            // oCity.setValueStateText("");
+            // oSTD.setValueState("None");
+            // oSTD.setValueStateText("");
+            // oPhone.setValueState("None");
+            // oPhone.setValueStateText("");
+            // oCheckInTime.setValueState("None");
+            // oCheckInTime.setValueStateText("");
+            // oCheckOutTime.setValueState("None");
+            // oCheckOutTime.setValueStateText("");
+            // oName.setValueStateText(this.i18nModel.getText("enterBranchName"));
+            // oAddress.setValueStateText(this.i18nModel.getText("enterAddress"));
+            // oPin.setValueStateText(this.i18nModel.getText("enterPincode"));
+            // oCountry.setValueStateText(this.i18nModel.getText("selectCountry"));
+            // oState.setValueStateText(this.i18nModel.getText("selectState"));
+            // oCity.setValueStateText(this.i18nModel.getText("cityValueText"));
+            // oPhone.setValueStateText(this.i18nModel.getText("enterContactNumber"));
+            // oCheckInTime.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
+            // oCheckOutTime.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
+            this._resetBranchValueStates();
             this._resetFacilityValueStates();
             oView.getModel("MDmodel").setData({
                 Name: "",
@@ -557,8 +550,6 @@ sap.ui.define([
                 oTP.setValueState("None");
                 oTP.setValueStateText("");
             }
-
-            this._validateCheckInOut();
         },
 
         onCheckInTimeChange: function (oEvent) {
@@ -567,8 +558,6 @@ sap.ui.define([
                 oTP.setValueState("None");
                 oTP.setValueStateText("");
             }
-
-            this._validateCheckInOut();
         },
 
         _validateCheckInOut: function () {
@@ -577,7 +566,6 @@ sap.ui.define([
             const oCheckOut = sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime"));
             const dCheckIn = oCheckIn.getDateValue();
             const dCheckOut = oCheckOut.getDateValue();
-
             if (!dCheckIn) {
                 oCheckIn.setValueState("Error");
                 oCheckIn.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
@@ -596,10 +584,9 @@ sap.ui.define([
                 return false;
             }
             oCheckIn.setValueState("None");
-            oCheckIn.setValueStateText("");
+            // oCheckIn.setValueStateText("");
             oCheckOut.setValueState("None");
-            oCheckOut.setValueStateText("");
-
+            // oCheckOut.setValueStateText("");
             return true;
         },
 
@@ -734,8 +721,42 @@ sap.ui.define([
                 oVisible.setProperty("/CC_id_CustInput", false);
             }
             this._resetFacilityValueStates();
+            this._resetBranchValueStates();
             this._applyCountryStateCityFilters();
             this.oDialog.open();
+        },
+
+        _resetBranchValueStates: function () {
+            const oView = this.getView();
+            const get = (id) => sap.ui.getCore().byId(oView.createId(id));
+
+            const mControls = {
+                BD_idBName: "enterBranchName",
+                BD_idAddress: "enterAddress",
+                BD_idPin: "enterPincode",
+                MC_id_Country: "selectCountry",
+                MC_id_State: "selectState",
+                MC_id_City: "cityValueText",
+                MC_id_CustomGst: "gstError",
+                MC_id_codeModel: "",
+                BD_idPhone: "enterContactNumber",
+                BD_id_CheckInTime: "enterCheckInTime",
+                BD_id_CheckOutTime: "enterCheckOutTime",
+                BD_idPenalty: "enterPenalty"
+            };
+
+            Object.keys(mControls).forEach((sId) => {
+                const oControl = get(sId);
+                if (oControl) {
+                    oControl.setValueState("None");
+                    oControl.setValueStateText("");
+                    if (mControls[sId]) {
+                        oControl.setValueStateText(
+                            this.i18nModel.getText(mControls[sId])
+                        );
+                    }
+                }
+            });
         },
 
         _applyCountryStateCityFilters: function () {
@@ -1037,7 +1058,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisRoom"));
+                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisbranch"));
                 return;
             }
 

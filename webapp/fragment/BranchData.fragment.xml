@@ -210,7 +210,7 @@
                     change="onCheckInTimeChange"
                     displayFormat="hh a"
                     placeholder="e.g. 10 AM"
-                    valueFormat="HH"
+                    valueFormat="hh a"
                 />
                 <Label
                     text="{i18n>bdCheckouttime}"
@@ -222,7 +222,7 @@
                     change="onCheckOutTimeChange"
                     displayFormat="hh a"
                     placeholder="e.g. 10 AM"
-                    valueFormat="HH"
+                    valueFormat="hh a"
                 />
                 <Label
                     text="{i18n>penalty}"
