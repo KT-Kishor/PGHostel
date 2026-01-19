@@ -153,15 +153,18 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column minScreenWidth="Tablet"
-                        demandPopin="true" >
+					<Column  >
 						<Text text="{i18n>filename}" />
 					</Column>
-					<Column>
+					<Column  minScreenWidth="Tablet"
+        demandPopin="true"
+        popinDisplay="Inline">
 						<Text text="{i18n>document}" />
 					</Column>
 					<!-- <Column><Text text="File Type" /></Column> -->
-					<Column>
+					<Column  minScreenWidth="Tablet"
+        demandPopin="true"
+        popinDisplay="Inline">
 						<Text text="{i18n>size}" />
 					</Column>
 				</columns>
@@ -169,12 +172,10 @@
 					<ColumnListItem>
 						<cells>
 							<!-- FILE NAME WITH ICON + PREVIEW LINK -->
-							<Link text="{AdminSignupModel>FileName}" press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}" />
+							<Link wrapping="true" text="{AdminSignupModel>FileName}" press="onAdminPreviewDoc" tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}" />
 							<!-- DOCUMENT TYPE (VdocType = Aadhaar/PAN/Resume) -->
 							<Text text="{AdminSignupModel>VdocType}" />
-							<!-- FILE TYPE SHORT (jpg/pdf/docx/etc) -->
-							<!-- <Text text="{path:'AdminSignupModel>DocumentType', formatter:'.Formatter.formatShortFileType'}" /> -->
-							<!-- SIZE -->
+
 							<Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}" />
 						</cells>
 					</ColumnListItem>

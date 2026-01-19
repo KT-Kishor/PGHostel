@@ -3691,3 +3691,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
   padding: 0.75rem 1.25rem;  
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
+/* Remove dialog padding completely */
+.adminPreviewDialog .sapMDialogScroll {
+  padding: 0;
+}
+
+/* Ensure image scales correctly */
+.adminPreviewImage {
+  object-fit: contain;   /* 🔑 keeps aspect ratio */
+}

@@ -23,7 +23,8 @@
             <Bar class="barheader">
                 <contentMiddle>
                     <!-- <Title text="{HostelModel>/BedType}" />-->
-                    <Title text="{HostelModel>/Area}" />
+                    <core:Icon src="sap-icon://building" /> 
+                    <Title text="{HostelModel>/Area}"/>
                 </contentMiddle>
                 <contentRight>
                     <Button

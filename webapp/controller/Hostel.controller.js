@@ -4817,7 +4817,34 @@ sap.ui.define([
                 );
 
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("registrationFailed"));
+
+                let sErrorMessage = "Registration failed. Please try again later.";
+
+                // 🔹 Case 1: jQuery AJAX error with JSON response
+                if (err?.responseJSON?.message) {
+                    sErrorMessage = err.responseJSON.message;
+                }
+                // 🔹 Case 2: OData-style error
+                else if (err?.responseJSON?.error?.message?.value) {
+                    sErrorMessage = err.responseJSON.error.message.value;
+                }
+                // 🔹 Case 3: Plain text response
+                else if (err?.responseText) {
+                    try {
+                        const oParsed = JSON.parse(err.responseText);
+                        sErrorMessage =
+                            oParsed?.message ||
+                            oParsed?.error?.message ||
+                            sErrorMessage;
+                    } catch (e) {
+                        sErrorMessage = err.responseText;
+                    }
+                }
+
+                sap.m.MessageBox.error(sErrorMessage, {
+                    title: "Registration Failed"
+                });
+
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -5152,16 +5179,28 @@ sap.ui.define([
                     title: "",
                     contentWidth: "70%",
                     contentHeight: "70%",
+
+                    // 🔑 THIS is the key
+                    stretch: "{device>/system/phone}",
+
                     resizable: true,
                     draggable: true,
-                    verticalScrolling: false,   // 🔑 IMPORTANT
-                    horizontalScrolling: false, // 🔑 IMPORTANT
+                    verticalScrolling: false,
+                    horizontalScrolling: false,
                     content: [
-                        new sap.m.Image({
+                        new sap.m.VBox({
                             width: "100%",
                             height: "100%",
-                            densityAware: false
-                        }).addStyleClass("adminPreviewImage")
+                            justifyContent: "Center",   // 🔑 vertical centering
+                            alignItems: "Center",       // 🔑 horizontal centering
+                            items: [
+                                new sap.m.Image({
+                                    width: "100%",
+                                    height: "100%",
+                                    densityAware: false
+                                }).addStyleClass("adminPreviewImage")
+                            ]
+                        })
                     ],
                     endButton: new sap.m.Button({
                         text: "Close",
@@ -5172,8 +5211,13 @@ sap.ui.define([
                 this.getView().addDependent(this._previewDialog);
             }
 
+
             this._previewDialog.setTitle(oDoc.FileName);
-            this._previewDialog.getContent()[0].setSrc(oDoc.PreviewUrl);
+            this._previewDialog
+                .getContent()[0]      // VBox
+                .getItems()[0]        // Image
+                .setSrc(oDoc.PreviewUrl);
+
             this._previewDialog.open();
         },
 
