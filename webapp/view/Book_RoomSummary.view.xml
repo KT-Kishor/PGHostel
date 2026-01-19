@@ -92,7 +92,7 @@
                     <Text
                         text="{parts: [
         'HostelModel>RoomRentPerPerson',
-        'HostelModel>/Currency'
+        'HostelModel>/DepositCurrency'
     ],formatter: '.Formatter.formatCurrency'}"
                     />
                     <Text text="{parts: [

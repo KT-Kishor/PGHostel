@@ -1078,27 +1078,40 @@ sap.ui.define([
                             required: true,
                         }),
 
-                        new sap.m.ComboBox({
-                            placeholder: "Select City",
-                            width: "100%",
-                            id: that.createId("ID_City_" + i),
-                            selectedKey: "{HostelModel>/Persons/" + i + "/City}",
-                            showSecondaryValues: true,
-                            items: {
-                                path: "CityModel>/", length: 1000, showSecondaryValues: true,
-                                template: new sap.ui.core.ListItem({
-                                    key: "{CityModel>cityName}",
-                                    text: "{CityModel>cityName}",
-                                    additionalText: "{CityModel>branchCode}"
-                                })
-                            },
-                            change: function (oEv) {
-                                const oSel = oEv.getSource().getSelectedItem();
-                                const aPersons = oModel.getProperty("/Persons");
-                                aPersons[i].City = oSel ? oSel.getText() : "";
-                                oModel.refresh(true);
-                            }
-                        }),
+                       new sap.m.ComboBox({
+    placeholder: "Select City",
+    width: "100%",
+    id: that.createId("ID_City_" + i),
+    selectedKey: "{HostelModel>/Persons/" + i + "/City}",
+    showSecondaryValues: true,
+    items: {
+        path: "CityModel>/",
+        length: 1000,
+        template: new sap.ui.core.ListItem({
+            key: "{CityModel>cityName}",
+            text: "{CityModel>cityName}",
+            additionalText: "{CityModel>branchCode}"
+        })
+    },
+    change: function (oEvent) {
+        const oSource = oEvent.getSource();
+        const oSelectedItem = oSource.getSelectedItem();
+        const sValue = oSource.getValue(); // <-- typed OR selected text
+
+        const aPersons = oModel.getProperty("/Persons");
+
+        // If item selected from list
+        if (oSelectedItem) {
+            aPersons[i].City = oSelectedItem.getText();
+        } 
+        // If user typed a custom value
+        else {
+            aPersons[i].City = sValue;
+        }
+
+        oModel.setProperty("/Persons", aPersons);
+    }
+}),
 
                         new sap.m.Label({
                             text: "Mobile No",
@@ -1458,7 +1471,7 @@ sap.ui.define([
                                             });
                                         }, 120);
 
-                                        return;
+                                        return; 
                                     }
 
                                     // -------------------------
@@ -1896,12 +1909,14 @@ sap.ui.define([
             oModel.setProperty("/AppliedDiscount", 0);
             // oBtn.setVisible(true);
             oModel.setProperty("/CouponButtonVisible", true);
-            // ❗ Skip totals recalculation if user is still on Step 0 or Step 1
+            //  Skip totals recalculation if user is still on Step 0 or Step 1
             if (this._iSelectedStepIndex < 2) {
                 // Only reset discount value, do NOT calculate totals yet
                 oModel.refresh(true);
                 return;
             }
+            var inputID = this.getCore().byId("BookingcouponInput")
+            inputID.setShowValueHelp(false)
 
             // From Step 2 onward — now calculate totals safely
             const aPersons = oModel.getProperty("/Persons") || [];
@@ -2141,6 +2156,7 @@ sap.ui.define([
             const sStartDate = oHostelModel.getProperty("/StartDate");
             const sEndDate = oHostelModel.getProperty("/EndDate");
             var PDeposit = parseFloat(oHostelModel.getProperty("/Deposit")) || 0;
+            var pDepositCurrency = oHostelModel.getProperty("/DepositCurrency") || "";
 
             const perUnitPrice = parseFloat(oHostelModel.getProperty("/FinalPrice")) || 0;
 
@@ -2221,7 +2237,8 @@ sap.ui.define([
                     GrandTotal: roomRentPerPerson + totalAmount + PDeposit,
 
                     TotalDays: iDays,
-                    Deposit: PDeposit
+                    Deposit: PDeposit,
+                    DepositCurrency: pDepositCurrency
                 };
             });
 
@@ -2271,7 +2288,6 @@ sap.ui.define([
 
 
             // (Per Day = End - Start + 1)
-            // ===============================
             let iDays = Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;
 
             const diffHours = 1; // keep your logic unchanged
@@ -2280,24 +2296,18 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
-
-            // ===============================
             // FIX 2 — TRUE CALENDAR MONTH DIFFERENCE
-            // ===============================
             let iMonths =
                 (oEndDate.getFullYear() - oStartDate.getFullYear()) * 12 +
                 (oEndDate.getMonth() - oStartDate.getMonth());
 
             iMonths = iMonths > 0 ? iMonths : 1; // never 0
 
-            // ===============================
             // FIX 3 — TRUE CALENDAR YEAR DIFFERENCE
-            // ===============================
             let iYears = oEndDate.getFullYear() - oStartDate.getFullYear();
             iYears = iYears > 0 ? iYears : 1;
 
             // DO NOT change anything below this line
-            // --------------------------------------
 
             let totalFacilityPrice = 0;
             let aAllFacilities = [];
@@ -2387,10 +2397,6 @@ sap.ui.define([
             return null;
         },
 
-        // TC_onDialogBackButton: function () {
-        //   const oWizard = this.getView().byId("TC_id_wizard");
-        //   oWizard.previousStep();
-        // },
 
         onFieldValidation: function (oEvent) {
             utils._LCvalidateDate(oEvent);

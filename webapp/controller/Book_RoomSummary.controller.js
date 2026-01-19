@@ -80,7 +80,7 @@ onDeleteFacility: function () {
     }
 
     sap.m.MessageBox.confirm(
-        this.i18nModel.getText("pleaseSelectRowDelete"),
+        this.i18nModel.getText("msgBoxConfirmDelete"),
         {
             title: this.i18nModel.getText("Confirm"),
             actions: [
@@ -243,7 +243,7 @@ _executeFacilityDelete: function () {
         }
     }
 
-    setTimeout(() => {
+   setTimeout(() => {
         $(".serviceCard").each(function () {
             const ctrl = sap.ui.getCore().byId($(this).attr("id"));
             if (ctrl) {
@@ -251,6 +251,7 @@ _executeFacilityDelete: function () {
             }
         });
     }, 150);
+
 
     // Clear selection state
     this._oSelectedTable = null;
