@@ -346,8 +346,8 @@ sap.ui.define([
                 Deopsit: oData.Deposit
             };
             
-            console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
-            console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
+            // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
+            // console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
 
 
             // -------------------------
