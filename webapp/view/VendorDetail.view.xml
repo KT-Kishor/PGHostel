@@ -139,7 +139,7 @@
                                             maxLength="50"
                                             placeholder="{i18n>enterEmailId}"
                                             liveChange="onAdminLiveValidate"
-                                            editable="{editable>/Edit}"
+                                            editable="false"
                                             id="V_id_Email"
                                             valueStateText="{i18n>MSenterValidEmail}"
                                         />
@@ -358,39 +358,46 @@
                                                 />
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
-                                        <m:columns>
-                                            <m:Column>
+                                         <m:columns>
+                                            <m:Column demandPopin="true" minScreenWidth="Tablet" width="auto">
                                                 <m:Text
                                                     text="{i18n>filename}"
                                                     tooltip="{i18n>filename}"
+                                                    wrapping="true"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column demandPopin="true">
                                                 <m:Text
                                                     text="{i18n>MVDdocumenttype}"
-                                                    tooltip="{i18n>MVDdocumenttype}"
+                                                    tooltip="{i18n>MVDdocumenttype}" wrapping="true"
                                                 />
                                             </m:Column>
-                                            <m:Column>
+                                            <m:Column demandPopin="true">
                                                 <m:Text
-                                                    text="{i18n>FileType}"
-                                                    tooltip="{i18n>FileType}"
+                                                    text="{i18n>fileSize}"
+                                                    tooltip="{i18n>fileSize}"
                                                 />
                                             </m:Column>
                                         </m:columns>
                                         <m:items>
                                             <m:ColumnListItem>
                                                 <m:cells>
-                                                    <m:Link
-                                                        text="{AdminSignupModel>FileName}"
-                                                        press="onAdminPreviewDoc"
-                                                        tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
-                                                    />
+                                                    <m:VBox width="100%">
+                                                        <m:Link
+                                                            text="{AdminSignupModel>FileName}"
+                                                            press="onAdminPreviewDoc"
+                                                            width="100%"
+                                                            wrapping="true"
+                                                        />
+                                                    </m:VBox>
                                                     <m:Text
                                                         text="{AdminSignupModel>DocumentType}"
                                                     />
-                                                    <m:Text
-                                                        text="{AdminSignupModel>FileType}"
+                                                   <m:Text
+                                                        text="{
+                                                            path: 'AdminSignupModel>size',
+                                                            formatter: '.Formatter.formatFileSize'
+                                                        }"
                                                     />
                                                 </m:cells>
                                             </m:ColumnListItem>

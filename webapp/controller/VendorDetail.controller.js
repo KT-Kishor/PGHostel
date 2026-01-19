@@ -59,7 +59,7 @@ sap.ui.define([
 
                 this._initAdminSignupModel();
                 await this._loadVendorDetails(this.sUserID);
-                this._applyCountryStateCityFilters();
+                await this._applyCountryStateCityFilters();
                 this._makeDatePickersReadOnly(["V_id_VendorDOB"]);
             } catch (e) {
                 this._goToNotFound();
@@ -109,11 +109,11 @@ sap.ui.define([
             oSourceCB.getBinding("items")?.filter([]);
 
             /* ================= LOAD COUNTRY DATA IF NEEDED ================= */
-            let aCountryData = oView.getModel("CountryModel")?.getData();
+            let aCountryData = this.getView().getModel("CountryModel")?.getData();
 
             if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
                 await this._fetchCommonData("Country", "CountryModel");
-                aCountryData = oView.getModel("CountryModel")?.getData();
+                aCountryData = this.getView().getModel("CountryModel")?.getData();
             }
 
             if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
@@ -321,7 +321,7 @@ sap.ui.define([
                         Country: oData.Country,
                         State: oData.State,
                         City: oData.City,
-                        DateOfBirth: oData.DOB
+                        DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
                     },
                     filters: {
                         UserID: oData.UserID

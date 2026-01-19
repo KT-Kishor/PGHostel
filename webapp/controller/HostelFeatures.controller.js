@@ -109,11 +109,12 @@ sap.ui.define([
             const oTable = this.byId("HF_HostelFeatureTable");
             const oSelected = oTable.getSelectedItems();
 
-            if (!oSelected) {
+            if (oSelected.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
                 return;
             }
-              if (oSelected.length > 1) {
+
+            if (oSelected.length > 1) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
                 return;
             }

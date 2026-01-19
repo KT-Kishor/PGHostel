@@ -292,7 +292,7 @@ sap.ui.define([
                         Country: oData.Country,
                         State: oData.State,
                         City: oData.City,
-                        DateOfBirth: oData.DOB
+                        DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
                     },
                     filters: {
                         UserID: oData.UserID
