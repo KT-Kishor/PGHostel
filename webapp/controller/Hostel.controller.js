@@ -590,6 +590,8 @@ sap.ui.define([
                 const oFullDetails = {
                     RoomNo: oSelected.RoomNo || "",
                     BedType: oSelected.Name || "",
+                    Address: oSelected.Address || "",
+                    Area: oSelected.Images?.[0]?.Area,                    
                     ACType: oSelected.ACType || "AC",
                     Description: oSelected.Description || "No description available",
                     Price: oSelected.Price || "N/A",
@@ -609,6 +611,7 @@ sap.ui.define([
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
+                // console.log("HostelModel:", oView.getModel("HostelModel").getData());
 
                 oView.setModel(new sap.ui.model.json.JSONModel({
                     loading: true,
@@ -2943,6 +2946,7 @@ sap.ui.define([
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
                 }
+                // console.log("VisibilityModel:", JSON.stringify(oVisibilityModel.getData(), null, 4));
             } catch (err) {
                 console.error("Error loading data:", err);
                 sap.m.MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));

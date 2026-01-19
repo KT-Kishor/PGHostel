@@ -22,7 +22,8 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="{HostelModel>/BedType}" />
+                    <!-- <Title text="{HostelModel>/BedType}" />-->
+                    <Title text="{HostelModel>/Area}" />
                 </contentMiddle>
                 <contentRight>
                     <Button
@@ -102,10 +103,37 @@
                                     class="descTextLarge"
                                 />
                             </VBox>
+                                                       
                             <!-- sap-icon://along-stacked-chart -->
                         </VBox>
                     </l:content>
-                </l:Grid>
+                    <!-- <Title text="{HostelModel>/Address}" /> -->
+
+                </l:Grid>               
+                
+                
+                
+<HBox
+    class="AddressBox AddressInline sapUiSmallMarginBegin sapUiMediumMarginEnd"
+    alignItems="Center"
+    renderType="Bare" 
+>
+    <core:Icon
+        src="sap-icon://addresses"
+        size="1.5rem"
+        class="AddressIcon"
+    />
+
+    <Text
+        text="{HostelModel>/Address}"
+        class="AddressTextLarge"
+        wrapping="true"
+    />
+</HBox>
+
+
+
+
                 <FlexBox
                     id="priceFlex"
                     class="priceFlex sapUiSmallMarginTop"

@@ -3666,3 +3666,28 @@ span.sapMBtnInner.sapMBtnEmphasized {
       margin-left: -5% !important;
     }
 }
+.AddressIcon {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+}
+.sapMFlexBox.AddressInline {
+  display: inline-flex !important; 
+  width: fit-content !important;   
+  max-width: 90%;                
+  min-width: 200px;         
+}
+.AddressTextLarge {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  word-break: normal;           
+  white-space: normal;          
+}
+.AddressBox {
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
