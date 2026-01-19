@@ -383,13 +383,20 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPenalty")), "ID")
-
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID")
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            if (!this._validateCheckInOut()) {
+                return;
+            }
+            const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
+            if (!oPenalty.getValue()) {
+                oPenalty.setValueState("Error");
+                oPenalty.setValueStateText(this.i18nModel.getText("enterPenalty"));
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                oPenalty.focus();
                 return;
             }
             const aCountries = this.getOwnerComponent().getModel("CountryModel").getData();
@@ -545,15 +552,55 @@ sap.ui.define([
         },
 
         onCheckOutTimeChange: function (oEvent) {
-            var oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
+            const oTP = oEvent.getSource();
+            if (oTP.getDateValue()) {
+                oTP.setValueState("None");
+                oTP.setValueStateText("");
+            }
+
+            this._validateCheckInOut();
         },
 
         onCheckInTimeChange: function (oEvent) {
-            var oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
+            const oTP = oEvent.getSource();
+            if (oTP.getDateValue()) {
+                oTP.setValueState("None");
+                oTP.setValueStateText("");
+            }
+
+            this._validateCheckInOut();
+        },
+
+        _validateCheckInOut: function () {
+            const oView = this.getView();
+            const oCheckIn = sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime"));
+            const oCheckOut = sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime"));
+            const dCheckIn = oCheckIn.getDateValue();
+            const dCheckOut = oCheckOut.getDateValue();
+
+            if (!dCheckIn) {
+                oCheckIn.setValueState("Error");
+                oCheckIn.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
+                return false;
+            }
+
+            if (!dCheckOut) {
+                oCheckOut.setValueState("Error");
+                oCheckOut.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
+                return false;
+            }
+
+            if (dCheckOut.getTime() <= dCheckIn.getTime()) {
+                oCheckOut.setValueState("Error");
+                oCheckOut.setValueStateText(this.i18nModel.getText("checkoutAfterCheckin"));
+                return false;
+            }
+            oCheckIn.setValueState("None");
+            oCheckIn.setValueStateText("");
+            oCheckOut.setValueState("None");
+            oCheckOut.setValueStateText("");
+
+            return true;
         },
 
         MD_DeleteRow: function () {

@@ -39,7 +39,7 @@
                     id="BD_idBName"
                     value="{MDmodel>/Name}"
                     placeholder="{i18n>enterBranchName}"
-                    maxLength="60"
+                    maxLength="120"
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
                 />
@@ -207,7 +207,10 @@
                 <TimePicker
                     id="BD_id_CheckInTime"
                     value="{MDmodel>/CheckinTime}"
-                    liveChange="onCheckInTimeChange"
+                    change="onCheckInTimeChange"
+                    displayFormat="hh a"
+                    placeholder="e.g. 10 AM"
+                    valueFormat="HH"
                 />
                 <Label
                     text="{i18n>bdCheckouttime}"
@@ -216,7 +219,10 @@
                 <TimePicker
                     id="BD_id_CheckOutTime"
                     value="{MDmodel>/CheckoutTime}"
-                    liveChange="onCheckOutTimeChange"
+                    change="onCheckOutTimeChange"
+                    displayFormat="hh a"
+                    placeholder="e.g. 10 AM"
+                    valueFormat="HH"
                 />
                 <Label
                     text="{i18n>penalty}"

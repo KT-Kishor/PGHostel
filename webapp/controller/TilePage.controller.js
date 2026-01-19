@@ -96,7 +96,7 @@ sap.ui.define([
                     draggable: true,
                     content: [
                         new sap.m.Image({
-                            src: "image/perfect for steps guide PG.png",
+                            src: "image/final image.png",
                             width: "100%",
                             height: "1000%",
                             decorative: false,
