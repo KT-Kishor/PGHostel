@@ -82,14 +82,15 @@
                         required="true"
                         text="{i18n>CDDiscountValue}"
                     />
-                    <Input
-                        placeholder="{i18n>enterDiscountValue}"
-                        id="inDiscountValue"
-                        value="{CouponView>/CurrentCoupon/DiscountValue}"
-                        type="Number"
-                        liveChange="onLiveChange_DiscountValue"
-                        valueStateText="{i18n>enterDiscountValue}"
-                    />
+<Input
+    id="inDiscountValue"
+    value="{CouponView>/CurrentCoupon/DiscountValue}"
+    type="Text"
+    liveChange="onLiveChange_DiscountValue"
+    placeholder="{i18n>enterDiscountValue}"
+    valueStateText="{i18n>enterDiscountValue}"
+/>
+
                     <Label
                         required="true"
                         text="{i18n>UptoValue}"
@@ -113,7 +114,7 @@
                         placeholder="{i18n>enterMaxUses}"
                         id="inMaxUses"
                         value="{CouponView>/CurrentCoupon/MaxUses}"
-                        type="Number"
+                        type="Text" maxLength="8"
                         liveChange="onLiveChange_Number_MinOne"
                         valueStateText="{i18n>enterMaxUses}"
                     />

@@ -647,6 +647,46 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+        _validateDiscountValueLogic: function () {
+            const oView = this.getView();
+            const oVM = oView.getModel("CouponView");
+
+            const sType = oVM.getProperty("/CurrentCoupon/DiscountType");
+            const sValue = oVM.getProperty("/CurrentCoupon/DiscountValue");
+
+            const oInput = sap.ui.getCore().byId(
+                oView.createId("inDiscountValue")
+            );
+
+            const fVal = parseFloat(sValue);
+
+            if (!sType) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText(
+                    this.i18nModel.getText("selectDiscountTypefirst")
+                );
+                return false;
+            }
+
+            if (isNaN(fVal) || fVal <= 0) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText(
+                    this.i18nModel.getText("invaliddiscountvalue")
+                );
+                return false;
+            }
+
+            if (sType === "Percentage" && fVal > 99.99) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText(
+                    this.i18nModel.getText("percentagemustbebetween1and100")
+                );
+                return false;
+            }
+
+            oInput.setValueState(sap.ui.core.ValueState.None);
+            return true;
+        },
 
         onSaveCoupon: async function () {
             var oView = this.getView();
@@ -660,10 +700,12 @@ sap.ui.define([
                 &&
                 utils._LCstrictValidationComboBox(
                     sap.ui.getCore().byId(oView.createId("cbDiscountType")), "ID"
-                ) &&
+                )  && 
                 utils._LCvalidateMandatoryField(
                     sap.ui.getCore().byId(oView.createId("inDiscountValue")), "ID"
-                ) && 
+                ) &&
+            this._validateDiscountValueLogic()
+                    && 
                 (
                     oCoupon.DiscountType !== "Percentage" ||
                     utils._LCvalidateMandatoryField(
@@ -881,79 +923,170 @@ sap.ui.define([
         },
 
         // ===== Discount Type (STRICT combo) =====
+        // onChange_DiscountType: function (oEvent) {
+        //     utils._LCstrictValidationComboBox(oEvent);
+        //     const oCB = oEvent.getSource();
+        //     const sKey = oCB.getSelectedKey();
+        //     const oVM = this.getView().getModel("CouponView");
+
+        //     // validate combo (you already do this)
+        //     utils._LCstrictValidationComboBox(oEvent);
+
+        //     if (sKey === "Percentage") {
+        //         // enable Upto only for percentage
+        //         oVM.setProperty("/isUptoEnabled", true);
+        //     } else {
+        //         // disable + clear value for Fixed Amount
+        //         oVM.setProperty("/isUptoEnabled", false);
+        //         oVM.setProperty("/CurrentCoupon/UptoValue", "");
+        //     }
+        // },
+        // ===== Discount Value (PERCENT vs FIXED logic) =====
+        // onLiveChange_DiscountValue: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     const sValue = oInput.getValue().trim();
+        //     const sType = sap.ui.getCore()
+        //         .byId(this.getView().createId("cbDiscountType"))
+        //         .getSelectedKey();
+        //     // Must have discount type selected first
+        //     if (!sType) {
+        //         oInput.setValueState(sap.ui.core.ValueState.Error);
+        //         oInput.setValueStateText(this.i18nModel.getText("selectDiscountTypefirst"));
+        //         return;
+        //     }
+        //     // Only digits + optional decimal
+        //     if (!/^\d+(\.\d+)?$/.test(sValue)) {
+        //         oInput.setValueState(sap.ui.core.ValueState.Error);
+        //         oInput.setValueStateText(this.i18nModel.getText("onlynumbersallowed"));
+        //         return;
+        //     }
+        //     const fVal = parseFloat(sValue);
+        //     if (sType === "Percentage") {
+        //         // ✅ Validate 1 – 100
+        //         if (fVal <= 0 || fVal > 100) {
+        //             oInput.setValueState(sap.ui.core.ValueState.Error);
+        //             oInput.setValueStateText(this.i18nModel.getText("percentagemustbebetween1and100"));
+        //             return;
+        //         }
+        //     } else {
+        //         // ✅ Validate currency amount
+        //         if (fVal <= 0) {
+        //             oInput.setValueState(sap.ui.core.ValueState.Error);
+        //             oInput.setValueStateText(this.i18nModel.getText("amountmustbegreaterthan0"));
+        //             return;
+        //         }
+        //     }
+        //     // ✅ Clear error when valid
+        //     oInput.setValueState(sap.ui.core.ValueState.None);
+        // },
+
+
+
         onChange_DiscountType: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
-            const oCB = oEvent.getSource();
-            const sKey = oCB.getSelectedKey();
-            const oVM = this.getView().getModel("CouponView");
 
-            // validate combo (you already do this)
-            utils._LCstrictValidationComboBox(oEvent);
+            const oVM = this.getView().getModel("CouponView");
+            const sKey = oEvent.getSource().getSelectedKey();
+            const oDiscountInput = this.byId("inDiscountValue");
+
+            // Reset value + state when type changes
+            oDiscountInput.setValue("");
+            oDiscountInput.setValueState(sap.ui.core.ValueState.None);
 
             if (sKey === "Percentage") {
-                // enable Upto only for percentage
                 oVM.setProperty("/isUptoEnabled", true);
+                oDiscountInput.setMaxLength(5); // 99.99
             } else {
-                // disable + clear value for Fixed Amount
                 oVM.setProperty("/isUptoEnabled", false);
                 oVM.setProperty("/CurrentCoupon/UptoValue", "");
+                oDiscountInput.setMaxLength(10); // fixed amount
             }
         },
-        // ===== Discount Value (PERCENT vs FIXED logic) =====
         onLiveChange_DiscountValue: function (oEvent) {
             const oInput = oEvent.getSource();
-            const sValue = oInput.getValue().trim();
-            const sType = sap.ui.getCore()
-                .byId(this.getView().createId("cbDiscountType"))
-                .getSelectedKey();
-            // Must have discount type selected first
+            let sValue = oInput.getValue();
+            const sType = this.byId("cbDiscountType").getSelectedKey();
+
             if (!sType) {
+                oInput.setValue("");
                 oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText(this.i18nModel.getText("selectDiscountTypefirst"));
+                oInput.setValueStateText(
+                    this.i18nModel.getText("selectDiscountTypefirst")
+                );
                 return;
             }
-            // Only digits + optional decimal
-            if (!/^\d+(\.\d+)?$/.test(sValue)) {
-                oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText(this.i18nModel.getText("onlynumbersallowed"));
-                return;
+
+            // Allow digits + single decimal
+            sValue = sValue.replace(/[^0-9.]/g, "");
+            const parts = sValue.split(".");
+
+            if (parts.length > 2) {
+                sValue = parts[0] + "." + parts[1];
             }
+
+            if (parts[1]?.length > 2) {
+                sValue = parts[0] + "." + parts[1].slice(0, 2);
+            }
+
+            oInput.setValue(sValue);
+
             const fVal = parseFloat(sValue);
+
+            // 🔴 Percentage rules
             if (sType === "Percentage") {
-                // ✅ Validate 1 – 100
-                if (fVal <= 0 || fVal > 100) {
+                if (isNaN(fVal) || fVal <= 0 || fVal > 99.99) {
                     oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText(this.i18nModel.getText("percentagemustbebetween1and100"));
-                    return;
-                }
-            } else {
-                // ✅ Validate currency amount
-                if (fVal <= 0) {
-                    oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText(this.i18nModel.getText("amountmustbegreaterthan0"));
+                    oInput.setValueStateText(
+                        this.i18nModel.getText("percentagemustbebetween1and100")
+                    );
                     return;
                 }
             }
-            // ✅ Clear error when valid
+
+            // 🔴 Fixed amount rules
+            if (sType === "Fixed Amount") {
+                if (isNaN(fVal) || fVal <= 0) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText(
+                        this.i18nModel.getText("amountmustbegreaterthan0")
+                    );
+                    return;
+                }
+            }
+
+            // ✅ Valid
             oInput.setValueState(sap.ui.core.ValueState.None);
         },
+
+
+
         // ===== All numeric fields =====
         onLiveChange_Number_MinOne: function (oEvent) {
-            const oInput = oEvent.getSource();
-            const sValue = oInput.getValue().trim();
-            if (!/^\d*$/.test(sValue)) {
-                oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText(this.i18nModel.getText("onlynumbersallowed"));
-                return;
-            }
-            const iVal = parseInt(sValue, 10);
-            if (isNaN(iVal) || iVal < 1) {
-                oInput.setValueState(sap.ui.core.ValueState.Error);
-                oInput.setValueStateText(this.i18nModel.getText("valuemustbeatleast1"));
-                return;
-            }
-            oInput.setValueState(sap.ui.core.ValueState.None);
-        },
+                const oInput = oEvent.getSource();
+                let sValue = oInput.getValue();
+
+                // ❌ Remove anything that is not a digit
+                sValue = sValue.replace(/\D/g, "");
+
+                // ❌ Remove leading zeros (except single digit)
+                sValue = sValue.replace(/^0+/, "");
+
+                oInput.setValue(sValue);
+
+                const iVal = parseInt(sValue, 10);
+
+                if (!sValue || isNaN(iVal) || iVal < 1) {
+                    oInput.setValueState(sap.ui.core.ValueState.Error);
+                    oInput.setValueStateText(
+                        this.i18nModel.getText("valuemustbeatleast1")
+                    );
+                    return;
+                }
+
+                // ✅ Natural number confirmed
+                oInput.setValueState(sap.ui.core.ValueState.None);
+            },
+
 
         onLiveChange_Number_AllowZero: function (oEvent) {
             const oInput = oEvent.getSource();
