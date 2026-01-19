@@ -11,29 +11,65 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteVendorDetail").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function(oEvent) {
+        _onRouteMatched: async function (oEvent) {
+            sap.ui.core.BusyIndicator.show(0);
+
             try {
+                const encodedUserID = oEvent.getParameter("arguments")?.UserID;
+
+                // 1️⃣ Must exist
+                if (!encodedUserID) {
+                    return this._goToNotFound();
+                }
+
+                // 2️⃣ Strict Base64 format check
+                const base64Regex =
+                    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
+                if (!base64Regex.test(encodedUserID)) {
+                    return this._goToNotFound();
+                }
+
+                // 3️⃣ Decode safely
+                let decodedUserID;
+                try {
+                    decodedUserID = atob(encodedUserID);
+                } catch (e) {
+                    return this._goToNotFound();
+                }
+
+                // 4️⃣ Re-encode and compare (detects ANY modification)
+                if (btoa(decodedUserID) !== encodedUserID) {
+                    return this._goToNotFound();
+                }
+
+                /* ✅ URL IS 100% VALID */
+                this.sUserID = decodedUserID;
+
                 var Layout = this.byId("V_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("V_id_OrderHeaderSection1"));
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                // Editable control model
+
                 const oEditableModel = new sap.ui.model.json.JSONModel({
                     Edit: false,
                     Save: false
                 });
                 this.getView().setModel(oEditableModel, "editable");
+
                 this._initAdminSignupModel();
-                this.sUserID = oEvent.getParameter("arguments").UserID;
                 await this._loadVendorDetails(this.sUserID);
                 this._applyCountryStateCityFilters();
                 this._makeDatePickersReadOnly(["V_id_VendorDOB"]);
-                sap.ui.core.BusyIndicator.hide();
-            } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show(err.message || err.responseText);
+            } catch (e) {
+                this._goToNotFound();
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+        },
+
+        _goToNotFound: function() {
+            this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
         },
 
         _initAdminSignupModel: function() {
@@ -58,7 +94,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: function() {
+        _applyCountryStateCityFilters: async function() {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCountryCB = this.byId("V_id_Country");
             const oStateCB = this.byId("V_id_State");
@@ -72,10 +108,20 @@ sap.ui.define([
             oStateCB.getBinding("items")?.filter([]);
             oSourceCB.getBinding("items")?.filter([]);
 
+            /* ================= LOAD COUNTRY DATA IF NEEDED ================= */
+            let aCountryData = oView.getModel("CountryModel")?.getData();
+
+            if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
+                await this._fetchCommonData("Country", "CountryModel");
+                aCountryData = oView.getModel("CountryModel")?.getData();
+            }
+
+            if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
+                return;// Still no data → stop safely
+            }
+
             if (sCountry) {
-                // Find countryCode by name
-                const aCountryData = this.getView().getModel("CountryModel").getData();
-                const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
+                const oCountryObj = aCountryData.find(c => c.countryName === sCountry); // Find countryCode by name
 
                 if (oCountryObj) {
                     const sCountryCode = oCountryObj.code;

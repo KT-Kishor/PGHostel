@@ -118,6 +118,9 @@
         "viewPath": "sap.ui.com.project1.view",
         "controlAggregation": "pages",
         "controlId": "app",
+         "bypassed": {
+          "target": "NotFound"
+        },
         "clearControlAggregation": false
       },
       "routes": [
@@ -274,7 +277,12 @@
           "target": [
             "TargetVendorDetail"
           ]
-        }
+        },
+       {
+        "name": "NotFound",
+        "pattern": "NotFound",
+        "target": "NotFound"
+      }
       ],
       "targets": {
         "TargetHostel": {
@@ -430,7 +438,14 @@
           "clearControlAggregation": false,
           "viewId": "VendorDetail",
           "viewName": "VendorDetail"
-      }
+      },
+      "NotFound": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "NotFound",
+          "viewName": "NotFound"
+    }
     }
     },
     "rootView": {
