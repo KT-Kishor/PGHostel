@@ -3127,6 +3127,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
     background: linear-gradient(135deg, #00b7c7, #008b96) !important;
 }
 
+.sapMDialog>header .sapMDialogTitleGroup .sapMTitle {
+    color: #e7eaed;
+    vertical-align: middle;
+}
+
+
 
 
 

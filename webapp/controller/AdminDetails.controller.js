@@ -2479,7 +2479,7 @@ if (sStartDate && sEndDate) {
 
             // Check discount type
             if (oCoupon.DiscountType === "Percentage") {
-                discountAmount = (subtotal * Number(oCoupon.DiscountValue || 0)) / 100;
+                discountAmount = (Number(oCoupon.UptoValue) * Number(oCoupon.DiscountValue || 0)) / 100;
                 newSubtotal = subtotal - discountAmount;
             } else if (oCoupon.DiscountType === "Fixed Amount") {
                 discountAmount = Number(oCoupon.DiscountValue || 0);

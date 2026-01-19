@@ -64,7 +64,6 @@
                     id="idBedType"
                     placeholder="{i18n>selectBedType}"
                     width="100%"
-                    visible="false"
                     selectedKey="{RoomModel>/BedTypeName}"
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"

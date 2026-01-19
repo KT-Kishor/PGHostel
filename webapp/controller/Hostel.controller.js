@@ -2883,7 +2883,8 @@ sap.ui.define([
                         b.BranchID?.toLowerCase() === room.BranchCode?.toLowerCase()
                     );
                     // const sLogo = oBranchInfo?.Photo1 ? `data:${oBranchInfo.Photo1Type};base64,${oBranchInfo.Photo1}` : "";
-                    const sArea = oBranchInfo?.Address || "";
+                      const sArea = oBranchInfo?.Name || "";
+                    const sAddress = oBranchInfo?.Address || "";
                     const sCountry = oBranchInfo?.Country || "";
 
                     const aImages = [];
@@ -2912,7 +2913,8 @@ sap.ui.define([
                         Country: sCountry,
                         PriceVisible: PriceVisible,
                         Visible: isVisible,
-                        AvailbleBeds: room.AvailableRooms
+                        AvailbleBeds: room.AvailableRooms,
+                         Address: sAddress
                     };
                 });
 
