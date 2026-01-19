@@ -29,8 +29,8 @@
                     text="{HostelModel>/FinalPrice} {HostelModel>/Currency}"
                 />
 
-                <Label text="{i18n>roomplan}" />
-                <Text text="{HostelModel>/SelectedPriceType}" />
+                <!-- <Label text="{i18n>roomplan}" />
+                <Text text="{HostelModel>/SelectedPriceType}" /> -->
                 <!-- Project Address -->
 
                 <Label text="{i18n>noofperson}" />
@@ -43,13 +43,25 @@
                 <Label text="{i18n>endDate}" />
                 <Text text="{HostelModel>/EndDate}" />
                 <Label
-                    text="{i18n>monthyear}"
+                    text="{i18n>roomplan}"
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"
                 />
-                <Text
-                    text="{HostelModel>/SelectedMonths}"
-                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'  }"
-                />
+             <Text
+    text="{
+        parts: [
+            { path: 'HostelModel>/SelectedPriceType' },
+            { path: 'HostelModel>/SelectedMonths' }
+        ],
+        formatter: '.Formatter.formatDurationText'
+    }"
+    visible="{
+        = ${HostelModel>/SelectedPriceType} === 'Per Month'
+        || ${HostelModel>/SelectedPriceType} === 'Per Year'
+    }"
+/>
+
+
+
                 <Label
                     text="{i18n>totaldays}"
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"

@@ -82,7 +82,7 @@ onDeleteFacility: function () {
     sap.m.MessageBox.confirm(
         this.i18nModel.getText("pleaseSelectRowDelete"),
         {
-            title: this.i18nModel.getText("confirm"),
+            title: this.i18nModel.getText("Confirm"),
             actions: [
                 sap.m.MessageBox.Action.OK,
                 sap.m.MessageBox.Action.CANCEL
@@ -1540,28 +1540,23 @@ _executeFacilityDelete: function () {
 
         if (discountType === "percentage") {
 
-            let baseAmountForDiscount = uptoValue;
+    // Calculate discount on subtotal
+    discountAmount = subTotal * (discountValue / 100);
 
-            // NEW LOGIC:
-            // calculate percentage on UptoValue
-            if (uptoValue > 0 && uptoValue >= minOrderValue) {
-                baseAmountForDiscount = uptoValue;
-            }
+    // NEW FIX:
+    // If discount exceeds UptoValue, force subtotal - uptoValue
+    if (uptoValue > 0 && discountAmount > uptoValue) {
+        discountAmount = uptoValue;
+    }
 
-            discountAmount = baseAmountForDiscount * (discountValue / 100);
+    discountedSubtotal = subTotal - discountAmount;
 
-            // Cap discount to UptoValue
-            if (uptoValue > 0) {
-                discountAmount = Math.min(discountAmount, uptoValue);
-            }
+} else {
+    // FLAT DISCOUNT
+    discountAmount = discountValue;
+    discountedSubtotal = subTotal - discountAmount;
+}
 
-            discountedSubtotal = subTotal - discountAmount;
-
-        } else {
-            // FLAT DISCOUNT
-            discountAmount = discountValue;
-            discountedSubtotal = subTotal - discountAmount;
-        }
 
         // Prevent negative values
         discountedSubtotal = Math.max(0, discountedSubtotal);

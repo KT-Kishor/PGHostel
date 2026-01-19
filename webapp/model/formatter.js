@@ -332,7 +332,24 @@ sap.ui.define([
 
     // Other units
     return `${price} ${currency} ${unitText}`;
+},
+formatDurationText: function (sPriceType, iMonths) {
+
+    if (!sPriceType || !iMonths) {
+        return "";
+    }
+
+    if (sPriceType === "Per Month") {
+        return iMonths + (iMonths > 1 ? " Months" : " Month");
+    }
+
+    if (sPriceType === "Per Year") {
+        return iMonths + (iMonths > 1 ? " Years" : " Year");
+    }
+
+    return "";
 }
+
 
 
 

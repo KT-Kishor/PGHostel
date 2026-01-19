@@ -65,6 +65,12 @@
                     tooltip="{i18n>placeRoomRent}"
                 />
             </Column>
+             <Column>
+                <Text
+                    text="{i18n>securitydeposit}"
+                    tooltip="{i18n>securitydeposit}"
+                />
+            </Column>
             <Column>
                 <Text
                     text="{i18n>total}"
@@ -89,6 +95,9 @@
         'HostelModel>/Currency'
     ],formatter: '.Formatter.formatCurrency'}"
                     />
+                    <Text text="{parts: [
+        'HostelModel>Deposit'
+    ],formatter: '.Formatter.formatCurrency'}"/>
                     <Text
                         class="totalColumnBold"
                         text="{ parts: [
