@@ -35,6 +35,7 @@ sap.ui.define([
                 dateRangeControl.setSecondDateValue(fyEnd);
             }
             // this._loadHostelMasterData();
+            await this._loadBranchCode()
             await this.Cust_read(true)
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
@@ -57,7 +58,36 @@ sap.ui.define([
             this.getView().setModel(model, "Visiblemodel")
             // this.BedTypedetails();
         },
+         _loadBranchCode: async function() {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+            let filters = {};
+
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
+            }else{
+                filters.BranchID = "";
+            }
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
+                const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                this.getView().setModel(oBranchModel, "BranchModel");
+            } catch (err) {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show(err.message || err.responseText);
+            }
+        },
         // _loadHostelMasterData: function () {
         //     this.ajaxReadWithJQuery("HM_Customer", {})
         //         .then((response) => {
@@ -164,11 +194,24 @@ sap.ui.define([
 
                 // ================= API Call =================
                 this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
+
+                        const customerData = Array.isArray(response.Customers) ? response.Customers : [response.Customers];
+
+    const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+
+    // Map BranchCode → BranchName
+    const mappedData = customerData.map(customer => {
+        const branch = branchData.find(br => br.BranchID === customer.BranchCode);
+        return {
+            ...customer,
+            BranchName: branch ? branch.Name : customer.BranchCode // fallback
+        };
+    });
                         if (!this._originalRoomdata || flag === true) {
-                            this._originalRoomdata = response.Customers;
+                            this._originalRoomdata = mappedData;
                         }
 
-                        const oModel = new sap.ui.model.json.JSONModel(response.Customers);
+                        const oModel = new sap.ui.model.json.JSONModel(mappedData);
                         this.getView().setModel(oModel, "HostelModel");
 
                         this._populateUniqueFilterValues(this._originalRoomdata);

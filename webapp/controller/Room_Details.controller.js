@@ -808,10 +808,23 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
 
+           const roomData = Array.isArray(oData.commentData) ? oData.commentData : [];
+
+    const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+
+    // Map BranchCode → BranchName
+    const mappedData = roomData.map(bed => {
+        const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+        return {
+            ...bed,
+            BranchName: branch ? branch.Name : bed.BranchCode // fallback
+        };
+    });
+
                 if (!this._originalRoomdata || flag === "true") {
-                    this._originalRoomdata = oData.commentData;
+                    this._originalRoomdata = mappedData;
                 }
-                var model = new JSONModel(oData.commentData);
+                var model = new JSONModel(mappedData);
                 this.getView().setModel(model, "RoomDetailsModel");
                 this._populateUniqueFilterValues(this._originalRoomdata);
                 sap.ui.core.BusyIndicator.hide();

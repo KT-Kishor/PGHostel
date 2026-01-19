@@ -129,7 +129,17 @@ sap.ui.define([
                 } else {
                     responseData = [oData.data];
                 }
+                    
+                  const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
+        // Map BranchCode to BranchName directly in response
+        responseData = responseData.map(bed => {
+            const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+            return {
+                ...bed,
+                BranchName: branch ? branch.Name : bed.BranchID 
+            };
+        });
                 this.getOwnerComponent().setModel(
                     new sap.ui.model.json.JSONModel(responseData),
                     "Facilities"

@@ -445,7 +445,18 @@ sap.ui.define([
             return this.ajaxReadWithJQuery("HM_BedType", filters)
                 .then((oData) => {
 
-                    const response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    let response = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+                     const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+
+        // Map BranchCode to BranchName directly in response
+        response = response.map(bed => {
+            const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+            return {
+                ...bed,
+                BranchName: branch ? branch.Name : bed.BranchID 
+            };
+        });
 
                     if (!response || response.length === 0) {
                         this._originalBedData = [];

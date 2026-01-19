@@ -318,7 +318,18 @@ sap.ui.define([
             if (sFacilityName) filters.FacilityName = sFacilityName;
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_HostelFeatures", filters).then((oData) => {
-                    const response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    let response = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+                      const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+
+        // Map BranchCode to BranchName directly in response
+        response = response.map(bed => {
+            const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+            return {
+                ...bed,
+                BranchName: branch ? branch.Name : bed.BranchID 
+            };
+        });
 
                     if (!this._originalBedData || flag === "true") {
                         this._originalBedData = response;
@@ -331,7 +342,7 @@ sap.ui.define([
                         return;
                     }
 
-                    const filteredData = Array.isArray(oData.data) ? oData.data : [oData.data];
+                    const filteredData = response;
                     const model = new sap.ui.model.json.JSONModel(filteredData);
                     this.getView().setModel(model, "HostelFeatures");
                     this._populateUniqueFilterValues(this._originalBedData);
