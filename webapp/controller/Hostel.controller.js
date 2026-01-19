@@ -2886,9 +2886,13 @@ sap.ui.define([
                         b.BranchID?.toLowerCase() === room.BranchCode?.toLowerCase()
                     );
                     // const sLogo = oBranchInfo?.Photo1 ? `data:${oBranchInfo.Photo1Type};base64,${oBranchInfo.Photo1}` : "";
-                      const sArea = oBranchInfo?.Name || "";
+                    const sArea = oBranchInfo?.Name || "";
                     const sAddress = oBranchInfo?.Address || "";
                     const sCountry = oBranchInfo?.Country || "";
+
+                    
+                    const sCheckInTime = oBranchInfo?.CheckinTime || "";
+                    const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
 
                     const aImages = [];
                     for (let i = 1; i <= 5; i++) {
@@ -2906,6 +2910,7 @@ sap.ui.define([
                         ACType: room.ACType,
                         NoOfPerson: room.NoOfPerson,
                         Description: room.Description || "",
+                        Deposit: room.Deposit || "",
                         Price: price,
                         BasicPrice: BasicPrice,
                         MonthPrice: MonthPrice,
@@ -2917,7 +2922,9 @@ sap.ui.define([
                         PriceVisible: PriceVisible,
                         Visible: isVisible,
                         AvailbleBeds: room.AvailableRooms,
-                         Address: sAddress
+                        Address: sAddress,
+                        CheckInTime: sCheckInTime,
+                        CheckOutTime: sCheckOutTime
                     };
                 });
 
