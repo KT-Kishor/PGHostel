@@ -343,7 +343,7 @@ sap.ui.define([
                 YearPrice: oData.YearPrice,
                 CheckInTime: oData.CheckInTime,
                 CheckOutTime: oData.CheckOutTime,
-                Deopsit: oData.Deposit
+                Deposit: oData.Deposit
             };
             
             // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
