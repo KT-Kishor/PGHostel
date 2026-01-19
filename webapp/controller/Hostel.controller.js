@@ -2921,6 +2921,7 @@ sap.ui.define([
                         NoOfPerson: room.NoOfPerson,
                         Description: room.Description || "",
                         Deposit: room.Deposit || "",
+                        DepositCurrency: room.DepositCurrency || "",
                         Price: price,
                         BasicPrice: BasicPrice,
                         MonthPrice: MonthPrice,
