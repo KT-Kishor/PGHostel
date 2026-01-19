@@ -1160,8 +1160,21 @@ sap.ui.define([
         async _loadRecipientContacts() {
             try {
                 sap.ui.core.BusyIndicator.show(0);
+                const oBranchModel = this.getView().getModel("Branchmodel");
+                const aData = oBranchModel?.getData();
 
-                const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", {});
+                if (!Array.isArray(aData) || !aData.length) {
+                    console.error("Branchmodel has no data", aData);
+                    return;
+                }
+
+                const sBranchCode = aData[0].BranchID;
+                const filter = {
+                    BranchCode: sBranchCode
+                };
+
+                const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter);
+                // const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", {});
                 const aContacts = (oData?.data || []).map(c => ({
                     UserName: c.UserName,
                     Role: c.Role,

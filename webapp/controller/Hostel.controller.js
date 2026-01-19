@@ -343,11 +343,12 @@ sap.ui.define([
                 YearPrice: oData.YearPrice,
                 CheckInTime: oData.CheckInTime,
                 CheckOutTime: oData.CheckOutTime,
-                Deposit: oData.Deposit
+                Deposit: oData.Deposit,
+                DepositCurrency: oData.DepositCurrency
             };
             
             // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
-            // console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
+            console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
 
 
             // -------------------------
@@ -616,7 +617,8 @@ sap.ui.define([
                     AvailbleBeds: oSelected.AvailbleBeds,
                     CheckInTime: oSelected.CheckInTime,
                     CheckOutTime: oSelected.CheckOutTime,
-                    Deposit: oSelected.Deposit  
+                    Deposit: oSelected.Deposit  ,
+                    DepositCurrency: oSelected.DepositCurrency
                 };
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);

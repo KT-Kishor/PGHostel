@@ -84,6 +84,7 @@
                         liveChange="onUserlivechange"
                         valueStateText="{i18n>pleaseentervalidUserID}"
                         maxLength="6"
+                        submit="onSignIn"
                     />
                     <Label
                         text="{i18n>MVusername}"
@@ -96,6 +97,7 @@
                         liveChange="onUserlivechange"
                         valueStateText="{i18n>pleaseenteravalidUserName}"
                         maxLength="40"
+                        submit="onSignIn"
                     />
                     <Label text="{i18n>loginwith}" />
                     <HBox
