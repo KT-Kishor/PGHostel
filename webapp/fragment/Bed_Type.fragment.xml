@@ -116,6 +116,18 @@
                     maxLength="3"
                     liveChange="onNoOfPersonInputLiveChange"
                 />
+                 <Label
+                    text="Deposit Amount"
+                    required="true"
+                />
+                <Input
+                    id="BD_id_DepositAmount"
+                    value="{BedModel>/Deposit}"
+                    placeholder="Enter Deposit Amount"
+                    valueStateText="Enter Deposit Amount"
+                    maxLength="7"
+                    liveChange="onNoOfPersonInputLiveChange"
+                />
 
                 <Label
                     text="{i18n>description}"
@@ -161,7 +173,7 @@
                         id="id_Bed_AttachmentTable"
                         items="{UploaderData>/attachments}"
                         mode="Delete"
-                        popinLayout="Block"
+                        popinLayout="Block" 
                         delete="onTokenDelete"
                         width="100%"
                       

@@ -33,9 +33,26 @@ sap.ui.define([
                 });
                 this.getView().setModel(BedImageModel, "BedImageModel")
 
+                 
+
                 this.BedID = oEvent.getParameter("arguments").sPath;
                 await this._loadBranchCode()
                 await this.Onsearch()
+                  var aInputIds = [
+                "idRoomType12",
+                "idBedType",
+                "idRoomtype",
+                "idR",
+                "id_MaxBeds",
+                "id_Description"
+            ];
+
+            aInputIds.forEach(function (sId) {
+                var oInput = this.getView().byId(sId);
+                if (oInput && oInput.setValueState) {
+                    oInput.setValueState("None");
+                }
+            }.bind(this));
                 await this.refershModel(this.BedID)
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
@@ -62,7 +79,7 @@ sap.ui.define([
                 filters.Role ="Admin";
 
             }else{
-                filters.BranchID = aBranchCodes;
+                filters.BranchID = "";
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -195,6 +212,9 @@ sap.ui.define([
         onNameInputLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
+        onNumber: function (oEvent) {
+            utils.onNumber(oEvent.getSource(), "ID");
+        },
 
         BT_onsavebuttonpress: async function() {
             var oView = this.getView();
@@ -207,6 +227,8 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("idRoomtype"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("idR"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("id_MaxBeds"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("id_DepositAmount"), "ID") &&
+
                 utils._LCvalidateMandatoryField(oView.byId("id_Description"), "ID")
             ) {
                 var aBedDetails = oView.getModel("BedDetails").getData();
@@ -255,7 +277,8 @@ sap.ui.define([
                         ACType: Payload.ACType,
                         NoOfPerson: Payload.NoOfPerson,
                         MaxBeds: Payload.MaxBeds,
-                        Description: Payload.Description,
+                        Deposit: Payload.Deposit.trim(),
+                        Description: Payload.Description    
 
                     },
                     Attachment: {

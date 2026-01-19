@@ -169,6 +169,8 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_Roomtype"), "ID") &&
                 utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("BD_id_DepositAmount"), "ID") &&
+
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
             ) {
                 var Attachment = oView.getModel("tokenModel").getData();
@@ -213,6 +215,7 @@ sap.ui.define([
                         ACType: Payload.ACType,
                         NoOfPerson: Payload.NoOfPerson.trim(),
                         MaxBeds: Payload.MaxBeds.trim(),
+                        Deposit: Payload.Deposit.trim(),
                         Description: Payload.Description
                     },
                     Attachment: {}
@@ -564,7 +567,6 @@ sap.ui.define([
             }).join(", ");
            var bAssignedExists = aSelectedItems.some(item => {
     var oBed = item.getBindingContext("BedDetails").getObject();
-
     return CustData.some(cust => 
         cust.BranchCode === oBed.BranchCode &&
         cust.BedType === oBed.Name +" - "+ oBed.ACType &&

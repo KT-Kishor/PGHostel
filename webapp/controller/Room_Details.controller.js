@@ -594,6 +594,9 @@ sap.ui.define([
                 }
                 if (Payload.Price === 0 && Payload.MonthPrice === 0 && Payload.YearPrice === 0) {
                     sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
+                    oRoomModel.setProperty("/Price", "");
+                    oRoomModel.setProperty("/MonthPrice", "");
+                    oRoomModel.setProperty("/YearPrice", "");
                     return;
                 }
 

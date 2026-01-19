@@ -121,8 +121,8 @@
                                             id="idR"
                                             value="{BedImageModel>/NoOfPerson}"
                                             placeholder="{i18n>enterNoofPerson}"
-                                            liveChange="onNameInputLiveChange"
-                                            type="Number"
+                                            liveChange="onNumber"
+                                            maxLength="2"
                                             valueStateText="{i18n>enterNoofPerson}"
                                             editable="{editable>/Edit}"
                                         />
@@ -135,9 +135,22 @@
                                             id="id_MaxBeds"
                                             value="{BedImageModel>/MaxBeds}"
                                             placeholder="{i18n>enterNoofRooms}"
-                                            liveChange="onNameInputLiveChange"
-                                            type="Number"
+                                            liveChange="onNumber"
+                                            maxLength="3"
                                             valueStateText="{i18n>enterMaxNoofRooms}"
+                                            editable="{editable>/Edit}"
+                                        />
+                                         <m:Label
+                                            text="Deposit Amount"
+                                            required="true"
+                                        />
+                                        <m:Input
+                                            id="id_DepositAmount"
+                                            value="{BedImageModel>/Deposit}"
+                                            placeholder="Enter Deposit Amount"
+                                            liveChange="onNumber"
+                                            maxLength="7"
+                                            valueStateText="Enter Deposit Amount"
                                             editable="{editable>/Edit}"
                                         />
 
