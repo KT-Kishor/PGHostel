@@ -43,6 +43,11 @@
                         validated="{HostelModel>/IsGeneralInfoValid}"
                         class="customPanelHeader"
                     >
+                    <MessageStrip
+                                    text="CheckIn Time :      ; CkeckOut Time : "
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                />
                         <core:Fragment
                             fragmentName="sap.ui.com.project1.fragment.GeneralInfo"
                             type="XML"

@@ -145,6 +145,7 @@
                     press="onChangeCouponCode"
                     class="sapUiTinyMarginEnd"
                     id="couponApplyBtn"
+                    visible="{HostelModel>/CouponButtonVisible}"
                 />
             </HBox>
             <HBox justifyContent="End">

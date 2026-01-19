@@ -14,6 +14,7 @@ sap.ui.define([
             this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             var oBtn = this.byId("couponApplyBtn");
             oBtn.setText("Apply Now")
+            // oBtn.setVisible(true);
             var inputID = this.getView().byId("BookingcouponInput")
             inputID.setShowValueHelp(false)
 
@@ -78,13 +79,37 @@ onDeleteFacility: function () {
         return;
     }
 
+    sap.m.MessageBox.confirm(
+        this.i18nModel.getText("pleaseSelectRowDelete"),
+        {
+            title: this.i18nModel.getText("confirm"),
+            actions: [
+                sap.m.MessageBox.Action.OK,
+                sap.m.MessageBox.Action.CANCEL
+            ],
+            emphasizedAction: sap.m.MessageBox.Action.OK,
+            onClose: function (sAction) {
+                if (sAction === sap.m.MessageBox.Action.OK) {
+                    this._executeFacilityDelete();
+                }
+            }.bind(this)
+        }
+    );
+},
+_executeFacilityDelete: function () {
+
+    if (!this._oSelectedFacility) {
+        sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRowDelete"));
+        return;
+    }
+
     const oModel = this.getView().getModel("HostelModel");
-    
-    // 1. Find & delete facility (your existing logic)
+
+    // 1. Find & delete facility
     let iPersonIndex = 0;
     let summaryIndex = -1;
     const aPersons = oModel.getProperty("/Persons") || [];
-    
+
     for (let i = 0; i < aPersons.length; i++) {
         const aSummary = oModel.getProperty(`/Persons/${i}/AllSelectedFacilities`) || [];
         summaryIndex = aSummary.findIndex(f => f === this._oSelectedFacility);
@@ -93,30 +118,37 @@ onDeleteFacility: function () {
             break;
         }
     }
-    
+
     if (summaryIndex === -1) {
         sap.m.MessageToast.show("Selected facility not found");
         return;
     }
 
-    // Delete from summary & selection
+    // Delete from summary
     const sSummaryPath = `/Persons/${iPersonIndex}/AllSelectedFacilities`;
     const aSummary = oModel.getProperty(sSummaryPath);
     aSummary.splice(summaryIndex, 1);
     oModel.setProperty(sSummaryPath, aSummary);
-    
+
+    // Delete from selected facilities
     const sSelectedPath = `/Persons/${iPersonIndex}/Facilities/SelectedFacilities`;
     const aSelected = oModel.getProperty(sSelectedPath) || [];
-    const selectedIdx = aSelected.findIndex(f => f.FacilityName === this._oSelectedFacility.FacilityName);
+    const selectedIdx = aSelected.findIndex(
+        f => f.FacilityName === this._oSelectedFacility.FacilityName
+    );
+
     if (selectedIdx > -1) {
         aSelected.splice(selectedIdx, 1);
         oModel.setProperty(sSelectedPath, aSelected);
     }
 
-    //  2. EXACT SAME CALCULATION LOGIC AS onEditFacilitySave
-    const perPersonRent = parseFloat(oModel.getProperty("/FinalPrice")) || parseFloat(oModel.getProperty("/Price")) || 0;
+    // 2. Recalculate totals (same as edit)
+    const perPersonRent =
+        parseFloat(oModel.getProperty("/FinalPrice")) ||
+        parseFloat(oModel.getProperty("/Price")) || 0;
+
     const totals = this.calculateTotals(aPersons, perPersonRent);
-    
+
     if (totals) {
         oModel.setProperty("/TotalFacilityPrice", totals.TotalFacilityPrice);
         oModel.setProperty("/GrandTotal", totals.GrandTotal);
@@ -125,7 +157,7 @@ onDeleteFacility: function () {
         oModel.setProperty("/FinalTotalCost", totals.FinalTotal || totals.GrandTotal);
     }
 
-    //  3. Per-person recalculation (EXACT same as edit)
+    // 3. Per-person recalculation
     let overAllTotal = 0;
     aPersons.forEach((oPerson, idx) => {
         const facs = oPerson.AllSelectedFacilities || [];
@@ -134,13 +166,16 @@ onDeleteFacility: function () {
         }, 0);
 
         oModel.setProperty(`/Persons/${idx}/TotalFacilityPrice`, totalAmount);
+
         const oldRoomRent = oPerson.RoomRentPerPerson || 0;
         oModel.setProperty(`/Persons/${idx}/GrandTotal`, totalAmount + oldRoomRent);
+
         overAllTotal += totalAmount + oldRoomRent;
     });
+
     oModel.setProperty("/OverallTotalCost", overAllTotal);
 
-    // 🔥 4. Coupon & tax recalculation (EXACT same as edit)
+    // 4. Coupon recalculation
     const discountApplied = Number(oModel.getProperty("/AppliedDiscount") || 0);
     const couponCode = oModel.getProperty("/CouponCode");
     const minOrderValue = Number(oModel.getProperty("/MinOrdervlaue") || 0);
@@ -158,7 +193,7 @@ onDeleteFacility: function () {
             recalculatedDiscount = discountValue;
         }
 
-        updatedSubtotal = updatedSubtotal - recalculatedDiscount;
+        updatedSubtotal -= recalculatedDiscount;
         oModel.setProperty("/AppliedDiscount", recalculatedDiscount);
     }
 
@@ -168,13 +203,20 @@ onDeleteFacility: function () {
         oModel.setProperty("/AppliedDiscountType", "");
         oModel.setProperty("/AppliedDiscountValue", 0);
         updatedSubtotal = overAllTotal;
-        if (oBtn) oBtn.setText("Apply Now");
-        MessageToast.show(this.i18nModel.getText("couponRemovedTotalLessthanMinimumOrderValue"));
+
+        if (oBtn) {
+            oBtn.setText("Apply Now");
+        }
+
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("couponRemovedTotalLessthanMinimumOrderValue")
+        );
     }
 
-    // 🔥 5. Re-apply taxes
+    // 5. Re-apply taxes
     const isIndia = oModel.getProperty("/IsIndia");
     let cgst = 0, sgst = 0, finalTotal = updatedSubtotal;
+
     if (isIndia) {
         cgst = updatedSubtotal * 0.09;
         sgst = updatedSubtotal * 0.09;
@@ -186,26 +228,29 @@ onDeleteFacility: function () {
     oModel.setProperty("/SGST", sgst);
     oModel.setProperty("/FinalTotalCost", finalTotal);
 
-    //  6. Table refresh & selection clear (EXACT same as edit)
+    // 6. Table refresh & selection clear
     const oTable = this._oSelectedTable || this.byId("idFacilitySummaryTable");
+
     if (oTable) {
         try {
             oTable.clearSelection();
             oTable.setSelectedIndex(-1);
-        } catch (e) {
-            /* ignore */
-        }
+        } catch (e) { /* ignore */ }
+
         const oBinding = oTable.getBinding("items");
-        if (oBinding) oBinding.refresh();
-    }
-   setTimeout(() => {
-    $(".serviceCard").each(function () {
-        const ctrl = sap.ui.getCore().byId($(this).attr("id"));
-        if (ctrl) {
-            ctrl.removeStyleClass("serviceCardSelected");
+        if (oBinding) {
+            oBinding.refresh();
         }
-    });
-}, 150);
+    }
+
+    setTimeout(() => {
+        $(".serviceCard").each(function () {
+            const ctrl = sap.ui.getCore().byId($(this).attr("id"));
+            if (ctrl) {
+                ctrl.removeStyleClass("serviceCardSelected");
+            }
+        });
+    }, 150);
 
     // Clear selection state
     this._oSelectedTable = null;
@@ -214,7 +259,10 @@ onDeleteFacility: function () {
     this._sSelectedPath = null;
 
     oModel.refresh(true);
-    sap.m.MessageToast.show(`Facility deleted for Person ${iPersonIndex + 1}`);
+
+    sap.m.MessageToast.show(
+        `Facility deleted for Person ${iPersonIndex + 1}`
+    );
 },
 
 
@@ -1388,156 +1436,173 @@ onDeleteFacility: function () {
             }
         },
 
-        onChangeCouponCode: async function (oEvent) {
-            var oHostelModel = this.getView().getModel("HostelModel");
-            var oBtn = this.byId("couponApplyBtn");
-            var sEnteredCode = oHostelModel.getProperty("/CouponCode")?.trim();
-            var sBranchCode = oHostelModel.getProperty("/BranchCode");
+       onChangeCouponCode: async function (oEvent) {
+    var oHostelModel = this.getView().getModel("HostelModel");
+    oHostelModel.setProperty("/CouponButtonVisible", true);
+    // var oBtn = this.byId("couponApplyBtn");
 
-            if (sEnteredCode === "") {
-                MessageToast.show(this.i18nModel.getText("enterCouponforDiscount"));
-                return;
+    var sEnteredCode = oHostelModel.getProperty("/CouponCode")?.trim();
+    var sBranchCode = oHostelModel.getProperty("/BranchCode");
+
+    if (!sEnteredCode) {
+        MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
+        return;
+    }
+
+    try {
+        BusyIndicator.show(0);
+
+        const filter = {
+            CouponCode: sEnteredCode,
+            Status: "Active"
+        };
+
+        // -----------------------------
+        // FETCH COUPON DATA
+        // -----------------------------
+        const response = await this.ajaxReadWithJQuery("HM_Coupon", filter);
+        const aCoupons = response?.data || [];
+
+        if (!aCoupons.length) {
+            MessageToast.show(this.i18nModel.getText("noCouponsFound"));
+            return;
+        }
+
+        const oMatched = aCoupons.find(c =>
+            String(c.CouponCode).toUpperCase() === sEnteredCode.toUpperCase()
+        );
+
+        if (!oMatched) {
+            MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+            return;
+        }
+
+        // -----------------------------
+        // EXPIRY CHECK
+        // -----------------------------
+        const couponEndISO = new Date(oMatched.EndDate).toISOString().split("T")[0];
+        const todayISO = new Date().toISOString().split("T")[0];
+
+        if (couponEndISO < todayISO) {
+            MessageToast.show(this.i18nModel.getText("couponisExpired"));
+            return;
+        }
+
+        // -----------------------------
+        // BRANCH VALIDATION
+        // -----------------------------
+        const couponBranch = String(oMatched.BranchCode || "").trim();
+        const selectedBranch = String(sBranchCode || "").trim();
+
+        if (couponBranch && couponBranch !== selectedBranch) {
+            MessageToast.show(
+                this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
+            );
+            return;
+        }
+
+        // -----------------------------
+        // COUPON DETAILS
+        // -----------------------------
+        const discountValue = Number(oMatched.DiscountValue || 0);
+        const discountType = (oMatched.DiscountType || "").toLowerCase();
+        const minOrderValue = Number(oMatched.MinOrderValue || 0);
+        const uptoValue = Number(oMatched.UptoValue || 0);
+
+        oHostelModel.setProperty("/AppliedDiscountType", discountType);
+        oHostelModel.setProperty("/AppliedDiscountValue", discountValue);
+        oHostelModel.setProperty("/MinOrderValue", minOrderValue);
+        oHostelModel.setProperty("/AppliedUptoValue", uptoValue);
+
+        // -----------------------------
+        // SUBTOTAL VALIDATION
+        // -----------------------------
+        const isIndia = oHostelModel.getProperty("/IsIndia");
+        let subTotal = Number(oHostelModel.getProperty("/OverallTotalCost") || 0);
+
+        if (subTotal <= 0) {
+            MessageToast.show(this.i18nModel.getText("subtotalisZeroCannotApplyCoupon"));
+            return;
+        }
+
+        if (subTotal < minOrderValue) {
+            MessageToast.show(
+                `Minimum Order Value ₹${minOrderValue} required to apply this coupon.`
+            );
+            return;
+        }
+
+        // -----------------------------
+        // APPLY DISCOUNT
+        // -----------------------------
+        let discountedSubtotal = subTotal;
+        let discountAmount = 0;
+
+        if (discountType === "percentage") {
+
+            let baseAmountForDiscount = uptoValue;
+
+            // NEW LOGIC:
+            // calculate percentage on UptoValue
+            if (uptoValue > 0 && uptoValue >= minOrderValue) {
+                baseAmountForDiscount = uptoValue;
             }
 
-            if (!sEnteredCode) {
+            discountAmount = baseAmountForDiscount * (discountValue / 100);
 
-                const originalTotal = oHostelModel.getProperty("/OverallTotalCost");
-                const originalCGST = oHostelModel.getProperty("/CGST");
-                const originalSGST = oHostelModel.getProperty("/SGST");
-                const originalFinal = oHostelModel.getProperty("/FinalTotalCost");
-
-                oHostelModel.setProperty("/AppliedDiscount", 0);
-                oHostelModel.setProperty("/OverallTotalCost", originalTotal);
-                oHostelModel.setProperty("/CGST", originalCGST);
-                oHostelModel.setProperty("/SGST", originalSGST);
-                oHostelModel.setProperty("/FinalTotalCost", originalFinal);
-
-                MessageToast.show(this.i18nModel.getText("couponRemovedPricesRestored"));
-                return;
+            // Cap discount to UptoValue
+            if (uptoValue > 0) {
+                discountAmount = Math.min(discountAmount, uptoValue);
             }
 
-            if (!sEnteredCode) {
-                MessageToast.show(this.i18nModel.getText("pleaseEnterCoupon"));
-                return;
-            }
+            discountedSubtotal = subTotal - discountAmount;
 
-            try {
-                BusyIndicator.show(0);
+        } else {
+            // FLAT DISCOUNT
+            discountAmount = discountValue;
+            discountedSubtotal = subTotal - discountAmount;
+        }
 
-                const filter = {
-                    CouponCode: sEnteredCode,
-                    Status: "Active"
-                }
-                // Fetch coupons
-                const response = await this.ajaxReadWithJQuery("HM_Coupon", filter
-                );
-                const aCoupons = response?.data || [];
+        // Prevent negative values
+        discountedSubtotal = Math.max(0, discountedSubtotal);
 
-                if (!aCoupons.length) {
-                    MessageToast.show(this.i18nModel.getText("noCouponsFound"));
-                    return;
-                }
-                const CouponCodeEnddate = aCoupons[0].EndDate;
-                const couponEndISO = new Date(CouponCodeEnddate).toISOString().split("T")[0];
-                const todayISO = new Date().toISOString().split("T")[0];
+        // -----------------------------
+        // APPLY TAX AGAIN
+        // -----------------------------
+        let cgst = 0, sgst = 0, finalTotal = discountedSubtotal;
 
-                // Compare
-                if (couponEndISO < todayISO) {
-                    MessageToast.show(this.i18nModel.getText("couponisExpired"));
-                    return;
-                }
-                // Match coupon
-                const oMatched = aCoupons.find(c =>
-                    String(c.CouponCode).toUpperCase() === sEnteredCode.toUpperCase()
-                );
+        if (isIndia) {
+            cgst = discountedSubtotal * 0.09;
+            sgst = discountedSubtotal * 0.09;
+            finalTotal = discountedSubtotal + cgst + sgst;
+        }
 
-                if (!oMatched) {
-                    MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
-                    return;
-                }
-                const couponBranch = String(oMatched.BranchCode || "").trim();
-                const selectedBranch = String(sBranchCode || "").trim();
+        // -----------------------------
+        // UPDATE MODEL
+        // -----------------------------
+        oHostelModel.setProperty("/AppliedDiscount", discountAmount);
+        oHostelModel.setProperty("/OverallTotalCost", discountedSubtotal);
+        oHostelModel.setProperty("/CGST", cgst);
+        oHostelModel.setProperty("/SGST", sgst);
+        oHostelModel.setProperty("/FinalTotalCost", finalTotal);
 
-                if (couponBranch && couponBranch !== selectedBranch) {
-                    MessageToast.show(
-                        this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
-                    );
-                    return;
-                }
+        oHostelModel.refresh(true);
 
-                // Extract coupon details
-                const discountValue = Number(oMatched.DiscountValue || 0);
-                const discountType = (oMatched.DiscountType || "").toLowerCase();
-                const minOrderValue = Number(oMatched.MinOrderValue || 0);
-                oHostelModel.setProperty("/AppliedDiscountType", discountType)
-                oHostelModel.setProperty("/AppliedDiscountValue", discountValue)
-                oHostelModel.setProperty("/MinOrdervlaue", minOrderValue)
-                // Read Subtotal and country
-                const isIndia = oHostelModel.getProperty("/IsIndia");
-                let subTotal = Number(oHostelModel.getProperty("/OverallTotalCost") || 0);
+        // oBtn.setVisible(false);
+        oHostelModel.setProperty("/CouponButtonVisible", false);
 
-                if (subTotal <= 0) {
-                    MessageToast.show(this.i18nModel.getText("subtotalisZeroCannotApplyCoupon"));
-                    return;
-                }
-                if (subTotal < minOrderValue) {
-                    MessageToast.show(
-                        `Minimum Order Value ₹${minOrderValue} required to Apply this Coupon.`
-                    );
-                    return;
-                }
 
-                let discountedSubtotal = subTotal;
-                let discountAmount = 0;
+        MessageToast.show(
+            this.i18nModel.getText("couponAppliedSuccessfully")
+        );
 
-                //  APPLY DISCOUNT LOGIC
-                if (discountType === "percentage") {
-                    // Example: 10% OFF
-                    discountedSubtotal = subTotal - (subTotal * (discountValue / 100));
-                    discountAmount = subTotal * (discountValue / 100);
-                }
-                else {
-                    // Flat amount
-                    discountedSubtotal = subTotal - discountValue;
-                    discountAmount = discountValue;
-                }
-
-                // Prevent negative totals
-                discountedSubtotal = Math.max(0, discountedSubtotal);
-
-                // Store the discounted subtotal
-                oHostelModel.setProperty("/OverallTotalCost", discountedSubtotal);
-                oHostelModel.setProperty("/AppliedDiscount", discountAmount);
-
-                // ------------------------------------------
-                //  APPLY TAX CALCULATIONS AGAIN
-                // ------------------------------------------
-                let finalTotal = discountedSubtotal;
-                let cgst = 0, sgst = 0;
-
-                if (isIndia) {
-                    cgst = discountedSubtotal * 0.09;
-                    sgst = discountedSubtotal * 0.09;
-                    finalTotal = discountedSubtotal + cgst + sgst;
-                }
-
-                // Update model
-                oHostelModel.setProperty("/CGST", cgst);
-                oHostelModel.setProperty("/SGST", sgst);
-                oHostelModel.setProperty("/FinalTotalCost", finalTotal);
-
-                oHostelModel.refresh(true);
-                oBtn.setVisible(false);
-                MessageToast.show(
-                    this.i18nModel.getText("couponAppliedSuccessfully")
-                );
-
-            } catch (err) {
-                console.error(err);
-                MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
-            } finally {
-                BusyIndicator.hide();
-            }
-        },
+    } catch (err) {
+        console.error(err);
+        MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
+    } finally {
+        BusyIndicator.hide();
+    }
+}
+,
     });
 });

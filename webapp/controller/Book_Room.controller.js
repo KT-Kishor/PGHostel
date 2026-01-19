@@ -690,6 +690,7 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
 
         _isPersonUIInitialized: false,
         _lastPersonCount: 1,
+        
 
         _createDynamicPersonsUI: function () {
             var that = this
@@ -1454,7 +1455,7 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
                 });
 
                 /** ---- FACILITIES SECTION (card layout) ---- **/
-                const oFacilities = new sap.m.Panel({
+               const oFacilities = new sap.m.Panel({
                     headerText: "Facilities",
                     expandable: true,
                     expanded: true,
@@ -1709,6 +1710,7 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
                     }
                 });
 
+
                 // Add sections for each person
                 oVBox.addItem(oForm);
 
@@ -1806,7 +1808,11 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
                 selectedFacilities.push(oNewFacilityData);
             }
 
+         setTimeout(() => {
+        if (oCard && oCard.addStyleClass) {
             oCard.addStyleClass("serviceCardSelected");
+        }
+    }, 0);
 
             if (oModel.getProperty("/ForBothSelected") && iPersonIndex === 0) {
                 for (let p = 1; p < aPersons.length; p++) {
@@ -1928,11 +1934,12 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
 
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
-
+        //   var oBtn = this.byId("couponApplyBtn");
             // Clear coupon & discount UI
             oModel.setProperty("/CouponCode", "");
             oModel.setProperty("/AppliedDiscount", 0);
-
+            // oBtn.setVisible(true);
+  oModel.setProperty("/CouponButtonVisible", true);
             // ❗ Skip totals recalculation if user is still on Step 0 or Step 1
             if (this._iSelectedStepIndex < 2) {
                 // Only reset discount value, do NOT calculate totals yet
@@ -1952,8 +1959,8 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
             oModel.setProperty("/FinalTotalCost", result.FinalTotal);
 
             // Reset button text
-            const oBtn = this.byId("couponApplyBtn");
-            if (oBtn) oBtn.setText("Apply Now");
+            // oModel.setProperty("/CouponButtonVisible", true);
+        
 
             oModel.refresh(true);
         },
@@ -1988,6 +1995,18 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
                 oHostelModel.getProperty("/SelectedPriceType") &&
                 oHostelModel.getProperty("/SelectedPerson")
             );
+
+               if (this._iSelectedStepIndex === 1) {
+        this._resetCouponAndDiscount();
+        const aMissing = this._checkMandatoryFields();
+        
+        //  Check MessageModel for errors (no need to count manually)
+        if (aMissing.length > 0 || this.getView().getModel("message")?.getProperty("/").length > 0) {
+            // Button becomes visible automatically via binding
+            MessageToast.show("Please review the errors and fix them");
+            return;
+        }
+    }
 
             //  BLOCK HEADER JUMP IF STEP 1 INVALID
             if (iTargetIndex > 0 && !bStep1Valid) {
@@ -2286,15 +2305,13 @@ this.oMessageManager = sap.ui.getCore().getMessageManager();
             oHostelModel.refresh(true);
         },
 
-        // Separated calculation function
         // signature now: calculateTotals(aPersons, sStartDate, sEndDate, roomRentPrice, sPaymentType, iSelectedMonths)
         calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice) {
 
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
-            // ===============================
-            // FIX 1 — INCLUSIVE DAY CALCULATION
+    
             // (Per Day = End - Start + 1)
             // ===============================
             let iDays = Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;

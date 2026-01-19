@@ -4,7 +4,7 @@
 	<MessagePopover
         id="idMessagePopover"
 		items="{message>/}"
-		initiallyExpanded="true">
+		initiallyExpanded="true" >
          <headerButton>
            <Button text="Error Messages" 
                     type="Emphasized" 
