@@ -7,7 +7,7 @@
       
         afterClose=".onEditDialogClose"
         afterOpen=".onEditDialogAfterOpen"
-         contentWidth="34%"
+         contentWidth="28rem"
         contentHeight="auto"
     >
         <customHeader>
