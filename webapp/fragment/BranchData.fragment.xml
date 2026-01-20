@@ -164,7 +164,7 @@
                 />
                 <Label text="" />
 				<HBox width="100%">
-					<VBox width="25%">
+					<VBox width="30%">
                 <Label
                     text="{i18n>MSisdCode}"
                     required="true"
@@ -186,7 +186,7 @@
                             />
                         </ComboBox>
                     </VBox>
-                    <VBox width="75%"
+                    <VBox width="70%"
                     class="sapUiTinyMarginBegin">
                     <Label
                     text="{i18n>MSmobileNo}"
