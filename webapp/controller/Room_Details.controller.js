@@ -517,6 +517,7 @@ sap.ui.define([
             delete Payload.File;
             delete Payload.Description;
             delete Payload.editable
+            delete Payload.BranchName
 
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
@@ -870,13 +871,26 @@ sap.ui.define([
         },
 
         onPriceInputLiveChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            let sValue = oInput.getValue();
+          const oInput = oEvent.getSource();
+let sValue = oInput.getValue();
 
-            // Remove any non-digit characters
-            sValue = sValue.replace(/[^0-9]/g, "");
+// Allow digits and one decimal point
+sValue = sValue.replace(/[^0-9.]/g, "");
 
-            oInput.setValue(sValue);
+// Allow only one decimal point
+const aParts = sValue.split(".");
+if (aParts.length > 2) {
+    sValue = aParts[0] + "." + aParts[1];
+}
+
+// Limit to 2 decimal places
+if (aParts[1]) {
+    aParts[1] = aParts[1].substring(0, 2);
+    sValue = aParts[0] + "." + aParts[1];
+}
+
+oInput.setValue(sValue);
+
         },
 
         onACtypeChange: function (oEvent) {

@@ -213,6 +213,7 @@
                     displayFormat="hh a"
                     placeholder="e.g. 10 AM"
                     valueFormat="hh a"
+                    valueStateText="Please select Check-In Time"
                 />
                 <Label
                     text="{i18n>bdCheckouttime}"
@@ -225,6 +226,7 @@
                     displayFormat="hh a"
                     valueFormat="hh a"
                     placeholder="e.g. 10 AM"
+                    valueStateText="Please select Check-Out Time"
                 />
                 <Label
                     text="{i18n>penalty}"

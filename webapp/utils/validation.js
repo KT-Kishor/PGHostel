@@ -16,20 +16,34 @@ sap.ui.define([], function() {
                 return true;
             }
         },
-    onNumber: function (oEvent, type) {
+ onNumber: function (oEvent, type) {
     var oField = type === "ID" ? oEvent : oEvent.getSource();
     if (!oField) return false;
 
-    // Remove non-digit characters
-    var value = oField.getValue().replace(/\D/g, "");
-    oField.setValue(value);
+    var sValue = oField.getValue();
 
-    if (!value) { // empty after removing non-digits
+    // Allow digits + optional decimal point + max 2 decimals
+    var sFilteredValue = sValue
+        .replace(/[^0-9.]/g, "")     // allow digits and dot
+        .replace(/(\..*)\./g, "$1"); // allow only one dot
+
+    // Limit to 2 decimal places
+    if (sFilteredValue.includes(".")) {
+        var aParts = sFilteredValue.split(".");
+        aParts[1] = aParts[1].slice(0, 2);
+        sFilteredValue = aParts.join(".");
+    }
+
+    oField.setValue(sFilteredValue);
+
+    // Validation
+    if (!sFilteredValue || sFilteredValue === ".") {
         oField.setValueState("Error");
+        oField.setValueStateText("Enter valid amount");
         return false;
     } else {
         oField.setValueState("None");
-        return true; 
+        return true;
     }
 },
 

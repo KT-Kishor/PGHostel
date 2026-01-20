@@ -381,14 +381,17 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
+                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
+
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID")
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            if (!this._validateCheckInOut()) {
-                return;
-            }
+            // if (!this._validateCheckInOut()) {
+            //     return;
+            // }
             const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
             if (!oPenalty.getValue() && oPenalty.getValue() !== "0") {
                 oPenalty.setValueState("Error");
@@ -473,7 +476,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                // sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -727,7 +730,7 @@ sap.ui.define([
                                     this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
                                 );
                             } finally {
-                                sap.ui.core.BusyIndicator.hide();
+                                // sap.ui.core.BusyIndicator.hide();
                                 oTable.removeSelections(true);
                             }
                         }
