@@ -390,11 +390,15 @@ sap.ui.define([
                 return;
             }
             const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
-            if (!oPenalty.getValue()) {
+            if (!oPenalty.getValue() && oPenalty.getValue() !== "0") {
                 oPenalty.setValueState("Error");
                 oPenalty.setValueStateText(this.i18nModel.getText("enterPenalty"));
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            if (oPenalty.getValueState() === "Error") {
                 oPenalty.focus();
+                sap.m.MessageToast.show("Please correct the Penalty amount");
                 return;
             }
             const aCountries = this.getOwnerComponent().getModel("CountryModel").getData();
@@ -415,12 +419,6 @@ sap.ui.define([
                 c.stateName === Payload.state &&
                 c.countryCode === aCountries.find(c => c.countryName === Payload.country)?.code
             );
-
-            // if (!validCity) {
-            //     MessageToast.show(this.i18nModel.getText("Irrcity"));
-            //     sap.ui.getCore().byId(oView.createId("MC_id_City")).setValueState("Error");
-            //     return;
-            // }
 
             if (!this.MC_ValidateGstNumber()) {
                 sap.ui.getCore().byId(oView.createId("MC_id_CustomGst")).focus();
@@ -531,9 +529,38 @@ sap.ui.define([
         },
 
         onPenaltyInputLiveChange: function (oEvent) {
-            var oInput = oEvent.getSource();
-            utils._LCvalidateAmount(oEvent.getSource(), "ID");
-            if (oInput.getValue() === "") oInput.setValueState("None");
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue();
+            sValue = sValue.replace(/[^0-9.]/g, "");
+            if (sValue.startsWith(".")) {
+                oInput.setValue("");
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Penalty cannot start with dot");
+                return;
+            }
+
+            const aParts = sValue.split(".");
+            if (aParts.length > 2) {
+                sValue = aParts[0] + "." + aParts[1];
+            }
+            if (aParts[1] && aParts[1].length > 2) {
+                sValue = aParts[0] + "." + aParts[1].substring(0, 2);
+            }
+
+            oInput.setValue(sValue);
+            if (!sValue) {
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
+                return;
+            }
+            if (parseFloat(sValue) < 0) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Penalty cannot be negative");
+                return;
+            }
+
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
         },
 
         onAddressInputLiveChange: function (oEvent) {

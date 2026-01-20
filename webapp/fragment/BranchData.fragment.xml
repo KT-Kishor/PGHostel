@@ -40,7 +40,7 @@
                     id="BD_idBName"
                     value="{MDmodel>/Name}"
                     placeholder="{i18n>enterBranchName}"
-                    maxLength="120"
+                    maxLength="60"
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
                 />
@@ -52,7 +52,7 @@
                     id="BD_idAddress"
                     value="{MDmodel>/Address}"
                     placeholder="{i18n>enterAddress}"
-                    maxLength="60"
+                    maxLength="120"
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
                 />
