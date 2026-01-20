@@ -9,7 +9,7 @@
         draggable="true"
         resizable="true"
         class="authDialog"
-       contentWidth="34%"
+       contentWidth="28rem"
         contentHeight="auto"
     >
 		<customHeader>

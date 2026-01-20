@@ -9,7 +9,7 @@
        
         type="Message"
         class="sapUiContentPadding"
-          contentWidth="34%"
+          contentWidth="28rem"
         contentHeight="auto"
     >
       <customHeader>

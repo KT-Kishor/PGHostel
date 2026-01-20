@@ -9,7 +9,7 @@
         id="editFacilityDialog"
       
         afterClose=".onEditDialogClose"
-          contentWidth="34%"
+          contentWidth="28rem"
         contentHeight="auto"
     >
       <customHeader>

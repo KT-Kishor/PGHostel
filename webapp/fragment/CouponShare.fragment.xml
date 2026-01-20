@@ -6,7 +6,7 @@
     xmlns:core="sap.ui.core"
     xmlns:f="sap.ui.layout.form"
     afterClose="onShareDialogAfterClose"
-       contentWidth="34%"
+      contentWidth="28rem"
         contentHeight="auto"
 >
     <customHeader>

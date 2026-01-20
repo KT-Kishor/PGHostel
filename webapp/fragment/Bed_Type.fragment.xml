@@ -11,7 +11,7 @@
         class="sapUiContentPadding"
         resizable="true"
         draggable="true"
-        contentWidth="34%"
+       contentWidth="28rem"
         contentHeight="auto"
     
     >

@@ -9,7 +9,7 @@
         draggable="true"
         resizable="true"
         afterClose="onDialogAfterClose"
-          contentWidth="34%"
+         contentWidth="28rem"
         contentHeight="auto"
     >
         <customHeader>
