@@ -105,8 +105,7 @@
             <Table
                 id="CI_id_InvoiceTable"
                 sticky="ColumnHeaders,HeaderToolbar"
-                items="{path: 'ManageInvoiceModel>/', sorter: {path: 'BranchCode',descending: false,group: true}}"
-            >
+                items="{path: 'ManageInvoiceModel>/', sorter: { path: 'BranchName', descending: false, group: true }}">
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title

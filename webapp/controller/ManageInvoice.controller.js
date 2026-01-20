@@ -35,6 +35,7 @@ sap.ui.define(
                             dateRangeControl.setDateValue(fyStart);
                             dateRangeControl.setSecondDateValue(fyEnd);
                         }
+                        await this._loadBranchCode()
                         await this.ManageInvoice_onSearch();
 
                     } catch (error) {
@@ -45,7 +46,44 @@ sap.ui.define(
                     }
                 },
 
+                _loadBranchCode: async function() {
+                    const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+                    const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
+                    let aBranchCodes = "";
+
+                    if (Array.isArray(omainModel) && omainModel.length) {
+                        aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+                    } else if (oExistingModel.BranchCode) {
+                        aBranchCodes = oExistingModel.BranchCode;
+                    }
+
+                    let filters = {};
+
+                    if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                        filters.BranchID = aBranchCodes;
+                        filters.Role = "Admin";
+                    } else {
+                        filters.BranchID = "";
+                    }
+                    try {
+                        const oView = this.getView();
+
+                        const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
+
+                        const aBranches = Array.isArray(oResponse?.data) ?
+                            oResponse.data :
+                            (oResponse?.data ? [oResponse.data] : []);
+
+                        const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                        oView.setModel(oBranchModel, "BranchModel");
+                    } catch (err) {
+                        console.error("Error while loading branch data:", err);
+                    }
+                },
+
                 ManageInvoice_onSearch: async function() {
+                    var oView = this.getView();
                     const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
                     const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -54,11 +92,11 @@ sap.ui.define(
 
                     try {
                         sap.ui.core.BusyIndicator.show(0);
-                        let aBranchCodes = ""; 
+                        let aBranchCodes = "";
 
-                            if (Array.isArray(omainModel) && omainModel.length) {
+                        if (Array.isArray(omainModel) && omainModel.length) {
                             aBranchCodes = omainModel.map(item => item.BranchID).filter(Boolean).join(",");
-                        }else if (oExistingModel.BranchCode) {
+                        } else if (oExistingModel.BranchCode) {
                             aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim()).join(",");
                         }
 
@@ -157,16 +195,39 @@ sap.ui.define(
                             filterModelParams
                         );
 
-                        /* ---------------- Main Data Fetch ---------------- */
-                        await this._fetchCommonData("HM_ManageInvoice", "ManageInvoiceModel", params);
+                        /* ---------------- FETCH MAIN TABLE DATA ---------------- */
+                        const invoiceResp = await this.ajaxReadWithJQuery("HM_ManageInvoice", params);
 
-                        const aInvoiceData = this.getView().getModel("ManageInvoiceModel")?.getData() || [];
-                        this._buildUniqueCustomerModel(aInvoiceData);
+                        const aInvoiceData = Array.isArray(invoiceResp?.data) ?
+                            invoiceResp.data : [];
+
+                        /* ---------------- BranchName Mapping ---------------- */
+                        const aBranchData =
+                            oView.getModel("BranchModel")?.getData() || [];
+
+                        const aFinalData = aInvoiceData.map(item => {
+                            const oBranch = aBranchData.find(
+                                br => br.BranchID === item.BranchCode
+                            );
+                            return {
+                                ...item,
+                                BranchName: oBranch?.Name || ""
+                            };
+                        });
+
+                        /* ---------------- SET TABLE MODEL (VIEW) ---------------- */
+                        oView.setModel(
+                            new sap.ui.model.json.JSONModel(aFinalData),
+                            "ManageInvoiceModel"
+                        );
+
+                        /* ---------------- Build Customer Filter ---------------- */
+                        this._buildUniqueCustomerModel(aFinalData);
                         sap.ui.core.BusyIndicator.hide();
-                    } catch (error) {
+                    } catch (err) {
                         sap.ui.core.BusyIndicator.hide();
-                        MessageToast.show(this.i18nModel.getText("technicalError"));
-                        console.error(error);
+                        console.error(err);
+                        sap.m.MessageToast.show("Technical Error");
                     }
                 },
 
