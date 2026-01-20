@@ -34,7 +34,14 @@ sap.ui.define([
             }), "CouponView");
 
         },
+        _buildBranchMap: function () {
+            const aBranches = this.getView().getModel("Branchmodel").getData() || [];
+            this._branchMap = {};
 
+            aBranches.forEach(b => {
+                this._branchMap[b.BranchID] = b.Name;
+            });
+        },
         onHome: function () {
             this.CommonLogoutFunction();
             this.getView().getModel("CouponModel").setData({});
@@ -51,6 +58,7 @@ sap.ui.define([
             //     : [];
 
             await this._loadBranchCode();
+            this._buildBranchMap();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             const sBRModel = this.getView().getModel("Branchmodel").getData();
 
@@ -176,6 +184,15 @@ sap.ui.define([
                 const aData = this._normalizeCouponResult(oResult);
                 this.getView().getModel("CouponModel").setData(aData);
                 this._applyCouponGroupingAndSorting();
+
+// ======== Branch Name ========
+
+                aData.forEach(coupon => {
+                    coupon.BranchName = this._branchMap[coupon.BranchCode] || "-";
+                });
+
+                this.getView().getModel("CouponModel").setData(aData);
+
 
             } catch (err) {
                 sap.m.MessageBox.error(
