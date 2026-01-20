@@ -475,36 +475,40 @@ sap.ui.define([
 
         onDownloadCoupons: function () {
             var oTable = this.getView().byId("couponTable");
-            const oModelData = oTable.getModel("CouponModel").getData();
-            if (!oModelData || oModelData.length === 0) {
-                sap.m.MessageBox.info(this.i18nModel.getText("nocouponsavailabledownload"));
+            var oModel = oTable.getModel("CouponModel");
+            var oData = oModel.getData();
+
+            // normalize data
+            var aData = Array.isArray(oData)
+                ? oData
+                : oData?.results || [];
+
+            if (aData.length === 0) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("nocouponsavailabledownload")
+                );
                 return;
             }
-            const aFormattedData = oModelData.map(item => {
-                return {
-                    ...item,
-                    StartDate: Formatter.formatDate(item.StartDate),
-                    EndDate: Formatter.formatDate(item.EndDate),
-                    CreatedAt: Formatter.formatDate(item.CreatedAt)
-                }
-            });
+
+            const aFormattedData = aData.map(item => ({
+                ...item,
+                StartDate: Formatter.formatDate(item.StartDate),
+                EndDate: Formatter.formatDate(item.EndDate),
+                CreatedAt: Formatter.formatDate(item.CreatedAt)
+            }));
+
             var aCols = this._createColumnConfig();
-            var oSettings = {
-                workbook: {
-                    columns: aCols
-                },
+
+            var oSheet = new Spreadsheet({
+                workbook: { columns: aCols },
                 dataSource: aFormattedData,
                 fileName: "Coupons.xlsx"
-            };
-            var oSheet = new Spreadsheet(oSettings);
+            });
+
             oSheet.build()
-                .then(function () {
-                    oSheet.destroy();
-                })
-                .catch(function () {
-                    oSheet.destroy();
-                });
+                .finally(() => oSheet.destroy());
         },
+
 
         _createColumnConfig: function () {
             return [
