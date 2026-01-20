@@ -42,20 +42,42 @@ sap.ui.define([
                 this._branchMap[b.BranchID] = b.Name;
             });
         },
+
         onHome: function () {
-            this.CommonLogoutFunction();
+            const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+
             this.getView().getModel("CouponModel").setData({});
 
+            this.getOwnerComponent()
+                .getRouter()
+                .navTo("RouteHostel", {}, true);
         },
 
         _onRouteMatched: async function () {
             const ok = await this.commonLoginFunction();
             if (!ok) return;
-            // const oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
 
-            // this._allowedBranches = oLoginData.BranchCode
-            //     ? oLoginData.BranchCode.split(",").map(b => b.trim())
-            //     : [];
+
+            // 🔑 Bind LoginModel to the view (same pattern as other controller)
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            if (oLoginModel) {
+                this.getView().setModel(
+                    new sap.ui.model.json.JSONModel(oLoginModel.getData()),
+                    "LoginModel"
+                );
+                this._oLoggedInUser = oLoginModel.getData();
+            } else {
+                this._oLoggedInUser = {};
+            }
+            console.log("this._oLoggedInUser", this._oLoggedInUser);
+
 
             await this._loadBranchCode();
             this._buildBranchMap();
@@ -94,8 +116,8 @@ sap.ui.define([
                 // ================= Branch Logic =================
                 params.BranchCode = this._allowedBranches;
 
-                if( oExistingModel.Role === "Admin"){
-                    params.Role ="Admin";
+                if (oExistingModel.Role === "Admin") {
+                    params.Role = "Admin";
                 }
 
                 // ================= Date Format =================
@@ -185,7 +207,7 @@ sap.ui.define([
                 this.getView().getModel("CouponModel").setData(aData);
                 this._applyCouponGroupingAndSorting();
 
-// ======== Branch Name ========
+                // ======== Branch Name ========
 
                 aData.forEach(coupon => {
                     coupon.BranchName = this._branchMap[coupon.BranchCode] || "-";
@@ -239,17 +261,17 @@ sap.ui.define([
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
-        
+
             let filters = {};
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }
-                 if (oExistingModel.Role === "Admin") {
-                 filters.BranchID = aBranchCodes;
-                filters.Role ="Admin";
-            }else{
-                 filters.BranchID = "";
+            if (oExistingModel.Role === "Admin") {
+                filters.BranchID = aBranchCodes;
+                filters.Role = "Admin";
+            } else {
+                filters.BranchID = "";
 
             }
             try {
@@ -1265,7 +1287,7 @@ sap.ui.define([
 
             const aRecipients = this._aAllRecipients || [];
             if (!aRecipients.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("nocontactsfound."));
+                sap.m.MessageToast.show(this.i18nModel.getText("nocontactsfound"));
                 return;
             }
             const oView = this.getView();
