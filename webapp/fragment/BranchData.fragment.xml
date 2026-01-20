@@ -111,7 +111,7 @@
                 />
                 <ComboBox
                     id="MC_id_City"
-                    selectionChange="MC_onChangeCity"
+                    change="MC_onChangeCity"
                     valueStateText="{i18n>cityValueText}"
                     placeholder="{i18n>enterCity}"
                     items="{path:'CityModel>/',length:1000}"

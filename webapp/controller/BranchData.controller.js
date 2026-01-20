@@ -312,7 +312,7 @@ sap.ui.define([
                 }
 
                 if (!oMDModel.getProperty("/CheckoutTime")) {
-                    oMDModel.setProperty("/CheckoutTime", "23:00:00");
+                    oMDModel.setProperty("/CheckoutTime", "11:00:00");
                 }
             }
         },
@@ -381,8 +381,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
-                  utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
-
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID")
             if (!isMandatoryValid) {
@@ -1194,7 +1193,6 @@ sap.ui.define([
         MC_ValidateGstNumber: function (oEvent) {
             const oInput = oEvent ? oEvent.getSource() : sap.ui.getCore().byId(this.getView().createId("MC_id_CustomGst"));
             const sValue = oInput.getValue().trim();
-
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
             if (!visiModel.getProperty("/isIndia")) {
@@ -1202,8 +1200,6 @@ sap.ui.define([
                 return true;
             }
             const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
-
-            // GST optional
             if (!sValue) {
                 oInput.setValueState("None");
                 visiModel.setProperty("/CC_id_CustInput", false);
@@ -1213,7 +1209,6 @@ sap.ui.define([
                 return true;
             }
 
-            // Invalid GST
             if (!GST_REGEX.test(sValue)) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("gstError"));
@@ -1222,7 +1217,6 @@ sap.ui.define([
                 return false;
             }
 
-            // ✅ Valid GST
             oInput.setValueState("None");
             oInput.setValueStateText("");
             visiModel.setProperty("/CC_id_CustInput", true);
