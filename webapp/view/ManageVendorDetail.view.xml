@@ -438,6 +438,7 @@
                         tooltip="{i18n>sendBackRemark}"
                         class="myUnifiedBtn"
                         press="MI_onPressButtons"
+                        enabled="{= ${AdminSignupModel>/Status} !== 'Send back' }"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
                         &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />

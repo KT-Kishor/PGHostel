@@ -5,7 +5,7 @@
     displayBlock="true">
 
     <Page
-        title="404"
+        title="Page Not Found"
         showNavButton="true"
         navButtonPress="onNavBack">
 

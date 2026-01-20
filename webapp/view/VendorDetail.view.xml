@@ -13,7 +13,11 @@
     xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
     xmlns:u="sap.ui.unified">
-    <m:Page  title="{i18n>MVDtitle}">
+    <m:Page
+        navButtonPress="BI_onButtonPress"
+        showNavButton="true"
+        title="{i18n>MVDtitle}"
+    >
         <ObjectPageLayout id="V_id_ObjectPageLayout">
             <sections>
                 <ObjectPageSection
@@ -49,6 +53,7 @@
                                                 class="myUnifiedBtn"
                                                 text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
                                                 press="onEditOrSavePress"
+                                                enabled="{= ${AdminSignupModel>/Status} !== 'Submitted' }"
                                             />
                                         </m:Toolbar>
                                     </f:toolbar>

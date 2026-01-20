@@ -3132,15 +3132,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
     vertical-align: middle;
 }
 
-@media (max-width: 600px) {
-    .sapMDialog > header .sapMDialogTitleGroup .sapMTitle {
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        line-height: 1;
-    }
-}
-
 
 
 

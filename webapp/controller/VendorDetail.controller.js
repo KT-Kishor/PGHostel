@@ -43,7 +43,13 @@ sap.ui.define([
                     return this._goToNotFound();
                 }
 
-                /* ✅ URL IS 100% VALID */
+                //  Check in backend (MOST IMPORTANT)
+                const bValid = await this._validateVendorUserID(decodedUserID);
+                if (!bValid) {
+                    return this._goToNotFound();
+                }
+
+                /* URL IS 100% VALID */
                 this.sUserID = decodedUserID;
 
                 var Layout = this.byId("V_id_ObjectPageLayout");
@@ -70,6 +76,22 @@ sap.ui.define([
 
         _goToNotFound: function() {
             this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
+        },
+
+        _validateVendorUserID: async function (sUserID) {
+            try {
+                const oResp = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
+                    UserID: sUserID
+                });
+
+                // ✅ Must exist AND must be in Send Back status
+                return (
+                    oResp?.data?.length === 1 &&
+                    oResp.data[0].Status === "Send back"
+                );
+            } catch (err) {
+                return false;
+            }
         },
 
         _initAdminSignupModel: function() {
@@ -284,7 +306,31 @@ sap.ui.define([
             }
         },
 
-        BT_onsavebuttonpress: async function() {
+        BT_onsavebuttonpress: async function () {
+            const bConfirm = await new Promise((resolve) => {
+                sap.m.MessageBox.confirm(
+                    "You can submit the details only once. Are you sure you want to proceed?",
+                    {
+                        icon: sap.m.MessageBox.Icon.WARNING,
+                        title: "Confirm Submission",
+                        actions: [
+                            sap.m.MessageBox.Action.YES,
+                            sap.m.MessageBox.Action.NO
+                        ],
+                        emphasizedAction: sap.m.MessageBox.Action.NO,
+                        onClose: function (sAction) {
+                            resolve(sAction === sap.m.MessageBox.Action.YES);
+                        }
+                    }
+                );
+            });
+
+            //  User clicked NO
+            if (!bConfirm) {
+                return false;
+            }
+
+            //  User clicked YES → continue existing logic
             try {
                 const C = this.byId.bind(this);
                 const oModel = this.getView().getModel("AdminSignupModel");
@@ -322,6 +368,7 @@ sap.ui.define([
                         State: oData.State,
                         City: oData.City,
                         DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                        Status: "Submitted"
                     },
                     filters: {
                         UserID: oData.UserID
@@ -331,7 +378,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.show(0);
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
-                sap.ui.core.BusyIndicator.hide();
+
                 MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
                 return true;
             } catch (err) {
@@ -797,6 +844,10 @@ sap.ui.define([
 
         onChangeDOB: function(oEvent) {
             utils._LCvalidateDate(oEvent);
+        },
+
+        BI_onButtonPress: function() {
+           this.getOwnerComponent().getRouter().navTo("RouteHostel");
         }
     });
 });

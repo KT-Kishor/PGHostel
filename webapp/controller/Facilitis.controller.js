@@ -480,6 +480,7 @@ sap.ui.define([
         },
 
         onFacilityFileChange: function (oEvent) {
+            
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -552,6 +553,7 @@ sap.ui.define([
 
                 oReader.readAsDataURL(oFile);
             });
+            oEvent.getSource().clear();        
         },
 
         _formatFileSize: function (bytes) {
