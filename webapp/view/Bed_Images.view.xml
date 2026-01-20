@@ -55,7 +55,7 @@
                                     columnsM="2"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:content>
+                                    <f:content>                              
                                         <m:Label
                                             text="{i18n>MSbranchCode}"
                                             required="true"
@@ -72,8 +72,8 @@
                                         >
                                             <core:ListItem
                                                 key="{BranchModel>BranchID}"
-                                                text="{BranchModel>BranchID}"
-                                                additionalText="{BranchModel>Name}"
+                                                text="{BranchModel>Name}"
+                                                additionalText="{BranchModel>BranchID}"
                                             />
                                         </m:ComboBox>
 

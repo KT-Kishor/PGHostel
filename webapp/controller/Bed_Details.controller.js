@@ -294,6 +294,7 @@ sap.ui.define([
         },
 
         onFacilityFileChange: function (oEvent) {
+             var oUploader = oEvent.getSource();
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -372,6 +373,7 @@ sap.ui.define([
 
                 oReader.readAsDataURL(oFile);
             });
+            oUploader.clear();
         },
 
         formatFileSize: function (bytes) {
@@ -551,6 +553,19 @@ sap.ui.define([
 
         onbranchChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            const sBranchCode = oEvent.getSource().getSelectedKey();
+              var oCurrencyModel = this.getView().getModel("BranchModel").getData();
+
+            var oCountryModel = this.getView().getModel("CountryModel").getData();
+
+            var Branch = oCurrencyModel.find((item) => {
+                return item.BranchID === sBranchCode
+            })
+
+            var Currency = oCountryModel.find((item) => {
+                return item.countryName === Branch.Country
+            })
+            this.getView().getModel("BedModel").setProperty("/DepositCurrency", Currency.currency);
         },
 
         onNameInputLiveChange: function (oEvent) {

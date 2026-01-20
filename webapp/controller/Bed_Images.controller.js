@@ -223,7 +223,6 @@ sap.ui.define([
             var oView = this.getView();
             var Payload = oView.getModel("BedImageModel").getData();
             var DisplayImagesModel = oView.getModel("DisplayImagesModel").getData();
-
             if (
                 utils._LCstrictValidationComboBox(oView.byId("idRoomType12"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("idBedType"), "ID") &&
@@ -237,6 +236,18 @@ sap.ui.define([
             ) {
                 var aBedDetails = oView.getModel("BedDetails").getData();
 
+
+              var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
+
+                var uploadedImages = attachments.filter(function (item) {
+                    return !item.isPlaceholder;
+                });
+
+                // Validation: at least one image required
+                if (uploadedImages.length === 0) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+                    return;
+                }
                 var bDuplicate = aBedDetails.some(function(bed) {
                     if (Payload.ID && bed.ID === Payload.ID) return false;
                     return (

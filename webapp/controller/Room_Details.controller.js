@@ -522,8 +522,8 @@ sap.ui.define([
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
             var Noofper = aBedTypes.find(function (bed) {
-                return bed.BranchCode === Payload.BranchCode && bed.Name.trim() === Payload.BedTypeName.split("-")[0].trim() &&
-                    bed.ACType === Payload.BedTypeName.split("-").slice(1).join("-").trim();
+                return bed.BranchCode === Payload.BranchCode && bed.Name.trim() === Payload.BedTypeName.substring(0, Payload.BedTypeName.lastIndexOf("-")).trim() &&
+                    bed.ACType === Payload.BedTypeName.substring(Payload.BedTypeName.lastIndexOf("-") + 1).trim();
 
             });
 
@@ -549,8 +549,8 @@ sap.ui.define([
                     return room.RoomNo === Payload.RoomNo;
                 });
 
-                var selectedBedTypeName = Payload.BedTypeName.split("-")[0].trim();
-                var selectedACType = Payload.BedTypeName.split("-").slice(1).join("-").trim();
+                var selectedBedTypeName = Payload.BedTypeName.substring(0,Payload.BedTypeName.lastIndexOf("-")).trim() ;
+                var selectedACType = Payload.BedTypeName.substring(Payload.BedTypeName.lastIndexOf("-") + 1).trim();
                 var aFiltered = aBedTypes.filter(function (bed) {
 
                     // Only check selected Bed Type
