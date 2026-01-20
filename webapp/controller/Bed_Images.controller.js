@@ -231,6 +231,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oView.byId("idR"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("id_MaxBeds"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("id_DepositAmount"), "ID") &&
+                 utils._LCstrictValidationComboBox(oView.byId("id_DepositCurrency"), "ID") &&
 
                 utils._LCvalidateMandatoryField(oView.byId("id_Description"), "ID")
             ) {
