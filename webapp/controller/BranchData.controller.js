@@ -337,6 +337,14 @@ sap.ui.define([
             const oCountry = sap.ui.getCore().byId(oView.createId("MC_id_Country"));
             const oState = sap.ui.getCore().byId(oView.createId("MC_id_State"));
             const oCity = sap.ui.getCore().byId(oView.createId("MC_id_City"));
+            const oCityCB = sap.ui.getCore().byId(oView.createId("MC_id_City"));
+
+            if (oCityCB) {
+                oCityCB.setSelectedKey(null);
+                oCityCB.setValue("");
+                oCityCB.setValueState("None");
+                oCityCB.setValueStateText("");
+            }
 
             oCountry.getBinding("items").filter([]);
             const stateBinding = oState.getBinding("items");
@@ -1012,33 +1020,25 @@ sap.ui.define([
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
 
-            // sanitize manual typing
-            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            let sValue = oCity.getValue().replace(/[^a-zA-Z\s]/g, "");
+            if (sValue.length > 50) {
+                sValue = sValue.substring(0, 50);
+            }
+            oCity.setValue(sValue);
 
             const oCountry = this.byId("MC_id_Country");
             const oState = this.byId("MC_id_State");
-
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem() || !!oState.getValue();
 
-            // Parent missing → block
             if (!hasCountry || !hasState) {
                 oCity.setValue("");
-                oCity.setSelectedKey("");
-
-                oCity.getBinding("items")?.filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
-                ]);
-
-                oCity.setValueState("None");
-                return;
+                oCity.setSelectedKey(null);
+                oCity.getBinding("items")?.filter([new sap.ui.model.Filter("cityName", "EQ", "__NONE__")]); oCity.setValueState("None"); return;
             }
 
             utils._LCvalidateMandatoryField(oEvent);
-
-            // ALWAYS write to model
-            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
-            oModel.setProperty("/baseLocation", sCityText);
+            oModel.setProperty("/baseLocation", sValue);
         },
 
         onSTDChange: function () {
