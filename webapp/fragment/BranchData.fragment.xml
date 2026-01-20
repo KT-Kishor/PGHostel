@@ -114,7 +114,6 @@
                     valueStateText="{i18n>cityValueText}"
                     placeholder="{i18n>enterCity}"
                     items="{path:'CityModel>/',length:1000}"
-                    selectedKey="{MDmodel>/baseLocation}"
                     value="{MDmodel>/baseLocation}"
                     showSecondaryValues="true"
                 >
@@ -162,16 +161,13 @@
                     value="{MDmodel>/Value}"
                     maxLength="5"
                 />
+                <Label text="" />
+				<HBox width="100%">
+					<VBox width="25%">
                 <Label
-                    text="{i18n>MSmobileNo}"
+                    text="{i18n>MSisdCode}"
                     required="true"
                 />
-                <HBox
-                    width="100%"
-                    justifyContent="Start"
-                    alignItems="Center"
-                >
-                    <VBox width="22%">
                         <ComboBox
                             change="onSTDChange"
                             id="MC_id_codeModel"
@@ -189,7 +185,12 @@
                             />
                         </ComboBox>
                     </VBox>
-                    <VBox width="78%">
+                    <VBox width="75%"
+                    class="sapUiTinyMarginBegin">
+                    <Label
+                    text="{i18n>MSmobileNo}"
+                    required="true"
+                />
                         <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
@@ -221,8 +222,8 @@
                     value="{MDmodel>/CheckoutTime}"
                     change="onCheckOutTimeChange"
                     displayFormat="hh a"
-                    placeholder="e.g. 10 AM"
                     valueFormat="hh a"
+                    placeholder="e.g. 10 AM"
                 />
                 <Label
                     text="{i18n>penalty}"

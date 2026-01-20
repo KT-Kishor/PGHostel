@@ -65,7 +65,8 @@ sap.ui.define([
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
-  Customerdata: function () {
+
+        Customerdata: function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -93,6 +94,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }).catch(() => sap.ui.core.BusyIndicator.hide());
         },
+
         Onsearch: async function () {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
 
@@ -300,6 +302,21 @@ sap.ui.define([
             });
         },
 
+        setDefaultTimesOnCreate: function () {
+            var oEditModel = this.getView().getModel("editableModel");
+            var oMDModel = this.getView().getModel("MDmodel");
+            if (!oEditModel.getProperty("/isEdit")) {
+
+                if (!oMDModel.getProperty("/CheckinTime")) {
+                    oMDModel.setProperty("/CheckinTime", "11:00:00");
+                }
+
+                if (!oMDModel.getProperty("/CheckoutTime")) {
+                    oMDModel.setProperty("/CheckoutTime", "23:00:00");
+                }
+            }
+        },
+
         MD_AddButtonPress: function () {
             this.byId("id_MD_Table").removeSelections();
             var oView = this.getView();
@@ -327,44 +344,6 @@ sap.ui.define([
 
             const cityBinding = oCity.getBinding("items");
             if (cityBinding) cityBinding.filter([]);
-            // oName.setSelectedKey("");
-            // oAddress.setSelectedKey("");
-            // oPin.setSelectedKey("");
-            // oPenalty.setValue("");
-            // oCountry.setSelectedKey("");
-            // oState.setSelectedKey("");
-            // oCity.setSelectedKey("");
-            // oSTD.setSelectedKey("");
-            // oPhone.setValue("");
-            // oName.setValueState("None");
-            // oName.setValueStateText("");
-            // oAddress.setValueState("None");
-            // oAddress.setValueStateText("");
-            // oPin.setValueState("None");
-            // oPin.setValueStateText("");
-            // oCountry.setValueState("None");
-            // oCountry.setValueStateText("");
-            // oState.setValueState("None");
-            // oState.setValueStateText("");
-            // oCity.setValueState("None");
-            // oCity.setValueStateText("");
-            // oSTD.setValueState("None");
-            // oSTD.setValueStateText("");
-            // oPhone.setValueState("None");
-            // oPhone.setValueStateText("");
-            // oCheckInTime.setValueState("None");
-            // oCheckInTime.setValueStateText("");
-            // oCheckOutTime.setValueState("None");
-            // oCheckOutTime.setValueStateText("");
-            // oName.setValueStateText(this.i18nModel.getText("enterBranchName"));
-            // oAddress.setValueStateText(this.i18nModel.getText("enterAddress"));
-            // oPin.setValueStateText(this.i18nModel.getText("enterPincode"));
-            // oCountry.setValueStateText(this.i18nModel.getText("selectCountry"));
-            // oState.setValueStateText(this.i18nModel.getText("selectState"));
-            // oCity.setValueStateText(this.i18nModel.getText("cityValueText"));
-            // oPhone.setValueStateText(this.i18nModel.getText("enterContactNumber"));
-            // oCheckInTime.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
-            // oCheckOutTime.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
             this._resetBranchValueStates();
             this._resetFacilityValueStates();
             oView.getModel("MDmodel").setData({
@@ -384,6 +363,7 @@ sap.ui.define([
                 CheckoutTime: ""
             });
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
+            this.setDefaultTimesOnCreate();
             this.isEdit = false;
             this.oDialog.open();
         },
@@ -393,16 +373,13 @@ sap.ui.define([
             const oUpload = oView.getModel("UploadModel").getData();
             var oFacilitiesModel = oView.getModel("MDmodel");
             var Payload = oFacilitiesModel.getData();
-            if (!this.MC_ValidateGstNumber()) {
-                sap.m.MessageToast.show(this.i18nModel.getText("gstError"));
-            }
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
-                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID")
             if (!isMandatoryValid) {
@@ -439,9 +416,14 @@ sap.ui.define([
                 c.countryCode === aCountries.find(c => c.countryName === Payload.country)?.code
             );
 
-            if (!validCity) {
-                MessageToast.show(this.i18nModel.getText("Irrcity"));
-                sap.ui.getCore().byId(oView.createId("MC_id_City")).setValueState("Error");
+            // if (!validCity) {
+            //     MessageToast.show(this.i18nModel.getText("Irrcity"));
+            //     sap.ui.getCore().byId(oView.createId("MC_id_City")).setValueState("Error");
+            //     return;
+            // }
+
+            if (!this.MC_ValidateGstNumber()) {
+                sap.ui.getCore().byId(oView.createId("MC_id_CustomGst")).focus();
                 return;
             }
 
@@ -619,113 +601,113 @@ sap.ui.define([
         },
 
         MD_DeleteRow: function () {
-    var oTable = this.byId("id_MD_Table");
-    var aSelectedItems = oTable.getSelectedItems();
-    var CustData = this.getView().getModel("HostelModel").getData();
+            var oTable = this.byId("id_MD_Table");
+            var aSelectedItems = oTable.getSelectedItems();
+            var CustData = this.getView().getModel("HostelModel").getData();
 
-    // No selection
-    if (aSelectedItems.length === 0) {
-        sap.m.MessageToast.show(
-            this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
-        );
-        return;
-    }
+            // No selection
+            if (aSelectedItems.length === 0) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
+                );
+                return;
+            }
 
-    var aAssignedBranches = [];
-    var aDeletableBranches = [];
+            var aAssignedBranches = [];
+            var aDeletableBranches = [];
 
-    // Split assigned & non-assigned branches
-    aSelectedItems.forEach(oItem => {
-        var oData = oItem.getBindingContext("mainModel").getObject();
+            // Split assigned & non-assigned branches
+            aSelectedItems.forEach(oItem => {
+                var oData = oItem.getBindingContext("mainModel").getObject();
 
-        var bAssigned = CustData.some(cust =>
-            cust.BranchCode === oData.BranchID &&
-            cust.Status === "Assigned"
-        );
+                var bAssigned = CustData.some(cust =>
+                    cust.BranchCode === oData.BranchID &&
+                    cust.Status === "Assigned"
+                );
 
-        if (bAssigned) {
-            aAssignedBranches.push(oData.BranchID);
-        } else {
-            aDeletableBranches.push({
-                branchId: oData.BranchID,
-                item: oItem
+                if (bAssigned) {
+                    aAssignedBranches.push(oData.BranchID);
+                } else {
+                    aDeletableBranches.push({
+                        branchId: oData.BranchID,
+                        item: oItem
+                    });
+                }
             });
-        }
-    });
 
-    // Single selection & assigned → stop
-    if (aSelectedItems.length === 1 && aAssignedBranches.length === 1) {
-        sap.m.MessageBox.warning(
-            "Cannot delete! Selected branch is already assigned."
-        );
-        return;
-    }
+            // Single selection & assigned → stop
+            if (aSelectedItems.length === 1 && aAssignedBranches.length === 1) {
+                sap.m.MessageBox.warning(
+                    "Cannot delete! Selected branch is already assigned."
+                );
+                return;
+            }
 
-    // All selected branches are assigned
-    if (aDeletableBranches.length === 0) {
-        sap.m.MessageBox.warning(
-            "All selected branches are already assigned and cannot be deleted."
-        );
-        return;
-    }
+            // All selected branches are assigned
+            if (aDeletableBranches.length === 0) {
+                sap.m.MessageBox.warning(
+                    "All selected branches are already assigned and cannot be deleted."
+                );
+                return;
+            }
 
-    // Show only non-assigned branch IDs
-    var sBranchIds = aDeletableBranches
-        .map(b => b.branchId)
-        .join(", ");
+            // Show only non-assigned branch IDs
+            var sBranchIds = aDeletableBranches
+                .map(b => b.branchId)
+                .join(", ");
 
-    sap.m.MessageBox.confirm(
-        `Are you sure you want to delete the following branch(es): ${sBranchIds}?`,
-        {
-            icon: sap.m.MessageBox.Icon.WARNING,
-            title: "Confirm Deletion",
-            actions: [
-                sap.m.MessageBox.Action.YES,
-                sap.m.MessageBox.Action.NO
-            ],
-            emphasizedAction: sap.m.MessageBox.Action.NO,
+            sap.m.MessageBox.confirm(
+                `Are you sure you want to delete the following branch(es): ${sBranchIds}?`,
+                {
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    title: "Confirm Deletion",
+                    actions: [
+                        sap.m.MessageBox.Action.YES,
+                        sap.m.MessageBox.Action.NO
+                    ],
+                    emphasizedAction: sap.m.MessageBox.Action.NO,
 
-            onClose: async (sAction) => {
-                if (sAction === sap.m.MessageBox.Action.YES) {
-                    sap.ui.core.BusyIndicator.show(0);
+                    onClose: async (sAction) => {
+                        if (sAction === sap.m.MessageBox.Action.YES) {
+                            sap.ui.core.BusyIndicator.show(0);
 
-                    try {
-                        var sUserID = this
-                            .getOwnerComponent()
-                            .getModel("LoginModel")
-                            .getData()
-                            .EmployeeID;
+                            try {
+                                var sUserID = this
+                                    .getOwnerComponent()
+                                    .getModel("LoginModel")
+                                    .getData()
+                                    .EmployeeID;
 
-                        // Delete only non-assigned branches
-                        for (let oBranch of aDeletableBranches) {
-                            await this.ajaxDeleteWithJQuery("HM_Branch", {
-                                filters: {
-                                    UserID: sUserID,
-                                    BranchID: oBranch.branchId
+                                // Delete only non-assigned branches
+                                for (let oBranch of aDeletableBranches) {
+                                    await this.ajaxDeleteWithJQuery("HM_Branch", {
+                                        filters: {
+                                            UserID: sUserID,
+                                            BranchID: oBranch.branchId
+                                        }
+                                    });
                                 }
-                            });
+
+                                sap.m.MessageToast.show(
+                                    this.i18nModel.getText("selectedRecordsDeletedSuccessfully")
+                                );
+
+                                await this.Onsearch();
+
+                            } catch (err) {
+                                console.error("Delete failed:", err);
+                                sap.m.MessageBox.error(
+                                    this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
+                                );
+                            } finally {
+                                sap.ui.core.BusyIndicator.hide();
+                                oTable.removeSelections(true);
+                            }
                         }
-
-                        sap.m.MessageToast.show(
-                            this.i18nModel.getText("selectedRecordsDeletedSuccessfully")
-                        );
-
-                        await this.Onsearch();
-
-                    } catch (err) {
-                        console.error("Delete failed:", err);
-                        sap.m.MessageBox.error(
-                            this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
-                        );
-                    } finally {
-                        sap.ui.core.BusyIndicator.hide();
-                        oTable.removeSelections(true);
                     }
                 }
-            }
-        }
-    );
-},
+            );
+        },
 
 
         MD_UpdateTableRow: function () {
@@ -1026,10 +1008,7 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
 
             // ALWAYS write to model
-            const sCityText =
-                oCity.getSelectedItem()?.getText() ||
-                oCity.getValue() ||
-                "";
+            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/baseLocation", sCityText);
         },
 
@@ -1215,6 +1194,7 @@ sap.ui.define([
 
             // ✅ Valid GST
             oInput.setValueState("None");
+            oInput.setValueStateText("");
             visiModel.setProperty("/CC_id_CustInput", true);
 
             const stateCode = sValue.substring(0, 2);
