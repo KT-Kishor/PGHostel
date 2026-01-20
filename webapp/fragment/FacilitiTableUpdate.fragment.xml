@@ -198,7 +198,7 @@
                 <Input
                     id="FT_id_editDays"
                     value="{edit>/TotalDays}"
-                    editable="false"
+                    editable="true"
                 />
             </VBox>
         </content>
