@@ -598,7 +598,7 @@
                                         path:'CityModel>/',
                                         length:1000
                                     }"
-                                selectedKey="{Bookingmodel>/City}"
+                                value="{Bookingmodel>/City}"
                                 showSecondaryValues="true"
                                 visible="{VisibleModel>/visible}"
                             >

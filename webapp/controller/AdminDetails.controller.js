@@ -1966,7 +1966,7 @@ if (sStartDate && sEndDate) {
                 utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("CC_id_City"), "ID") && 
+                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") && 
                 utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") && 
                 utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
