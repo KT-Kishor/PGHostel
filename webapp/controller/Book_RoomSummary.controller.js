@@ -82,13 +82,25 @@ onDeleteFacility: function () {
     sap.m.MessageBox.confirm(
         this.i18nModel.getText("msgBoxConfirmDelete"),
         {
-            title: this.i18nModel.getText("Confirm"),
+            title: this.i18nModel.getText("msgBoxConfirm"),
             actions: [
                 sap.m.MessageBox.Action.OK,
                 sap.m.MessageBox.Action.CANCEL
             ],
             emphasizedAction: sap.m.MessageBox.Action.OK,
             onClose: function (sAction) {
+ var Table = this._oSelectedTable || oView.byId("idFacilitySummaryTable");
+            if (Table) {
+                // remove selection
+                try {
+                    Table.removeSelections(true);
+                } catch (e) {
+                    /* ignore */
+                }
+                const oBinding = Table.getBinding("items");
+                if (oBinding) oBinding.refresh();
+            }
+
                 if (sAction === sap.m.MessageBox.Action.OK) {
                     this._executeFacilityDelete();
                 }
