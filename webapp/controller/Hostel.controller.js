@@ -4432,7 +4432,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/bookingCount", length);
             }
         },
-
+////
         onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment(
@@ -4765,7 +4765,9 @@ sap.ui.define([
             oDatePicker.setValueState("None");
 
             // Save to model in yyyy-MM-dd format for payload
-            oModel.setProperty("/DOB", oDatePicker.getValue());
+            // oModel.setProperty("/DOB", oDatePicker.getValue());
+            oModel.setProperty("/DOB", oDatePicker.getValue("yyyy-MM-dd"));
+
          },
 
         onSubmitAdminSignup: async function () {
@@ -4860,6 +4862,21 @@ sap.ui.define([
 
             const file = oEvent.getParameter("files")?.[0];
             if (!file) return;
+            // ---- REJECT DOC / DOCX (defensive) ----
+            const forbiddenExt = ["doc", "docx"];
+            const ext = (file.name || "").split(".").pop().toLowerCase();
+
+            const forbiddenMimes = [
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ];
+
+            if (forbiddenExt.includes(ext) || forbiddenMimes.includes(file.type)) {
+                sap.m.MessageToast.show(this.i18nModel.getText("filetypeNotAllowed") || "This file type is not allowed.");
+                oUploader.clear();
+                return;
+            }
+
 
             const MAX_SIZE = 2 * 1024 * 1024; // 5 MB
             if (file.size > MAX_SIZE) {
@@ -4895,9 +4912,8 @@ sap.ui.define([
                 const docs = oModel.getProperty("/Documents") || [];
 
                 // 🔑 ADDITION: preview URL for images ONLY
-                const previewUrl = file.type.startsWith("image/")
-                    ? URL.createObjectURL(file)
-                    : null;
+                const previewUrl = URL.createObjectURL(file);
+
 
                 docs.push({
                     FileName: file.name,
@@ -5170,70 +5186,184 @@ sap.ui.define([
         },
 
         onAdminPreviewDoc: function (oEvent) {
-            const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel").getObject();
 
-            if (!oDoc.PreviewUrl) {
-                sap.m.MessageToast.show(this.i18nModel.getText("previewunavailable"));
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") || // PNG
+                            last.startsWith("/9j") || // JPG
+                            last.startsWith("JVBER")   // PDF
+                        ) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return last;
+            }
+
+            const oDoc = oEvent.getSource()
+                .getBindingContext("AdminSignupModel")
+                ?.getObject();
+
+            if (!oDoc || !oDoc.File) {
+                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
                 return;
             }
 
-            if (!this._previewDialog) {
-                this._previewDialog = new sap.m.Dialog({
-                    title: "",
-                    contentWidth: "70%",
-                    contentHeight: "70%",
+            const sBase64 = autoDecodeBase64(oDoc.File);
 
-                    // 🔑 THIS is the key
-                    stretch: "{device>/system/phone}",
-
-                    resizable: true,
-                    draggable: true,
-                    verticalScrolling: false,
-                    horizontalScrolling: false,
-                    content: [
-                        new sap.m.VBox({
-                            width: "100%",
-                            height: "100%",
-                            justifyContent: "Center",   // 🔑 vertical centering
-                            alignItems: "Center",       // 🔑 horizontal centering
-                            items: [
-                                new sap.m.Image({
-                                    width: "100%",
-                                    height: "100%",
-                                    densityAware: false
-                                }).addStyleClass("adminPreviewImage")
-                            ]
-                        })
-                    ],
-                    endButton: new sap.m.Button({
-                        text: "Close",
-                        press: () => this._previewDialog.close()
-                    })
-                }).addStyleClass("adminPreviewDialog");
-
-                this.getView().addDependent(this._previewDialog);
+            let sMimeType = "application/octet-stream";
+            if (sBase64.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sBase64.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
             }
 
+            /* ===============================
+               IMAGE PREVIEW (DITTO)
+               =============================== */
+            if (sMimeType.startsWith("image/")) {
 
-            this._previewDialog.setTitle(oDoc.FileName);
-            this._previewDialog
-                .getContent()[0]      // VBox
-                .getItems()[0]        // Image
-                .setSrc(oDoc.PreviewUrl);
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
 
-            this._previewDialog.open();
+                if (!this._previewDialog) {
+
+                    const oFlex = new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        renderType: "Div",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [
+                            new sap.m.Image({
+                                id: this.createId("adminDocPreviewImage"),
+                                densityAware: false,
+                                width: "100%",
+                                height: "100%",
+                                style: "object-fit: contain; display:block;"
+                            })
+                        ]
+                    });
+
+                    this._previewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Image",
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        horizontalScrolling: false,
+                        verticalScrolling: true,
+                        content: [oFlex],
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => this._previewDialog.close()
+                        }),
+                        afterClose: () => {
+                            this._previewDialog.destroy();
+                            this._previewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._previewDialog);
+                } else {
+                    this._previewDialog.setTitle(oDoc.FileName || "Document Image");
+                }
+
+                this.byId("adminDocPreviewImage").setSrc(sImageSrc);
+                this._previewDialog.open();
+                return;
+            }
+
+            /* ===============================
+               PDF PREVIEW (DITTO)
+               =============================== */
+            if (sMimeType === "application/pdf") {
+
+                if (!this._previewDialog) {
+                    this._previewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Preview",
+                        stretch: true,
+                        draggable: true,
+                        resizable: true,
+                        contentWidth: "50%",
+                        contentHeight: "50%",
+                        horizontalScrolling: true,
+                        verticalScrolling: false,
+                        contentPadding: "0rem",
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => {
+                                if (this._previewUrl) {
+                                    URL.revokeObjectURL(this._previewUrl);
+                                    this._previewUrl = null;
+                                }
+                                this._previewDialog.close();
+                            }
+                        }),
+                        afterClose: () => {
+                            this._previewDialog.destroy();
+                            this._previewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._previewDialog);
+                }
+
+                this._previewDialog.removeAllContent();
+
+                const byteChars = atob(sBase64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteChars.length; offset += 512) {
+                    const slice = byteChars.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: sMimeType });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._previewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+            <div style="width:100%; height:100%; overflow:hidden;">
+                <iframe
+                    src="${this._previewUrl}"
+                    style="width:100%; height:calc(100vh - 100px); border:none; display:block;">
+                </iframe>
+            </div>
+        `
+                    })
+                );
+
+                this._previewDialog.open();
+                return;
+            }
+
+            sap.m.MessageToast.show("Preview not supported.");
         },
 
-        _openReadOnlyDoc: function (oDoc) {
-            sap.m.MessageBox.information(
-                "Preview not available for this document type.\n\nFile: " + oDoc.FileName,
-                { title: "Read-Only Document" }
-            );
-        },
 
-        onClosePreview: function () {
-            this._previewDialog.close();
-        },
+
 
         onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();

@@ -148,7 +148,7 @@
 						</ComboBox>
 						<!-- Upload button -->
 						<VBox id="adminUploaderWrapper">
-							<u:FileUploader enabled="{= ${AdminSignupModel>/CurrentDocType} !== '' }" id="adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf,doc,docx" />
+							<u:FileUploader enabled="{= ${AdminSignupModel>/CurrentDocType} !== '' }" id="adminFileUploader" buttonOnly="true" buttonText="Upload" uploadOnChange="false" change="onAdminFileSelect" fileType="jpg,jpeg,png,pdf" />
 						</VBox>
 					</OverflowToolbar>
 				</headerToolbar>
