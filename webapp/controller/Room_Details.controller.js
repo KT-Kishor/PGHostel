@@ -365,7 +365,7 @@ sap.ui.define([
             var oTable = this.byId("id_ARD_Table");
             var oSelected = oTable.getSelectedItems();
 
-            if (!oSelected) {
+            if (!oSelected || oSelected.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordEditRoom"));
                 return;
             }

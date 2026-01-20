@@ -171,7 +171,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_Roomtype"), "ID") &&
                 utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("BD_id_DepositAmount"), "ID") &&
+                utils._LCvalidateTraineeAmount(oView.byId("BD_id_DepositAmount"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID")&&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
             ) {

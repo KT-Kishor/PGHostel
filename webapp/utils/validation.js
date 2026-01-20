@@ -16,16 +16,16 @@ sap.ui.define([], function() {
                 return true;
             }
         },
- onNumber: function (oEvent, type) {
+onNumber: function (oEvent, type) {
     var oField = type === "ID" ? oEvent : oEvent.getSource();
     if (!oField) return false;
 
     var sValue = oField.getValue();
 
-    // Allow digits + optional decimal point + max 2 decimals
+    // Allow digits and only one dot
     var sFilteredValue = sValue
-        .replace(/[^0-9.]/g, "")     // allow digits and dot
-        .replace(/(\..*)\./g, "$1"); // allow only one dot
+        .replace(/[^0-9.]/g, "")
+        .replace(/(\..*)\./g, "$1");
 
     // Limit to 2 decimal places
     if (sFilteredValue.includes(".")) {
@@ -36,15 +36,21 @@ sap.ui.define([], function() {
 
     oField.setValue(sFilteredValue);
 
-    // Validation
-    if (!sFilteredValue || sFilteredValue === ".") {
+    // ❌ INVALID cases:
+    // empty, only ".", or ends with "."
+    if (
+        sFilteredValue === "" ||
+        sFilteredValue === "." ||
+        sFilteredValue.endsWith(".")
+    ) {
         oField.setValueState("Error");
         oField.setValueStateText("Enter valid amount");
         return false;
-    } else {
-        oField.setValueState("None");
-        return true;
     }
+
+    // ✅ VALID
+    oField.setValueState("None");
+    return true;
 },
 
         // Validate mobile number
