@@ -2511,21 +2511,21 @@ sap.ui.define([
                 oHostelModel.setProperty("/TotalDays", diffDays);
                 oEndDatePicker.setValueState("None");
 
-                if (!this._perDayInfoShown) {
+                // if (!this._perDayInfoShown) {
 
-                    const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
-                    const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
+                //     const sFormattedStartDate = this._formatDateToDDMMYYYY(oStart);
+                //     const sFormattedEndDate = this._formatDateToDDMMYYYY(oEnd);
 
-                    const sMessage =
-                        "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
-                        "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
+                //     const sMessage =
+                //         "Start Date: " + sFormattedStartDate + " – Check-in Time: 11:00 AM\n\n" +
+                //         "End Date: " + sFormattedEndDate + " – Check-out Time: 11:00 AM";
 
-                    MessageBox.information(sMessage, {
-                        title: "Check-in / Check-out Information"
-                    });
+                //     MessageBox.information(sMessage, {
+                //         title: "Check-in / Check-out Information"
+                //     });
 
-                    this._perDayInfoShown = true;
-                }
+                //     this._perDayInfoShown = true;
+                // }
             }
 
             if (oEvent.getSource().getId().includes("idStartDate1") ||

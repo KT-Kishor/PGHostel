@@ -1,85 +1,83 @@
-sap.ui.define(
-  [
-    "sap/ui/core/mvc/Controller",
-    "sap/m/MessageBox"
-  ],
-  function (BaseController, MessageBox) {
-    "use strict";
+sap.ui.define([
+  "sap/ui/core/mvc/Controller",
+  "sap/m/MessageBox"
+], function (Controller, MessageBox) {
+  "use strict";
 
-    return BaseController.extend("sap.ui.com.project1.controller.App", {
-      TIMEOUT_DURATION: 15 * 60 * 1000,
-      logoutTimer: null,
-      onInit: function () {
+  return Controller.extend("your.namespace.controller.App", {
 
-        var oLoginModel = this.getView().getModel("LoginModel");
+    TIMEOUT_DURATION: 2 * 60 * 1000, // 15 minutes
+    logoutTimer: null,
 
-        if (oLoginModel && oLoginModel.getProperty("/isLoggedIn")) {
-          this._startSessionTracking();
+    onInit: function () {
+      var oLoginModel = this.getView().getModel("LoginModel");
+
+      if (oLoginModel && oLoginModel.getProperty("/isLoggedIn")) {
+        this._startSessionTracking();
+      }
+    },
+
+    _startSessionTracking: function () {
+      this.resetLogoutTimer();
+      this._attachEventHandlers();
+    },
+
+    _attachEventHandlers: function () {
+      // Avoid multiple bindings
+      if (this._bEventsAttached) {
+        return;
+      }
+      this._bEventsAttached = true;
+
+      // Attach to document (IMPORTANT)
+      document.addEventListener("mousemove", this.resetLogoutTimer.bind(this));
+      document.addEventListener("keydown", this.resetLogoutTimer.bind(this));
+      document.addEventListener("click", this.resetLogoutTimer.bind(this));
+      document.addEventListener("touchstart", this.resetLogoutTimer.bind(this));
+    },
+
+    resetLogoutTimer: function () {
+      var oLoginModel = this.getView().getModel("LoginModel");
+
+      if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
+        return;
+      }
+
+      if (this.logoutTimer) {
+        clearTimeout(this.logoutTimer);
+      }
+
+      this.logoutTimer = setTimeout(
+        this.logoutUser.bind(this),
+        this.TIMEOUT_DURATION
+      );
+    },
+
+    logoutUser: function () {
+      var oLoginModel = this.getView().getModel("LoginModel");
+
+      if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
+        return;
+      }
+
+      clearTimeout(this.logoutTimer);
+      this.logoutTimer = null;
+
+      oLoginModel.setProperty("/isLoggedIn", false);
+
+      MessageBox.information(
+        "Your session has expired due to inactivity. Please log in again to continue.",
+        {
+          title: "Session Expired",
+          actions: [MessageBox.Action.OK],
+          emphasizedAction: MessageBox.Action.OK,
+          dependentOn: this.getView(),
+          onClose: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteHostel", {}, true);
+          }.bind(this)
         }
-
-      },
-
-      _startSessionTracking: function () {
-        this.resetLogoutTimer();
-        this._attachEventHandlers();
-      },
-      _attachEventHandlers: function () {
-        // Reset timer on mouse movement, keyboard input, or any interaction
-        var oView = this.getView();
-        oView.attachBrowserEvent("mousemove", this.resetLogoutTimer, this);
-        oView.attachBrowserEvent("keydown", this.resetLogoutTimer, this);
-        oView.attachBrowserEvent("touchstart", this.resetLogoutTimer, this);
-      },
-
-     resetLogoutTimer: function () {
-  var oLoginModel = this.getView().getModel("LoginModel");
-
-  // ⛔ Do nothing if user is not logged in
-  if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
-    return;
-  }
-
-  if (this.logoutTimer) {
-    clearTimeout(this.logoutTimer);
-  }
-
-  this.logoutTimer = setTimeout(
-    this.logoutUser.bind(this),
-    this.TIMEOUT_DURATION
-  );
-},
-
-
-     logoutUser: function () {
-  var oLoginModel = this.getView().getModel("LoginModel");
-
-  // ⛔ Do NOT show popup if user is already logged out
-  if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
-    return;
-  }
-
-  if (this.logoutTimer) {
-    clearTimeout(this.logoutTimer);
-  }
-
-  oLoginModel.setData({ isLoggedIn: false });
-
-  MessageBox.information(
-    "Your session has expired due to inactivity. Please log in again to continue",
-    {
-      title: "Session Expired",
-      actions: [MessageBox.Action.OK],
-      emphasizedAction: MessageBox.Action.OK,
-      dependentOn: this.getView(),
-
-      onClose: function () {
-        window.location.reload(true);
-        this.getOwnerComponent().getRouter().navTo("RouteHostel");
-      }.bind(this)
+      );
     }
-  );
-},
 
-    });
-  }
-);
+  });
+});

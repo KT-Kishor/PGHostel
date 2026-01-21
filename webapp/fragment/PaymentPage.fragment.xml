@@ -190,13 +190,16 @@
                     </VBox>
                 </l:Grid>
             </VBox>
-           <HBox>
-                   <Label
+           <HBox class="paymentMonthlyBox">
+          <Label
+    class="sapUiTinyMargin"
     text="{
-        path: 'HostelModel>/SelectedPerson',
+        parts: [
+            { path: 'HostelModel>/SelectedPerson' },
+            { path: 'HostelModel>/SelectedPriceType' }
+        ],
         formatter: '.Formatter.formatMonthlyPaymentText'
     }"
-    class="sapUiTinyMargin"
 />
 
 

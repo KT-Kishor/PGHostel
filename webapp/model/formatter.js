@@ -349,11 +349,43 @@ formatDurationText: function (sPriceType, iMonths) {
 
     return "";
 },
-formatMonthlyPaymentText: function (iSelectedPerson) {
-    return iSelectedPerson > 1
-        ? "You need to pay monthly for each person"
-        : "You need to pay Every month";
+formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
+
+    // Guard: missing values
+    if (!sSelectedPriceType) {
+        return "";
+    }
+
+    // Multiple persons
+    if (iSelectedPerson > 1) {
+        if (sSelectedPriceType === "Per Month") {
+            return "You need to pay monthly for each person";
+        }
+        if (sSelectedPriceType === "Per Year") {
+            return "You need to pay yearly for each person";
+        }
+        if (sSelectedPriceType === "Per Day") {
+            return "You need to pay  for each person";
+        }
+
+    }
+
+    // Single or less than one person
+    if (iSelectedPerson <= 1) {
+        if (sSelectedPriceType === "Per Month") {
+            return "You need to pay every month";
+        }
+        if (sSelectedPriceType === "Per Year") {
+            return "You need to pay every year";
+        }
+        if (sSelectedPriceType === "Per Day") {
+            return "You need to pay ";
+        }
+    }
+
+    return "";
 }
+
 
 
 

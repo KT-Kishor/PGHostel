@@ -2976,10 +2976,10 @@ span.sapMBtnInner.sapMBtnEmphasized {
   background-repeat: no-repeat;
 }
 
-/* .sapMPopover .sapMIBar {
+.sapMPopover .sapMIBar {
   background: linear-gradient(135deg, #00b7c7, #007984) !important;
   color: white !important;
-} */
+}
 
 /* .sapMBtnIcon{
   color: white !important;
