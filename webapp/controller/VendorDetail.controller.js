@@ -16,13 +16,10 @@ sap.ui.define([
 
             try {
                 const encodedUserID = oEvent.getParameter("arguments")?.UserID;
-
-                // 1️⃣ Must exist
                 if (!encodedUserID) {
                     return this._goToNotFound();
                 }
 
-                // 2️⃣ Strict Base64 format check
                 const base64Regex =
                     /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
@@ -30,26 +27,22 @@ sap.ui.define([
                     return this._goToNotFound();
                 }
 
-                // 3️⃣ Decode safely
                 let decodedUserID;
                 try {
                     decodedUserID = atob(encodedUserID);
-                } catch (e) {
+                } catch {
                     return this._goToNotFound();
                 }
 
-                // 4️⃣ Re-encode and compare (detects ANY modification)
                 if (btoa(decodedUserID) !== encodedUserID) {
                     return this._goToNotFound();
                 }
 
-                //  Check in backend (MOST IMPORTANT)
                 const bValid = await this._validateVendorUserID(decodedUserID);
                 if (!bValid) {
                     return this._goToNotFound();
                 }
 
-                /* URL IS 100% VALID */
                 this.sUserID = decodedUserID;
 
                 var Layout = this.byId("V_id_ObjectPageLayout");
@@ -64,13 +57,30 @@ sap.ui.define([
                 this.getView().setModel(oEditableModel, "editable");
 
                 this._initAdminSignupModel();
+
+                //  PRELOAD MASTER DATA FIRST (only once)
+                await this._ensureCountryDataLoaded();
+
+                //  THEN load vendor data
                 await this._loadVendorDetails(this.sUserID);
-                await this._applyCountryStateCityFilters();
+
+                //  THEN apply filters
+                this._applyCountryStateCityFilters();
+
                 this._makeDatePickersReadOnly(["V_id_VendorDOB"]);
+
             } catch (e) {
                 this._goToNotFound();
             } finally {
                 sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        _ensureCountryDataLoaded: async function () {
+            let aCountryData = this.getView().getModel("CountryModel")?.getData();
+
+            if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
+                await this._fetchCommonData("Country", "CountryModel");
             }
         },
 
@@ -116,58 +126,45 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: async function() {
+        _applyCountryStateCityFilters: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCountryCB = this.byId("V_id_Country");
             const oStateCB = this.byId("V_id_State");
-            const oSourceCB = this.byId("V_id_City");
+            const oCityCB = this.byId("V_id_City");
 
-            const sCountry = oModel.getProperty("/Country"); // e.g. "Australia"
-            const sState = oModel.getProperty("/State"); // e.g. "Queensland"
-            const sSource = oModel.getProperty("/City"); // e.g. "Bongaree"
+            const sCountry = oModel.getProperty("/Country");
+            const sState = oModel.getProperty("/State");
+            const sCity = oModel.getProperty("/City");
 
-            // Reset all filters
             oStateCB.getBinding("items")?.filter([]);
-            oSourceCB.getBinding("items")?.filter([]);
+            oCityCB.getBinding("items")?.filter([]);
 
-            /* ================= LOAD COUNTRY DATA IF NEEDED ================= */
-            let aCountryData = this.getView().getModel("CountryModel")?.getData();
-
-            if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
-                await this._fetchCommonData("Country", "CountryModel");
-                aCountryData = this.getView().getModel("CountryModel")?.getData();
-            }
-
-            if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
-                return;// Still no data → stop safely
+            const aCountryData = this.getView().getModel("CountryModel")?.getData();
+            if (!Array.isArray(aCountryData)) {
+                return;
             }
 
             if (sCountry) {
-                const oCountryObj = aCountryData.find(c => c.countryName === sCountry); // Find countryCode by name
-
+                const oCountryObj = aCountryData.find(c => c.countryName === sCountry);
                 if (oCountryObj) {
                     const sCountryCode = oCountryObj.code;
 
-                    // Filter States by Country
                     oStateCB.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                        new sap.ui.model.Filter("countryCode", "EQ", sCountryCode)
                     ]);
 
                     if (sState) {
-                        // Filter Cities by State + Country
-                        const aFilters = [
-                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
-                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                        ];
-                        oSourceCB.getBinding("items")?.filter(aFilters);
+                        oCityCB.getBinding("items")?.filter([
+                            new sap.ui.model.Filter("stateName", "EQ", sState),
+                            new sap.ui.model.Filter("countryCode", "EQ", sCountryCode)
+                        ]);
                     }
                 }
             }
 
-            // Ensure values are set back in UI
             oCountryCB.setValue(sCountry || "");
             oStateCB.setValue(sState || "");
-            oSourceCB.setValue(sSource || "");
+            oCityCB.setValue(sCity || "");
         },
 
         _loadVendorDetails: async function(sUserID) {
