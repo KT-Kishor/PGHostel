@@ -2953,14 +2953,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* Base spacing for all screens */
 .serviceCard {
-  margin-bottom: 20px;
   margin: 0.5rem;
 }
 
 /* Extra spacing for larger screens */
-@media screen and (min-width: 1024px) {
+@media screen and (max-width: 600px) {
   .serviceCard {
-    margin-bottom: 24px;
+    width: 100% !important;
+        max-width: 320px;
+        margin: 0.75rem auto;
   }
 }
 
@@ -3734,4 +3735,25 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 .sapMDialog>header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
     font-size: 0;
+}
+.AddressBox/* Default (Desktop & Tablet) */
+.couponContainer {
+    flex-wrap: nowrap;
+}
+
+/* Mobile devices */
+@media (max-width: 600px) {
+    .couponContainer {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .couponInput {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .couponButton {
+        width: 100%;
+    }
 }

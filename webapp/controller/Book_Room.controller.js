@@ -1417,7 +1417,7 @@ sap.ui.define([
                 /** ---- FACILITIES SECTION (card layout) ---- **/
                 const oFacilities = new sap.m.Panel({
                     headerText: "Facilities",
-                    expandable: true,
+                    expandable: true, 
                     expanded: true,
                     content: [
                         ...(i === 0 && iPersons > 1 ? [
@@ -1521,8 +1521,8 @@ sap.ui.define([
                         new sap.m.FlexBox({
                             wrap: "Wrap",
                            alignItems: "Start",
-    alignContent: "Start",      // IMPORTANT when wrap is enabled
-    justifyContent: "Start",
+                           alignContent: "Start",      // IMPORTANT when wrap is enabled
+                           justifyContent: "Start",
                             items: {
                                 path: "FacilityModel>/Facilities",
                                 filters: [
@@ -1729,7 +1729,6 @@ sap.ui.define([
             }
 
             this._oFacilityActionSheet = new sap.m.ActionSheet({
-                placement: sap.m.PlacementType.Top,
                 buttons: aButtons
             });
 
@@ -4639,12 +4638,12 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                     //  FIX: Use oData for booking fields, not individual person object
                     if (oData.StartDate) {
 
-                        const totalCost = Number(oData.FinalTotalCost || 0);
-                        const noOfPersons = Number(oData.SelectedPerson || oData.Persons.length || 1);
-                        const rentPrice = totalCost / noOfPersons;
-                        const perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
-                        const today = new Date();
-                        const todayDate = today.toISOString().split("T")[0];
+                        var totalCost = Number(oData.FinalTotalCost || 0);
+                        var noOfPersons = Number(oData.SelectedPerson || oData.Persons.length || 1);
+                        var  rentPrice = totalCost / noOfPersons;
+                        var  perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
+                        var today = new Date();
+                        var todayDate = today.toISOString().split("T")[0];
                         bookingData.push({
                             BookingDate: todayDate,
                             RentPrice: rentPrice.toString(),
@@ -4661,7 +4660,7 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                             CouponCode: oData.CouponCode || "",
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID,
-                            PerMonthTotalRent: perMonthTotalRent.toString()
+                            PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
                         });
                     }
                     let paymentDetails;
@@ -4688,6 +4687,8 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                             Date: sap.ui.getCore().byId("idPaymentDate").getValue()
                                 ? sap.ui.getCore().byId("idPaymentDate").getValue().split("/").reverse().join("-")
                                 : "",
+                               Deposit:oData.Deposit || "0",
+                               PerMonthTotalRent:perMonthTotalRent.toFixed(2).toString() || "0"
                         };
 
                     }

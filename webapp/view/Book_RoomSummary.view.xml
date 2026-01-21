@@ -47,31 +47,33 @@
         </headerToolbar>
 
         <columns>
-            <Column>
+            <Column demandPopin="true">
                 <Text
                     text="{i18n>personName}"
                     tooltip="{i18n>personName}"
                 />
             </Column>
-            <Column>
+            <Column demandPopin="true">
                 <Text
                     text="{i18n>facilityCost}"
                     tooltip="{i18n>facilityCost}"
                 />
             </Column>
-            <Column>
+            <Column demandPopin="true">
                 <Text
                     text="{i18n>placeRoomRent}"
                     tooltip="{i18n>placeRoomRent}"
                 />
             </Column>
-             <Column>
+             <Column  minScreenWidth="Desktop"
+                        demandPopin="true">
                 <Text
                     text="{i18n>securitydeposit}"
                     tooltip="{i18n>securitydeposit}"
                 />
             </Column>
-            <Column>
+            <Column  minScreenWidth="Desktop"
+                        demandPopin="true">
                 <Text
                     text="{i18n>total}"
                     tooltip="{i18n>total}"
@@ -121,7 +123,7 @@
                 width="100%"
                 justifyContent="End"
                 alignItems="Center"
-                class="sapUiSmallMarginBottom"
+                class="sapUiSmallMarginBottom couponContainer"
                 visible="{= (${LoginModel>/UserID} ? true : false)
         || (${LoginModel>/EmployeeID} ? true : false) }"
             >
@@ -137,7 +139,7 @@
                     value="{HostelModel>/CouponCode}"
                     placeholder="{i18n>enterCoupon}"
                     width="150px"
-                    class="sapUiTinyMarginEnd"
+                    class="sapUiTinyMarginEnd couponInput"
                     id="BookingcouponInput"
                     showValueHelp="true"
                     valueHelpIconSrc="sap-icon://decline"
@@ -151,7 +153,7 @@
                     text="{i18n>applyNow}"
                     type="Emphasized"
                     tooltip="{i18n>applyCoupon}"
-                    press="onChangeCouponCode"
+                    press="onChangeCouponCode couponButton"
                     class="sapUiTinyMarginEnd"
                     id="couponApplyBtn"
                     visible="{HostelModel>/CouponButtonVisible}"
