@@ -190,7 +190,8 @@
                     </VBox>
                 </l:Grid>
             </VBox>
-           <HBox class="paymentMonthlyBox">
+           <HBox class="paymentMonthlyBox"
+             visible="{= ${HostelModel>/SelectedPriceType} !== 'Per Day' }">
           <Label
     class="sapUiTinyMargin"
     text="{
@@ -200,9 +201,7 @@
         ],
         formatter: '.Formatter.formatMonthlyPaymentText'
     }"
-/>
-
-
+           />
                     <Text
                         text="{parts: ['HostelModel>/PerMonthNoPerson','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
                     />

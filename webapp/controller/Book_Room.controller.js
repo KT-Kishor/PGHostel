@@ -3072,10 +3072,14 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
+                oLoginModel.setProperty("/isLoggedIn", true);
+                this.getOwnerComponent()
+    .getRootControl()
+    .getController()
+    ._startSessionTracking();
                 //BLOCK ADMIN LOGIN
                 if (oMatchedUser.Role !== "Customer") {
                     MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed"));
-
                     // Optional: clear sensitive inputs
                     if (ctrlPassword) ctrlPassword.setValue("");
                     if (ctrlOTP) ctrlOTP.setValue("");

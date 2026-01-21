@@ -3964,6 +3964,11 @@ sap.ui.define([
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
                 // if (!user?.UserID) {
+                 oLoginModel.setProperty("/isLoggedIn", true);
+                this.getOwnerComponent()
+    .getRootControl()
+    .getController()
+    ._startSessionTracking();
                 // 💡 FIX: Enforce case-sensitive username check for password login
                 if (!user?.UserID || (!isOTP && user.UserName !== sUsername)) {
                     if (!isOTP && user?.UserID) {

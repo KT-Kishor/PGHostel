@@ -364,9 +364,7 @@ formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
         if (sSelectedPriceType === "Per Year") {
             return "You need to pay yearly for each person";
         }
-        if (sSelectedPriceType === "Per Day") {
-            return "You need to pay  for each person";
-        }
+      
 
     }
 
@@ -378,9 +376,7 @@ formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
         if (sSelectedPriceType === "Per Year") {
             return "You need to pay every year";
         }
-        if (sSelectedPriceType === "Per Day") {
-            return "You need to pay ";
-        }
+       
     }
 
     return "";

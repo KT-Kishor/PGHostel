@@ -72,8 +72,11 @@ sap.ui.define([
           actions: [MessageBox.Action.OK],
           emphasizedAction: MessageBox.Action.OK,
           dependentOn: this.getView(),
-          onClose: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteHostel", {}, true);
+          onClose: function (sAction) {
+            if (sAction === sap.m.MessageBox.Action.OK) {
+              window.location.reload(true);
+              this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            }
           }.bind(this)
         }
       );
