@@ -3700,3 +3700,22 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .adminPreviewImage {
   object-fit: contain;   /* 🔑 keeps aspect ratio */
 }
+
+/* Allow token text to wrap */
+.wrapTokenizer .sapMTokenText {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+
+/* Allow token container to grow vertically */
+.wrapTokenizer .sapMToken {
+    height: auto !important;
+    align-items: flex-start;
+}
+
+/* Prevent tokenizer from forcing single-line tokens */
+.wrapTokenizer .sapMTokenizerScrollContainer {
+    white-space: normal;
+}

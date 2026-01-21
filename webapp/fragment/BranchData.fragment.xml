@@ -163,12 +163,12 @@
                     maxLength="5"
                 />
                 <Label text="" />
-				<HBox width="100%">
-					<VBox width="30%">
-                <Label
-                    text="{i18n>MSisdCode}"
-                    required="true"
-                />
+                <HBox width="100%">
+                    <VBox width="30%">
+                        <Label
+                            text="{i18n>MSisdCode}"
+                            required="true"
+                        />
                         <ComboBox
                             change="onSTDChange"
                             id="MC_id_codeModel"
@@ -186,12 +186,14 @@
                             />
                         </ComboBox>
                     </VBox>
-                    <VBox width="70%"
-                    class="sapUiTinyMarginBegin">
-                    <Label
-                    text="{i18n>MSmobileNo}"
-                    required="true"
-                />
+                    <VBox
+                        width="70%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Label
+                            text="{i18n>MSmobileNo}"
+                            required="true"
+                        />
                         <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
@@ -229,6 +231,26 @@
                     valueStateText="Please select Check-Out Time"
                 />
                 <Label
+                    text="{i18n>currency}"
+                    required="true"
+                />
+                <ComboBox
+                    id="Bd_id_DepositCurrency"
+                    selectedKey="{MDmodel>/Currency}"
+                    items="{path:'CountryModel>/',length:1000}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    change="onDepositCurrency"
+                    placeholder="{i18n>selectCurrency}"
+                    showSecondaryValues="true"
+                >
+                    <core:ListItem
+                        key="{CountryModel>currency}"
+                        text="{CountryModel>currency}"
+                        additionalText="{CountryModel>countryName}"
+                    />
+                </ComboBox>
+                <Label
                     text="{i18n>penalty}"
                     required="true"
                 />
@@ -262,7 +284,7 @@
                             id="BD_id_FileUploader"
                             width="120px"
                             fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="5MB"
+                            maximumFileSize="2"
                             typeMissmatch="onFileTypeMissmatch"
                             fileType="jpg,jpeg,png"
                             change="onFacilityFileChange"
@@ -286,6 +308,7 @@
                             <Tokenizer
                                 id="BD_id_TokenList"
                                 width="100%"
+                                class="wrapTokenizer"
                                 tokenDelete="onTokenDelete"
                                 tokens="{tokenModel>/tokens}"
                             >

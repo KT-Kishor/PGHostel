@@ -209,7 +209,7 @@
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
-                            <Button
+                            <Button 
                                 text="{i18n>view}"
                                 press="HF_viewroom"
                             />

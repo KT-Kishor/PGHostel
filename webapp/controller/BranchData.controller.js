@@ -29,6 +29,7 @@ sap.ui.define([
                     state: "",
                     City: "",
                     GSTIN: "",
+                    Currency: "",
                     Type: "",
                     Value: "",
                     CheckinTime: "",
@@ -308,11 +309,11 @@ sap.ui.define([
             if (!oEditModel.getProperty("/isEdit")) {
 
                 if (!oMDModel.getProperty("/CheckinTime")) {
-                    oMDModel.setProperty("/CheckinTime", "11:00:00");
+                    oMDModel.setProperty("/CheckinTime", "11 a");
                 }
 
                 if (!oMDModel.getProperty("/CheckoutTime")) {
-                    oMDModel.setProperty("/CheckoutTime", "11:00:00");
+                    oMDModel.setProperty("/CheckoutTime", "11 a");
                 }
             }
         },
@@ -346,7 +347,7 @@ sap.ui.define([
                 oCityCB.setValueStateText("");
             }
 
-            oCountry.getBinding("items").filter([]);
+            // oCountry.getBinding("items").filter([]);
             const stateBinding = oState.getBinding("items");
             if (stateBinding) stateBinding.filter([]);
 
@@ -376,6 +377,10 @@ sap.ui.define([
             this.oDialog.open();
         },
 
+        onDepositCurrency: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+
         MD_onSaveButtonPress: async function () {
             var oView = this.getView();
             const oUpload = oView.getModel("UploadModel").getData();
@@ -384,21 +389,42 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
+                utils._LCvalidatePinCode(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idPhone")), "ID")
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID")
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            // if (!this._validateCheckInOut()) {
-            //     return;
-            // }
+            const oMobile = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
+            if (!oMobile.getValue()) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText(this.i18nModel.getText("enterContactNumber"));
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            if (oMobile.getValueState() === "Error") {
+                sap.m.MessageToast.show("Please enter a valid mobile number");
+                return;
+            }
+            const oCurrency = sap.ui.getCore().byId(oView.createId("Bd_id_DepositCurrency"));
+            if (!oCurrency.getSelectedKey()) {
+                oCurrency.setValueState("Error");
+                oCurrency.setValueStateText(this.i18nModel.getText("selectCurrency"));
+                oCurrency.focus();
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            if (oCurrency.getValueState() === "Error") {
+                oCurrency.focus();
+                sap.m.MessageToast.show("Please select a valid currency");
+                return;
+            }
+
             const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
             if (!oPenalty.getValue() && oPenalty.getValue() !== "0") {
                 oPenalty.setValueState("Error");
@@ -446,6 +472,7 @@ sap.ui.define([
                 State: Payload.state,
                 City: Payload.baseLocation,
                 Penalty: Payload.Penalty,
+                Currency: Payload.Currency,
                 Photo1: oUpload.Photo1,
                 GSTIN: Payload.GSTIN,
                 Type: Payload.Type,
@@ -694,7 +721,7 @@ sap.ui.define([
                 .join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the following branch(es): ${sBranchIds}?`,
+                `Are you sure you want to delete the following branches: ${sBranchIds}?`,
                 {
                     icon: sap.m.MessageBox.Icon.WARNING,
                     title: "Confirm Deletion",
@@ -806,6 +833,7 @@ sap.ui.define([
                 GSTIN: oData.GSTIN,
                 Type: oData.Type,
                 Value: oData.Value,
+                Currency: oData.Currency,
                 CheckinTime: oData.CheckinTime,
                 CheckoutTime: oData.CheckoutTime,
                 Penalty: oData.Penalty
@@ -918,14 +946,16 @@ sap.ui.define([
             const oState = this.byId("MC_id_State");
             const oCity = this.byId("MC_id_City");
             const oSTD = this.byId("MC_id_codeModel");
+            const oCurrency = this.byId("Bd_id_DepositCurrency");
 
             // Model reset
-            ["state", "baseLocation", "stdCode"].forEach(p =>
+            ["state", "baseLocation", "stdCode", "Currency"].forEach(p =>
                 oModel.setProperty("/" + p, "")
             );
             oModel.setProperty("/GSTIN", "");
             oModel.setProperty("/Type", "");
             oModel.setProperty("/Value", "");
+            oModel.setProperty("/Currency", "");
 
             oVisible.setProperty("/CC_id_CustInput", false);
             oVisible.setProperty("/isIndia", false);
@@ -965,7 +995,11 @@ sap.ui.define([
                 oSTD.setValue(data.stdCode);
                 this.onSTDChange();
             }
-
+            const adata = countries.find(c => c.countryName === sCountry);
+           if (data?.currency) {
+    oModel.setProperty("/Currency", adata.currency);
+    oCurrency.setSelectedKey(adata.currency);
+            }
             // Release states only after country is valid
             if (sCountryCode) {
                 oState.getBinding("items")?.filter([
@@ -1056,42 +1090,48 @@ sap.ui.define([
             if (sKey === "+91") {
                 oMobile.setMaxLength(10);
             } else {
-                oMobile.setMaxLength(18);
+                oMobile.setMaxLength(14);
             }
         },
 
         onMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
+            let sValue = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(sValue);
 
-            // Digits only
-            let val = oInput.getValue().replace(/\D/g, "");
-            oInput.setValue(val);
-
-            const stdRaw = this.byId("MC_id_codeModel").getValue() || "";
-            const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
-                stdRaw.replace(/\s+/g, "") :
-                "+" + stdRaw.replace(/\s+/g, "");
-
-            // Untouched empty field → no error
-            if (val.length === 0) {
+            const sSTD = this.byId("MC_id_codeModel").getSelectedKey();
+            if (!sValue) {
                 oInput.setValueState("None");
+                oInput.setValueStateText("");
                 return;
             }
 
-            if (!std) {
+            if (!sSTD) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
+                oInput.setValueStateText("Please select ISD code first");
                 return;
             }
-
-            const isValid = utils._LCvalidateISDmobile(oInput, std);
-
-            if (!isValid) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
-            } else {
-                oInput.setValueState("None");
+            if (sSTD === "+91") {
+                if (sValue.length !== 10) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
+                    return;
+                }
             }
+            else {
+                if (sValue.length < 4) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText("Mobile number must be at least 4 digits");
+                    return;
+                }
+
+                if (sValue.length > 14) {
+                    sValue = sValue.substring(0, 14);
+                    oInput.setValue(sValue);
+                }
+            }
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
         },
 
         onAfterRendering: function () {
@@ -1108,17 +1148,19 @@ sap.ui.define([
 
         onFacilityFileChange: function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
-            if (!oFile) return;
+            if (!oFile) {
+                return;
+            }
+
             const oReader = new FileReader();
+
             oReader.onload = (e) => {
                 const base64 = e.target.result.split(",")[1];
-
                 this.getView().getModel("UploadModel").setData({
                     Photo1: base64,
                     Photo1Type: oFile.type,
                     Photo1Name: oFile.name
                 });
-
                 this.getView().getModel("tokenModel").setData({
                     tokens: [{
                         key: oFile.name,
@@ -1129,8 +1171,15 @@ sap.ui.define([
                 if (oVisModel) {
                     oVisModel.setProperty("/Logo", base64);
                 }
+                sap.m.MessageToast.show("Logo uploaded successfully");
             };
+
             oReader.readAsDataURL(oFile);
+        },
+        onFileSizeExceeds: function () {
+            sap.m.MessageToast.show(
+                "This file is more than 2 MB and cannot be uploaded"
+            );
         },
 
         onTokenDelete: function (oEvent) {
