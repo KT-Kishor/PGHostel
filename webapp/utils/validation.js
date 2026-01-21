@@ -36,15 +36,13 @@ onNumber: function (oEvent, type) {
 
     oField.setValue(sFilteredValue);
 
-    // ❌ INVALID cases:
-    // empty, only ".", or ends with "."
+
     if (
         sFilteredValue === "" ||
         sFilteredValue === "." ||
         sFilteredValue.endsWith(".")
     ) {
         oField.setValueState("Error");
-        oField.setValueStateText("Enter valid amount");
         return false;
     }
 
