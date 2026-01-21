@@ -1134,7 +1134,7 @@ sap.ui.define([
                                     key: "{CountryModel>stdCode}",
                                     text: "{CountryModel>stdCode}",
                                     additionalText: "{CountryModel>code}"
-                                })
+                                }) 
                             },
 
                             change: function (oEv) {
@@ -1520,8 +1520,9 @@ sap.ui.define([
 
                         new sap.m.FlexBox({
                             wrap: "Wrap",
-                            alignItems: "Start",
-                            justifyContent: "SpaceAround",
+                           alignItems: "Start",
+    alignContent: "Start",      // IMPORTANT when wrap is enabled
+    justifyContent: "Start",
                             items: {
                                 path: "FacilityModel>/Facilities",
                                 filters: [
@@ -4390,8 +4391,17 @@ sap.ui.define([
             // Set default values
             oPaymentModel.setProperty("/PaymentDate", this.Formatter.formatDate(new Date()));
             oPaymentModel.setProperty("/PaymentType", "UPI");
-            var fAmount = parseFloat(oHostelModel.getProperty("/FinalTotalCost") || 0).toFixed(2);
-            oPaymentModel.setProperty("/Amount", parseFloat(fAmount));
+            var fFinalTotalCost = parseFloat(oHostelModel.getProperty("/FinalTotalCost")) || 0;
+var iSelectedMonths = parseInt(oHostelModel.getProperty("/SelectedMonths"), 10) || 1;
+
+// Calculate per-month amount
+var fAmount = (fFinalTotalCost / iSelectedMonths).toFixed(2);
+var fPerMonthnoPerson = (fAmount / (parseInt(oHostelModel.getProperty("/SelectedPerson"), 10) || 1)).toFixed(2);
+
+// Set numeric value in Payment model
+oPaymentModel.setProperty("/Amount", parseFloat(fAmount));
+oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
+
 
             this._oPaymentDialog.open();
         },
@@ -4628,6 +4638,7 @@ sap.ui.define([
                         const totalCost = Number(oData.FinalTotalCost || 0);
                         const noOfPersons = Number(oData.SelectedPerson || oData.Persons.length || 1);
                         const rentPrice = totalCost / noOfPersons;
+                        const perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
                         const today = new Date();
                         const todayDate = today.toISOString().split("T")[0];
                         bookingData.push({
@@ -4645,7 +4656,8 @@ sap.ui.define([
                             Discount: oData.AppliedDiscount.toString() || "0",
                             CouponCode: oData.CouponCode || "",
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
-                            UserID: p.UserID
+                            UserID: p.UserID,
+                            PerMonthTotalRent: perMonthTotalRent.toString()
                         });
                     }
                     let paymentDetails;

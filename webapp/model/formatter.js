@@ -348,7 +348,13 @@ formatDurationText: function (sPriceType, iMonths) {
     }
 
     return "";
+},
+formatMonthlyPaymentText: function (iSelectedPerson) {
+    return iSelectedPerson > 1
+        ? "You need to pay monthly for each person"
+        : "You need to pay Every month";
 }
+
 
 
 

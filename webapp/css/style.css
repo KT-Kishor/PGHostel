@@ -185,7 +185,7 @@
 
 /* Hero Banner */
 .contact-hero {
-  background-image: url("../image/washingRoom.png");
+  background-image: url("../image/HomePage1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -198,6 +198,7 @@
   text-align: center;
   border-radius: 0.6rem;
   overflow: hidden;
+  
 }
 
 .contact-hero::after {
@@ -383,46 +384,6 @@
   background: transparent;
   color: #333 !important;
 }
-
-
-
-/* .switch-toggle-container {
-  background: #fff;
-  border-radius: 32px;
-  box-shadow: 0 4px 12px rgba(60, 70, 90, 0.08);
-  padding: 4px;
-  width: 420px;
-  display: flex;
-  justify-content: left;  
-  align-items: stretch;
-  gap: 4px;                  
-  margin: 0 auto 18px auto;
-}
-
-.switch-toggle-btn {
-  flex: 1;                  
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.2rem;  
-  border-radius: 32px !important;
-  transition: background 0.2s, color 0.2s;
-  padding: 0.8rem 0;        
-  min-width: 0;             
-  border: none;
-}
-.switch-toggle-btn {
-  margin: 0;
-}
-.switch-toggle-btn.active {
-  background: linear-gradient(90deg, #2596ff 0%, #1669e6 100%);
-  color: #fff !important;
-}
-
-.switch-toggle-btn.inactive {
-  background: transparent;
-  color: #333 !important;
-} */
-
 
 .customSearchBar.sapMInput {
   /* background: #1bb2bf  !important;           
@@ -2958,6 +2919,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 /* Base spacing for all screens */
 .serviceCard {
   margin-bottom: 20px;
+  margin: 0.5rem;
 }
 
 /* Extra spacing for larger screens */
@@ -3700,7 +3662,23 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .adminPreviewImage {
   object-fit: contain;   /* 🔑 keeps aspect ratio */
 }
+.sapMITBFilter.sapMITBSelected .sapMITBText .sapMITHTextContent {
+    color:#00b7c7!important ; /* selected color */
+    font-weight: 600; /* optional */
+}
+/* .sapMITBContentArrow:after {
+  color: #02e0fd !important;
+} */
 
+/* WizardStep */
+
+.sapMWizardProgressNavStepTitle{
+  color:#1bb2bf !important; /* selected color */
+}
+/* .sapMWizardProgressNavStepCircle{
+  background: #1bb2bf !important;
+  color:#ffffff !important;
+} */
 /* Allow token text to wrap */
 .wrapTokenizer .sapMTokenText {
     white-space: normal !important;

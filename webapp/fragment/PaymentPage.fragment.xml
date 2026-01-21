@@ -10,11 +10,10 @@
 >
     <Dialog
         id="idPaymentDialog"
-       
         draggable="true"
         resizable="true"
         class="paymentDialogRoot"
-        contentWidth="28rem"
+        contentWidth="32rem"
         contentHeight="auto"
     >
         <customHeader>
@@ -94,13 +93,7 @@
                             />
                             <Text text="{i18n>scanusinganyUPIapp}" />
 
-                            <!-- <Label text="UPI ID" />
-                            <Input id="idUPIID"
-                                placeholder="Enter your UPI ID"
-                                visible="true"
-                                liveChange=".onChangeUPIID"
-                                valueStateText="{i18n>enterUPIID}"
-                                maxLength="25" /> -->
+                          
                         </VBox>
 
                         <!-- CARD SECTION -->
@@ -142,15 +135,9 @@
                             level="H4"
                         />
 
-                        <!-- <Label text="Bank Name" required="true" />
-                        <Input id="idBankName"
-                            placeholder="Enter Bank Name"
-                            liveChange=".onBankNameChange"
-                            valueStateText="{i18n>enterBankName}"
-                            maxLength="30" /> -->
 
                         <Label
-                            text="{i18n>amount}"
+                            text="{i18n>monthlyamount}"
                             required="true"
                         />
                         <Input
@@ -162,14 +149,6 @@
                             maxLength="15"
                         />
 
-                        <!-- <Label text="Currency" required="true" />
-                        <ComboBox id="idCurrency"
-                            items="{CurrencyModel>/}"
-                            placeholder="Select Currency"
-                            valueStateText="Select Currency"
-                            change=".onCurrencyChange">
-                            <core:Item key="{CurrencyModel>currency}" text="{CurrencyModel>currency}" />
-                        </ComboBox> -->
 
                         <Label
                             text="{i18n>paymentType}"
@@ -211,6 +190,20 @@
                     </VBox>
                 </l:Grid>
             </VBox>
+           <HBox>
+                   <Label
+    text="{
+        path: 'HostelModel>/SelectedPerson',
+        formatter: '.Formatter.formatMonthlyPaymentText'
+    }"
+    class="sapUiTinyMargin"
+/>
+
+
+                    <Text
+                        text="{parts: ['HostelModel>/PerMonthNoPerson','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
+                    />
+                </HBox>
         </f:SimpleForm>
        
         <footer>
