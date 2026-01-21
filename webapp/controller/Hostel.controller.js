@@ -4733,42 +4733,83 @@ sap.ui.define([
         ADMIN_onChangeDOB: function (oEvent) {
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
+            const raw = oDatePicker.getDateValue(); // JS Date or null
 
-            const value = oDatePicker.getValue();  // formatted date (dd/MM/yyyy)
-            const raw = oDatePicker.getDateValue(); // JS Date object or null
-
-            // If no valid date selected
+            // ❌ No date
             if (!raw) {
                 oDatePicker.setValueState("Error");
-                // valueStateText comes from XML
+                oDatePicker.setValueStateText("Date of birth is required");
+                oModel.setProperty("/DOB", "");
                 return;
             }
 
-            // Calculate age
             const today = new Date();
-            const birth = new Date(raw);
-            let age = today.getFullYear() - birth.getFullYear();
+            let age = today.getFullYear() - raw.getFullYear();
 
-            const m = today.getMonth() - birth.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            const m = today.getMonth() - raw.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < raw.getDate())) {
                 age--;
             }
 
-            // Validate range
+            // ❌ Age invalid
             if (age < 18 || age > 70) {
                 oDatePicker.setValueState("Error");
-                // XML valueStateText handles the message
+                oDatePicker.setValueStateText("Age must be between 18 and 70");
+                oModel.setProperty("/DOB", "");
                 return;
             }
 
-            // All good → clear error
+            // ✅ ALWAYS clear error — no conditions
             oDatePicker.setValueState("None");
+            oDatePicker.setValueStateText("");
 
-            // Save to model in yyyy-MM-dd format for payload
-            // oModel.setProperty("/DOB", oDatePicker.getValue());
-            oModel.setProperty("/DOB", oDatePicker.getValue("yyyy-MM-dd"));
+            // ✅ Store ISO format (never use getValue())
+            const yyyy = raw.getFullYear();
+            const mm = String(raw.getMonth() + 1).padStart(2, "0");
+            const dd = String(raw.getDate()).padStart(2, "0");
 
-         },
+            oModel.setProperty("/DOB", `${yyyy}-${mm}-${dd}`);
+        },
+
+        // ADMIN_onChangeDOB: function (oEvent) {
+        //     const oDatePicker = oEvent.getSource();
+        //     const oModel = this.getView().getModel("AdminSignupModel");
+
+        //     const value = oDatePicker.getValue();  // formatted date (dd/MM/yyyy)
+        //     const raw = oDatePicker.getDateValue(); // JS Date object or null
+
+        //     // If no valid date selected
+        //     if (!raw) {
+        //         oDatePicker.setValueState("Error");
+        //         // valueStateText comes from XML
+        //         return;
+        //     }
+
+        //     // Calculate age
+        //     const today = new Date();
+        //     const birth = new Date(raw);
+        //     let age = today.getFullYear() - birth.getFullYear();
+
+        //     const m = today.getMonth() - birth.getMonth();
+        //     if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        //         age--;
+        //     }
+
+        //     // Validate range
+        //     if (age < 18 || age > 70) {
+        //         oDatePicker.setValueState("Error");
+        //         // XML valueStateText handles the message
+        //         return;
+        //     }
+
+        //     // All good → clear error
+        //     oDatePicker.setValueState("None");
+
+        //     // Save to model in yyyy-MM-dd format for payload
+        //     // oModel.setProperty("/DOB", oDatePicker.getValue());
+        //     oModel.setProperty("/DOB", oDatePicker.getValue("yyyy-MM-dd"));
+
+        //  },
 
         onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
@@ -5229,9 +5270,6 @@ sap.ui.define([
                 sMimeType = "application/pdf";
             }
 
-            /* ===============================
-               IMAGE PREVIEW (DITTO)
-               =============================== */
             if (sMimeType.startsWith("image/")) {
 
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
@@ -5285,9 +5323,6 @@ sap.ui.define([
                 return;
             }
 
-            /* ===============================
-               PDF PREVIEW (DITTO)
-               =============================== */
             if (sMimeType === "application/pdf") {
 
                 if (!this._previewDialog) {
