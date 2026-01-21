@@ -1748,7 +1748,13 @@ sap.ui.define([
 
             if (!isValid) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
+
+                // 🔑 ONLY MESSAGE DIFFERENCE
+                oInput.setValueStateText(
+                    std === "+91"
+                        ? this.i18nModel.getText("MSmobileNoValueStateIN")
+                        : this.i18nModel.getText("MSmobileNoValueStateINT")
+                );
             } else {
                 oInput.setValueState("None");
             }
@@ -4710,7 +4716,12 @@ sap.ui.define([
 
             oInput.setValueState(valid ? "None" : "Error");
             if (!valid) {
-                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
+                // 🔑 ONLY MESSAGE DIFFERENCE (same pattern as before)
+                oInput.setValueStateText(
+                    std === "+91"
+                        ? this.i18nModel.getText("MSmobileNoValueStateIN")
+                        : this.i18nModel.getText("MSmobileNoValueStateINT")
+                );
             }
         },
 
