@@ -11,20 +11,17 @@
         class="sapUiContentPadding"
         resizable="true"
         draggable="true"
-       contentWidth="28rem"
+        contentWidth="28rem"
         contentHeight="auto"
-    
     >
-    <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>bedDetails}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>bedDetails}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
-        
-          
+
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -116,7 +113,7 @@
                     maxLength="3"
                     liveChange="onNoOfPersonInputLiveChange"
                 />
-                 <Label
+                <Label
                     text="Deposit Amount"
                     required="true"
                 />
@@ -128,7 +125,7 @@
                     maxLength="7"
                     liveChange="onNoOfPersonInputLiveChange"
                 />
-                  <Label
+                <Label
                     text="{i18n>currency}"
                     required="true"
                 />
@@ -161,94 +158,98 @@
                     valueStateText="{i18n>enterDescription}"
                     liveChange="onLivehange"
                 />
-                      </f:content>
+            </f:content>
         </f:SimpleForm>
-          
-	<VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop ">
-			<!-- Informational Message Strip -->
-			<MessageStrip text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB." showIcon="true" type="Warning" class="sapUiTinyMarginBottom" />
-		</VBox>
-                <Label text="" />
-                <VBox width="100%" >
-                    <HBox
-                        justifyContent="End"
-                        width="100%"
-                    >
-                        <u:FileUploader
-                            id="BT_id_FileUploader"
-                            fileType="jpg,jpeg,png"
-                            multiple="true"
-                            sameFilenameAllowed="false"
-                            buttonOnly="true"
-                            buttonText="Upload Images"
-                            change="onFacilityFileChange"
-                            class="myUnifiedBtn"
-                        />
-                        <Text
-                            text="*"
-                            class="upload-star"
-                        />
-                    </HBox>
-                    <Table
-                        id="id_Bed_AttachmentTable"
-                        items="{UploaderData>/attachments}"
-                        mode="Delete"
-                        popinLayout="Block" 
-                        delete="onTokenDelete"
-                        width="100%"
-                      
-                    >
-                        <columns>
-                            <Column
-                                demandPopin="true"
-                                minScreenWidth="Phone"
-                            >
-                                <Text text="{i18n>filename}" />
-                            </Column>
-                            <Column
-                                demandPopin="true"
-                                hAlign="Center"
-                                minScreenWidth="Tablet"
-                            >
-                                <Text text="{i18n>FileType}" />
-                            </Column>
-                            <Column
-                                demandPopin="true"
-                                hAlign="Center"
-                                minScreenWidth="Tablet"
-                            >
-                                <Text text="{i18n>FileSize}" />
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="{UploaderData>filename}" />
-                                    <Text text="{UploaderData>fileType}" />
-                                    <Text text="{UploaderData>size}" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </VBox>
-                
-      
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    press="BT_onsavebuttonpress"
+
+        <VBox
+            class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop "
+        >
+            <!-- Informational Message Strip -->
+            <MessageStrip
+                text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB."
+                showIcon="true"
+                type="Warning"
+                class="sapUiTinyMarginBottom"
+            />
+        </VBox>
+        <Label text="" />
+        <VBox width="100%">
+            <HBox
+                justifyContent="End"
+                width="100%"
+            >
+                <u:FileUploader
+                    id="BT_id_FileUploader"
+                    fileType="jpg,jpeg,png"
+                    multiple="true"
+                    sameFilenameAllowed="false"
+                    buttonOnly="true"
+                    buttonText="Upload Images"
+                    change="onFacilityFileChange"
                     class="myUnifiedBtn"
                 />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press="BT_onCancelButtonPress"
-                    class="myUnifiedBtn"
+                <Text
+                    text="*"
+                    class="upload-star"
                 />
-            </Toolbar>
-        </footer>
+            </HBox>
+            <Table
+                id="id_Bed_AttachmentTable"
+                items="{UploaderData>/attachments}"
+                mode="Delete"
+                popinLayout="Block"
+                delete="onTokenDelete"
+                width="100%"
+            >
+                <columns>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Phone"
+                    >
+                        <Text text="{i18n>filename}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Center"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>FileType}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Center"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>FileSize}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{UploaderData>filename}" />
+                            <Text text="{UploaderData>fileType}" />
+                            <Text text="{UploaderData>size}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </VBox>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="BT_onsavebuttonpress"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="BT_onCancelButtonPress"
+                class="myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>

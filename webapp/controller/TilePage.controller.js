@@ -115,5 +115,10 @@ sap.ui.define([
             }
             this._oGuideDialog.open();
         },
+
+        Tile_onHomePress: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteHostel");
+        }
     })
 })

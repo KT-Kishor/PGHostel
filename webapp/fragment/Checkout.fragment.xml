@@ -6,21 +6,19 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-      
         type="Message"
         class="sapUiContentPadding"
-          contentWidth="28rem"      
-            contentHeight="auto"
+        contentWidth="28rem"
+        contentHeight="auto"
     >
-       <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>manageRoomDetails}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>manageRoomDetails}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
-        
+
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -59,27 +57,26 @@
                 />
             </f:content>
         </f:SimpleForm>
-      
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    press="Ck_onsavebuttonpress"
-                    type="Accept"
-                    id="Ck_id_saveButton"
-                    class="marginRight myUnifiedBtn"
-                />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press="Ck_onCancelButtonPress"
-                    type="Reject"
-                    id="Ck_id_CancelButton"
-                    class="marginRight myUnifiedBtn"
-                />
-            </Toolbar>
-        </footer>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="Ck_onsavebuttonpress"
+                type="Accept"
+                id="Ck_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="Ck_onCancelButtonPress"
+                type="Reject"
+                id="Ck_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>

@@ -313,9 +313,19 @@ sap.ui.define([
                 }
 
                 if (!oMDModel.getProperty("/CheckoutTime")) {
-                    oMDModel.setProperty("/CheckoutTime", "23:00");
+                    oMDModel.setProperty("/CheckoutTime", "11:00");
                 }
             }
+        },
+
+        convert24ToAmPm: function (sTime) {
+            if (!sTime) return "";
+
+            const hour24 = parseInt(sTime.split(":")[0], 10);
+            const ampm = hour24 >= 12 ? "PM" : "AM";
+            const hour12 = hour24 % 12 || 12;
+
+            return hour12 + ampm;
         },
 
         MD_AddButtonPress: function () {
@@ -479,8 +489,8 @@ sap.ui.define([
                 Value: Payload.Value,
                 Photo1Type: oUpload.Photo1Type,
                 Photo1Name: oUpload.Photo1Name,
-                CheckinTime: Payload.CheckinTime,
-                CheckoutTime: Payload.CheckoutTime
+                CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
+                CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
             };
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -834,8 +844,8 @@ sap.ui.define([
                 Type: oData.Type,
                 Value: oData.Value,
                 Currency: oData.Currency,
-                CheckinTime: oData.CheckinTime,
-                CheckoutTime: oData.CheckoutTime,
+                CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
+                CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
                 Penalty: oData.Penalty
             });
             this.isEdit = true;
@@ -996,9 +1006,9 @@ sap.ui.define([
                 this.onSTDChange();
             }
             const adata = countries.find(c => c.countryName === sCountry);
-           if (data?.currency) {
-    oModel.setProperty("/Currency", adata.currency);
-    oCurrency.setSelectedKey(adata.currency);
+            if (data?.currency) {
+                oModel.setProperty("/Currency", adata.currency);
+                oCurrency.setSelectedKey(adata.currency);
             }
             // Release states only after country is valid
             if (sCountryCode) {

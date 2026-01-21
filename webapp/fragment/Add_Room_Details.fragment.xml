@@ -7,22 +7,19 @@
 >
     <Dialog
         id="sds1"
-     
         type="Message"
         class="sapUiContentPadding"
         contentWidth="28rem"
         contentHeight="auto"
-       
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>manageRoomDetails}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>manageRoomDetails}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
-   
+
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -33,7 +30,6 @@
             columnsXL="2"
             columnsL="2"
             columnsM="1"
-
         >
             <f:content>
                 <Label
@@ -167,7 +163,7 @@
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
-                     editable="{RoomModel>/editable}"
+                    editable="{RoomModel>/editable}"
                 />
                 <Label text="{i18n>yearlyPrice}" />
                 <Input
@@ -177,7 +173,7 @@
                     maxLength="7"
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>pleaseenterValidAmount}"
-                     editable="{RoomModel>/editable}"
+                    editable="{RoomModel>/editable}"
                 />
                 <Label
                     text="{i18n>currency}"
@@ -202,24 +198,23 @@
                 </ComboBox>
             </f:content>
         </f:SimpleForm>
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    press="AR_onsavebuttonpress"
-                    id="AR_id_saveButton"
-                    class="marginRight myUnifiedBtn"
-                />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press="AR_onCancelButtonPress"
-                    id="AR_id_CancelButton"
-                    class="marginRight myUnifiedBtn"
-                />
-            </Toolbar>
-        </footer>
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="AR_onsavebuttonpress"
+                id="AR_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="AR_onCancelButtonPress"
+                id="AR_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>

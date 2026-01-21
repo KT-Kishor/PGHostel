@@ -5,21 +5,19 @@
 >
     <Dialog
         id="EctraFaciliotiID"
-    
         type="Message"
         class="sapUiContentPadding"
-         contentWidth="28rem"
+        contentWidth="28rem"
         contentHeight="auto"
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>addFacility}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>addFacility}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
-    
+
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -80,22 +78,21 @@
             </f:content>
         </f:SimpleForm>
 
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>MSadd}"
-                    tooltip="{i18n>MSadd}"
-                    press=".onAddFacilitySave"
-                    class="myUnifiedBtn"
-                />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press=".onAddFacilityCancel"
-                    class="myUnifiedBtn"
-                />
-            </Toolbar>
-        </footer>
+        <beginButton>
+            <Button
+                text="{i18n>MSadd}"
+                tooltip="{i18n>MSadd}"
+                press=".onAddFacilitySave"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press=".onAddFacilityCancel"
+                class="myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </core:FragmentDefinition>

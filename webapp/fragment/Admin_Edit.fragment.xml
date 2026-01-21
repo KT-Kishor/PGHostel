@@ -7,17 +7,15 @@
 >
     <Dialog
         id="editFacilityDialog"
-      
         afterClose=".onEditDialogClose"
-          contentWidth="28rem"
+        contentWidth="28rem"
         contentHeight="auto"
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>editFacility}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>editFacility}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
         <f:SimpleForm
@@ -33,7 +31,10 @@
         >
             <f:content>
                 <!-- Facility Name -->
-                <Label text="{i18n>facilityname}" required="true"/>
+                <Label
+                    text="{i18n>facilityname}"
+                    required="true"
+                />
                 <ComboBox
                     id="editFacilityName"
                     placeholder="{i18n>selectFacility}"
@@ -98,7 +99,10 @@
                 </ComboBox>
 
                 <!-- Start Date -->
-                <Label text="{i18n>startDate}" required="true"/>
+                <Label
+                    text="{i18n>startDate}"
+                    required="true"
+                />
                 <DatePicker
                     id="editStartDate"
                     value="{edit>/StartDate}"
@@ -169,7 +173,10 @@
                 </Select>
 
                 <!-- End Date -->
-                <Label text="{i18n>endDate}" required="true"/>
+                <Label
+                    text="{i18n>endDate}"
+                    required="true"
+                />
                 <DatePicker
                     id="editEndDate"
                     editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' }"
@@ -225,19 +232,21 @@
                 />
             </f:content>
         </f:SimpleForm>
-        <buttons>
+        <beginButton>
             <Button
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
                 press=".onEditFacilitySave"
                 class="myUnifiedBtn"
             />
+        </beginButton>
+        <endButton>
             <Button
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="onEditDialogClose"
                 class="myUnifiedBtn"
             />
-        </buttons>
+        </endButton>
     </Dialog>
 </core:FragmentDefinition>

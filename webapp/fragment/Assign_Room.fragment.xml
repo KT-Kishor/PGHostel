@@ -6,21 +6,19 @@
 >
     <Dialog
         id="sds"
-       
         type="Message"
         class="sapUiContentPadding"
-          contentWidth="28rem"
+        contentWidth="28rem"
         contentHeight="auto"
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>assignRoom}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>assignRoom}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
-         
+
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -138,27 +136,26 @@
                 </MultiComboBox>
             </f:content>
         </f:SimpleForm>
-      
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    press="ARNO_onsavebuttonpress"
-                    type="Accept"
-                    id="HM_id_saveButton"
-                    class="marginRight myUnifiedBtn"
-                />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press="HM_onCancelButtonPress"
-                    type="Reject"
-                    id="HM_id_CancelButton"
-                    class="marginRight myUnifiedBtn"
-                />
-            </Toolbar>
-        </footer>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="ARNO_onsavebuttonpress"
+                type="Accept"
+                id="HM_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="HM_onCancelButtonPress"
+                type="Reject"
+                id="HM_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>

@@ -8,18 +8,16 @@
 >
     <Dialog
         id="FDD_id_FacilitiesDialog"
-    
         type="Message"
         class="sapUiContentPadding"
-          contentWidth="34%"
+        contentWidth="34%"
         contentHeight="auto"
     >
-      <customHeader>
+        <customHeader>
             <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>addRoomImage}" />
-            </contentMiddle>
-              
+                <contentMiddle>
+                    <Title text="{i18n>addRoomImage}" />
+                </contentMiddle>
             </Bar>
         </customHeader>
         <f:SimpleForm
@@ -150,26 +148,25 @@
             </f:content>
         </f:SimpleForm>
 
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    press="FD_onsavebuttonpress"
-                    type="Accept"
-                    id="FDD_id_saveButton"
-                    class="marginRight myUnifiedBtn"
-                />
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    press="BD_onCancelButtonPress"
-                    type="Reject"
-                    id="BD_id_CancelBtn"
-                    class="marginRight myUnifiedBtn"
-                />
-            </Toolbar>
-        </footer>
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="FD_onsavebuttonpress"
+                type="Accept"
+                id="FDD_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="BD_onCancelButtonPress"
+                type="Reject"
+                id="BD_id_CancelBtn"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>
