@@ -114,51 +114,62 @@ sap.ui.define([
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        refershModel: function(BEdID) {
-            var that = this;
-            sap.ui.core.BusyIndicator.show(0); // show immediately
-
-            this.ajaxReadWithJQuery("HM_BedType", {
-                    ID: BEdID
-                })
-                .then(function(oData) {
-                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                    var oBedData = oFCIAerData[0]; // main data object
-                    that.getView().getModel("BedImageModel").setData(oBedData); // Set BedImageModel data
-                    var oBedImages = oData.data[0]; // Photo1..Photo5
-
-                    // Transform Photo fields into array
-                    var aDisplayImages = [];
-                    for (var i = 1; i <= 5; i++) {
-                        var photoKey = "Photo" + i;
-                        var nameKey = "Photo" + i + "Name";
-                        var typeKey = "Photo" + i + "Type";
-
-                        if (oBedImages[photoKey]) {
-                            var sImageSrc = "data:" + (oBedImages[typeKey] || "image/jpeg") + ";base64," + oBedImages[photoKey];
-                            aDisplayImages.push({
-                                src: sImageSrc,
-                                fileName: oBedImages[nameKey] || ("Photo " + i),
-                                fileType: oBedImages[typeKey],
-                                isPlaceholder: false
-                            });
-                        }
-                    }
-
-                    // Set DisplayImagesModel
-                    var oDisplayModel = new sap.ui.model.json.JSONModel({
-                        DisplayImages: aDisplayImages
-                    });
-                    that.getView().setModel(oDisplayModel, "DisplayImagesModel");
-                })
-                .catch(function(err) {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show(err.message || err.responseText);
-                })
-                .finally(function() {
-                    // always hide busy indicator
-                    sap.ui.core.BusyIndicator.hide();
+        refershModel: async function (sBedID) {
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_BedType", {
+                    ID: sBedID
                 });
+
+                const aData = Array.isArray(oResponse?.data)
+                    ? oResponse.data
+                    : [oResponse.data];
+
+                const oBedData = aData[0] || {};
+
+                // 1️⃣ Set main Bed data
+                this.getView().getModel("BedImageModel").setData(oBedData);
+
+                // 2️⃣ Prepare image array
+                let aDisplayImages = [];
+
+                for (let i = 1; i <= 5; i++) {
+                    const sPhoto = oBedData[`Photo${i}`];
+                    const sName  = oBedData[`Photo${i}Name`];
+                    const sType  = oBedData[`Photo${i}Type`];
+
+                    if (sPhoto) {
+                        aDisplayImages.push({
+                            src: `data:${sType || "image/jpeg"};base64,${sPhoto}`,
+                            fileName: sName || `Photo${i}`,
+                            fileType: sType || "image/jpeg",
+                            isPlaceholder: false
+                        });
+                    }
+                }
+
+                // 3️⃣ Normalize placeholders (ALWAYS pad to 5)
+                const MAX_IMAGES = 5;
+                const realImagesCount = aDisplayImages.length;
+
+                for (let i = realImagesCount; i < MAX_IMAGES; i++) {
+                    aDisplayImages.push({
+                        isPlaceholder: true
+                    });
+                }
+
+                // 4️⃣ Set DisplayImagesModel
+                const oDisplayModel = new sap.ui.model.json.JSONModel({
+                    DisplayImages: aDisplayImages
+                });
+
+                this.getView().setModel(oDisplayModel, "DisplayImagesModel");
+
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
         },
 
         onAddItemButtonPress: function() {
