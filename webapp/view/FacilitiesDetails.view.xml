@@ -58,7 +58,7 @@
                                     <f:content>
                                         <!-- Branch Code -->
                                         <m:Label
-                                            text="{i18n>MSbranchCode}"
+                                           text="Branch Name"
                                             required="true"
                                         />
                                         <m:ComboBox
