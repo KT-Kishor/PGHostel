@@ -1203,22 +1203,22 @@ sap.ui.define([
         async _loadRecipientContacts() {
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                const oBranchModel = this.getView().getModel("Branchmodel");
-                const aData = oBranchModel?.getData();
+                const sRole = this._oLoggedInUser?.Role || "";
 
-                if (!Array.isArray(aData) || !aData.length) {
-                    console.error("Branchmodel has no data", aData);
-                    return;
-                }
+                // Decide filter STRICTLY by role
+                const oFilter =
+                    sRole === "Super Admin"
+                        ? {} // backend returns everything
+                        : { BranchCode: this._allowedBranches };
 
-                const sBranchCode = aData[0].BranchID;
-                const filter = {
-                    BranchCode: sBranchCode
-                };
+                console.log("HM_CustomerContact filter:", oFilter);
 
-                const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter);
-                // const oData = await this.ajaxReadWithJQuery("HM_CustomerContact", {});
-                const aContacts = (oData?.data || []).map(c => ({
+                const oResponse = await this.ajaxReadWithJQuery(
+                    "HM_CustomerContact",
+                    oFilter
+                );
+
+                const aContacts = (oResponse?.data || []).map(c => ({
                     UserName: c.UserName,
                     Role: c.Role,
                     Email: c.EmailID,
@@ -1290,10 +1290,10 @@ sap.ui.define([
             this._oCouponToShare = oCoupon;
 
             const aRecipients = this._aAllRecipients || [];
-            if (!aRecipients.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("nocontactsfound"));
-                return;
-            }
+            // if (!aRecipients.length) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("nocontactsfound"));
+            //     return;
+            // }
             const oView = this.getView();
             const oVM = oView.getModel("CouponView");
 
