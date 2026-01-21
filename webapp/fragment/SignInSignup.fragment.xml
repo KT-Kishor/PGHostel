@@ -100,11 +100,12 @@
                         submit="onSignIn"
                     />
                     <Label text="{i18n>loginwith}" />
-                    <HBox
-                        class="aleftMargin"
-                        alignItems="End"
-                        justifyContent="Start"
-                    >
+<FlexBox
+    class="aleftMargin loginOptionsRow"
+    direction="Row"
+    wrap="Wrap"
+    alignItems="Center"
+    justifyContent="Start">
                         <RadioButton
                             text="{i18n>password}"
                             groupName="loginType"
@@ -125,7 +126,7 @@
                             visible="{= ${LoginViewModel>/loginMode} === 'otp' }"
                             press="onPressOTP"
                         />
-                    </HBox>
+                    </FlexBox>
                     <!-- PASSWORD SECTION -->
                     <Label
                         text="{i18n>password}"

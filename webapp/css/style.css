@@ -384,6 +384,14 @@
   background: transparent;
   color: #333 !important;
 }
+.loginOptionsRow {
+    gap: 0.5rem;
+}
+
+.resendOtpBtn {
+    white-space: nowrap; /* prevent ugly multi-line text */
+}
+
 
 .customSearchBar.sapMInput {
   /* background: #1bb2bf  !important;           
@@ -1735,9 +1743,36 @@ span.sapMBtnInner.sapMBtnEmphasized {
     
 } */
 
-.aleftMargin>* {
+/* .aleftMargin > * {
   margin-right: 2.9dvw;
+} */
+.aleftMargin > * {
+    margin-right: clamp(0.5rem, 2.9dvw, 2rem);
+    margin-bottom: 0.5rem;
 }
+
+@media (max-width: 600px) {
+    .aleftMargin > * {
+        margin-right: 0;
+    }
+}
+
+
+.aleftMargin > *:last-child {
+    margin-right: 0;
+}
+
+.resendOtpBtn {
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .loginOptionsRow {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+
 
 
 /* ===== Base blur fallback (works everywhere) ===== */
