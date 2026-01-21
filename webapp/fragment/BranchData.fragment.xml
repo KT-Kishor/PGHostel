@@ -214,7 +214,7 @@
                     change="onCheckInTimeChange"
                     displayFormat="hh a"
                     placeholder="e.g. 10 AM"
-                    valueFormat="hh a"
+                    valueFormat="HH:mm"
                     valueStateText="Please select Check-In Time"
                 />
                 <Label
@@ -226,7 +226,7 @@
                     value="{MDmodel>/CheckoutTime}"
                     change="onCheckOutTimeChange"
                     displayFormat="hh a"
-                    valueFormat="hh a"
+                    valueFormat="HH:mm"
                     placeholder="e.g. 10 AM"
                     valueStateText="Please select Check-Out Time"
                 />
@@ -322,9 +322,7 @@
                 </VBox>
             </f:content>
         </f:SimpleForm>
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
+        <beginButton>
                 <Button
                     id="BD_id_saveButoon"
                     text="{i18n>save}"
@@ -332,13 +330,14 @@
                     class="myUnifiedBtn"
                     press="MD_onSaveButtonPress"
                 />
+                </beginButton>
+                <endButton>
                 <Button
                     text="{i18n>CancelButton}"
                     tooltip="{i18n>CancelButton}"
                     class="myUnifiedBtn"
                     press="MD_onCancelButtonPress"
                 />
-            </Toolbar>
-        </footer>
+                </endButton>
     </Dialog>
 </c:FragmentDefinition>

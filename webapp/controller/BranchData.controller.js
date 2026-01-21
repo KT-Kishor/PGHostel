@@ -309,11 +309,11 @@ sap.ui.define([
             if (!oEditModel.getProperty("/isEdit")) {
 
                 if (!oMDModel.getProperty("/CheckinTime")) {
-                    oMDModel.setProperty("/CheckinTime", "11 a");
+                    oMDModel.setProperty("/CheckinTime", "11:00");
                 }
 
                 if (!oMDModel.getProperty("/CheckoutTime")) {
-                    oMDModel.setProperty("/CheckoutTime", "11 a");
+                    oMDModel.setProperty("/CheckoutTime", "23:00");
                 }
             }
         },
