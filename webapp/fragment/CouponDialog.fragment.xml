@@ -99,7 +99,6 @@
                         id="inUptoValue"
                         placeholder="{i18n>enterMaxDiscountValue}"
                         value="{CouponView>/CurrentCoupon/UptoValue}"
-                        type="Number"
                         liveChange="onLiveChange_UptoValue"
                         maxLength="10"
                         valueStateText="{i18n>enterMaxDiscountValue}"

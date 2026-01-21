@@ -6,7 +6,7 @@ sap.ui.define([
 
   return Controller.extend("your.namespace.controller.App", {
 
-    TIMEOUT_DURATION: 2 * 60 * 1000, // 15 minutes
+    TIMEOUT_DURATION: 10 * 60 * 1000, // 15 minutes
     logoutTimer: null,
 
     onInit: function () {
