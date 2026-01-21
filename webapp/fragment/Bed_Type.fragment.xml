@@ -77,7 +77,7 @@
                 <ComboBox
                     id="BD_id_Roomtype"
                     selectedKey="{BedModel>/ACType}"
-                    change="onbranchChange"
+                    change="onDepositCurrency"
                     placeholder="{i18n>selectRoomType}"
                     valueStateText="{i18n>selectRoomType}"
                 >

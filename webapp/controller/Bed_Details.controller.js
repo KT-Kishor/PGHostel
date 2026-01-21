@@ -15,6 +15,15 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             try {
+                   var oView = this.getView();
+        var oModel = oView.getModel("BedDetails");
+
+        if (!oModel) {
+            oModel = new sap.ui.model.json.JSONModel({});
+            oView.setModel(oModel, "BedDetails");
+        } else {
+            oModel.setData({});
+        }
                 this.commonLoginFunction();
                 var model = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
@@ -171,7 +180,7 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_Roomtype"), "ID") &&
                 utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
-                utils._LCvalidateTraineeAmount(oView.byId("BD_id_DepositAmount"), "ID") &&
+                utils.onNumber(oView.byId("BD_id_DepositAmount"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID")&&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
             ) {
@@ -499,17 +508,15 @@ sap.ui.define([
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 PO_id_CustomerName: new Set(),
-                PO_id_CompanyName: new Set(),
 
             };
 
             data.forEach(item => {
                 uniqueValues.PO_id_CustomerName.add(item.Name);
-                uniqueValues.PO_id_CompanyName.add(item.ACType);
             });
 
             let oView = this.getView();
-            ["PO_id_CustomerName", "PO_id_CompanyName"].forEach(field => {
+            ["PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 oComboBox.destroyItems();
                 Array.from(uniqueValues[field]).sort().forEach(value => {

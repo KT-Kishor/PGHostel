@@ -3697,3 +3697,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .wrapTokenizer .sapMTokenizerScrollContainer {
     white-space: normal;
 }
+.sapMDialog>header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
+    font-size: 0;
+}

@@ -14,6 +14,16 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+
+                 var oView = this.getView();
+        var oModel = oView.getModel("RoomDetailsModel");
+
+        if (!oModel) {
+            oModel = new sap.ui.model.json.JSONModel({});
+            oView.setModel(oModel, "RoomDetailsModel");
+        } else {
+            oModel.setData({});
+        }
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.commonLoginFunction();
 
@@ -521,11 +531,15 @@ sap.ui.define([
 
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
-            var Noofper = aBedTypes.find(function (bed) {
-                return bed.BranchCode === Payload.BranchCode && bed.Name.trim() === Payload.BedTypeName.substring(0, Payload.BedTypeName.lastIndexOf("-")).trim() &&
-                    bed.ACType === Payload.BedTypeName.substring(Payload.BedTypeName.lastIndexOf("-") + 1).trim();
+          var Noofper = aBedTypes.find(function (bed) {
+    const bedName = Payload.BedTypeName.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+    const acType = Payload.BedTypeName.includes("NON-AC") ? "NON-AC" : "AC";
 
-            });
+    return bed.BranchCode === Payload.BranchCode &&
+           bed.Name.trim() === bedName &&
+           bed.ACType === acType;
+});
+
 
             // Field validations
             if (
@@ -549,8 +563,8 @@ sap.ui.define([
                     return room.RoomNo === Payload.RoomNo;
                 });
 
-                var selectedBedTypeName = Payload.BedTypeName.substring(0,Payload.BedTypeName.lastIndexOf("-")).trim() ;
-                var selectedACType = Payload.BedTypeName.substring(Payload.BedTypeName.lastIndexOf("-") + 1).trim();
+                var selectedBedTypeName =  Payload.BedTypeName.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim() ;
+                var selectedACType = Payload.BedTypeName.includes("NON-AC") ? "NON-AC" : "AC";;
                 var aFiltered = aBedTypes.filter(function (bed) {
 
                     // Only check selected Bed Type
@@ -756,7 +770,7 @@ sap.ui.define([
                             this.i18nModel.getText("errorwhileDeletingRoomPleasetryagain")
                         );
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                        // sap.ui.core.BusyIndicator.hide();
                         table.removeSelections(true);
                     }
                 }

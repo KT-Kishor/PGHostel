@@ -238,9 +238,9 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("idRoomType12"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("idBedType"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("idRoomtype"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("idR"), "ID") &&
+                utils.onNumber(oView.byId("idR"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("id_MaxBeds"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("id_DepositAmount"), "ID") &&
+                utils.onNumber(oView.byId("id_DepositAmount"), "ID") &&
                  utils._LCstrictValidationComboBox(oView.byId("id_DepositCurrency"), "ID") &&
 
                 utils._LCvalidateMandatoryField(oView.byId("id_Description"), "ID")
@@ -351,7 +351,6 @@ sap.ui.define([
                 await this.Onsearch();
                 sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(this.i18nModel.getText("bedsavedsuccessfully"));
-                this.ARD_Dialog.close();
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             }
