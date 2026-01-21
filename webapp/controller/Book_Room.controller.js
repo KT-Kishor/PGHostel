@@ -1120,55 +1120,48 @@ sap.ui.define([
 
                         new sap.m.ComboBox({
                             placeholder: "STD Code",
-                            forceSelection: true,
-                            value: "{HostelModel>/Persons/" + i + "/STDCode}",
                             id: that.createId("ID_STDCode_" + i),
+
                             selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
+
                             showSecondaryValues: true,
                             filterSecondaryValues: true,
+
                             items: {
                                 path: "CountryModel>/",
-                                length: 1000, showSecondaryValues: true,
+                                length: 1000,
                                 template: new sap.ui.core.ListItem({
                                     key: "{CountryModel>stdCode}",
                                     text: "{CountryModel>stdCode}",
                                     additionalText: "{CountryModel>code}"
                                 })
                             },
+
                             change: function (oEv) {
                                 const oCombo = oEv.getSource();
                                 const oItem = oCombo.getSelectedItem();
 
                                 if (!oItem) {
-                                    oCombo.setValue("");
                                     oCombo.setSelectedKey("");
                                     oCombo.setValueState("Error");
                                     oCombo.setValueStateText("Please select a valid STD Code");
                                     return;
                                 }
-                                oCombo.setValueState("None");
 
-                                const aPersons = oModel.getProperty("/Persons") || [];
+                                oCombo.setValueState("None");
 
                                 const oSTDObj = oItem.getBindingContext("CountryModel").getObject();
                                 const sSTDCode = oSTDObj.stdCode;
 
-                                // Decide Mobile Max Length
-                                let iMobileMax;
-                                if (sSTDCode === "+91") {
-                                    iMobileMax = 10;
-                                } else {
-                                    iMobileMax = 18;
-                                }
+                                const aPersons = oModel.getProperty("/Persons") || [];
 
-                                // Update model properly
+                                const iMobileMax = (sSTDCode === "+91") ? 10 : 18;
+
                                 aPersons[i].STDCode = sSTDCode;
                                 aPersons[i].MobileMax = iMobileMax;
 
                                 oModel.setProperty("/Persons", aPersons);
-                                oModel.refresh(true);
 
-                                // Update UI Input immediately (same as country logic)
                                 const oMobileInput = sap.ui.getCore().byId(
                                     that.createId("ID_Mobile_" + i)
                                 );
@@ -1176,7 +1169,6 @@ sap.ui.define([
                                 if (oMobileInput) {
                                     oMobileInput.setMaxLength(iMobileMax);
 
-                                    // Trim existing value if longer than allowed
                                     let sValue = oMobileInput.getValue() || "";
                                     if (sValue.length > iMobileMax) {
                                         sValue = sValue.substring(0, iMobileMax);
@@ -1185,7 +1177,6 @@ sap.ui.define([
                                     }
                                 }
                             }
-
                         }),
 
                         new sap.m.Input({
