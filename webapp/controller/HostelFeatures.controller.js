@@ -233,18 +233,17 @@ sap.ui.define([
                             ID: Payload.ID
                         }
                     });
-
+                    this.ARD_Dialog.close();
                     sap.m.MessageToast.show(this.i18nModel.getText("amenitiesUpdatedSuccessfully"));
                 } else {
                     // CREATE
                     await this.ajaxCreateWithJQuery("HM_HostelFeatures", {
                         data: oPayload
                     });
-
+                    this.ARD_Dialog.close();
                     sap.m.MessageToast.show(this.i18nModel.getText("amenitiesAddedSuccessfully"));
                 }
 
-                this.ARD_Dialog.close();
                 await this.Onsearch("true");
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();

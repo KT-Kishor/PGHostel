@@ -37,7 +37,7 @@
 				<!-- Facility Name -->
 				<Label text="{i18n>amenitiesName}" required="true"/>
 				<Input id="HFF_id_FacilityName" value="{HostelFeaturesModel>/FacilityName}"
-                placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterFacilityName}"/>
+                placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterAmenitiesName}"/>
 				<!-- Description -->
 				<Label text="{i18n>description}" required="true"/>
 				<TextArea id="HFF_id_Description" value="{HostelFeaturesModel>/Description}"
