@@ -321,18 +321,13 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-                    if (!bookingDetails) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("bookingDetailsnotFound"));
-                        return;
-                    }
-
+                    
                     const facilityArray = Array.isArray(oData.data.BookingFacilityItems)
                         ? oData.data.BookingFacilityItems
                         : [oData.data.BookingFacilityItems];
 
-                    const hasRoomPrice = bookingDetails.BookingPrice && parseFloat(bookingDetails.BookingPrice) > 0;
-                    if (hasRoomPrice === 0) {
-                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
+                    if (!bookingDetails && facilityArray.length === 0) {
+                         MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
                         return;
                     }
 
