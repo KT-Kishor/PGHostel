@@ -4848,7 +4848,7 @@ sap.ui.define([
             const payload = {
                 data: {
                     Salutation: oAdmin.Salutation,
-                    UserName: oAdmin.VendorName,
+                    UserName: oAdmin.VendorName.trim(),
                     DateOfBirth: oAdmin.DOB,
                     Gender: oAdmin.Gender,
                     EmailID: oAdmin.Email,
