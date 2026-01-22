@@ -33,7 +33,7 @@
                 class="sapUiTinyMarginBottom"
             />
             <Title
-                text="{= 'Branch : ' + ${CouponView>/ShareCoupon/BranchCode} }"
+                text="{= 'Branch : ' + ${CouponView>/ShareCoupon/BranchName} }"
                 wrapping="true"
             />
         </VBox>

@@ -142,14 +142,14 @@
                             text="{i18n>CDtitle} ({= ${CouponModel>/}.length })"
                         />
                         <ToolbarSpacer />
-                        <Button
-                            id="btnShareCoupon"
-                            text="{i18n>CDShareCoupons}"
-                            tooltip="{i18n>CDShareCoupons}"
-                            enabled="false"
-                            press="onShareCoupon"
-                            class="myUnifiedBtn"
-                        />
+<Button
+    id="btnShareCoupon" class="myUnifiedBtn" text="Share Coupon"
+    icon="sap-icon://action"
+    tooltip="Share Coupon"
+    press="onShareCouponPress"
+/>
+
+
                         <Button
                             text="{i18n>MSadd}"
                             tooltip="{i18n>MSadd}"

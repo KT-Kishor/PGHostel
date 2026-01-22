@@ -1289,7 +1289,7 @@ sap.ui.define([
             // cache for share confirm
             this._oCouponToShare = oCoupon;
 
-            const aRecipients = this._aAllRecipients || [];
+            // const aRecipients = this._aAllRecipients || [];
             // if (!aRecipients.length) {
             //     sap.m.MessageToast.show(this.i18nModel.getText("nocontactsfound"));
             //     return;
@@ -1300,8 +1300,9 @@ sap.ui.define([
             // this._oCouponToShare is already set earlier
             oVM.setProperty("/ShareCoupon", {
                 CouponCode: this._oCouponToShare.CouponCode,
-                BranchCode: this._oCouponToShare.BranchCode
-            });
+                BranchCode: this._oCouponToShare.BranchCode,
+                BranchName: this._oCouponToShare.BranchName
+            }); 
             if (!this._oShareDialog) {
                 const oView = this.getView();
                 this._oShareDialog = await sap.ui.core.Fragment.load({
@@ -1358,7 +1359,8 @@ sap.ui.define([
                     StartDate: c.StartDate,
                     EndDate: c.EndDate,
                     MinOrderValue: c.MinOrderValue,
-                    PerUserLimit: c.PerUserLimit
+                    // PerUserLimit: c.PerUserLimit,
+                    BranchName: c.BranchName
                 });
             });
 
@@ -1374,7 +1376,8 @@ sap.ui.define([
                         StartDate: c.StartDate,
                         EndDate: c.EndDate,
                         MinOrderValue: c.MinOrderValue,
-                        PerUserLimit: c.PerUserLimit
+                        // PerUserLimit: c.PerUserLimit,
+                        BranchName: c.BranchName
                     });
                 });
             }
@@ -1469,5 +1472,191 @@ sap.ui.define([
                 oShareBtn.setEnabled(false);
             }
         },
-    });
+
+        onShareCouponPress: function (oEvent) {
+            const oTable = this.byId("couponTable");
+            const aSel = oTable.getSelectedItems();
+
+            if (aSel.length !== 1) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("selectexactlyonecouponshare")
+                );
+                return;
+            }
+
+            const oCoupon =
+                aSel[0].getBindingContext("CouponModel").getObject();
+
+            if (oCoupon.Status !== "Active") {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("onlyACTIVEcouponsshared")
+                );
+                return;
+            }
+
+            const sBaseURL = window.location.origin + window.location.pathname;
+            const sHash = `#/CouponView/${encodeURIComponent(oCoupon.CouponCode)}`;
+            const sShareURL = `${sBaseURL}?sap-ui-xx-viewCache=false${sHash}`;
+
+            const sMessage = this._buildCouponShareMessage(oCoupon);
+            const sEmailBody = this._buildCouponShareMessageEmail(oCoupon);
+
+
+
+            const createItem = (icon, text, fn) =>
+                new sap.m.CustomListItem({
+                    type: "Active",
+                    press: fn,
+                    content: [
+                        new sap.m.HBox({
+                            alignItems: "Center",
+                            items: [
+                                new sap.m.Image({
+                                    src: icon,
+                                    width: "18px"
+                                }).addStyleClass("shareIcon"),
+                                new sap.m.Text({
+                                    text
+                                }).addStyleClass("shareText")
+                            ]
+                        }).addStyleClass("shareItemBox")
+                    ]
+                });
+
+            if (this._oSharePopover) {
+                this._oSharePopover.destroy();
+            }
+
+            this._oSharePopover = new sap.m.Popover({
+                placement: sap.m.PlacementType.Bottom,
+                showHeader: false,
+                contentWidth: "180px",
+                afterClose: function () {
+                    this._clearTableSelection();
+                }.bind(this),
+                content: [
+                    new sap.m.List({
+                        items: [
+
+                            // ✅ WhatsApp
+                            createItem("image/Whatsapp.png", "WhatsApp", () => {
+                                window.open(
+                                    "https://api.whatsapp.com/send?text=" +
+                                    encodeURIComponent(sMessage),
+                                    "_blank"
+                                );
+                                this._oSharePopover.close();
+                            }),
+
+                            // // ✅ Facebook
+                            // createItem("image/Facebook.png", "Facebook", () => {
+                            //     navigator.clipboard.writeText(sMessage);
+                            //     sap.m.MessageToast.show(
+                            //         "Coupon message copied. Paste it on Facebook."
+                            //     );
+                            //     window.open("https://www.facebook.com", "_blank");
+                            //     this._oSharePopover.close();
+                            // }),
+
+
+                            // // ✅ Instagram (copy-based)
+                            // createItem("image/Instagram.png", "Instagram", () => {
+                            //     navigator.clipboard.writeText(sMessage);
+                            //     sap.m.MessageToast.show(
+                            //         "Coupon message copied. Paste it on Instagram"
+                            //     );
+                            //     this._oSharePopover.close();
+                            // }),
+
+                            // ✅ EMAIL → TRIGGERS EXISTING FLOW
+                            createItem("image/Email.png", "Email to Customers", () => {
+                                this._oSharePopover.close();
+                                this.onShareCoupon(); // 🔥 THIS is the key
+                            }),
+
+                            createItem("image/Mail.png", "Email", () => {
+                                window.location.href =
+                                    "mailto:?subject=" +
+                                    encodeURIComponent("New Discount Coupon") +
+                                "&body=" + encodeURIComponent(sEmailBody);
+                                this._oSharePopover.close();
+                            }),
+
+
+                            // ✅ SMS
+                            createItem("image/sms.png", "Text SMS", () => {
+                                window.location.href =
+                                    "sms:?body=" +
+                                    encodeURIComponent(sMessage);
+                                this._oSharePopover.close();
+                            }),
+
+                            // ✅ Copy link
+                            createItem("image/Link.png", "Copy Coupon Details", () => {
+                                navigator.clipboard.writeText(sMessage);
+                                sap.m.MessageToast.show("Coupon Details copied");
+                                this._oSharePopover.close();
+                            })
+                        ]
+                    })
+                ]
+            });
+
+            this._oSharePopover.openBy(oEvent.getSource());
+        },
+        _buildCouponShareMessage: function (oCoupon) {
+            const sBranchName =
+                this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
+
+            const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
+            const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+
+            return (
+                `🎉 ${sBranchName} Special Deal! 🎊\n\n` +
+                `Don't miss out on this exclusive coupon 🎉\n\n` +
+                `🔑 Code: ${oCoupon.CouponCode}\n` +
+                `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
+                `💰 Min Order: ${oCoupon.MinOrderValue}\n\n` +
+                `Use this coupon during booking and save instantly 🙌\n\n` +
+                `Terms: \n` +
+                ` • New bookings only\n` +
+                ` • No other offers applicable\n\n` +
+                `— ${sBranchName} Management`
+            );
+        },
+
+
+
+
+
+        _buildCouponShareMessageEmail: function (oCoupon) {
+            const sBranchName =
+                this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
+
+            const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
+            const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+
+            return (
+                `Dear Customer,\n\n` +
+                `We are pleased to share your coupon code with you.\n\n` +
+                `Coupon Code: ${oCoupon.CouponCode}\n\n` +
+                `You can use this coupon during the booking creation process ` +
+                `to avail the applicable discount.\n` +
+                `Please ensure to enter the code correctly at the time of booking.\n\n` +
+
+                `If you have any questions or need support, feel free to contact us.\n\n` +
+
+                `Terms & Conditions\n` +
+                `This coupon code is valid from ${sStartDate} to ${sEndDate}.\n` +
+                `The coupon is applicable only for new bookings made during the validity period ` +
+                `and requires a minimum order value of ${oCoupon.MinOrderValue}.\n` +
+                `This coupon cannot be combined with any other offers or discounts.\n` +
+                `The company reserves the right to modify or cancel the coupon at any time.\n\n` +
+
+                `Thank you for choosing our service.\n\n` +
+                `Best regards,\n` +
+                `${sBranchName} Management`
+            );
+        },
+    }); 
 });

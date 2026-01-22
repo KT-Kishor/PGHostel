@@ -3757,3 +3757,47 @@ span.sapMBtnInner.sapMBtnEmphasized {
         width: 100%;
     }
 }
+/* Optional spacing between icon and text */
+.shareText {
+  margin-left: 0.5rem;
+}
+/* Common box */
+.shareItemBox {
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBox:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* Last item without bottom border */
+.shareItemBoxLast {
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBoxLast:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+/* Last item without bottom border */
+.shareItemBoxLast {
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.shareItemBoxLast:hover {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+.customPopoverContent {
+  padding: 1rem;
+  background-color: lightskyblue !important;
+  border-radius: 8px;
+}
