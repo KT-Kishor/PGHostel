@@ -109,7 +109,6 @@ sap.ui.define([
                 isPasswordSelected: true,
                 authFlow: "signin",
                 isOtpBoxVisible: false
-
             }), "LoginViewModel");
 
             const vm = oView.getModel("LoginViewModel");
@@ -3127,6 +3126,8 @@ sap.ui.define([
         onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
+            this._resetOtpState();
+
             vm.setProperty("/authFlow", "forgot");
             vm.setProperty("/forgotStep", 1); // safe, runtime only
             vm.setProperty("/dialogTitle", "Set / Reset Password"); //
@@ -3450,7 +3451,7 @@ sap.ui.define([
                     oOtpCtrl.focus();
 
                     // 🔥 THIS WAS MISSING
-                    this._startOtpTimer();     // ✅ start 20 sec resend cooldown
+                    this._startOtpTimer();
 
                 }
                 else {
@@ -3982,10 +3983,7 @@ sap.ui.define([
                 const user = oResponse?.data?.[0];
                 // if (!user?.UserID) {
                  oLoginModel.setProperty("/isLoggedIn", true);
-                this.getOwnerComponent()
-    .getRootControl()
-    .getController()
-    ._startSessionTracking();
+                this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
                 // 💡 FIX: Enforce case-sensitive username check for password login
                 if (!user?.UserID || (!isOTP && user.UserName !== sUsername)) {
                     if (!isOTP && user?.UserID) {
@@ -4264,7 +4262,7 @@ sap.ui.define([
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
                     // ✅ Start resend cooldown
-                    this._startOtpCooldown(20);
+                    this._startOtpCooldown(120);
 
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
@@ -4282,7 +4280,7 @@ sap.ui.define([
         _startOtpTimer: function () {
             const vm = this.getView().getModel("LoginViewModel");
             this._clearOtpTimer();
-            const START = 20;
+            const START = 120;
 
             vm.setProperty("/canResendOTP", false);
             vm.setProperty("/otpTimer", START);
@@ -4340,7 +4338,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
         },
 
-        _startOtpCooldown: function (iSeconds = 20) {
+        _startOtpCooldown: function (iSeconds = 120) {
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
