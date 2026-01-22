@@ -1303,6 +1303,14 @@ sap.ui.define([
         SM_onChnageSetAndConfirm: function (oEvent) {
 
             const oInput = oEvent.getSource();
+
+
+            // ❌ REMOVE ALL SPACES IMMEDIATELY
+            let val = oInput.getValue();
+            if (/\s/.test(val)) {
+                val = val.replace(/\s+/g, "");
+                oInput.setValue(val);
+            }
             const sId = oInput.getId();
             let oStrengthText = null;
 
@@ -1403,28 +1411,34 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
-
                 if (!oResp || oResp.success !== true) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("registrationFailedPleasetryagain"));
-                    console.error("SignUp Error Response:", oResp);
+                    const sFailMsg =
+                        oResp?.message ||
+                        this.i18nModel.getText("registrationFailedPleasetryagain");
+
+                    sap.m.MessageBox.error(sFailMsg, {
+                        title: "Registration Failed"
+                    });
                     return;
                 }
+
                 const sUsername = data.fullname.trim();
+                const Salutation = C("signUpSalutation").getSelectedItem().getText();
+                const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
+                    "Your account has been created successfully. You will receive an email shortly with your login credentials.";
 
                 const sPassword = data.password;
                 const oCtrl = this;   // 👈 REQUIRED
-
-                sap.m.MessageBox.success("Registration Successful", {
+                sap.m.MessageBox.success(sSuccessMsg, {
                     title: "Success",
+                    contentWidth: "500px",
                     onClose: () => {
-
                         // ✅ Credentials trigger FIRST
                         oCtrl._triggerBrowserSaveCredentials(
                             sUsername,
                             sPassword
                         );
 
-                        // ✅ ALWAYS use oCtrl – never this
                         const vm = oCtrl.getView().getModel("LoginViewModel");
 
                         vm.setProperty("/authFlow", "signin");
@@ -1470,24 +1484,20 @@ sap.ui.define([
                 });
 
 
+
             } catch (err) {
 
-                let sMsg = "Registration failed! Please try again.";
-
-                // ---- Extract backend error message safely ----
-                if (err?.responseJSON?.message) {
-                    sMsg = err.responseJSON.message;
-                }
-                else if (typeof err?.responseText === "string") {
-                    try {
-                        const oErr = JSON.parse(err.responseText);
-                        if (oErr?.message) {
-                            sMsg = oErr.message;
+                let sMsg =
+                    err?.responseJSON?.message ||
+                    (() => {
+                        if (typeof err?.responseText === "string") {
+                            try {
+                                const oErr = JSON.parse(err.responseText);
+                                return oErr?.message;
+                            } catch (e) { }
                         }
-                    } catch (e) {
-                        // ignore JSON parse errors
-                    }
-                }
+                        return this.i18nModel.getText("registrationFailedPleasetryagain");
+                    })();
 
                 sap.m.MessageBox.error(sMsg, {
                     title: "Registration Failed"
@@ -1498,6 +1508,7 @@ sap.ui.define([
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+
 
         },
 

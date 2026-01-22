@@ -430,7 +430,8 @@ _LCgenerateStrongPassword: function () {
     // shuffle
     pwdArr.sort(() => Math.random() - 0.5);
 
-    return pwdArr.join("");
+    // 🔒 FINAL SAFETY NET — ABSOLUTE
+    return pwdArr.join("").replace(/\s/g, "");
 },
 
 _LCvalidatePassword: function (oEventOrInput, oStrengthText) {
@@ -477,6 +478,10 @@ _getPasswordStrength: function(pwd) {
 
     if (!pwd) return "poor";
 
+    // ❌ SPACES ARE IMMEDIATE FAILURE
+    if (/\s/.test(pwd)) {
+        return "poor";
+    }
     var length  = pwd.length;
     var upper   = /[A-Z]/.test(pwd);
     var lower   = /[a-z]/.test(pwd);
@@ -498,7 +503,7 @@ _getPasswordStrength: function(pwd) {
         }
 
         if (length >= 6) {
-            return "weak";       // ✅ Aaa@12 lives here
+            return "weak";
         }
     }
 
