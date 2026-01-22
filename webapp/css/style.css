@@ -2961,7 +2961,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   .serviceCard {
     width: 100% !important;
         max-width: 320px;
-        margin: 0.75rem auto;
+        margin: 0.5rem auto;
   }
 }
 

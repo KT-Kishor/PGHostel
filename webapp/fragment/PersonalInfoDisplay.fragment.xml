@@ -78,6 +78,7 @@
                         height="140px"
                         densityAware="false"
                         press="onOpenDocumentPreview"
+                        class="serviceImage"
                     />
                 </VBox>
             </FlexBox>

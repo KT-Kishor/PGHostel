@@ -65,13 +65,13 @@
                     tooltip="{i18n>placeRoomRent}"
                 />
             </Column>
-             <Column  minScreenWidth="Desktop"
+             <!-- <Column  minScreenWidth="Desktop"
                         demandPopin="true">
                 <Text
                     text="{i18n>securitydeposit}"
                     tooltip="{i18n>securitydeposit}"
                 />
-            </Column>
+            </Column> -->
             <Column  minScreenWidth="Desktop"
                         demandPopin="true">
                 <Text
@@ -94,12 +94,12 @@
                     <Text
                         text="{parts: [
         'HostelModel>RoomRentPerPerson',
-        'HostelModel>/DepositCurrency'
+        'HostelModel>/Currency'
     ],formatter: '.Formatter.formatCurrency'}"
                     />
-                    <Text text="{parts: [
+                    <!-- <Text text="{parts: [
         'HostelModel>Deposit'
-    ],formatter: '.Formatter.formatCurrency'}"/>
+    ],formatter: '.Formatter.formatCurrency'}"/> -->
                     <Text
                         class="totalColumnBold"
                         text="{ parts: [
@@ -153,7 +153,7 @@
                     text="{i18n>applyNow}"
                     type="Emphasized"
                     tooltip="{i18n>applyCoupon}"
-                    press="onChangeCouponCode couponButton"
+                    press="onChangeCouponCode"
                     class="sapUiTinyMarginEnd"
                     id="couponApplyBtn"
                     visible="{HostelModel>/CouponButtonVisible}"
@@ -247,6 +247,19 @@
                 />
                 <Text
                     text="{parts:['HostelModel>/FinalTotalCost','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+                </HBox>
+            <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+            >
+                <Label
+                    text="{i18n>securitydeposit}"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
+                />
+                <Text
+                    text="{parts:['HostelModel>/Deposit','HostelModel>/DepositCurrency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
                 />
             </HBox>

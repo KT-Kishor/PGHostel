@@ -247,14 +247,14 @@ _executeFacilityDelete: function () {
         }
     }
 
-   setTimeout(() => {
-        $(".serviceCard").each(function () {
-            const ctrl = sap.ui.getCore().byId($(this).attr("id"));
-            if (ctrl) {
-                ctrl.removeStyleClass("serviceCardSelected");
-            }
-        });
-    }, 150);
+//    setTimeout(() => {
+//         $(".serviceCard").each(function () {
+//             const ctrl = sap.ui.getCore().byId($(this).attr("id"));
+//             if (ctrl) {
+//                 ctrl.removeStyleClass("serviceCardSelected");
+//             }
+//         });
+//     }, 150);
 
 
     // Clear selection state

@@ -1537,7 +1537,7 @@ sap.ui.define([
                                     height: "auto",
                                     alignItems: "Center",
                                     justifyContent: "Center", //Center
-                                    // styleClass: "serviceCard",
+                                   
                                     items: [
                                         // Facility Image + Overlay Name
                                         new sap.m.VBox({
@@ -1729,6 +1729,7 @@ sap.ui.define([
             }
 
             this._oFacilityActionSheet = new sap.m.ActionSheet({
+                placement: sap.m.PlacementType.Top,
                 buttons: aButtons
             });
 
@@ -2197,7 +2198,7 @@ sap.ui.define([
                 p.GrandTotal = 0;
             });
             // Continue existing logic...
-            const totals = this.calculateTotals(aPersons, sStartDate, sEndDate, perUnitPrice, PDeposit);
+            const totals = this.calculateTotals(aPersons, sStartDate, sEndDate, perUnitPrice);
             if (!totals) return;
 
             const aUpdatedPersons = aPersons.map((oPerson, iIndex) => {
@@ -2225,7 +2226,7 @@ sap.ui.define([
 
                     RoomRentPerPerson: roomRentPerPerson,
 
-                    GrandTotal: roomRentPerPerson + totalAmount + PDeposit,
+                    GrandTotal: roomRentPerPerson + totalAmount ,
 
                     TotalDays: iDays,
                     Deposit: PDeposit,
@@ -2272,7 +2273,7 @@ sap.ui.define([
         },
 
         // signature now: calculateTotals(aPersons, sStartDate, sEndDate, roomRentPrice, sPaymentType, iSelectedMonths)
-        calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice, PDeposit) {
+        calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice) {
 
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
@@ -2348,7 +2349,7 @@ sap.ui.define([
                 });
             });
 
-            const grandTotal = totalFacilityPrice + Number(roomRentPrice || 0) + Number(PDeposit || 0);
+            const grandTotal = totalFacilityPrice + Number(roomRentPrice || 0)
 
             return {
                 TotalHours: diffHours,
@@ -4660,8 +4661,8 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                             CouponCode: oData.CouponCode || "",
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID,
-                            PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
-                        });
+                            // PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
+                        }); 
                     }
                     let paymentDetails;
 
@@ -4689,7 +4690,10 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                                 : "",
                                Deposit:oData.Deposit || "0",
                                PerMonthTotalRent:perMonthTotalRent.toFixed(2).toString() || "0",
-                               BranchCode:oData.BranchCode || ""
+                               BranchCode:oData.BranchCode || "",
+                               CustomerName:p.FullName || "",
+                               Currency: oData.Currency || "INR",
+                               DepositCurrency:oData.DepositCurrency || "INR"
                         };
 
                     }
