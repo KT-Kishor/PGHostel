@@ -1,6 +1,6 @@
 sap.ui.define([
     "sap/ui/core/format/DateFormat"
-], function( DateFormat) {
+], function (DateFormat) {
     "use strict";
     function parseDDMMYYYY(sDate) {
         if (!sDate) return null;
@@ -11,7 +11,7 @@ sap.ui.define([
         return new Date(year, month - 1, day); // JS months are 0-based
     }
     return {
-        formatDate: function(sDate) {
+        formatDate: function (sDate) {
             if (sDate) {
                 var oDateFormat = DateFormat.getDateInstance({
                     pattern: "dd/MM/yyyy"
@@ -21,7 +21,7 @@ sap.ui.define([
             return sDate;
         },
 
-        calculateFacilityTotal: function(fPrice, iDays) {
+        calculateFacilityTotal: function (fPrice, iDays) {
             if (!fPrice || !iDays) return "₹ 0";
             const fTotal = parseFloat(fPrice) * parseInt(iDays);
             return "₹ " + fTotal.toFixed(2);
@@ -32,7 +32,7 @@ sap.ui.define([
         //     return "₹ " + parseFloat(fValue).toFixed(2);
         // },
 
-        calculateDays: function(sStartDate, sEndDate) {
+        calculateDays: function (sStartDate, sEndDate) {
             if (!sStartDate || !sEndDate) return 0;
 
             const aParts1 = sStartDate.split("/");
@@ -47,7 +47,7 @@ sap.ui.define([
             return iDays > 0 ? iDays : 0;
         },
 
-        DateFormat: function(sDate) {
+        DateFormat: function (sDate) {
             if (sDate) {
                 var oDateFormat = DateFormat.getDateInstance({
                     pattern: "dd/MM/yyyy"
@@ -57,7 +57,7 @@ sap.ui.define([
             return sDate;
         },
 
-        bytesToMB: function(bytes) {
+        bytesToMB: function (bytes) {
             if (!bytes || isNaN(bytes)) {
                 return "0 MB";
             }
@@ -66,7 +66,7 @@ sap.ui.define([
             return mb.toFixed(2) + " MB";
         },
 
-        minDate: function(sStartDate) {
+        minDate: function (sStartDate) {
             if (!sStartDate) return null;
             const [d, m, y] = sStartDate.split("/");
             return new Date(`${y}-${m}-${d}`);
@@ -84,34 +84,34 @@ sap.ui.define([
         // },
 
         formatPrice: function (price, currency) {
-        if (!price || price === "" || price === 0) {
-            return "";
-        }
+            if (!price || price === "" || price === 0) {
+                return "";
+            }
 
-        var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-            currencyCode: true,    
-            minFractionDigits: 2,
-            maxFractionDigits: 2
-        });
+            var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
+                currencyCode: true,
+                minFractionDigits: 2,
+                maxFractionDigits: 2
+            });
 
-        // Format value
-        return oCurrencyFormat.format(Number(price), currency);
-    },
+            // Format value
+            return oCurrencyFormat.format(Number(price), currency);
+        },
 
-    formatStartingPrice: function (currency, price) {
+        formatStartingPrice: function (currency, price) {
 
-        if (!price || price === "" || price === 0) {
-            return "";
-        }
+            if (!price || price === "" || price === 0) {
+                return "";
+            }
 
-        var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-            currencyCode: true,
-            minFractionDigits: 2,
-            maxFractionDigits: 2
-        });
+            var oCurrencyFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
+                currencyCode: true,
+                minFractionDigits: 2,
+                maxFractionDigits: 2
+            });
 
-        var formattedValue = oCurrencyFormat.format(Number(price), currency);
-        return "Starting At " + formattedValue;
+            var formattedValue = oCurrencyFormat.format(Number(price), currency);
+            return "Starting At " + formattedValue;
         },
 
         formatCurrency: function (value, code) {
@@ -128,7 +128,7 @@ sap.ui.define([
             return ""; // fallback
         },
 
-         fromatNumber: function (currencyOrValue, totalAmount, amountInINR) {
+        fromatNumber: function (currencyOrValue, totalAmount, amountInINR) {
             var avalue;
 
             // If only one argument passed, treat it as value to format
@@ -209,14 +209,14 @@ sap.ui.define([
                     return "Error"
                 case "Assigned":
                     return "Indication03"
-                      case "Completed":
+                case "Completed":
                     return "Success"
                 case "Transferred":
                     return "Warning"
                 case "Saved":
                     return "Indication03";
-                 case "Payment Partially":
-                    return "Indication01";    
+                case "Payment Partially":
+                    return "Indication01";
                 default:
                     return "Indication01";
 
@@ -319,74 +319,86 @@ sap.ui.define([
 
             return result;
         },
-    formatFacilityPrice: function (price, currency, unitText, totalTime) {
-    if (!price || !currency || !unitText) {
-        return "";
-    }
+        formatFacilityPrice: function (price, currency, unitText, totalTime) {
+            if (!price || !currency || !unitText) {
+                return "";
+            }
 
-    // Default hour = 1 if not provided
-    if (unitText === "Per Hour") {
-        const hours = totalTime && Number(totalTime) > 0 ? totalTime : 1;
-        return `${price} ${currency} (${hours} Hour)`;
-    }
+            // Default hour = 1 if not provided
+            if (unitText === "Per Hour") {
+                const hours = totalTime && Number(totalTime) > 0 ? totalTime : 1;
+                return `${price} ${currency} (${hours} Hour)`;
+            }
 
-    // Other units
-    return `${price} ${currency} ${unitText}`;
-},
-formatDurationText: function (sPriceType, iMonths) {
+            // Other units
+            return `${price} ${currency} ${unitText}`;
+        },
+        formatDurationText: function (sPriceType, iMonths) {
 
-    if (!sPriceType || !iMonths) {
-        return "";
-    }
+            if (!sPriceType || !iMonths) {
+                return "";
+            }
 
-    if (sPriceType === "Per Month") {
-        return iMonths + (iMonths > 1 ? " Months" : " Month");
-    }
+            if (sPriceType === "Per Month") {
+                return iMonths + (iMonths > 1 ? " Months" : " Month");
+            }
 
-    if (sPriceType === "Per Year") {
-        return iMonths + (iMonths > 1 ? " Years" : " Year");
-    }
+            if (sPriceType === "Per Year") {
+                return iMonths + (iMonths > 1 ? " Years" : " Year");
+            }
 
-    return "";
-},
-formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
+            return "";
+        },
+        formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
 
-    // Guard: missing values
-    if (!sSelectedPriceType) {
-        return "";
-    }
+            // Guard: missing values
+            if (!sSelectedPriceType) {
+                return "";
+            }
 
-    // Multiple persons
-    if (iSelectedPerson > 1) {
-        if (sSelectedPriceType === "Per Month") {
-            return "You need to pay monthly for each person";
+            // Multiple persons
+            if (iSelectedPerson > 1) {
+                if (sSelectedPriceType === "Per Month") {
+                    return "You need to pay monthly for each person";
+                }
+                if (sSelectedPriceType === "Per Year") {
+                    return "You need to pay yearly for each person";
+                }
+            }
+
+            // Single or less than one person
+            if (iSelectedPerson <= 1) {
+                if (sSelectedPriceType === "Per Month") {
+                    return "You need to pay every month";
+                }
+                if (sSelectedPriceType === "Per Year") {
+                    return "You need to pay every year";
+                }
+
+            }
+            return "";
+        },
+
+        displayFormatDate: function (sDate) {
+            if (!sDate) {
+                return "";
+            }
+
+            const oDate = new Date(sDate);
+
+            // Handle invalid / default backend dates like 1899-11-30
+            if (
+                isNaN(oDate.getTime()) ||
+                oDate.getFullYear() <= 1900
+            ) {
+                return "";
+            }
+
+            const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                pattern: "dd/MM/yyyy"
+            });
+
+            return oDateFormat.format(oDate);
         }
-        if (sSelectedPriceType === "Per Year") {
-            return "You need to pay yearly for each person";
-        }
-      
-
-    }
-
-    // Single or less than one person
-    if (iSelectedPerson <= 1) {
-        if (sSelectedPriceType === "Per Month") {
-            return "You need to pay every month";
-        }
-        if (sSelectedPriceType === "Per Year") {
-            return "You need to pay every year";
-        }
-       
-    }
-
-    return "";
-}
-
-
-
-
-
-
-
     }
 });

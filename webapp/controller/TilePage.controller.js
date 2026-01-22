@@ -85,6 +85,10 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageVendor");
         },
+        TileV_onpressPayment: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RoutePayment");
+        },
 
         onStartGuide: function () {
             if (!this._oGuideDialog) {
@@ -96,7 +100,7 @@ sap.ui.define([
                     draggable: true,
                     content: [
                         new sap.m.Image({
-                            src: "image/correct1.png",
+                            src: "image/u1.png",
                             width: "100%",
                             height: "1000%",
                             decorative: false,

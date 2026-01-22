@@ -153,6 +153,17 @@
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
+
+                <GenericTile
+                    id="id7roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>payment}"
+                    press="TileV_onpressPayment"
+                >
+                    <TileContent unit="{i18n>paymentHistory}">
+                        <ImageContent src="sap-icon://monitor-payments" />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <!-- <footer>

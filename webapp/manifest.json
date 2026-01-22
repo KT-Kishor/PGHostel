@@ -278,6 +278,13 @@
             "TargetVendorDetail"
           ]
         },
+        {
+          "name": "RoutePayment",
+          "pattern": "Payment",
+          "target": [
+            "TargetPayment"
+          ]
+        },
        {
         "name": "NotFound",
         "pattern": "NotFound",
@@ -438,6 +445,13 @@
           "clearControlAggregation": false,
           "viewId": "VendorDetail",
           "viewName": "VendorDetail"
+      },
+      "TargetPayment": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Payment",
+          "viewName": "Payment"
       },
       "NotFound": {
           "viewType": "XML",
