@@ -54,6 +54,30 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
+
+                 <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="Customer Name"
+                        label="Customer Name"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="PO_id_CustomerName"
+                                items="{HostelModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{HostelModel>CustomerName}"
+                                    text="{HostelModel>CustomerName}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room No"

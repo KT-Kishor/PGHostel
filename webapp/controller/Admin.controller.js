@@ -122,6 +122,9 @@ sap.ui.define([
                 const sStatus = this.byId("PO_id_Status").getSelectedKey()
                     || this.byId("PO_id_Status").getValue();
 
+                 const sCustomerName= this.byId("PO_id_CustomerName").getSelectedKey()
+                    || this.byId("PO_id_CustomerName").getValue();
+
                 const oDateRange = this.byId("PO_id_Date");
                 const oStartDate = oDateRange.getDateValue();
                 const oEndDate = oDateRange.getSecondDateValue();
@@ -169,6 +172,8 @@ sap.ui.define([
                 if (sbookID) filters.BookingID = sbookID;
                 if (sRoomNo) filters.RoomNo = sRoomNo;
                 if (sStatus) filters.Status = sStatus;
+                if (sCustomerName) filters.CustomerName = sCustomerName;
+
 
                 // ================= Date Handling (Same as Invoice) =================
                 if (this._isClearPressed) {
@@ -225,7 +230,8 @@ sap.ui.define([
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 PO_id_CompanyName: new Set(),
-                PO_id_Status: new Set()
+                PO_id_Status: new Set(),
+                PO_id_CustomerName: new Set()
             };
 
             data.forEach(item => {
@@ -235,11 +241,14 @@ sap.ui.define([
                 if (item.Status) {
                     uniqueValues.PO_id_Status.add(item.Status.trim());
                 }
+                if (item.CustomerName) {
+                    uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
+                }
             });
 
             let oView = this.getView();
 
-            ["PO_id_CompanyName", "PO_id_Status"].forEach(field => {
+            ["PO_id_CompanyName", "PO_id_Status","PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 

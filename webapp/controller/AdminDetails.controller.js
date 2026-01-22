@@ -276,11 +276,13 @@ sap.ui.define([
                 var aDueamount = this.getView().getModel("Beddetails").getData().HM_ManageInvoice
 
 
-               var Paymentpaid=aPayment.find((item)=>{
+               var Dueamount=aDueamount.find((item)=>{
                       return item.CustomerID === oCustomer.CustomerID;    
                 })
               
-                        
+                          var Paymentpaid=aPayment.find((item)=>{
+                      return item.CustomerID === oCustomer.CustomerID;    
+                })
 
                 var bedname=oCustomer.Bookings?.[0]?.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
                 var acname=oCustomer.Bookings?.[0]?.BedType.includes("NON-AC") ? "NON-AC" : "AC"
@@ -481,8 +483,12 @@ sap.ui.define([
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
+             
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
                 this.getView().setModel(oCustomerModel, "CustomerData");
+
+
+             
 
                 
 

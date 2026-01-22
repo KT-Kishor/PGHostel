@@ -991,12 +991,13 @@
                                     textAlign="End"
                                 />
                             </HBox>
+                               <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
                             <HBox
                                 width="100%"
                                 justifyContent="End"
                                 alignItems="Center"
                                 class="sapUiSmallMarginBottom"
-                                visible="{VisibleModel>/visible}"
+                                visible="false"
                             >
                                 <!-- Coupon Label -->
                                 <Label
