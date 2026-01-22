@@ -1131,6 +1131,60 @@
                         }"
                                     textAlign="End"
                                 />
+                               <!-- Deposit -->
+                            </HBox>
+                                <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Security Deposit:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/Deposit' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                                    <!-- Paid -->
+                              <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Paid Amount:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/PaymentPaid' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
+                                    <!-- Due Amount -->
+                               <HBox justifyContent="SpaceBetween">
+                                <Label
+                                    text="Due Amount:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/PaymentPaid' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
                             </HBox>
                         </VBox>
                     </FlexBox>

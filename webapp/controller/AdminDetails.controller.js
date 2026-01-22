@@ -65,6 +65,7 @@ sap.ui.define([
             this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
             this.valuestate()
             await this.OnRoom();
+            await this.getBranchHotelData()
             this.AD_onSearch()
 
             //    const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {});
@@ -102,6 +103,15 @@ sap.ui.define([
                 var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 var model = new sap.ui.model.json.JSONModel(aRooms);
                 this.getView().setModel(model, "Availablebeds")
+
+            });
+        },
+      
+        getBranchHotelData:function(){
+               this.ajaxReadWithJQuery("getBranchHotelData", "").then((oData) => {
+                var aBeds =oData;
+                var model = new sap.ui.model.json.JSONModel(aBeds);
+                this.getView().setModel(model, "Beddetails")
 
             });
         },
@@ -261,6 +271,29 @@ sap.ui.define([
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
+                var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
+                var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
+                var aDueamount = this.getView().getModel("Beddetails").getData().HM_ManageInvoice
+
+
+               var Paymentpaid=aPayment.find((item)=>{
+                      return item.CustomerID === oCustomer.CustomerID;    
+                })
+              
+                        
+
+                var bedname=oCustomer.Bookings?.[0]?.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
+                var acname=oCustomer.Bookings?.[0]?.BedType.includes("NON-AC") ? "NON-AC" : "AC"
+
+
+               var Deposit= abeds.find((item) => {
+                    if (item.Name === bedname && item.BranchCode===oCustomer.Bookings?.[0]?.BranchCode
+                         && item.ACType===acname) {
+                        return item.Deposit
+                    }
+                })
+               
+
                 const oCustomerData = {
                     CustomerName: oCustomer.CustomerName,
                     CustomerID: oCustomer.CustomerID,
@@ -290,6 +323,8 @@ sap.ui.define([
                     Currency: oCustomer.Bookings?.[0]?.Currency || "",
                     Discount: oCustomer.Bookings?.[0]?.Discount || "",
                     CouponCode: oCustomer.Bookings?.[0]?.CouponCode || "",
+                    Deposit: Deposit.Deposit || "0.00",
+                    PaymentPaid:Paymentpaid?.PerMonthTotalRent ||"0.00",
 
 
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
@@ -448,6 +483,8 @@ sap.ui.define([
                 }
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
                 this.getView().setModel(oCustomerModel, "CustomerData");
+
+                
 
                 // Now it is available here:
                 // Set model
@@ -1040,9 +1077,13 @@ sap.ui.define([
 
                     if (oMatchedCoupon.MinOrderValue <= (total + (oCustomerData.RentPrice || 0))) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount) {
+                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && oCustomerData.Discount) {
+                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
                             oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                        } else {
+                                if (oMatchedCoupon.UptoValue > 0 &&  oCustomerData.Discount > oMatchedCoupon.UptoValue) {
+                                           oCustomerData.Discount = Number(oMatchedCoupon.UptoValue);
+                                             }
+                         } else {
                             oCustomerData.Discount = this.CouponDiscount || oCustomerData.Discount || "0.00";
                         }
 
@@ -1239,7 +1280,28 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SGST", SGST);
                 oCustomerModel.setProperty("/CGST", SGST);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-                oCustomerModel.setProperty("/Discount", 0.00)
+                 var CustData=oCustomerModel.getData();
+                 var fFacilityPrice=oCustomerModel.getProperty("/TotalFacilityPrice") || 0
+                    if (CustData.CouponCode || this.Code) {
+                    var oCouponData = this.getView().getModel("CouponModel").getData();
+                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+
+                    if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
+
+                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                            CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
+                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                                             }
+                         } else {
+                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                        }
+
+                    }
+                }
+                oCustomerModel.setProperty("/Discount",CustData.Discount)
                 oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
                 oData.EndDate = this._formatDate(oEnd);
                 oBookingModel.refresh();
@@ -1301,7 +1363,7 @@ sap.ui.define([
         onBookMonthYearChange: function (oEvent) {
             const oModel = this.getView().getModel("Bookingmodel");
             const oCustomerData = this.getView().getModel("CustomerData");
-
+   var CustData=this.getView().getModel("CustomerData").getData()
             // Store original RentPrice once if not already stored
             let originalRent = oCustomerData.getProperty("/OriginalRentPrice");
             if (!originalRent) {
@@ -1350,7 +1412,27 @@ sap.ui.define([
             oCustomerData.setProperty("/SGST", CGST);
             oCustomerData.setProperty("/CGST", CGST);
             oCustomerData.setProperty("/SubTotal", SubTotal);
-            oCustomerData.setProperty("/Discount", 0.00)
+
+                if (CustData.CouponCode || this.Code) {
+                    var oCouponData = this.getView().getModel("CouponModel").getData();
+                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+
+                    if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
+
+                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                            CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
+                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                                             }
+                         } else {
+                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                        }
+
+                    }
+                }
+            oCustomerData.setProperty("/Discount", CustData.Discount)
             // oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice);
             oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST + CGST);
 
@@ -1594,7 +1676,11 @@ if (sStartDate && sEndDate) {
                     || {};
 
                 if (oCouponData.DiscountType === "Percentage") {
+                       this.CouponDiscount = this.CouponDiscount || oCouponData.DiscountValue || "0"
                     oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                         if (oCouponData.UptoValue > 0 &&  oCustomerData.Discount > oCouponData.UptoValue) {
+                       oCustomerData.Discount = Number(oCouponData.UptoValue);
+                    }
                 } else {
                     oCustomerData.Discount = Number(oCouponData.DiscountValue)
                 }
@@ -1679,7 +1765,27 @@ if (sStartDate && sEndDate) {
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
-                oCustomerModel.setProperty("/Discount", 0.00)
+                var CustData=this.getView().getModel("CustomerData").getData()
+                    if (CustData.CouponCode || this.Code) {
+                    var oCouponData = this.getView().getModel("CouponModel").getData();
+                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+
+                    if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
+
+                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                            CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
+                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                                             }
+                         } else {
+                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                        }
+
+                    }
+                }
+                oCustomerModel.setProperty("/Discount", CustData.Discount)
                 oCustomerModel.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST * 2);
 
             }
@@ -1700,7 +1806,7 @@ if (sStartDate && sEndDate) {
             var sBedType = oEvent.getParameter("selectedItem").getKey(); // Selected bed type
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var oCustomerModel = this.getView().getModel("CustomerData");
-
+            var CustData = this.getView().getModel("CustomerData").getData();
             // Update selected bed in Bookingmodel
             oBookingModel.setProperty("/BedTypeName", sBedType);
 
@@ -1773,7 +1879,39 @@ if (sStartDate && sEndDate) {
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
-                oCustomerModel.setProperty("/Discount", 0.00)
+                   var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
+                        var Bedname=sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
+                        var Acname=sBedType.includes("NON-AC") ? "NON-AC" : "AC"
+               var Deposit= abeds.find((item) => {
+                    if (item.Name === Bedname && item.BranchCode===CustData.BranchCode
+                         && item.ACType===Acname) {
+                        return item.Deposit
+                    }
+                })
+
+                    if (CustData.CouponCode || this.Code) {
+                    var oCouponData = this.getView().getModel("CouponModel").getData();
+                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+
+                    if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
+
+                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                            CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
+                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                                             }
+                         } else {
+                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                        }
+
+                    }
+                }
+
+                oCustomerModel.setProperty("/Discount",CustData.Discount)
+                oCustomerModel.setProperty("/Deposit",Deposit.Deposit)
+
                 oCustomerModel.setProperty("/GrandTotal", fOriginalRentPrice + fFacilityPrice + CGST * 2);
             }
         },

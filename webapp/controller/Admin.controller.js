@@ -548,6 +548,9 @@ sap.ui.define([
         success: async function () {
             sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
             await this.Cust_read(true);
+               this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                sPath: ID.CustomerID,dash :"ManageInvoice"
+            });
             this.HM_Dialog.close();
         }.bind(this),
         error: function (xhr) {
