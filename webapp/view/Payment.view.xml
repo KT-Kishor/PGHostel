@@ -44,7 +44,7 @@
                             >
                                 <core:Item
                                     key="{mainModel>CustomerID}"
-                                    text="{mainModel>CustomerID}"
+                                    text="{mainModel>CustomerID} - {mainModel>CustomerName}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -69,6 +69,47 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="BranchCode"
+                        label="{i18n>MSbranchCode}"
+                        groupName="Group"
+                        visible="{RoleModel>/isSuperAdmin}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="P_id_BranchCode"
+                                items="{mainModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                                busyIndicatorDelay="0"
+                            >
+                                <core:ListItem
+                                    key="{mainModel>BranchID}"
+                                    text="{mainModel>BranchID} - {mainModel>Name}"
+                                    additionalText="{mainModel>City}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="StartDate"
+                        label="{i18n>date}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DateRangeSelection
+                                id="P_id_Date"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
                 id="P_id_PaymentTable"
@@ -77,7 +118,7 @@
                 width="auto"
                 busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
-                items="{path: 'mainModel>/', sorter: {path: 'BranchCode',descending: false,group: true}}"
+                items="{path: 'mainModel>/', sorter: {path: '',descending: false,group: true}}"
             >
                 <headerToolbar>
                     <OverflowToolbar>
@@ -88,7 +129,7 @@
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
-                            press="MS_onDownload"
+                            press="P_onDownload"
                             class="myUnifiedBtn"
                         />
                     </OverflowToolbar>
@@ -105,8 +146,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="{i18n>bookingDate}"
-                            tooltip="{i18n>bookingDate}"
+                            text="{i18n>paymentDate}"
+                            tooltip="{i18n>paymentDate}"
                         />
                     </Column>
                     <Column demandPopin="true">
@@ -139,7 +180,7 @@
                             tooltip="{i18n>bankTransactionID}"
                         />
                     </Column>
-                    <Column
+                    <!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -147,7 +188,7 @@
                             text="{i18n>customerID}"
                             tooltip="{i18n>customerID}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -211,7 +252,7 @@
                             tooltip="{i18n>MSbranchCode}"
                         />
                     </Column> -->
-                    <Column
+                    <!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -219,7 +260,7 @@
                             text="{i18n>perMonthTotalRent}"
                             tooltip="{i18n>perMonthTotalRent}"
                         />
-                    </Column>
+                    </Column> -->
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -234,7 +275,7 @@
                             />
                             <Text text="{mainModel>PaymentType}" />
                             <Text text="{mainModel>BankTransactionID}" />
-                            <Text text="{mainModel>CustomerID}" />
+                            <!-- <Text text="{mainModel>CustomerID}" /> -->
                             <Text text="{mainModel>CustomerName}" />
                             <!-- <Text text="{mainModel>Mode}" /> -->
                             <Text
@@ -248,7 +289,7 @@
                                 text="{mainModel>ReturnDepositTransactionID}"
                             />
                             <!-- <Text text="{mainModel>BranchCode}" /> -->
-                            <Text text="{mainModel>PerMonthTotalRent}" />
+                            <!-- <Text text="{mainModel>PerMonthTotalRent}" /> -->
                         </cells>
                     </ColumnListItem>
                 </items>
