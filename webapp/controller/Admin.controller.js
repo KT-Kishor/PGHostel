@@ -352,6 +352,18 @@ sap.ui.define([
         return;
     }
 
+        var oStartDate = new Date(this.data.StartDate);
+    var oToday = new Date();
+
+    // normalize time (important!)
+    oStartDate.setHours(0, 0, 0, 0);
+    oToday.setHours(0, 0, 0, 0);
+
+    if (oStartDate.getTime() !== oToday.getTime()) {
+        sap.m.MessageToast.show("Room can be assigned only on start date");
+        return;
+    }
+
     var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
     var aRooms = oRoomDetailsModel.getData();
 
@@ -557,9 +569,9 @@ sap.ui.define([
         success: async function () {
             sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
             await this.Cust_read(true);
-               this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
-                sPath: ID.CustomerID,dash :"ManageInvoice"
-            });
+            //    this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+            //     sPath: ID.CustomerID,dash :"ManageInvoice"
+            // });
             this.HM_Dialog.close();
         }.bind(this),
         error: function (xhr) {
@@ -759,6 +771,7 @@ sap.ui.define([
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
             this.getView().byId("PO_id_Status").setSelectedKey("")
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
+            this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.byId("PO_id_Date").setValue("");
         },
 

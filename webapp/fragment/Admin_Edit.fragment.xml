@@ -246,10 +246,10 @@
         placeholder="Enter Coupon Code"
         width="200px"
         class="sapUiSmallMarginEnd"
-          showValueHelp="true"
-                                    valueHelpIconSrc="sap-icon://decline"
-                                    valueHelpRequest="oncancelFacilityCoupon"
-                                    liveChange="onCouponLiveChange"
+        showValueHelp="true"
+        valueHelpIconSrc="sap-icon://decline"
+        valueHelpRequest="oncancelFacilityCoupon"
+        liveChange="onCouponLiveChange"
     />
 
     <Button
@@ -268,7 +268,7 @@
                     value="{edit>/CouponDiscount}"
                     editable="false"
                 />
-            
+
             </f:content>
         </f:SimpleForm>
         <beginButton>

@@ -69,20 +69,6 @@ sap.ui.define([
             await this.OnRoom();
             await this.getBranchHotelData()
             this.AD_onSearch()
-
-            //    const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {});
-            //                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
-
-            //                 var Data=aBranches.find((item)=>{
-            //                     var sBranchCode=this.getView().getModel("CustomerData").getData().BranchCode
-            //                     return item.BranchID===sBranchCode
-            //              })
-            //              if(Data.Country==="India"){
-            //                  this.getView().getModel("VisibleModel").setProperty("/GSt",true)
-            //              }else{
-            //                     this.getView().getModel("VisibleModel").setProperty("/GSt",false)
-            //              }
-
         },
 
         valuestate: function () {
@@ -479,9 +465,9 @@ sap.ui.define([
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
-               oCustomerData.DueAmount=oCustomerData.GrandTotal - oCustomerData.PaymentPaid
+                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
- 
+
                 this.getView().setModel(oCustomerModel, "CustomerData");
 
                 // Now it is available here:
@@ -971,6 +957,29 @@ sap.ui.define([
                 oPayload.TotalHour = Month || "1";
             }
 
+            if (oPayload.CouponCode) {
+                var oModel = this.getView().getModel("CouponModel");
+                var oCouponData = oModel && Array.isArray(oModel.getData())
+                    ? oModel.getData()
+                    : [];
+                var oCoupon = oCouponData.find(c => c.CouponCode === oPayload.CouponCode);
+                if (oPayload.UnitText === "Per Month") {
+                    var subtotal = oPayload.Price * (oPayload.TotalUnits || 1)
+                } else if (oPayload.UnitText === "Per Year") {
+                    var subtotal = oPayload.Price * (oPayload.TotalUnits || 1)
+                } else if (oPayload.UnitText === "Per Day") {
+                    var subtotal = oPayload.Price * (oPayload.TotalDays || 1)
+                } else if (oPayload.UnitText === "Per Hour") {
+                    var subtotal = oPayload.Price * oPayload.TotalHour * oPayload.TotalDays
+                }
+
+                oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
+                if (oCoupon.MinOrderValue > subtotal) {
+                    sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
+                    return;
+                }
+            }
+
             if (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") &&
                 // utils._LCstrictValidationComboBox(oView.byId("idBedType"), "ID") &&
@@ -1106,6 +1115,7 @@ sap.ui.define([
                 oCustomerData.SGST = oCustomerData.SubTotal * 0.09;
                 oCustomerData.CGST = oCustomerData.SubTotal * 0.09;
                 oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
+                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
 
                 // Update model
                 oCustomerModel.setData(oCustomerData);
@@ -1277,12 +1287,7 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
                 oCustomerModel.setProperty("/Duration", diffDays);
-                var SGST = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) * 0.09
-                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
 
-                oCustomerModel.setProperty("/SGST", SGST);
-                oCustomerModel.setProperty("/CGST", SGST);
-                oCustomerModel.setProperty("/SubTotal", SubTotal);
                 var CustData = oCustomerModel.getData();
                 var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
                 if (CustData.CouponCode || this.Code) {
@@ -1304,8 +1309,17 @@ sap.ui.define([
 
                     }
                 }
+                var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")) - Number(CustData.Discount)
+
+                var SubTotal = SubTotal
+                var SGST = SubTotal * 0.09
+
+                oCustomerModel.setProperty("/SGST", SGST);
+                oCustomerModel.setProperty("/CGST", SGST);
+                oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
-                oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
+                oCustomerModel.setProperty("/GrandTotal", SubTotal + SGST + SGST);
+                oCustomerModel.setProperty("/DueAmount", SubTotal + SGST + SGST - CustData.PaymentPaid);
                 oData.EndDate = this._formatDate(oEnd);
                 oBookingModel.refresh();
                 return;
@@ -1409,12 +1423,8 @@ sap.ui.define([
             var fPrice = oCustomerData.getProperty("/RentPrice")
 
             var fFacilityPrice = parseFloat(oCustomerData.getProperty("/TotalFacilityPrice") || 0);
-            var CGST = (fPrice + fFacilityPrice) * 0.09
-            var SubTotal = fPrice + fFacilityPrice
 
-            oCustomerData.setProperty("/SGST", CGST);
-            oCustomerData.setProperty("/CGST", CGST);
-            oCustomerData.setProperty("/SubTotal", SubTotal);
+
 
             if (CustData.CouponCode || this.Code) {
                 var oCouponData = this.getView().getModel("CouponModel").getData();
@@ -1435,9 +1445,17 @@ sap.ui.define([
 
                 }
             }
+            var SubTotal = (fPrice + fFacilityPrice) - Number(CustData.Discount)
+            var CGST = SubTotal * 0.09
+
+            oCustomerData.setProperty("/SGST", CGST);
+            oCustomerData.setProperty("/CGST", CGST);
+
+            oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
             // oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice);
-            oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST + CGST);
+            oCustomerData.setProperty("/GrandTotal", SubTotal + CGST + CGST);
+            oCustomerData.setProperty("/DueAmount", SubTotal + CGST + CGST - CustData.PaymentPaid);
 
         },
 
@@ -1467,6 +1485,7 @@ sap.ui.define([
             oCustomerData.GrandTotal = grandTotal;
 
             // Refresh model and reset coupon flag
+            this.AD_onSearch()
             this.getView().getModel("CustomerData").refresh(true);
         },
 
@@ -1479,10 +1498,17 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoEdit"));
                 return;
             }
-            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false);
+
 
             var oContext = oSelectedItem.getBindingContext("CustomerData");
             var oSelectedData = oContext.getObject();
+
+            var editCouponCode = sap.ui.getCore().byId("ID_editCouponCode");
+
+            if (editCouponCode) {
+                editCouponCode.setShowValueHelp(!!oSelectedData.CouponCode);
+            }
+
 
             var sStartDate = oSelectedData.StartDate.split("/").reverse().join("-"); // e.g. "2025-01-15"
             var sEndDate = oSelectedData.EndDate.split("/").reverse().join("-");   // e.g. "2025-06-14"
@@ -1703,6 +1729,8 @@ sap.ui.define([
             oCustomerData.SGST = oCustomerData.SubTotal * 0.09;
             oCustomerData.CGST = oCustomerData.SubTotal * 0.09;
             oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
+            oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
+
             // oCustomerData.GrandTotal = total + (oCustomerData.RentPrice || 0);
         },
 
@@ -1763,12 +1791,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/OrginalRentPrice", fPrice);
                 // Update GrandTotal
                 var fFacilityPrice = parseFloat(oCustomerModel.getProperty("/TotalFacilityPrice") || 0);
-                var SubTotal = fPrice + fFacilityPrice
-                var CGST = (fPrice + fFacilityPrice) * 0.09
 
-                oCustomerModel.setProperty("/SGST", CGST)
-                oCustomerModel.setProperty("/CGST", CGST)
-                oCustomerModel.setProperty("/SubTotal", SubTotal)
                 var CustData = this.getView().getModel("CustomerData").getData()
                 if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
@@ -1789,8 +1812,16 @@ sap.ui.define([
 
                     }
                 }
+                var SubTotal = fPrice + fFacilityPrice - Number(CustData.Discount)
+                var CGST = SubTotal * 0.09
+
+                oCustomerModel.setProperty("/SGST", CGST)
+                oCustomerModel.setProperty("/CGST", CGST)
+                oCustomerModel.setProperty("/SubTotal", SubTotal)
+
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
-                oCustomerModel.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST * 2);
+                oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST * 2);
+                oCustomerModel.setProperty("/DueAmount", SubTotal + CGST * 2 - CustData.PaymentPaid);
 
             }
         },
@@ -1877,12 +1908,7 @@ sap.ui.define([
 
                 // Recalculate GrandTotal
                 var fFacilityPrice = parseFloat(oCustomerModel.getProperty("/TotalFacilityPrice") || 0);
-                var SubTotal = fOriginalRentPrice + fFacilityPrice
-                var CGST = (fOriginalRentPrice + fFacilityPrice) * 0.09
 
-                oCustomerModel.setProperty("/SGST", CGST)
-                oCustomerModel.setProperty("/CGST", CGST)
-                oCustomerModel.setProperty("/SubTotal", SubTotal)
                 var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
                 var Bedname = sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
                 var Acname = sBedType.includes("NON-AC") ? "NON-AC" : "AC"
@@ -1912,11 +1938,20 @@ sap.ui.define([
 
                     }
                 }
+                var SubTotal = fOriginalRentPrice + fFacilityPrice - Number(CustData.Discount)
+                var CGST = SubTotal * 0.09
+
+                oCustomerModel.setProperty("/SGST", CGST)
+                oCustomerModel.setProperty("/CGST", CGST)
+                oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
                 oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
 
-                oCustomerModel.setProperty("/GrandTotal", fOriginalRentPrice + fFacilityPrice + CGST * 2);
+                oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST * 2);
+                oCustomerModel.setProperty("/DueAmount", SubTotal + CGST * 2 - CustData.PaymentPaid);
+
+
             }
         },
 
@@ -2714,7 +2749,18 @@ sap.ui.define([
 
             // 3. Percentage discount
 
-            var subtotal = edit.Price
+            var subtotal = 0;
+
+            if (edit.UnitText === "Per Month") {
+                var subtotal = edit.Price * (edit.TotalUnits || 1)
+            } else if (edit.UnitText === "Per Year") {
+                var subtotal = edit.Price * (edit.TotalUnits || 1)
+            } else if (edit.UnitText === "Per Day") {
+                var subtotal = edit.Price * (edit.TotalDays || 1)
+            } else if (edit.UnitText === "Per Hour") {
+                var subtotal = edit.Price * edit.TotalHour * edit.TotalDays
+            }
+
             oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
             if (oCoupon.MinOrderValue > subtotal) {
                 sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
