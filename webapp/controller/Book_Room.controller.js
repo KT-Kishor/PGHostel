@@ -4689,7 +4689,6 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                                 ? sap.ui.getCore().byId("idPaymentDate").getValue().split("/").reverse().join("-")
                                 : "",
                                Deposit:oData.Deposit || "0",
-                               PerMonthTotalRent:perMonthTotalRent.toFixed(2).toString() || "0",
                                BranchCode:oData.BranchCode || "",
                                CustomerName:p.FullName || "",
                                Currency: oData.Currency || "INR",

@@ -1029,7 +1029,11 @@ sap.ui.define([
                     Currency: oNavigationModel.Currency,
                     ConversionRate: "",
                     AmountInINR: "",
-                    FlagVisCompany: "Company Invoice"
+                    FlagVisCompany: "Company Invoice",
+                    CustomerName : oNavigationModel.CustomerName,
+                    CustomerID : oNavigationModel.CustomerID,
+                    BookingID : oNavigationModel.BookingID,
+                    BranchCode : oNavigationModel.BranchCode
                 });
                 this.getView().setModel(oModel, "PaymentModel");
             },
@@ -1152,13 +1156,18 @@ sap.ui.define([
                 const jsonData = {
                     InvNo: String(paymentModel.InvNo),
                     TransactionId: String(paymentModel.TransactionId),
-                    ReceivedDate: String(paymentModel.ReceivedDate),
+                    ReceivedDate: paymentModel.ReceivedDate ? paymentModel.ReceivedDate.split("/").reverse().join("-") : "",
                     ReceivedAmount: String(paymentModel.ReceivedAmount),
                     TotalAmount: String(paymentModel.TotalAmount),
                     DueAmount: String(paymentModel.DueAmount),
                     Currency: String(paymentModel.Currency),
                     ConversionRate: paymentModel.Currency !== "INR" ? String(paymentModel.ConversionRate) : "",
-                    AmountInINR: paymentModel.Currency !== "INR" ? String(paymentModel.AmountInINR) : ""
+                    AmountInINR: paymentModel.Currency !== "INR" ? String(paymentModel.AmountInINR) : "",
+                    CustomerName : paymentModel.CustomerName,
+                    CustomerID : paymentModel.CustomerID,
+                    BookingID : paymentModel.BookingID,
+                    BranchCode : paymentModel.BranchCode,
+                    PaymentType : "UPI"
                 };
 
                 try {

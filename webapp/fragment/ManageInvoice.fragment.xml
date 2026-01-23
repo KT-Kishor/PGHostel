@@ -104,7 +104,7 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{PaymentDetailModel>TransactionId}" />
-							<Text text="{PaymentDetailModel>ReceivedDate}" />
+                            <Text text="{path:'PaymentDetailModel>ReceivedDate', formatter:'.Formatter.formatDate'}" />
 							<Text text="{path:'PaymentDetailModel>TotalAmount',formatter: '.Formatter.fromatNumber'}"/>
 							<Text text="{path:'PaymentDetailModel>ReceivedAmount',formatter: '.Formatter.fromatNumber'}"/>
 							<Text text="{path:'PaymentDetailModel>DueAmount',formatter: '.Formatter.fromatNumber'}"/>

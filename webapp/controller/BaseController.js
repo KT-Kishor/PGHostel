@@ -750,5 +750,46 @@ sap.ui.define([
         resolve(true);
       });
     },
+
+    compressBase64: function (base64) {
+      // Base64 → binary
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      // gzip compress (browser)
+      const compressed = window.pako.gzip(bytes);
+
+      // compressed → Base64
+      let compressedBinary = "";
+      compressed.forEach(b => {
+        compressedBinary += String.fromCharCode(b);
+      });
+
+      return btoa(compressedBinary);
+    },
+
+    decompressBase64: function (base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      const decompressed = window.pako.ungzip(bytes);
+
+      let resultBinary = "";
+      decompressed.forEach(b => {
+        resultBinary += String.fromCharCode(b);
+      });
+
+      return btoa(resultBinary);
+    }
   })
 });

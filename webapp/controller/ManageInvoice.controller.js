@@ -16,6 +16,7 @@ sap.ui.define(
 
                 _onRouteMatched: async function() {
                     try {
+                        sap.ui.core.BusyIndicator.show(0);
                         this.commonLoginFunction();
                         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                         this._isClearPressed = false; // ensure full data is not requested'
