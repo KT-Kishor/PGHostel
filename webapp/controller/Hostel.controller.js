@@ -328,6 +328,7 @@ sap.ui.define([
                 ACType: oData.ACType || "",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
+                Area: oData.Area || "",  
                 Description: oData.Description || "",
                 BranchCode: oData.BranchCode || "",
                 SelectedPriceType: oData.SelectedPriceType,
@@ -347,7 +348,9 @@ sap.ui.define([
             };
             
             // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
-            console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
+            // console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
+            // console.log("Area from HostelModel:", oData.Area);
+
 
 
             // -------------------------
