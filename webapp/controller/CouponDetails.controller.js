@@ -814,7 +814,7 @@ sap.ui.define([
                             DiscountValue: oCoupon.DiscountValue,
                             UptoValue: oCoupon.UptoValue,
                             Description: oCoupon.Description,
-                            //MaxUses: oCoupon.MaxUses,
+                            MaxUses: oCoupon.MaxUses,
                             //erLimit: oCoupon.PerUserLimit,
                             BranchCode: oCoupon.BranchCode,
                             StartDate: oCoupon.StartDate,

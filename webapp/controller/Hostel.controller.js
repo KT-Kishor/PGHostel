@@ -9,6 +9,8 @@ sap.ui.define([
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
     const $V = (id) => $C(id)?.getValue()?.trim() || "";
+    this._otpResendInterval = null;
+    this._otpValidityInterval = null;
     return BaseController.extend("sap.ui.com.project1.controller.Hostel", {
         _isProfileRequested: false,
         Formatter: Formatter,
@@ -108,7 +110,9 @@ sap.ui.define([
                 isOtpSelected: false,
                 isPasswordSelected: true,
                 authFlow: "signin",
-                isOtpBoxVisible: false
+                isOtpBoxVisible: false,
+                otpExpiryTs: null,
+                otpValidityText: ""
             }), "LoginViewModel");
 
             const vm = oView.getModel("LoginViewModel");
@@ -185,6 +189,69 @@ sap.ui.define([
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
 
+        },
+        _clearOtpValidityTimer: function () {
+            if (this._otpValidityInterval) {
+                clearInterval(this._otpValidityInterval);
+                this._otpValidityInterval = null;
+            }
+        },/**/
+        _startOtpValidity: function () {
+            const vm = this.getView().getModel("LoginViewModel");
+
+            const expiryTs = Date.now() + (10 * 60 * 1000); //1000xx
+
+            vm.setProperty("/otpExpiryTs", expiryTs);
+
+            this._clearOtpValidityTimer();
+
+            this._otpValidityInterval = setInterval(() => {
+                const remainingMs = expiryTs - Date.now();
+
+                if (remainingMs <= 0) {
+                    this._onOtpExpired();
+                    return;
+                }
+
+                const totalSec = Math.floor(remainingMs / 1000); //1000xx
+                const min = Math.floor(totalSec / 60);
+                const sec = totalSec % 60;
+
+                vm.setProperty(
+                    "/otpValidityText",
+                    `OTP expires in ${min}:${sec.toString().padStart(2, "0")}`
+                );
+            }, 1000);
+        },
+
+
+
+        _onOtpExpired: function () {
+            const vm = this.getView().getModel("LoginViewModel");
+
+            this._clearOtpValidityTimer();
+            this._clearOtpResendTimer();
+
+            vm.setProperty("/otpExpiryTs", null);
+            vm.setProperty("/otpValidityText", "OTP expired");
+            vm.setProperty("/canResendOTP", true);
+            vm.setProperty("/showOTPField", false);
+            vm.setProperty("/isOtpEntered", false);
+
+            if (vm.getProperty("/authFlow") === "forgot") {
+                vm.setProperty("/forgotStep", 1);
+            }
+
+            const otpCtrl =
+                vm.getProperty("/authFlow") === "forgot"
+                    ? sap.ui.getCore().byId("fpOTP")
+                    : sap.ui.getCore().byId("signInOTP");
+
+            otpCtrl?.setValue("");
+            otpCtrl?.setEnabled(false);
+            otpCtrl?.setValueState("None");
+
+            sap.m.MessageToast.show("OTP expired. Please resend OTP.");
         },
 
 
@@ -3438,6 +3505,7 @@ sap.ui.define([
 
                     sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     // alert(oResp.OTP);
+                    console.log("Use OTP : ", oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
 
@@ -3453,8 +3521,14 @@ sap.ui.define([
                     oOtpCtrl.setValueStateText("");
                     oOtpCtrl.focus();
 
-                    // 🔥 THIS WAS MISSING
-                    this._startOtpTimer();
+
+                    this._startOtpValidity();   // 🔥 10-minute validity starts HERE
+                   
+                   
+                   
+                    this._startOtpResend(120) //120xx
+
+
 
                 }
                 else {
@@ -3468,6 +3542,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+
 
         _onVerifyOTP: async function () {
 
@@ -3503,7 +3578,16 @@ sap.ui.define([
             // --- Backend verification ---
             let isValid = false;
 
+
+
             try {
+                const expiryTs = vm.getProperty("/otpExpiryTs");
+
+                if (!expiryTs || Date.now() > expiryTs) {
+                    this._onOtpExpired();
+                    return;
+                }
+
                 isValid = await this._verifyOTPWithBackend(otp);
             } catch (e) {
                 sap.m.MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
@@ -3516,8 +3600,12 @@ sap.ui.define([
                 return;
             }
 
-            // ✅ OTP accepted: reset resend cooldown state
-            this._resetOtpCooldown();
+            // 🔥 OTP VERIFIED SUCCESSFULLY → DESTROY EXPIRY STATE (INLINE)
+            this._clearOtpValidityTimer();
+            this._clearOtpResendTimer();
+            vm.setProperty("/otpExpiryTs", null);
+            vm.setProperty("/otpValidityText", "");
+
 
             // --------------------------
             // 📌 Forgot Password Flow
@@ -3526,7 +3614,7 @@ sap.ui.define([
                 vm.setProperty("/forgotStep", 3);
                 return;
             }
-
+            
             // --------------------------
             // 📌 Normal OTP Login Flow
             // --------------------------
@@ -3932,6 +4020,12 @@ sap.ui.define([
                         sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                         return;
                     }
+                    const expiryTs = vm.getProperty("/otpExpiryTs");
+                    if (!expiryTs || Date.now() > expiryTs) {
+                        this._onOtpExpired();
+                        return;
+                    }
+
 
                     // 4️⃣ Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
@@ -4262,11 +4356,14 @@ sap.ui.define([
                 if (oResp?.success) {
                     sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     // alert(oResp.OTP);
+                    console.log("Use OTP : ", oResp.OTP);
 
                     this._oResetUser = { UserID: sUserId, UserName: sUserName };
                     // ✅ Start resend cooldown
-                    this._startOtpCooldown(120);
+                    this._startOtpValidity();      // ✅ ADD THIS
 
+
+                    this._startOtpResend(120);// 120xx
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
                 } else {
@@ -4280,50 +4377,44 @@ sap.ui.define([
             }
         },
 
-        _startOtpTimer: function () {
+        _clearOtpResendTimer: function () {
+            if (this._otpResendInterval) {
+                clearInterval(this._otpResendInterval);
+                this._otpResendInterval = null;
+            }
+        },
+
+        _startOtpResend: function (seconds = 120) { //120xx
             const vm = this.getView().getModel("LoginViewModel");
-            this._clearOtpTimer();
-            const START = 120;
+            let remaining = seconds;
+
+            this._clearOtpResendTimer();
 
             vm.setProperty("/canResendOTP", false);
-            vm.setProperty("/otpTimer", START);
+            vm.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
 
-            // 🔥 UPDATE TEXT IMMEDIATELY (important)
-            vm.setProperty("/otpButtonText", `Resend OTP (${START}s)`);
-
-            this._otpInterval = setInterval(() => {
-
-                let remaining = vm.getProperty("/otpTimer");
-
+            this._otpResendInterval = setInterval(() => {
                 remaining--;
 
                 if (remaining <= 0) {
-                    this._clearOtpTimer();
-                    vm.setProperty("/otpTimer", 0);
-                    vm.setProperty("/otpButtonText", "Resend OTP");
+                    this._clearOtpResendTimer();
                     vm.setProperty("/canResendOTP", true);
+                    vm.setProperty("/otpButtonText", "Resend OTP");
                     return;
                 }
 
-                vm.setProperty("/otpTimer", remaining);
                 vm.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
-
             }, 1000);
-        },
-
-        _clearOtpTimer: function () {
-            if (this._otpInterval) {
-                clearInterval(this._otpInterval);
-                this._otpInterval = null;
-            }
         },
 
         _resetOtpState: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
-            this._clearOtpTimer();
+            this._clearOtpResendTimer();
+            this._clearOtpValidityTimer();
 
-            vm.setProperty("/otpTimer", 0);
+            vm.setProperty("/otpExpiryTs", null);
+            vm.setProperty("/otpValidityText", "");
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpButtonText", "Send OTP");
             vm.setProperty("/showOTPField", false);
@@ -4333,56 +4424,9 @@ sap.ui.define([
             otpCtrl?.setValue("");
             otpCtrl?.setEnabled(false);
             otpCtrl?.setValueState("None");
-            clearInterval(this._otpInterval);
-            this._otpInterval = null;
-
-            vm.setProperty("/canResendOTP", true);
-            vm.setProperty("/otpTimer", 0);
-            vm.setProperty("/otpButtonText", "Send OTP");
         },
 
-        _startOtpCooldown: function (iSeconds = 120) {
-            const vm = this.getView().getModel("LoginViewModel");
-            let remaining = iSeconds;
-
-            vm.setProperty("/canResendOTP", false);
-            vm.setProperty("/otpButtonText", `Resend OTP in ${remaining}s`);
-
-            if (this._otpInterval) {
-                clearInterval(this._otpInterval);
-                this._otpInterval = null;
-            }
-
-            this._otpInterval = setInterval(() => {
-
-                remaining--;
-
-                if (remaining <= 0) {
-                    clearInterval(this._otpInterval);
-                    this._otpInterval = null;
-
-                    vm.setProperty("/canResendOTP", true);
-                    vm.setProperty("/otpButtonText", "Resend OTP");
-                    return;
-                }
-
-                vm.setProperty("/otpButtonText", `Resend OTP in ${remaining}s`);
-
-            }, 1000);
-        },
-
-        _resetOtpCooldown: function () {
-            const vm = this.getView().getModel("LoginViewModel");
-
-            if (this._otpInterval) {
-                clearInterval(this._otpInterval);
-                this._otpInterval = null;
-            }
-
-            vm.setProperty("/otpButtonText", "Send OTP");
-            vm.setProperty("/canResendOTP", false);
-        },
-
+     
         onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
 

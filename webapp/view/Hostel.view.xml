@@ -172,7 +172,7 @@
                                                             class="position-welcome"
                                                         >
                                                             <VBox
-                                                                class=" sapUiLargeMarginTop"
+                                                                class=" sapUiLargeMarginTop heroTextBox"
                                                             >
                                                                 <Text
                                                                     class="custom-welcome sapUiTinyMarginTopBottom"
