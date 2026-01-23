@@ -80,6 +80,7 @@
                                 press="onEditBooking"
                                 visible="{=
                                     ${CustomerData>/Status} !== 'Cancelled'
+                                     &amp;&amp; ${CustomerData>/Status} !== 'Completed'
                                      &amp;&amp;
                                     (
                                         ${CustomerData>/Status} === 'New' ||

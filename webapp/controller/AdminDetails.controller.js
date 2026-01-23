@@ -2687,6 +2687,7 @@ sap.ui.define([
         },
 
         onEditCouponCodeLiveChange: async function () {
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
             var edit = this.getView().getModel("edit").getData();
 
             var sEnteredCode = edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode").getValue();
@@ -2722,6 +2723,11 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                 return;
             }
+               if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
+                sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
+                return;
+            }
+
             // if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
             //     sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
             //     return;
