@@ -61,13 +61,27 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             const oDateRange = this.byId("P_id_Date");
             const sCustomerID =
-                oView.byId("P_id_CustomerID").getSelectedKey() ||
-                oView.byId("P_id_CustomerID").getValue();
-
+                oView.byId("P_id_CustomerID").getSelectedKey() || oView.byId("P_id_CustomerID").getValue();
             const sBookingID =
-                oView.byId("P_id_BookingID").getSelectedKey() ||
-                oView.byId("P_id_BookingID").getValue();
+                oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
+            let sBranch = "";
+            const oBranchCombo = oView.byId("P_id_BranchCode");
+            if (oBranchCombo) {
+                sBranch = oBranchCombo.getSelectedKey();
+                if (!sBranch) {
+                    const sTyped = (oBranchCombo.getValue() || "").trim().toLowerCase();
+                    const aItems = oBranchCombo.getItems();
 
+                    const oMatch = aItems.find(item =>
+                        (item.getText() || "").toLowerCase() === sTyped ||
+                        (item.getAdditionalText() || "").toLowerCase() === sTyped
+                    );
+
+                    if (oMatch) {
+                        sBranch = oMatch.getKey();
+                    }
+                }
+            }
             let filters = {};
             if (sCustomerID) {
                 filters.CustomerID = sCustomerID;
@@ -76,23 +90,17 @@ sap.ui.define([
             if (sBookingID) {
                 filters.BookingID = sBookingID;
             }
-            let aBranchCodes = [];
-            if (Array.isArray(omainModel) && omainModel.length && oLogin.Role === "Super Admin") {
-                aBranchCodes = omainModel.map(item => item.BranchCode).filter(Boolean).join(",");
-            } else if (oLogin.BranchCode) {
-                aBranchCodes = oLogin.BranchCode.split(",").map(c => c.trim());
-            }
-
             if (oLogin.Role === "Admin") {
-                filters.BranchCode = aBranchCodes;
+                filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
                 filters.Role = "Admin";
-            } else if (oLogin.Role === "Super Admin") {
-                filters.BranchCode = "";
-                filters.Role = "Super Admin";
             }
 
-            // if (sCustomerID) filters.CustomerID = sCustomerID;
-            // if (sBookingID) filters.BookingID = sBookingID;
+            if (oLogin.Role === "Super Admin") {
+                filters.Role = "Super Admin";
+                if (sBranch) {
+                    filters.BranchCode = sBranch;
+                }
+            }
             if (oDateRange?.getDateValue() && oDateRange?.getSecondDateValue()) {
                 filters.StartDate = oDateRange.getDateValue().toISOString().slice(0, 10);
                 filters.EndDate = oDateRange.getSecondDateValue().toISOString().slice(0, 10);
@@ -111,14 +119,22 @@ sap.ui.define([
                 });
         },
 
+        onAfterRendering: function () {
+            const oCombo = this.byId("P_id_BranchCode");
+            if (oCombo) {
+                oCombo.setFilterFunction((sTerm, oItem) => {
+                    sTerm = sTerm.toLowerCase();
+                    return ((oItem.getText() || "").toLowerCase().includes(sTerm) || (oItem.getAdditionalText() || "").toLowerCase().includes(sTerm));
+                });
+            }
+        },
+
         setDefaultCurrentMonth: function () {
             const oDateRange = this.byId("P_id_Date");
             if (!oDateRange) return;
-
             const now = new Date();
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
             oDateRange.setDateValue(firstDay);
             oDateRange.setSecondDateValue(lastDay);
         },
@@ -163,6 +179,7 @@ sap.ui.define([
         FC_onPressClear: function () {
             this.getView().byId("P_id_CustomerID").setSelectedKey("");
             this.getView().byId("P_id_BookingID").setSelectedKey("");
+            this.getView().byId("P_id_BranchCode").setSelectedKey("");
             this.getView().byId("P_id_Date").setValue("");
         },
 

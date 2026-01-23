@@ -4693,7 +4693,8 @@ oHostelModel.setProperty("/PerMonthNoPerson", parseFloat(fPerMonthnoPerson));
                                BranchCode:oData.BranchCode || "",
                                CustomerName:p.FullName || "",
                                Currency: oData.Currency || "INR",
-                               DepositCurrency:oData.DepositCurrency || "INR"
+                               DepositCurrency:oData.DepositCurrency || "INR",
+                               BranchName:oData.Area || ""
                         };
 
                     }

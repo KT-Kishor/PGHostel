@@ -98,7 +98,6 @@ sap.ui.define([
 
         Onsearch: async function () {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
-
             var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey()
 
             var filter = {

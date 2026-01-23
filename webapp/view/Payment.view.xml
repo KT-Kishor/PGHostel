@@ -68,8 +68,6 @@
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="BranchCode"
                         label="{i18n>MSbranchCode}"
@@ -86,15 +84,13 @@
                                 busyIndicatorDelay="0"
                             >
                                 <core:ListItem
-                                    key="{mainModel>BranchID}"
-                                    text="{mainModel>BranchID} - {mainModel>Name}"
-                                    additionalText="{mainModel>City}"
+                                    key="{mainModel>BranchCode}"
+                                    text="{mainModel>BranchName}"
+                                    additionalText="{mainModel>BranchCode}"
                                 />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="StartDate"
                         label="{i18n>date}"
@@ -118,7 +114,7 @@
                 width="auto"
                 busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
-                items="{path: 'mainModel>/', sorter: {path: '',descending: false,group: true}}"
+                items="{path: 'mainModel>/', sorter: [{path: 'BranchName', group: true}, {path: 'Date', descending: true}]}"
             >
                 <headerToolbar>
                     <OverflowToolbar>
