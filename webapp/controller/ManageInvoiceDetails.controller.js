@@ -354,7 +354,8 @@ sap.ui.define([
                             CouponDiscount: bookingDetails.Discount || "",
                             CustomerID: customerID,
                             BookingID: bookingID,
-                            UserID: bookingDetails.UserID || ""
+                            UserID: bookingDetails.UserID || "",
+                            PaidAmount: oData.data.PerMonthTotalRent || "0.00"
                         });
                     }
 
@@ -587,6 +588,18 @@ sap.ui.define([
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
+
+                // ---------------- PAID AMOUNT ADJUSTMENT ----------------
+                let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
+                let balanceAmount = roundedAmount;
+
+                if (paidAmount > 0) {
+                    balanceAmount = roundedAmount - paidAmount;
+                    if (balanceAmount < 0) balanceAmount = 0;
+                    oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
+                    oCustomerModel.setProperty("/TotalAmount", balanceAmount.toFixed(2));
+                    oSOWModel.setProperty("/TotalAmount", balanceAmount.toFixed(2));
+                }
                 oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
             },
@@ -760,7 +773,8 @@ sap.ui.define([
                     BranchCode: oSelectedCustomerModel.BranchCode || "",
                     RoomNo: oSelectedCustomerModel.RoomNo || "",
                     CouponDiscount: oSelectedCustomerModel.CouponDiscount || "",
-                    UserID: oSelectedCustomerModel.UserID || ""
+                    UserID: oSelectedCustomerModel.UserID || "",
+                    PaidAmount: oSelectedCustomerModel.PaidAmount || "",
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1527,7 +1541,8 @@ sap.ui.define([
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
+                    const amountToConvert = oModel.TotalAmount > 0 ? oModel.TotalAmount : oModel.PaidAmount;
+                    let totalInWords = await this.convertNumberToWords(amountToConvert, data.Currency);
                     const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
 
                     const margin = 15;
@@ -1712,6 +1727,10 @@ sap.ui.define([
 
                     if (parseFloat(AllReceivedAmount) > 0) {
                         summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
+                    }
+
+                    if (parseFloat(oModel.PaidAmount) > 0) {
+                        summaryBody.push([`Advance Paid Amount (${data.Currency}) :`, oModel.PaidAmount]);
                     }
 
                     const totalRowIndex = summaryBody.length;

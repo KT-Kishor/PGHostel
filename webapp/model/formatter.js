@@ -140,7 +140,7 @@ sap.ui.define([
             }
 
             if (avalue === "0" || avalue === 0) {
-                return "- -";
+                return "0.00";
             }
             var numericValue = parseFloat(avalue);
             if (isNaN(numericValue)) {

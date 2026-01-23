@@ -735,6 +735,21 @@
                                                     textAlign="End"
                                                 />
                                             </m:HBox>
+                                            <!-- Paid Amount -->
+                                             <m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{= ${SelectedCustomerModel>/PaidAmount} > 0 }"
+                                            >
+                                                <m:Label
+                                                    text="{i18n>paidAmount} ({FilteredSOWModel>/Currency}) :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{path:'SelectedCustomerModel>/PaidAmount',formatter: '.Formatter.fromatNumber'}"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
                                             <!-- Total Amount -->
                                             <m:HBox
                                                 justifyContent="SpaceBetween"
