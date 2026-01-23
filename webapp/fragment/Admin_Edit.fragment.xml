@@ -230,6 +230,45 @@
                     editable="false"
                     visible="{= ${edit>/UnitText} === 'Per Hour'}"
                 />
+                  <Label
+        text="Add CouponCode:"
+        class="sapUiSmallMarginEnd"
+    />
+                  <HBox
+    alignItems="Center"
+    justifyContent="SpaceEvenly"
+>
+  
+
+    <Input
+        id="ID_editCouponCode"
+        value="{edit>/CouponCode}"
+        placeholder="Enter Coupon Code"
+        width="200px"
+        class="sapUiSmallMarginEnd"
+          showValueHelp="true"
+                                    valueHelpIconSrc="sap-icon://decline"
+                                    valueHelpRequest="oncancelFacilityCoupon"
+                                    liveChange="onCouponLiveChange"
+    />
+
+    <Button
+        id="idApplyNowButton"
+        text="{i18n>applyNow}"
+        tooltip="{i18n>applyCoupon}"
+        type="Emphasized"
+        press=".onEditCouponCodeLiveChange"
+     
+    />
+</HBox>
+
+                 <Label text="Discount Value" />
+                <Input
+                    id="idD_editDiscountValue"
+                    value="{edit>/CouponDiscount}"
+                    editable="false"
+                />
+            
             </f:content>
         </f:SimpleForm>
         <beginButton>

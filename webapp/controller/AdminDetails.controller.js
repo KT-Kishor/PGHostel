@@ -11,7 +11,7 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteAdminDetails").attachMatched(this._onRouteMatched, this);
         },
-        
+
         _onRouteMatched: async function (oEvent) {
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -19,8 +19,8 @@ sap.ui.define([
             this.getView().setModel(model, "LoginModel");
             var oRateTypeModel = this.getView().getModel("RateType");
             this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
-            
-             const oUserModel = sap.ui.getCore().getModel("LoginModel");
+
+            const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
                 this._oLoggedInUser = oUserModel.getData();
             } else {
@@ -34,7 +34,9 @@ sap.ui.define([
                 Currency: "",
                 StartDate: "",
                 EndDate: "",
-                TotalDays: ""
+                TotalDays: "",
+                CouponCode: "",
+                CouponDiscount: ""
 
             });
             this.getView().setModel(model, "edit")
@@ -106,10 +108,10 @@ sap.ui.define([
 
             });
         },
-      
-        getBranchHotelData:function(){
-               this.ajaxReadWithJQuery("getBranchHotelData", "").then((oData) => {
-                var aBeds =oData;
+
+        getBranchHotelData: function () {
+            this.ajaxReadWithJQuery("getBranchHotelData", "").then((oData) => {
+                var aBeds = oData;
                 var model = new sap.ui.model.json.JSONModel(aBeds);
                 this.getView().setModel(model, "Beddetails")
 
@@ -148,7 +150,7 @@ sap.ui.define([
 
         },
 
-        Ck_onsavebuttonpress:async function () {
+        Ck_onsavebuttonpress: async function () {
             // Get edited data from Bookingmodel
             var oBookingData = this.getView().getModel("Bookingmodel").getData();
 
@@ -165,7 +167,7 @@ sap.ui.define([
             };
 
             // Send payload
-          await this.ajaxUpdateWithJQuery("HM_Customer", {
+            await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
                     CustomerID: oCustomerModel.CustomerID
@@ -251,7 +253,7 @@ sap.ui.define([
         },
 
         onHome: function () {
-             const oUser = this._oLoggedInUser;
+            const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
             if (oUser && oUser.UserID) {
@@ -275,26 +277,22 @@ sap.ui.define([
                 var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
                 var aDueamount = this.getView().getModel("Beddetails").getData().HM_ManageInvoice
 
-
-               var Dueamount=aDueamount.find((item)=>{
-                      return item.CustomerID === oCustomer.CustomerID;    
-                })
-              
-                          var Paymentpaid=aPayment.find((item)=>{
-                      return item.CustomerID === oCustomer.CustomerID;    
-                })
-
-                var bedname=oCustomer.Bookings?.[0]?.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
-                var acname=oCustomer.Bookings?.[0]?.BedType.includes("NON-AC") ? "NON-AC" : "AC"
+                var Paymentpaid = aPayment
+                    .filter(item => item.CustomerID === oCustomer.CustomerID)
+                    .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
 
-               var Deposit= abeds.find((item) => {
-                    if (item.Name === bedname && item.BranchCode===oCustomer.Bookings?.[0]?.BranchCode
-                         && item.ACType===acname) {
+                var bedname = oCustomer.Bookings?.[0]?.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
+                var acname = oCustomer.Bookings?.[0]?.BedType.includes("NON-AC") ? "NON-AC" : "AC"
+
+
+                var Deposit = abeds.find((item) => {
+                    if (item.Name === bedname && item.BranchCode === oCustomer.Bookings?.[0]?.BranchCode
+                        && item.ACType === acname) {
                         return item.Deposit
                     }
                 })
-               
+
 
                 const oCustomerData = {
                     CustomerName: oCustomer.CustomerName,
@@ -326,9 +324,7 @@ sap.ui.define([
                     Discount: oCustomer.Bookings?.[0]?.Discount || "",
                     CouponCode: oCustomer.Bookings?.[0]?.CouponCode || "",
                     Deposit: Deposit.Deposit || "0.00",
-                    PaymentPaid:Paymentpaid?.PerMonthTotalRent ||"0.00",
-
-
+                    PaymentPaid: Paymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
 
@@ -483,14 +479,10 @@ sap.ui.define([
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
-             
+               oCustomerData.DueAmount=oCustomerData.GrandTotal - oCustomerData.PaymentPaid
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
+ 
                 this.getView().setModel(oCustomerModel, "CustomerData");
-
-
-             
-
-                
 
                 // Now it is available here:
                 // Set model
@@ -622,6 +614,8 @@ sap.ui.define([
                         Currency: f.Currency,
                         EndTime: f.EndTime,
                         StartTime: f.StartTime,
+                        CouponCode: f.CouponCode || "",
+                        CouponDiscount: f.CouponDiscount || "0.00"
                     });
 
                 });
@@ -718,6 +712,7 @@ sap.ui.define([
                 oView.addDependent(this.HM_Dialog);
             }
             this.HM_Dialog.open();
+            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false);
             this.getView().getModel("edit").setData({
                 FacilityName: "",
                 UnitText: "",
@@ -879,11 +874,11 @@ sap.ui.define([
             // ✅ Correct date conversion
             if (sStartDate.includes("/")) {
                 sStartDate = sStartDate.split("/").reverse().join("-");
-           
+
             }
-                if (sEndDate.includes("/")) {
-                    sEndDate = sEndDate.split("/").reverse().join("-");
-                }
+            if (sEndDate.includes("/")) {
+                sEndDate = sEndDate.split("/").reverse().join("-");
+            }
 
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
@@ -1048,7 +1043,9 @@ sap.ui.define([
                     // ✅ Newly Added Hour Calculation
                     finalPrice = basePrice * iHours * iDays;
                 }
-
+                if (oPayload.CouponDiscount !== "") {
+                    finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
+                }
                 oPayload.TotalAmount = finalPrice;
 
                 // Remove unwanted fields
@@ -1076,33 +1073,33 @@ sap.ui.define([
 
                 oCustomerData.TotalFacilityPrice = total;
 
-                if (oCustomerData.CouponCode || this.Code) {
-                    var oCouponData = this.getView().getModel("CouponModel").getData();
-                    var sEnteredCode = this.Code || oCustomerData.CouponCode; // user entered code
-                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+                // if (oCustomerData.CouponCode || this.Code) {
+                //     var oCouponData = this.getView().getModel("CouponModel").getData();
+                //     var sEnteredCode = this.Code || oCustomerData.CouponCode; // user entered code
+                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-                    if (oMatchedCoupon.MinOrderValue <= (total + (oCustomerData.RentPrice || 0))) {
+                //     if (oMatchedCoupon.MinOrderValue <= (total + (oCustomerData.RentPrice || 0))) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && oCustomerData.Discount) {
-                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                            oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                                if (oMatchedCoupon.UptoValue > 0 &&  oCustomerData.Discount > oMatchedCoupon.UptoValue) {
-                                           oCustomerData.Discount = Number(oMatchedCoupon.UptoValue);
-                                             }
-                         } else {
-                            oCustomerData.Discount = this.CouponDiscount || oCustomerData.Discount || "0.00";
-                        }
+                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && oCustomerData.Discount) {
+                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                //             oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                //                 if (oMatchedCoupon.UptoValue > 0 &&  oCustomerData.Discount > oMatchedCoupon.UptoValue) {
+                //                            oCustomerData.Discount = Number(oMatchedCoupon.UptoValue);
+                //                              }
+                //          } else {
+                //             oCustomerData.Discount = this.CouponDiscount || oCustomerData.Discount || "0.00";
+                //         }
 
-                    } else {
-                        oCustomerData.Discount = "0.00";
-                        this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
-                        this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
-                        var oInput = this.getView().byId("couponInput");
-                        this.Code = ""
-                        oInput.setValue("");
-                        oInput.setShowValueHelp(false);
-                    }
-                }
+                //     } else {
+                //         oCustomerData.Discount = "0.00";
+                //         this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+                //         this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
+                //         var oInput = this.getView().byId("couponInput");
+                //         this.Code = ""
+                //         oInput.setValue("");
+                //         oInput.setShowValueHelp(false);
+                //     }
+                // }
 
                 oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
                 oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0) - Number(oCustomerData.Discount));
@@ -1137,12 +1134,12 @@ sap.ui.define([
             var data = this.getView().getModel("CustomerData").getData()
             var model = this.getView().getModel("Bookingmodel")
             var aAvailableBeds = this.getView().getModel("Availablebeds").getData()
-               if (data.STDCode === "+91") {
+            if (data.STDCode === "+91") {
                 oMobile.setMaxLength(10);
             } else {
                 oMobile.setMaxLength(18);
             }
-            
+
             var filteredBeds = aAvailableBeds.filter(function (bed) {
 
                 // 1) Count assigned customers for this bed
@@ -1286,9 +1283,9 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SGST", SGST);
                 oCustomerModel.setProperty("/CGST", SGST);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-                 var CustData=oCustomerModel.getData();
-                 var fFacilityPrice=oCustomerModel.getProperty("/TotalFacilityPrice") || 0
-                    if (CustData.CouponCode || this.Code) {
+                var CustData = oCustomerModel.getData();
+                var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
+                if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
@@ -1298,16 +1295,16 @@ sap.ui.define([
                         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
                             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
                             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
-                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                                             }
-                         } else {
+                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                            }
+                        } else {
                             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
                         }
 
                     }
                 }
-                oCustomerModel.setProperty("/Discount",CustData.Discount)
+                oCustomerModel.setProperty("/Discount", CustData.Discount)
                 oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
                 oData.EndDate = this._formatDate(oEnd);
                 oBookingModel.refresh();
@@ -1369,7 +1366,7 @@ sap.ui.define([
         onBookMonthYearChange: function (oEvent) {
             const oModel = this.getView().getModel("Bookingmodel");
             const oCustomerData = this.getView().getModel("CustomerData");
-   var CustData=this.getView().getModel("CustomerData").getData()
+            var CustData = this.getView().getModel("CustomerData").getData()
             // Store original RentPrice once if not already stored
             let originalRent = oCustomerData.getProperty("/OriginalRentPrice");
             if (!originalRent) {
@@ -1419,25 +1416,25 @@ sap.ui.define([
             oCustomerData.setProperty("/CGST", CGST);
             oCustomerData.setProperty("/SubTotal", SubTotal);
 
-                if (CustData.CouponCode || this.Code) {
-                    var oCouponData = this.getView().getModel("CouponModel").getData();
-                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+            if (CustData.CouponCode || this.Code) {
+                var oCouponData = this.getView().getModel("CouponModel").getData();
+                var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-                    if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
+                if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                            CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
-                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                                             }
-                         } else {
-                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                    if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                        this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                        CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+                        if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                            CustData.Discount = Number(oMatchedCoupon.UptoValue);
                         }
-
+                    } else {
+                        CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
                     }
+
                 }
+            }
             oCustomerData.setProperty("/Discount", CustData.Discount)
             // oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice);
             oCustomerData.setProperty("/GrandTotal", fPrice + fFacilityPrice + CGST + CGST);
@@ -1482,27 +1479,28 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoEdit"));
                 return;
             }
+            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false);
 
             var oContext = oSelectedItem.getBindingContext("CustomerData");
             var oSelectedData = oContext.getObject();
 
             var sStartDate = oSelectedData.StartDate.split("/").reverse().join("-"); // e.g. "2025-01-15"
-var sEndDate   = oSelectedData.EndDate.split("/").reverse().join("-");   // e.g. "2025-06-14"
+            var sEndDate = oSelectedData.EndDate.split("/").reverse().join("-");   // e.g. "2025-06-14"
 
-if (sStartDate && sEndDate) {
-    var oStart = new Date(sStartDate);
-    var oEnd = new Date(sEndDate);
+            if (sStartDate && sEndDate) {
+                var oStart = new Date(sStartDate);
+                var oEnd = new Date(sEndDate);
 
-    var iMonths =
-        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-        (oEnd.getMonth() - oStart.getMonth());
+                var iMonths =
+                    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+                    (oEnd.getMonth() - oStart.getMonth());
 
-    // Optional: include partial month logic
-    if (oEnd.getDate() >= oStart.getDate()) {
-        iMonths += 1;
-    }
+                // Optional: include partial month logic
+                if (oEnd.getDate() >= oStart.getDate()) {
+                    iMonths += 1;
+                }
 
-}
+            }
 
             // 👉 STORE INDEX for update later
             this._editIndex = Number(oContext.getPath().split("/").pop());
@@ -1574,7 +1572,7 @@ if (sStartDate && sEndDate) {
 
             // 8. Set filtered data back to RateType model
             oRateTypeModel.setData(aFilteredRateTypes);
-            
+
             sap.ui.getCore().byId("idUnitType").setValueState("None")
             sap.ui.getCore().byId("editStartTime").setValueState("None")
             sap.ui.getCore().byId("editEndTime").setValueState("None")
@@ -1676,30 +1674,30 @@ if (sStartDate && sEndDate) {
             });
             oCustomerData.TotalFacilityPrice = total;
 
-            if (oCustomerData.CouponCode || this.Code) {
-                var oCouponData = this.getView().getModel("CouponModel").getData().
-                    find((item) => item.CouponCode === this.Code || oCustomerData.CouponCode)
-                    || {};
+            // if (oCustomerData.CouponCode || this.Code) {
+            //     var oCouponData = this.getView().getModel("CouponModel").getData().
+            //         find((item) => item.CouponCode === this.Code || oCustomerData.CouponCode)
+            //         || {};
 
-                if (oCouponData.DiscountType === "Percentage") {
-                       this.CouponDiscount = this.CouponDiscount || oCouponData.DiscountValue || "0"
-                    oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                         if (oCouponData.UptoValue > 0 &&  oCustomerData.Discount > oCouponData.UptoValue) {
-                       oCustomerData.Discount = Number(oCouponData.UptoValue);
-                    }
-                } else {
-                    oCustomerData.Discount = Number(oCouponData.DiscountValue)
-                }
-                if (total + (oCustomerData.RentPrice || 0) < Number(oCouponData.MinOrderValue)) {
-                    oCustomerData.Discount = "0.00";
-                    this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
-                    this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
-                    var oInput = this.getView().byId("couponInput");
-                    this.Code = ""
-                    oInput.setValue("");
-                    oInput.setShowValueHelp(false);
-                }
-            }
+            //     if (oCouponData.DiscountType === "Percentage") {
+            //            this.CouponDiscount = this.CouponDiscount || oCouponData.DiscountValue || "0"
+            //         oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+            //              if (oCouponData.UptoValue > 0 &&  oCustomerData.Discount > oCouponData.UptoValue) {
+            //            oCustomerData.Discount = Number(oCouponData.UptoValue);
+            //         }
+            //     } else {
+            //         oCustomerData.Discount = Number(oCouponData.DiscountValue)
+            //     }
+            //     if (total + (oCustomerData.RentPrice || 0) < Number(oCouponData.MinOrderValue)) {
+            //         oCustomerData.Discount = "0.00";
+            //         this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+            //         this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
+            //         var oInput = this.getView().byId("couponInput");
+            //         this.Code = ""
+            //         oInput.setValue("");
+            //         oInput.setShowValueHelp(false);
+            //     }
+            // }
 
             oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0) - Number(oCustomerData.Discount));
             oCustomerData.SGST = oCustomerData.SubTotal * 0.09;
@@ -1771,8 +1769,8 @@ if (sStartDate && sEndDate) {
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
-                var CustData=this.getView().getModel("CustomerData").getData()
-                    if (CustData.CouponCode || this.Code) {
+                var CustData = this.getView().getModel("CustomerData").getData()
+                if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
@@ -1782,10 +1780,10 @@ if (sStartDate && sEndDate) {
                         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
                             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
                             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
-                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                                             }
-                         } else {
+                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                            }
+                        } else {
                             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
                         }
 
@@ -1885,17 +1883,17 @@ if (sStartDate && sEndDate) {
                 oCustomerModel.setProperty("/SGST", CGST)
                 oCustomerModel.setProperty("/CGST", CGST)
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
-                   var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
-                        var Bedname=sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
-                        var Acname=sBedType.includes("NON-AC") ? "NON-AC" : "AC"
-               var Deposit= abeds.find((item) => {
-                    if (item.Name === Bedname && item.BranchCode===CustData.BranchCode
-                         && item.ACType===Acname) {
+                var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
+                var Bedname = sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
+                var Acname = sBedType.includes("NON-AC") ? "NON-AC" : "AC"
+                var Deposit = abeds.find((item) => {
+                    if (item.Name === Bedname && item.BranchCode === CustData.BranchCode
+                        && item.ACType === Acname) {
                         return item.Deposit
                     }
                 })
 
-                    if (CustData.CouponCode || this.Code) {
+                if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
@@ -1905,18 +1903,18 @@ if (sStartDate && sEndDate) {
                         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
                             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
                             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                                if (oMatchedCoupon.UptoValue > 0 &&  CustData.Discount > oMatchedCoupon.UptoValue) {
-                                           CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                                             }
-                         } else {
+                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                            }
+                        } else {
                             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
                         }
 
                     }
                 }
 
-                oCustomerModel.setProperty("/Discount",CustData.Discount)
-                oCustomerModel.setProperty("/Deposit",Deposit.Deposit)
+                oCustomerModel.setProperty("/Discount", CustData.Discount)
+                oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
 
                 oCustomerModel.setProperty("/GrandTotal", fOriginalRentPrice + fFacilityPrice + CGST * 2);
             }
@@ -2004,7 +2002,7 @@ if (sStartDate && sEndDate) {
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
         },
-              onSTDChange: function () {
+        onSTDChange: function () {
             const oSTD = this.byId("CC_id_STDCode");
             const oMobile = this.byId("CD_ID_idPhone");
 
@@ -2055,34 +2053,34 @@ if (sStartDate && sEndDate) {
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-  onmobileChange: function (oEvent) {
-    const oSTD = this.byId("CC_id_STDCode");
-    const oMobile = this.byId("CD_ID_idPhone");
+        onmobileChange: function (oEvent) {
+            const oSTD = this.byId("CC_id_STDCode");
+            const oMobile = this.byId("CD_ID_idPhone");
 
-    const std = oSTD.getValue().trim();      // get STD code
-    const mobileValue = oMobile.getValue().trim();
+            const std = oSTD.getValue().trim();      // get STD code
+            const mobileValue = oMobile.getValue().trim();
 
-    // Reset value state if empty
-    if (mobileValue === "") {
-        oMobile.setValueState("None");
-        return;
-    }
+            // Reset value state if empty
+            if (mobileValue === "") {
+                oMobile.setValueState("None");
+                return;
+            }
 
-    // Determine required length
-    let requiredLength = 10;
+            // Determine required length
+            let requiredLength = 10;
 
-    // Validate length
-    if (std==="+91" && mobileValue.length === requiredLength) {
-        oMobile.setValueState("None");       // valid
-    } else {
-        oMobile.setValueState("Error");      // invalid
-    }
-    if(std!="+91"){
-        oMobile.setValueState("None");       // valid
+            // Validate length
+            if (std === "+91" && mobileValue.length === requiredLength) {
+                oMobile.setValueState("None");       // valid
+            } else {
+                oMobile.setValueState("Error");      // invalid
+            }
+            if (std != "+91") {
+                oMobile.setValueState("None");       // valid
 
-    }
-}
-,
+            }
+        }
+        ,
 
         onChangemail: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
@@ -2110,21 +2108,21 @@ if (sStartDate && sEndDate) {
                 utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") && 
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") && 
+                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
 
-         
-              if (Bookingdata.STDCode === "+91") {
-                 if (Bookingdata.MobileNo.length === 10) {
+
+            if (Bookingdata.STDCode === "+91") {
+                if (Bookingdata.MobileNo.length === 10) {
                     oInput.setValueState("None");
-                
+
                 } else {
                     oInput.setValueState("Error");
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
 
-                        return;
+                    return;
                 }
             }
 
@@ -2189,7 +2187,11 @@ if (sStartDate && sEndDate) {
                         Currency: item.Currency,
                         StartTime: item.StartTime,
                         EndTime: item.EndTime,
-                        BasicFacilityPrice: item.Price
+                        BasicFacilityPrice: item.Price,
+                        CouponCode: item.CouponCode || "",
+                        CouponDiscount: item.CouponDiscount || "0.00"
+
+
 
 
                     };
@@ -2334,14 +2336,14 @@ if (sStartDate && sEndDate) {
             var DocumentType = this.getView().getModel("Bookingmodel").getData().DocumentType;
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
-            aDocs.find((item)=>{
-                if(item.DocumentType?.replace(/\s+/g, '').toLowerCase() ===DocumentType?.replace(/\s+/g, '').toLowerCase()){
+            aDocs.find((item) => {
+                if (item.DocumentType?.replace(/\s+/g, '').toLowerCase() === DocumentType?.replace(/\s+/g, '').toLowerCase()) {
                     sap.m.MessageToast.show("Document of type '" + DocumentType + "' is Already Uploaded.");
                     oFileUploader.clear();
                     return;
                 }
             })
-             
+
             if (!DocumentType) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 oFileUploader.clear();
@@ -2623,10 +2625,10 @@ if (sStartDate && sEndDate) {
 
             // Check discount type
             if (oCoupon.DiscountType === "Percentage") {
-                discountAmount = (subtotal* Number(oCoupon.DiscountValue || 0)) / 100;
-                    if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
-                       discountAmount = Number(oCoupon.UptoValue);
-                    }
+                discountAmount = (subtotal * Number(oCoupon.DiscountValue || 0)) / 100;
+                if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
+                    discountAmount = Number(oCoupon.UptoValue);
+                }
                 newSubtotal = subtotal - discountAmount;
             } else if (oCoupon.DiscountType === "Fixed Amount") {
                 discountAmount = Number(oCoupon.DiscountValue || 0);
@@ -2648,6 +2650,93 @@ if (sStartDate && sEndDate) {
 
             sap.m.MessageToast.show(this.i18nModel.getText("couponAppliedSuccessfully"));
         },
+
+        onEditCouponCodeLiveChange: async function () {
+            var edit = this.getView().getModel("edit").getData();
+
+            var sEnteredCode = edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode").getValue();
+            if (!sEnteredCode) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
+                return;
+            }
+
+            const filter = {
+                CouponCode: sEnteredCode,
+                Status: "Active"
+            };
+            sap.ui.core.BusyIndicator.show(0);
+            await this.ajaxReadWithJQuery("HM_Coupon", filter).then((oData) => {
+                var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
+                var model = new sap.ui.model.json.JSONModel(aCoupon);
+                this.getView().setModel(model, "CouponModel")
+
+            });
+            sap.ui.core.BusyIndicator.hide();
+            var oCouponData = this.getView().getModel("CouponModel").getData();
+
+            // user entered code
+
+            // if (oCustomerData.CouponCode === sEnteredCode) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("couponAlreadyApplied"));
+            //     return;
+            // }
+
+            // 1. Check coupon exists
+            var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
+            if (!oCoupon) {
+                sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+                return;
+            }
+            // if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
+            //     return;
+            // }
+
+            if (edit.StartDate.includes("/")) {
+                edit.StartDate = edit.StartDate.split("/").reverse().join("-");
+            } else if (edit.EndDate.includes("/")) {
+                edit.EndDate = edit.EndDate.split("/").reverse().join("-");
+            }
+            // 2. Date validation
+            var custStart = new Date(edit.StartDate);
+            var custEnd = new Date(edit.EndDate);
+            var coupStart = new Date(oCoupon.StartDate);
+            var coupEnd = new Date(oCoupon.EndDate);
+
+            if (custStart < coupStart || custStart > coupEnd) {
+                sap.m.MessageToast.show(this.i18nModel.getText("couponnotValidforSelectedDates"));
+                return; // Exit function immediately
+            }
+            if (!oCoupon.Status === "Active") {
+                sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
+                return;
+            }
+
+            // 3. Percentage discount
+
+            var subtotal = edit.Price
+            oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
+            if (oCoupon.MinOrderValue > subtotal) {
+                sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
+                return;
+            }
+
+
+
+            var discountAmount = 0;
+            // Check discount type
+            if (oCoupon.DiscountType === "Percentage") {
+                discountAmount = (subtotal * Number(oCoupon.DiscountValue || 0)) / 100;
+                if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
+                    discountAmount = Number(oCoupon.UptoValue);
+                }
+            } else if (oCoupon.DiscountType === "Fixed Amount") {
+                discountAmount = Number(oCoupon.DiscountValue || 0);
+            }
+
+            this.getView().getModel("edit").setProperty("/CouponDiscount", discountAmount.toFixed(2));
+        },
+
 
         oncancelCoupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
@@ -2716,6 +2805,15 @@ if (sStartDate && sEndDate) {
             var sValue = oInput.getValue();
             // Show icon only if there is value
             oInput.setShowValueHelp(!!sValue);
+        },
+        oncancelFacilityCoupon: function (oEvent) {
+
+            var oInput = oEvent.getSource();
+
+            oInput.setValue("");
+            oInput.setShowValueHelp(false);
+            this.getView().getModel("edit").setProperty("/CouponDiscount", "");
         }
+
     });
 });

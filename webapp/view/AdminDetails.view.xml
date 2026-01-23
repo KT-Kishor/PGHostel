@@ -896,6 +896,24 @@
                                     tooltip="{i18n>Tooldays}"
                                 />
                             </Column>
+                               <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text
+                                    text="Coupon Code"
+                                    tooltip="Coupon Code"
+                                />
+                            </Column>
+                               <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text
+                                    text="Discount"
+                                    tooltip="Discount"
+                                />
+                            </Column>
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
@@ -931,6 +949,10 @@
                                             }"
                                     />
                                     <Text text="{CustomerData>TotalDays}" />
+                                    <Text text="{CustomerData>CouponCode}" />
+
+                                    <Text text="{CustomerData>CouponDiscount}" />
+
                                     <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
                                     <Text
                                         text="{
@@ -997,7 +1019,7 @@
                                 justifyContent="End"
                                 alignItems="Center"
                                 class="sapUiSmallMarginBottom"
-                                visible="false"
+                               visible="false"
                             >
                                 <!-- Coupon Label -->
                                 <Label
@@ -1016,7 +1038,7 @@
                                     valueHelpIconSrc="sap-icon://decline"
                                     valueHelpRequest="oncancelCoupon"
                                     liveChange="onCouponLiveChange"
-                                />
+                                />      
                                 <!-- Apply Now Button -->
                                 <Button
                                     id="idApplyNowButton"
@@ -1179,7 +1201,7 @@
                                     class="amountText totalColumnBold1"
                                     text="{
                             parts: [
-                                { path: 'CustomerData>/PaymentPaid' },
+                                { path: 'CustomerData>/DueAmount' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
