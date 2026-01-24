@@ -9,20 +9,21 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RoutePayment").attachMatched(this._onRouteMatched, this);
+            this.isFirstLoad = true;
         },
 
         _onRouteMatched: async function () {
             try {
+                this.isFirstLoad = true;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ isSuperAdmin: oLogin.Role === "Super Admin" }), "RoleModel");
-                this.onClearAndSearch("P_id_Filterbar");
                 this.commonLoginFunction();
-                this.setDefaultCurrentMonth();
                 await this._loadBranchCode();
-                await this.Onsearch("true");
+                this.setDefaultCurrentMonth();
+                await this.Onsearch();
+                this.isFirstLoad = false;
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
                 sap.ui.core.BusyIndicator.hide();
@@ -38,13 +39,14 @@ sap.ui.define([
             }
 
             let filters = {};
-            if (oExistingModel.Role) {
+            if (oExistingModel.Role === "Admin") {
                 filters.BranchCode = aBranchCodes;
             }
 
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_Payment", filters);
+                console.log("FINAL FILTERS SENT:", JSON.stringify(filters));
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
 
@@ -58,7 +60,7 @@ sap.ui.define([
         Onsearch: function () {
             const oView = this.getView();
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
-            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+            const omainModel = this.getView().getModel("mainModel")?.getData() || [];
             const oDateRange = this.byId("P_id_Date");
             const sCustomerID =
                 oView.byId("P_id_CustomerID").getSelectedKey() || oView.byId("P_id_CustomerID").getValue();
@@ -95,21 +97,29 @@ sap.ui.define([
                 filters.Role = "Admin";
             }
 
-            if (oLogin.Role === "Super Admin") {
-                filters.Role = "Super Admin";
-                if (sBranch) {
-                    filters.BranchCode = sBranch;
-                }
+            if (oLogin.Role === "Super Admin" && !filters.StartDate) {
+                filters.GetAll = true;
             }
-            if (oDateRange?.getDateValue() && oDateRange?.getSecondDateValue()) {
-                filters.StartDate = oDateRange.getDateValue().toISOString().slice(0, 10);
-                filters.EndDate = oDateRange.getSecondDateValue().toISOString().slice(0, 10);
+
+            function formatLocalDate(d) {
+                return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(d);
+            }
+            const d1 = oDateRange.getDateValue();
+            const d2 = oDateRange.getSecondDateValue();
+
+            if (d1 instanceof Date && d2 instanceof Date) {
+                filters.StartDate = formatLocalDate(d1);
+                filters.EndDate = formatLocalDate(d2);
+            } else {
+                delete filters.StartDate;
+                delete filters.EndDate;
             }
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
-                console.log(oResponse);
+                console.log("FINAL FILTERS SENT:", JSON.stringify(filters));
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
+                this.prepareUniqueFilterDropdowns();
             })
                 .catch((err) => {
                     sap.m.MessageToast.show(err.message || err.responseText);
@@ -117,6 +127,48 @@ sap.ui.define([
                 .finally(() => {
                     sap.ui.core.BusyIndicator.hide();
                 });
+        },
+
+        prepareUniqueFilterDropdowns: function () {
+            const aPayments = this.getView().getModel("mainModel")?.getData() || [];
+
+            const mBranch = new Map();
+            const mCustomer = new Map();
+            const mBooking = new Map();
+
+            aPayments.forEach(item => {
+                if (item.BranchCode && !mBranch.has(item.BranchCode)) {
+                    mBranch.set(item.BranchCode, {
+                        BranchCode: item.BranchCode,
+                        BranchName: item.BranchName
+                    });
+                }
+                if (item.CustomerID && !mCustomer.has(item.CustomerID)) {
+                    mCustomer.set(item.CustomerID, {
+                        CustomerID: item.CustomerID,
+                        CustomerName: item.CustomerName
+                    });
+                }
+                if (item.BookingID && !mBooking.has(item.BookingID)) {
+                    mBooking.set(item.BookingID, {
+                        BookingID: item.BookingID
+                    });
+                }
+            });
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(Array.from(mBranch.values())),
+                "BranchFilterModel"
+            );
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(Array.from(mCustomer.values())),
+                "CustomerFilterModel"
+            );
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(Array.from(mBooking.values())),
+                "BookingFilterModel"
+            );
         },
 
         onAfterRendering: function () {
@@ -139,34 +191,6 @@ sap.ui.define([
             oDateRange.setSecondDateValue(lastDay);
         },
 
-        _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                P_id_CustomerID: new Set(),
-                P_id_BookingID: new Set()
-            };
-
-            data.forEach(item => {
-                if (item.CustomerID) uniqueValues.P_id_CustomerID.add(item.CustomerID);
-                if (item.BookingID) uniqueValues.P_id_BookingID.add(item.BookingID);
-            });
-
-            let oView = this.getView();
-
-            ["P_id_CustomerID", "P_id_BookingID"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                if (!oComboBox) return;
-
-                oComboBox.destroyItems();
-
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    }));
-                });
-            });
-        },
-
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
@@ -177,10 +201,14 @@ sap.ui.define([
         },
 
         FC_onPressClear: function () {
-            this.getView().byId("P_id_CustomerID").setSelectedKey("");
-            this.getView().byId("P_id_BookingID").setSelectedKey("");
-            this.getView().byId("P_id_BranchCode").setSelectedKey("");
-            this.getView().byId("P_id_Date").setValue("");
+            const oView = this.getView();
+            oView.byId("P_id_CustomerID").setSelectedKey("");
+            oView.byId("P_id_BookingID").setSelectedKey("");
+            oView.byId("P_id_BranchCode").setSelectedKey("");
+            const oDate = oView.byId("P_id_Date");
+            oDate.setDateValue(null);
+            oDate.setSecondDateValue(null);
+            oDate.setValue("");
         },
 
         createTableSheet: function () {
@@ -191,8 +219,8 @@ sap.ui.define([
             },
             {
                 label: "Payment Date",
-                property: "PaymentDate",
-                type: "string"
+                property: "Date",
+                type: "String"
             },
             {
                 label: "Bank Name",
@@ -206,7 +234,7 @@ sap.ui.define([
             },
             {
                 label: "Payment Type",
-                property: "Type",
+                property: "PaymentType",
                 type: "string"
             },
             {

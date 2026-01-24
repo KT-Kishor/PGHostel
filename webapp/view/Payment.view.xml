@@ -39,12 +39,14 @@
                         <fb:control>
                             <ComboBox
                                 id="P_id_CustomerID"
-                                items="{mainModel>/}"
+                                showSecondaryValues="true"
+                                items="{CustomerFilterModel>/}"
                                 showClearIcon="true"
                             >
-                                <core:Item
-                                    key="{mainModel>CustomerID}"
-                                    text="{mainModel>CustomerID} - {mainModel>CustomerName}"
+                                <core:ListItem
+                                    key="{CustomerFilterModel>CustomerID}"
+                                    text="{CustomerFilterModel>CustomerID}"
+                                    additionalText="{CustomerFilterModel>CustomerName}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -58,12 +60,12 @@
                         <fb:control>
                             <ComboBox
                                 id="P_id_BookingID"
-                                items="{mainModel>/}"
+                                items="{BookingFilterModel>/}"
                                 showClearIcon="true"
                             >
                                 <core:Item
-                                    key="{mainModel>BookingID}"
-                                    text="{mainModel>BookingID}"
+                                    key="{BookingFilterModel>BookingID}"
+                                    text="{BookingFilterModel>BookingID}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -78,15 +80,15 @@
                         <fb:control>
                             <ComboBox
                                 id="P_id_BranchCode"
-                                items="{mainModel>/}"
+                                items="{BranchFilterModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                                 busyIndicatorDelay="0"
                             >
                                 <core:ListItem
-                                    key="{mainModel>BranchCode}"
-                                    text="{mainModel>BranchName}"
-                                    additionalText="{mainModel>BranchCode}"
+                                    key="{BranchFilterModel>BranchCode}"
+                                    text="{BranchFilterModel>BranchName}"
+                                    additionalText="{BranchFilterModel>BranchCode}"
                                 />
                             </ComboBox>
                         </fb:control>

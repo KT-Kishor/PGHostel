@@ -2322,6 +2322,7 @@ sap.ui.define([
             if (oLoginModel) {
                 oLoginModel.setData({});
             }
+            sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
             this.CommonLogoutFunction();
             this._oLoggedInUser = null;
             this._isProfileRequested = false;
