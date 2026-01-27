@@ -483,7 +483,7 @@ sap.ui.define([
 
         // },
 
-     ARNO_onsavebuttonpress: function () {
+     ARNO_onsavebuttonpress: async function () {
 
     var table = this.byId("idPOTable");
     var selected = table.getSelectedItem();
@@ -557,28 +557,30 @@ sap.ui.define([
         }
     };
 
-    $.ajax({
-        url: "https://rest.kalpavrikshatechnologies.com/HM_Booking",
-        method: "PUT",
-        contentType: "application/json",
-        data: JSON.stringify(oBody),
-        headers: {
-            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+    try {
+                this.ajaxUpdateWithJQuery("HM_Booking", oBody);
+                sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
+                await this.Cust_read(true);
+                this.HM_Dialog.close();
+                // Store CustomerID globally (component-level)
+                this.getOwnerComponent().setModel(
+                    new sap.ui.model.json.JSONModel({
+                        CustomerID: ID.CustomerID
+                    }),
+                    "InvoiceNavContext"
+                );
+
+                // Navigate normally (NO CHANGE TO ROUTE)
+                this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                    sPath: "X",
+                    dash: "ManageInvoice"
+                });
+            } catch (oError) {
+                sap.m.MessageToast.show(
+                    "Error: " + (oError.responseText || oError.statusText)
+                );
+            }
         },
-        success: async function () {
-            sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
-            await this.Cust_read(true);
-            //    this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
-            //     sPath: ID.CustomerID,dash :"ManageInvoice"
-            // });
-            this.HM_Dialog.close();
-        }.bind(this),
-        error: function (xhr) {
-            sap.m.MessageToast.show("Error: " + xhr.statusText);
-        }
-    });
-},
 
 
         onTableUpdateFinished: function () {
