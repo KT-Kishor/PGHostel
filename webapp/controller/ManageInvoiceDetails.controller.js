@@ -646,8 +646,6 @@ sap.ui.define([
                     balanceAmount = roundedAmount - paidAmount;
                     if (balanceAmount < 0) balanceAmount = 0;
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
-                    oCustomerModel.setProperty("/TotalAmount", balanceAmount.toFixed(2));
-                    oSOWModel.setProperty("/TotalAmount", balanceAmount.toFixed(2));
                 }
                 oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
@@ -1596,8 +1594,7 @@ sap.ui.define([
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    const amountToConvert = oModel.TotalAmount > 0 ? oModel.TotalAmount : oModel.PaidAmount;
-                    let totalInWords = await this.convertNumberToWords(amountToConvert, data.Currency);
+                    let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
                     const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
 
                     const margin = 15;
@@ -1833,6 +1830,10 @@ sap.ui.define([
 
                     if (parseFloat(oModel.PaidAmount) > 0) {
                         summaryBody.push([`Advance Paid Amount (${data.Currency}) :`, oModel.PaidAmount]);
+                    }
+
+                    if(parseFloat(oModel.PaidAmount) === parseFloat(oModel.TotalAmount)){
+                        summaryBody.push([`Due Amount:`, '0.00']);
                     }
 
                     const totalRowIndex = summaryBody.length;
