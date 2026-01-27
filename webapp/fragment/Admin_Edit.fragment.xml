@@ -231,7 +231,7 @@
                     visible="{= ${edit>/UnitText} === 'Per Hour'}"
                 />
                   <Label
-        text="Add CouponCode:"
+        text="Add CouponCode"
         class="sapUiSmallMarginEnd"
     />
                   <HBox

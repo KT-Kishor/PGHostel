@@ -631,6 +631,7 @@ sap.ui.define([
                 }
 
                 delete Payload._isEditing;
+              sap.ui.core.BusyIndicator.show(0);
 
                 $.ajax({
                     url: sUrl,

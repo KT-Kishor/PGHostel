@@ -17,6 +17,8 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
             this.getView().setModel(model, "LoginModel");
+            await this.getOwnerComponent().getModel("RateType").dataLoaded();
+
             var oRateTypeModel = this.getView().getModel("RateType");
             this._aOriginalRateTypes = JSON.parse(JSON.stringify(oRateTypeModel.getData()));
 
@@ -2710,14 +2712,7 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.hide();
             var oCouponData = this.getView().getModel("CouponModel").getData();
 
-            // user entered code
-
-            // if (oCustomerData.CouponCode === sEnteredCode) {
-            //     sap.m.MessageToast.show(this.i18nModel.getText("couponAlreadyApplied"));
-            //     return;
-            // }
-
-            // 1. Check coupon exists
+            
             var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
             if (!oCoupon) {
                 sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
