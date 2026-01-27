@@ -278,7 +278,7 @@ sap.ui.define([
                     await this.ajaxCreateWithJQuery("HM_Login", {
                         data: payload
                     });
-                    MessageToast.show(this.i18nModel.getText("MSstaffaddsuccess"));
+                    MessageToast.show(this.i18nModel.getText("MSstaffadd"));
                 }
 
                 this.FD_onCancelButtonPress();

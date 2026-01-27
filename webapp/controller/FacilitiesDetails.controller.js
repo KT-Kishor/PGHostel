@@ -2,15 +2,15 @@ sap.ui.define([
     "./BaseController",
     "sap/m/MessageBox",
     "../utils/validation",
-], function (BaseController, MessageBox, utils) {
+], function(BaseController, MessageBox, utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.FacilitiesDetails", {
 
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteFacilitiesDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             try {
                 this.commonLoginFunction();
                 var Layout = this.byId("FD_id_ObjectPageLayout");
@@ -45,11 +45,10 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
-            } finally {
-            }
+            } finally {}
         },
 
-     _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -65,14 +64,14 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-                filters.Role ="Admin";
+                filters.Role = "Admin";
 
-            }else{
+            } else {
                 filters.BranchID = "";
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
-                 this.commonLoginFunction();
+                this.commonLoginFunction();
 
                 const oView = this.getView();
 
@@ -91,7 +90,7 @@ sap.ui.define([
             }
         },
 
-        BI_onEditButtonPress: function () {
+        BI_onEditButtonPress: function() {
             const oView = this.getView();
             oView.getModel("editable").setProperty("/Edit", true);
 
@@ -120,44 +119,46 @@ sap.ui.define([
             oModel.setProperty("/DisplayImages", aImages);
         },
 
-        BI_onButtonPress: function () {
+        BI_onButtonPress: function() {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteFacilitis", { value: "Facilities", });
+            oRouter.navTo("RouteFacilitis", {
+                value: "Facilities",
+            });
             this.getView().getModel("Facilities").setData({});
             this.getView().getModel("DisplayImagesModel").setData({});
         },
 
-        onFacilitybranchChange: function (oEvent) {
+        onFacilitybranchChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function (oEvent) {
+        onFacilityNameChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityTypeChange: function (oEvent) {
+        onFacilityTypeChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityRateChange: function (oEvent) {
+        onFacilityRateChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onPriceChange: function (oEvent) {
+        onPriceChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateAmount(oEvent.getSource(), "ID");
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onDeleteImage: function (oEvent) {
+        onDeleteImage: function(oEvent) {
             const oContext = oEvent.getSource().getBindingContext("DisplayImagesModel");
             const sFileName = oContext.getProperty("fileName");
             const oModel = this.getView().getModel("DisplayImagesModel");
@@ -181,7 +182,7 @@ sap.ui.define([
             oModel.setProperty("/CanAddMore", aRealImages.length < maxImages);
         },
 
-        onFileSelected: function (oEvent) {
+        onFileSelected: function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
@@ -226,7 +227,9 @@ sap.ui.define([
                 const realImagesCount = aImages.filter(img => !img.isPlaceholder).length;
                 if (realImagesCount < 3) {
                     if (!aImages.some(img => img.isPlaceholder)) {
-                        aImages.push({ isPlaceholder: true });
+                        aImages.push({
+                            isPlaceholder: true
+                        });
                     }
                 } else {
                     aImages = aImages.filter(img => !img.isPlaceholder);
@@ -238,7 +241,7 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
-        Onsearch: function () {
+        Onsearch: function() {
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_ExtraFacilities", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -247,7 +250,7 @@ sap.ui.define([
             })
         },
 
-        BT_onsavebuttonpress: async function () {
+        BT_onsavebuttonpress: async function() {
             var oView = this.getView();
             var Payload = oView.getModel("FacilitiesModel").getData();
             var aFacilitiesData = oView.getModel("Facilities").getData();
@@ -261,7 +264,7 @@ sap.ui.define([
             ) {
                 var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
 
-                var uploadedImages = attachments.filter(function (item) {
+                var uploadedImages = attachments.filter(function(item) {
                     return !item.isPlaceholder;
                 });
 
@@ -278,7 +281,7 @@ sap.ui.define([
                 }
 
                 //  Duplicate check
-                var bDuplicate = aFacilitiesData.some(function (facility) {
+                var bDuplicate = aFacilitiesData.some(function(facility) {
                     if (Payload.ID && facility.ID === Payload.ID) return false; // Skip comparing the same record during update
                     return (
                         facility.BranchCode === Payload.BranchCode &&
@@ -291,7 +294,7 @@ sap.ui.define([
                     return;
                 }
 
-                if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0)  &&
+                if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) &&
                     (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0) &&
                     (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0) &&
                     (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
@@ -372,7 +375,7 @@ sap.ui.define([
             }
         },
 
-        _refreshFacilityDetails: async function (sFacilityID) {
+        _refreshFacilityDetails: async function(sFacilityID) {
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
                     ID: sFacilityID
@@ -411,7 +414,7 @@ sap.ui.define([
             }
         },
 
-        onImagePress: function (oEvent) {
+        onImagePress: function(oEvent) {
             var oSource = oEvent.getSource();
             var sImageSrc = oSource.getSrc();
 
@@ -449,12 +452,12 @@ sap.ui.define([
 
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function () {
+                        press: function() {
                             this._oImageDialog.close();
                         }.bind(this)
                     }),
 
-                    afterClose: function () {
+                    afterClose: function() {
                         this._oImageDialog.destroy();
                         this._oImageDialog = null;
                     }.bind(this)
