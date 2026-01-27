@@ -30,30 +30,37 @@ sap.ui.define([
             }
         },
 
-        _loadBranchCode: async function () {
+         _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             let aBranchCodes = [];
 
-            if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(c => c.trim());
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
             }
-
             let filters = {};
             if (oExistingModel.Role === "Admin") {
-                filters.BranchCode = aBranchCodes;
+                filters = {
+                    BranchID: aBranchCodes,
+                    Role: "Admin"
+                };
+            } else {
+                filters.BranchID = aBranchCodes;
             }
 
             sap.ui.core.BusyIndicator.show(0);
             try {
-                const oResponse = await this.ajaxReadWithJQuery("HM_Payment", filters);
-                console.log("FINAL FILTERS SENT:", JSON.stringify(filters));
-                const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
-                this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
-
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
+                const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.m.MessageToast.show(err.message || err.responseText);
-            } finally {
                 sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
 
@@ -116,7 +123,6 @@ sap.ui.define([
             }
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
-                console.log("FINAL FILTERS SENT:", JSON.stringify(filters));
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
                 this.prepareUniqueFilterDropdowns();
