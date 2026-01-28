@@ -729,6 +729,7 @@ sap.ui.define([
 
         onEditDialogClose: function () {
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
+            this.iCount=1;
             this.HM_Dialog.close();
         },
 
@@ -932,7 +933,7 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1)
 
             } else if (sUnit === "Per Year") {
-                oEnd.setMonth(oEnd.getMonth() + iCount);
+                  oEnd.setFullYear(oEnd.getFullYear() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
             }
             if (oEnd && iDays === 0) {
@@ -1020,6 +1021,11 @@ sap.ui.define([
                         sap.m.MessageToast.show(this.i18nModel.getText("startTimeShouldbeLessthanEndTime"));
                         return;
                     }
+                }
+
+                if(oCustomerData.minEndDate<= new Date(this._parseDate(oPayload.EndDate))){
+                    sap.m.MessageToast.show(this.i18nModel.getText("facilityEndDateExceedsBookingEndDate"));
+                    return;
                 }
 
                 // Format Dates
