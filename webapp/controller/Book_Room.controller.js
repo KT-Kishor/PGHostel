@@ -120,7 +120,7 @@ sap.ui.define([
 
             const oData = oHostelModel.getData();
 
-            // 🟦 RESET VALUES EVERY TIME ROUTE LOADS
+            //  RESET VALUES EVERY TIME ROUTE LOADS
             oHostelModel.setProperty("/StartDate", "");
             oHostelModel.setProperty("/EndDate", "");
             oHostelModel.setProperty("/Salutation", "");
@@ -249,7 +249,7 @@ sap.ui.define([
             const oView = this.getView();
 
             try {
-                // ✅ SHOW busy immediately
+                // SHOW busy immediately
                 // BusyIndicator.show(0);
 
                 const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
@@ -310,7 +310,7 @@ sap.ui.define([
                 MessageBox.error("Unable to load facilities. Please try again.");
 
             } finally {
-                // ✅ ALWAYS hide busy
+                //  ALWAYS hide busy
                 // BusyIndicator.hide();
             }
         }
@@ -789,6 +789,11 @@ sap.ui.define([
                                             oLoginModel.setProperty("/MobileNo", oUser.MobileNo);
                                             oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth || oUser.DateofBirth);
                                             const DOB = that.Formatter.DateFormat(oUser.DateOfBirth)
+                                            if (oUser.Role !== "Customer") {
+    MessageToast.show("Only customers are allowed to use self check-in.");
+    oEvent.getSource().setSelected(false);
+    return;
+}
                                             // Already logged in → auto-fill
                                             aPersons.forEach((p, index) => {
 
@@ -4799,18 +4804,20 @@ setTimeout(() => {
                     //  FIX: Use oData for booking fields, not individual person object
                     if (oData.StartDate) {
 
-                       var rentPrice =
-        Number(p.FinalTotalCost || 0);
+                       var rentPrice = Number(p.FinalTotalCost || 0);
                      var Discountvalue = Number(p.AppliedDiscount || 0);
                      var oCouponCode = oData.CouponCode || "";
                         // var  perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
                         var today = new Date();
                         var todayDate = today.toISOString().split("T")[0];
+                        var iSelected = Number(oData.SelectedPerson || 0);
+var iPersons = oData.Persons.length || 1;
+var iSplitValue = Math.ceil(iSelected / iPersons);
                         bookingData.push({
                             BookingDate: todayDate,
                             RentPrice: rentPrice.toString(),
                             RoomPrice: oData.FinalPrice,
-                            NoOfPersons: oData.Person || oData.Persons.length,
+                            NoOfPersons: iSplitValue,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
                             EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
                             Status: "New",
