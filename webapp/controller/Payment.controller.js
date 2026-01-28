@@ -27,7 +27,7 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel(aBranchData), "PayBranchModel");
                 await this._loadBranchCode();
                 this.setDefaultCurrentMonth();
-                await this.Onsearch();
+                await this.Onsearch(true);
                 this.isFirstLoad = false;
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -168,21 +168,24 @@ sap.ui.define([
             if (d1 instanceof Date && d2 instanceof Date) {
                 filters.StartDate = formatLocalDate(d1);
                 filters.EndDate = formatLocalDate(d2);
-            } else {
+            } else if (d1 instanceof Date && d2 instanceof Date) {
                 delete filters.StartDate;
                 delete filters.EndDate;
+            } else {
+                this.setDefaultCurrentMonth();
             }
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
+                
+                    if (bInitialLoad && this.fullPaymentData.length === 0) {
+                        this.fullPaymentData = aData;
+                        this.prepareMasterFilterData(aData);
+                    }
                 const mBranchMap = this.buildBranchMap();
                 aData.forEach(item => {
                     if (!item.BranchName && item.BranchCode) {
                         item.BranchName = mBranchMap[item.BranchCode] || item.BranchCode;
-                    }
-                    if (bInitialLoad && this.fullPaymentData.length === 0) {
-                        this.fullPaymentData = aData;
-                        this.prepareMasterFilterData(this.fullPaymentData);
                     }
                 });
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
