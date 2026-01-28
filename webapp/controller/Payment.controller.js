@@ -10,6 +10,7 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RoutePayment").attachMatched(this._onRouteMatched, this);
+            this.fullPaymentData = [];
             this.isFirstLoad = true;
         },
 
@@ -81,7 +82,37 @@ sap.ui.define([
             return mBranchMap;
         },
 
-        Onsearch: function () {
+        prepareMasterFilterData: function (aData) {
+            const mBranch = new Map();
+            const mCustomer = new Map();
+            const mBooking = new Map();
+
+            aData.forEach(item => {
+                if (item.BranchCode && !mBranch.has(item.BranchCode)) {
+                    mBranch.set(item.BranchCode, {
+                        BranchCode: item.BranchCode,
+                        BranchName: item.BranchName
+                    });
+                }
+                if (item.CustomerID && !mCustomer.has(item.CustomerID)) {
+                    mCustomer.set(item.CustomerID, {
+                        CustomerID: item.CustomerID,
+                        CustomerName: item.CustomerName
+                    });
+                }
+                if (item.BookingID && !mBooking.has(item.BookingID)) {
+                    mBooking.set(item.BookingID, {
+                        BookingID: item.BookingID
+                    });
+                }
+            });
+
+            this.getView().setModel(new JSONModel([...mBranch.values()]), "BranchFilterModel");
+            this.getView().setModel(new JSONModel([...mCustomer.values()]), "CustomerFilterModel");
+            this.getView().setModel(new JSONModel([...mBooking.values()]), "BookingFilterModel");
+        },
+
+        Onsearch: function (bInitialLoad) {
             const oView = this.getView();
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getView().getModel("mainModel")?.getData() || [];
@@ -116,6 +147,9 @@ sap.ui.define([
             if (sBookingID) {
                 filters.BookingID = sBookingID;
             }
+            if (sBranch) {
+                filters.BranchCode = sBranch;
+            }
             if (oLogin.Role === "Admin") {
                 filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
                 filters.Role = "Admin";
@@ -146,9 +180,12 @@ sap.ui.define([
                     if (!item.BranchName && item.BranchCode) {
                         item.BranchName = mBranchMap[item.BranchCode] || item.BranchCode;
                     }
+                    if (bInitialLoad && this.fullPaymentData.length === 0) {
+                        this.fullPaymentData = aData;
+                        this.prepareMasterFilterData(this.fullPaymentData);
+                    }
                 });
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
-                this.prepareUniqueFilterDropdowns();
             })
                 .catch((err) => {
                     sap.m.MessageToast.show(err.message || err.responseText);
@@ -156,48 +193,6 @@ sap.ui.define([
                 .finally(() => {
                     sap.ui.core.BusyIndicator.hide();
                 });
-        },
-
-        prepareUniqueFilterDropdowns: function () {
-            const aPayments = this.getView().getModel("mainModel")?.getData() || [];
-
-            const mBranch = new Map();
-            const mCustomer = new Map();
-            const mBooking = new Map();
-
-            aPayments.forEach(item => {
-                if (item.BranchCode && !mBranch.has(item.BranchCode)) {
-                    mBranch.set(item.BranchCode, {
-                        BranchCode: item.BranchCode,
-                        BranchName: item.BranchName
-                    });
-                }
-                if (item.CustomerID && !mCustomer.has(item.CustomerID)) {
-                    mCustomer.set(item.CustomerID, {
-                        CustomerID: item.CustomerID,
-                        CustomerName: item.CustomerName
-                    });
-                }
-                if (item.BookingID && !mBooking.has(item.BookingID)) {
-                    mBooking.set(item.BookingID, {
-                        BookingID: item.BookingID
-                    });
-                }
-            });
-            this.getView().setModel(
-                new sap.ui.model.json.JSONModel(Array.from(mBranch.values())),
-                "BranchFilterModel"
-            );
-
-            this.getView().setModel(
-                new sap.ui.model.json.JSONModel(Array.from(mCustomer.values())),
-                "CustomerFilterModel"
-            );
-
-            this.getView().setModel(
-                new sap.ui.model.json.JSONModel(Array.from(mBooking.values())),
-                "BookingFilterModel"
-            );
         },
 
         onAfterRendering: function () {
