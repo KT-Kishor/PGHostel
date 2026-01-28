@@ -42,6 +42,14 @@
                 <Text text="{HostelModel>/StartDate}" />
                 <Label text="{i18n>endDate}" />
                 <Text text="{HostelModel>/EndDate}" />
+                 <Label
+                    text="{i18n>totaldays}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
+                />
+                <Text
+                    text="{HostelModel>/TotalDays}"
+                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
+                />
                 <Label
                     text="{i18n>roomplan}"
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year'   }"
@@ -62,14 +70,7 @@
 
 
 
-                <Label
-                    text="{i18n>totaldays}"
-                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
-                />
-                <Text
-                    text="{HostelModel>/TotalDays}"
-                    visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
-                />
+               
             </f:content>
         </f:SimpleForm>
         <!-- <f:SimpleForm

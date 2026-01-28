@@ -45,7 +45,7 @@
                         class="sapUiTinyMargin"
                     />
                     <Text
-                        text="{parts: ['HostelModel>/FinalTotalCost','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
+                        text="{parts: ['HostelModel>/GrandTotal','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
                     />
                 </HBox>
 
@@ -138,15 +138,16 @@
 
                         <Label
                             text="{i18n>monthlyamount}"
-                            required="true"
+                           
                         />
                         <Input
                             id="idAmount"
                             type="Number"
-                            value="{PaymentModel>/Amount}"
+                            value="{HostelModel>/PerMonthNoPerson}"
                             placeholder="{i18n>enterAmount}"
                             liveChange=".onAmountChange"
                             maxLength="15"
+                            editable="false"
                         />
 
 
@@ -190,7 +191,7 @@
                     </VBox>
                 </l:Grid>
             </VBox>
-           <HBox class="paymentMonthlyBox"
+           <!-- <HBox class="paymentMonthlyBox"
              visible="{= ${HostelModel>/SelectedPriceType} !== 'Per Day' }">
           <Label
     class="sapUiTinyMargin"
@@ -205,7 +206,7 @@
                     <Text
                         text="{parts: ['HostelModel>/PerMonthNoPerson','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
                     />
-                </HBox>
+                </HBox> -->
         </f:SimpleForm>
        
         <footer>

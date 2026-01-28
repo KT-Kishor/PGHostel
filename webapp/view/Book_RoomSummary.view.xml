@@ -53,7 +53,7 @@
                     tooltip="{i18n>personName}"
                 />
             </Column>
-            <Column demandPopin="true">
+            <!-- <Column demandPopin="true">
                 <Text
                     text="{i18n>facilityCost}"
                     tooltip="{i18n>facilityCost}"
@@ -64,7 +64,7 @@
                     text="{i18n>placeRoomRent}"
                     tooltip="{i18n>placeRoomRent}"
                 />
-            </Column>
+            </Column> -->
              <!-- <Column  minScreenWidth="Desktop"
                         demandPopin="true">
                 <Text
@@ -75,8 +75,8 @@
             <Column  minScreenWidth="Desktop"
                         demandPopin="true">
                 <Text
-                    text="{i18n>total}"
-                    tooltip="{i18n>total}"
+                    text="{i18n>totalcost}"
+                    tooltip="{i18n>totalcost}"
                 />
             </Column>
         </columns>
@@ -85,25 +85,25 @@
             <ColumnListItem>
                 <cells>
                     <Text text="{HostelModel>FullName}" />
-                    <Text
+                    <!-- <Text
                         text="{parts: [
         'HostelModel>TotalFacilityPrice',
         'HostelModel>/Currency'
     ],formatter: '.Formatter.formatCurrency'}"
-                    />
-                    <Text
+                    /> -->
+                    <!-- <Text
                         text="{parts: [
         'HostelModel>RoomRentPerPerson',
         'HostelModel>/Currency'
     ],formatter: '.Formatter.formatCurrency'}"
-                    />
+                    /> -->
                     <!-- <Text text="{parts: [
         'HostelModel>Deposit'
     ],formatter: '.Formatter.formatCurrency'}"/> -->
                     <Text
                         class="totalColumnBold"
                         text="{ parts: [
-        'HostelModel>GrandTotal',
+        'HostelModel>FinalTotalCost',
         'HostelModel>/Currency'
     ],formatter: '.Formatter.formatCurrency'}"
                     />
@@ -159,7 +159,7 @@
                     visible="{HostelModel>/CouponButtonVisible}"
                 />
             </HBox>
-            <HBox justifyContent="End">
+            <!-- <HBox justifyContent="End">
                 <Label
                     text="Discount:"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
@@ -171,8 +171,8 @@
         }"
                     class="totalColumnBold1"
                 />
-            </HBox>
-            <HBox
+            </HBox> -->
+            <!-- <HBox
                 justifyContent="End"
                 visible="{= !${HostelModel>/IsIndia} }"
             >
@@ -236,6 +236,7 @@
                     class="totalColumnBold1"
                 />
             </HBox>
+            -->
 
             <HBox
                 justifyContent="End"
@@ -246,10 +247,12 @@
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
-                    text="{parts:['HostelModel>/FinalTotalCost','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    text="{parts:['HostelModel>/GrandTotal','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
                 />
                 </HBox>
+                
+                <!--
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
@@ -262,7 +265,7 @@
                     text="{parts:['HostelModel>/Deposit','HostelModel>/DepositCurrency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
                 />
-            </HBox>
+            </HBox> -->
         </VBox>
     </FlexBox>
     <!--<VBox class="sapUiMediumMarginBottom">
