@@ -1983,14 +1983,14 @@ oModel.setProperty("/IsIndia", bAnyIndia);
 
             if (this._iSelectedStepIndex === 1) {
                 this._resetCouponAndDiscount();
-                const aMissing = this._checkMandatoryFields();
+                // const aMissing = this._checkMandatoryFields();
 
-                //  Check MessageModel for errors (no need to count manually)
-                if (aMissing.length > 0 || this.getView().getModel("message")?.getProperty("/").length > 0) {
-                    // Button becomes visible automatically via binding
-                    MessageToast.show("Please review the errors and fix them");
-                    return;
-                }
+                // //  Check MessageModel for errors (no need to count manually)
+                // if (aMissing.length > 0 || this.getView().getModel("message")?.getProperty("/").length > 0) {
+                //     // Button becomes visible automatically via binding
+                //     MessageToast.show("Please review the errors and fix them");
+                //     return;
+                // }
             }
 
             //  BLOCK HEADER JUMP IF STEP 1 INVALID
@@ -2121,11 +2121,9 @@ oModel.setProperty("/IsIndia", bAnyIndia);
     return;
 }
 
-
-
     // Build summary ONCE
     this.TC_onDialogNextButton();
-}
+            }
 ,
 
         _resetWizardFromStep1: function () {
