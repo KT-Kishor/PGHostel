@@ -40,6 +40,7 @@
                             <ComboBox
                                 id="P_id_CustomerID"
                                 showSecondaryValues="true"
+                                filterSecondaryValues="true"
                                 items="{CustomerFilterModel>/}"
                                 showClearIcon="true"
                             >
@@ -60,6 +61,7 @@
                         <fb:control>
                             <ComboBox
                                 id="P_id_BookingID"
+                                filterSecondaryValues="true"
                                 items="{BookingFilterModel>/}"
                                 showClearIcon="true"
                             >
@@ -82,8 +84,8 @@
                                 id="P_id_BranchCode"
                                 items="{BranchFilterModel>/}"
                                 showClearIcon="true"
+                                filterSecondaryValues="true"
                                 showSecondaryValues="true"
-                                busyIndicatorDelay="0"
                             >
                                 <core:ListItem
                                     key="{BranchFilterModel>BranchCode}"

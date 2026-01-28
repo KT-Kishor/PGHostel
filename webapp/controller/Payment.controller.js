@@ -2,8 +2,9 @@ sap.ui.define([
     "./BaseController",
     "../model/formatter",
     "sap/ui/export/Spreadsheet",
+    "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-], function (BaseController, Formatter, Spreadsheet, MessageToast) {
+], function (BaseController, Formatter, Spreadsheet, JSONModel, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Payment", {
         Formatter: Formatter,
@@ -13,12 +14,16 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            sap.ui.core.BusyIndicator.show(0);
             try {
                 this.isFirstLoad = true;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ isSuperAdmin: oLogin.Role === "Super Admin" }), "RoleModel");
+                this.getView().setModel(new JSONModel({ isSuperAdmin: oLogin.Role === "Super Admin" }), "RoleModel");
                 this.commonLoginFunction();
+                const oData = await this.ajaxReadWithJQuery("HM_Branch", "");
+                const aBranchData = Array.isArray(oData?.commentData) ? oData.commentData : [];
+                this.getView().setModel(new JSONModel(aBranchData), "PayBranchModel");
                 await this._loadBranchCode();
                 this.setDefaultCurrentMonth();
                 await this.Onsearch();
@@ -30,7 +35,7 @@ sap.ui.define([
             }
         },
 
-         _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             let aBranchCodes = [];
@@ -38,9 +43,7 @@ sap.ui.define([
             if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
             let filters = {};
             if (oExistingModel.Role === "Admin") {
@@ -59,9 +62,23 @@ sap.ui.define([
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
             }
+        },
+
+        buildBranchMap: function () {
+            const aBranches = this.getView().getModel("PayBranchModel")?.getData() || [];
+            const mBranchMap = {};
+
+            aBranches.forEach(b => {
+                if (b.BranchCode && b.BranchName) {
+                    mBranchMap[b.BranchCode] = b.BranchName;
+                }
+            });
+
+            return mBranchMap;
         },
 
         Onsearch: function () {
@@ -124,6 +141,12 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
+                const mBranchMap = this.buildBranchMap();
+                aData.forEach(item => {
+                    if (!item.BranchName && item.BranchCode) {
+                        item.BranchName = mBranchMap[item.BranchCode] || item.BranchCode;
+                    }
+                });
                 this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
                 this.prepareUniqueFilterDropdowns();
             })
