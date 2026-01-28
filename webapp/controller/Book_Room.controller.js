@@ -4792,7 +4792,7 @@ setTimeout(() => {
 
             try {
                 // Format payload according to your new structure
-                const formattedPayload = oData.Persons.map((p) => {
+                const formattedPayload = oData.Persons.map((p ,index) => {
                     const bookingData = [];
                     const facilityData = [];
 
@@ -4802,6 +4802,7 @@ setTimeout(() => {
                        var rentPrice =
         Number(p.FinalTotalCost || 0);
                      var Discountvalue = Number(p.AppliedDiscount || 0);
+                     var oCouponCode = oData.CouponCode || "";
                         // var  perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
                         var today = new Date();
                         var todayDate = today.toISOString().split("T")[0];
@@ -4818,7 +4819,7 @@ setTimeout(() => {
                             BranchCode: oData.BranchCode,
                             Currency: oData.Currency,
                             Discount: Discountvalue.toString() || "0",
-                            CouponCode: oData.CouponCode || "",
+                            CouponCode: index === 0 ? oCouponCode : "",
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID,
                             // PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
@@ -4864,7 +4865,7 @@ const perPersonAmount =
                                Currency: oData.Currency || "INR",
                                DepositCurrency:oData.DepositCurrency || "INR",
                                BranchName:oData.Area || "",
-                           BankName:sap.ui.getCore().byId("idPaymentTypeField").getValue()                    
+                              BankName:sap.ui.getCore().byId("idPaymentTypeField").getValue()                    
                                };
 
                     }
