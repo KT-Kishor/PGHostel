@@ -30,6 +30,7 @@ sap.ui.define([
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.BranchCode = loginModel.getProperty("/BranchCode");
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
+                await this.onSearch();
                 this.Discount = true;
                 this.RateUnit = true;
                 this.Particulars = true;
@@ -132,7 +133,6 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "ManageInvoiceItemModel");
                 this.byId("CID_id_TableInvoiceItem").setMode("Delete");
-                await this.onSearch();
                 this.Update = false;
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
@@ -297,7 +297,7 @@ sap.ui.define([
                             clearInterval(interval);
                             resolve();
                         }
-                    }, 50);
+                    }, 100);
                 });
             },
 
