@@ -180,15 +180,6 @@
                             tooltip="{i18n>bankTransactionID}"
                         />
                     </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>customerID}"
-                            tooltip="{i18n>customerID}"
-                        />
-                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -198,69 +189,6 @@
                             tooltip="{i18n>customerName}"
                         />
                     </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>mode}"
-                            tooltip="{i18n>mode}"
-                        />
-                    </Column> -->
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>deposit}"
-                            tooltip="{i18n>deposit}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>depositDate}"
-                            tooltip="{i18n>depositDate}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>depositMode}"
-                            tooltip="{i18n>depositMode}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>depositTransactionID}"
-                            tooltip="{i18n>depositTransactionID}"
-                        />
-                    </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>MSbranchCode}"
-                            tooltip="{i18n>MSbranchCode}"
-                        />
-                    </Column> -->
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>perMonthTotalRent}"
-                            tooltip="{i18n>perMonthTotalRent}"
-                        />
-                    </Column> -->
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -275,21 +203,7 @@
                             />
                             <Text text="{mainModel>PaymentType}" />
                             <Text text="{mainModel>BankTransactionID}" />
-                            <!-- <Text text="{mainModel>CustomerID}" /> -->
                             <Text text="{mainModel>CustomerName}" />
-                            <!-- <Text text="{mainModel>Mode}" /> -->
-                            <Text
-                                text="{parts:['mainModel>Deposit', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"
-                            />
-                            <Text
-                                text="{parts:['mainModel>ReturnDepositDate'], formatter: '.Formatter.displayFormatDate'}"
-                            />
-                            <Text text="{mainModel>ReturnDepositMode}" />
-                            <Text
-                                text="{mainModel>ReturnDepositTransactionID}"
-                            />
-                            <!-- <Text text="{mainModel>BranchCode}" /> -->
-                            <!-- <Text text="{mainModel>PerMonthTotalRent}" /> -->
                         </cells>
                     </ColumnListItem>
                 </items>

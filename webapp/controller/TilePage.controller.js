@@ -100,7 +100,7 @@ sap.ui.define([
                     draggable: true,
                     content: [
                         new sap.m.Image({
-                            src: "image/u1.png",
+                            src: "image/u11.png",
                             width: "100%",
                             height: "1000%",
                             decorative: false,

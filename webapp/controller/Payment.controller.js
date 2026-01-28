@@ -12,6 +12,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RoutePayment").attachMatched(this._onRouteMatched, this);
             this.fullPaymentData = [];
             this.isFirstLoad = true;
+            this.goclick = 0;
         },
 
         _onRouteMatched: async function () {
@@ -165,23 +166,33 @@ sap.ui.define([
             const d1 = oDateRange.getDateValue();
             const d2 = oDateRange.getSecondDateValue();
 
-            if (d1 instanceof Date && d2 instanceof Date) {
+            if (d1 && d2) {
                 filters.StartDate = formatLocalDate(d1);
                 filters.EndDate = formatLocalDate(d2);
-            } else if (d1 instanceof Date && d2 instanceof Date) {
-                delete filters.StartDate;
-                delete filters.EndDate;
             } else {
-                this.setDefaultCurrentMonth();
+                this.goclick++;
+
+                if (this.goclick >= 2) {
+                    this.setDefaultCurrentMonth();
+                    const firstDay = oDateRange.getDateValue();
+                    const lastDay = oDateRange.getSecondDateValue();
+                    filters.StartDate = formatLocalDate(firstDay);
+                    filters.EndDate = formatLocalDate(lastDay);
+                }
+                else {
+                    delete filters.StartDate;
+                    delete filters.EndDate;
+                    filters.GetAll = true;
+                }
             }
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
                 const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
-                
-                    if (bInitialLoad && this.fullPaymentData.length === 0) {
-                        this.fullPaymentData = aData;
-                        this.prepareMasterFilterData(aData);
-                    }
+
+                if (bInitialLoad && this.fullPaymentData.length === 0) {
+                    this.fullPaymentData = aData;
+                    this.prepareMasterFilterData(aData);
+                }
                 const mBranchMap = this.buildBranchMap();
                 aData.forEach(item => {
                     if (!item.BranchName && item.BranchCode) {
@@ -236,6 +247,7 @@ sap.ui.define([
             oDate.setDateValue(null);
             oDate.setSecondDateValue(null);
             oDate.setValue("");
+            this.goclick = 0;
         },
 
         createTableSheet: function () {
@@ -273,26 +285,6 @@ sap.ui.define([
                 label: "Customer Name",
                 property: "CustomerName",
                 type: "string"
-            },
-            {
-                label: "Deposit",
-                property: "Deposit",
-                type: "string"
-            },
-            {
-                label: "Return Deposit Date",
-                property: "ReturnDepositDate",
-                type: "string"
-            },
-            {
-                label: "Return Deposit Mode",
-                property: "ReturnDepositMode",
-                type: "string"
-            },
-            {
-                label: "Return Deposit Transaction ID",
-                property: "ReturnDepositTransactionID",
-                type: "string"
             }
             ]
         },
@@ -305,8 +297,7 @@ sap.ui.define([
             }
             const adjustedData = oModel.map(item => ({
                 ...item,
-                Date: Formatter.displayFormatDate(item.Date),
-                ReturnDepositDate: Formatter.displayFormatDate(item.ReturnDepositDate),
+                Date: Formatter.displayFormatDate(item.Date)
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
