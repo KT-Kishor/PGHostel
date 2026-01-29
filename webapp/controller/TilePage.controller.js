@@ -89,6 +89,10 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RoutePayment");
         },
+        TileV_onpressDeposit: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteDeposit");
+        },
 
         onStartGuide: function () {
             if (!this._oGuideDialog) {

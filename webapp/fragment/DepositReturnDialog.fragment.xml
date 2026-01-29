@@ -1,0 +1,162 @@
+<!-- In DepositReturnDialog.fragment.xml -->
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="depositReturnDialog"
+        title="Return Deposit"
+        contentWidth="500px"
+        stretch="false"
+        afterClose="onDialogAfterClose"
+        escapeHandler=".onDialogEscape"
+    >
+        <content>
+            <form:SimpleForm
+                id="returnForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="0"
+                emptySpanL="0"
+                emptySpanM="0"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false"
+            >
+                <!-- Booking ID (Read-only) -->
+                <Label text="Booking ID" />
+                <Text
+                    id="inBookingID"
+                    text="{DepositView>/CurrentDeposit/BookingID}"
+                />
+
+                <!-- Customer Name (Read-only) -->
+                <Label text="Customer Name" />
+                <Text
+                    id="inCustomerName"
+                    text="{DepositView>/CurrentDeposit/CustomerName}"
+                />
+
+                <!-- Deposit Amount (Read-only) -->
+                <Label text="Deposit Amount" />
+                <Text
+                    id="inDepositAmount"
+                    text="{
+                        parts: [
+                            {path: 'DepositView>/CurrentDeposit/DepositAmount'},
+                            {path: 'DepositView>/CurrentDeposit/DepositCurrency'}
+                        ],
+                        formatter: '.Formatter.formatCurrency'
+                    }"
+                />
+
+                <!-- Deposit Taken By (Read-only) -->
+                <Label text="Deposit Taken By" />
+                <Text
+                    id="inDepositTakenBy"
+                    text="{DepositView>/CurrentDeposit/DepositTakenBy}"
+                />
+
+                <!-- Return Amount -->
+                <Label
+                    text="Return Amount"
+                    required="true"
+                />
+                <Input
+                    id="inReturnAmount"
+                    value="{
+                        path: 'DepositView>/CurrentDeposit/ReturnDepositAmount'
+                    }"
+                    placeholder="Enter return amount"
+                    change="_validateReturnAmount"
+                    liveChange="_validateReturnAmount"
+                />
+
+                <!-- Return Mode -->
+                <Label
+                    text="Return Mode"
+                    required="true"
+                />
+<ComboBox
+    id="inReturnMode"
+    selectedKey="{DepositView>/CurrentDeposit/ReturnDepositMode}"
+    placeholder="Select return mode"
+    change="_onReturnModeChange"
+    valueStateText="Select a valid return mode"
+>
+                    <core:Item
+                        key="Cash"
+                        text="Cash"
+                    />
+                    <core:Item
+                        key="UPI"
+                        text="UPI"
+                    />
+                    <core:Item
+                        key="Bank Transfer"
+                        text="Bank Transfer"
+                    />
+                    <!-- <core:Item
+                        key="Cheque"
+                        text="Cheque"
+                    />
+                    <core:Item
+                        key="Credit Card"
+                        text="Credit Card"
+                    />
+                    <core:Item
+                        key="Debit Card"
+                        text="Debit Card"
+                    /> -->
+                </ComboBox>
+
+                <!-- Return Transaction ID -->
+                <Label
+                    text="Transaction ID"
+                    required="false"
+                />
+                <Input
+                    id="inReturnTransactionID"
+                    value="{DepositView>/CurrentDeposit/ReturnDepositTransactionID}"
+                    placeholder="Enter transaction ID"
+                    change="_validateTransactionID"
+                    liveChange="_validateTransactionID"
+                    valueStateText="Transaction ID is required for non-cash transactions"
+                />
+
+                <!-- Return Deposit By (Auto-filled from login) -->
+                <Label text="Returning By" />
+                <Text
+                    id="inReturnDepositBy"
+                    text="{
+                        path: 'LoginModel>/EmployeeName'
+                    }"
+                />
+            </form:SimpleForm>
+        </content>
+
+        <buttons>
+            <Button
+                text="Return Deposit"
+                type="Emphasized"
+                press="onSaveReturn"
+            />
+
+            <Button
+                text="Cancel"
+                press="onDialogClose"
+                class="myUnifiedBtn"
+                type="Emphasized"
+            />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

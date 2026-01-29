@@ -1,0 +1,368 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Deposit"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    displayBlock="true"
+    busyIndicatorDelay="0"
+>
+    <Page
+        id="DepositPage"
+        showHeader="true"
+    >
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+
+        <content>
+            <!-- Filter Bar -->
+            <fb:FilterBar
+                id="depositFilterBar"
+                showFilterConfiguration="false"
+                useToolbar="false"
+                clear="onClearDeposits"
+                showClearOnFB="true"
+                search="onDepositSearch"
+            >
+                <fb:filterGroupItems>
+                    <!-- BRANCH FILTER -->
+                    <fb:FilterGroupItem
+                        name="BranchCode"
+                        groupName="Group"
+                        label="{i18n>branch}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="DfBranch"
+                                width="100%"
+                                items="{Branchmodel>/}"
+                                placeholder="{i18n>selectBranch}"
+                                selectedKey=""
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{Branchmodel>BranchID}"
+                                    text="{Branchmodel>BranchID} - {Branchmodel>Name}"
+                                    additionalText="{Branchmodel>City}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <!-- CUSTOMER NAME FILTER -->
+                    <fb:FilterGroupItem
+                        name="CustomerName"
+                        groupName="Group"
+                        label="{i18n>customerName}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <Input
+                                id="fCustomerName"
+                                width="100%"
+                                placeholder="{i18n>enterCustomerName}"
+                                liveChange="onDateRangeChange"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <!-- BOOKING ID FILTER -->
+                    <fb:FilterGroupItem
+                        name="BookingID"
+                        groupName="Group"
+                        label="{i18n>bookingID}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <Input
+                                id="fBookingID"
+                                width="100%"
+                                placeholder="{i18n>enterBookingID}"
+                                liveChange="onDateRangeChange"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <!-- DEPOSIT DATE RANGE -->
+                    <fb:FilterGroupItem
+                        name="DepositDateRange"
+                        groupName="Group"
+                        label="{i18n>DdepositDate}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DateRangeSelection
+                                id="fDepositRange"
+                                delimiter=" - "
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                                width="100%"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <!-- RETURN DATE RANGE -->
+                    <fb:FilterGroupItem
+                        name="ReturnDateRange"
+                        groupName="Group"
+                        label="{i18n>returnDate}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DateRangeSelection
+                                id="fReturnRange"
+                                delimiter=" - "
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                                width="100%"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <!-- DEPOSIT STATUS FILTER -->
+<!-- In the filter section of Deposit.view.xml -->
+<!-- DEPOSIT STATUS FILTER -->
+<fb:FilterGroupItem
+    name="Status"
+    groupName="Group"
+    label="{i18n>status}"
+    visibleInFilterBar="true"
+>
+    <fb:control>
+        <ComboBox
+            id="DfStatus"
+            width="100%"
+            placeholder="{i18n>selectStatus}"
+            valueStateText="Select status"
+        >
+            <core:Item
+                key=""
+                text="{i18n>all}"
+            />
+            <core:Item
+                key="Pending"
+                text="{i18n>pending}"
+            />
+            <core:Item
+                key="Returned"
+                text="{i18n>returned}"
+            />
+        </ComboBox>
+    </fb:control>
+</fb:FilterGroupItem>
+
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+
+            <!-- Deposit Table -->
+            <Table
+                id="depositTable"
+                items="{
+                    path: 'DepositModel>/',
+                    sorter: {
+                        path: 'DepositDate',
+                        descending: true
+                    }
+                }"
+                mode="MultiSelect"
+                sticky="ColumnHeaders,HeaderToolbar"
+                growing="true"
+                busyIndicatorDelay="0"
+                growingThreshold="100"
+                alternateRowColors="true"
+            >
+                <!-- Header Toolbar with Actions -->
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="{i18n>depositManagement} ({= ${DepositModel>/}.length })"
+                        />
+                        <ToolbarSpacer />
+
+                        <!-- Return Deposit Button -->
+                        <Button
+                            text="{i18n>returnDeposit}"
+                            tooltip="{i18n>returnDeposit}"
+                            press="onReturnDeposit"
+                            class="myUnifiedBtn"
+                            type="Emphasized"
+                        />
+
+                        <!-- Download Button -->
+                        <Button
+                            text="{i18n>download}"
+                            tooltip="{i18n>download}"
+                            press="onDownloadDeposits"
+                            class="myUnifiedBtn"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+
+                <!-- Columns - ADD NEW COLUMNS HERE -->
+                <columns>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>bookingID}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>customerName}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>depositAmount}" />
+                    </Column>
+                    <!-- <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>depositCurrency}" />
+                    </Column> -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>DdepositDate}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>depositMode}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>transactionID}" />
+                    </Column>
+                    <!-- NEW COLUMN: Deposit Taken By -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>depositTakenBy}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>returnAmount}" />
+                    </Column>
+                    <!-- <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnCurrency}" />
+                    </Column> -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>returnDate}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnMode}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>returnTransactionID}" />
+                    </Column>
+                    <!-- NEW COLUMN: Return Deposit By -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnDepositBy}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>branch}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>status}" />
+                    </Column>
+                </columns>
+
+                <!-- Row Template - UPDATE CELLS HERE -->
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{DepositModel>BookingID}" />
+                            <Text text="{DepositModel>CustomerName}" />
+                            <Text
+                                text="{ 
+                                    parts: [
+                                        {path: 'DepositModel>DepositAmount'},{path: 'DepositModel>DepositCurrency'}
+                                    ],
+                                    formatter: '.Formatter.formatCurrency'
+                                }"
+                            />
+                            <!-- <Text text="{DepositModel>DepositCurrency}" /> -->
+                            <Text
+                                text="{ 
+                                    path: 'DepositModel>DepositDate',
+                                    formatter: '.Formatter.formatDate' 
+                                }"
+                            />
+                            <Text text="{DepositModel>DepositMode}" />
+                            <Text text="{DepositModel>DepositTransactionID}" />
+                            <!-- NEW CELL: DepositTakenBy -->
+                            <Text text="{DepositModel>DepositTakenBy}" />
+                            <Text
+                                text="{ 
+                                    parts: [
+                                        {path: 'DepositModel>ReturnDepositAmount'},{path: 'DepositModel>ReturnDepositCurrency'}
+                                    ],
+                                    formatter: '.Formatter.formatCurrency'
+                                }"
+                            />
+                            <!-- <Text text="{DepositModel>ReturnDepositCurrency}" /> -->
+                            <Text
+                                text="{ 
+                                    path: 'DepositModel>ReturnDepositDate',
+                                    formatter: '.Formatter.formatDate' 
+                                }"
+                            />
+                            <Text text="{DepositModel>ReturnDepositMode}" />
+                            <Text
+                                text="{DepositModel>ReturnDepositTransactionID}"
+                            />
+                            <!-- NEW CELL: ReturnDepositBy -->
+                            <Text text="{DepositModel>ReturnDepositBy}" />
+                            <Text text="{DepositModel>BranchCode}" />
+                            <ObjectStatus
+                                text="{DepositModel>Status}"
+                                state="{ 
+                                    path: 'DepositModel>Status',
+                                    formatter: '.Formatter.formatObjectStatus'
+                                }"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

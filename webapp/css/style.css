@@ -3296,7 +3296,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
   .heroTextBox {
     width: 100%;                 
-    max-width: 520px;           
+    max-width: 620px;      /*/// old 520*/      
     align-self: stretch;
     background: linear-gradient(
       135deg,
@@ -3397,7 +3397,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
     }
 
     .heroTextBox {
-        max-width: 420px;
+        max-width: 600px; /*///old 420*/ 
         padding: 20px 25px;
     }
 

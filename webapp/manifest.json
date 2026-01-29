@@ -285,6 +285,13 @@
             "TargetPayment"
           ]
         },
+                {
+                  "name": "RouteDeposit",
+                  "pattern": "Deposit",
+                  "target": [
+                    "TargetDeposit"
+                  ]
+                },
        {
         "name": "NotFound",
         "pattern": "NotFound",
@@ -452,6 +459,13 @@
           "clearControlAggregation": false,
           "viewId": "Payment",
           "viewName": "Payment"
+      },
+      "TargetDeposit": {
+        "viewType": "XML",
+        "transition": "slide",
+        "clearControlAggregation": false,
+        "viewId": "Deposit",
+        "viewName": "Deposit"
       },
       "NotFound": {
           "viewType": "XML",
