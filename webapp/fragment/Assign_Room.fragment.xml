@@ -39,7 +39,58 @@
                     id="idCustomerNameText"
                     text="{HostelModel>/CustomerName}"
                 />
-                <Label
+              
+                   <Label
+                    text="Deposit Amount"
+                />
+                <Input
+                    id="id_DepositAmount"
+                    placeholder="Enter Deposit Amount"
+                    value="{HostelModel>/DepositAmount}"
+
+                    visible="{Visiblemodel>/Visible}"
+                />
+
+                   <Label
+                    text="Payment Mode"
+                    required="true"
+                />
+                <ComboBox
+                    id="idPaymentMode"
+                    placeholder="Select Payment Mode"
+                    selectedKey="{HostelModel>/PaymentMode}"
+                    valueStateText="Select Payment Mode"
+                    change="onRoomNoChange"
+                    visible="{Visiblemodel>/Visible}"
+
+                >
+                    <core:ListItem
+                        key="UPI"
+                        text="UPI"
+                    />
+                      <core:ListItem
+                        key="Cash"
+                        text="Cash"
+                    />
+                    <core:ListItem
+                        key="Card"
+                        text="Card"
+                    />
+                </ComboBox>
+
+                  <Label
+                    text="Transaction ID"
+                        required="true"
+                />
+                <Input
+                    id="id_TransactionID"
+                    placeholder="Enter Transaction ID"
+                    value="{HostelModel>/TransactionID}"
+                    visible="{Visiblemodel>/Visible}"
+
+                />
+
+                  <Label
                     text="{i18n>roomNo}"
                     required="true"
                 />
@@ -50,6 +101,7 @@
                     items="{AvailableRoomsModel>/}"
                     valueStateText="{i18n>selectRoomNo}"
                     change="onRoomNoChange"
+
                 >
                     <core:ListItem
                         key="{AvailableRoomsModel>RoomNo}"
@@ -57,90 +109,16 @@
                     />
                 </ComboBox>
 
-                <Label
-                    text="{i18n>MSbranchCode}"
-                    required="true"
-                />
-                <ComboBox
-                    id="id_BranchCode"
-                    placeholder="{i18n>placeSelectBranchCode}"
-                    selectedKey="{RoomModel>/BranchCode}"
-                    selectionChange=".onBranchChange"
-                    valueStateText="{i18n>pleaseSelectValidBranchCode}"
-                    items="{BranchModel>/}"
-                    showSecondaryValues="true"
-                    visible="{Visiblemodel>/Visible}"
-                >
-                    <core:ListItem
-                        key="{BranchModel>BranchID}"
-                        text="{BranchModel>BranchID}"
-                        additionalText="{BranchModel>Name}"
-                    />
-                </ComboBox>
-                <Label
-                    text="{i18n>bedType}"
-                    required="true"
-                />
-                <ComboBox
-                    id="idBedType"
-                    placeholder="{i18n>selectBedType}"
-                    width="100%"
-                    selectedKey="{HostelModel>/BedTypeName}"
-                    items="{BedTypeModel>/}"
-                    selectionChange=".onBedTypeChange"
-                    valueStateText="{i18n>pleaseSelectValidBedType}"
-                    visible="{Visiblemodel>/Visible}"
-                >
-                    <core:ListItem
-                        key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
-                        text="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
-                    />
-                </ComboBox>
+               
 
-                <Label text="{i18n>startDate}" />
-                <DatePicker
-                    id="AR_id_StartDate"
-                    value="{HostelModel>/StartDate}"
-                    change="FCIA_ondatechange"
-                    valueStateText="{i18n>selectdate}"
-                    valueFormat="dd/MM/yyyy"
-                    displayFormat="dd/MM/yyyy"
-                    visible="{Visiblemodel>/Visible}"
-                />
-
-                <Label text="{i18n>endDate}" />
-                <DatePicker
-                    id="AR_id_EndDate"
-                    value="{HostelModel>/EndDate}"
-                    change="FCIA_ondatechange"
-                    valueStateText="{i18n>selectdate}"
-                    valueFormat="dd/MM/yyyy"
-                    displayFormat="dd/MM/yyyy"
-                    visible="{Visiblemodel>/Visible}"
-                />
-                <Label text="{i18n>addFacility}" />
-                <MultiComboBox
-                    id="id_facility"
-                    placeholder="{i18n>selectFacility}"
-                    selectedKey="{HostelModel>/Facility}"
-                    items="{facilitymodel>/}"
-                    valueStateText="{i18n>selectRoomNo}"
-                    showSecondaryValues="true"
-                    visible="{Visiblemodel>/Visible}"
-                >
-                    <core:ListItem
-                        key="{facilitymodel>FacilityName}"
-                        text="{facilitymodel>FacilityName}"
-                        additionalText="{facilitymodel>UnitText}"
-                    />
-                </MultiComboBox>
+              
             </f:content>
         </f:SimpleForm>
 
         <beginButton>
             <Button
-                text="{i18n>save}"
-                tooltip="{i18n>save}"
+                text="Assign"
+                tooltip="Assign"
                 press="ARNO_onsavebuttonpress"
                 type="Accept"
                 id="HM_id_saveButton"

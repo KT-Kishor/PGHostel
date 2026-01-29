@@ -1051,7 +1051,7 @@
                                     visible="{= !${VisibleModel>/IsCouponApplied} }"
                                 />
                             </HBox>
-                            <HBox
+                            <!-- <HBox
                                 justifyContent="SpaceBetween"
                                 visible="{= ${CustomerData>/CouponCode} ? true : false }"
                             >
@@ -1066,10 +1066,12 @@
                         }"
                                     textAlign="End"
                                 />
-                            </HBox>
+                            </HBox> -->
                             <HBox justifyContent="SpaceBetween">
                                 <Label
-                                    text="Discount:"
+                                      text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+    ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
+    : 'Discount:' }"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -1103,9 +1105,9 @@
                                 />
                             </HBox>
                             <!-- CGST -->
-                            <HBox justifyContent="SpaceBetween">
+                            <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CGST} > 0 }">
                                 <Label
-                                    text="CGST (9%):"
+                                   text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -1121,9 +1123,9 @@
                                 />
                             </HBox>
                             <!-- SGST -->
-                            <HBox justifyContent="SpaceBetween">
+                            <HBox justifyContent="SpaceBetween"  visible="{= ${CustomerData>/SGST} > 0 }">
                                 <Label
-                                    text="SGST (9%):"
+                                    text="{= 'SGST (' + ${CustomerData>/GSTValue} + '%):'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -1138,8 +1140,26 @@
                                     textAlign="End"
                                 />
                             </HBox>
+                            <!-- IGST -->
+                               <HBox justifyContent="SpaceBetween"  visible="{= ${CustomerData>/IGST} > 0 }">
+                                <Label
+                                    text="{= 'IGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/IGST' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
                             <!-- Grand Total -->
-                            <HBox justifyContent="SpaceBetween">
+                            <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CGST} > 0 || ${CustomerData>/IGST} > 0 }">
                                 <Label
                                     text="Grand Total:"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"

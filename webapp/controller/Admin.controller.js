@@ -56,7 +56,7 @@ sap.ui.define([
                 Visible: false
             });
             this.getView().setModel(model, "Visiblemodel")
-            // this.BedTypedetails();
+            this.BedTypedetails();
         },
          _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -332,6 +332,8 @@ sap.ui.define([
 
     HM_AssignRoom: function (oEvent) {
 
+       var Beddata= this.getView().getModel("BedTypeModel").getData()
+
     var table = this.byId("idPOTable");
     var selected = table.getSelectedItem();
 
@@ -342,10 +344,16 @@ sap.ui.define([
 
     var Model = selected.getBindingContext("HostelModel");
     this.data = Model.getObject();
+    const bedName =this.data.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                const acType =this.data.BedType.includes("NON-AC") ? "NON-AC" : "AC";
+
+   var Deposit= Beddata.find((item)=>{
+        return item.Name===bedName && item.ACType===acType && item.BranchCode===this.data.BranchCode
+          
+    })
 
     if (
         this.data.Status === "Cancelled" ||
-        this.data.Status === "Assigned" ||
         this.data.Status === "Completed"
     ) {
         sap.m.MessageToast.show(this.i18nModel.getText("thisCustomercantbeAssign"));
@@ -359,10 +367,11 @@ sap.ui.define([
     oStartDate.setHours(0, 0, 0, 0);
     oToday.setHours(0, 0, 0, 0);
 
-    if (oStartDate.getTime() !== oToday.getTime()) {
+    if (oStartDate.getTime() !== oToday.getTime() &&  this.data.Status !== "Assigned") {
         sap.m.MessageToast.show("Room can be assigned only on start date");
         return;
     }
+  
 
     var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
     var aRooms = oRoomDetailsModel.getData();
@@ -400,18 +409,81 @@ sap.ui.define([
         this.getView().addDependent(this.HM_Dialog);
     }
 
-    this.getView().getModel("Visiblemodel").setProperty("/Visible", false);
 
     sap.ui.getCore().byId("idCustomerNameText")
         .setText(this.data.CustomerName + " (" + this.data.CustomerID + ")");
 
+
+  if(this.data.Status === "Assigned"){
+           sap.ui.getCore().byId("idRoomNumber1")
+        .setSelectedKey(this.data.RoomNo)
+        .setValueState("None"); 
+    this.getView().getModel("Visiblemodel").setProperty("/Visible", false);
+
+    }else{
     sap.ui.getCore().byId("idRoomNumber1")
         .setSelectedKey("")
         .setValueState("None");
+    this.getView().getModel("Visiblemodel").setProperty("/Visible", true);
+
+    }
+            sap.ui.getCore().byId("id_DepositAmount").setValue(Deposit.Deposit);
 
     this.HM_Dialog.open();
 },
+HM_UnassignRoom: function () {
+    var table = this.byId("idPOTable");
+    var selected = table.getSelectedItem();
 
+    if (!selected) {
+        sap.m.MessageToast.show("Please select a record to unassign.");
+        return;
+    }
+
+    var oContext = selected.getBindingContext("HostelModel");
+    var data = oContext.getObject();
+
+    if (data.Status !== "Assigned") {
+        sap.m.MessageToast.show("Only assigned rooms can be unassigned.");
+        return;
+    }
+
+    sap.m.MessageBox.confirm(
+        "Are you sure you want to unassign this room?",
+        {
+            title: "Confirm Unassign",
+            actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+            emphasizedAction: sap.m.MessageBox.Action.YES,
+            onClose: function (oAction) {
+                if (oAction === sap.m.MessageBox.Action.YES) {
+
+                    var Payload = {
+                        RoomNo: "",
+                        Status: "New"
+                    };
+
+                    var oBody = {
+                        data: Payload,
+                        filters: {
+                            CustomerID: data.CustomerID
+                        }
+                    };
+
+                    this.ajaxUpdateWithJQuery("HM_Booking", oBody)
+                        .then(() => {
+                            sap.m.MessageToast.show("Room unassigned successfully.");
+                            this.Cust_read(true);
+                        })
+                        .catch((oError) => {
+                            sap.m.MessageToast.show(
+                                "Error: " + (oError.responseText || oError.statusText)
+                            );
+                        });
+                }
+            }.bind(this)
+        }
+    );
+},
 
 
         HM_RoomDetails: function (oEvent) {
@@ -485,6 +557,9 @@ sap.ui.define([
 
      ARNO_onsavebuttonpress: async function () {
 
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+
     var table = this.byId("idPOTable");
     var selected = table.getSelectedItem();
 
@@ -492,12 +567,21 @@ sap.ui.define([
         sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"));
         return;
     }
+  
 
     var Model = selected.getBindingContext("HostelModel");
     var ID = Model.getObject();
 
+
+
     var selectedRoomNo =
         sap.ui.getCore().byId("idRoomNumber1").getSelectedKey() || ID.RoomNo;
+            var DepositAmount =
+        sap.ui.getCore().byId("id_DepositAmount").getValue();
+            var PaymentMode =
+        sap.ui.getCore().byId("idPaymentMode").getSelectedKey();
+            var TransactionID =
+        sap.ui.getCore().byId("id_TransactionID").getValue();
 
     if (!selectedRoomNo) {
         sap.m.MessageToast.show("Please select a Room Number.");
@@ -543,22 +627,46 @@ sap.ui.define([
         );
         return;
     }
-
-    // 🔹 SAVE
-    var Payload = {
+if( ID.Status==="Assigned"){
+ var Payload = {    
         RoomNo: selectedRoomNo,
         Status: "Assigned"
     };
-
+    
     var oBody = {
         data: Payload,
         filters: {
-            CustomerID: ID.CustomerID
+            BookingID: ID.BookingID,
+            flag:"True"
         }
+    }
+
+}else{
+     var Payload = {
+        CustomerName: ID.CustomerName,
+        DepositAmount: parseInt(DepositAmount),
+        DepositCurrency: "INR",
+        DepositMode: PaymentMode,
+        DepositTransactionID: TransactionID,
+        DepositDate: new Date().toISOString().split("T")[0],
+        BranchCode: ID.BranchCode,
+        DepositTakenBy: oExistingModel.EmployeeName,
+        
+        RoomNo: selectedRoomNo,
+        Status: "Assigned"
     };
+    
+    var oBody = {
+        data: Payload,
+        filters: {
+            BookingID: ID.BookingID,
+            flag:"False"
+        }
+    }
+};
 
     try {
-                this.ajaxUpdateWithJQuery("HM_Booking", oBody);
+                this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
                 sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
                 await this.Cust_read(true);
                 this.HM_Dialog.close();
@@ -569,12 +677,34 @@ sap.ui.define([
                     }),
                     "InvoiceNavContext"
                 );
+                sap.m.MessageBox.confirm(
+    "Are you sure you want to proceed to the invoice?",
+    {
+        title: "Confirm Navigation",
+        icon: sap.m.MessageBox.Icon.INFORMATION,
+        actions: [
+            sap.m.MessageBox.Action.OK,
+            sap.m.MessageBox.Action.CANCEL
+        ],
+        onClose: async (sAction) => {
+            if (sAction === sap.m.MessageBox.Action.OK) {
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo("RouteManageInvoiceDetails", {
+                        sPath: "X",
+                        dash: "AdminPage"
+                    });
+            }
+        }
+    }
+);
+
 
                 // Navigate normally (NO CHANGE TO ROUTE)
-                this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
-                    sPath: "X",
-                    dash: "AdminPage"
-                });
+                // this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                //     sPath: "X",
+                //     dash: "ManageInvoice"
+                // });
             } catch (oError) {
                 sap.m.MessageToast.show(
                     "Error: " + (oError.responseText || oError.statusText)

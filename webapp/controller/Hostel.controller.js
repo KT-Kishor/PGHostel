@@ -2857,7 +2857,7 @@ sap.ui.define([
                 var sBranchCode = this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
 
 
-                if (Scity && !sBranchCode) {
+                if (Scity && !sBranchCode)  {
                     // Filter branches by city
                     var aFilteredBranches = aBranchesData.filter(function (branch) {
                         return branch.City === Scity;
@@ -2988,6 +2988,10 @@ sap.ui.define([
                     const sArea = oBranchInfo?.Name || "";
                     const sAddress = oBranchInfo?.Address || "";
                     const sCountry = oBranchInfo?.Country || "";
+                    const sGSTType = oBranchInfo?.Type || "";
+                    const sGSTValue = oBranchInfo?.Value || "";
+
+
 
                     
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
@@ -3024,7 +3028,9 @@ sap.ui.define([
                         AvailbleBeds: room.AvailableRooms,
                         Address: sAddress,
                         CheckInTime: sCheckInTime,
-                        CheckOutTime: sCheckOutTime
+                        CheckOutTime: sCheckOutTime,
+                        GSTType: sGSTType,
+                        GSTValue: sGSTValue,
                     };
                 });
 

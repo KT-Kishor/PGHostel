@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Booking ID"
-                        label="{i18n>bookingID}"
+                        label="{i18n>BCustomerID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -160,6 +160,12 @@
                             text="{i18n>assignRoom}"
                             tooltip="{i18n>assignRoom}"
                             press="HM_AssignRoom"
+                            class="myUnifiedBtn"
+                        />
+                         <Button
+                            text="Unassign Room"
+                            tooltip="Unassign Room"
+                            press="HM_UnassignRoom"
                             class="myUnifiedBtn"
                         />
                         <Button
