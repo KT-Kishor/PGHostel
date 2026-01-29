@@ -573,7 +573,7 @@ sap.ui.define([
                 // Navigate normally (NO CHANGE TO ROUTE)
                 this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
                     sPath: "X",
-                    dash: "ManageInvoice"
+                    dash: "AdminPage"
                 });
             } catch (oError) {
                 sap.m.MessageToast.show(

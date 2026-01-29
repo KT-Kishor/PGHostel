@@ -271,7 +271,7 @@ sap.ui.define([
                 var filter = {
                     BranchCode: this.BranchCode
                 }
-                this.ajaxReadWithJQuery("HM_Booking", filter).then((oData) => {
+                this.ajaxReadWithJQuery("HM_CustomerReadCall", filter).then((oData) => {
                     var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                     const aFilteredData = oFCIAerData.filter(item =>
                         item.Status === "Assigned" || item.Status === "Completed");
@@ -310,7 +310,9 @@ sap.ui.define([
                     const oUIModel = this.getOwnerComponent().getModel("UIModel");
                     oUIModel.setProperty("/isLoggedIn", true);
                     this.getOwnerComponent().getRouter().navTo("RouteHostel");
-                } else {
+                }else if (this.sourceView === "AdminPage") {
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+                }else {
                     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
                 }
             },
@@ -563,13 +565,17 @@ sap.ui.define([
                 const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
                 const oCustomerModel = oView.getModel("SelectedCustomerModel");
                 let aSOWDetails = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
-                let totalWithGST = 0,
-                    totalWithoutGST = 0;
+
+                let totalWithGST = 0;
+                let totalWithoutGST = 0;
 
                 aSOWDetails.forEach((item) => {
-                    if (oSOWModel.getProperty("/Currency") === "INR" && !oCustomerModel.getProperty("/GST")) {
-                        oCustomerModel.setProperty("/Value", '9');
-                        oCustomerModel.setProperty("/Type", 'CGST/SGST');
+                    if (
+                        oSOWModel.getProperty("/Currency") === "INR" &&
+                        !oCustomerModel.getProperty("/GST")
+                    ) {
+                        oCustomerModel.setProperty("/Value", "9");
+                        oCustomerModel.setProperty("/Type", "CGST/SGST");
                         this.visiablityPlay.setProperty("/GST", true);
                     }
 
@@ -592,45 +598,53 @@ sap.ui.define([
                     let finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    const isGSTApplicable = item.GSTCalculation === "YES" && oSOWModel.getProperty("/Currency") === "INR";
+                    const isGSTApplicable =
+                        item.GSTCalculation === "YES" &&
+                        oSOWModel.getProperty("/Currency") === "INR";
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
 
-                    if (isGSTApplicable) totalWithGST += finalAmount;
-                    else totalWithoutGST += finalAmount;
+                    if (isGSTApplicable) {
+                        totalWithGST += finalAmount;
+                    } else {
+                        totalWithoutGST += finalAmount;
+                    }
                 });
 
-                //  Show initial subtotals (before discount)
+                // ---------------- SUBTOTALS ----------------
                 oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
                 oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
 
-                //  Coupon Discount applied ONLY on GST subtotal section
+                // ---------------- COUPON (USED AFTER GST) ----------------
                 let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
                 oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
 
-                let discountedGSTSubtotal = totalWithGST - couponDiscount;
-                if (discountedGSTSubtotal < 0) discountedGSTSubtotal = 0;
-
-                // Final subtotal used for GST calc
-                let subtotalAfterDiscount = discountedGSTSubtotal + totalWithoutGST;
-
-                const type = oCustomerModel.getProperty("/Type");
+                // ---------------- GST CALC (NO COUPON IMPACT) ----------------
+                const taxType = oCustomerModel.getProperty("/Type");
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
 
-                let gstAmount = 0,
-                    finalAmount = subtotalAfterDiscount;
+                let gstAmount = 0;
+                let finalAmount = totalWithGST + totalWithoutGST;
 
-                if (type === "CGST/SGST") {
-                    gstAmount = (discountedGSTSubtotal * taxRate) / 100;
+                if (taxType === "CGST/SGST") {
+                    gstAmount = (totalWithGST * taxRate) / 100;
                     finalAmount += gstAmount * 2;
+
                     oCustomerModel.setProperty("/CGST", gstAmount.toFixed(2));
                     oCustomerModel.setProperty("/SGST", gstAmount.toFixed(2));
-                } else if (type === "IGST") {
-                    gstAmount = (discountedGSTSubtotal * taxRate) / 100;
+                } 
+                else if (taxType === "IGST") {
+                    gstAmount = (totalWithGST * taxRate) / 100;
                     finalAmount += gstAmount;
+
                     oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                 }
 
+                // ---------------- APPLY COUPON AFTER GST ----------------
+                finalAmount -= couponDiscount;
+                if (finalAmount < 0) finalAmount = 0;
+
+                // ---------------- ROUND OFF ----------------
                 let roundedAmount = Math.round(finalAmount);
                 let difference = (roundedAmount - finalAmount).toFixed(2);
                 oSOWModel.setProperty("/RoundOf", difference);
@@ -646,6 +660,8 @@ sap.ui.define([
                     balanceAmount = roundedAmount - paidAmount;
                     if (balanceAmount < 0) balanceAmount = 0;
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
+                    oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                    oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                 }
                 oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
@@ -822,6 +838,7 @@ sap.ui.define([
                     CouponDiscount: oSelectedCustomerModel.CouponDiscount || "",
                     UserID: oSelectedCustomerModel.UserID || "",
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
+                    BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1087,16 +1104,30 @@ sap.ui.define([
             },
 
             modelFunction: function() {
-                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
-                var oModel = new JSONModel({
+            var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+
+                var fTotalAmount = parseFloat(oNavigationModel.TotalAmount) || 0;
+                var fPaidAmount  = parseFloat(oNavigationModel.PaidAmount) || 0;
+
+                // NEW: calculate balance amount
+                var fBalanceAmount = fTotalAmount > fPaidAmount ? (fTotalAmount - fPaidAmount) : fTotalAmount;
+
+                var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
+                var fDueAmount = 0;
+
+                if (oInvoicePaymentModel && oInvoicePaymentModel.getData().length !== 0) {
+                    fDueAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllDueAmount")) || fBalanceAmount;
+                } else {
+                    fDueAmount = fBalanceAmount;
+                }
+
+                var oModel = new sap.ui.model.json.JSONModel({
                     InvNo: oNavigationModel.InvNo,
                     TransactionId: "",
                     ReceivedDate: "",
                     ReceivedAmount: "",
-                    TotalAmount: parseFloat(oNavigationModel.TotalAmount).toFixed(2),
-                    DueAmount: (this.getView().getModel("InvoicePayment").getData().length !== 0 ?
-                        parseFloat(this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount")) :
-                        parseFloat(oNavigationModel.TotalAmount || 0)).toFixed(2),
+                    TotalAmount: fBalanceAmount.toFixed(2),
+                    DueAmount: fDueAmount.toFixed(2),
                     Currency: oNavigationModel.Currency,
                     ConversionRate: "",
                     AmountInINR: "",
@@ -1585,9 +1616,7 @@ sap.ui.define([
             CID_onPressGeneratePdf: async function() {
                 try {
                     sap.ui.core.BusyIndicator.show(0);
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
@@ -1598,11 +1627,12 @@ sap.ui.define([
                     var AllReceivedAmount = paymentModel ? (paymentModel.getProperty("/AllReceivedAmount") || 0) : 0;
 
                     // fetch company details
-                    let filter = {
-                        BranchID: [oModel.BranchCode]
-                    };
+                    let filter = { BranchID: [oModel.BranchCode] };
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
+
+                    let paymentTermsFilter = { CustomerID: [oModel.CustomerID] };
+                    const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
                     const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
@@ -1838,14 +1868,6 @@ sap.ui.define([
                         summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
                     }
 
-                    if (parseFloat(oModel.PaidAmount) > 0) {
-                        summaryBody.push([`Advance Paid Amount (${data.Currency}) :`, oModel.PaidAmount]);
-                    }
-
-                    if(parseFloat(oModel.PaidAmount) === parseFloat(oModel.TotalAmount)){
-                        summaryBody.push([`Due Amount:`, '0.00']);
-                    }
-
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
@@ -1893,13 +1915,71 @@ sap.ui.define([
                     // ===== AMOUNT IN WORDS =====
                     oModel.AmountInWords = totalInWords;
                     doc.setFont("times", "bold");
-                    doc.text("Amount in Words :", 13, currentY);
+                    doc.text("Amount in Words :", margin, currentY);
 
                     currentY += 5;
                     doc.setFont("times", "normal");
-                    doc.text(oModel.AmountInWords || "", 13, currentY, {
-                        maxWidth: 180
-                    });
+
+                    const amountLines = doc.splitTextToSize(
+                        oModel.AmountInWords || "",
+                        usableWidth
+                    );
+                    doc.text(amountLines, margin, currentY);
+
+                    // Move Y below wrapped text
+                    currentY += amountLines.length * 5 + 8;
+
+                    // ===== CUSTOMER TRANSACTION HISTORY =====
+                    if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
+
+                        // Page break check
+                        if (currentY + 50 > pageHeight) {
+                            doc.addPage();
+                            currentY = 20;
+                        }
+
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("Customer Transaction History", margin, currentY);
+
+                        currentY += 5;
+
+                        const paymentBody = paymentdata.commentData.map((item, index) => ([
+                            index + 1,
+                            Formatter.formatDate(item.Date),
+                            item.PaymentType || "",
+                            item.BankName || "",
+                            item.BankTransactionID || "-",
+                            Formatter.fromatNumber(item.Amount),
+                            item.Currency || ""
+                        ]));
+
+                        doc.autoTable({
+                            startY: currentY,
+                            head: [['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']],
+                            body: paymentBody,
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                1: { halign: "center" },
+                                2: { halign: "left" },
+                                3: { halign: "left" },
+                                4: { halign: "left" },
+                                5: { halign: "right" }
+                            }
+                        });
+
+                        currentY = doc.lastAutoTable.finalY + 8;
+                    }
 
                     currentY += 15;
                     doc.setFontSize(11);

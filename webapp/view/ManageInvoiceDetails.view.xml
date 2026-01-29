@@ -76,6 +76,7 @@
                                             <core:ListItem
                                                 key="{ManageCustomerModel>CustomerID}"
                                                 text="{ManageCustomerModel>CustomerID}"
+                                                additionalText="{ManageCustomerModel>CustomerName}"
                                             />
                                         </m:ComboBox>
                                         <m:Label
@@ -90,7 +91,7 @@
                                             showButton="true"
                                             visible="{visiablityPlay>/createVisi}"
                                             items="{BookingModel>/}"
-                                            value="{BookingModel>/BookingID }"
+                                            value="{BookingModel>/BookingID}"
                                             valueStateText="{i18n>selectBookingID}"
                                             showSecondaryValues="true"
                                         >
@@ -735,6 +736,20 @@
                                                     textAlign="End"
                                                 />
                                             </m:HBox>
+                                            <!-- Total Amount -->
+                                            <m:HBox
+                                                justifyContent="SpaceBetween"
+                                            >
+                                                <m:Label
+                                                    text="{i18n>total} ({FilteredSOWModel>/Currency}) :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{path:'FilteredSOWModel>/TotalAmount',formatter: '.Formatter.fromatNumber'}"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
                                             <!-- Paid Amount -->
                                              <m:HBox
                                                 justifyContent="SpaceBetween"
@@ -750,17 +765,18 @@
                                                     textAlign="End"
                                                 />
                                             </m:HBox>
-                                            <!-- Total Amount -->
-                                            <m:HBox
+                                            <!-- Pending Amount -->
+                                             <m:HBox
                                                 justifyContent="SpaceBetween"
+                                                visible="{= ${SelectedCustomerModel>/BalanceAmount} > 0 }"
                                             >
                                                 <m:Label
-                                                    text="{i18n>total} ({FilteredSOWModel>/Currency}) :"
+                                                    text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
                                                     class="amountText"
-                                                    text="{path:'FilteredSOWModel>/TotalAmount',formatter: '.Formatter.fromatNumber'}"
+                                                    text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
                                             </m:HBox>
@@ -831,13 +847,13 @@
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
-                    <m:Button
+                    <!-- <m:Button
                         visible="{= ${visiablityPlay>/payByDate} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{i18n>companyInvoiceSendEmail}"
                         press="CID_onPressSendEmail"
                         tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
-                    />
+                    /> -->
                     <m:Button
                         visible="{= ${visiablityPlay>/Edit} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
