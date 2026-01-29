@@ -137,11 +137,9 @@ sap.ui.define([
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                     const sCustomerID = oNavCtx?.getProperty("/CustomerID");
+                    const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
 
                     if (sCustomerID) {
-                        const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
-
-                        //  Force UI5 to rebind before selecting
                         oCustomerCombo.setSelectedKey(null);
                         sap.ui.getCore().applyChanges();
 
@@ -160,6 +158,7 @@ sap.ui.define([
                     } else {
                         oCustomerCombo.setEditable(true);
                     }
+                    sap.ui.core.BusyIndicator.hide();
                     return;
                 }
                 this.visiablityPlay.setProperty("/Edit", true);
