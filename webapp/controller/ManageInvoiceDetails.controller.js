@@ -406,7 +406,8 @@ sap.ui.define([
                             CustomerID: customerID,
                             BookingID: bookingID,
                             UserID: bookingDetails.UserID || "",
-                            PaidAmount: oData.data.PerMonthTotalRent || "0.00"
+                            PaidAmount: oData.data.PerMonthTotalRent || "0.00",
+                            CouponCode: bookingDetails.CouponCode
                         });
                     }
 
@@ -839,6 +840,7 @@ sap.ui.define([
                     UserID: oSelectedCustomerModel.UserID || "",
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
                     BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
+                    CouponCode: oSelectedCustomerModel.CouponCode || "",
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1832,7 +1834,7 @@ sap.ui.define([
 
                     if (parseFloat(oModel.CouponDiscount) > 0) {
                         summaryBody.push([
-                            `Coupon Discount (${data.Currency}) :`,
+                            `Discount (${oModel.CouponCode}) :`,
                             Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
                         ]);
                     }
