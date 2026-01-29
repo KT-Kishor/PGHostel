@@ -30,7 +30,6 @@ sap.ui.define([
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.BranchCode = loginModel.getProperty("/BranchCode");
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
-                await this.onSearch();
                 this.Discount = true;
                 this.RateUnit = true;
                 this.Particulars = true;
@@ -134,34 +133,33 @@ sap.ui.define([
                 oView.setModel(new JSONModel(), "ManageInvoiceItemModel");
                 this.byId("CID_id_TableInvoiceItem").setMode("Delete");
                 this.Update = false;
+                await this.onSearch();
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                     const sCustomerID = oNavCtx?.getProperty("/CustomerID");
 
                     if (sCustomerID) {
-                        await this._waitForModel("ManageCustomerModel");
-
                         const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
 
-                        // auto-select customer
+                        //  Force UI5 to rebind before selecting
+                        oCustomerCombo.setSelectedKey(null);
+                        sap.ui.getCore().applyChanges();
+
                         oCustomerCombo.setSelectedKey(sCustomerID);
                         this.SelectKey = sCustomerID;
 
-                        // 🔒 LOCK ONLY FOR ROOM ASSIGN FLOW
+                        //  Lock only for Room Assign flow
                         oCustomerCombo.setEditable(false);
 
                         await this.onChangeAddCustomer({
                             getSource: () => oCustomerCombo
                         });
 
-                        // clear after use
+                        // Clear nav context AFTER use
                         oNavCtx.setProperty("/CustomerID", "");
                     } else {
-                        // 🔓 NORMAL ADD INVOICE FLOW
-                        this.byId("CID_id_AddCustComboBox").setEditable(true);
+                        oCustomerCombo.setEditable(true);
                     }
-
-                    sap.ui.core.BusyIndicator.hide();
                     return;
                 }
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -266,38 +264,35 @@ sap.ui.define([
                 }
             },
 
-            onSearch: function() {
-                sap.ui.core.BusyIndicator.show(0);
-                var filter = {
-                    BranchCode: this.BranchCode
-                }
-                this.ajaxReadWithJQuery("HM_CustomerReadCall", filter).then((oData) => {
-                    var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                    const aFilteredData = oFCIAerData.filter(item =>
-                        item.Status === "Assigned" || item.Status === "Completed");
-                    var model = new sap.ui.model.json.JSONModel(aFilteredData);
-                    this.getView().setModel(model, "ManageCustomerModel");
-                }).catch((err) => {
-                    MessageToast.show(err.responseText || "Failed to Load Customer Data.");
-                    sap.ui.core.BusyIndicator.hide();
-                });
-            },
+            onSearch: function () {
+                return new Promise((resolve, reject) => {
+                    sap.ui.core.BusyIndicator.show(0);
 
-            _waitForModel: function(sModelName) {
-                return new Promise((resolve) => {
-                    const oView = this.getView();
+                    var filter = {
+                        BranchCode: this.BranchCode
+                    };
 
-                    if (oView.getModel(sModelName)) {
-                        resolve();
-                        return;
-                    }
+                    this.ajaxReadWithJQuery("HM_CustomerReadCall", filter)
+                        .then((oData) => {
+                            var aData = Array.isArray(oData.commentData)
+                                ? oData.commentData
+                                : [oData.commentData];
 
-                    const interval = setInterval(() => {
-                        if (oView.getModel(sModelName)) {
-                            clearInterval(interval);
-                            resolve();
-                        }
-                    }, 100);
+                            const aFilteredData = aData.filter(item =>
+                                item.Status === "Assigned" || item.Status === "Completed"
+                            );
+
+                            this.getView().setModel(
+                                new sap.ui.model.json.JSONModel(aFilteredData),
+                                "ManageCustomerModel"
+                            );
+
+                            resolve(); // ✅ VERY IMPORTANT
+                        })
+                        .catch((err) => {
+                            MessageToast.show(err.responseText || "Failed to Load Customer Data.");
+                            sap.ui.core.BusyIndicator.hide();
+                        })
                 });
             },
 
