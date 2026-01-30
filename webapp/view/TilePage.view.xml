@@ -167,7 +167,7 @@
                 <GenericTile
                     id="id8roomTile"
                     class="sapUiMediumMargin glassTile"
-                    header="{i18n>deposit}"
+                    header="{i18n>returnDeposit}"
                     press="TileV_onpressDeposit"
                 >
                     <TileContent unit="{i18n>ManageDeposit}">

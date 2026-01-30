@@ -191,180 +191,6 @@ sap.ui.define([
             return { fyStart, fyEnd };
         },
 
-
-            // onDepositSearch: async function () {
-            //     try {
-            //         sap.ui.core.BusyIndicator.show(0);
-
-            //         const oFilterBar = this.byId("depositFilterBar");
-            //         const aItems = oFilterBar.getFilterGroupItems();
-            //         const oDepositRange = this.byId("fDepositRange");
-            //         const oReturnRange = this.byId("fReturnRange");
-
-            //         const params = {};
-
-            //         // ================= Branch Logic =================
-            //         params.BranchCode = this._allowedBranches;
-
-            //         const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-            //         if (oExistingModel.Role === "Admin") {
-            //             params.Role = "Admin";
-            //         }
-
-            //         // ================= Date Format =================
-            //         const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-            //             pattern: "yyyy-MM-dd"
-            //         });
-
-            //         // ================= Deposit Date Handling =================
-            //         if (this._isDateRangeCleared === true) {
-            //             delete params.DepositStartDate;
-            //             delete params.DepositEndDate;
-            //             // Also clear the date range from UI state
-            //             if (oDepositRange) {
-            //                 oDepositRange.setValue("");
-            //                 oDepositRange.setDateValue(null);
-            //                 oDepositRange.setSecondDateValue(null);
-            //             }
-            //         } else if (oDepositRange) {
-            //             const oStartDate = oDepositRange.getDateValue();
-            //             const oEndDate = oDepositRange.getSecondDateValue();
-
-            //             if (oStartDate && oEndDate) {
-            //                 params.FromDate = oDateFormat.format(oStartDate);
-            //                 params.ToDate = oDateFormat.format(oEndDate);
-            //                 params.StartDate = oDateFormat.format(oStartDate);
-            //                 params.EndDate = oDateFormat.format(oEndDate);
-            //                 params.DepositStartDate = oDateFormat.format(oStartDate);
-            //                 params.DepositEndDate = oDateFormat.format(oEndDate);
-            //             }
-            //         }
-
-            //         // ================= Return Date Handling =================
-            //         if (oReturnRange) {
-            //             const oStartDate = oReturnRange.getDateValue();
-            //             const oEndDate = oReturnRange.getSecondDateValue();
-
-            //             if (oStartDate && oEndDate) {
-            //                 params.ReturnFromDate = oDateFormat.format(oStartDate);
-            //                 params.ReturnToDate = oDateFormat.format(oEndDate);
-            //                 params.ReturnStartDate = oDateFormat.format(oStartDate);
-            //                 params.ReturnEndDate = oDateFormat.format(oEndDate);
-            //             } else {
-            //                 delete params.ReturnStartDate;
-            //                 delete params.ReturnEndDate;
-            //                 delete params.ReturnFromDate;
-            //                 delete params.ReturnToDate;
-            //             }
-            //         }
-
-            //         // ================= Other Filters =================
-            //         aItems.forEach(item => {
-            //             const ctrl = item.getControl();
-            //             const key = item.getName();
-            //             if (!ctrl) return;
-
-            //             switch (key) {
-            //                 case "Status": {
-            //                     const val = ctrl.getSelectedKey ? ctrl.getSelectedKey() : ctrl.getValue();
-            //                     if (val && val.trim()) {
-            //                         params[key] = val.trim();
-            //                     }
-            //                     break;
-            //                 }
-
-            //                 case "BranchCode": {
-            //                     const val = ctrl.getSelectedKey?.();
-            //                     if (val && val.trim()) {
-            //                         params[key] = val.trim();
-            //                     }
-            //                     break;
-            //                 }
-
-            //                 case "CustomerName":
-            //                 case "BookingID": {
-            //                     const val = ctrl.getValue?.();
-            //                     if (val && val.trim()) {
-            //                         params[key] = val.trim();
-            //                     }
-            //                     break;
-            //                 }
-            //             }
-            //         });
-
-            //         // ================= Branch Specific Logic =================
-            //         const oBranchCB = this.byId("DfBranch");
-            //         if (oBranchCB) {
-            //             const sValue = oBranchCB.getValue()?.trim();
-            //             const sSelectedKey = oBranchCB.getSelectedKey();
-
-            //             if (sValue && sSelectedKey) {
-            //                 if (this._allowedBranches?.split(",").includes(sSelectedKey)) {
-            //                     params.BranchCode = sSelectedKey;
-            //                 } else {
-            //                     params.BranchCode = "__INVALID__";
-            //                 }
-            //             }
-            //         }
-
-            //         // ================= Status Filter =================
-            //         const oStatusCB = this.byId("DfStatus");
-            //         if (oStatusCB) {
-            //             const sStatus = oStatusCB.getSelectedKey();
-            //             if (sStatus && sStatus.trim()) {
-            //                 params.Status = sStatus.trim();
-            //             }
-            //         }
-
-            //         console.log("API Call Params:", JSON.stringify(params, null, 2));
-
-            //         // ================= API Call =================
-            //         const oResult = await this.ajaxReadWithJQuery("HM_Deposit", params);
-
-            //         console.log("API Response:", oResult);
-
-            //         // ================= Normalize Data =================
-            //         const aData = this._normalizeDepositResult(oResult);
-
-            //         console.log("Normalized Data:", aData.length, "records");
-
-            //         // ================= Apply Status Filter =================
-            //         let filteredData = aData;
-            //         if (params.Status) {
-            //             filteredData = aData.filter(deposit => deposit.Status === params.Status);
-            //         }
-
-            //         // ================= Add Branch Name =================
-            //         filteredData.forEach(deposit => {
-            //             deposit.BranchName = this._branchMap[deposit.BranchCode] || "-";
-
-            //             // SIMPLIFIED STATUS LOGIC: Only "Pending" or "Returned"
-            //             // If any amount has been returned, status is "Returned"
-            //             const depositAmount = parseFloat(deposit.DepositAmount || 0);
-            //             const returnAmount = parseFloat(deposit.ReturnDepositAmount || 0);
-
-            //             // Simple binary logic
-            //             deposit.Status = returnAmount > 0 ? "Returned" : "Pending";
-
-            //             console.log(`Deposit ${deposit.BookingID}: Deposit=${depositAmount}, Return=${returnAmount}, Status=${deposit.Status}`);
-            //         });
-
-            //         // ================= Update Model =================
-            //         this.getView().getModel("DepositModel").setData(filteredData);
-            //         console.log("Data loaded to model:", filteredData.length, "records");
-
-            //     } catch (err) {
-            //         console.error("Failed to load deposit data:", err);
-            //         sap.m.MessageBox.error(
-            //             err?.responseJSON?.message ||
-            //             err?.message ||
-            //             "Failed to load deposit data."
-            //         );
-            //     } finally {
-            //         sap.ui.core.BusyIndicator.hide();
-            //         this._isDateRangeCleared = false;
-            //     }
-            // },
         onDepositSearch: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
@@ -427,8 +253,6 @@ sap.ui.define([
                 if (sDepositStartDate && sDepositEndDate) {
                     // Send as array [startDate, endDate] - this is what backend expects
                     params.DepositDate = [sDepositStartDate, sDepositEndDate];
-                    console.log("=== Deposit Date Filter ===");
-                    console.log("DepositDate array:", params.DepositDate);
                 }
 
                 // ================= Return Date Handling =================
@@ -446,8 +270,6 @@ sap.ui.define([
                 if (sReturnStartDate && sReturnEndDate) {
                     // Send as array [startDate, endDate] - this is what backend expects
                     params.ReturnDepositDate = [sReturnStartDate, sReturnEndDate];
-                    console.log("=== Return Date Filter ===");
-                    console.log("ReturnDepositDate array:", params.ReturnDepositDate);
                 }
 
                 // ================= Other Filters =================
@@ -523,19 +345,14 @@ sap.ui.define([
                     }
                 }
 
-                console.log("=== Final API Parameters ===");
-                console.log(JSON.stringify(params, null, 2));
-                console.log("=== End Debug ===");
 
                 // ================= API Call =================
                 const oResult = await this.ajaxReadWithJQuery("HM_Deposit", params);
 
-                console.log("API Response:", oResult);
 
                 // ================= Normalize Data =================
                 const aData = this._normalizeDepositResult(oResult);
 
-                console.log("Data from API:", aData.length, "records");
 
                 // ================= Client-side Filtering (Fallback) =================
                 let filteredData = aData;
@@ -566,8 +383,6 @@ sap.ui.define([
                     });
 
                     if (beforeFilterCount !== filteredData.length) {
-                        console.log("Client-side deposit date filtering applied.");
-                        console.log("Before:", beforeFilterCount, "After:", filteredData.length, "records");
                     }
                 }
 
@@ -595,8 +410,6 @@ sap.ui.define([
                     });
 
                     if (beforeFilterCount !== filteredData.length) {
-                        console.log("Client-side return date filtering applied.");
-                        console.log("Before:", beforeFilterCount, "After:", filteredData.length, "records");
                     }
                 }
 
@@ -618,7 +431,6 @@ sap.ui.define([
 
                 // Add these lines to populate comboboxes:
                 this._refreshFilterComboBoxes(filteredData);
-                console.log("Final data loaded to model:", filteredData.length, "records");
 
             } catch (err) {
                 console.error("Failed to load deposit data:", err);
@@ -644,7 +456,6 @@ sap.ui.define([
                 aData = [oResult.data];
             }
 
-            console.log("Raw data extracted:", aData.length, "records");
 
             // Normalize data with simplified status logic
             return aData.map(d => {
@@ -781,12 +592,7 @@ sap.ui.define([
                 ReturnDepositTransactionID: ""
             });
 
-            console.log("=== Dialog Data ===");
-            console.log("Deposit Amount:", depositAmount);
-            console.log("Deposit Currency:", depositCurrency);
-            console.log("Return Amount: (empty - user will enter)");
-            console.log("Return Currency will be same as deposit:", depositCurrency);
-            console.log("=== End Debug ===");
+
 
             this._openDepositReturnDialog();
         },
@@ -870,7 +676,7 @@ sap.ui.define([
             if (oModeInput && oTransactionIDInput) {
                 const currentMode = oModeInput.getSelectedKey() || oModeInput.getValue();
 
-                if (currentMode === "Cash") {
+                if (currentMode === "CASH") {
                     oTransactionIDInput.setEnabled(false);
                     oTransactionIDInput.setValue(""); // Clear any existing value
                 } else {
@@ -926,12 +732,12 @@ sap.ui.define([
 
             const returnMode = oReturnModeInput ? oReturnModeInput.getSelectedKey() || oReturnModeInput.getValue() : "";
 
-            // Get Transaction ID (field might be disabled for Cash)
+            // Get Transaction ID (field might be disabled for CASH)
             const oTransactionIDInput = sap.ui.getCore().byId(oView.createId("inReturnTransactionID"));
             const transactionID = oTransactionIDInput ? oTransactionIDInput.getValue() : "";
 
             // Validate transaction ID only for non-cash transactions AND when field is enabled
-            if (returnMode !== "Cash" && oTransactionIDInput && oTransactionIDInput.getEnabled()) {
+            if (returnMode !== "CASH" && oTransactionIDInput && oTransactionIDInput.getEnabled()) {
                 if (!transactionID || transactionID.trim() === "") {
                     oTransactionIDInput.setValueState("Error");
                     MessageToast.show("Transaction ID is required for non-cash transactions");
@@ -959,11 +765,7 @@ sap.ui.define([
                     // Status: newStatus
                 };
 
-                console.log("=== Update Data for API ===");
-                console.log("Update Data:", JSON.stringify(updateData, null, 2));
-                console.log("Using Currency:", depositCurrency);
-                console.log("Deposit ID:", oDeposit.DepositID);
-                console.log("=== End Debug ===");
+
 
                 // Call API with proper structure
                 const apiPayload = {
@@ -973,11 +775,9 @@ sap.ui.define([
                     data: updateData
                 };
 
-                console.log("API Payload:", JSON.stringify(apiPayload, null, 2));
 
                 const response = await this.ajaxUpdateWithJQuery("HM_Deposit", apiPayload);
 
-                console.log("API Response:", response);
 
                 if (response && response.success) {
                     MessageToast.show("Deposit returned successfully");
@@ -1002,76 +802,6 @@ sap.ui.define([
             }
         },
 
-        // _validateReturnFields: function () {
-        //     const oView = this.getView();
-        //     let bValid = true;
-
-        //     // SIMPLE: Return Amount validation - just check it's not empty
-        //     const oReturnAmount = sap.ui.getCore().byId(oView.createId("inReturnAmount"));
-        //     if (oReturnAmount) {
-        //         const userEnteredAmount = oReturnAmount.getValue();
-
-        //         // Check if empty
-        //         if (!userEnteredAmount || userEnteredAmount.trim() === "") {
-        //             oReturnAmount.setValueState("Error");
-        //             oReturnAmount.setValueStateText("Please enter return amount");
-        //             bValid = false;
-        //         } else {
-        //             // Use validation utility for format
-        //             const amountValid = utils._LCvalidateAmount(oReturnAmount, "ID");
-        //             if (!amountValid) {
-        //                 bValid = false;
-        //             } else {
-        //                 // Check amount range
-        //                 const newReturnAmount = parseFloat(userEnteredAmount);
-        //                 const oVM = this.getView().getModel("DepositView");
-        //                 const oDeposit = oVM.getProperty("/CurrentDeposit");
-        //                 const depositAmount = parseFloat(oDeposit.DepositAmount || 0);
-
-        //                 if (newReturnAmount > depositAmount) {
-        //                     oReturnAmount.setValueState("Error");
-        //                     oReturnAmount.setValueStateText(`Cannot exceed ${depositAmount.toFixed(2)}`);
-        //                     bValid = false;
-        //                 } else if (newReturnAmount < 0) {
-        //                     oReturnAmount.setValueState("Error");
-        //                     oReturnAmount.setValueStateText("Amount cannot be negative");
-        //                     bValid = false;
-        //                 } else {
-        //                     oReturnAmount.setValueState("None");
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        //     // Return Mode validation
-        //     const oReturnMode = sap.ui.getCore().byId(oView.createId("inReturnMode"));
-        //     if (oReturnMode) {
-        //         const modeValid = utils._LCvalidateMandatoryField(oReturnMode, "ID");
-
-        //         if (!modeValid) {
-        //             bValid = false;
-        //         }
-
-        //         // Validate Transaction ID based on mode
-        //         const returnMode = oReturnMode.getSelectedKey() || oReturnMode.getValue();
-        //         const oTransactionID = sap.ui.getCore().byId(oView.createId("inReturnTransactionID"));
-
-        //         if (returnMode !== "Cash" && oTransactionID) {
-        //             const transactionID = oTransactionID.getValue();
-        //             if (!transactionID || transactionID.trim() === "") {
-        //                 oTransactionID.setValueState("Error");
-        //                 bValid = false;
-        //             } else {
-        //                 oTransactionID.setValueState("None");
-        //             }
-        //         } else if (oTransactionID) {
-        //             // For cash, clear any error state
-        //             oTransactionID.setValueState("None");
-        //         }
-        //     }
-
-        //     return bValid;
-        // },
 
         _validateReturnFields: function () {
             const oView = this.getView();
@@ -1126,8 +856,8 @@ sap.ui.define([
                 const returnMode = oReturnMode.getSelectedKey() || oReturnMode.getValue();
                 const oTransactionID = sap.ui.getCore().byId(oView.createId("inReturnTransactionID"));
 
-                // Only validate Transaction ID if mode is not Cash and field is enabled
-                if (returnMode !== "Cash" && oTransactionID && oTransactionID.getEnabled()) {
+                // Only validate Transaction ID if mode is not CASH and field is enabled
+                if (returnMode !== "CASH" && oTransactionID && oTransactionID.getEnabled()) {
                     const transactionID = oTransactionID.getValue();
                     if (!transactionID || transactionID.trim() === "") {
                         oTransactionID.setValueState("Error");
@@ -1182,29 +912,6 @@ sap.ui.define([
             }
         },
 
-        // _onReturnModeChange: function (oEvent) {
-        //     const oModeInput = oEvent.getSource();
-        //     const oView = this.getView();
-        //     const oTransactionIDInput = sap.ui.getCore().byId(oView.createId("inReturnTransactionID"));
-        //     const returnMode = oModeInput.getSelectedKey() || oModeInput.getValue();
-
-        //     // Update Transaction ID field based on return mode
-        //     if (oTransactionIDInput) {
-        //         if (returnMode === "Cash") {
-        //             oTransactionIDInput.setRequired(false);
-        //             oTransactionIDInput.setValueState("None");
-        //         } else {
-        //             oTransactionIDInput.setRequired(true);
-        //             // Validate if there's already a value
-        //             const currentValue = oTransactionIDInput.getValue();
-        //             if (!currentValue || currentValue.trim() === "") {
-        //                 oTransactionIDInput.setValueState("Error");
-        //             } else {
-        //                 oTransactionIDInput.setValueState("None");
-        //             }
-        //         }
-        //     }
-        // },
         _onReturnModeChange: function (oEvent) {
             const oModeInput = oEvent.getSource();
             const oView = this.getView();
@@ -1217,8 +924,8 @@ sap.ui.define([
 
             // Update Transaction ID field state based on return mode
             if (oTransactionIDInput) {
-                if (returnMode === "Cash") {
-                    // Disable and clear validation for Transaction ID when Cash is selected
+                if (returnMode === "CASH") {
+                    // Disable and clear validation for Transaction ID when CASH is selected
                     oTransactionIDInput.setEnabled(false);
                     oTransactionIDInput.setRequired(false);
                     oTransactionIDInput.setValueState("None");
@@ -1243,8 +950,8 @@ sap.ui.define([
             const oModeInput = sap.ui.getCore().byId(oView.createId("inReturnMode"));
             const returnMode = oModeInput ? (oModeInput.getSelectedKey() || oModeInput.getValue()) : "";
 
-            // If Cash mode, no validation needed
-            if (returnMode === "Cash") {
+            // If CASH mode, no validation needed
+            if (returnMode === "CASH") {
                 oInput.setValueState("None");
                 return true;
             }
@@ -1259,63 +966,7 @@ sap.ui.define([
             oInput.setValueState("None");
             return true;
         },
-        // _onReturnModeChange: function (oEvent) {
-        //     const oModeInput = oEvent.getSource();
-        //     const oView = this.getView();
-        //     const oTransactionIDInput = sap.ui.getCore().byId(oView.createId("inReturnTransactionID"));
-
-        //     // Use strict validation for combobox
-        //     const isValid = this.utils._LCstrictValidationComboBox(oEvent, "EVENT");
-
-        //     const returnMode = oModeInput.getSelectedKey() || oModeInput.getValue();
-
-        //     // Update Transaction ID field based on return mode
-        //     if (oTransactionIDInput) {
-        //         if (returnMode === "Cash") {
-        //             // Disable and clear validation for Transaction ID when Cash is selected
-        //             oTransactionIDInput.setEnabled(false);
-        //             oTransactionIDInput.setRequired(false);
-        //             oTransactionIDInput.setValueState("None");
-        //             oTransactionIDInput.setValue(""); // Clear any existing value
-        //         } else {
-        //             // Enable and set as required for non-cash transactions
-        //             oTransactionIDInput.setEnabled(true);
-        //             oTransactionIDInput.setRequired(true);
-
-        //             // Validate if there's already a value
-        //             const currentValue = oTransactionIDInput.getValue();
-        //             if (!currentValue || currentValue.trim() === "") {
-        //                 oTransactionIDInput.setValueState("Error");
-        //             } else {
-        //                 oTransactionIDInput.setValueState("None");
-        //             }
-        //         }
-        //     }
-
-        //     return isValid;
-        // },
-        // _validateTransactionID: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     const oView = this.getView();
-        //     const oModeInput = sap.ui.getCore().byId(oView.createId("inReturnMode"));
-        //     const returnMode = oModeInput ? (oModeInput.getSelectedKey() || oModeInput.getValue()) : "";
-
-        //     // Only validate for non-cash transactions
-        //     if (returnMode !== "Cash") {
-        //         const value = oInput.getValue();
-        //         if (!value || value.trim() === "") {
-        //             oInput.setValueState("Error");
-        //             return false;
-        //         }
-        //     }
-
-        //     oInput.setValueState("None");
-        //     return true;
-        // },
- 
-
-        // In your controller file
-
+     
 
 
 
@@ -1350,7 +1001,7 @@ sap.ui.define([
 
             if (oReturnMode && oTransactionID) {
                 const returnMode = oReturnMode.getSelectedKey() || oReturnMode.getValue();
-                if (returnMode === "Cash") {
+                if (returnMode === "CASH") {
                     oTransactionID.setEnabled(false);
                     oTransactionID.setRequired(false);
                     oTransactionID.setValueState("None");
@@ -1461,7 +1112,6 @@ sap.ui.define([
                     });
                 }
 
-                console.log("Table selection cleared");
             }
         },
 

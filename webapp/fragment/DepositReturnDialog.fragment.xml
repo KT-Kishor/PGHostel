@@ -95,29 +95,18 @@
     valueStateText="Select a valid return mode"
 >
                     <core:Item
-                        key="Cash"
-                        text="Cash"
+                        key="CASH"
+                        text="CASH"
                     />
                     <core:Item
                         key="UPI"
                         text="UPI"
                     />
                     <core:Item
-                        key="Bank Transfer"
-                        text="Bank Transfer"
+                        key="CARD"
+                        text="CARD"
                     />
-                    <!-- <core:Item
-                        key="Cheque"
-                        text="Cheque"
-                    />
-                    <core:Item
-                        key="Credit Card"
-                        text="Credit Card"
-                    />
-                    <core:Item
-                        key="Debit Card"
-                        text="Debit Card"
-                    /> -->
+
                 </ComboBox>
 
                 <!-- Return Transaction ID -->
