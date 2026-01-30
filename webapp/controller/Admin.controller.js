@@ -187,7 +187,7 @@ sap.ui.define([
                     filters.StartDate = oDateFormat.format(oStartDate);
                     filters.EndDate = oDateFormat.format(oEndDate);
 
-                } else {
+                } else {    
                     // No date selected → default Financial Year
                     filters.StartDate = oDateFormat.format(fyStart);
                     filters.EndDate = oDateFormat.format(fyEnd);
@@ -409,10 +409,24 @@ sap.ui.define([
         this.getView().addDependent(this.HM_Dialog);
     }
 
+    var aControls = this.HM_Dialog.findAggregatedObjects(true, function (oControl) {
+                return oControl instanceof sap.m.Input ||
+                    oControl instanceof sap.m.ComboBox ||
+                    oControl instanceof sap.m.Select ||
+                    oControl instanceof sap.m.TextArea;
+            });
+
+            aControls.forEach(function (oControl) {
+                oControl.setValueState("None");
+            });
 
     sap.ui.getCore().byId("idCustomerNameText")
         .setText(this.data.CustomerName + " (" + this.data.CustomerID + ")");
 
+    sap.ui.getCore().byId("idPaymentMode").setSelectedKey("");
+    sap.ui.getCore().byId("id_TransactionID").setValue("");
+
+    sap.ui.getCore().byId("idRoomNumber1").setSelectedKey("");
 
   if(this.data.Status === "Assigned"){
            sap.ui.getCore().byId("idRoomNumber1")
@@ -556,7 +570,7 @@ HM_UnassignRoom: function () {
         // },
 
      ARNO_onsavebuttonpress: async function () {
-
+      var oView = sap.ui.getCore();
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
 
@@ -583,10 +597,36 @@ HM_UnassignRoom: function () {
             var TransactionID =
         sap.ui.getCore().byId("id_TransactionID").getValue();
 
-    if (!selectedRoomNo) {
-        sap.m.MessageToast.show("Please select a Room Number.");
-        return;
+
+      if (ID.Status === "New") {
+
+    if (
+        !utils._LCvalidateMandatoryField(oView.byId("id_DepositAmount"), "ID") ||
+        !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
+        !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID") ||
+        !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
+    ) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving")
+        );
+        return; 
     }
+}
+
+if (ID.Status === "Assigned") {
+
+    if (
+        !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
+    ) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving")
+        );
+        return; 
+    }
+}
+
+
+
 
     var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
     var aRooms = oRoomDetailsModel.getData();
@@ -619,9 +659,9 @@ HM_UnassignRoom: function () {
             assignedCount++;
         }
     });
-
-    // ❌ ROOM FULL → STOP
-    if (assignedCount >= oRoom.NoofPerson) {
+      
+var isSameRoom = ID.RoomNo === selectedRoomNo;
+    if (!isSameRoom && assignedCount >= oRoom.NoofPerson) {
         sap.m.MessageToast.show(
             "Selected room is already filled. Please choose another room."
         );
@@ -909,6 +949,9 @@ if( ID.Status==="Assigned"){
 
         onRoomNoChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+        DepositAmountLiveChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
 
         AD_onPressEditDetails: function (oEvent) {

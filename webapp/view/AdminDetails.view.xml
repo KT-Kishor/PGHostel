@@ -1067,7 +1067,9 @@
                                     textAlign="End"
                                 />
                             </HBox> -->
-                            <HBox justifyContent="SpaceBetween">
+
+                            <!-- Discount -->
+                            <!-- <HBox justifyContent="SpaceBetween">
                                 <Label
                                       text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
     ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
@@ -1085,7 +1087,7 @@
                         }"
                                     textAlign="End"
                                 />
-                            </HBox>
+                            </HBox> -->
                             <!-- Sub Total -->
                             <HBox justifyContent="SpaceBetween">
                                 <Label
@@ -1158,8 +1160,28 @@
                                     textAlign="End"
                                 />
                             </HBox>
+                           <!-- Discount -->
+                              <HBox justifyContent="SpaceBetween">
+                                <Label
+                                      text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+    ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
+    : 'Discount:' }"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/Discount' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
                             <!-- Grand Total -->
-                            <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CGST} > 0 || ${CustomerData>/IGST} > 0 }">
+                            <HBox justifyContent="SpaceBetween">
                                 <Label
                                     text="Grand Total:"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"

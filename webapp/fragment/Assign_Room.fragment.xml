@@ -47,8 +47,10 @@
                     id="id_DepositAmount"
                     placeholder="Enter Deposit Amount"
                     value="{HostelModel>/DepositAmount}"
-
+                    maxLength="6"
                     visible="{Visiblemodel>/Visible}"
+                    liveChange="DepositAmountLiveChange"
+                    valueStateText="Enter Deposit Amount"
                 />
 
                    <Label
@@ -87,6 +89,9 @@
                     placeholder="Enter Transaction ID"
                     value="{HostelModel>/TransactionID}"
                     visible="{Visiblemodel>/Visible}"
+                    liveChange="DepositAmountLiveChange"
+                    valueStateText="Enter Transaction ID"
+                    maxLength="20"
 
                 />
 
