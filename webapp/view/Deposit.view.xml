@@ -30,6 +30,7 @@
             >
                 <fb:filterGroupItems>
                     <!-- BRANCH FILTER -->
+                    <!-- BRANCH FILTER - UPDATED TO SHOW NAME -->
                     <fb:FilterGroupItem
                         name="BranchCode"
                         groupName="Group"
@@ -47,13 +48,14 @@
                             >
                                 <core:ListItem
                                     key="{Branchmodel>BranchID}"
-                                    text="{Branchmodel>BranchID} - {Branchmodel>Name}"
-                                    additionalText="{Branchmodel>City}"
+                                    text="{Branchmodel>Name}"
+                                    additionalText="{Branchmodel>BranchID} - {Branchmodel>City}"
                                 />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
 
+                    <!-- CUSTOMER NAME FILTER - CHANGED FROM INPUT TO COMBOBOX -->
                     <!-- CUSTOMER NAME FILTER -->
                     <fb:FilterGroupItem
                         name="CustomerName"
@@ -62,12 +64,19 @@
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                            <Input
-                                id="fCustomerName"
+                            <ComboBox
+                                id="DfCustomerName"
                                 width="100%"
-                                placeholder="{i18n>enterCustomerName}"
-                                liveChange="onDateRangeChange"
-                            />
+                                items="{CustomerFilterModel>/}"
+                                placeholder="{i18n>selectCustomerName}"
+                                selectedKey=""
+                                showSecondaryValues="false"
+                            >
+                                <core:ListItem
+                                    key="{CustomerFilterModel>key}"
+                                    text="{CustomerFilterModel>text}"
+                                />
+                            </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
 
@@ -79,12 +88,20 @@
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                            <Input
-                                id="fBookingID"
+                            <ComboBox
+                                id="DfBookingID"
                                 width="100%"
-                                placeholder="{i18n>enterBookingID}"
-                                liveChange="onDateRangeChange"
-                            />
+                                items="{BookingFilterModel>/}"
+                                placeholder="{i18n>selectBookingID}"
+                                selectedKey=""
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{BookingFilterModel>key}"
+                                    text="{BookingFilterModel>text}"
+                                    additionalText="{BookingFilterModel>additionalText}"
+                                />
+                            </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
 
@@ -162,12 +179,23 @@
             <Table
                 id="depositTable"
                 items="{
-                    path: 'DepositModel>/',
-                    sorter: {
-                        path: 'DepositDate',
-                        descending: true
-                    }
-                }"
+        path: 'DepositModel>/',
+        sorter: [
+            {
+                path: 'BranchName',
+                group: true
+            },
+            {
+                path: 'Status',
+                group: false,
+                descending: false 
+            },
+            {
+                path: 'DepositDate',
+                descending: true
+            }
+        ]
+    }"
                 mode="MultiSelect"
                 sticky="ColumnHeaders,HeaderToolbar"
                 growing="true"
@@ -203,7 +231,7 @@
                 </headerToolbar>
 
                 <!-- Columns - ADD NEW COLUMNS HERE -->
-                <columns>
+                <!-- <columns>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -261,7 +289,6 @@
                     >
                         <Text text="{i18n>returnTransactionID}" />
                     </Column>
-                    <!-- NEW COLUMN: Return Deposit By -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Desktop"
@@ -270,10 +297,84 @@
                     </Column>
                     <Column
                         demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>status}" />
+                    </Column>
+                </columns> -->
+                <columns>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>bookingID}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>customerName}" />
+                    </Column>
+
+                    <!-- TIMELINE INFORMATION (Tablet and up) -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>DdepositDate}" />
+                    </Column>
+
+                    <!-- FINANCIAL STATUS (Always visible) -->
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>depositAmount}" />
+                    </Column>
+
+                    <!-- TRANSACTION REFERENCES (Desktop only - detailed view) -->
+                    <Column
+                        demandPopin="true"
                         minScreenWidth="Desktop"
                     >
-                        <Text text="{i18n>branch}" />
+                        <Text text="{i18n>DepositMTransactionID}" />
                     </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>depositTakenBy}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>returnDate}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnAmount}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnTransactionID}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>returnDepositBy}" />
+                    </Column>
+
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -331,7 +432,8 @@
                             />
                             <!-- NEW CELL: ReturnDepositBy -->
                             <Text text="{DepositModel>ReturnDepositBy}" />
-                            <Text text="{DepositModel>BranchCode}" />
+                            <!-- <Text text="{DepositModel>BranchCode}" /> -->
+                            <!-- Branch Cell - SHOW BRANCH NAME -->
                             <ObjectStatus
                                 text="{DepositModel>Status}"
                                 state="{ 

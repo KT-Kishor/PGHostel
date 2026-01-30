@@ -33,8 +33,39 @@ sap.ui.define([
             if (!this.getView().getModel("DepositModel")) {
                 this.getView().setModel(new JSONModel([]), "DepositModel");
             }
+            // Initialize filter models
+            this.getView().setModel(new JSONModel([]), "CustomerFilterModel");
+            this.getView().setModel(new JSONModel([]), "BookingFilterModel");
         },
+        _getUniqueValuesFromDepositData: function (propertyName) {
+            const oModel = this.getView().getModel("DepositModel");
+            const aData = oModel.getData();
 
+            if (!Array.isArray(aData) || aData.length === 0) {
+                return [];
+            }
+
+            // Extract unique values for the given property
+            const uniqueValues = [];
+            const seen = new Set();
+
+            aData.forEach(item => {
+                const value = item[propertyName];
+                if (value && value.trim() && !seen.has(value)) {
+                    seen.add(value);
+                    uniqueValues.push({
+                        key: value,
+                        text: value,
+                        ...(propertyName === 'BookingID' && { additionalText: item.CustomerName })
+                    });
+                }
+            });
+
+            // Sort alphabetically
+            uniqueValues.sort((a, b) => a.text.localeCompare(b.text));
+
+            return uniqueValues;
+        },
         onHome: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
@@ -420,6 +451,7 @@ sap.ui.define([
                 }
 
                 // ================= Other Filters =================
+                // ================= Other Filters =================
                 aItems.forEach(item => {
                     const ctrl = item.getControl();
                     const key = item.getName();
@@ -442,9 +474,16 @@ sap.ui.define([
                             break;
                         }
 
-                        case "CustomerName":
+                        case "CustomerName": {
+                            const val = ctrl.getSelectedKey?.();
+                            if (val && val.trim()) {
+                                params[key] = val.trim();
+                            }
+                            break;
+                        }
+
                         case "BookingID": {
-                            const val = ctrl.getValue?.();
+                            const val = ctrl.getSelectedKey?.();
                             if (val && val.trim()) {
                                 params[key] = val.trim();
                             }
@@ -561,10 +600,8 @@ sap.ui.define([
                     }
                 }
 
-                // ================= Add Branch Name and Calculate Status =================
+                // ================= Calculate Status =================
                 filteredData.forEach(deposit => {
-                    deposit.BranchName = this._branchMap[deposit.BranchCode] || "-";
-
                     // SIMPLIFIED STATUS LOGIC: Only "Pending" or "Returned"
                     const depositAmount = parseFloat(deposit.DepositAmount || 0);
                     const returnAmount = parseFloat(deposit.ReturnDepositAmount || 0);
@@ -575,6 +612,12 @@ sap.ui.define([
 
                 // ================= Update Model =================
                 this.getView().getModel("DepositModel").setData(filteredData);
+
+                // After this line:
+                this.getView().getModel("DepositModel").setData(filteredData);
+
+                // Add these lines to populate comboboxes:
+                this._refreshFilterComboBoxes(filteredData);
                 console.log("Final data loaded to model:", filteredData.length, "records");
 
             } catch (err) {
@@ -612,24 +655,72 @@ sap.ui.define([
                 // SIMPLIFIED STATUS: Returned if any amount returned, otherwise Pending
                 const status = returnAmt > 0 ? "Returned" : "Pending";
 
+                // Get branch name from branch map (populated from HM_BranchData)
+                const branchName = this._branchMap[d.BranchCode] || d.BranchCode || "-";
+
                 return {
-                    ...d,   
+                    ...d,
                     DepositDate: d.DepositDate?.slice(0, 10),
                     ReturnDepositDate: d.ReturnDepositDate?.slice(0, 10),
                     DepositAmount: depositAmt.toString(),
                     ReturnDepositAmount: returnAmt.toString(),
                     DepositCurrency: d.DepositCurrency || "INR",
                     ReturnDepositCurrency: d.ReturnDepositCurrency || "INR",
-                    Status: status // Simplified binary status
+                    Status: status, // Simplified binary status
+                    BranchName: branchName, // Add branch name here
+                    BranchCodeDisplay: d.BranchCode // Keep branch code for display if needed
                 };
             });
         },
+        _refreshFilterComboBoxes: function (aData) {
+            // Extract unique customer names
+            const uniqueCustomers = [];
+            const seenCustomers = new Set();
 
+            // Extract unique booking IDs
+            const uniqueBookings = [];
+            const seenBookings = new Set();
+
+            aData.forEach(item => {
+                // Customer Name
+                if (item.CustomerName && item.CustomerName.trim() && !seenCustomers.has(item.CustomerName)) {
+                    seenCustomers.add(item.CustomerName);
+                    uniqueCustomers.push({
+                        key: item.CustomerName,
+                        text: item.CustomerName
+                    });
+                }
+
+                // Booking ID
+                if (item.BookingID && item.BookingID.trim() && !seenBookings.has(item.BookingID)) {
+                    seenBookings.add(item.BookingID);
+                    uniqueBookings.push({
+                        key: item.BookingID,
+                        text: item.BookingID,
+                        additionalText: item.CustomerName || ""
+                    });
+                }
+            });
+
+            // Sort alphabetically
+            uniqueCustomers.sort((a, b) => a.text.localeCompare(b.text));
+            uniqueBookings.sort((a, b) => a.text.localeCompare(b.text));
+
+            // Create models for comboboxes
+            const oCustomerModel = new JSONModel(uniqueCustomers);
+            const oBookingModel = new JSONModel(uniqueBookings);
+
+            // Set models to the view
+            this.getView().setModel(oCustomerModel, "CustomerFilterModel");
+            this.getView().setModel(oBookingModel, "BookingFilterModel");
+        },
         onClearDeposits: function () {
             this.byId("DfStatus").setSelectedKey("");
             this.byId("DfBranch").setSelectedKey("");
-            this.byId("fCustomerName").setValue("");
-            this.byId("fBookingID").setValue("");
+
+            // Clear comboboxes instead of input fields
+            this.byId("DfCustomerName").setSelectedKey("");
+            this.byId("DfBookingID").setSelectedKey("");
 
             // Clear date ranges
             const oDepositRange = this.byId("fDepositRange");
@@ -648,9 +739,6 @@ sap.ui.define([
             }
 
             this._isDateRangeCleared = true;
-
-            // Trigger search to reload with cleared filters
-            // this.onDepositSearch();
         },
 
         // ================= CRUD Operations =================
@@ -743,14 +831,15 @@ sap.ui.define([
                 { label: "Deposit Date", property: "DepositDate", type: "String" },
                 { label: "Deposit Mode", property: "DepositMode", type: "String" },
                 { label: "Transaction ID", property: "DepositTransactionID", type: "String" },
-                { label: "Deposit Taken By", property: "DepositTakenBy", type: "String" }, // NEW
+                { label: "Deposit Taken By", property: "DepositTakenBy", type: "String" },
                 { label: "Return Amount", property: "ReturnDepositAmount", type: "Number" },
                 { label: "Return Currency", property: "ReturnDepositCurrency", type: "String" },
                 { label: "Return Date", property: "ReturnDepositDate", type: "String" },
                 { label: "Return Mode", property: "ReturnDepositMode", type: "String" },
                 { label: "Return Transaction ID", property: "ReturnDepositTransactionID", type: "String" },
-                { label: "Return Deposit By", property: "ReturnDepositBy", type: "String" }, // NEW
-                { label: "Branch", property: "BranchCode", type: "String" },
+                { label: "Return Deposit By", property: "ReturnDepositBy", type: "String" },
+                { label: "Branch Code", property: "BranchCode", type: "String" },
+                { label: "Branch Name", property: "BranchName", type: "String" }, // NEW COLUMN
                 { label: "Status", property: "Status", type: "String" }
             ];
         },
