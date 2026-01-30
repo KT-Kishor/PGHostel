@@ -413,7 +413,7 @@ sap.ui.define([
                 Deposit: oData.Deposit,
                 DepositCurrency: oData.DepositCurrency,
                 GSTValue: oData.GSTValue,
-                GSTType: oData.GSTType,
+                GSTType: oData.GSTType
             };
             
             // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
@@ -2992,6 +2992,10 @@ sap.ui.define([
                     const sArea = oBranchInfo?.Name || "";
                     const sAddress = oBranchInfo?.Address || "";
                     const sCountry = oBranchInfo?.Country || "";
+                    const sGSTType = oBranchInfo?.Type || "";
+                    const sGSTValue = oBranchInfo?.Value || "";
+
+
 
                     
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
@@ -3024,7 +3028,7 @@ sap.ui.define([
                         Images: aImages,
                         Country: sCountry,
                         PriceVisible: PriceVisible,
-                        Visible: true,
+                        Visible: isVisible,
                         AvailbleBeds: room.AvailableRooms,
                         Address: sAddress,
                         CheckInTime: sCheckInTime,
