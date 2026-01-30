@@ -401,7 +401,10 @@ sap.ui.define([
                             BookingID: bookingID,
                             UserID: bookingDetails.UserID || "",
                             PaidAmount: oData.data.PerMonthTotalRent || "0.00",
-                            CouponCode: bookingDetails.CouponCode
+                            CouponCode: bookingDetails.CouponCode,
+                            GST : oData.data.BranchDetails.GSTIN || "",
+                            Type : oData.data.BranchDetails.Type || "",
+                            Value : oData.data.BranchDetails.Value || ""
                         });
                     }
 
@@ -559,24 +562,32 @@ sap.ui.define([
                 const oSOWModel = oView.getModel("FilteredSOWModel");
                 const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
                 const oCustomerModel = oView.getModel("SelectedCustomerModel");
-                let aSOWDetails = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                let aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
 
                 let totalWithGST = 0;
                 let totalWithoutGST = 0;
 
-                aSOWDetails.forEach((item) => {
-                    if (
-                        oSOWModel.getProperty("/Currency") === "INR" &&
-                        !oCustomerModel.getProperty("/GST")
-                    ) {
-                        oCustomerModel.setProperty("/Value", "9");
-                        oCustomerModel.setProperty("/Type", "CGST/SGST");
-                        this.visiablityPlay.setProperty("/GST", true);
-                    }
+                // ---------------- GST MASTER CHECK ----------------
+                const gstin = oCustomerModel.getProperty("/GST");
+                const taxType = oCustomerModel.getProperty("/Type");
+                const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
+                const currency = oSOWModel.getProperty("/Currency");
 
+                const isGSTEnabled =
+                    !!gstin &&
+                    !!taxType &&
+                    taxRate > 0 &&
+                    currency === "INR";
+
+                this.visiablityPlay.setProperty("/GST", isGSTEnabled);
+
+                // ---------------- ITEM CALCULATION ----------------
+                aItems.forEach((item) => {
                     const baseAmount = parseFloat(item.Total) || 0;
-                    let discountAmount = 0;
 
+                    // ---------- DISCOUNT ----------
+                    let discountAmount = 0;
                     if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
                         discountAmount = baseAmount * (parseFloat(item.Discount) / 100);
                     } else {
@@ -593,9 +604,14 @@ sap.ui.define([
                     let finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    const isGSTApplicable =
-                        item.GSTCalculation === "YES" &&
-                        oSOWModel.getProperty("/Currency") === "INR";
+                    // ---------- GST APPLICABLE ----------
+                    let isGSTApplicable = false;
+
+                    if (isGSTEnabled && item.GSTCalculation === "YES") {
+                        isGSTApplicable = true;
+                    } else {
+                        item.GSTCalculation = "NO";
+                    }
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
 
@@ -610,29 +626,35 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
                 oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
 
-                // ---------------- COUPON (USED AFTER GST) ----------------
+                // ---------------- COUPON ----------------
                 let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
                 oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
 
-                // ---------------- GST CALC (NO COUPON IMPACT) ----------------
-                const taxType = oCustomerModel.getProperty("/Type");
-                const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
-
+                // ---------------- GST CALCULATION ----------------
                 let gstAmount = 0;
                 let finalAmount = totalWithGST + totalWithoutGST;
 
-                if (taxType === "CGST/SGST") {
-                    gstAmount = (totalWithGST * taxRate) / 100;
-                    finalAmount += gstAmount * 2;
+                if (isGSTEnabled) {
+                    if (taxType === "CGST/SGST") {
+                        gstAmount = (totalWithGST * taxRate) / 100;
+                        finalAmount += gstAmount * 2;
 
-                    oCustomerModel.setProperty("/CGST", gstAmount.toFixed(2));
-                    oCustomerModel.setProperty("/SGST", gstAmount.toFixed(2));
-                } 
-                else if (taxType === "IGST") {
-                    gstAmount = (totalWithGST * taxRate) / 100;
-                    finalAmount += gstAmount;
-
-                    oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
+                        oCustomerModel.setProperty("/CGST", gstAmount.toFixed(2));
+                        oCustomerModel.setProperty("/SGST", gstAmount.toFixed(2));
+                        oCustomerModel.setProperty("/IGST", "0.00");
+                    } 
+                    else if (taxType === "IGST") {
+                        gstAmount = (totalWithGST * taxRate) / 100;
+                        finalAmount += gstAmount;
+                        oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
+                        oCustomerModel.setProperty("/CGST", "0.00");
+                        oCustomerModel.setProperty("/SGST", "0.00");
+                    }
+                } else {
+                    // GST NOT APPLICABLE
+                    oCustomerModel.setProperty("/CGST", "0.00");
+                    oCustomerModel.setProperty("/SGST", "0.00");
+                    oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
                 // ---------------- APPLY COUPON AFTER GST ----------------
@@ -641,13 +663,14 @@ sap.ui.define([
 
                 // ---------------- ROUND OFF ----------------
                 let roundedAmount = Math.round(finalAmount);
-                let difference = (roundedAmount - finalAmount).toFixed(2);
-                oSOWModel.setProperty("/RoundOf", difference);
+                let roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
+
+                oSOWModel.setProperty("/RoundOf", roundOffDiff);
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
-                // ---------------- PAID AMOUNT ADJUSTMENT ----------------
+                // ---------------- PAID AMOUNT ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
                 let balanceAmount = roundedAmount;
 
@@ -1833,22 +1856,24 @@ sap.ui.define([
                         ]);
                     }
 
-                    const percentageText = oModel.Value !== undefined ? `(${oModel.Value}%)` : `(${type.split(" ")[1]})`;
-                    const cgstPercentage = percentageText;
-                    const sgstPercentage = percentageText;
-                    const igstPercentage = percentageText;
+                   
 
-                    if (data.Currency !== "USD") {
-                        const cgstValue = parseFloat(oModel.CGST) || 0;
-                        const sgstValue = parseFloat(oModel.SGST) || 0;
-                        const igstValue = parseFloat(oModel.IGST) || 0;
+                    if (data.Currency !== "USD" && oModel.Type) {
+                        const percentageText = oModel.Value && oModel.Value !== "0" ? `(${oModel.Value}%)` : "";
 
-                        if (data.Currency === "INR" && (oModel.Type === "CGST/SGST" || type.split(" ")[0] === "CGST/SGST") && cgstValue > 0) {
-                            summaryBody.push([`CGST ${cgstPercentage} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
-                            summaryBody.push([`SGST ${sgstPercentage} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
-                        } else if (data.Currency === "INR" && (oModel.Type === "IGST" || type.split(" ")[0] === "IGST") &&
-                            igstValue > 0) {
-                            summaryBody.push([`IGST ${igstPercentage} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+                        const cgstValue = parseFloat(oModel.CGST);
+                        const sgstValue = parseFloat(oModel.SGST);
+                        const igstValue = parseFloat(oModel.IGST);
+
+                        if (data.Currency === "INR" && oModel.Type === "CGST/SGST" && cgstValue
+                        ) {
+                            summaryBody.push([`CGST ${percentageText} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+                            summaryBody.push([`SGST ${percentageText} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+                        }
+
+                        if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue
+                        ) {
+                            summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
                     }
 

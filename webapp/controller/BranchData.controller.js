@@ -506,7 +506,8 @@ sap.ui.define([
                 await this.Onsearch();
                 this.oDialog.close();
                 sap.m.MessageToast.show(
-                    this.isEdit ? sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully")) : sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully"))
+                    this.isEdit  ? this.i18nModel.getText("branchUpdatedSuccessfully")
+                        : this.i18nModel.getText("branchaddedSuccessfully")
                 );
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);

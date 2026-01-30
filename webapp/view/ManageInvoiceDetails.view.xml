@@ -546,7 +546,7 @@
                                                         items="{InvoiceSAC>/}"
                                                         editable="{visiablityPlay>/editable}"
                                                         value="{ManageInvoiceItemModel>SAC}"
-                                                        selectedKey="1"
+                                                        selectedKey="{ManageInvoiceItemModel>SAC}"
                                                     >
                                                         <core:ListItem
                                                             key="{InvoiceSAC>ID}"
@@ -648,9 +648,9 @@
                                                 />
                                             </m:HBox>
                                             <!-- Sub Total (Taxable) -->
-                                            <m:HBox
-                                                justifyContent="SpaceBetween"
-                                                visible="{= ${FilteredSOWModel>/Currency} === 'INR' }"
+                                            <m:HBox justifyContent="SpaceBetween"
+                                                visible="{= ${FilteredSOWModel>/Currency} === 'INR' 
+                                                        &amp;&amp; ${SelectedCustomerModel>/SubTotalInGST} > 0 }"
                                             >
                                                 <m:Label
                                                     text="{i18n>subTotal} ({i18n>Taxable}) ({FilteredSOWModel>/Currency}) :"
