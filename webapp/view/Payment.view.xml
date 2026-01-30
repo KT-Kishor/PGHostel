@@ -1,23 +1,18 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.Payment"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
+<mvc:View controllerName="sap.ui.com.project1.controller.Payment"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
-    busyIndicatorDelay="0"
->
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
+    busyIndicatorDelay="0">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
                 id="P_id_Filterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -27,187 +22,139 @@
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
-                filterContainerWidth="auto"
-            >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                filterContainerWidth="auto">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="CustomerID"
                         label="{i18n>customerID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="P_id_CustomerID"
                                 showSecondaryValues="true"
                                 filterSecondaryValues="true"
                                 items="{path:'CustomerFilterModel>/', sorter:{path:'CustomerID', descending:false}}"
                                 showClearIcon="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{CustomerFilterModel>CustomerID}"
                                     text="{CustomerFilterModel>CustomerID}"
                                     additionalText="{CustomerFilterModel>CustomerName}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="BookingID"
                         label="{i18n>bookingID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="P_id_BookingID"
                                 filterSecondaryValues="true"
                                 items="{path:'BookingFilterModel>/', sorter:{path:'BookingID', descending:false}}"
                                 showClearIcon="true"
                             >
-                                <core:Item
+								<core:Item
                                     key="{BookingFilterModel>BookingID}"
                                     text="{BookingFilterModel>BookingID}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="BranchCode"
                         label="{i18n>MSbranchCode}"
                         groupName="Group"
                         visible="{RoleModel>/isSuperAdmin}"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="P_id_BranchCode"
                                 items="{BranchFilterModel>/}"
                                 showClearIcon="true"
                                 filterSecondaryValues="true"
                                 showSecondaryValues="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{BranchFilterModel>BranchCode}"
                                     text="{BranchFilterModel>BranchName}"
                                     additionalText="{BranchFilterModel>BranchCode}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="StartDate"
                         label="{i18n>date}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <DateRangeSelection
+						<fb:control>
+							<DateRangeSelection
                                 id="P_id_Date"
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
                             />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
-                id="P_id_PaymentTable"
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="P_id_PaymentTable"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
-                items="{path: 'mainModel>/', sorter: [{path: 'BranchName', group: true}, {path: 'Date', descending: true}]}"
-            >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title
-                            text="{i18n>invoicePaymentTitle} ({= ${mainModel>/}.length})"
-                        />
-                        <ToolbarSpacer />
-                        <Button
-                            text="{i18n>download}"
-                            tooltip="{i18n>download}"
-                            press="P_onDownload"
-                            class="myUnifiedBtn"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>bookingID}"
-                            tooltip="{i18n>bookingID}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>paymentDate}"
-                            tooltip="{i18n>paymentDate}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>bankName}"
-                            tooltip="{i18n>bankName}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>amount}"
-                            tooltip="{i18n>amount}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>paymentType}"
-                            tooltip="{i18n>paymentType}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>bankTransactionID}"
-                            tooltip="{i18n>bankTransactionID}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>customerName}"
-                            tooltip="{i18n>customerName}"
-                        />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <Text text="{mainModel>BookingID}" />
-                            <Text
-                                text="{parts:['mainModel>Date'], formatter: '.Formatter.displayFormatDate'}"
-                            />
-                            <Text text="{mainModel>BankName}" />
-                            <Text
-                                text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"
-                            />
-                            <Text text="{mainModel>PaymentType}" />
-                            <Text text="{mainModel>BankTransactionID}" />
-                            <Text text="{mainModel>CustomerName}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-    </Page>
+                items="{path: 'mainModel>/', sorter: [{path: 'BranchName', group: true}, {path: 'Date', descending: true}]}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>invoicePaymentTitle} ({= ${mainModel>/}.length})"/>
+						<ToolbarSpacer />
+						<Button text="{i18n>download}" tooltip="{i18n>download}" press="P_onDownload" class="myUnifiedBtn"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>bookingID}" tooltip="{i18n>bookingID}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>customerName}" tooltip="{i18n>customerName}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>paymentDate}" tooltip="{i18n>paymentDate}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>paymentType}" tooltip="{i18n>paymentType}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>bankTransactionID}" tooltip="{i18n>bankTransactionID}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>bankName}" tooltip="{i18n>bankName}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>amount}" tooltip="{i18n>amount}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{mainModel>BookingID}" />
+							<Text text="{mainModel>CustomerName}" />
+							<Text text="{parts:['mainModel>Date'], formatter: '.Formatter.displayFormatDate'}"/>
+							<Text text="{mainModel>PaymentType}" />
+							<Text text="{mainModel>BankTransactionID}" />
+							<Text text="{mainModel>BankName}" />
+							<Text text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
 </mvc:View>
