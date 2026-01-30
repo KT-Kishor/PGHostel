@@ -1,0 +1,118 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Dashboard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+>
+    <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+
+        <VBox class="sapUiSmallMargin">
+            <Title
+                text="Today's Bookings"
+                level="H3"
+            />
+
+            <Carousel
+                height="300px"
+                showPageIndicator="false"
+                pages="{todayModel>/pages}"
+            >
+                <HBox
+                    wrap="NoWrap"
+                    justifyContent="Start"
+                    items="{path:'todayModel>', templateShareable:false}"
+                >
+                    <Panel
+                        width="260px"
+                        class="sapUiMediumMargin sapUiContentPadding"
+                        expandable="false"
+                    >
+                        <VBox>
+                            <Title
+                                text="{todayModel>BookingID}"
+                                level="H4"
+                                wrapping="true"
+                            />
+
+                            <Text text="Customer ID: {todayModel>CustomerID}" />
+
+                            <Text
+                                text="From: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' }"
+                            />
+
+                            <Text
+                                text="To: { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                            />
+
+                            <Button
+                                text="View Booking"
+                                type="Emphasized"
+                                press="onBookingCardPress"
+                                class="sapUiSmallMarginTop"
+                            />
+                        </VBox>
+                    </Panel>
+                </HBox>
+            </Carousel>
+            <VBox class="sapUiMediumMarginTop">
+                <Toolbar>
+                    <Title
+                        text="Monthly Booking Trend"
+                        level="H3"
+                    />
+                    <ToolbarSpacer />
+                    <Button
+                        icon="sap-icon://vertical-bar-chart"
+                        press="onColumnChart"
+                        tooltip="Vertical bar chart"
+                    />
+                    <Button
+                        icon="sap-icon://bar-chart"
+                        press="onBarChart"
+                        tooltip="Bar chart"
+                    />
+                    <Button
+                        icon="sap-icon://line-chart"
+                        press="onLineChart"
+                        tooltip="Line chart"
+                    />
+                    <Button
+                        icon="sap-icon://pie-chart"
+                        press="onPieChart"
+                        tooltip="Pie chart"
+                    />
+                </Toolbar>
+
+                <viz:VizFrame
+                    id="bookingChart"
+                    height="400px"
+                    width="100%"
+                    vizType="{chartTypeModel>/monthlyType}"
+                    uiConfig="{applicationSet:'fiori'}"
+                    vizProperties="{
+    plotArea: {
+        dataLabel: { visible: true, type: 'valueAndPercentage' }
+    },
+    valueAxis: {
+        title: { visible: true, text: 'Number of Bookings' }
+    },
+    categoryAxis: {
+        title: { visible: true, text: 'Month' }
+    },
+    legend: {
+        visible: true
+    }
+}"
+                />
+            </VBox>
+        </VBox>
+    </Page>
+</mvc:View>

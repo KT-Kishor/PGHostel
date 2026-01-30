@@ -11,59 +11,59 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBranchData").attachMatched(this._onRouteMatched, this);
+            const oMDmodel = new sap.ui.model.json.JSONModel({
+                BranchID: "",
+                Name: "",
+                Address: "",
+                Pincode: "",
+                Contact: "",
+                stdCode: "",
+                country: "",
+                state: "",
+                City: "",
+                GSTIN: "",
+                Currency: "",
+                Type: "",
+                Value: "",
+                CheckinTime: "",
+                CheckoutTime: "",
+                Penalty: "",
+            });
+            this.getView().setModel(oMDmodel, "MDmodel");
+
+            var oeditable = new sap.ui.model.json.JSONModel({
+                isEdit: false
+            });
+            this.getView().setModel(oeditable, "editableModel");
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                CC_id_CustInput: false,
+                selectedIndex: -1,
+                isIndia: false
+            }), "visiblePlay");
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                Photo1: "",
+                Photo1Type: "",
+                Photo1Name: ""
+            }), "UploadModel");
+
+            // Token model
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                tokens: []
+            }), "tokenModel");
         },
 
         _onRouteMatched: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-                const oMDmodel = new sap.ui.model.json.JSONModel({
-                    BranchID: "",
-                    Name: "",
-                    Address: "",
-                    Pincode: "",
-                    Contact: "",
-                    stdCode: "",
-                    country: "",
-                    state: "",
-                    City: "",
-                    GSTIN: "",
-                    Currency: "",
-                    Type: "",
-                    Value: "",
-                    CheckinTime: "",
-                    CheckoutTime: "",
-                    Penalty: "",
-                });
-                this.getView().setModel(oMDmodel, "MDmodel");
-
-                var oeditable = new sap.ui.model.json.JSONModel({
-                    isEdit: false
-                });
-                this.getView().setModel(oeditable, "editableModel");
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
-                    CC_id_CustInput: false,
-                    selectedIndex: -1,
-                    isIndia: false
-                }), "visiblePlay");
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
-                    Photo1: "",
-                    Photo1Type: "",
-                    Photo1Name: ""
-                }), "UploadModel");
-
-                // Token model
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
-                    tokens: []
-                }), "tokenModel");
-                await this.onClearAndSearch("MD_id_Filterbar");
+                // await this.onClearAndSearch("MD_id_Filterbar");
                 await this.Onsearch();
                 this.commonLoginFunction();
                 await this.Customerdata()
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -88,12 +88,11 @@ sap.ui.define([
                 filters.BranchCode = "";
             }
             this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
-
                 const oModel = new sap.ui.model.json.JSONModel(response.Customers);
                 this.getView().setModel(oModel, "HostelModel");
-
-                sap.ui.core.BusyIndicator.hide();
-            }).catch(() => sap.ui.core.BusyIndicator.hide());
+            }).catch((err) => {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            });
         },
 
         Onsearch: async function () {
@@ -104,18 +103,12 @@ sap.ui.define([
                 UserID: oLoginmodel.EmployeeID
             }
 
-            var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter).then((oData) => {
-                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                return oFCIAerData
-            })
-            const oExistingModel = LoginData[0];
+            var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter)
+            var oFCIAerData = Array.isArray(LoginData.data) ? LoginData.data : [LoginData.data];
+            const oExistingModel = oFCIAerData[0];
             const oView = this.getView();
 
             let filters = {};
-
-            // if (oExistingModel.Role !== "") {
-            //     filters.City = oExistingModel.City;
-            // }
             if (oLoginmodel.Role === "Admin") {
                 filters.BranchID = Branch === "" ? oExistingModel.BranchCode : Branch;
                 filters.Role = "Admin";
@@ -136,13 +129,10 @@ sap.ui.define([
             if (sPincode) {
                 filters.Pincode = sPincode;
             }
-            sap.ui.core.BusyIndicator.show(0);
-            this.ajaxReadWithJQuery("HM_Branch", filters).then((oData) => {
-                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                var model = new sap.ui.model.json.JSONModel(oFCIAerData);
-                this.getOwnerComponent().setModel(model, "mainModel")
-                sap.ui.core.BusyIndicator.hide();
-            })
+            var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
+            var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
+            var model = new sap.ui.model.json.JSONModel(aBranchData);
+            this.getOwnerComponent().setModel(model, "mainModel")
         },
 
         MD_onPressClear: function () {
@@ -152,44 +142,46 @@ sap.ui.define([
 
         MD_onSearch: async function () {
             sap.ui.core.BusyIndicator.show(0);
-            await this.Onsearch();
-            const oView = this.getView();
-            const oTable = oView.byId("id_MD_Table");
-            const oBinding = oTable.getBinding("items");
+            try {
+                await this.Onsearch();
+                const oView = this.getView();
+                const oTable = oView.byId("id_MD_Table");
+                const oBinding = oTable.getBinding("items");
 
-            let sCustomerName = oView.byId("MD_id_BranchCode").getValue().trim().toLowerCase();
-            let sPincode = oView.byId("MD_id_SearchField").getValue().trim();
+                let sCustomerName = oView.byId("MD_id_BranchCode").getValue().trim().toLowerCase();
+                let sPincode = oView.byId("MD_id_SearchField").getValue().trim();
 
-            let aFilters = [];
-            if (!sCustomerName && !sPincode) {
-                oBinding.filter([]);
-                this._updateRowCount();
-                return;
-            }
-            if (sCustomerName) {
-
-                if (sCustomerName.includes(" - ")) {
-                    sCustomerName = sCustomerName.split(" - ")[0];
+                let aFilters = [];
+                if (!sCustomerName && !sPincode) {
+                    oBinding.filter([]);
+                    this._updateRowCount();
+                    return;
                 }
-                aFilters.push(
-                    new sap.ui.model.Filter({
-                        filters: [
-                            new sap.ui.model.Filter("BranchID", sap.ui.model.FilterOperator.Contains, sCustomerName),
-                            new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sCustomerName),
-                            new sap.ui.model.Filter("City", sap.ui.model.FilterOperator.Contains, sCustomerName)
-                        ],
-                        and: false
-                    })
-                );
+                if (sCustomerName) {
+                    if (sCustomerName.includes(" - ")) {
+                        sCustomerName = sCustomerName.split(" - ")[0];
+                    }
+                    aFilters.push(
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter("BranchID", sap.ui.model.FilterOperator.Contains, sCustomerName),
+                                new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sCustomerName),
+                                new sap.ui.model.Filter("City", sap.ui.model.FilterOperator.Contains, sCustomerName)
+                            ],
+                            and: false
+                        })
+                    );
+                }
+                if (sPincode) {
+                    aFilters.push(
+                        new sap.ui.model.Filter("Pincode", sap.ui.model.FilterOperator.Contains, sPincode)
+                    );
+                }
+                oBinding.filter(aFilters);
+                this._updateRowCount();
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
             }
-            if (sPincode) {
-                aFilters.push(
-                    new sap.ui.model.Filter("Pincode", sap.ui.model.FilterOperator.Contains, sPincode)
-                );
-            }
-            oBinding.filter(aFilters);
-            this._updateRowCount();
-            sap.ui.core.BusyIndicator.hide();
         },
 
         onGlobalSearch: function (oEvent) {
@@ -503,7 +495,6 @@ sap.ui.define([
                             // UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Branch", {
                         data: oData,
@@ -511,15 +502,16 @@ sap.ui.define([
                             UserID: oData.UserID
                         }
                     });
-                    sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully"));
                 }
-
                 await this.Onsearch();
                 this.oDialog.close();
+                sap.m.MessageToast.show(
+                    this.isEdit ? sap.m.MessageToast.show(this.i18nModel.getText("branchUpdatedSuccessfully")) : sap.m.MessageToast.show(this.i18nModel.getText("branchaddedSuccessfully"))
+                );
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                // sap.ui.core.BusyIndicator.hide();
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -745,11 +737,7 @@ sap.ui.define([
                             sap.ui.core.BusyIndicator.show(0);
 
                             try {
-                                var sUserID = this
-                                    .getOwnerComponent()
-                                    .getModel("LoginModel")
-                                    .getData()
-                                    .EmployeeID;
+                                var sUserID = this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID;
 
                                 // Delete only non-assigned branches
                                 for (let oBranch of aDeletableBranches) {
@@ -760,20 +748,17 @@ sap.ui.define([
                                         }
                                     });
                                 }
-
+                                await this.Onsearch();
                                 sap.m.MessageToast.show(
                                     this.i18nModel.getText("selectedRecordsDeletedSuccessfully")
                                 );
-
-                                await this.Onsearch();
-
                             } catch (err) {
                                 console.error("Delete failed:", err);
                                 sap.m.MessageBox.error(
                                     this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
                                 );
                             } finally {
-                                // sap.ui.core.BusyIndicator.hide();
+                                sap.ui.core.BusyIndicator.hide();
                                 oTable.removeSelections(true);
                             }
                         }
@@ -853,11 +838,20 @@ sap.ui.define([
             setTimeout(() => {
                 this.MC_ValidateGstNumber();
             }, 0);
+            const bIsIndia = oData.Country === "India";
+            oVisible.setProperty("/isIndia", bIsIndia);
 
-            if (oData.GST) {
-                oVisible.setProperty("/CC_id_CustInput", true);
+            // 2️⃣ GST present or not
+            const bHasGST = !!oData.GSTIN;
+            oVisible.setProperty("/CC_id_CustInput", bHasGST);
+
+            // 3️⃣ Lock radio selection based on saved Type
+            if (oData.Type === "CGST") {
+                oVisible.setProperty("/selectedIndex", 0);
+            } else if (oData.Type === "IGST") {
+                oVisible.setProperty("/selectedIndex", 1);
             } else {
-                oVisible.setProperty("/CC_id_CustInput", false);
+                oVisible.setProperty("/selectedIndex", -1);
             }
             this._resetFacilityValueStates();
             this._resetBranchValueStates();

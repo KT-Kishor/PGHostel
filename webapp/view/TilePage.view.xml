@@ -165,16 +165,26 @@
                     </TileContent>
                 </GenericTile>
                 <GenericTile
-    id="id8roomTile"
-    class="sapUiMediumMargin glassTile"
-    header="{i18n>deposit}"
-    press="TileV_onpressDeposit"
->
-    <TileContent unit="{i18n>ManageDeposit}">
-        <ImageContent src="sap-icon://batch-payments" />
-    </TileContent>
-</GenericTile>
+                    id="id8roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>deposit}"
+                    press="TileV_onpressDeposit"
+                >
+                    <TileContent unit="{i18n>ManageDeposit}">
+                        <ImageContent src="sap-icon://batch-payments" />
+                    </TileContent>
+                </GenericTile>
 
+                <GenericTile
+                    id="id9roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>dashboard}"
+                    press="TileV_onpressdashboard"
+                >
+                    <TileContent unit="{i18n>viewDashboard}">
+                        <ImageContent src="sap-icon://bbyd-dashboard" />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <!-- <footer>
