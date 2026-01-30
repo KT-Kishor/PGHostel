@@ -47,7 +47,12 @@
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
                 />
                 <Text
-                    text="{HostelModel>/TotalDays}"
+                    text="{
+                    parts:[
+                    { path: 'HostelModel>/SelectedPriceType' },
+            { path: 'HostelModel>/SelectedMonths' },
+            { path: 'HostelModel>/TotalDays' }],
+                    formatter:'.Formatter.formatDurationText'}"
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
                 />
                 <Label

@@ -56,7 +56,7 @@
                 />
                 <RadioButtonGroup
                     id="idPaymentTypeGroup"
-                    columns="2"
+                    columns="1"
                     select="onPaymentTypeSelect"
                     selectedIndex="0"
                     class="paymentTypeGroup"
@@ -137,7 +137,7 @@
 
 
                         <Label
-                            text="{i18n>monthlyamount}"
+                            text="{i18n>amount}"
                            
                         />
                         <Input

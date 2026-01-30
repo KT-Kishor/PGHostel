@@ -333,11 +333,12 @@ sap.ui.define([
             // Other units
             return `${price} ${currency} ${unitText}`;
         },
-        formatDurationText: function (sPriceType, iMonths) {
+        formatDurationText: function (sPriceType, iMonths, iDays) {
 
-            if (!sPriceType || !iMonths) {
-                return "";
-            }
+            if (sPriceType === "Per Day") {
+        return iDays + " Days";
+    }
+
 
             if (sPriceType === "Per Month") {
                 return iMonths + (iMonths > 1 ? " Months" : " Month");
@@ -400,7 +401,37 @@ sap.ui.define([
 
             return oDateFormat.format(oDate);
         },
-        joinWithSlash: function (mode, txnId) {
+      getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
+    if (sType === "Per Day") {
+        return iTotalDays || 0;
+    }
+    if (sType === "Per Month" || sType === "Per Year") {
+        return iSelectedMonths || 0;
+    }
+    return "";
+},
+formatCGSTLabel: function (sGSTValue) {
+
+    const gst = Number(sGSTValue) || 0;
+    const cgst = gst;
+
+    return `CGST (${cgst}%):`;
+},
+formatSGSTLabel: function (sGSTValue) {
+
+    const gst = Number(sGSTValue) || 0;
+    const sgst = gst;
+
+    return `SGST (${sgst}%):`;
+},
+formatIGSTLabel: function (sGSTValue) {
+
+    const gst = Number(sGSTValue) || 0;
+    const igst = gst;
+
+    return `IGST (${igst}%):`;
+},
+ joinWithSlash: function (mode, txnId) {
             if (!mode && !txnId) return "";
             if (!mode) return txnId;
             if (!txnId) return mode;
@@ -408,5 +439,8 @@ sap.ui.define([
         },
 
 
+
+
+        
     }
 });

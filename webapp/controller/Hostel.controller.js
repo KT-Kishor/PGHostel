@@ -411,7 +411,9 @@ sap.ui.define([
                 CheckInTime: oData.CheckInTime,
                 CheckOutTime: oData.CheckOutTime,
                 Deposit: oData.Deposit,
-                DepositCurrency: oData.DepositCurrency
+                DepositCurrency: oData.DepositCurrency,
+                GSTValue: oData.GSTValue,
+                GSTType: oData.GSTType,
             };
             
             // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
@@ -687,7 +689,9 @@ sap.ui.define([
                     CheckInTime: oSelected.CheckInTime,
                     CheckOutTime: oSelected.CheckOutTime,
                     Deposit: oSelected.Deposit  ,
-                    DepositCurrency: oSelected.DepositCurrency
+                    DepositCurrency: oSelected.DepositCurrency,
+                    GSTType: oSelected.GSTType,
+                    GSTValue: oSelected.GSTValue,
                 };
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
@@ -2988,10 +2992,6 @@ sap.ui.define([
                     const sArea = oBranchInfo?.Name || "";
                     const sAddress = oBranchInfo?.Address || "";
                     const sCountry = oBranchInfo?.Country || "";
-                    const sGSTType = oBranchInfo?.Type || "";
-                    const sGSTValue = oBranchInfo?.Value || "";
-
-
 
                     
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
@@ -3024,7 +3024,7 @@ sap.ui.define([
                         Images: aImages,
                         Country: sCountry,
                         PriceVisible: PriceVisible,
-                        Visible: isVisible,
+                        Visible: true,
                         AvailbleBeds: room.AvailableRooms,
                         Address: sAddress,
                         CheckInTime: sCheckInTime,

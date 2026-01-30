@@ -205,7 +205,9 @@
 
                             <Text text="{HostelModel>StartDate}" />
                             <Text text="{HostelModel>EndDate}" />
-                            <Text text="{HostelModel>TotalDays}" />
+                            <Text text="
+        
+    {HostelModel>TotalDays}"/>
                             <Text
                                 class="totalColumnBold"
                                 text="{
@@ -222,10 +224,12 @@
             </Table>
 
             <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
+</VBox>
 
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
+                visible="{= ${HostelModel>AllSelectedFacilities}.length > 0 }"
             >
                 <Label
                     text="{i18n>totalfacilitycost}"
@@ -245,8 +249,8 @@
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
-            >
+               
+            > 
                 <Label
                     text="Total Room Rent:"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
@@ -258,7 +262,8 @@
             </HBox>
             <HBox
                 justifyContent="End"
-                visible="{= !${HostelModel>/IsIndia} }"
+               visible="{= !${HostelModel>/GSTType} === 'CGST/SGST' &amp;&amp; !${HostelModel>/GSTType} === 'IGST' }"
+                class="sapUiSmallMarginTop"
             >
                 <Label
                     text="Sub-Total (Non-Taxable):"
@@ -276,7 +281,7 @@
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
-                visible="{HostelModel>IsIndia}"
+                visible="{= ${HostelModel>/GSTType} === 'CGST/SGST' || ${HostelModel>/GSTType} === 'IGST' }"
             >
                 <Label
                     text="Sub-Total (Taxable):"
@@ -291,13 +296,21 @@
                 />
             </HBox>
 
+           
+
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
+               visible="{= ${HostelModel>/GSTType} === 'CGST/SGST'}"
             >
                 <Label
-                    text="CGST (9%):"
+                    text="{
+    parts: [
+        { path: 'HostelModel>/GSTValue' }
+    ],
+    formatter: '.Formatter.formatCGSTLabel'
+}"
+
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
@@ -309,14 +322,39 @@
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
+                visible="{= ${HostelModel>/GSTType} === 'CGST/SGST'}"
             >
                 <Label
-                    text="SGST (9%):"
+                   text="{
+    parts: [
+        { path: 'HostelModel>/GSTValue' }
+    ],
+    formatter: '.Formatter.formatSGSTLabel'
+}"
+
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
                     text="{parts:['HostelModel>SGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
+                    class="totalColumnBold1"
+                />
+            </HBox>
+             <HBox
+                justifyContent="End"
+                class="sapUiSmallMarginTop"
+                visible="{= ${HostelModel>/GSTType} === 'IGST'}"
+            >
+                <Label
+                    text="{
+    parts: [
+        { path: 'HostelModel>/GSTValue' }
+    ],
+    formatter: '.Formatter.formatIGSTLabel'
+}"
+                    class="totalColumnBold1 sapUiTinyMarginEnd"
+                />
+                <Text
+                    text="{parts:['HostelModel>IGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
                 />
             </HBox>
@@ -361,7 +399,7 @@
                     class="totalColumnBold1"
                 />
             </HBox>
-        </VBox>
+        
     </Panel>
     <!-- Grand Total section -->
 </core:FragmentDefinition>

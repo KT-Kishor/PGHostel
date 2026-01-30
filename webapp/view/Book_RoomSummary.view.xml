@@ -53,25 +53,32 @@
                     tooltip="{i18n>personName}"
                 />
             </Column>
-            <!-- <Column demandPopin="true">
+           <Column demandPopin="true">
                 <Text
-                    text="{i18n>facilityCost}"
-                    tooltip="{i18n>facilityCost}"
+                    text="{i18n>roomplan}"
+                    tooltip="{i18n>roomplan}"
                 />
             </Column>
-            <Column demandPopin="true">
+           <Column demandPopin="true">
                 <Text
-                    text="{i18n>placeRoomRent}"
-                    tooltip="{i18n>placeRoomRent}"
+                    text="{i18n>firstpayment}"
+                    tooltip="{i18n>roomplan}"
                 />
-            </Column> -->
-             <!-- <Column  minScreenWidth="Desktop"
-                        demandPopin="true">
+            </Column>
+             <Column demandPopin="true" 
+            visible="{=
+    (
+        ${HostelModel>/SelectedPriceType} === 'Per Month' ||
+        ${HostelModel>/SelectedPriceType} === 'Per Year'
+    )
+   &amp;&amp; ${HostelModel>/SelectedMonths} > 1
+}">
                 <Text
-                    text="{i18n>securitydeposit}"
-                    tooltip="{i18n>securitydeposit}"
+                    text="{i18n>nextpayment}"
+                    tooltip="{i18n>nextpayment}"
                 />
-            </Column> -->
+            </Column>
+            
             <Column  minScreenWidth="Desktop"
                         demandPopin="true">
                 <Text
@@ -85,21 +92,30 @@
             <ColumnListItem>
                 <cells>
                     <Text text="{HostelModel>FullName}" />
-                    <!-- <Text
-                        text="{parts: [
-        'HostelModel>TotalFacilityPrice',
-        'HostelModel>/Currency'
-    ],formatter: '.Formatter.formatCurrency'}"
-                    /> -->
-                    <!-- <Text
-                        text="{parts: [
-        'HostelModel>RoomRentPerPerson',
-        'HostelModel>/Currency'
-    ],formatter: '.Formatter.formatCurrency'}"
-                    /> -->
-                    <!-- <Text text="{parts: [
-        'HostelModel>Deposit'
-    ],formatter: '.Formatter.formatCurrency'}"/> -->
+                    <Text
+                         text="{
+        parts: [                                                                          
+            { path: 'HostelModel>/SelectedPriceType' },
+            { path: 'HostelModel>/SelectedMonths' },
+             { path: 'HostelModel>/TotalDays' }
+        ],
+        formatter: '.Formatter.formatDurationText'
+    }"
+                    />
+                    <Text
+                        text="{
+            parts: ['HostelModel>MonthlyCostPerPerson','HostelModel>/Currency'],
+            formatter: '.Formatter.formatCurrency'
+        }"
+                    />
+                    
+                    <Text
+                        text="{
+            parts: ['HostelModel>MonthlyCostPerson','HostelModel>/Currency'],
+            formatter: '.Formatter.formatCurrency'
+        }"
+                    />
+                   
                     <Text
                         class="totalColumnBold"
                         text="{ parts: [
@@ -243,7 +259,7 @@
                 class="sapUiSmallMarginTop"
             >
                 <Label
-                    text="{i18n>totalCost}"
+                    text="{i18n>grandTotal}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                 />
                 <Text
