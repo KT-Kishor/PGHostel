@@ -399,6 +399,14 @@ sap.ui.define([
             });
 
             return oDateFormat.format(oDate);
-        }
+        },
+        joinWithSlash: function (mode, txnId) {
+            if (!mode && !txnId) return "";
+            if (!mode) return txnId;
+            if (!txnId) return mode;
+            return mode + " / " + txnId;
+        },
+
+
     }
 });

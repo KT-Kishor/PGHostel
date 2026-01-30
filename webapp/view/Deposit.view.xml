@@ -125,37 +125,36 @@
                     </fb:FilterGroupItem>
 
                     <!-- DEPOSIT STATUS FILTER -->
-<!-- In the filter section of Deposit.view.xml -->
-<!-- DEPOSIT STATUS FILTER -->
-<fb:FilterGroupItem
-    name="Status"
-    groupName="Group"
-    label="{i18n>status}"
-    visibleInFilterBar="true"
->
-    <fb:control>
-        <ComboBox
-            id="DfStatus"
-            width="100%"
-            placeholder="{i18n>selectStatus}"
-            valueStateText="Select status"
-        >
-            <core:Item
-                key=""
-                text="{i18n>all}"
-            />
-            <core:Item
-                key="Pending"
-                text="{i18n>pending}"
-            />
-            <core:Item
-                key="Returned"
-                text="{i18n>returned}"
-            />
-        </ComboBox>
-    </fb:control>
-</fb:FilterGroupItem>
-
+                    <!-- In the filter section of Deposit.view.xml -->
+                    <!-- DEPOSIT STATUS FILTER -->
+                    <fb:FilterGroupItem
+                        name="Status"
+                        groupName="Group"
+                        label="{i18n>status}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="DfStatus"
+                                width="100%"
+                                placeholder="{i18n>selectStatus}"
+                                valueStateText="Select status"
+                            >
+                                <core:Item
+                                    key=""
+                                    text="{i18n>all}"
+                                />
+                                <core:Item
+                                    key="Pending"
+                                    text="{i18n>pending}"
+                                />
+                                <core:Item
+                                    key="Returned"
+                                    text="{i18n>returned}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
 
@@ -221,33 +220,21 @@
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>depositAmount}" />
+                        <Text text="{i18n>DdepositDate}" />
                     </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Desktop"
-                    >
-                        <Text text="{i18n>depositCurrency}" />
-                    </Column> -->
+
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>DdepositDate}" />
+                        <Text text="{i18n>depositAmount}" />
                     </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Desktop"
                     >
-                        <Text text="{i18n>depositMode}" />
+                        <Text text="{i18n>DepositMTransactionID}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Desktop"
-                    >
-                        <Text text="{i18n>transactionID}" />
-                    </Column>
-                    <!-- NEW COLUMN: Deposit Taken By -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Desktop"
@@ -258,26 +245,16 @@
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>returnAmount}" />
+                        <Text text="{i18n>returnDate}" />
                     </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Desktop"
-                    >
-                        <Text text="{i18n>returnCurrency}" />
-                    </Column> -->
+
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>returnDate}" />
+                        <Text text="{i18n>returnAmount}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Desktop"
-                    >
-                        <Text text="{i18n>returnMode}" />
-                    </Column>
+
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -313,6 +290,13 @@
                             <Text text="{DepositModel>CustomerName}" />
                             <Text
                                 text="{ 
+                                    path: 'DepositModel>DepositDate',
+                                    formatter: '.Formatter.formatDate' 
+                                }"
+                            />
+
+                            <Text
+                                text="{ 
                                     parts: [
                                         {path: 'DepositModel>DepositAmount'},{path: 'DepositModel>DepositCurrency'}
                                     ],
@@ -320,16 +304,19 @@
                                 }"
                             />
                             <!-- <Text text="{DepositModel>DepositCurrency}" /> -->
+
+                            <Text
+                                text="{  parts: [  { path: 'DepositModel>DepositMode' },  { path: 'DepositModel>DepositTransactionID' }  ],  formatter: '.Formatter.joinWithSlash'  }"
+                            />
+                            <!-- NEW CELL: DepositTakenBy -->
+                            <Text text="{DepositModel>DepositTakenBy}" />
                             <Text
                                 text="{ 
-                                    path: 'DepositModel>DepositDate',
+                                    path: 'DepositModel>ReturnDepositDate',
                                     formatter: '.Formatter.formatDate' 
                                 }"
                             />
-                            <Text text="{DepositModel>DepositMode}" />
-                            <Text text="{DepositModel>DepositTransactionID}" />
-                            <!-- NEW CELL: DepositTakenBy -->
-                            <Text text="{DepositModel>DepositTakenBy}" />
+
                             <Text
                                 text="{ 
                                     parts: [
@@ -338,16 +325,9 @@
                                     formatter: '.Formatter.formatCurrency'
                                 }"
                             />
-                            <!-- <Text text="{DepositModel>ReturnDepositCurrency}" /> -->
+
                             <Text
-                                text="{ 
-                                    path: 'DepositModel>ReturnDepositDate',
-                                    formatter: '.Formatter.formatDate' 
-                                }"
-                            />
-                            <Text text="{DepositModel>ReturnDepositMode}" />
-                            <Text
-                                text="{DepositModel>ReturnDepositTransactionID}"
+                                text="{parts: [{ path: 'DepositModel>ReturnDepositMode' }, { path: 'DepositModel>ReturnDepositTransactionID' }],formatter: '.Formatter.joinWithSlash'}"
                             />
                             <!-- NEW CELL: ReturnDepositBy -->
                             <Text text="{DepositModel>ReturnDepositBy}" />
