@@ -185,6 +185,16 @@
                         <ImageContent src="sap-icon://bbyd-dashboard" />
                     </TileContent>
                 </GenericTile>
+                <GenericTile
+                    id="id10roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>paymentdashboard}"
+                    press="TileV_onpresshosteldashboard"
+                >
+                    <TileContent unit="{i18n>paymentGraph}">
+                        <ImageContent src="sap-icon://business-objects-experience" />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <!-- <footer>

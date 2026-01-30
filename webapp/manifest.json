@@ -299,7 +299,14 @@
             "TargetDashboard"
           ]
         },
-        {
+                {
+                  "name": "RouteHostelDashboard",
+                  "pattern": "PaymentDashboard",
+                  "target": [
+                    "TargetHostelDashboard"
+                  ]
+                },
+                {
           "name": "NotFound",
           "pattern": "NotFound",
           "target": "NotFound"
@@ -480,6 +487,13 @@
           "clearControlAggregation": false,
           "viewId": "Dashboard",
           "viewName": "Dashboard"
+        },
+        "TargetHostelDashboard": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "PaymentDashboard",
+          "viewName": "PaymentDashboard"
         },
         "NotFound": {
           "viewType": "XML",
