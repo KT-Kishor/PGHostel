@@ -1217,7 +1217,7 @@ sap.ui.define([
 
                                 // Country-specific validations
                                 if (sCountry === "India") {
-                                    
+
                                     // update model value for MobileNo
                                     oModel.setProperty("/Persons/" + i + "/MobileNo", sValue);
                                     return;
@@ -1806,6 +1806,22 @@ sap.ui.define([
             }, 0);
 
             oModel.refresh(true);
+            // 🔁 Rebuild AllSelectedFacilities from all persons
+let aAll = [];
+
+aPersons.forEach(person => {
+    if (person.Facilities?.SelectedFacilities) {
+        person.Facilities.SelectedFacilities.forEach(fac => {
+            aAll.push({
+                ...fac,
+                PersonIndex: person.PersonIndex || 0   // optional
+            });
+        });
+    }
+});
+
+oModel.setProperty("/AllSelectedFacilities", aAll);
+
         }
         ,
 
@@ -1846,10 +1862,10 @@ sap.ui.define([
                 );
             }
 
-            if (bHasError) {
-                MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
-                return; //  STOP wizard navigation
-            }
+            // if (bHasError) {
+            //     MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
+            //     return; //  STOP wizard navigation
+            // }
             const oModel = this.getView().getModel("HostelModel");
             const sCurrentBranch = oModel.getProperty("/BranchCode");
 
@@ -1981,7 +1997,7 @@ sap.ui.define([
 
             if (this._iSelectedStepIndex === 1) {
                 this._resetCouponAndDiscount();
-               
+
             }
 
             //  BLOCK HEADER JUMP IF STEP 1 INVALID
@@ -2090,10 +2106,10 @@ sap.ui.define([
                     oModel.setProperty("/NXTVis", false);
                     oModel.setProperty("/PERVIOUSVIS", false);
 
-                    if (this._bPricingDirty) {
-        this.TC_onDialogNextButton();
-        this._bPricingDirty = false;   // reset after calculation
-    }
+                    // if (this._bPricingDirty) {
+                        this.TC_onDialogNextButton();
+                        this._bPricingDirty = false;   // reset after calculation
+                    // }
 
                     break;
                 default:
@@ -2184,28 +2200,33 @@ sap.ui.define([
             const baseRoomRent = Number(oModel.getProperty("/FinalPrice")) || 0;
 
             // 🔁 CENTRALIZED CALCULATION
+            const selectedMonths =
+                Number(oModel.getProperty("/SelectedMonths")) || 1;
+
             const result = this.calculateTotals(
                 aPersons,
                 sStartDate,
                 sEndDate,
-                baseRoomRent
+                baseRoomRent,
+                selectedMonths
             );
+
 
             if (!result) {
                 return;
             }
 
-            oModel.setProperty("/Persons", result.Persons);
+           oModel.setProperty("/Persons", [...result.Persons]);
             oModel.setProperty("/GrandTotal", result.GrandTotal);
 
             oModel.refresh(true);
         }
         ,
 
-        
-        calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice) {
 
+        calculateTotals: function (aPersons, sStartDate, sEndDate, roomRentPrice, selectedMonths) {
 
+            selectedMonths = Number(selectedMonths) || 1;
             const oHostelModel = this.getView().getModel("HostelModel");
             const sGSTType = oHostelModel.getProperty("/GSTType");
             const sGSTValue = oHostelModel.getProperty("/GSTValue");
@@ -2227,11 +2248,11 @@ sap.ui.define([
             }
 
             // ---------- MONTHS ----------
-            let iMonths =
-                (oEndDate.getFullYear() - oStartDate.getFullYear()) * 12 +
-                (oEndDate.getMonth() - oStartDate.getMonth());
+            // let iMonths =
+            //     (oEndDate.getFullYear() - oStartDate.getFullYear()) * 12 +
+            //     (oEndDate.getMonth() - oStartDate.getMonth());
 
-            iMonths = iMonths > 0 ? iMonths : 1;
+            // iMonths = iMonths > 0 ? iMonths : 1;
 
             // ---------- YEARS ----------
             let iYears = oEndDate.getFullYear() - oStartDate.getFullYear();
@@ -2247,15 +2268,6 @@ sap.ui.define([
                 const paymentType =
                     this.getView().getModel("HostelModel")
                         .getProperty("/SelectedPriceType");
-
-                const selectedMonths =
-                    Number(
-                        this.getView().getModel("HostelModel")
-                            .getProperty("/SelectedMonths")
-                    ) || 1;
-
-             
-
                 let roomRent = 0;
 
                 switch (paymentType) {
@@ -2271,7 +2283,7 @@ sap.ui.define([
                         roomRent = Number(roomRentPrice) * selectedMonths;
                         break;
 
-                    default:    
+                    default:
                         roomRent = Number(roomRentPrice);
                 }
 
@@ -2296,7 +2308,7 @@ sap.ui.define([
                             total = price * iDays;
                             break;
                         case "Per Month":
-                            total = price * iMonths;
+                            total = price * selectedMonths;
                             break;
                         case "Per Year":
                             total = price * iYears;
@@ -2331,39 +2343,39 @@ sap.ui.define([
                 // ------------------
                 // GST
                 // ------------------
-      // ------------------
-// GST (DYNAMIC)
-// ------------------
-let cgst = 0;
-let sgst = 0;
-let igst = 0;
+                // ------------------
+                // GST (DYNAMIC)
+                // ------------------
+                let cgst = 0;
+                let sgst = 0;
+                let igst = 0;
 
-if (sGSTType && sGSTType === "CGST/SGST") {
+                if (sGSTType && sGSTType === "CGST/SGST") {
 
-    const gstPercent = Number(sGSTValue) || 0;   // eg: 18
+                    const gstPercent = Number(sGSTValue) || 0;   // eg: 18
 
-    // split equally
-    cgst = oPerson.SubTotal * (gstPercent) / 100;
-    sgst = oPerson.SubTotal * (gstPercent) / 100;
+                    // split equally
+                    cgst = oPerson.SubTotal * (gstPercent) / 100;
+                    sgst = oPerson.SubTotal * (gstPercent) / 100;
 
-    bAnyIndia = true;
+                    bAnyIndia = true;
 
-} else if (sGSTType && sGSTType === "IGST") {
+                } else if (sGSTType && sGSTType === "IGST") {
 
-    const gstPercent = Number(sGSTValue) || 0;
+                    const gstPercent = Number(sGSTValue) || 0;
 
-    igst = oPerson.SubTotal * gstPercent / 100;
+                    igst = oPerson.SubTotal * gstPercent / 100;
 
-    bAnyIndia = true;
-}
+                    bAnyIndia = true;
+                }
 
-oPerson.CGST = Number(cgst.toFixed(2));
-oPerson.SGST = Number(sgst.toFixed(2));
-oPerson.IGST = Number(igst.toFixed(2));
+                oPerson.CGST = Number(cgst.toFixed(2));
+                oPerson.SGST = Number(sgst.toFixed(2));
+                oPerson.IGST = Number(igst.toFixed(2));
 
-oPerson.FinalTotalCost =
-    Number((
-        oPerson.SubTotal + oPerson.CGST + oPerson.SGST + oPerson.IGST  ).toFixed(2));
+                oPerson.FinalTotalCost =
+                    Number((
+                        oPerson.SubTotal + oPerson.CGST + oPerson.SGST + oPerson.IGST).toFixed(2));
 
 
                 if (paymentType !== "Per Day") {
@@ -2373,19 +2385,23 @@ oPerson.FinalTotalCost =
                     oPerson.MonthlyCostPerPerson =
                         Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));   // or null
                 }
-                   oPerson.MonthlyCostPerson =
-                oPerson.FinalTotalCost / selectedMonths;
+                oPerson.MonthlyCostPerson =
+                    oPerson.FinalTotalCost / selectedMonths;
 
-                grandTotal += oPerson.FinalTotalCost;
+                grandTotal += Number(oPerson.FinalTotalCost) || 0;
+
             });
+            grandTotal = Number(grandTotal.toFixed(2));
 
-            aPersons.forEach(p => p.GrandTotal = grandTotal);
-            oHostelModel.setProperty("/IsIndia", !!bAnyIndia);
+            aPersons.forEach(p => {
+                p.GrandTotal = grandTotal;
+            });
+            // oHostelModel.setProperty("/IsIndia", !!bAnyIndia);
 
             return {
-                Persons: aPersons,
-                GrandTotal: Number(grandTotal.toFixed(2))
-            };
+    Persons: aPersons.map(p => ({ ...p })),   // NEW ARRAY
+    GrandTotal: grandTotal
+};
         },
 
         // Helper function to parse date
@@ -2537,7 +2553,7 @@ oPerson.FinalTotalCost =
                 oHostelModel.setProperty("/TotalDays", diffDays);
                 oEndDatePicker.setValueState("None");
 
-              
+
             }
 
             if (oEvent.getSource().getId().includes("idStartDate1") ||
@@ -2628,7 +2644,7 @@ oPerson.FinalTotalCost =
         },
 
         onMonthSelectionChange: function (oEvent) {
-
+  this._bPricingDirty = true;
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
 
@@ -2702,14 +2718,16 @@ oPerson.FinalTotalCost =
                 aPersons,
                 sStartDate,
                 sEndDate,
-                Number(oHostelModel.getProperty("/FinalPrice")) || 0
+                Number(oHostelModel.getProperty("/FinalPrice")) || 0,
+                iSelectedMonths
             );
             this.byId("step1").setValidated(false);
-             oHostelModel.setProperty("/IsGeneralInfoValid", false);
-             this._bPricingDirty = true;
+            oHostelModel.setProperty("/IsGeneralInfoValid", false);
+            // this._bPricingDirty = true;
 
             if (result) {
-                oHostelModel.setProperty("/Persons", result.Persons);
+              oHostelModel.setProperty("/Persons", [...result.Persons]);
+
                 oHostelModel.setProperty("/GrandTotal", result.GrandTotal);
                 oHostelModel.refresh(true);
             }
@@ -4625,7 +4643,7 @@ oPerson.FinalTotalCost =
                 "/PerMonthNoPerson",
                 Number(perPersonAmount)
             );
-        } ,
+        },
 
         _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
             // LEFT SIDE visibility
@@ -4662,32 +4680,6 @@ oPerson.FinalTotalCost =
 
         },
 
-        // onAmountChange: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     const sValue = oInput.getValue();
-
-        //     if (!sValue || sValue === "." || sValue.endsWith(".")) {
-        //         return; // Wait for complete input
-        //     }
-
-        //     const enteredAmount = parseFloat(sValue);
-        //     const grandTotal = parseFloat(
-        //         this.getView().getModel("HostelModel").getProperty("/FinalTotalCost")
-        //     );
-
-        //     if (isNaN(enteredAmount) || isNaN(grandTotal)) {
-        //         oInput.setValueState("Error");
-        //         oInput.setValueStateText(this.i18nModel.getText("invalidamount"));
-        //         return;
-        //     }
-
-        //     if (enteredAmount > grandTotal) {
-        //         oInput.setValueState("Error");
-        //         oInput.setValueStateText(this.i18nModel.getText("amountCannotbeGreaterthanGrandTotal"));
-        //     } else {
-        //         oInput.setValueState("None");
-        //     }
-        // },
 
         _clearAllPaymentFields: function () {
             [
@@ -4793,7 +4785,7 @@ oPerson.FinalTotalCost =
                 return;
             }
 
-           
+
             oAmountInput.setValueState("None");
 
             try {
@@ -4848,7 +4840,7 @@ oPerson.FinalTotalCost =
                         };
 
                     } else {
-                        
+
 
                         // ✔ Normal payment → take user input
                         paymentDetails = {
@@ -4955,7 +4947,7 @@ oPerson.FinalTotalCost =
                 // Extract BookingDetails array
                 const aBookingDetails = oResponse.BookingDetails || [];
                 BusyIndicator.hide()
-          
+
                 let sMessage = "Booking Successful!\n\n";
 
                 aBookingDetails.forEach((item, index) => {
@@ -4978,7 +4970,7 @@ oPerson.FinalTotalCost =
                                     title: "Guest Booking",
                                     actions: [MessageBox.Action.OK],
                                     onClose: function () {
-                                     oModel.setProperty("/CouponCode", "")
+                                        oModel.setProperty("/CouponCode", "")
                                         // Continue navigation after warning
                                         this._navigateAfterBooking();
                                     }.bind(this)

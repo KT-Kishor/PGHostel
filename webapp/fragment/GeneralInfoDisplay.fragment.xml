@@ -50,9 +50,8 @@
                     text="{
                     parts:[
                     { path: 'HostelModel>/SelectedPriceType' },
-            { path: 'HostelModel>/SelectedMonths' },
             { path: 'HostelModel>/TotalDays' }],
-                    formatter:'.Formatter.formatDurationText'}"
+                    formatter:'.Formatter.formatPerDayText'}"
                     visible="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
                 />
                 <Label
@@ -65,7 +64,7 @@
             { path: 'HostelModel>/SelectedPriceType' },
             { path: 'HostelModel>/SelectedMonths' }
         ],
-        formatter: '.Formatter.formatDurationText'
+        formatter: '.Formatter.formatPerMonthYearText'
     }"
     visible="{
         = ${HostelModel>/SelectedPriceType} === 'Per Month'

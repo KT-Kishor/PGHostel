@@ -1383,28 +1383,32 @@ oncancelCoupon: function () {
     // -----------------------------
     // RESTORE LATEST SAVED VALUES
     // -----------------------------
-    if (oFirstPerson.__preCouponState) {
+  
 
-        oFirstPerson.FinalTotalCost =
-            oFirstPerson.__preCouponState.FinalTotalCost;
+const sStartDate = oHostelModel.getProperty("/StartDate");
+const sEndDate   = oHostelModel.getProperty("/EndDate");
+const baseRoomRent =
+    Number(oHostelModel.getProperty("/FinalPrice")) || 0;
 
-        oFirstPerson.MonthlyCostPerPerson =
-            oFirstPerson.__preCouponState.MonthlyCostPerPerson;
+const selectedMonths =
+    Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
 
-        oFirstPerson.CGST =
-            oFirstPerson.__preCouponState.CGST;
+// 🔁 Recalculate using CURRENT DATES
+const result = this.calculateTotals(
+    aPersons,
+    sStartDate,
+    sEndDate,
+    baseRoomRent,
+    selectedMonths
+);
 
-        oFirstPerson.SGST =
-            oFirstPerson.__preCouponState.SGST;
+if (!result) return;
 
-        oFirstPerson.IGST =
-            oFirstPerson.__preCouponState.IGST;
+oHostelModel.setProperty("/Persons", result.Persons);
+oHostelModel.setProperty("/GrandTotal", result.GrandTotal);
+oHostelModel.refresh(true);
 
-        oFirstPerson.SubTotal =
-            oFirstPerson.__preCouponState.SubTotal;
 
-        delete oFirstPerson.__preCouponState;
-    }
 
     oFirstPerson.AppliedDiscount = 0;
     oFirstPerson.SubTotalAfterDiscount = 0;
@@ -1441,9 +1445,195 @@ oncancelCoupon: function () {
     );
 }
 ,
+/* =========================================================== */
+/*  CENTRAL PRICING ENGINE                                    */
+/* =========================================================== */
+
+calculateTotals: function (
+    aPersons,
+    sStartDate,
+    sEndDate,
+    roomRentPrice,
+    selectedMonths
+) {
+
+    const oHostelModel = this.getView().getModel("HostelModel");
+
+    const sGSTType = oHostelModel.getProperty("/GSTType");
+    const sGSTValue = oHostelModel.getProperty("/GSTValue");
+
+    /* -----------------------------
+       DATE UNITS
+    ----------------------------- */
+    const oUnits = this._calculateDateUnits(sStartDate, sEndDate);
+
+    const iDays = oUnits.iDays;
+    const iMonthsFromDates = oUnits.iMonths;
+    const iYears = oUnits.iYears;
+
+    selectedMonths =
+        Number(selectedMonths) || iMonthsFromDates || 1;
+
+    let grandTotal = 0;
+    let bAnyIndia = false;
+
+    /* -----------------------------
+       LOOP PERSONS
+    ----------------------------- */
+    aPersons.forEach(oPerson => {
+
+        const paymentType =
+            oHostelModel.getProperty("/SelectedPriceType");
+
+        /* -----------------------------
+           ROOM RENT
+        ----------------------------- */
+        let roomRent = 0;
+
+        switch (paymentType) {
+
+            case "Per Day":
+                roomRent = Number(roomRentPrice) * iDays;
+                break;
+
+            case "Per Month":
+                roomRent = Number(roomRentPrice) * selectedMonths;
+                break;
+
+            case "Per Year":
+                roomRent = Number(roomRentPrice) * selectedMonths;
+                break;
+
+            default:
+                roomRent = Number(roomRentPrice);
+        }
+
+        oPerson.RoomRentPerPerson = Number(roomRent.toFixed(2));
+
+        /* -----------------------------
+           FACILITIES
+        ----------------------------- */
+        let facilityTotal = 0;
+        oPerson.AllSelectedFacilities = [];
+
+        (oPerson.Facilities?.SelectedFacilities || []).forEach(f => {
+
+            const price = Number(f.SelectedPrice) || 0;
+            let total = 0;
+
+            switch (f.SelectedPriceType) {
+
+                case "Per Hour":
+                    total = price * 1 * iDays;
+                    break;
+
+                case "Per Day":
+                    total = price * iDays;
+                    break;
+
+                case "Per Month":
+                    total = price * selectedMonths;
+                    break;
+
+                case "Per Year":
+                    total = price * iYears;
+                    break;
+            }
+
+            facilityTotal += total;
+
+            oPerson.AllSelectedFacilities.push({
+                FacilityName: f.FacilityName,
+                Price: price,
+                Currency: f.Currency,
+                UnitText: f.SelectedPriceType,
+                StartDate: sStartDate,
+                EndDate: sEndDate,
+                TotalDays: iDays,
+                TotalAmount: Number(total.toFixed(2)),
+                Image: f.Image,
+                Branch: f.BranchCode
+            });
+        });
+
+        oPerson.TotalFacilityPrice =
+            Number(facilityTotal.toFixed(2));
+
+        /* -----------------------------
+           SUBTOTAL
+        ----------------------------- */
+        oPerson.SubTotal =
+            Number((
+                oPerson.RoomRentPerPerson +
+                oPerson.TotalFacilityPrice
+            ).toFixed(2));
+
+        /* -----------------------------
+           GST
+        ----------------------------- */
+        let cgst = 0, sgst = 0, igst = 0;
+
+        if (sGSTType === "CGST/SGST") {
+
+            const p = Number(sGSTValue) || 0;
+
+            cgst = oPerson.SubTotal * p / 100;
+            sgst = oPerson.SubTotal * p / 100;
+
+            bAnyIndia = true;
+
+        } else if (sGSTType === "IGST") {
+
+            const p = Number(sGSTValue) || 0;
+
+            igst = oPerson.SubTotal * p / 100;
+
+            bAnyIndia = true;
+        }
+
+        oPerson.CGST = Number(cgst.toFixed(2));
+        oPerson.SGST = Number(sgst.toFixed(2));
+        oPerson.IGST = Number(igst.toFixed(2));
+
+        /* -----------------------------
+           FINAL TOTAL
+        ----------------------------- */
+        oPerson.FinalTotalCost =
+            Number((
+                oPerson.SubTotal +
+                oPerson.CGST +
+                oPerson.SGST +
+                oPerson.IGST
+            ).toFixed(2));
+
+        /* -----------------------------
+           MONTHLY COST DISPLAY
+        ----------------------------- */
+        oPerson.MonthlyCostPerPerson =
+            Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));
+
+        grandTotal += oPerson.FinalTotalCost;
+    });
+
+    aPersons.forEach(p => p.GrandTotal =
+        Number(grandTotal.toFixed(2)));
+
+    oHostelModel.setProperty("/IsIndia", !!bAnyIndia);
+
+    return {
+        Persons: aPersons,
+        GrandTotal: Number(grandTotal.toFixed(2))
+    };
+},
+
+/* =========================================================== */
+/*  DATE UNIT HELPER                                          */
+/* =========================================================== */
+
 _calculateDateUnits: function (sStartDate, sEndDate) {
 
     const parseDate = (s) => {
+
         if (!s) return null;
 
         if (typeof s === "string" && s.includes("/")) {
@@ -1465,30 +1655,24 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
     const oStart = parseDate(sStartDate);
     const oEnd = parseDate(sEndDate);
 
-    if (!oStart || !oEnd) {
+    if (!oStart || !oEnd || oEnd < oStart) {
         return { iDays: 1, iMonths: 1, iYears: 1 };
     }
 
-    /* ============================
-       DAYS (INCLUSIVE)
-    ============================ */
+    /* DAYS (INCLUSIVE) */
     let iDays =
         Math.floor((oEnd - oStart) / 86400000) + 1;
 
     if (iDays < 1) iDays = 1;
 
-    /* ============================
-       MONTHS (CALENDAR DIFF)
-    ============================ */
+    /* MONTHS (CALENDAR) */
     let iMonths =
         (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
         (oEnd.getMonth() - oStart.getMonth());
 
     if (iMonths < 1) iMonths = 1;
 
-    /* ============================
-       YEARS (CALENDAR DIFF)
-    ============================ */
+    /* YEARS */
     let iYears =
         oEnd.getFullYear() - oStart.getFullYear();
 
@@ -1500,6 +1684,7 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
         iYears: iYears
     };
 }
+
 ,
 
         onCouponLiveChange: function (oEvent) {

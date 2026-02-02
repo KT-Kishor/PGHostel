@@ -147,13 +147,7 @@
                     width="100%"
                     editable="false"
                 />
-                <!-- <Label text="CheckIn Time"  visible="{= ${HostelModel>/SelectedPriceType} === 'Per Hour' }"/>
-				<TimePicker id="Id_checkintime" value="{HostelModel>/CheckInTime}" displayFormat="HH" valueFormat="HH"
-                change=".onTimeChange" visible="{= ${HostelModel>/SelectedPriceType} === 'Per Hour' }" valueStateText="Select End Time"/>
-
-                <Label text="CheckOut Time"  visible="{= ${edit>/UnitText} === 'Per Hour' }"/>
-				<TimePicker id="Id_checkouttime" value="{edit>/EndTime}" displayFormat="HH" valueFormat="HH"
-                change=".onTimeChange" visible="{= ${edit>/UnitText} === 'Per Hour' }" valueStateText="Select End Time"/> -->
+              
             </f:content>
         </f:SimpleForm>
     </Panel>

@@ -333,23 +333,42 @@ sap.ui.define([
             // Other units
             return `${price} ${currency} ${unitText}`;
         },
-        formatDurationText: function (sPriceType, iMonths, iDays) {
+         formatPerDayText: function (sPriceType, iDays) {
+    if (sPriceType === "Per Day") {
+        return iDays ? iDays + " Days" : "";
+    }
+    return "";
+},
 
-            if (sPriceType === "Per Day") {
-        return iDays + " Days";
+formatPerMonthYearText: function (sPriceType, iMonths) {
+
+    if (sPriceType === "Per Month") {
+        return iMonths + (iMonths > 1 ? " Months" : " Month");
     }
 
+    if (sPriceType === "Per Year") {
+        return iMonths + (iMonths > 1 ? " Years" : " Year");
+    }
 
-            if (sPriceType === "Per Month") {
-                return iMonths + (iMonths > 1 ? " Months" : " Month");
-            }
+    return "";
+},
+formatDurationText: function (sPriceType, iMonths, iDays) {
 
-            if (sPriceType === "Per Year") {
-                return iMonths + (iMonths > 1 ? " Years" : " Year");
-            }
+    if (sPriceType === "Per Day") {
+        return iDays ? iDays + " Days" : "";
+    }
 
-            return "";
-        },
+    if (sPriceType === "Per Month") {
+        return iMonths ? iMonths + (iMonths > 1 ? " Months" : " Month") : "";
+    }
+
+    if (sPriceType === "Per Year") {
+        return iMonths ? iMonths + (iMonths > 1 ? " Years" : " Year") : "";
+    }
+
+    return "";
+},
+
         formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
 
             // Guard: missing values
@@ -401,15 +420,23 @@ sap.ui.define([
 
             return oDateFormat.format(oDate);
         },
-      getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
+    getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
+
+    if (!sType) {
+        return "";
+    }
+
     if (sType === "Per Day") {
         return iTotalDays || 0;
     }
+
     if (sType === "Per Month" || sType === "Per Year") {
         return iSelectedMonths || 0;
     }
+
     return "";
-},
+}
+,
 formatCGSTLabel: function (sGSTValue) {
 
     const gst = Number(sGSTValue) || 0;

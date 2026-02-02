@@ -205,9 +205,18 @@
 
                             <Text text="{HostelModel>StartDate}" />
                             <Text text="{HostelModel>EndDate}" />
-                            <Text text="
-        
-    {HostelModel>TotalDays}"/>
+                            <Text
+    text="{
+        parts: [
+            'HostelModel>/SelectedPriceType',
+            'HostelModel>/TotalDays',
+            'HostelModel>/SelectedMonths'
+        ],
+        formatter: '.Formatter.getDurationValue'
+    }"
+/>
+
+
                             <Text
                                 class="totalColumnBold"
                                 text="{
