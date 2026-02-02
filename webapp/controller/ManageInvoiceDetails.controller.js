@@ -190,6 +190,21 @@ sap.ui.define([
 
                     this.SelectedCustomerModel.setData(oHeader);
 
+                    // ---- GST checkbox derived selection ----
+                    const igst = parseFloat(oHeader.IGST) || 0;
+                    const cgst = parseFloat(oHeader.CGST) || 0;
+                    const sgst = parseFloat(oHeader.SGST) || 0;
+
+                    // reset first
+                    this.SelectedCustomerModel.setProperty("/IGSTSelected", false);
+                    this.SelectedCustomerModel.setProperty("/CGSTSelected", false);
+
+                    if (igst > 0) {
+                        this.SelectedCustomerModel.setProperty("/IGSTSelected", true);
+                    } else if (cgst > 0 || sgst > 0) {
+                        this.SelectedCustomerModel.setProperty("/CGSTSelected", true);
+                    }
+
                     const aItems = oData.data.ManageInvoiceItem.map((item, index) => ({
                         ...item,
                         IndexNo: index + 1,
@@ -295,26 +310,10 @@ sap.ui.define([
                 });
             },
 
-            // onNavBack: function() {
-            //     const oLoginModel = this.getView().getModel("LoginModel");
-            //     const sRole = oLoginModel?.getProperty("/Role") || "";
-            //     const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-            //     if (sRole === "Customer") {
-            //         this._sLoggedUserID = sEmpID;
-            //         const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            //         oUIModel.setProperty("/isLoggedIn", true);
-            //         this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            //     }else if (this.sourceView === "AdminPage") {
-            //         this.getOwnerComponent().getRouter().navTo("RouteAdmin");
-            //     }else {
-            //         this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
-            //     }
-            // },
-            onNavBack: function () {
+            onNavBack: function() {
                 const oLoginModel = this.getView().getModel("LoginModel");
                 const sRole = oLoginModel?.getProperty("/Role") || "";
                 const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-
                 if (sRole === "Customer") {
                     this._sLoggedUserID = sEmpID;
                     const oUIModel = this.getOwnerComponent().getModel("UIModel");
@@ -328,6 +327,7 @@ sap.ui.define([
                     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
                 }
             },
+
             onHome: function() {
                 this.CommonLogoutFunction();
             },
@@ -419,16 +419,45 @@ sap.ui.define([
                             UserID: bookingDetails.UserID || "",
                             PaidAmount: oData.data.PerMonthTotalRent || "0.00",
                             CouponCode: bookingDetails.CouponCode,
-                            GST : oData.data.BranchDetails.GSTIN || "",
-                            Type : oData.data.BranchDetails.Type || "",
-                            Value : oData.data.BranchDetails.Value || ""
+                            GST: oData.data.BranchDetails.GSTIN || "",
+                            Type: oData.data.BranchDetails.Type || "",
+                            Value: oData.data.BranchDetails.Value || ""
                         });
                     }
 
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
                     mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate);
-                    oModel.setData(mergedData);           
+                    oModel.setData(mergedData);
+
+                    const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                    // ---- GST auto mapping from BranchDetails ----
+                    if (mergedData.GST) {
+                        oCustomerModel.setProperty("/GST", mergedData.GST);
+                        oCustomerModel.setProperty("/GSTValid", true);
+
+                        // Set percentage
+                        oCustomerModel.setProperty("/Value", mergedData.Value || "");
+
+                        // Select GST Type
+                        if (mergedData.Type === "CGST/SGST") {
+                            oCustomerModel.setProperty("/Type", "CGST/SGST");
+                            oCustomerModel.setProperty("/CGSTSelected", true);
+                            oCustomerModel.setProperty("/IGSTSelected", false);
+                        } else if (mergedData.Type === "IGST") {
+                            oCustomerModel.setProperty("/Type", "IGST");
+                            oCustomerModel.setProperty("/CGSTSelected", false);
+                            oCustomerModel.setProperty("/IGSTSelected", true);
+                        }
+                    } else {
+                        // Reset GST section if no GST from backend
+                        oCustomerModel.setProperty("/GSTValid", false);
+                        oCustomerModel.setProperty("/Type", "");
+                        oCustomerModel.setProperty("/Value", "");
+                        oCustomerModel.setProperty("/CGSTSelected", false);
+                        oCustomerModel.setProperty("/IGSTSelected", false);
+                    }
 
                     this.byId("CID_id_Invoice").setMinDate(invoiceDate);
                     this.byId("CID_id_Payby").setMinDate(invoiceDate);
@@ -515,7 +544,7 @@ sap.ui.define([
                 utils._LCvalidateDate(oEvent);
             },
 
-            _getInvoiceDescription: function (oDate) {
+            _getInvoiceDescription: function(oDate) {
                 if (!oDate) return "";
 
                 const aMonths = [
@@ -610,12 +639,12 @@ sap.ui.define([
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled =
-                    !!gstin &&
+                const isGSTEnabled = !!gstin &&
                     !!taxType &&
                     taxRate > 0 &&
                     currency === "INR";
 
+                // Controls only UI visibility / enablement
                 this.visiablityPlay.setProperty("/GST", isGSTEnabled);
 
                 // ---------------- ITEM CALCULATION ----------------
@@ -637,17 +666,12 @@ sap.ui.define([
                         item.Discount = discountAmount.toFixed(2);
                     }
 
-                    let finalAmount = baseAmount - discountAmount;
+                    const finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    // ---------- GST APPLICABLE ----------
-                    let isGSTApplicable = false;
-
-                    if (isGSTEnabled && item.GSTCalculation === "YES") {
-                        isGSTApplicable = true;
-                    } else {
-                        item.GSTCalculation = "NO";
-                    }
+                    // ---------- GST APPLICABILITY  ----------
+                    const isGSTApplicable =
+                        isGSTEnabled && item.GSTCalculation === "YES";
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
 
@@ -678,16 +702,15 @@ sap.ui.define([
                         oCustomerModel.setProperty("/CGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/SGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/IGST", "0.00");
-                    } 
-                    else if (taxType === "IGST") {
+                    } else if (taxType === "IGST") {
                         gstAmount = (totalWithGST * taxRate) / 100;
                         finalAmount += gstAmount;
+
                         oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/CGST", "0.00");
                         oCustomerModel.setProperty("/SGST", "0.00");
                     }
                 } else {
-                    // GST NOT APPLICABLE
                     oCustomerModel.setProperty("/CGST", "0.00");
                     oCustomerModel.setProperty("/SGST", "0.00");
                     oCustomerModel.setProperty("/IGST", "0.00");
@@ -698,26 +721,20 @@ sap.ui.define([
                 if (finalAmount < 0) finalAmount = 0;
 
                 // ---------------- ROUND OFF ----------------
-                let roundedAmount = Math.round(finalAmount);
-                let roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
+                const roundedAmount = Math.round(finalAmount);
+                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
 
                 oSOWModel.setProperty("/RoundOf", roundOffDiff);
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
-                // ---------------- PAID & BALANCE AMOUNT ----------------
+                // ---------------- PAID & BALANCE ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
-                // Always recalculate balance
                 let balanceAmount = roundedAmount - paidAmount;
+                if (balanceAmount < 0) balanceAmount = 0;
 
-                // Clamp negative balance
-                if (balanceAmount < 0) {
-                    balanceAmount = 0;
-                }
-
-                // Persist values
                 oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                 oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                 oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
@@ -1055,9 +1072,95 @@ sap.ui.define([
             },
 
             CID_onPressLiveChangeGST: function(oEvent) {
-                var oInput = oEvent.getSource();
-                utils._LCvalidateGstNumber(oEvent)
-                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+                const oInput = oEvent.getSource();
+                const sGST = oInput.getValue().toUpperCase();
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                oInput.setValue(sGST);
+
+                // Empty GST → reset
+                if (!sGST) {
+                    oInput.setValueState("None");
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                    this.totalAmountCalculation();
+                    return;
+                }
+
+                // Validate GST format
+                if (!utils._LCvalidateGstNumber(oEvent)) {
+                    return;
+                }
+
+                // First 2 digits = State Code
+                const stateCode = sGST.substring(0, 2);
+
+                if (stateCode === "29") {
+                    // Karnataka → CGST + SGST
+                    oCustomerModel.setProperty("/Type", "CGST/SGST");
+                    oCustomerModel.setProperty("/CGSTSelected", true);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                } else {
+                    // Other states → IGST
+                    oCustomerModel.setProperty("/Type", "IGST");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                    oCustomerModel.setProperty("/IGSTSelected", true);
+                }
+
+                // GST is valid → allow percentage entry
+                oCustomerModel.setProperty("/GSTValid", true);
+
+                // Keep existing Value if already present
+                if (!oCustomerModel.getProperty("/Value")) {
+                    oCustomerModel.setProperty("/Value", "");
+                }
+                this.totalAmountCalculation();
+            },
+
+            CI_onSelectCGST: function(oEvent) {
+                const bSelected = oEvent.getParameter("selected");
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                if (bSelected) {
+                    oCustomerModel.setProperty("/Type", "CGST/SGST");
+                    oCustomerModel.setProperty("/Value", "9");
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                } else {
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/Value", "18");
+                }
+
+                this.totalAmountCalculation();
+            },
+
+            CI_onSelectIGST: function(oEvent) {
+                const bSelected = oEvent.getParameter("selected");
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                if (bSelected) {
+                    oCustomerModel.setProperty("/Type", "IGST");
+                    oCustomerModel.setProperty("/Value", "18");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                } else {
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/Value", "");
+                }
+
+                this.totalAmountCalculation();
+            },
+
+            CI_onPercentageChange: function(oEvent) {
+                const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
+
+                const oView = this.getView();
+                const oCustomerModel = oView.getModel("SelectedCustomerModel");
+
+                // Update percentage value only
+                oCustomerModel.setProperty("/Value", sPercentage);
+
+                // Recalculate totals
+                this.totalAmountCalculation();
             },
 
             CID_onPressLiveChangePAN: function(oEvent) {
@@ -1164,10 +1267,10 @@ sap.ui.define([
             },
 
             modelFunction: function() {
-            var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
 
                 var fTotalAmount = parseFloat(oNavigationModel.TotalAmount) || 0;
-                var fPaidAmount  = parseFloat(oNavigationModel.PaidAmount) || 0;
+                var fPaidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
 
                 // NEW: calculate balance amount
                 var fBalanceAmount = fTotalAmount > fPaidAmount ? (fTotalAmount - fPaidAmount) : fTotalAmount;
@@ -1682,16 +1785,16 @@ sap.ui.define([
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
                     const oCompanyItemModel = oManageInvoiceItemModel.ManageInvoiceItem || [];
                     var data = this.getView().getModel("FilteredSOWModel").getData();
-                    var paymentModel = this.getView().getModel("InvoicePayment");
-                    var allDueAmount = paymentModel ? (paymentModel.getProperty("/AllDueAmount") || 0) : 0;
-                    var AllReceivedAmount = paymentModel ? (paymentModel.getProperty("/AllReceivedAmount") || 0) : 0;
+                    // var paymentModel = this.getView().getModel("InvoicePayment");
+                    // var allDueAmount = paymentModel ? (paymentModel.getProperty("/AllDueAmount") || 0) : 0;
+                    // var AllReceivedAmount = paymentModel ? (paymentModel.getProperty("/AllReceivedAmount") || 0) : 0;
 
                     // fetch company details
                     let filter = { BranchID: [oModel.BranchCode] };
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let paymentTermsFilter = { InvNo: [oModel.InvNo] };
+                    let paymentTermsFilter = {InvNo: [oModel.InvNo] };
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
@@ -1713,9 +1816,13 @@ sap.ui.define([
                     let headerMargin = 25.4;
                     doc.setFontSize(14).setFont("times", "bold");
                     if (oModel.Status === "Payment Received") {
-                        doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                        doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, {
+                            align: "right"
+                        });
                     } else {
-                        doc.text("DRAFT INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                        doc.text("DRAFT INVOICE", pageWidth - 18, headerMargin, {
+                            align: "right"
+                        });
                     }
 
                     if (companyImage && companyImage.trim() !== "") {
@@ -1906,14 +2013,12 @@ sap.ui.define([
                         const sgstValue = parseFloat(oModel.SGST);
                         const igstValue = parseFloat(oModel.IGST);
 
-                        if (data.Currency === "INR" && oModel.Type === "CGST/SGST" && cgstValue
-                        ) {
+                        if (data.Currency === "INR" && oModel.Type === "CGST/SGST" && cgstValue) {
                             summaryBody.push([`CGST ${percentageText} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
                             summaryBody.push([`SGST ${percentageText} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
                         }
 
-                        if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue
-                        ) {
+                        if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue) {
                             summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
                     }
@@ -1922,17 +2027,17 @@ sap.ui.define([
                         summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
 
-                    if (parseFloat(allDueAmount) > 0) {
-                        summaryBody.push([`Due Amount (${data.Currency}) :`, allDueAmount]);
-                    }
+                    // if (parseFloat(allDueAmount) > 0) {
+                    //     summaryBody.push([`Due Amount (${data.Currency}) :`, allDueAmount]);
+                    // }
 
-                    if (parseFloat(AllReceivedAmount) > 0) {
-                        summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
-                    }
+                    // if (parseFloat(AllReceivedAmount) > 0) {
+                    //     summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
+                    // }
 
-                    if (parseFloat(data.BalanceAmount) > 0) {
-                        summaryBody.push([`Due Amount (${data.Currency}) :`, data.BalanceAmount]);
-                    }
+                    // if (parseFloat(data.BalanceAmount) > 0) {
+                    //     summaryBody.push([`Due Amount (${data.Currency}) :`, data.BalanceAmount]);
+                    // }
 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
@@ -2021,7 +2126,9 @@ sap.ui.define([
 
                         doc.autoTable({
                             startY: currentY,
-                            head: [['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']],
+                            head: [
+                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']
+                            ],
                             body: paymentBody,
                             theme: 'grid',
                             headStyles: {
@@ -2036,11 +2143,21 @@ sap.ui.define([
                                 halign: "center"
                             },
                             columnStyles: {
-                                1: { halign: "center" },
-                                2: { halign: "left" },
-                                3: { halign: "left" },
-                                4: { halign: "left" },
-                                5: { halign: "right" }
+                                1: {
+                                    halign: "center"
+                                },
+                                2: {
+                                    halign: "left"
+                                },
+                                3: {
+                                    halign: "left"
+                                },
+                                4: {
+                                    halign: "left"
+                                },
+                                5: {
+                                    halign: "right"
+                                }
                             }
                         });
 
