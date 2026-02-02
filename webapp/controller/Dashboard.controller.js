@@ -3,7 +3,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
-    "../model/Formatter"
+    "../model/formatter"
 ], function (BaseController, MessageBox, MessageToast, JSONModel, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Dashboard", {
