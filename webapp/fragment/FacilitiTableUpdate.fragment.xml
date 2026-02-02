@@ -32,7 +32,7 @@
                     required="true"
                 />
                 <ComboBox
-                    editable="true"
+                    editable="false"
                     id="FT_id_UnitType"
                     placeholder="{i18n>selectUnitType}"
                     items="{RateType>/}"
@@ -40,6 +40,7 @@
                     change="onUnitTextChange"
                     width="100%"
                     valueStateText="{i18n>selectRateType}"
+                   
                 >
                     <core:Item
                         key="{RateType>ID}"

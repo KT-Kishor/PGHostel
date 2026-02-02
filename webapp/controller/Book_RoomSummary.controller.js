@@ -1215,7 +1215,7 @@ oHostelModel.setProperty("/Persons", aPersons);
             oEditModel.setProperty("/TotalDays", "");
             oEditModel.refresh(true);
 
-    // 🔑 Do NOT touch TotalDays here
+    //  Do NOT touch TotalDays here
 
     // Resolve price
     const aFacilities = oFacilityModel.getProperty("/Facilities") || [];
@@ -1836,6 +1836,14 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
             MessageToast.show(
                 this.i18nModel.getText("thisCouponValidtheSelectedBranchRoom")
             );
+            oHostelModel.setProperty("/CouponCode", "");
+             const inputID = sap.ui.core.Fragment.byId(
+        this.getView().getId(),
+        "BookingcouponInput"
+    );
+    if (inputID) {
+        inputID.setShowValueHelp(false);
+    }
             return;
         }
 

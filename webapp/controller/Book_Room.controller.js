@@ -1720,18 +1720,18 @@ sap.ui.define([
 
             if (SelectedPriceType === "Per Day") {
                 addButton(facility.PricePerDay, "Per Day");
-                addButton(facility.PricePerHour, "Per Hour");
+                // addButton(facility.PricePerHour, "Per Hour");
 
             } else if (SelectedPriceType === "Per Month") {
                 addButton(facility.PricePerMonth, "Per Month");
-                addButton(facility.PricePerDay, "Per Day");
-                addButton(facility.PricePerHour, "Per Hour");
+                // addButton(facility.PricePerDay, "Per Day");
+                // addButton(facility.PricePerHour, "Per Hour");
 
             } else if (SelectedPriceType === "Per Year") {
                 addButton(facility.PricePerYear, "Per Year");
-                addButton(facility.PricePerMonth, "Per Month");
-                addButton(facility.PricePerDay, "Per Day");
-                addButton(facility.PricePerHour, "Per Hour");
+                // addButton(facility.PricePerMonth, "Per Month");
+                // addButton(facility.PricePerDay, "Per Day");
+                // addButton(facility.PricePerHour, "Per Hour");
             }
 
             this._oFacilityActionSheet = new sap.m.ActionSheet({
