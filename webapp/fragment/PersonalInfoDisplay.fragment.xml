@@ -120,7 +120,7 @@
                     />
                 </VBox>
             </FlexBox>
-
+    
             <!-- Booking Details for THIS person -->
             <Table
                 id="idFacilitySummaryTable"
@@ -205,16 +205,17 @@
 
                             <Text text="{HostelModel>StartDate}" />
                             <Text text="{HostelModel>EndDate}" />
-                            <Text
-    text="{
-        parts: [
-            'HostelModel>/SelectedPriceType',
-            'HostelModel>/TotalDays',
-            'HostelModel>/SelectedMonths'
-        ],
-        formatter: '.Formatter.getDurationValue'
-    }"
+                         <!-- REPLACE your Text TEMPORARILY -->
+ <Text
+ text="{= ${HostelModel>UnitText} === 'Per Day' || 
+         ${HostelModel>UnitText} === 'Per Hour'
+       ? ${HostelModel>TotalDays}
+       : ${HostelModel>IsDurationEdited}
+           ? ${HostelModel>SelectedMonths}
+           : ${HostelModel>/SelectedMonths} }"
 />
+
+
 
 
                             <Text

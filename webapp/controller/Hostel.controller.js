@@ -416,12 +416,6 @@ sap.ui.define([
                 GSTType: oData.GSTType
             };
             
-            // console.log("HostelModel:", JSON.stringify(oGlobalModel.getData(), null, 2));
-            // console.log("oBookingData:", JSON.stringify(oBookingData, null, 2));
-            // console.log("Area from HostelModel:", oData.Area);
-
-
-
             // -------------------------
             // MERGE WITH GLOBAL MODEL
             // -------------------------

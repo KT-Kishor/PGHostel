@@ -156,21 +156,33 @@ sap.ui.define([
 RECALCULATE ONLY THIS PERSON
 ================================== */
 const oPerson = aPersons[iPersonIndex];
+const hasPerMonthFacility =
+    oPerson.Facilities.SelectedFacilities.some(
+        f => f.UnitText === "Per Month"
+    );
 
+// 🔥 Sync SelectedMonths from summary rows back to real facility objects
+const realFacilities = oPerson.Facilities.SelectedFacilities || [];
+
+realFacilities.forEach(rf => {
+    const row = oPerson.AllSelectedFacilities.find(
+        f => f.FacilityName === rf.FacilityName
+    );
+
+    if (row && row.SelectedMonths) {
+        rf.SelectedMonths = row.SelectedMonths;
+    }
+});
+
+// oPerson.SelectedMonths = oPerson.SelectedMonths || 1;
 /* ---- Facility totals (per facility units) ---- */
-oPerson.AllSelectedFacilities.forEach(f => {
+oPerson.Facilities.SelectedFacilities.forEach(f => {
 
-    let fDays = Number(f.TotalDays || 1);
-    let fMonths = 0;
-    let fYears = 0;
-
-    if (f.UnitText === "Per Month") {
-        fMonths = Number(f.TotalMonths || 1);
-    }
-
-    if (f.UnitText === "Per Year") {
-        fYears = Number(f.TotalYears || 1);
-    }
+    const fDays   = Number(f.TotalDays || oPerson.TotalDays || 1);
+  const fMonths = hasPerMonthFacility
+    ? Number(f.SelectedMonths || 1)
+    : 0;
+    const fYears  = Number(f.TotalYears || 1);
 
     f.TotalAmount = this._calculateFacilityTotal(
         f,
@@ -180,8 +192,10 @@ oPerson.AllSelectedFacilities.forEach(f => {
     );
 });
 
+
+
 /* ---- Facility total sum ---- */
-oPerson.TotalFacilityPrice = oPerson.AllSelectedFacilities.reduce(
+oPerson.TotalFacilityPrice = oPerson.Facilities.SelectedFacilities.reduce(
     (s, f) => s + (Number(f.TotalAmount) || 0),
     0
 );
@@ -189,7 +203,12 @@ oPerson.TotalFacilityPrice = oPerson.AllSelectedFacilities.reduce(
 /* ---- Room rent ---- */
 const baseRoomRent = Number(oModel.getProperty("/FinalPrice")) || 0;
 const paymentType = oModel.getProperty("/SelectedPriceType");
-const selectedMonths = Number(oModel.getProperty("/SelectedMonths")) || 1;
+const selectedMonths = hasPerMonthFacility
+    ? Number(oPerson.SelectedMonths || 1)
+    : 0;
+
+
+
 
 const parseDate = v => {
     if (typeof v === "string" && v.includes("/")) {
@@ -261,11 +280,14 @@ oPerson.FinalTotalCost =
 if (paymentType !== "Per Day") {
     oPerson.MonthlyCostPerPerson =
         Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));
+        oPerson.MonthlyCostPerson =
+        Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));
 } else {
-    oPerson.MonthlyCostPerPerson = 0;
+   oPerson.MonthlyCostPerPerson =
+        Number(oPerson.FinalTotalCost.toFixed(2));
+         oPerson.MonthlyCostPerson =
+        Number(oPerson.FinalTotalCost.toFixed(2));
 }
-
-
         /* ==================================
         GRAND TOTAL (ONCE)
         ================================== */
@@ -597,9 +619,9 @@ if (paymentType !== "Per Day") {
     let oEnd = new Date(oStart);
 
     // ------------------------------------------------
-    // 👉 FIND CURRENT FACILITY
+    //  FIND CURRENT FACILITY
     // ------------------------------------------------
-    const sPath = this._sSelectedPath;   // "/Persons/1/AllSelectedFacilities/2"
+    const sPath = this._sSelectedPath;  
     const iPersonIndex = parseInt(sPath.split("/")[2], 10);
     const iFacilityIndex = parseInt(sPath.split("/")[4], 10);
 
@@ -620,8 +642,12 @@ if (paymentType !== "Per Day") {
 
         oFacility.TotalMonths = iCount;
         oFacility.TotalYears = 0;
-        oEditModel.setProperty("/TotalMonths", iCount);
-
+         oFacility.SelectedMonths = iCount;
+         oFacility.IsDurationEdited = true;
+          const aPersons = oHostelModel.getProperty("/Persons");
+    aPersons[iPersonIndex].SelectedMonths = iCount;
+        // oHostelModel.setProperty("/SelectedMonths", iCount);
+       
     }
 
     if (sUnit === "Per Year") {
@@ -630,7 +656,10 @@ if (paymentType !== "Per Day") {
 
         oFacility.TotalYears = iCount;
         oFacility.TotalMonths = 0;
-        oEditModel.setProperty("/TotalYears", iCount);
+        oFacility.IsDurationEdited = true;
+         const aPersons = oHostelModel.getProperty("/Persons");
+    aPersons[iPersonIndex].SelectedMonths = iCount;
+        // oHostelModel.setProperty("/SelectedYears", iCount);
 
     }
 
@@ -644,8 +673,7 @@ if (paymentType !== "Per Day") {
 
     oEditModel.setProperty("/EndDate", this._formatDateToDDMMYYYY(oEnd));
     oEditModel.setProperty("/TotalDays", iTotalDays);
-}
- ,
+},
 
         onEditDateChange: function (oEvent) {
 
@@ -857,6 +885,7 @@ if (paymentType !== "Per Day") {
 const iDays = Number(oFacility.TotalDays || oEditModel.getProperty("/TotalDays") || 1);
 //  TAKE FROM EDIT MODEL IF PRESENT
 const iMonths = Number(
+    oFacility.SelectedMonths ||
     oEditModel.getProperty("/TotalMonths")
 ) || (
     (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
@@ -864,6 +893,7 @@ const iMonths = Number(
 ) || 1;
 
 const iYears = Number(
+    oFacility.TotalYears ||
     oEditModel.getProperty("/TotalYears")
 ) || Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
 
@@ -875,11 +905,12 @@ const iYears = Number(
 if (oFacility.UnitText !== "Per Hour") {
     oFacility.TotalTime = 0;
 }
+oFacility.TotalMonths = iMonths;
 
 oFacility.TotalAmount = this._calculateFacilityTotal(
     oFacility,
     oFacility.TotalDays ?? iDays,
-    oFacility.TotalMonths ?? iMonths,
+    oFacility.TotalMonths,
     oFacility.TotalYears ?? iYears
 );
 
@@ -912,13 +943,7 @@ oFacility.TotalAmount = this._calculateFacilityTotal(
     oPerson.RoomRentPerPerson = roomRent;
     oPerson.SubTotal = roomRent + oPerson.TotalFacilityPrice;
 
-    // const sCountry = oHostelModel.getProperty("/Country");
-    // oPerson.CGST = sCountry === "India" ? oPerson.SubTotal * 0.09 : 0;
-    // oPerson.SGST = sCountry === "India" ? oPerson.SubTotal * 0.09 : 0;
-    // oPerson.FinalTotalCost =
-    //     oPerson.SubTotal + oPerson.CGST + oPerson.SGST;
-
-    // oPerson.IsIndia = (sCountry === "India");
+  
     // ------------------
 // GST (REFERENCE LOGIC ONLY)
 // ------------------
@@ -953,14 +978,7 @@ oPerson.FinalTotalCost = Number((
     oPerson.SGST +
     oPerson.IGST
 ).toFixed(2));
-// ------------------
-// MONTHLY COST PER PERSON
-// ------------------
-// const paymentType =
-//     oHostelModel.getProperty("/SelectedPriceType");
 
-// const selectedMonths =
-//     Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
 
 if (paymentType === "Per Day") {
     oPerson.MonthlyCostPerPerson =
@@ -1050,9 +1068,7 @@ oHostelModel.setProperty("/Persons", aPersons);
   
 
     MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
-}
-
-,
+},
 
         _formatDateToDDMMYYYY: function (dt) {
             if (!dt || !(dt instanceof Date)) return "";
@@ -1086,10 +1102,7 @@ oHostelModel.setProperty("/Persons", aPersons);
         default:
             return 0;
     }
-}
-
-
-,
+},
 
       _parseDate: function (s) {
     if (!s) return null;

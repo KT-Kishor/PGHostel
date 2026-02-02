@@ -1747,6 +1747,8 @@ sap.ui.define([
 
             const oModel = this.getView().getModel("HostelModel");
             const aPersons = oModel.getProperty("/Persons");
+            const selectedMonths =
+                Number(oModel.getProperty("/SelectedMonths")) || 1;
 
             let aSelected =
                 aPersons[iPersonIndex].Facilities.SelectedFacilities;
@@ -1805,22 +1807,46 @@ sap.ui.define([
                 }
             }, 0);
 
-            oModel.refresh(true);
+          
             // 🔁 Rebuild AllSelectedFacilities from all persons
+            // Ensure duration values exist
+aPersons[iPersonIndex].TotalDays = 30;
+aPersons[iPersonIndex].SelectedMonths = selectedMonths;
+
+            
 let aAll = [];
 
-aPersons.forEach(person => {
+const defaultMonths =
+    Number(oModel.getProperty("/SelectedMonths")) || 1;
+
+aPersons.forEach((person, personIdx) => {
     if (person.Facilities?.SelectedFacilities) {
-        person.Facilities.SelectedFacilities.forEach(fac => {
+        person.Facilities.SelectedFacilities.forEach(facility => {
+
+            // 🔥 Ensure months exist
+            if (!facility.SelectedMonths) {
+                facility.SelectedMonths = defaultMonths;
+            }
+
             aAll.push({
-                ...fac,
-                PersonIndex: person.PersonIndex || 0   // optional
+                FacilityName: facility.FacilityName,
+                UnitText: facility.SelectedPriceType,
+                SelectedPriceType: facility.SelectedPriceType,
+                PersonIndex: personIdx,
+                Currency: facility.Currency,
+                SelectedPrice: facility.SelectedPrice,
+
+                TotalDays: person.TotalDays || 1,
+                SelectedMonths: facility.SelectedMonths,
+                 IsDurationEdited: facility.IsDurationEdited 
             });
         });
     }
 });
 
+
 oModel.setProperty("/AllSelectedFacilities", aAll);
+  oModel.refresh(true);
 
         }
         ,
@@ -4822,6 +4848,8 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                             CouponCode: index === 0 ? oCouponCode : "",
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID,
+                            GSTType: oData.GSTType || "",
+                            GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0"
                             // PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
                         });
                     }
