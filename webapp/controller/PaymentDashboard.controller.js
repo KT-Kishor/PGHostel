@@ -40,12 +40,71 @@ sap.ui.define([
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "invoiceChartTypeModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostelDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
+        _loadBranchCode: async function () {
+            try {
+                const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+                const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
+                let aBranchCodes = "";
+
+                if (Array.isArray(omainModel) && omainModel.length) {
+                    aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+                } else if (oExistingModel.BranchCode) {
+                    aBranchCodes = oExistingModel.BranchCode;
+                }
+
+                let filters = {};
+
+                if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                    filters.BranchID = aBranchCodes;
+                }
+                if (oExistingModel.Role === "Admin") {
+                    filters.BranchID = aBranchCodes;
+                    filters.Role = "Admin";
+                } else {
+                    filters.BranchID = "";
+                }
+
+                const oView = this.getView();
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
+                const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                oView.setModel(oBranchModel, "Branchmodel");
+
+                // Store allowed branches for filtering
+                this._allowedBranches = aBranches
+                    .map(item => item.BranchID)
+                    .join(",");
+
+            } catch (err) {
+                console.error("Error while loading branch data:", err);
+            }
+        },
+
+        _buildBranchMap: function () {
+            const aBranches = this.getView().getModel("Branchmodel").getData() || [];
+            this._branchMap = {};
+
+            aBranches.forEach(b => {
+                this._branchMap[b.BranchID] = b.Name;
+            });
+        },
         _onObjectMatched: async function () {
             var LoginFunction = await this.commonLoginFunction("PaymentDashboard");
             if (!LoginFunction) return;
-            var oVizFrame = this.getView().byId("donutChartStatus");
 
+            // Get logged in user info
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            if (oLoginModel) {
+                this._oLoggedInUser = oLoginModel.getData();
+            } else {
+                this._oLoggedInUser = {};
+            }
+
+            await this._loadBranchCode();
+            this._buildBranchMap();
+
+            var oVizFrame = this.getView().byId("donutChartStatus");
 
             this.getView().getModel("invoiceChartTypeModel").setData(JSON.parse(JSON.stringify(INITIAL_CHART_TYPES)));
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -73,10 +132,26 @@ sap.ui.define([
 
         readInvoiceData: async function () {
             try {
-                // this.getBusyDialog();
                 sap.ui.core.BusyIndicator.show(0);
-                const oData = await this.ajaxReadWithJQuery("HM_ManageInvoice");
-                const CreditNote = await this.ajaxReadWithJQuery("CreditNote");
+
+                // Prepare filters based on role
+                let invoiceFilters = {};
+                let creditNoteFilters = {};
+
+                // If user is not Super Admin, filter by allowed branches
+                if (this._oLoggedInUser?.Role !== "Super Admin" && this._allowedBranches) {
+                    invoiceFilters.BranchCode = this._allowedBranches;
+                    creditNoteFilters.BranchCode = this._allowedBranches;
+
+                    // If user is Admin with specific role
+                    if (this._oLoggedInUser?.Role === "Admin") {
+                        invoiceFilters.Role = "Admin";
+                        creditNoteFilters.Role = "Admin";
+                    }
+                }
+
+                const oData = await this.ajaxReadWithJQuery("HM_ManageInvoice", invoiceFilters);
+                const CreditNote = await this.ajaxReadWithJQuery("CreditNote", creditNoteFilters);
 
                 this.rawInvoiceData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 this.creditNotesData = Array.isArray(CreditNote.data) ? CreditNote.data : [CreditNote.data];
@@ -126,7 +201,6 @@ sap.ui.define([
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
-                // this.closeBusyDialog();
                 sap.ui.core.BusyIndicator.hide();
             }
         },

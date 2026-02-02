@@ -178,10 +178,10 @@
                                                                     class="custom-welcome sapUiTinyMarginTopBottom"
                                                                     text="{i18n>bookYourRoom} "
                                                                 />
-                                                                <Text
+                                                                <!-- <Text
                                                                     class="custom-welcome  sapUiTinyMarginTopBottom "
                                                                     text="{i18n>companynameKT}"
-                                                                />
+                                                                /> -->
                                                                 <Text
                                                                     text="{i18n>yourNewHomeAwayFromHome}"
                                                                     class="custom-tagline s apUiTinyMarginTop "

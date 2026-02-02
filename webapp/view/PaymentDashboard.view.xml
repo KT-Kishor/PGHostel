@@ -25,7 +25,9 @@
             />
         </headerContent>
         <content>
-            <VBox class="sapUiSmallMargin">
+            <!-- <VBox class="sapUiSmallMargin"> -->
+            <VBox class="sapUiSmallMargin paymentDashboardTheme">
+
                 <!-- Filter Bar -->
                 <fb:FilterBar
                     id="dashboardFilterBar"
@@ -138,7 +140,18 @@
                                                     id="donutChartStatus"
                                                     vizType="{invoiceChartTypeModel>/statusType}"
                                                     width="100%"
-                                                    vizProperties="{ title: { visible: false }, plotArea: { dataLabel: { visible: false, type: 'value' } }, interaction: { selectability: { mode: 'SINGLE' } } }"
+vizProperties="{
+  title: { visible: false },
+  legend: { label: { color: '#ffffff' } },
+  plotArea: {
+    dataLabel: { visible: false },
+    colorPalette: ['#4ac2d2', '#007984']
+  }
+    }"
+
+
+
+
                                                     selectData="onStatusChartSelect"
                                                 >
                                                     <viz:dataset>
@@ -212,6 +225,7 @@
                                     showFullScreen="true"
                                     showPersonalization="false"
                                     autoAdjustHeight="false"
+                                    class="monthly-trend-chart"
                                 >
                                     <com:content>
                                         <com:ChartContainerContent>
@@ -473,6 +487,71 @@
                                 </Toolbar>
                             </f:header>
                             <f:content>
+    <com:ChartContainer
+        showFullScreen="true"
+        showPersonalization="false"
+        autoAdjustHeight="false"
+    >
+        <com:content>
+            <com:ChartContainerContent>
+                <com:content>
+                    <viz:VizFrame
+                        id="stackedChartPayment"
+                        vizType="{invoiceChartTypeModel>/paymentBreakdownType}"
+                        width="100%"
+                        vizProperties="{
+                            title: { visible: false },
+                            plotArea: { 
+                                dataLabel: { visible: false, formatString: '#' },
+                                colorPalette: ['#2196F3', '#FFC107'] 
+                            },
+                            interaction: { selectability: { mode: 'SINGLE' } }
+                        }"
+                        selectData="onPaymentBreakdownSelect"
+                    >
+                        <viz:dataset>
+                            <vizData:FlattenedDataset
+                                data="{chartData>/paymentBreakdown}"
+                            >
+                                <vizData:dimensions>
+                                    <vizData:DimensionDefinition
+                                        name="Customer"
+                                        value="{chartData>customerName}"
+                                    />
+                                </vizData:dimensions>
+                                <vizData:measures>
+                                    <vizData:MeasureDefinition
+                                        name="Taxable Amount"
+                                        value="{chartData>taxableAmount}"
+                                    />
+                                    <vizData:MeasureDefinition
+                                        name="GST Amount"
+                                        value="{chartData>gstAmount}"
+                                    />
+                                    <!-- Credit Notes Amount has been removed -->
+                                </vizData:measures>
+                            </vizData:FlattenedDataset>
+                        </viz:dataset>
+                        <viz:feeds>
+                            <vizFeeds:FeedItem
+                                uid="valueAxis"
+                                type="Measure"
+                                values="Taxable Amount,GST Amount"
+                            />
+                            <vizFeeds:FeedItem
+                                uid="categoryAxis"
+                                type="Dimension"
+                                values="Customer"
+                            />
+                        </viz:feeds>
+                    </viz:VizFrame>
+                </com:content>
+            </com:ChartContainerContent>
+        </com:content>
+    </com:ChartContainer>
+</f:content>
+
+                            <!-- <f:content>
                                 <com:ChartContainer
                                     showFullScreen="true"
                                     showPersonalization="false"
@@ -538,7 +617,7 @@
                                         </com:ChartContainerContent>
                                     </com:content>
                                 </com:ChartContainer>
-                            </f:content>
+                            </f:content> -->
                         </f:Card>
 
                         <!-- 6. Pending Payments by Customer -->

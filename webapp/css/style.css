@@ -3801,3 +3801,79 @@ span.sapMBtnInner.sapMBtnEmphasized {
   background-color: lightskyblue !important;
   border-radius: 8px;
 }
+.customdashboard {
+    background: linear-gradient(135deg, #00b7c7, #007984) !important;
+    border-radius: 15px 15px 0 0 !important;
+    color: #ffffff !important;
+}
+
+.Dashboardtitle {
+    margin: 0;
+    padding: 0;
+    color: #ffffff !important;
+}
+
+@media (max-width: 400px) {
+    .Dashboardtitle {
+        font-size: 12px !important;
+    }
+}
+
+/* Styling for the Toolbar in Card headers (chart type buttons) */
+.customdashboard .sapUiIcon {
+    color: #ffffff !important;
+}
+
+.customdashboard .sapMBtn:hover .sapUiIcon {
+    color: #e0f7fa !important;
+}
+
+/* ======================================== */
+
+.sapFCard {
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+/* Fix for ChartContainer Toolbar (chart/table toggle, fullscreen, etc.) */
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar .sapMBtn .sapUiIcon {
+    color: #007984 !important; /* This should work now */
+}
+
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar .sapMBtn:hover .sapUiIcon {
+    color: #00b7c7 !important; /* Hover color */
+}
+
+/* Make sure the toolbar background is transparent */
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar {
+    background: transparent !important;
+    border-bottom: none !important;
+}
+
+/* ChartContainer chart/table toggle button */
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar .sapMBtn.sapMBtnEmphasized {
+    background-color: transparent !important;
+    border-color: #007984 !important;
+}
+
+.paymentDashboardTheme .sapFCard {
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+/* Monthly Trend Chart specific styling */
+.paymentDashboardTheme .monthly-trend-chart.sapSuiteUiCommonsChartContainerToolbar .sapMBtn .sapUiIcon {
+    color: #e0f7fa !important; /* Single color for Monthly Trend Chart */
+}
+
+.paymentDashboardTheme .monthly-trend-chart.sapSuiteUiCommonsChartContainerToolbar .sapMBtn:hover .sapUiIcon {
+    color: #ffffff !important; /* Hover color */
+}
+
+/* Keep the original styling for all other ChartContainers */
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar:not(.monthly-trend-chart) .sapMBtn .sapUiIcon {
+    color: #007984 !important;
+}
+
+.paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar:not(.monthly-trend-chart) .sapMBtn:hover .sapUiIcon {
+    color: #00b7c7 !important;
+}

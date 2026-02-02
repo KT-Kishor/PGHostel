@@ -4,7 +4,7 @@
 	xmlns:layout="sap.ui.layout">
 	<Dialog id="invoiceListDialog" contentWidth="1000px" contentHeight="500px" resizable="true" draggable="true">
 		<customHeader>
-			<Bar class="Coursetitle">
+			<Bar class="barheader">
 				<contentLeft>
 					<Title text="{i18n>invoiceFor} {popoverData>/status}" />
 				</contentLeft>

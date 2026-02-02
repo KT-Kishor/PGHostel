@@ -13,10 +13,10 @@
                 alignItems="Center"
                 justifyContent="SpaceBetween"
             >
-                <Text
-                    text="{i18n>companynameKT}"
-                    class="footer-text"
-                />
+<core:HTML
+    content="&lt;a href='https://www.kalpavrikshatechnologies.com/' class='footer-text' target='_blank'&gt;Developed by: Kalpavriksha Technologies&lt;/a&gt;"
+/>
+
                 <HBox
                     class="footer-social"
                     alignItems="Center"
