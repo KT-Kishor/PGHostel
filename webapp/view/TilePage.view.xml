@@ -177,8 +177,9 @@
 
                 <GenericTile
                     id="id9roomTile"
+                    visible="{= ${LoginModel>/Role} === 'Admin'}"
                     class="sapUiMediumMargin glassTile"
-                    header="{i18n>dashboard}"
+                    header="{i18n>bookingDashboard}"
                     press="TileV_onpressdashboard"
                 >
                     <TileContent unit="{i18n>viewDashboard}">

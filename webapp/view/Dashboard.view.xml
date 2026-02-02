@@ -2,6 +2,7 @@
     controllerName="sap.ui.com.project1.controller.Dashboard"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:core="sap.ui.core"
     displayBlock="true"
@@ -14,7 +15,7 @@
             />
         </headerContent>
 
-        <VBox class="sapUiSmallMargin">
+        <VBox class=" todaySection sapUiSmallMargin">
             <Title
                 text="Today's Bookings"
                 level="H3"
@@ -37,82 +38,314 @@
                     >
                         <VBox>
                             <Title
-                                text="{todayModel>BookingID}"
+                                text="Booking ID: {todayModel>BookingID}"
                                 level="H4"
                                 wrapping="true"
                             />
-
-                            <Text text="Customer ID: {todayModel>CustomerID}" />
-
                             <Text
-                                text="From: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' }"
+                                text="Booking Date: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
                             />
-
                             <Text
-                                text="To: { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                                text="Customer Name: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                                wrapping="true"
                             />
-
-                            <Button
-                                text="View Booking"
-                                type="Emphasized"
-                                press="onBookingCardPress"
+                            <Text
+                                text="Stay: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                            />
+                            <HBox
+                                justifyContent="End"
                                 class="sapUiSmallMarginTop"
-                            />
+                            >
+                                <Button
+                                    text="View Booking"
+                                    type="Emphasized"
+                                    press="onBookingCardPress"
+                                />
+                            </HBox>
                         </VBox>
                     </Panel>
                 </HBox>
             </Carousel>
-            <VBox class="sapUiMediumMarginTop">
-                <Toolbar>
-                    <Title
-                        text="Monthly Booking Trend"
-                        level="H3"
-                    />
-                    <ToolbarSpacer />
-                    <Button
-                        icon="sap-icon://vertical-bar-chart"
-                        press="onColumnChart"
-                        tooltip="Vertical bar chart"
-                    />
-                    <Button
-                        icon="sap-icon://bar-chart"
-                        press="onBarChart"
-                        tooltip="Bar chart"
-                    />
-                    <Button
-                        icon="sap-icon://line-chart"
-                        press="onLineChart"
-                        tooltip="Line chart"
-                    />
-                    <Button
-                        icon="sap-icon://pie-chart"
-                        press="onPieChart"
-                        tooltip="Pie chart"
-                    />
-                </Toolbar>
 
-                <viz:VizFrame
-                    id="bookingChart"
-                    height="400px"
-                    width="100%"
-                    vizType="{chartTypeModel>/monthlyType}"
-                    uiConfig="{applicationSet:'fiori'}"
-                    vizProperties="{
-    plotArea: {
-        dataLabel: { visible: true, type: 'valueAndPercentage' }
-    },
-    valueAxis: {
-        title: { visible: true, text: 'Number of Bookings' }
-    },
-    categoryAxis: {
-        title: { visible: true, text: 'Month' }
-    },
-    legend: {
-        visible: true
-    }
-}"
-                />
+            <VBox class="sapUiMediumMarginTop">
+                <fb:FilterBar
+                    id="D_id_FilterbarEmployee"
+                    persistencyKey="myPersKey"
+                    useToolbar="false"
+                    clear="D_onPressClear"
+                    showClearOnFB="true"
+                    search="onFilterGo"
+                    filterChange="onFilterChange"
+                    afterVariantLoad="IA_.onAfterVariantLoad"
+                    showFilterConfiguration="false"
+                    filterContainerWidth="auto"
+                >
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="year"
+                            label="{i18n>year}"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <DatePicker
+                                    id="D_id_year"
+                                    valueFormat="yyyy"
+                                    displayFormat="yyyy"
+                                    change="onFilterChange"
+                                />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="month"
+                            label="{i18n>month}"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <Select
+                                    id="D_id_month"
+                                    selectedKey="{filterModel>/month}"
+                                    change="onFilterChange"
+                                >
+                                    <items>
+                                        <core:Item
+                                            key="1"
+                                            text="Jan"
+                                        />
+                                        <core:Item
+                                            key="2"
+                                            text="Feb"
+                                        />
+                                        <core:Item
+                                            key="3"
+                                            text="Mar"
+                                        />
+                                        <core:Item
+                                            key="4"
+                                            text="Apr"
+                                        />
+                                        <core:Item
+                                            key="5"
+                                            text="May"
+                                        />
+                                        <core:Item
+                                            key="6"
+                                            text="Jun"
+                                        />
+                                        <core:Item
+                                            key="7"
+                                            text="Jul"
+                                        />
+                                        <core:Item
+                                            key="8"
+                                            text="Aug"
+                                        />
+                                        <core:Item
+                                            key="9"
+                                            text="Sep"
+                                        />
+                                        <core:Item
+                                            key="10"
+                                            text="Oct"
+                                        />
+                                        <core:Item
+                                            key="11"
+                                            text="Nov"
+                                        />
+                                        <core:Item
+                                            key="12"
+                                            text="Dec"
+                                        />
+                                    </items>
+                                </Select>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                </fb:FilterBar>
             </VBox>
+
+            <HBox
+                width="100%"
+                class="sapUiMediumMarginTop"
+                renderType="Bare"
+            >
+                <VBox
+                    width="50%"
+                    class="sapUiSmallMarginEnd"
+                >
+                    <Toolbar>
+                        <Title
+                            text="Monthly Booking Trend"
+                            level="H3"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            icon="sap-icon://vertical-bar-chart"
+                            press="onColumnChart"
+                        />
+                        <Button
+                            icon="sap-icon://bar-chart"
+                            press="onBarChart"
+                        />
+                        <Button
+                            icon="sap-icon://line-chart"
+                            press="onLineChart"
+                        />
+                        <Button
+                            icon="sap-icon://pie-chart"
+                            press="onPieChart"
+                        />
+                    </Toolbar>
+
+                    <viz:VizFrame
+                        id="bookingChart"
+                        height="400px"
+                        width="100%"
+                        vizType="{chartTypeModel>/monthly}"
+                        uiConfig="{applicationSet:'fiori'}"
+                        vizProperties="{
+                            plotArea: { dataLabel: { visible: true } },
+                            valueAxis: { title: { text: 'Number of Bookings' } },
+                            categoryAxis: { title: { text: 'Month' } },
+                            legend: { visible: true }
+                        }"
+                    />
+                </VBox>
+
+                <VBox
+                    width="50%"
+                    class="sapUiSmallMarginBegin"
+                >
+                    <Toolbar>
+                        <Title
+                            text="Daily Booking Trend"
+                            level="H3"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            icon="sap-icon://vertical-bar-chart"
+                            press="ondayColumnChart"
+                        />
+                        <Button
+                            icon="sap-icon://bar-chart"
+                            press="ondayBarChart"
+                        />
+                        <Button
+                            icon="sap-icon://line-chart"
+                            press="ondayLineChart"
+                        />
+                        <Button
+                            icon="sap-icon://pie-chart"
+                            press="ondayPieChart"
+                        />
+                    </Toolbar>
+                    <viz:VizFrame
+                        id="dailyBookingChart"
+                        height="400px"
+                        width="100%"
+                        vizType="{chartTypeModel>/daily}"
+                        uiConfig="{applicationSet:'fiori'}"
+                        vizProperties="{
+                            plotArea: { dataLabel: { visible: true } },
+                            valueAxis: { title: { text: 'Number of Bookings' } },
+                            categoryAxis: { title: { text: 'Day' } }
+                        }"
+                    />
+                </VBox>
+            </HBox>
+            <HBox
+                width="100%"
+                class="sapUiMediumMarginTop"
+                renderType="Bare"
+            >
+                <VBox
+                    width="50%"
+                    class="sapUiSmallMarginEnd"
+                >
+                    <Toolbar>
+                        <Title
+                            text="Status Wise Booking Trend"
+                            level="H3"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            icon="sap-icon://vertical-bar-chart"
+                            press="onStatusColumnChart"
+                        />
+                        <Button
+                            icon="sap-icon://bar-chart"
+                            press="onStatusBarChart"
+                        />
+                        <Button
+                            icon="sap-icon://line-chart"
+                            press="onStatusLineChart"
+                        />
+                        <Button
+                            icon="sap-icon://pie-chart"
+                            press="onStatusPieChart"
+                        />
+                    </Toolbar>
+
+                    <viz:VizFrame
+                        id="statusBookingChart"
+                        height="400px"
+                        width="100%"
+                        vizType="{chartTypeModel>/status}"
+                        uiConfig="{applicationSet:'fiori'}"
+                        vizProperties="{
+                plotArea: { dataLabel: { visible: true } },
+                valueAxis: { title: { text: 'Number of Bookings' } },
+                categoryAxis: { title: { text: 'Status' } }
+            }"
+                    />
+                </VBox>
+
+                <VBox
+                    width="50%"
+                    class="sapUiSmallMarginBegin"
+                >
+                    <Toolbar>
+                        <Title
+                            text="Payment Type Booking Trend"
+                            level="H3"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            icon="sap-icon://vertical-bar-chart"
+                            press="onPayColumnChart"
+                        />
+                        <Button
+                            icon="sap-icon://bar-chart"
+                            press="onPayBarChart"
+                        />
+                        <Button
+                            icon="sap-icon://line-chart"
+                            press="onPayLineChart"
+                        />
+                        <Button
+                            icon="sap-icon://pie-chart"
+                            press="onPayPieChart"
+                        />
+                    </Toolbar>
+
+                    <viz:VizFrame
+                        id="paymentTypeChart"
+                        height="400px"
+                        width="100%"
+                        vizType="{chartTypeModel>/payment}"
+                        uiConfig="{applicationSet:'fiori'}"
+                        vizProperties="{
+                plotArea: { dataLabel: { visible: true } },
+                valueAxis: { title: { text: 'Number of Bookings' } },
+                categoryAxis: { title: { text: 'Payment Type' } }
+            }"
+                    />
+                </VBox>
+            </HBox>
         </VBox>
     </Page>
 </mvc:View>

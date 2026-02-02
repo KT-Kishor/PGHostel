@@ -3877,3 +3877,14 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .paymentDashboardTheme .sapSuiteUiCommonsChartContainerToolbar:not(.monthly-trend-chart) .sapMBtn:hover .sapUiIcon {
     color: #00b7c7 !important;
 }
+
+.todaySection {
+    background: linear-gradient(135deg, #f7fbff, #eef5ff);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.todaySection .sapMGTContent {
+  background: transparent !important;
+}
