@@ -601,10 +601,11 @@ HM_UnassignRoom: function () {
     /* ================= VALIDATIONS ================= */
 
     if (ID.Status === "New") {
+           var bIsCash = PaymentMode === "Cash";
         if (
             !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
             !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
-            !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID") ||
+            (!bIsCash && !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID")) ||
             !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
         ) {
             sap.m.MessageToast.show(
@@ -675,6 +676,7 @@ HM_UnassignRoom: function () {
 
     if (ID.Status === "Assigned") {
         Payload = {
+            CustomerID: ID.CustomerID,
             RoomNo: selectedRoomNo,
             Status: "Assigned"
         };
@@ -693,7 +695,7 @@ HM_UnassignRoom: function () {
             DepositAmount: parseInt(DepositAmount),
             DepositCurrency: "INR",
             DepositMode: PaymentMode,
-            DepositTransactionID: TransactionID,
+            DepositTransactionID:PaymentMode==="Cash"? "" :TransactionID,
             DepositDate: new Date().toISOString().split("T")[0],
             BranchCode: ID.BranchCode,
             DepositTakenBy: oExistingModel.EmployeeName,
@@ -713,6 +715,7 @@ HM_UnassignRoom: function () {
     /* ================= API CALL ================= */
 
     try {
+        sap.ui.core.BusyIndicator.show(0);
         await this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
 
         sap.m.MessageToast.show(
@@ -961,11 +964,25 @@ HM_UnassignRoom: function () {
             this.byId("PO_id_Date").setValue("");
         },
 
-        onRoomNoChange: function (oEvent) {
+        onPaymentModeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            var value=oEvent.getSource().getValue();
+            if(value==="Cash"){
+              sap.ui.getCore().byId("id_TransactionID").setEnabled(false).setValue("");
+            }else{
+                sap.ui.getCore().byId("id_TransactionID").setEnabled(true);
+            }
+            
+        },
+        onRoomNoChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
         },
         DepositAmountLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+        },
+        ActualAmountLiveChange: function (oEvent) {
+            utils.onNumber(oEvent.getSource(), "ID");
         },
 
         AD_onPressEditDetails: function (oEvent) {

@@ -64,7 +64,7 @@
                     value="{HostelModel>/ActualAmount}"
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
-                    liveChange="DepositAmountLiveChange"
+                    liveChange="ActualAmountLiveChange"
                     valueStateText="Enter Actual Amount"
                 />
 
@@ -77,7 +77,7 @@
                     placeholder="Select Payment Mode"
                     selectedKey="{HostelModel>/PaymentMode}"
                     valueStateText="Select Payment Mode"
-                    change="onRoomNoChange"
+                    change="onPaymentModeChange"
                     visible="{Visiblemodel>/Visible}"
 
                 >
@@ -97,7 +97,7 @@
 
                   <Label
                     text="Transaction ID"
-                        required="true"
+                        required="{= ${HostelModel>/PaymentMode} === 'Cash' ? false : true }"
                 />
                 <Input
                     id="id_TransactionID"
@@ -107,6 +107,8 @@
                     liveChange="DepositAmountLiveChange"
                     valueStateText="Enter Transaction ID"
                     maxLength="20"
+                    enabled="{= ${HostelModel>/PaymentMode} === 'Cash' ? false : true }"
+                  
 
                 />
 
