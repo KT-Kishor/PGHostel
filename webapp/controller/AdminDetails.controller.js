@@ -3243,8 +3243,9 @@ sap.ui.define([
             this.getView().getModel("edit").setProperty("/CouponDiscount", "");
         },
         onGSTBooking: function () {
-
-
+              
+              var oCustomerModel = this.getView().getModel("CustomerData")
+                const CustData = this.getView().getModel("CustomerData").getData();
 
             if (!this.GST_Dialog) {
                 var oView = this.getView();
@@ -3252,7 +3253,8 @@ sap.ui.define([
                 oView.addDependent(this.GST_Dialog);
             }
             sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue("");
-            sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue("");
+            sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
+            sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
 
             this.GST_Dialog.open();
         },
