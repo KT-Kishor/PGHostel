@@ -410,7 +410,8 @@ sap.ui.define([
 
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
-                    oModel.setData(mergedData);
+                    mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate);
+                    oModel.setData(mergedData);           
 
                     this.byId("CID_id_Invoice").setMinDate(invoiceDate);
                     this.byId("CID_id_Payby").setMinDate(invoiceDate);
@@ -485,12 +486,30 @@ sap.ui.define([
                 this.byId("CID_id_Invoice").setMinDate(selectedDate);
                 this.byId("CID_id_Payby").setMinDate(selectedDate);
 
-                this.getView().getModel("SelectedCustomerModel").setProperty("/PayByDate", payByDate);
+                const oModel = this.getView().getModel("SelectedCustomerModel");
+
+                oModel.setProperty("/InvoiceDate", selectedDate);
+                oModel.setProperty("/PayByDate", payByDate);
+                oModel.setProperty("/InvoiceDescription", this._getInvoiceDescription(selectedDate));
                 utils._LCvalidateDate(oEvent);
             },
 
             onPayByDateDatePickerChange: function(oEvent) {
                 utils._LCvalidateDate(oEvent);
+            },
+
+            _getInvoiceDescription: function (oDate) {
+                if (!oDate) return "";
+
+                const aMonths = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                const monthName = aMonths[oDate.getMonth()];
+                const year = oDate.getFullYear();
+
+                return `Invoice for ${monthName} ${year}`;
             },
 
             CID_onPressAddInvoiceItems: function(oEvent) {
@@ -670,17 +689,22 @@ sap.ui.define([
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
-                // ---------------- PAID AMOUNT ----------------
+                // ---------------- PAID & BALANCE AMOUNT ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
-                let balanceAmount = roundedAmount;
 
-                if (paidAmount > 0) {
-                    balanceAmount = roundedAmount - paidAmount;
-                    if (balanceAmount < 0) balanceAmount = 0;
-                    oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
-                    oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
-                    oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                // Always recalculate balance
+                let balanceAmount = roundedAmount - paidAmount;
+
+                // Clamp negative balance
+                if (balanceAmount < 0) {
+                    balanceAmount = 0;
                 }
+
+                // Persist values
+                oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
+                oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+
                 oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
             },
@@ -1301,7 +1325,7 @@ sap.ui.define([
                         this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
-                        this.Readcall("ManageInvoice", {
+                        this.Readcall("HM_ManageInvoice", {
                             InvNo: this.decodedPath
                         });
 
@@ -1650,7 +1674,7 @@ sap.ui.define([
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let paymentTermsFilter = { CustomerID: [oModel.CustomerID] };
+                    let paymentTermsFilter = { InvNo: [oModel.InvNo] };
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
@@ -1671,9 +1695,11 @@ sap.ui.define([
                     // Header
                     let headerMargin = 25.4;
                     doc.setFontSize(14).setFont("times", "bold");
-                    doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, {
-                        align: "right"
-                    });
+                    if (oModel.Status === "Payment Received") {
+                        doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                    } else {
+                        doc.text("DRAFT INVOICE", pageWidth - 18, headerMargin, { align: "right" });
+                    }
 
                     if (companyImage && companyImage.trim() !== "") {
                         const imgData = "data:image/png;base64," + companyImage;
@@ -1856,8 +1882,6 @@ sap.ui.define([
                         ]);
                     }
 
-                   
-
                     if (data.Currency !== "USD" && oModel.Type) {
                         const percentageText = oModel.Value && oModel.Value !== "0" ? `(${oModel.Value}%)` : "";
 
@@ -1887,6 +1911,10 @@ sap.ui.define([
 
                     if (parseFloat(AllReceivedAmount) > 0) {
                         summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
+                    }
+
+                    if (parseFloat(data.BalanceAmount) > 0) {
+                        summaryBody.push([`Due Amount (${data.Currency}) :`, data.BalanceAmount]);
                     }
 
                     const totalRowIndex = summaryBody.length;
