@@ -51,6 +51,21 @@
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
                     valueStateText="Enter Deposit Amount"
+                    editable="false"
+                />
+
+                 <Label
+                    text="Actual Amount"
+                    required="true"
+                />
+                <Input
+                    id="id_ActualAmount"
+                    placeholder="Enter Actual Amount"
+                    value="{HostelModel>/ActualAmount}"
+                    maxLength="6"
+                    visible="{Visiblemodel>/Visible}"
+                    liveChange="DepositAmountLiveChange"
+                    valueStateText="Enter Actual Amount"
                 />
 
                    <Label

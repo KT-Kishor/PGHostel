@@ -569,64 +569,67 @@ HM_UnassignRoom: function () {
 
         // },
 
-     ARNO_onsavebuttonpress: async function () {
-      var oView = sap.ui.getCore();
-            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-
+    ARNO_onsavebuttonpress: async function () {
+    var oView = sap.ui.getCore();
+    const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
     var table = this.byId("idPOTable");
     var selected = table.getSelectedItem();
 
     if (!selected) {
-        sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"));
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectRecordtoAssignRoom")
+        );
         return;
     }
-  
 
-    var Model = selected.getBindingContext("HostelModel");
-    var ID = Model.getObject();
-
-
+    var oContext = selected.getBindingContext("HostelModel");
+    var ID = oContext.getObject();
 
     var selectedRoomNo =
         sap.ui.getCore().byId("idRoomNumber1").getSelectedKey() || ID.RoomNo;
-            var DepositAmount =
-        sap.ui.getCore().byId("id_DepositAmount").getValue();
-            var PaymentMode =
+
+    var DepositAmount =
+        sap.ui.getCore().byId("id_ActualAmount").getValue();
+
+    var PaymentMode =
         sap.ui.getCore().byId("idPaymentMode").getSelectedKey();
-            var TransactionID =
+
+    var TransactionID =
         sap.ui.getCore().byId("id_TransactionID").getValue();
 
+    /* ================= VALIDATIONS ================= */
 
-      if (ID.Status === "New") {
-
-    if (
-        !utils._LCvalidateMandatoryField(oView.byId("id_DepositAmount"), "ID") ||
-        !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
-        !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID") ||
-        !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
-    ) {
-        sap.m.MessageToast.show(
-            this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving")
-        );
-        return; 
+    if (ID.Status === "New") {
+        if (
+            !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
+            !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
+            !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID") ||
+            !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
+        ) {
+            sap.m.MessageToast.show(
+                this.i18nModel.getText(
+                    "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                )
+            );
+            return;
+        }
     }
-}
 
-if (ID.Status === "Assigned") {
-
-    if (
-        !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
-    ) {
-        sap.m.MessageToast.show(
-            this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving")
-        );
-        return; 
+    if (ID.Status === "Assigned") {
+        if (
+            !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
+        ) {
+            sap.m.MessageToast.show(
+                this.i18nModel.getText(
+                    "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                )
+            );
+            return;
+        }
     }
-}
 
-
-
+    /* ================= ROOM VALIDATION ================= */
 
     var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");
     var aRooms = oRoomDetailsModel.getData();
@@ -634,7 +637,6 @@ if (ID.Status === "Assigned") {
     var oHostelModel = this.getView().getModel("HostelModel");
     var aCustomers = oHostelModel.getData();
 
-    // 🔹 FIND ROOM
     var oRoom = aRooms.find(function (room) {
         return (
             room.RoomNo === selectedRoomNo &&
@@ -648,7 +650,6 @@ if (ID.Status === "Assigned") {
         return;
     }
 
-    // 🔹 COUNT ASSIGNED USERS
     var assignedCount = 0;
     aCustomers.forEach(function (customer) {
         if (
@@ -659,99 +660,112 @@ if (ID.Status === "Assigned") {
             assignedCount++;
         }
     });
-      
-var isSameRoom = ID.RoomNo === selectedRoomNo;
+
+    var isSameRoom = ID.RoomNo === selectedRoomNo;
     if (!isSameRoom && assignedCount >= oRoom.NoofPerson) {
         sap.m.MessageToast.show(
             "Selected room is already filled. Please choose another room."
         );
         return;
     }
-if( ID.Status==="Assigned"){
- var Payload = {    
-        RoomNo: selectedRoomNo,
-        Status: "Assigned"
-    };
-    
-    var oBody = {
-        data: Payload,
-        filters: {
-            BookingID: ID.BookingID,
-            flag:"True"
-        }
+
+    /* ================= PAYLOAD ================= */
+
+    let Payload, oBody;
+
+    if (ID.Status === "Assigned") {
+        Payload = {
+            RoomNo: selectedRoomNo,
+            Status: "Assigned"
+        };
+
+        oBody = {
+            data: Payload,
+            filters: {
+                BookingID: ID.BookingID,
+                flag: "True"
+            }
+        };
+    } else {
+        Payload = {
+            CustomerID: ID.CustomerID,
+            CustomerName: ID.CustomerName,
+            DepositAmount: parseInt(DepositAmount),
+            DepositCurrency: "INR",
+            DepositMode: PaymentMode,
+            DepositTransactionID: TransactionID,
+            DepositDate: new Date().toISOString().split("T")[0],
+            BranchCode: ID.BranchCode,
+            DepositTakenBy: oExistingModel.EmployeeName,
+            RoomNo: selectedRoomNo,
+            Status: "Assigned"
+        };
+
+        oBody = {
+            data: Payload,
+            filters: {
+                BookingID: ID.BookingID,
+                flag: "False"
+            }
+        };
     }
 
-}else{
-     var Payload = {
-        CustomerName: ID.CustomerName,
-        DepositAmount: parseInt(DepositAmount),
-        DepositCurrency: "INR",
-        DepositMode: PaymentMode,
-        DepositTransactionID: TransactionID,
-        DepositDate: new Date().toISOString().split("T")[0],
-        BranchCode: ID.BranchCode,
-        DepositTakenBy: oExistingModel.EmployeeName,
-        
-        RoomNo: selectedRoomNo,
-        Status: "Assigned"
-    };
-    
-    var oBody = {
-        data: Payload,
-        filters: {
-            BookingID: ID.BookingID,
-            flag:"False"
-        }
-    }
-};
+    /* ================= API CALL ================= */
 
     try {
-                this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
-                sap.m.MessageToast.show(this.i18nModel.getText("recordUpdatedSuccessfully"));
-                await this.Cust_read(true);
-                this.HM_Dialog.close();
-                // Store CustomerID globally (component-level)
-                this.getOwnerComponent().setModel(
-                    new sap.ui.model.json.JSONModel({
-                        CustomerID: ID.CustomerID
-                    }),
-                    "InvoiceNavContext"
-                );
-                sap.m.MessageBox.confirm(
-    "Are you sure you want to proceed to the invoice?",
-    {
-        title: "Confirm Navigation",
-        icon: sap.m.MessageBox.Icon.INFORMATION,
-        actions: [
-            sap.m.MessageBox.Action.OK,
-            sap.m.MessageBox.Action.CANCEL
-        ],
-        onClose: async (sAction) => {
-            if (sAction === sap.m.MessageBox.Action.OK) {
-                this.getOwnerComponent()
-                    .getRouter()
-                    .navTo("RouteManageInvoiceDetails", {
-                        sPath: "X",
-                        dash: "AdminPage"
-                    });
+        await this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
+
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("recordUpdatedSuccessfully")
+        );
+
+        await this.Cust_read(true);
+        this.HM_Dialog.close();
+
+        this.getOwnerComponent().setModel(
+            new sap.ui.model.json.JSONModel({
+                CustomerID: ID.CustomerID
+            }),
+            "InvoiceNavContext"
+        );
+
+        sap.m.MessageBox.confirm(
+            "Are you sure you want to proceed to the invoice?",
+            {
+                title: "Confirm Navigation",
+                icon: sap.m.MessageBox.Icon.INFORMATION,
+                actions: [
+                    sap.m.MessageBox.Action.OK,
+                    sap.m.MessageBox.Action.CANCEL
+                ],
+                onClose: (sAction) => {
+                    if (sAction === sap.m.MessageBox.Action.OK) {
+                        this.getOwnerComponent()
+                            .getRouter()
+                            .navTo("RouteManageInvoiceDetails", {
+                                sPath: "X",
+                                dash: "AdminPage"
+                            });
+                    }
+                }
             }
+        );
+
+    } catch (oError) {
+
+        let sErrorMsg = "Update failed";
+
+        if (oError.responseJSON && oError.responseJSON.message) {
+            sErrorMsg = oError.responseJSON.message;
+        } else if (oError.responseText) {
+            sErrorMsg = oError.responseText;
+        } else if (oError.statusText) {
+            sErrorMsg = oError.statusText;
         }
+
+        sap.m.MessageBox.error(sErrorMsg);
     }
-);
-
-
-                // Navigate normally (NO CHANGE TO ROUTE)
-                // this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
-                //     sPath: "X",
-                //     dash: "ManageInvoice"
-                // });
-            } catch (oError) {
-                sap.m.MessageToast.show(
-                    "Error: " + (oError.responseText || oError.statusText)
-                );
-            }
-        },
-
+},
 
         onTableUpdateFinished: function () {
             this._updateRowCount();

@@ -72,6 +72,15 @@
                             justifyContent="End"
                             alignItems="End"
                         >
+                        
+                            <Button
+                                text="Set GST"
+                                id="idGST"
+                                tooltip="Set GST"
+                                press="onGSTBooking"
+                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin') }"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
                             <Button
                                 text="{i18n>MSedit}"
                                 id="idedit"
@@ -893,8 +902,8 @@
                                 demandPopin="true"
                             >
                                 <Text
-                                    text="{i18n>Tooldays}"
-                                    tooltip="{i18n>Tooldays}"
+                                    text="Period"
+                                    tooltip="Period"
                                 />
                             </Column>
                                <Column
@@ -949,7 +958,15 @@
                                         text="{= ${CustomerData>UnitText} === 'Per Hour'  ? ${CustomerData>UnitText} + ' (' + ${CustomerData>TotalHour} + ')' : ${CustomerData>UnitText}
                                             }"
                                     />
-                                    <Text text="{CustomerData>TotalDays}" />
+                    <Text
+    text="{= (${CustomerData>UnitText} === 'Per Month') 
+        ? ${CustomerData>TotalMonths} + ' ' + (${CustomerData>TotalMonths} === 1 ? 'Month' : 'Months')
+        : (${CustomerData>UnitText} === 'Per Year') 
+            ? ${CustomerData>TotalYears} + ' ' + (${CustomerData>TotalYears} === 1 ? 'Year' : 'Years')
+            : ${CustomerData>TotalDays} + ' ' + (${CustomerData>TotalDays} === 1 ? 'Day' : 'Days') }" />
+
+
+
                                     <Text text="{CustomerData>CouponCode}" />
 
                                     <Text text="{CustomerData>CouponDiscount}" />

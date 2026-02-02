@@ -1,0 +1,98 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        type="Message"
+        class="sapUiContentPadding"
+        contentWidth="28rem"
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="Manage GST" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                 <Label
+                    text="GST Number"
+                    required="true"
+                />
+                <Input
+                    id="idGSTNumber"
+                    value="{GSTModel>/GSTNumber}"
+                    placeholder="Enter GST Number"
+                    maxLength="15"
+                    liveChange="onGSTInputLiveChange"
+                    valueStateText="Please enter a valid GST Number"
+                />
+                  <Label
+        text="GST Type"
+        required="true" />
+
+    <RadioButtonGroup
+        id="idGSTType"
+        columns="2"
+        select="onGSTTypeSelect">
+
+        <buttons>
+            <RadioButton text="IGST" />
+            <RadioButton text="CGST/SGST" />
+        </buttons>
+
+    </RadioButtonGroup>
+       <Label
+                    text="GST Percentage"
+                    required="true"
+                />
+                <Input
+                    id="idGSTPercentage"
+                    value="{GSTModel>/GSTPercentage}"
+                    placeholder="Enter GST Percentage"
+                    maxLength="5"
+                    liveChange="onPercentagetLiveChange"
+                    valueStateText="Please enter a valid GST Percentage"
+                />
+            </f:content>
+        
+        </f:SimpleForm>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="GST_onsavebuttonpress"
+                type="Accept"
+                id="GST_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="GST_onCancelButtonPress"
+                type="Reject"
+                id="GST_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</c:FragmentDefinition>

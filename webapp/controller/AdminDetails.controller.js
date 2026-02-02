@@ -68,10 +68,10 @@ sap.ui.define([
             var sPath = oEvent.getParameter("arguments").sPath;
             this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
             this.valuestate()
-                sap.ui.core.BusyIndicator.show(0);
+            sap.ui.core.BusyIndicator.show(0);
 
             await this.OnRoom();
-           
+
             this.AD_onSearch()
         },
 
@@ -90,28 +90,28 @@ sap.ui.define([
             this.getView().byId("CD_ID_idPhone").setValueState("None")
         },
 
-   OnRoom: function () {
-    return new Promise((resolve, reject) => {
-        this.ajaxReadWithJQuery("HM_Rooms", "")
-            .then(oData => {
-                var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                this.getView().setModel(new JSONModel(aRooms), "Availablebeds");
-                resolve();
-            })
-            .catch(reject);
-    });
-},
+        OnRoom: function () {
+            return new Promise((resolve, reject) => {
+                this.ajaxReadWithJQuery("HM_Rooms", "")
+                    .then(oData => {
+                        var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+                        this.getView().setModel(new JSONModel(aRooms), "Availablebeds");
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        },
 
-getBranchHotelData: function (filter) {
-    return new Promise((resolve, reject) => {
-        this.ajaxReadWithJQuery("getBranchHotelData",filter)
-            .then(oData => {
-                this.getView().setModel(new JSONModel(oData), "Beddetails");
-                resolve();
-            })
-            .catch(reject);
-    });
-},
+        getBranchHotelData: function (filter) {
+            return new Promise((resolve, reject) => {
+                this.ajaxReadWithJQuery("getBranchHotelData", filter)
+                    .then(oData => {
+                        this.getView().setModel(new JSONModel(oData), "Beddetails");
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        },
         Coupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             const filter = {
@@ -269,12 +269,12 @@ getBranchHotelData: function (filter) {
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
 
-                   const filterData = {
+                const filterData = {
                     BranchCode: oCustomer.Bookings?.[0]?.BranchCode,
                     BranchID: oCustomer.Bookings?.[0]?.BranchCode
                 };
 
-                 await this.getBranchHotelData(filterData)
+                await this.getBranchHotelData(filterData)
                 var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
                 var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
@@ -295,9 +295,9 @@ getBranchHotelData: function (filter) {
                     }
                 })
 
-                  var Branch = aBranch.find((item) => {
-                    return item.BranchID === oCustomer.Bookings?.[0]?.BranchCode 
-                    
+                var Branch = aBranch.find((item) => {
+                    return item.BranchID === oCustomer.Bookings?.[0]?.BranchCode
+
                 })
 
 
@@ -334,8 +334,8 @@ getBranchHotelData: function (filter) {
                     PaymentPaid: Paymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
-                    GSTType:Branch.Type || "",
-                    GSTValue:Branch.Value || "",
+                    GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
+                    GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -446,33 +446,26 @@ getBranchHotelData: function (filter) {
 
 
                     } else if (paymentType === "per month") {
-    const startYear = start.getFullYear();
-    const startMonth = start.getMonth();
-    const startDay = start.getDate();
+                        const years = end.getFullYear() - start.getFullYear();
+                        const months = end.getMonth() - start.getMonth();
+                        let totalMonths = years * 12 + months;
 
-    const endYear = end.getFullYear();
-    const endMonth = end.getMonth();
-    const endDay = end.getDate();
+                        // If end day >= start day, add 1 month
+                        if (end.getDate() >= start.getDate()) {
+                            totalMonths += 1;
+                        }
 
-    let totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth);
+                        Duration = totalMonths;
+                        DurationUnit = "months";
 
-    // If end day is less than start day, last month not completed
-    if (endDay < startDay) {
-        totalMonths -= 1;
-    }
 
-    // Prevent negative values
-    totalMonths = Math.max(totalMonths, 0);
-
-    Duration = totalMonths;
-    DurationUnit = "months";
-}
- else if (paymentType === "per year") {
+                    }
+                    else if (paymentType === "per year") {
                         let years = end.getFullYear() - start.getFullYear();
 
                         // If end month > start month OR same month and end day >= start day, add 1
                         if (
-                             end.getMonth() > start.getMonth() ||
+                            end.getMonth() > start.getMonth() ||
                             (end.getMonth() === start.getMonth() && end.getDate() >= start.getDate())
                         ) {
                             years += 1;
@@ -491,7 +484,7 @@ getBranchHotelData: function (filter) {
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,Branch);
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -509,7 +502,7 @@ getBranchHotelData: function (filter) {
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount,Branch) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -575,12 +568,16 @@ getBranchHotelData: function (filter) {
                     // -------------------------------
                     // Calculate Months
                     // -------------------------------
-                    const months =
+                    let months =
                         (facEnd.getFullYear() - facStart.getFullYear()) * 12 +
-                        (facEnd.getMonth() - facStart.getMonth()) +
-                        (facEnd.getDate() >= facStart.getDate() ? 0 : -1);
+                        (facEnd.getMonth() - facStart.getMonth());
+
+                    if (facEnd.getDate() >= facStart.getDate()) {
+                        months += 1;
+                    }
 
                     const totalMonths = Math.max(months, 1);
+
 
                     // -------------------------------
                     // Calculate Years
@@ -643,7 +640,7 @@ getBranchHotelData: function (filter) {
             // const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
             // let DiscountAmount = Discount || 0;
             // const SubTotal = FacilityPrice + roomRentPrice - DiscountAmount;
-             
+
             // let SGST = 0;
             // let CGST = 0;
             // let IGST = 0;
@@ -661,19 +658,19 @@ getBranchHotelData: function (filter) {
             const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
             let DiscountAmount = Discount || 0;
             const SubTotal = FacilityPrice + roomRentPrice;
-             
+
             let SGST = 0;
             let CGST = 0;
             let IGST = 0;
             let grandTotal = 0;
-            if(Branch.Type==="IGST"){
-             IGST = SubTotal * Branch.Value / 100;
-             grandTotal = SubTotal + IGST - DiscountAmount;
+            if (oCustomer.Bookings?.[0]?.GSTType === "IGST") {
+                IGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                grandTotal = SubTotal + IGST - DiscountAmount;
 
-            }else{       
-             SGST = SubTotal * Branch.Value / 100;
-             CGST = SubTotal * Branch.Value / 100;
-             grandTotal = SubTotal + SGST + CGST - DiscountAmount;
+            } else {
+                SGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                CGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                grandTotal = SubTotal + SGST + CGST - DiscountAmount;
 
             }
 
@@ -787,7 +784,7 @@ getBranchHotelData: function (filter) {
 
         onEditDialogClose: function () {
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
-            this.iCount=1;
+            this.iCount = 1;
             this.HM_Dialog.close();
         },
 
@@ -991,7 +988,7 @@ getBranchHotelData: function (filter) {
                 oEnd.setDate(oEnd.getDate() - 1)
 
             } else if (sUnit === "Per Year") {
-                  oEnd.setFullYear(oEnd.getFullYear() + iCount);
+                oEnd.setFullYear(oEnd.getFullYear() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
             }
             if (oEnd && iDays === 0) {
@@ -1081,7 +1078,7 @@ getBranchHotelData: function (filter) {
                     }
                 }
 
-                if(oCustomerData.minEndDate<= new Date(this._parseDate(oPayload.EndDate))){
+                if (oCustomerData.minEndDate <= new Date(this._parseDate(oPayload.EndDate))) {
                     sap.m.MessageToast.show(this.i18nModel.getText("facilityEndDateExceedsBookingEndDate"));
                     return;
                 }
@@ -1104,6 +1101,7 @@ getBranchHotelData: function (filter) {
                 var basePrice = Number(oPayload.Price) || 0;
                 var iDays = Number(oPayload.TotalDays) || 0;
                 var iHours = Number(oPayload.TotalHour) || 0; // ← NEW for Per Hour
+
                 var finalPrice = 0;
                 const iCount = oPayload.TotalHour || 1;
 
@@ -1122,6 +1120,9 @@ getBranchHotelData: function (filter) {
                     finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
                 }
                 oPayload.TotalAmount = finalPrice;
+                oPayload.TotalMonths=oPayload.TotalUnits || "1"
+                oPayload.TotalYears=oPayload.TotalUnits || "1"
+
 
                 // Remove unwanted fields
 
@@ -1189,23 +1190,23 @@ getBranchHotelData: function (filter) {
                 // oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
 
                 // }
-             
+
                 // oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid;
 
                 oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
                 oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
 
-                if(oCustomerData.GSTType==="IGST"){
-                oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
+                if (oCustomerData.GSTType === "IGST") {
+                    oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                    oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
 
-                }else{
-                oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100 ;
-                oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100 ;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
+                } else {
+                    oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                    oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                    oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
 
                 }
-             
+
                 oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid;
 
                 // Update model
@@ -1416,28 +1417,28 @@ getBranchHotelData: function (filter) {
                 // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST + CGST - CustData.PaymentPaid);
                 // }
 
-             
+
                 // oCustomerModel.setProperty("/SubTotal", SubTotal);
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")) - Number(CustData.Discount)
 
                 var SubTotal = SubTotal
-                  var CGST = SubTotal * CustData.GSTValue / 100
-                      let TotalAmount;
+                var CGST = SubTotal * CustData.GSTValue / 100
+                let TotalAmount;
 
-                    if(CustData.GSTType==="IGST"){
-                        TotalAmount = SubTotal + CGST;
-                    }else if(CustData.GSTType==="CGST/SGST"){
-                        TotalAmount = SubTotal + CGST + CGST;
-                    }else{
-                        TotalAmount = SubTotal
-                    }
-                   if (CustData.CouponCode || this.Code) {
+                if (CustData.GSTType === "IGST") {
+                    TotalAmount = SubTotal + CGST;
+                } else if (CustData.GSTType === "CGST/SGST") {
+                    TotalAmount = SubTotal + CGST + CGST;
+                } else {
+                    TotalAmount = SubTotal
+                }
+                if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-                   
+
 
                     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
@@ -1453,23 +1454,23 @@ getBranchHotelData: function (filter) {
 
                     }
                 }
-           
-                if(CustData.GSTType==="IGST"){
-                oCustomerModel.setProperty("/IGST", CGST)
-                   oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
 
-                }else{
-                oCustomerModel.setProperty("/SGST", CGST)
-                oCustomerModel.setProperty("/CGST", CGST)
-                   oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                if (CustData.GSTType === "IGST") {
+                    oCustomerModel.setProperty("/IGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+                } else {
+                    oCustomerModel.setProperty("/SGST", CGST)
+                    oCustomerModel.setProperty("/CGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 }
 
-             
+
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
-             
+
                 oData.EndDate = this._formatDate(oEnd);
                 oBookingModel.refresh();
                 return;
@@ -1608,23 +1609,23 @@ getBranchHotelData: function (filter) {
             //        oCustomerData.setProperty("/GrandTotal", SubTotal + CGST + CGST);
             //      oCustomerData.setProperty("/DueAmount", SubTotal + CGST + CGST - CustData.PaymentPaid);
             //     }
-   
+
 
             // oCustomerData.setProperty("/SubTotal", SubTotal);
             // oCustomerData.setProperty("/Discount", CustData.Discount)
-               var SubTotal = (fPrice + fFacilityPrice)
-              var CGST = SubTotal * CustData.GSTValue / 100
-              
-                   let TotalAmount;
+            var SubTotal = (fPrice + fFacilityPrice)
+            var CGST = SubTotal * CustData.GSTValue / 100
 
-                   if(CustData.GSTType==="IGST"){
-                        TotalAmount = SubTotal + CGST;
-                    }else if(CustData.GSTType==="CGST/SGST"){
-                        TotalAmount = SubTotal + CGST + CGST;
-                    }else{
-                        TotalAmount = SubTotal
-                    }
-              if (CustData.CouponCode || this.Code) {
+            let TotalAmount;
+
+            if (CustData.GSTType === "IGST") {
+                TotalAmount = SubTotal + CGST;
+            } else if (CustData.GSTType === "CGST/SGST") {
+                TotalAmount = SubTotal + CGST + CGST;
+            } else {
+                TotalAmount = SubTotal
+            }
+            if (CustData.CouponCode || this.Code) {
                 var oCouponData = this.getView().getModel("CouponModel").getData();
                 var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                 var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
@@ -1632,7 +1633,7 @@ getBranchHotelData: function (filter) {
 
                 if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
-                    
+
 
                     if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
                         this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
@@ -1646,23 +1647,23 @@ getBranchHotelData: function (filter) {
 
                 }
             }
-        
-                if(CustData.GSTType==="IGST"){
-                oCustomerData.setProperty("/IGST", CGST)
-                      oCustomerData.setProperty("/GrandTotal", TotalAmount  - Number(CustData.Discount));
-            oCustomerData.setProperty("/DueAmount",TotalAmount  - Number(CustData.Discount) - CustData.PaymentPaid);
 
-                }else{
+            if (CustData.GSTType === "IGST") {
+                oCustomerData.setProperty("/IGST", CGST)
+                oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+            } else {
                 oCustomerData.setProperty("/SGST", CGST)
                 oCustomerData.setProperty("/CGST", CGST)
-                   oCustomerData.setProperty("/GrandTotal", TotalAmount  - Number(CustData.Discount));
-                 oCustomerData.setProperty("/DueAmount", TotalAmount  - Number(CustData.Discount) - CustData.PaymentPaid);
-                }
-   
+                oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+            }
+
 
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
-      
+
 
         },
 
@@ -1741,7 +1742,7 @@ getBranchHotelData: function (filter) {
             // Load data into edit model
             this.getView().getModel("edit").setData(Object.assign({}, oSelectedData));
             this.getView().getModel("edit").setProperty("/TotalUnits", iMonths)
-            this.iCount=iMonths
+            this.iCount = iMonths
             // Open dialog
             if (!this.HM_Dialog) {
                 var oView = this.getView();
@@ -1944,14 +1945,14 @@ getBranchHotelData: function (filter) {
             // }
             // oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
 
-               oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
-            if(oCustomerData.GSTType==="IGST"){
-            oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue/100;
-            oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
+            oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
+            if (oCustomerData.GSTType === "IGST") {
+                oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
             } else {
-            oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue/100;
-            oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue/100;
-            oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
+                oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
             }
             oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
 
@@ -2049,28 +2050,28 @@ getBranchHotelData: function (filter) {
                 //     oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST * 2);
                 // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST * 2 - CustData.PaymentPaid);
                 // }
-             
+
                 // oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
-                  var SubTotal = fPrice + fFacilityPrice 
-                  var CGST = SubTotal * CustData.GSTValue0 / 100
+                var SubTotal = fPrice + fFacilityPrice
+                var CGST = SubTotal * CustData.GSTValue0 / 100
 
-                      let TotalAmount;
+                let TotalAmount;
 
-                       if(CustData.GSTType==="IGST"){
-                        TotalAmount = SubTotal + CGST;
-                    }else if(CustData.GSTType==="CGST/SGST"){
-                        TotalAmount = SubTotal + CGST + CGST;
-                    }else{
-                        TotalAmount = SubTotal
-                    }
+                if (CustData.GSTType === "IGST") {
+                    TotalAmount = SubTotal + CGST;
+                } else if (CustData.GSTType === "CGST/SGST") {
+                    TotalAmount = SubTotal + CGST + CGST;
+                } else {
+                    TotalAmount = SubTotal
+                }
                 if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-                   
+
 
                     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
@@ -2086,19 +2087,19 @@ getBranchHotelData: function (filter) {
 
                     }
                 }
-              
-                if(CustData.GSTType==="IGST"){
-                oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
 
-                }else{
-                oCustomerModel.setProperty("/SGST", CGST)
-                oCustomerModel.setProperty("/CGST", CGST)
+                if (CustData.GSTType === "IGST") {
+                    oCustomerModel.setProperty("/IGST", CGST)
                     oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount  - Number(CustData.Discount) - CustData.PaymentPaid);
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+                } else {
+                    oCustomerModel.setProperty("/SGST", CGST)
+                    oCustomerModel.setProperty("/CGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 }
-             
+
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
@@ -2218,11 +2219,11 @@ getBranchHotelData: function (filter) {
 
                 //     }
                 // }
-                    
+
                 // var SubTotal = fOriginalRentPrice + fFacilityPrice - Number(CustData.Discount)
                 // var CGST = SubTotal * CustData.GSTValue / 100
 
-                
+
                 // if(CustData.GSTType==="IGST"){
                 // oCustomerModel.setProperty("/IGST", CGST)
                 //  oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST );
@@ -2234,25 +2235,25 @@ getBranchHotelData: function (filter) {
                 //  oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST * 2);
                 // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST * 2 - CustData.PaymentPaid);
                 // }
-            
+
                 // oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 // oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
 
-                  var SubTotal = fOriginalRentPrice + fFacilityPrice 
+                var SubTotal = fOriginalRentPrice + fFacilityPrice
                 var CGST = SubTotal * CustData.GSTValue / 100
-                
-                      let TotalAmount;
 
-                       if(CustData.GSTType==="IGST"){
-                        TotalAmount = SubTotal + CGST;
-                    }else if(CustData.GSTType==="CGST/SGST"){
-                        TotalAmount = SubTotal + CGST + CGST;
-                    }else{
-                        TotalAmount = SubTotal
-                    }
-                    if (CustData.CouponCode || this.Code) {
+                let TotalAmount;
+
+                if (CustData.GSTType === "IGST") {
+                    TotalAmount = SubTotal + CGST;
+                } else if (CustData.GSTType === "CGST/SGST") {
+                    TotalAmount = SubTotal + CGST + CGST;
+                } else {
+                    TotalAmount = SubTotal
+                }
+                if (CustData.CouponCode || this.Code) {
                     var oCouponData = this.getView().getModel("CouponModel").getData();
                     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
                     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
@@ -2261,7 +2262,7 @@ getBranchHotelData: function (filter) {
                     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
                         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
-                             && CustData.Discount) {
+                            && CustData.Discount) {
                             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
                             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
                             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
@@ -2273,22 +2274,22 @@ getBranchHotelData: function (filter) {
 
                     }
                 }
-                    
-             
 
-                
-                if(CustData.GSTType==="IGST"){
-                oCustomerModel.setProperty("/IGST", CGST)
-                 oCustomerModel.setProperty("/GrandTotal", TotalAmount- Number(CustData.Discount) );
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount)- CustData.PaymentPaid);
 
-                }else{
-                oCustomerModel.setProperty("/SGST", CGST)
-                oCustomerModel.setProperty("/CGST", CGST)
-                 oCustomerModel.setProperty("/GrandTotal",TotalAmount- Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount",TotalAmount- Number(CustData.Discount) - CustData.PaymentPaid);
+
+
+                if (CustData.GSTType === "IGST") {
+                    oCustomerModel.setProperty("/IGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+                } else {
+                    oCustomerModel.setProperty("/SGST", CGST)
+                    oCustomerModel.setProperty("/CGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 }
-            
+
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
@@ -2491,40 +2492,40 @@ getBranchHotelData: function (filter) {
                 utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
-         Bookingdata.EndDate= (Bookingdata.EndDate).includes("/") ? Bookingdata.EndDate : Bookingdata.EndDate.split('-').reverse().join('/')
-          var BookingdataEndDate= (Bookingdata.EndDate).includes("/") ? this._parseDate(Bookingdata.EndDate) : Bookingdata.EndDate
+            Bookingdata.EndDate = (Bookingdata.EndDate).includes("/") ? Bookingdata.EndDate : Bookingdata.EndDate.split('-').reverse().join('/')
+            var BookingdataEndDate = (Bookingdata.EndDate).includes("/") ? this._parseDate(Bookingdata.EndDate) : Bookingdata.EndDate
 
             const facilityItems = CustomerData.AllSelectedFacilities || [];
 
-const invalidFacilities = [];
+            const invalidFacilities = [];
 
-for (let i = 0; i < facilityItems.length; i++) {
-    const item = facilityItems[i];
+            for (let i = 0; i < facilityItems.length; i++) {
+                const item = facilityItems[i];
 
-    const facilityStart = this._parseDate(item.StartDate);
-    const facilityEnd   = this._parseDate(item.EndDate);
+                const facilityStart = this._parseDate(item.StartDate);
+                const facilityEnd = this._parseDate(item.EndDate);
 
 
 
-    // Validation: must be inside booking period
-    if (
-        facilityStart < this._parseDate(Bookingdata.StartDate) ||
-        facilityEnd > BookingdataEndDate
-    ) {
-      invalidFacilities.push(item.FacilityName);
-    }
-    
-}
+                // Validation: must be inside booking period
+                if (
+                    facilityStart < this._parseDate(Bookingdata.StartDate) ||
+                    facilityEnd > BookingdataEndDate
+                ) {
+                    invalidFacilities.push(item.FacilityName);
+                }
 
-if (invalidFacilities.length > 0) {
-    sap.m.MessageBox.error(
-        "The following facilities have dates outside the booking period:\n\n" +
-        invalidFacilities.map(name => `• ${name}`).join("\n") +
-        `\n\nPlease ensure all facility dates are between ` +
-        `${Bookingdata.StartDate} and ${Bookingdata.EndDate}.`
-    );  
-    return; // ⛔ stop save
-}
+            }
+
+            if (invalidFacilities.length > 0) {
+                sap.m.MessageBox.error(
+                    "The following facilities have dates outside the booking period:\n\n" +
+                    invalidFacilities.map(name => `• ${name}`).join("\n") +
+                    `\n\nPlease ensure all facility dates are between ` +
+                    `${Bookingdata.StartDate} and ${Bookingdata.EndDate}.`
+                );
+                return; // ⛔ stop save
+            }
 
             if (Bookingdata.STDCode === "+91") {
                 if (Bookingdata.MobileNo.length === 10) {
@@ -2581,7 +2582,9 @@ if (invalidFacilities.length > 0) {
                     "RoomPrice": CustomerData.OrginalRentPrice,
                     "Discount": CustomerData.Discount || 0,
                     "CouponCode": Bookingdata.CouponCode,
-                    "TotalRoomprice": CustomerData.RentPrice
+                    "TotalRoomprice": CustomerData.RentPrice,
+                    "GSTType": CustomerData.GSTType,
+                    "GSTValue": CustomerData.GSTValue,
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
                     // Normalize UnitText for facility as well
@@ -3087,13 +3090,13 @@ if (invalidFacilities.length > 0) {
             sap.ui.core.BusyIndicator.hide();
             var oCouponData = this.getView().getModel("CouponModel").getData();
 
-            
+
             var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
             if (!oCoupon) {
                 sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                 return;
             }
-               if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
+            if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
                 return;
             }
@@ -3238,7 +3241,192 @@ if (invalidFacilities.length > 0) {
             oInput.setValue("");
             oInput.setShowValueHelp(false);
             this.getView().getModel("edit").setProperty("/CouponDiscount", "");
+        },
+        onGSTBooking: function () {
+
+
+
+            if (!this.GST_Dialog) {
+                var oView = this.getView();
+                this.GST_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.GST", this);
+                oView.addDependent(this.GST_Dialog);
+            }
+            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue("");
+            sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue("");
+
+            this.GST_Dialog.open();
+        },
+        GST_onCancelButtonPress: function () {
+            this.GST_Dialog.close();
+        },
+        onGSTInputLiveChange: function (oEvent) {
+            const oInput = oEvent
+                ? oEvent.getSource()
+                : sap.ui.getCore().byId(this.getView().createId("idGSTNumber"));
+
+            const sValue = oInput.getValue().trim().toUpperCase();
+            oInput.setValue(sValue);
+
+            const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+
+            // 🔹 If empty or incomplete → no error
+            if (!GST_REGEX.test(sValue)) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText(this.i18nModel.getText("gstError"));
+                return;
+            }
+            if (!sValue || sValue.length < 15) {
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
+                return;
+            }
+
+            // 🔹 Validate only when length is 15
+
+
+            // 🔹 Correct GST → ValueState None
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+        },
+        GST_onsavebuttonpress: function () {
+            var oView = sap.ui.getCore()
+
+            if (
+                utils._LCvalidateGstNumber(oView.byId("idGSTNumber"), "ID") &&
+                utils.onNumber(oView.byId("idGSTPercentage"), "ID")
+            ) {
+                var oCustomerModel = this.getView().getModel("CustomerData")
+                const CustData = this.getView().getModel("CustomerData").getData();
+                const oInput = sap.ui.getCore().byId(this.getView().createId("idGSTNumber"));
+                var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
+                var oRadioGroup = sap.ui.getCore().byId("idGSTType");
+
+                var iIndex = oRadioGroup.getSelectedIndex();
+                var sValue = oRadioGroup.getButtons()[iIndex].getText();
+                // const sGSTNumber = oInput.getValue().trim().toUpperCase();
+
+                // const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+                // if (!GST_REGEX.test(sGSTNumber)) {
+                //     oInput.setValueState("Error");
+                //     oInput.setValueStateText(this.i18nModel.getText("gstError"));
+                //     return;
+                // }
+                // oCustomerModel.setProperty("/GSTNumber", sGSTNumber);
+                // oCustomerModel.refresh(true);
+
+                //  var SubTotal =CustData.SubTotal
+                //             var CGST = SubTotal * Percentage / 100
+
+                //                   let TotalAmount;
+
+                //                    if(sValue==="IGST"){
+                //                     TotalAmount = SubTotal + CGST;
+                //                 }else if(sValue==="CGST/SGST"){
+                //                     TotalAmount = SubTotal + CGST + CGST;
+                //                 }else{
+                //                     TotalAmount = SubTotal
+                //                 }
+                //                 if (CustData.CouponCode || this.Code) {
+                //                 var oCouponData = this.getView().getModel("CouponModel").getData();
+                //                 var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                //                 var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+
+
+                //                 if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
+
+                //                     if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
+                //                          && CustData.Discount) {
+                //                         this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                //                         CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+                //                         if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                //                             CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                //                         }
+                //                     } else {
+                //                         CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                //                     }
+
+                //                 }
+                //             }
+
+
+
+
+                //             if(sValue==="IGST"){
+                //             oCustomerModel.setProperty("/IGST", CGST)
+                //              oCustomerModel.setProperty("/GrandTotal", TotalAmount- Number(CustData.Discount) );
+                //             oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount)- CustData.PaymentPaid);
+                //               oCustomerModel.setProperty("/SGST", 0)
+                //             oCustomerModel.setProperty("/CGST", 0)
+
+
+
+                //             }else{
+                //             oCustomerModel.setProperty("/IGST", 0)
+
+                //              oCustomerModel.setProperty("/GrandTotal",TotalAmount- Number(CustData.Discount));
+                //             oCustomerModel.setProperty("/DueAmount",TotalAmount- Number(CustData.Discount) - CustData.PaymentPaid);
+
+                //             }
+
+                //             oCustomerModel.setProperty("/SubTotal", SubTotal)
+                //               oCustomerModel.setProperty("/GSTValue", Percentage)
+
+                //             oCustomerModel.setProperty("/Discount", CustData.Discount)
+                var Payload =
+                {
+                    "Booking": [{
+                        "GSTType": sValue,
+                        "GSTValue": Percentage,
+                    }],
+                }
+
+                sap.ui.core.BusyIndicator.show(0);
+                this.ajaxUpdateWithJQuery("HM_Customer", {
+                    data: [Payload],
+                    filters: {
+                        CustomerID: CustData.CustomerID
+                    }
+                })
+                    .then(() => {
+
+                        // Refresh models
+                        this.AD_onSearch();
+                        sap.m.MessageToast.show(this.i18nModel.getText("GST Details Saved Successfully"));
+
+                        this.getView().getModel("VisibleModel").setProperty("/visible", false);
+                        this.byId("idMonthYearSelect").setVisible(false);
+                    })
+                    .catch(err => {
+                        sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
+                        console.error(err);
+                    });
+                this.GST_Dialog.close();
+            } else {
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                return;
+            }
+        },
+        onGSTTypeSelect: function (oEvent) {
+            var oRadioGroup = oEvent.getSource();
+
+            // Selected index (0 or 1)
+            var iSelectedIndex = oRadioGroup.getSelectedIndex();
+
+            // Get selected RadioButton text
+            var sSelectedText = oRadioGroup.getButtons()[iSelectedIndex].getText();
+
+            console.log(iSelectedIndex); // 0 or 1
+            console.log(sSelectedText);  // "IGST" or "CGST / SGST"
+        },
+
+        onPercentagetLiveChange: function (oEvent) {
+            utils.onNumber(oEvent.getSource(), "ID");
         }
+
+
+
+
+
 
     });
 });

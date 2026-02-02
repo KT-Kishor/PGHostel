@@ -23,7 +23,7 @@
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="PO_onPressClear"
-                showClearOnFB="true"
+                showClearOnFB="true" 
                 search="Cust_read"
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
