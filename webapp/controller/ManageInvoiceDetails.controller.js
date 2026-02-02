@@ -295,22 +295,39 @@ sap.ui.define([
                 });
             },
 
-            onNavBack: function() {
+            // onNavBack: function() {
+            //     const oLoginModel = this.getView().getModel("LoginModel");
+            //     const sRole = oLoginModel?.getProperty("/Role") || "";
+            //     const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+            //     if (sRole === "Customer") {
+            //         this._sLoggedUserID = sEmpID;
+            //         const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            //         oUIModel.setProperty("/isLoggedIn", true);
+            //         this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            //     }else if (this.sourceView === "AdminPage") {
+            //         this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+            //     }else {
+            //         this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
+            //     }
+            // },
+            onNavBack: function () {
                 const oLoginModel = this.getView().getModel("LoginModel");
                 const sRole = oLoginModel?.getProperty("/Role") || "";
                 const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+
                 if (sRole === "Customer") {
                     this._sLoggedUserID = sEmpID;
                     const oUIModel = this.getOwnerComponent().getModel("UIModel");
                     oUIModel.setProperty("/isLoggedIn", true);
                     this.getOwnerComponent().getRouter().navTo("RouteHostel");
-                }else if (this.sourceView === "AdminPage") {
+                } else if (this.sourceView === "AdminPage") {
                     this.getOwnerComponent().getRouter().navTo("RouteAdmin");
-                }else {
+                } else if (this.sourceView === "PaymentDashboard") {
+                    this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+                } else {
                     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
                 }
             },
-
             onHome: function() {
                 this.CommonLogoutFunction();
             },

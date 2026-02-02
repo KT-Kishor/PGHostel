@@ -542,7 +542,7 @@
                         </f:Card>
 
                         <!-- 6. Pending Payments by Customer -->
-                        <f:Card class="sapUiTinyMargin">
+                        <!-- <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
                                     <Title
@@ -620,18 +620,18 @@
                                     </com:content>
                                 </com:ChartContainer>
                             </f:content>
-                        </f:Card>
+                        </f:Card> -->
                     </layout:content>
                 </layout:Grid>
 
                 <!-- Grid for Credit Note Charts -->
-                <layout:Grid
+                <!-- <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"
                     class="sapUiResponsiveMargin"
                 >
-                    <layout:content>
+                    <layout:content> -->
                         <!-- 7. Credit Note Status Distribution -->
-                        <f:Card class="sapUiTinyMargin">
+                        <!-- <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
                                     <Title
@@ -710,10 +710,10 @@
                                     </com:content>
                                 </com:ChartContainer>
                             </f:content>
-                        </f:Card>
+                        </f:Card> -->
 
                         <!-- 8. Monthly Credit Note Trend -->
-                        <f:Card class="sapUiTinyMargin">
+                        <!-- <f:Card class="sapUiTinyMargin">
                             <f:header>
                                 <Toolbar class="customdashboard">
                                     <Title
@@ -798,7 +798,7 @@
                             </f:content>
                         </f:Card>
                     </layout:content>
-                </layout:Grid>
+                </layout:Grid> -->
             </VBox>
         </content>
     </Page>

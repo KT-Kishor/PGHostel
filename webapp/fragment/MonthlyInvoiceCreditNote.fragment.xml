@@ -1,0 +1,126 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+>
+    <Dialog
+        id="MonthlyInvoiceCreditNoteDialog"
+        contentWidth="900px"
+        contentHeight="450px"
+        resizable="true"
+        draggable="true"
+    >
+        <customHeader>
+            <Bar class="Coursetitle">
+                <contentLeft>
+                    <Title
+                        text="{i18n>monthlycreditnotefor} {dialogData>/month}"
+                    />
+                </contentLeft>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://decline"
+                        press="onCloseDialog"
+                        tooltip="{i18n>close}"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <Table
+                sticky="ColumnHeaders"
+                items="{dialogData>/invoices}"
+                noDataText="{i18n>noCreditNoteData}"
+            >
+                <columns>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                    >
+                        <Text text="{i18n>invoiceNo}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>creditMemoNo}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                    >
+                        <Text text="{i18n>invoiceDate}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>customerName}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>CustomerID}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="End"
+                    >
+                        <Text text="{i18n>totalAmount}" />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Left"
+                    >
+                        <Text text="{i18n>status}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        type="Navigation"
+                        press="onPressCreditNoteInvoice"
+                    >
+                        <cells>
+                            <Text text="{dialogData>InvNo}" />
+                            <Text text="{dialogData>CCInvNo}" />
+                            <Text
+                                text="{path: 'dialogData>InvoiceDate', formatter: '.Formatter.formatDate'}"
+                            />
+                            <Text text="{dialogData>CustomerName}" />
+                            <Text text="{dialogData>CustomerID}" />
+                            <layout:VerticalLayout>
+                                <ObjectNumber
+                                    number="{parts: [{ path: 'dialogData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+                                    unit="{dialogData>Currency}"
+                                />
+                                <ObjectNumber
+                                    visible="{= ${dialogData>Currency} !== 'INR' }"
+                                    number="{parts: [{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}"
+                                    unit="INR"
+                                />
+                            </layout:VerticalLayout>
+                            <ObjectStatus
+                                text="{dialogData>Status}"
+                                state="{path: 'dialogData>Status', formatter: '.Formatter.creditNoteStatusState'}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Text text="{i18n>totalAmount} : " />
+                <ObjectNumber
+                    number="{parts: [{ path: 'dialogData>/AllTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+                    unit="INR"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

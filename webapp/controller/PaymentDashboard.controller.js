@@ -42,9 +42,10 @@ sap.ui.define([
         },
 
         _onObjectMatched: async function () {
-            var oVizFrame = this.getView().byId("donutChartStatus");
             var LoginFunction = await this.commonLoginFunction("PaymentDashboard");
             if (!LoginFunction) return;
+            var oVizFrame = this.getView().byId("donutChartStatus");
+
 
             this.getView().getModel("invoiceChartTypeModel").setData(JSON.parse(JSON.stringify(INITIAL_CHART_TYPES)));
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -72,7 +73,8 @@ sap.ui.define([
 
         readInvoiceData: async function () {
             try {
-                this.getBusyDialog();
+                // this.getBusyDialog();
+                sap.ui.core.BusyIndicator.show(0);
                 const oData = await this.ajaxReadWithJQuery("HM_ManageInvoice");
                 const CreditNote = await this.ajaxReadWithJQuery("CreditNote");
 
@@ -124,7 +126,8 @@ sap.ui.define([
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
-                this.closeBusyDialog();
+                // this.closeBusyDialog();
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -133,6 +136,20 @@ sap.ui.define([
             oYearFilter.setValue("");
         },
 
+        onNavBack: function () {
+            // var oHistory = sap.ui.core.routing.History.getInstance();
+            // var sPreviousHash = oHistory.getPreviousHash();
+            // if (sPreviousHash !== undefined) {
+            //     window.history.go(-1);
+            // } else {
+                var oRouter = this.getOwnerComponent().getRouter();
+                oRouter.navTo("TilePage", {}, true);
+            // },
+            // this.getView().getModel("CouponModel").setData({});
+        },
+        onHome: function () {
+            this.CommonLogoutFunction();
+        },
         onchangeFY: function (oEvent) {
             // get selected year from DatePicker
             const sYear = oEvent.getSource().getValue();
@@ -149,7 +166,8 @@ sap.ui.define([
 
         onFilterChange: function () {
             if (!this.rawInvoiceData) return;
-            this.getBusyDialog();
+            // this.getBusyDialog();
+            sap.ui.core.BusyIndicator.show(0);
 
             setTimeout(() => {
                 try {
@@ -210,7 +228,8 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    this.closeBusyDialog();
+                    // this.closeBusyDialog();
+                    sap.ui.core.BusyIndicator.hide();
                 }
             }, 100);
         },
@@ -417,7 +436,8 @@ sap.ui.define([
                     gstAmount: gst,
                     IncomeTax: this._convertToInr(item.IncomeTax, item),
                     totalAmountInINR: this._getInrValue(item),
-                    CreditNotesTotal: cnInr
+                    CreditNotesTotal: cnInr, 
+                    CustomerID: item.CustomerID,
                 });
 
                 return acc;
@@ -786,23 +806,53 @@ sap.ui.define([
         onCloseDialog: function (oEvent) {
             oEvent.getSource().getParent().getParent().close();
         },
-
+        // onInvoiceNumberPress: function (oEvent) {
+        //     this.getRouter().navTo("RouteManageInvoiceDetails", {
+        //         sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo),
+        //         dash: "PaymentDashboard"
+        //     });
+        // },
         onInvoiceNumberPress: function (oEvent) {
-            this.getRouter().navTo("RouteHostelInvoiceDetails", {
-                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("popoverData").getObject().InvNo),
+            // Try to get context from multiple possible sources
+            let oContext = oEvent.getSource().getBindingContext("popoverData");
+            if (!oContext) {
+                oContext = oEvent.getSource().getBindingContext("dialogData");
+            }
+
+            if (!oContext) {
+                MessageToast.show(this.i18nModel.getText("noDataFound"));
+                return;
+            }
+
+            const oRowData = oContext.getObject();
+            if (!oRowData.InvNo) {
+                MessageToast.show(this.i18nModel.getText("noInvoiceDetails"));
+                return;
+            }
+
+            this.getRouter().navTo("RouteManageInvoiceDetails", {
+                sPath: encodeURIComponent(oRowData.InvNo),
                 dash: "PaymentDashboard"
             });
         },
 
         onInvoiceCreditNotesPress: function (oEvent) {
-            var oContext = oEvent.getSource().getBindingContext("popoverData");
+            // Try to get context from multiple possible sources
+            let oContext = oEvent.getSource().getBindingContext("popoverData");
             if (!oContext) {
-                var oContext = oEvent.getSource().getBindingContext("dialogData");
+                oContext = oEvent.getSource().getBindingContext("dialogData");
             }
-            if (!oContext) return MessageToast.show("No data found for this row.");
+
+            if (!oContext) {
+                MessageToast.show(this.i18nModel.getText("noDataFound"));
+                return;
+            }
 
             const oRowData = oContext.getObject();
-            if (!oRowData.CCInvNo) return MessageToast.show("No Credit Note details found for this invoice.");
+            if (!oRowData.CCInvNo) {
+                MessageToast.show(this.i18nModel.getText("noCreditNoteDetails"));
+                return;
+            }
 
             this.getRouter().navTo("RouteCreditNoteDetails", {
                 sPath: encodeURIComponent(oRowData.CCInvNo),
@@ -811,14 +861,14 @@ sap.ui.define([
         },
 
         onPaymentBreakdownPress: function (oEvent) {
-            this.getRouter().navTo("RouteHostelInvoiceDetails", {
+            this.getRouter().navTo("RouteManageInvoiceDetails", {
                 sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo),
                 dash: "PaymentDashboard"
             });
         },
 
         onPendingInvoicePress: function (oEvent) {
-            this.getRouter().navTo("RouteHostelInvoiceDetails", {
+            this.getRouter().navTo("RouteManageInvoiceDetails", {
                 sPath: encodeURIComponent(oEvent.getSource().getBindingContext("dialogData").getObject().InvNo),
                 dash: "PaymentDashboard"
             });

@@ -6,7 +6,8 @@ sap.ui.define([
   "sap/ui/unified/CalendarLegend",
   "sap/ui/unified/CalendarLegendItem",
   "sap/ui/unified/DateTypeRange"
-], function (Controller, JSONModel, jsPDF, Formatter, BusyIndicator, CalendarLegend, CalendarLegendItem, DateTypeRange) {
+], function (Controller, JSONModel, jsPDF, Formatter, 
+  BusyIndicator, CalendarLegend, CalendarLegendItem, DateTypeRange) {
   "use strict";
 
   return Controller.extend("sap.ui.com.project1.controller.BaseController", {
@@ -31,6 +32,30 @@ sap.ui.define([
       });
     },
 
+
+    // 1. Router access - completely safe
+    getRouter: function () {
+      return sap.ui.core.UIComponent.getRouterFor(this);
+    },
+
+
+    // 3. Navigation helper (optional, but consistent with other controllers)
+    navTo: function (routeName, parameters, bReplace) {
+      this.getRouter().navTo(routeName, parameters, bReplace);
+    },
+
+    // 4. Check if model exists helper (optional)
+    getModel: function (sName) {
+      return this.getView().getModel(sName);
+    },
+
+    // 5. Set model helper (optional)
+    setModel: function (oModel, sName) {
+      return this.getView().setModel(oModel, sName);
+    },
+
+
+    
     //Common create call for all the app
     async ajaxCreateWithJQuery(sUrl, oPayLoad) {
       return new Promise((resolve, reject) => {
