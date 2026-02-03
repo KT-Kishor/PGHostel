@@ -132,7 +132,7 @@
 
                 <GenericTile
                     id="id5roomTile"
-                    visible="{= ${TileVisibility>/ManageStaff} !== 0 }"
+                    visible="{= ${TileVisibility>/ManageBedType}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageStaff}"
                     press="TileV_onpressManageStaff"
@@ -144,7 +144,7 @@
 
                 <GenericTile
                     id="id6roomTile"
-                    visible="{= ${TileVisibility>/ManageVendor} !== 0 }"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageVendors}"
                     press="TileV_onpressManageVendor"
@@ -156,6 +156,7 @@
 
                 <GenericTile
                     id="id7roomTile"
+                    visible="{= ${TileVisibility>/ManagePaymentHistory}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>payment}"
                     press="TileV_onpressPayment"
@@ -167,6 +168,7 @@
                 <GenericTile
                     id="id8roomTile"
                     class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageSecurityDeposit}!== 0?true:false }"
                     header="{i18n>returnDeposit}"
                     press="TileV_onpressDeposit"
                 >
@@ -177,7 +179,7 @@
 
                 <GenericTile
                     id="id9roomTile"
-                    visible="{= ${LoginModel>/Role} === 'Admin'}"
+                    visible="{= ${TileVisibility>/ManageBookingDashboard}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>bookingDashboard}"
                     press="TileV_onpressdashboard"
@@ -189,20 +191,18 @@
                 <GenericTile
                     id="id10roomTile"
                     class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManagePaymentDashboard}!== 0?true:false }"
                     header="{i18n>paymentdashboard}"
                     press="TileV_onpresshosteldashboard"
                 >
                     <TileContent unit="{i18n>paymentGraph}">
-                        <ImageContent src="sap-icon://business-objects-experience" />
+                        <ImageContent
+                            src="sap-icon://business-objects-experience"
+                        />
                     </TileContent>
                 </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
-        <!-- <footer>
-            <Bar>
-                <contentRight />
-            </Bar>
-        </footer> -->
         <Button
             text="Steps Guide"
             icon="sap-icon://learning-assistant"

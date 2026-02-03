@@ -763,7 +763,11 @@ sap.ui.define([
             "ManageInvoice": "/ManageInvoice",
             "ManageCoupon": "/ManageCoupon",
             "ManageStaff": "/ManageStaff",
-            "ManageVendor": "/ManageVendor"
+            "ManageVendor": "/ManageVendor",
+            "ManagePaymentDashboard": "/ManagePaymentDashboard",
+            "ManageBookingDashboard": "/ManageBookingDashboard",
+            "ManageSecurityDeposit": "/ManageSecurityDeposit",
+            "ManagePaymentHistory": "/ManagePaymentHistory"
           };
 
           const modelPath = tileMap[value];
