@@ -3888,3 +3888,20 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .todaySection .sapMGTContent {
   background: transparent !important;
 }
+
+.Dashboardtitle{
+  /* font-size: 12px !important; */
+  margin: 0;
+  padding: 0;
+}
+@media (max-width: 400px) {
+  .Dashboardtitle{
+    font-size: 12px !important;
+  }
+}
+
+.todayCard .truncateText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -87,8 +87,19 @@ sap.ui.define([
             return aPages;
         },
 
+        _getCardsPerPage: function () {
+            if (sap.ui.Device.system.phone) {
+                return 1;
+            }
+            if (sap.ui.Device.system.tablet) {
+                return 3;
+            }
+            return 5;
+        },
+
         dashboardModels: function (aCards, oMonthMap) {
-            const aPages = this._groupCardsForCarousel(aCards, 5);
+            const iPerPage = this._getCardsPerPage();
+            const aPages = this._groupCardsForCarousel(aCards, iPerPage);
             this.getView().setModel(new JSONModel({ pages: aPages }), "todayModel");
 
             const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -179,11 +190,13 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentYearBarChart", oPayload).then((oData) => {
+                console.log("month wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.data;
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("MONTH");
                 }
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "monthlyChartModel");
+                 console.table(aData);
                 this._bindMonthlyChart();
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -197,7 +210,9 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentMonthBarChart", oPayload).then((oData) => {
+                console.log("daily wise response:", oData);
                 let aData = oData.results || [];
+                //   console.log("Parsed daily data:", aData);
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("DAY");
                 }
@@ -218,7 +233,7 @@ sap.ui.define([
             const oDataset = new sap.viz.ui5.data.FlattenedDataset({
                 dimensions: [{
                     name: "Day",
-                    value: "{Day}"
+                    value: "{Date}"
                 }],
                 measures: [{
                     name: "Count",
@@ -250,6 +265,7 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentYearStatusBarChart", oPayload).then((oData) => {
+                console.log("status wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : (oData.results || oData.data || []);
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("STATUS");
@@ -304,6 +320,7 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentYearPaymentTypeBarChart", oPayload).then((oData) => {
+                console.log("payment wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.results || [];
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("PAYMENT");
@@ -491,7 +508,10 @@ sap.ui.define([
                 EndDate: oRange.yearEnd,
                 BranchCode: this.BranchID
             };
-
+            console.log("monthly payload:", oMonthPayload)
+            console.log("daily payload:", oDailyPayload)
+            console.log("status payload:", oStatusPayload)
+            console.log("payment payload:", oPaymentPayload)
             this._loadMonthChart(oMonthPayload);
             this._loadDayChart(oDailyPayload);
             this._loadStatusChart(oStatusPayload);
