@@ -419,9 +419,9 @@ sap.ui.define([
                             UserID: bookingDetails.UserID || "",
                             PaidAmount: oData.data.PerMonthTotalRent || "0.00",
                             CouponCode: bookingDetails.CouponCode,
-                            GST: oData.data.BranchDetails.GSTIN || "",
-                            Type: oData.data.BranchDetails.Type || "",
-                            Value: oData.data.BranchDetails.Value || ""
+                            GST: bookingDetails.GSTIN || "",
+                            Type: bookingDetails.GSTType || "",
+                            Value: bookingDetails.GSTValue || ""
                         });
                     }
 
