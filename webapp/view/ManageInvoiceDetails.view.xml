@@ -400,8 +400,8 @@
                                         id="CID_id_TableInvoiceItem"
                                         sticky="ColumnHeaders,HeaderToolbar"
                                         items="{ManageInvoiceItemModel>/ManageInvoiceItem}"
-                                        mode="Delete"
-                                        delete="CID_onPressDelete"
+                                        mode="MultiSelect"
+                                        
                                     >
 										<m:headerToolbar>
 											<m:Toolbar>
@@ -423,6 +423,14 @@
                                                     tooltip="{i18n>addInvItems}"
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressAddInvoiceItems"
+                                                />
+                                                <m:Button
+                                                   id="deleteItem"
+                                                    visible="{visiablityPlay>/addInvBtn}"
+                                                    text="{i18n>MSdelete}"
+                                                    tooltip="{i18n>MSdelete}"
+                                                    class="myUnifiedBtn"
+                                                    press="CID_onPressDelete"
                                                 />
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
@@ -520,7 +528,8 @@
 											</m:Column>
 										</m:columns>
 										<m:items>
-											<m:ColumnListItem>
+											<m:ColumnListItem  type="Active"
+        >
 												<m:cells>
 													<m:Input
                                                         value="{ManageInvoiceItemModel>IndexNo}"
@@ -869,6 +878,13 @@
                         text="{i18n>GeneratePDF}"
                         tooltip="{i18n>GeneratePDF}"
                         press="CID_onPressGeneratePdf"
+                        class="myUnifiedBtn"
+                    />
+                    <m:Button
+                        visible="{visiablityPlay>/merge}"
+                        text="{i18n>printInvoice}"
+                        tooltip="{i18n>GenerateSelectedInvoicePDF}"
+                        press="CID_onPressGenerateSelectedPDF"
                         class="myUnifiedBtn"
                     />
 				</m:contentRight>

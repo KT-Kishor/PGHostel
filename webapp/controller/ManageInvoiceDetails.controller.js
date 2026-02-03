@@ -131,7 +131,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.visiablityPlay.setProperty("/merge", false);
                 oView.setModel(new JSONModel(), "ManageInvoiceItemModel");
-                this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+                // this.byId("CID_id_TableInvoiceItem").setMode("Delete");
                 this.Update = false;
                 await this.onSearch();
                 if (sArg === "X") {
@@ -168,7 +168,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/editable", false);
                 this.visiablityPlay.setProperty("/addInvBtn", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
-                this.byId("CID_id_TableInvoiceItem").setMode("None");
+                // this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
                 this.visiablityPlay.setProperty("/merge", true);
                 this.visiablityPlay.setProperty("/MultiEmail", true);
@@ -278,7 +278,7 @@ sap.ui.define([
                 }
             },
 
-            onSearch: function () {
+            onSearch: function() {
                 return new Promise((resolve, reject) => {
                     sap.ui.core.BusyIndicator.show(0);
 
@@ -881,9 +881,9 @@ sap.ui.define([
 
                 const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
 
-                const sFinalStatus = balanceAmount === 0
-                    ? "Payment Received"
-                    : (oSelectedCustomerModel.Status || "Submitted");
+                const sFinalStatus = balanceAmount === 0 ?
+                    "Payment Received" :
+                    (oSelectedCustomerModel.Status || "Submitted");
 
 
                 const oPayload = {
@@ -1062,7 +1062,7 @@ sap.ui.define([
                 } else {
                     this.visiablityPlay.setProperty("/editable", true);
                     this.visiablityPlay.setProperty("/CInvoice", true);
-                    this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+                    // this.byId("CID_id_TableInvoiceItem").setMode("Delete");
                     this.visiablityPlay.setProperty("/addInvBtn", true);
                     this.visiablityPlay.setProperty("/merge", false);
                     this.visiablityPlay.setProperty("/MultiEmail", false);
@@ -1206,7 +1206,7 @@ sap.ui.define([
                         });
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
-                        this.byId("CID_id_TableInvoiceItem").setMode("None");
+                        // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         this.visiablityPlay.setProperty("/addInvBtn", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/MultiEmail", true);
@@ -1466,7 +1466,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
 
-                        this.byId("CID_id_TableInvoiceItem").setMode("None");
+                        // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         MessageToast.show(this.i18nModel.getText("paymentMessage"));
                     }
                 } catch (error) {
@@ -1540,48 +1540,77 @@ sap.ui.define([
                 this._oPopover.openBy(oEvent.getSource());
             },
 
-            CID_onPressDelete: function(oEvent) {
+            CID_onPressDelete: function() {
                 var that = this;
+                var oTable = this.byId("CID_id_TableInvoiceItem");
                 var oModel = this.getView().getModel("ManageInvoiceItemModel");
-                var oContext = oEvent.getParameter("listItem").getBindingContext("ManageInvoiceItemModel");
-                var sIndex = oContext.getPath().split("/")[2];
-                var aData = oModel.getData().ManageInvoiceItem;
-                if (oContext.getObject().ItemID) {
+
+                var aSelectedItems = oTable.getSelectedItems();
+
+                //  No selection
+                if (!aSelectedItems.length) {
+                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
+                    return;
+                }
+
+                //  More than one selected
+                if (aSelectedItems.length > 1) {
+                    MessageToast.show(this.i18nModel.getText("onlyOneRecordDelete"));
+                    return;
+                }
+
+                //  Single selected item
+                var oSelectedItem = aSelectedItems[0];
+                var oContext = oSelectedItem.getBindingContext("ManageInvoiceItemModel");
+                var oObject = oContext.getObject();
+
+                var sPath = oContext.getPath(); // /ManageInvoiceItem/2
+                var iIndex = parseInt(sPath.split("/")[2], 10);
+
+                var aData = oModel.getProperty("/ManageInvoiceItem");
+
+                var fnDeleteLocal = function() {
+                    aData.splice(iIndex, 1);
+
+                    // Re-index
+                    aData.forEach(function(item, idx) {
+                        item.IndexNo = idx + 1;
+                    });
+
+                    oModel.setProperty("/ManageInvoiceItem", aData);
+                    oTable.removeSelections(true);
+
+                    that.SNoValue = aData.length;
+                    that.totalAmountCalculation();
+
+                    MessageToast.show(that.i18nModel.getText("ManageInvoiceDeleteSuccess"));
+                };
+
+                // 🔁 If already saved → backend delete
+                if (oObject.ItemID) {
                     this.showConfirmationDialog(
                         that.i18nModel.getText("msgBoxConfirm"),
                         that.i18nModel.getText("msgBoxConfirmDelete"),
                         function() {
                             that.getBusyDialog();
+
                             that.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
                                 filters: {
-                                    ItemID: oContext.getObject().ItemID
+                                    ItemID: oObject.ItemID
                                 }
-                            }).then(() => {
-
-                                aData.splice(sIndex, 1);
-                                aData.forEach((item, idx) => item.IndexNo = idx + 1);
-
-                                oModel.setProperty("/ManageInvoiceItem", aData);
-                                that.SNoValue = aData.length;
-                                that.totalAmountCalculation();
-                                MessageToast.show(that.i18nModel.getText("ManageInvoiceDeleteSuccess"));
+                            }).then(function() {
+                                fnDeleteLocal();
                                 that.closeBusyDialog();
-
-                            }).catch((error) => {
+                            }).catch(function(error) {
                                 that.closeBusyDialog();
                                 MessageToast.show(error.responseText);
                             });
-                        },
-                        function() {
-                            that.closeBusyDialog();
                         }
                     );
-                } else {
-                    aData.splice(sIndex, 1);
-                    aData.forEach((item, idx) => item.IndexNo = idx + 1);
-                    oModel.setProperty("/ManageInvoiceItem", aData);
-                    this.SNoValue = aData.length;
-                    this.totalAmountCalculation();
+                }
+                //  Not saved yet → local delete only
+                else {
+                    fnDeleteLocal();
                 }
             },
 
@@ -1793,16 +1822,17 @@ sap.ui.define([
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
                     const oCompanyItemModel = oManageInvoiceItemModel.ManageInvoiceItem || [];
                     var data = this.getView().getModel("FilteredSOWModel").getData();
-                    // var paymentModel = this.getView().getModel("InvoicePayment");
-                    // var allDueAmount = paymentModel ? (paymentModel.getProperty("/AllDueAmount") || 0) : 0;
-                    // var AllReceivedAmount = paymentModel ? (paymentModel.getProperty("/AllReceivedAmount") || 0) : 0;
 
                     // fetch company details
-                    let filter = { BranchID: [oModel.BranchCode] };
+                    let filter = {
+                        BranchID: [oModel.BranchCode]
+                    };
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let paymentTermsFilter = {InvNo: [oModel.InvNo] };
+                    let paymentTermsFilter = {
+                        InvNo: [oModel.InvNo]
+                    };
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
@@ -2035,17 +2065,6 @@ sap.ui.define([
                         summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
 
-                    // if (parseFloat(allDueAmount) > 0) {
-                    //     summaryBody.push([`Due Amount (${data.Currency}) :`, allDueAmount]);
-                    // }
-
-                    // if (parseFloat(AllReceivedAmount) > 0) {
-                    //     summaryBody.push([`Received Amount (${data.Currency}) :`, AllReceivedAmount]);
-                    // }
-
-                    // if (parseFloat(data.BalanceAmount) > 0) {
-                    //     summaryBody.push([`Due Amount (${data.Currency}) :`, data.BalanceAmount]);
-                    // }
 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
@@ -2244,6 +2263,334 @@ sap.ui.define([
                         doc.text(line, 5, currentYPosition);
                         currentYPosition += lineHeight;
                     });
+                }
+            },
+
+            CID_onPressGenerateSelectedPDF: async function() {
+                try {
+                    sap.ui.core.BusyIndicator.show(0);
+
+                    const { jsPDF } = window.jspdf;
+                    const oView = this.getView();
+
+                    const oTable = this.byId("CID_id_TableInvoiceItem");
+                    const aSelectedItems = oTable.getSelectedItems();
+
+                    if (!aSelectedItems.length) {
+                        sap.m.MessageToast.show("Please select at least one invoice item");
+                        return;
+                    }
+
+                    // ================= SELECTED ITEMS =================
+                    const aInvoiceItems = aSelectedItems.map(oItem =>
+                        oItem.getBindingContext("ManageInvoiceItemModel").getObject()
+                    );
+
+                    // ================= MODELS =================
+                    const oCustomerModel = oView.getModel("SelectedCustomerModel").getData();
+                    const oSOWModel = oView.getModel("FilteredSOWModel").getData();
+
+                    // ================= GST MASTER CHECK (SAME AS UI) =================
+                    const gstin = oCustomerModel.GST;
+                    const taxType = oCustomerModel.Type;
+                    const taxRate = parseFloat(oCustomerModel.Value) || 0;
+                    const currency = oSOWModel.Currency;
+
+                    const isGSTEnabled = !!gstin &&
+                        !!taxType &&
+                        taxRate > 0 &&
+                        currency === "INR";
+
+                    // ================= COMPANY DETAILS =================
+                    const filter = { BranchID: [oCustomerModel.BranchCode] };
+                    const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+                    const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
+
+                    // ================= RECALCULATE TOTALS (SELECTED ONLY) =================
+                    let totalWithGST = 0;
+                    let totalWithoutGST = 0;
+
+                    aInvoiceItems.forEach(item => {
+                        const amount = parseFloat(item.Total) || 0;
+
+                        const isGSTApplicable =
+                            isGSTEnabled && item.GSTCalculation === "YES"; 
+
+                        item.SAC = isGSTApplicable ? "996322" : "-";
+
+                        if (isGSTApplicable) {
+                            totalWithGST += amount;
+                        } else {
+                            totalWithoutGST += amount;
+                        }
+                    });
+
+                    // ================= GST CALCULATION =================
+                    let cgst = 0,
+                        sgst = 0,
+                        igst = 0;
+                    let gstAmount = 0;
+                    let finalAmount = totalWithGST + totalWithoutGST;
+
+                    if (isGSTEnabled) {
+                        if (taxType === "CGST/SGST") {
+                            gstAmount = (totalWithGST * taxRate) / 100;
+                            cgst = gstAmount;
+                            sgst = gstAmount;
+                            finalAmount += gstAmount * 2;
+                        } else if (taxType === "IGST") {
+                            gstAmount = (totalWithGST * taxRate) / 100;
+                            igst = gstAmount;
+                            finalAmount += gstAmount;
+                        }
+                    }
+
+                    // ================= COUPON AFTER GST =================
+                    const couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
+                    finalAmount -= couponDiscount;
+                    if (finalAmount < 0) finalAmount = 0;
+
+                    // ================= ROUND OFF =================
+                    const roundedAmount = Math.round(finalAmount);
+
+                    // ================= ASSIGN VALUES FOR PDF =================
+                    oCustomerModel.SubTotalInGST = totalWithGST.toFixed(2);
+                    oCustomerModel.SubTotalNotGST = totalWithoutGST.toFixed(2);
+                    oCustomerModel.CGST = cgst.toFixed(2);
+                    oCustomerModel.SGST = sgst.toFixed(2);
+                    oCustomerModel.IGST = igst.toFixed(2);
+                    oCustomerModel.TotalAmount = roundedAmount.toFixed(2);
+
+                    const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
+                    const showSAC = isGSTEnabled;
+
+                    // ================= PDF INIT =================
+                    const doc = new jsPDF("p", "mm", "a4");
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const margin = 15;
+                    const usableWidth = pageWidth - margin * 2;
+                    let currentY = 25;
+
+                    // ================= HEADER =================
+                    doc.setFont("times", "bold").setFontSize(14);
+                    doc.text(oCustomerModel.Status === "Payment Received" ? "TAX INVOICE" : "DRAFT INVOICE",
+                        pageWidth - 18,
+                        currentY, {
+                            align: "right"
+                        }
+                    );
+
+                    if (companyImage) {
+                        doc.addImage("data:image/png;base64," + companyImage,"PNG", margin, 15, 40, 40);
+                    }
+
+                    // ================= INVOICE DETAILS =================
+                    currentY = 40;
+                    doc.setFontSize(11).setFont("times", "bold");
+
+                    const details = [
+                        ["Invoice No :", oCustomerModel.InvNo],
+                        ["Date :", Formatter.formatDate(oCustomerModel.InvoiceDate)],
+                        ["Room No :", oCustomerModel.RoomNo]
+                    ];
+
+                    details.forEach(row => {
+                        doc.text(row[0], pageWidth - 80, currentY);
+                        doc.text(String(row[1] || ""), pageWidth - 45, currentY);
+                        currentY += 6;
+                    });
+
+                    // ================= CUSTOMER DETAILS =================
+                    currentY += 10;
+                    doc.text("To,", margin, currentY);
+                    doc.setFont("times", "normal");
+
+                    if (oCustomerModel.CustomerName)
+                        doc.text(`Name : ${oCustomerModel.CustomerName}`, margin, currentY += 6);
+
+                    if (oCustomerModel.PermanentAddress) {
+                        const addr = doc.splitTextToSize(oCustomerModel.PermanentAddress, usableWidth / 2);
+                        doc.text(addr, margin, currentY += 6);
+                        currentY += addr.length * 5;
+                    }
+
+                    if (oCustomerModel.MobileNo) {
+                        doc.text(`Mobile No : ${oCustomerModel.MobileNo}`, margin, currentY);
+                        currentY += 5;
+                    }
+                    if (oCustomerModel.CustomerEmail) {
+                        doc.text(`Email : ${oCustomerModel.CustomerEmail}`, margin, currentY);
+                        currentY += 5;
+                    }
+                    if (isGSTEnabled) {
+                        doc.text(`GSTIN : ${oCustomerModel.GST}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    currentY += 5;
+
+                    // ================= ITEMS TABLE =================
+                    const head = showSAC ? [
+                        ['Sl.No', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross', 'Unit', 'Total']
+                    ] : [
+                        ['Sl.No', 'Particulars', 'Start Date', 'End Date', 'Gross', 'Unit', 'Total']
+                    ];
+
+                    const body = aInvoiceItems.map((item, i) => {
+                        const row = [
+                            i + 1,
+                            item.Particulars,
+                            item.StartDate || "",
+                            item.EndDate || "",
+                            Formatter.fromatNumber(item.GrossPrice),
+                            item.UnitText,
+                            Formatter.fromatNumber(item.Total)
+                        ];
+                        if (showSAC) row.splice(2, 0, item.SAC);
+                        return row;
+                    });
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head,
+                        body,
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [20, 170, 183]
+                        },
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            cellPadding: 3,
+                            lineWidth: 0.5,
+                            lineColor: [30, 30, 30],
+                            halign: "center"
+                        },
+                        columnStyles: {
+                            0: {
+                                halign: 'center'
+                            },
+                            1: {
+                                halign: 'left'
+                            },
+                            ...(showSAC ? {
+                                2: {
+                                    halign: 'center'
+                                },
+                                3: {
+                                    halign: 'right'
+                                },
+                                4: {
+                                    halign: 'right'
+                                },
+                                5: {
+                                    halign: 'right'
+                                },
+                                6: {
+                                    halign: 'right'
+                                },
+                                7: {
+                                    halign: 'right'
+                                }
+                            } : {
+                                2: {
+                                    halign: 'center'
+                                },
+                                3: {
+                                    halign: 'right'
+                                },
+                                4: {
+                                    halign: 'right'
+                                },
+                                5: {
+                                    halign: 'right'
+                                },
+                                6: {
+                                    halign: 'right'
+                                }
+                            })
+                        },
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 6;
+
+                    // ================= SUMMARY =================
+                    const summary = [];
+
+                    if (totalWithoutGST > 0)
+                        summary.push(["Sub-Total (Non-Taxable)", Formatter.fromatNumber(totalWithoutGST)]);
+
+                    if (totalWithGST > 0)
+                        summary.push(["Sub-Total (Taxable)", Formatter.fromatNumber(totalWithGST)]);
+
+                    const pct = taxRate ? `(${taxRate}%)` : "";
+
+                    if (cgst > 0) summary.push([`CGST ${pct}`, Formatter.fromatNumber(cgst)]);
+                    if (sgst > 0) summary.push([`SGST ${pct}`, Formatter.fromatNumber(sgst)]);
+                    if (igst > 0) summary.push([`IGST ${pct}`, Formatter.fromatNumber(igst)]);
+
+                    const totalRowIndex = summary.length;
+                    summary.push(["Total", Formatter.fromatNumber(roundedAmount)]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        body: summary,
+                        theme: 'plain',
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            halign: "right",
+                            cellPadding: 2,
+                            overflow: "ellipsize"
+                        },
+                        columnStyles: {
+                            0: {
+                                halign: "right",
+                                cellWidth: 60
+                            },
+                            1: {
+                                halign: "right",
+                                cellWidth: 40
+                            }
+                        },
+                        margin: {
+                            left: 95
+                        },
+                        didParseCell: function(data) {
+                            if (data.row.index === totalRowIndex) {
+                                data.cell.styles.lineWidth = {
+                                    top: 0.5,
+                                    right: 0,
+                                    bottom: 0,
+                                    left: 0
+                                };
+                                data.cell.styles.lineColor = [0, 0, 0];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    });
+
+                    // ================= AMOUNT IN WORDS =================
+                    currentY = doc.lastAutoTable.finalY + 8;
+                    doc.setFont("times", "bold");
+                    doc.text("Amount in Words :", margin, currentY);
+                    doc.setFont("times", "normal");
+                    doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY + 6);
+
+                    // ================= FOOTER =================
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Selected-Invoice.pdf`);
+
+                } catch (e) {
+                    sap.m.MessageToast.show(e.message || "PDF generation failed");
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
                 }
             }
         });
