@@ -906,15 +906,16 @@ sap.ui.define([
                             formatter: that.DateFormat,
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
-
-                            placeholder: "Select Date of Birth",
-                            change: function (oEvent) {
+                             maxDate: new Date(new Date().getFullYear() - 10, 11, 31),
+                             placeholder: "Select Date of Birth",
+                           change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
                                     MessageToast.show(that.i18nModel.getText("dateofBirthcannotbeFuture"));
                                     oEvent.getSource().setValue("");
                                 }
                             }
+
                         }),
                         new sap.m.Label({
                             text: "{i18n>MVgender}",
@@ -1591,12 +1592,13 @@ sap.ui.define([
                                                         if (existsIndex > -1) {
 
                                                             aSelected.splice(existsIndex, 1);
-
+                                                        
                                                             //  Force summary recalculation
                                                             aPersons[iPersonIndex].PersonFacilitiesSummary = [];
                                                             aPersons[iPersonIndex].AllSelectedFacilities = [];
                                                             aPersons[iPersonIndex].TotalFacilityPrice = 0;
                                                             aPersons[iPersonIndex].GrandTotal = 0;
+                                                            that._bPricingDirty = true;
 
                                                             oCard.removeStyleClass("serviceCardSelected");
 
@@ -1720,18 +1722,12 @@ sap.ui.define([
 
             if (SelectedPriceType === "Per Day") {
                 addButton(facility.PricePerDay, "Per Day");
-                // addButton(facility.PricePerHour, "Per Hour");
 
             } else if (SelectedPriceType === "Per Month") {
                 addButton(facility.PricePerMonth, "Per Month");
-                // addButton(facility.PricePerDay, "Per Day");
-                // addButton(facility.PricePerHour, "Per Hour");
-
+            
             } else if (SelectedPriceType === "Per Year") {
                 addButton(facility.PricePerYear, "Per Year");
-                // addButton(facility.PricePerMonth, "Per Month");
-                // addButton(facility.PricePerDay, "Per Day");
-                // addButton(facility.PricePerHour, "Per Hour");
             }
 
             this._oFacilityActionSheet = new sap.m.ActionSheet({
@@ -1765,12 +1761,12 @@ sap.ui.define([
                 SelectedPrice: selectedPrice,
                 SelectedPriceType: selectedType
             };
-            if (selectedType === "Per Hour") {
-                MessageBox.information(
-                    "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
-                    { title: "Default Time Applied" }
-                );
-            }
+            // if (selectedType === "Per Hour") {
+            //     MessageBox.information(
+            //         "The default Start Time is 09:00 AM and End Time is 10:00 AM.\nIf you want to change it, Please Edit it in the Summary Section.",
+            //         { title: "Default Time Applied" }
+            //     );
+            // }
 
             if (idx > -1) {
                 aSelected[idx] = oNew;
@@ -2132,36 +2128,16 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     oModel.setProperty("/NXTVis", false);
                     oModel.setProperty("/PERVIOUSVIS", false);
 
-                    // if (this._bPricingDirty) {
+                    if (this._bPricingDirty) {
                         this.TC_onDialogNextButton();
                         this._bPricingDirty = false;   // reset after calculation
-                    // }
+                    }
 
                     break;
                 default:
                     break;
             }
         },
-        _ensureSummaryExists: function () {
-
-            const oModel = this.getView().getModel("HostelModel");
-
-            const aPersons = oModel.getProperty("/Persons") || [];
-
-            // If summary already present → do nothing
-            const bAllHaveSummary = aPersons.every(p =>
-                (p.Facilities?.SelectedFacilities || []).length > 0 ||
-                (p.AllSelectedFacilities || []).length > 0
-            );
-
-            if (bAllHaveSummary) {
-                return;
-            }
-
-            // Build summary ONCE
-            this.TC_onDialogNextButton();
-        }
-        ,
 
         _resetWizardFromStep1: function () {
             const oWizard = this.byId("TC_id_wizard");
@@ -2208,7 +2184,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             oBTN.setProperty("/NXTVis", true);
 
             // ===============================
-            // 6️⃣ MODEL STATE
+            // 6 MODEL STATE
             // ===============================
             oHostelModel.setProperty("/IsGeneralInfoValid", false);
         },
@@ -2217,6 +2193,19 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             const oView = this.getView();
             const oModel = oView.getModel("HostelModel");
+             oModel.setProperty("/CouponCode", "");
+    //  const inputID = sap.ui.core.Fragment.byId(
+    //     this.getView().getId(),
+    //     "BookingcouponInput"
+    // );
+    // if (inputID) {
+    //     inputID.setShowValueHelp(false);
+    // }
+
+    const oBtn = this.byId("couponApplyBtn");
+    if (oBtn) {
+        oBtn.setVisible(true);
+    }
 
             const aPersons = oModel.getProperty("/Persons") || [];
 
@@ -2367,9 +2356,6 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     oPerson.TotalFacilityPrice;
 
                 // ------------------
-                // GST
-                // ------------------
-                // ------------------
                 // GST (DYNAMIC)
                 // ------------------
                 let cgst = 0;
@@ -2422,7 +2408,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             aPersons.forEach(p => {
                 p.GrandTotal = grandTotal;
             });
-            // oHostelModel.setProperty("/IsIndia", !!bAnyIndia);
+   
 
             return {
     Persons: aPersons.map(p => ({ ...p })),   // NEW ARRAY
@@ -2749,7 +2735,6 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             );
             this.byId("step1").setValidated(false);
             oHostelModel.setProperty("/IsGeneralInfoValid", false);
-            // this._bPricingDirty = true;
 
             if (result) {
               oHostelModel.setProperty("/Persons", [...result.Persons]);
@@ -4533,7 +4518,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 "/PaymentDate",
                 this.Formatter.formatDate(new Date())
             );
-            oPaymentModel.setProperty("/PaymentType", "UPI");
+            oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
 
             // ============================
             // CALCULATE ONCE (NON-DESTRUCTIVE)
@@ -4549,38 +4534,47 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 (oHostelModel.getProperty("/Persons") || []).length || 1;
 
             // Sum of each person's monthly cost
-            const paymentType =
-                oHostelModel.getProperty("/SelectedPriceType");
+          const paymentType =
+        oHostelModel.getProperty("/SelectedPriceType");
 
-            const aPersons =
-                oHostelModel.getProperty("/Persons") || [];
+    const aPersons =
+        oHostelModel.getProperty("/Persons") || [];
 
-            let totalPersonsAmount = 0;
+    let totalPersonsMonthly = 0;
 
-            if (paymentType === "Per Day") {
-                // pay full amount
-                totalPersonsAmount = aPersons.reduce(
-                    (sum, p) => sum + (Number(p.FinalTotalCost) || 0),
-                    0
-                );
-            } else {
-                // pay monthly amount
-                totalPersonsAmount = aPersons.reduce(
-                    (sum, p) => sum + (Number(p.MonthlyCostPerPerson) || 0),
-                    0
-                );
-            }
+    if (paymentType === "Per Day") {
 
-            //  STORE IN SEPARATE FIELDS
-            oHostelModel.setProperty(
-                "/PerMonthNoPerson",
-                Number(totalPersonsAmount.toFixed(2))
-            );
+        totalPersonsMonthly = aPersons.reduce(
+            (s, p) => s + (Number(p.FinalTotalCost) || 0),
+            0
+        );
 
+    } else {
 
+        totalPersonsMonthly = aPersons.reduce(
+            (s, p) => s + (Number(p.MonthlyCostPerPerson) || 0),
+            0
+        );
+    }
 
+    oHostelModel.setProperty(
+        "/PerMonthNoPerson",
+        Number(totalPersonsMonthly.toFixed(2))
+    );
 
-            this._oPaymentDialog.open();
+    // Default radio = PayOnCheckIn
+    const oRadio = sap.ui.getCore().byId("idPaymentTypeGroup");
+    if (oRadio) {
+        oRadio.setSelectedIndex(0);
+    }
+
+    this.onPaymentTypeSelect({
+        getSource: () => ({
+            getSelectedIndex: () => 0
+        })
+    });
+
+    this._oPaymentDialog.open();
         }
         ,
 
@@ -4588,87 +4582,95 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             const index = oEvent.getSource().getSelectedIndex();
 
-            const isUPI = index === 0;
-            const isCard = index === 1;
-            const isPayOnCheckIn = index === 2;
+            const isPayOnCheckIn = index === 0;
+            const isUPI = index === 1;
+            const isCard = index === 2;
 
             this._togglePaymentSections(isUPI, isCard, isPayOnCheckIn);
 
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const oHostelModel = this.getView().getModel("HostelModel");
 
-            // -----------------------------
-            // BASE VALUES (SOURCE OF TRUTH)
-            // -----------------------------
-            const finalTotal =
-                Number(oHostelModel.getProperty("/FinalTotalCost")) ||
-                Number(oHostelModel.getProperty("/GrandTotal")) ||
-                0;
+const paymentType =
+    oHostelModel.getProperty("/SelectedPriceType");
 
-            const selectedMonths =
-                Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+const aPersons =
+    oHostelModel.getProperty("/Persons") || [];
 
-            const selectedPersons =
-                Number(oHostelModel.getProperty("/SelectedPerson")) ||
-                oHostelModel.getProperty("/Persons")?.length ||
-                1;
+let totalPersonsMonthly = 0;
 
-            const perMonthAmount =
-                (finalTotal / selectedMonths).toFixed(2);
+if (paymentType === "Per Day") {
 
-            const perPersonAmount =
-                (perMonthAmount / selectedPersons).toFixed(2);
+    totalPersonsMonthly = aPersons.reduce(
+        (s, p) => s + (Number(p.FinalTotalCost) || 0),
+        0
+    );
+
+} else {
+
+    totalPersonsMonthly = aPersons.reduce(
+        (s, p) => s + (Number(p.MonthlyCostPerPerson) || 0),
+        0
+    );
+}
+
+// store again every time
+oHostelModel.setProperty(
+    "/PerMonthNoPerson",
+    Number(totalPersonsMonthly.toFixed(2))
+);
+
 
             // -----------------------------
             // PAY ON CHECKIN
             // -----------------------------
-            if (isPayOnCheckIn) {
+           if (isPayOnCheckIn) {
 
-                oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
-                oPaymentModel.setProperty("/Amount", "0");
-                oPaymentModel.setProperty("/PaymentDate", "");
+        oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
+        oPaymentModel.setProperty("/Amount", "0");
+        oPaymentModel.setProperty("/PaymentDate", "");
 
-                // still show breakup
-                oHostelModel.setProperty(
-                    "/PayableAmountPerMonth",
-                    Number(perMonthAmount)
-                );
-                oHostelModel.setProperty(
-                    "/PerMonthNoPerson",
-                    Number(perPersonAmount)
-                );
+        oHostelModel.setProperty(
+            "/PayableAmountPerMonth",
+            totalPersonsMonthly
+        );
 
-                return;
-            }
+        oHostelModel.setProperty(
+            "/PerMonthNoPerson",
+            totalPersonsMonthly
+        );
 
-            // -----------------------------
-            // UPI / CARD
-            // -----------------------------
-            oPaymentModel.setProperty(
-                "/PaymentType",
-                isUPI ? "UPI" : "CARD"
-            );
+        return;
+    }
 
-            oPaymentModel.setProperty(
-                "/PaymentDate",
-                this.Formatter.formatDate(new Date())
-            );
+    /* =====================
+       UPI / CARD
+    ===================== */
 
-            oPaymentModel.setProperty(
-                "/Amount",
-                Number(perMonthAmount)
-            );
+    oPaymentModel.setProperty(
+        "/PaymentType",
+        isUPI ? "UPI" : "CARD"
+    );
 
-            // ensure breakup never clears
-            oHostelModel.setProperty(
-                "/PayableAmountPerMonth",
-                Number(perMonthAmount)
-            );
+    oPaymentModel.setProperty(
+        "/PaymentDate",
+        this.Formatter.formatDate(new Date())
+    );
 
-            oHostelModel.setProperty(
-                "/PerMonthNoPerson",
-                Number(perPersonAmount)
-            );
+    oPaymentModel.setProperty(
+        "/Amount",
+        totalPersonsMonthly
+    );
+
+    oHostelModel.setProperty(
+        "/PayableAmountPerMonth",
+        totalPersonsMonthly
+    );
+
+    oHostelModel.setProperty(
+        "/PerMonthNoPerson",
+        totalPersonsMonthly
+    );
         },
 
         _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
@@ -4849,7 +4851,8 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                             TotalRoomprice: p.RoomRentPerPerson.toString() || "0",
                             UserID: p.UserID,
                             GSTType: oData.GSTType || "",
-                            GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0"
+                            GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0",
+                            GSTIN:oData.GSTIN || ""
                             // PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
                         });
                     }
@@ -4899,23 +4902,23 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
                         let facilityPrice = fac.TotalAmount || 0;
 
-                        let startTime = "";
-                        let endTime = "";
-                        let facilityHour = "";
+                        // let startTime = "";
+                        // let endTime = "";
+                        // let facilityHour = "";
 
-                        if (fac.UnitText === "Per Hour") {
+                        // if (fac.UnitText === "Per Hour") {
 
-                            // ✔ Preserve edited values, fallback to defaults
-                            startTime = fac.StartTime ? fac.StartTime : "09";
-                            endTime = fac.EndTime ? fac.EndTime : "10";
-                            facilityHour = fac.TotalTime ? String(fac.TotalTime) : "1";
+                        //     // ✔ Preserve edited values, fallback to defaults
+                        //     startTime = fac.StartTime ? fac.StartTime : "09";
+                        //     endTime = fac.EndTime ? fac.EndTime : "10";
+                        //     facilityHour = fac.TotalTime ? String(fac.TotalTime) : "1";
 
-                        } else {
+                        // } else {
 
-                            startTime = "";
-                            endTime = "";
-                            facilityHour = "";
-                        }
+                        //     startTime = "";
+                        //     endTime = "";
+                        //     facilityHour = "";
+                        // }
 
                         facilityData.push({
                             PaymentID: "",
@@ -4925,9 +4928,9 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                             EndDate: fac.EndDate ? fac.EndDate.split("/").reverse().join("-") : "",
                             PaidStatus: "Pending",
                             UnitText: fac.UnitText,
-                            StartTime: startTime,
-                            EndTime: endTime,
-                            TotalHour: facilityHour,
+                            // StartTime: startTime,
+                            // EndTime: endTime,
+                            // TotalHour: facilityHour,
                             Currency: fac.Currency,
                             BasicFacilityPrice: fac.Price
                         });

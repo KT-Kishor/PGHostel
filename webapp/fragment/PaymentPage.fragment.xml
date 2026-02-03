@@ -58,12 +58,12 @@
                     id="idPaymentTypeGroup"
                     columns="1"
                     select="onPaymentTypeSelect"
-                    selectedIndex="0"
+                    selectedIndex="2"
                     class="paymentTypeGroup"
                 >
+                    <RadioButton text="{i18n>payatcheckintime}" />
                     <RadioButton text="{i18n>uPI}" />
                     <RadioButton text="{i18n>creditDebitCard}" />
-                    <RadioButton text="{i18n>payatcheckintime}" />
                 </RadioButtonGroup>
 
                 <!-- MAIN GRID -->
@@ -139,7 +139,7 @@
                         <Label
                             text="{i18n>amount}"
                            
-                        />
+                        />      
                         <Input
                             id="idAmount"
                             type="Number"

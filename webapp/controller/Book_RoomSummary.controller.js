@@ -113,9 +113,9 @@ sap.ui.define([
     String(oModel.getProperty("/SelectedPriceType") || "")
         .trim();
 
-        /* ==================================
-        FIND PERSON + FACILITY INDEX
-        ================================== */
+      
+        // FIND PERSON + FACILITY INDEX
+      
         let iPersonIndex = -1;
         let iFacilityIndex = -1;
 
@@ -1512,9 +1512,9 @@ oHostelModel.refresh(true);
         oBtn.setVisible(true);
     }
 
-    MessageToast.show(
-        this.i18nModel.getText("couponRemovedSuccessfully")
-    );
+    // MessageToast.show(
+    //     this.i18nModel.getText("couponRemovedSuccessfully")
+    // );
 }
 ,
 /* =========================================================== */
@@ -1843,7 +1843,7 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
     );
     if (inputID) {
         inputID.setShowValueHelp(false);
-    }
+    }3
             return;
         }
 

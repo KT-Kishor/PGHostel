@@ -29,7 +29,6 @@
 
                 <Label
                     text="{i18n>unitType}"
-                    required="true"
                 />
                 <ComboBox
                     editable="false"
