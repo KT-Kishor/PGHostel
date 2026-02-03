@@ -879,6 +879,13 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
+                const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
+
+                const sFinalStatus = balanceAmount === 0
+                    ? "Payment Received"
+                    : (oSelectedCustomerModel.Status || "Submitted");
+
+
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.CustomerName,
@@ -896,7 +903,7 @@ sap.ui.define([
                     SGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oSelectedCustomerModel.SGST) || 0 : 0,
                     IGST: oSelectedCustomerModel.Type === "IGST" ? parseFloat(oSelectedCustomerModel.IGST) || 0 : 0,
                     TotalAmount: parseFloat(oModel.TotalAmount) || 0,
-                    Status: oSelectedCustomerModel.Status || "Submitted",
+                    Status: sFinalStatus,
                     InvoiceDescription: oSelectedCustomerModel.InvoiceDescription || "",
                     IncomeTax: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomeTax : "",
                     CustomerEmail: oSelectedCustomerModel.CustomerEmail || "",
@@ -1082,6 +1089,7 @@ sap.ui.define([
                 if (!sGST) {
                     oInput.setValueState("None");
                     oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/Value", "");
                     oCustomerModel.setProperty("/CGSTSelected", false);
                     oCustomerModel.setProperty("/IGSTSelected", false);
                     this.totalAmountCalculation();
