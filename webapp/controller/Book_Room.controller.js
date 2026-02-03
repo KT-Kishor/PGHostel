@@ -27,7 +27,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
-
+        this._bPricingDirty = true; // For calculation 
             var oMessageManager = sap.ui.getCore().getMessageManager();
 
             // Register view
