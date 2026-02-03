@@ -413,7 +413,9 @@ sap.ui.define([
                 Deposit: oData.Deposit,
                 DepositCurrency: oData.DepositCurrency,
                 GSTValue: oData.GSTValue,
-                GSTType: oData.GSTType
+                GSTType: oData.GSTType,
+                GSTIN: oData.GSTIN || ""
+                
             };
             
             // -------------------------
@@ -686,6 +688,7 @@ sap.ui.define([
                     DepositCurrency: oSelected.DepositCurrency,
                     GSTType: oSelected.GSTType,
                     GSTValue: oSelected.GSTValue,
+                    GSTIN: oSelected.GSTIN || ""
                 };
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
@@ -2626,7 +2629,8 @@ sap.ui.define([
 
             // Navigate
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(sCustomerID)
+                sPath: encodeURIComponent(sCustomerID),
+                from: "ManageProfile"
             });
         },
 
@@ -2988,6 +2992,8 @@ sap.ui.define([
                     const sCountry = oBranchInfo?.Country || "";
                     const sGSTType = oBranchInfo?.Type || "";
                     const sGSTValue = oBranchInfo?.Value || "";
+                    const sGSTIN = oBranchInfo?.GSTIN || "";
+
 
 
 
@@ -3029,6 +3035,7 @@ sap.ui.define([
                         CheckOutTime: sCheckOutTime,
                         GSTType: sGSTType,
                         GSTValue: sGSTValue,
+                        GSTIN: sGSTIN,
                     };
                 });
 

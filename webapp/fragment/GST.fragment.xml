@@ -33,7 +33,6 @@
             <f:content>
                  <Label
                     text="GST Number"
-                    required="true"
                 />
                 <Input
                     id="idGSTNumber"

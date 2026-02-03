@@ -987,7 +987,8 @@ HM_UnassignRoom: function () {
 
         AD_onPressEditDetails: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID)
+                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID),
+                from: "Customerdetails"
             });
         },
 

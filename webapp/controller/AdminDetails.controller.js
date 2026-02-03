@@ -13,6 +13,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this._fromRoute = oEvent.getParameter("arguments").from;
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
@@ -28,6 +29,7 @@ sap.ui.define([
             } else {
                 this._oLoggedInUser = {}; // fallback
             }
+       
             this.Code = ""
             var model = new JSONModel({
                 FacilityName: "",
@@ -56,7 +58,8 @@ sap.ui.define([
             var model = new JSONModel({
                 visible: false,
                 GSt: false,
-                IsCouponApplied: false
+                IsCouponApplied: false,
+                showCancelButton: false
 
             });
             this.getView().setModel(model, "VisibleModel")
@@ -72,7 +75,23 @@ sap.ui.define([
 
             await this.OnRoom();
 
-            this.AD_onSearch()
+           await this.AD_onSearch()
+           var oCustomerData= this.getView().getModel("CustomerData").getData();
+          var VisibleModel= this.getView().getModel("VisibleModel")
+                 if(this._oLoggedInUser.Role==="Customer"){
+                   const bookingDate = new Date(oCustomerData.BookingDate);
+                    const now = new Date();
+
+    let diffHours = (now - bookingDate) / (1000 * 60 * 60);
+
+    if (diffHours > 24) {
+        // hide cancel button
+        VisibleModel.setProperty("/showCancelButton", true);
+    } else {
+        // show cancel button
+        VisibleModel.setProperty("/showCancelButton", false);
+    }
+            }
         },
 
         valuestate: function () {
@@ -233,6 +252,10 @@ sap.ui.define([
         },
 
         onNavBack: function () {
+            if( this._fromRoute==="Dashboard"){
+                this.getOwnerComponent().getRouter().navTo("RouteDashboard");
+            }else{
+             
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
             const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
@@ -244,7 +267,9 @@ sap.ui.define([
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
             }
+        
             this.getView().getModel("CustomerData").setData({});
+        }
         },
 
         onHome: function () {
@@ -336,6 +361,7 @@ sap.ui.define([
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
                     GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
                     GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
+                    GSTIN: oCustomer.Bookings?.[0]?.GSTIN || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -2526,6 +2552,7 @@ sap.ui.define([
                 );
                 return; // ⛔ stop save
             }
+              
 
             if (Bookingdata.STDCode === "+91") {
                 if (Bookingdata.MobileNo.length === 10) {
@@ -2623,8 +2650,69 @@ sap.ui.define([
                     };
                 })
             };
+           
 
+              const customerEndDate =  this._parseDate(CustomerData.EndDate);
+    const bookingEndDate  = this._parseDate(Bookingdata.EndDate);
+
+ let isAnyFacilityMatchingBookingEnd = true;
+
+for (let i = 0; i < facilityItems.length; i++) {
+    const facilityEnd = this._parseDate(facilityItems[i].EndDate);
+
+    if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
+        isAnyFacilityMatchingBookingEnd = false;
+        break;
+    }
+}
+if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
+
+    var that = this;
+
+    sap.m.MessageBox.confirm(
+    "Would you like to extend your facility duration until your booking end date?"  ,     
+        {
+            title: "Upgrade Required",
+            actions: [sap.m.MessageBox.Action.OK,"NO"],
+            emphasizedAction: sap.m.MessageBox.Action.OK,
+
+            onClose: function (sAction) {
+                if (sAction === "NO") {
+                    // ✅ Continue save WITHOUT modifying bookingEndDate
+                    that.oneditsavebooking(Payload);
+                }
+              
+            }
+        }
+    );
+
+    return; 
+}
             // Send payload
+            sap.ui.core.BusyIndicator.show(0);
+            this.ajaxUpdateWithJQuery("HM_Customer", {
+                data: [Payload],
+                filters: {
+                    CustomerID: CustomerData.CustomerID
+                }
+            })
+                .then(() => {
+
+                    // Refresh models
+                    this.AD_onSearch();
+                    sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
+
+                    this.getView().getModel("VisibleModel").setProperty("/visible", false);
+                    this.byId("idMonthYearSelect").setVisible(false);
+                })
+                .catch(err => {
+                    sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
+                    console.error(err);
+                });
+        },
+        oneditsavebooking: function (Payload) {
+            var CustomerData = this.getView().getModel("CustomerData").getData();
+
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
@@ -3252,7 +3340,7 @@ sap.ui.define([
                 this.GST_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.GST", this);
                 oView.addDependent(this.GST_Dialog);
             }
-            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue("");
+            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue(CustData.GSTIN || "");
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
             sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
 
@@ -3294,12 +3382,12 @@ sap.ui.define([
             var oView = sap.ui.getCore()
 
             if (
-                utils._LCvalidateGstNumber(oView.byId("idGSTNumber"), "ID") &&
                 utils.onNumber(oView.byId("idGSTPercentage"), "ID")
             ) {
                 var oCustomerModel = this.getView().getModel("CustomerData")
                 const CustData = this.getView().getModel("CustomerData").getData();
                 const oInput = sap.ui.getCore().byId(this.getView().createId("idGSTNumber"));
+              
                 var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
                 var oRadioGroup = sap.ui.getCore().byId("idGSTType");
 
@@ -3379,6 +3467,7 @@ sap.ui.define([
                     "Booking": [{
                         "GSTType": sValue,
                         "GSTValue": Percentage,
+                        "GSTIN": oInput?oInput.getValue().trim().toUpperCase() : ""
                     }],
                 }
 
