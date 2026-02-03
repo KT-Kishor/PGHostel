@@ -5212,6 +5212,12 @@ oHostelModel.setProperty(
                             bookingGroup = "Upcoming";
                         }
                     }
+                    let GSTValue=0;
+                    if(booking.GSTType === "IGST"){
+                         GSTValue=Number(booking.GSTValue) /100 || 0;
+                    }else{
+                         GSTValue=(Number(booking.GSTValue) + Number(booking.GSTValue)) /100 || 0;
+                    }
                     // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
                     return {
                         customerName: booking.Salutation + " " + booking.CustomerName,
@@ -5219,9 +5225,9 @@ oHostelModel.setProperty(
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
                         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                        amount: (
-                            (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) +
-                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0) - Number(booking.Discount || 0)) * 0.09 * 2)
+                        amount:(
+                            (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
+                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
                         ).toString() || "",
                         status: booking.Status,
                         customerID: booking.CustomerID,
