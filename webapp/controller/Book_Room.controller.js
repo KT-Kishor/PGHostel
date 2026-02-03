@@ -2038,6 +2038,12 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             this._oSelectedStep = oTargetStep;
             this._iSelectedStepIndex = iTargetIndex;
 
+      setTimeout(function () {
+        var oWizardDom = this._oWizard.getDomRef();
+        if (oWizardDom) {
+            oWizardDom.scrollTop = 0;
+        }
+    }.bind(this), 0);
             this.handleButtonsVisibility();
         },
 
@@ -2776,6 +2782,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onRoomDurationChange: function (oEvent) {
+    this._bPricingDirty = true;
             this._resetWizardFromStep1();
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");

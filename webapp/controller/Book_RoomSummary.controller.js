@@ -480,25 +480,37 @@ if (paymentType === "Per Month") {
         const oEnd = parseDate(oSafeCopy.EndDate);
 
         // Calendar month diff
-        let iMonths =
-            (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-            (oEnd.getMonth() - oStart.getMonth());
+       // Calendar month diff (fallback only)
+let iMonths =
+    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+    (oEnd.getMonth() - oStart.getMonth());
 
-        iMonths = iMonths > 0 ? iMonths : 1;
+iMonths = iMonths > 0 ? iMonths : 1;
 
-        // Calendar year diff
-        let iYears = oEnd.getFullYear() - oStart.getFullYear();
-        iYears = iYears > 0 ? iYears : 1;
+// Calendar year diff (fallback only)
+let iYears =
+    oEnd.getFullYear() - oStart.getFullYear();
 
-        if (oSafeCopy.UnitText === "Per Month") {
-            oSafeCopy.TotalMonths = iMonths;
-            oSafeCopy.TotalYears = 0;
-        }
+iYears = iYears > 0 ? iYears : 1;
 
-        if (oSafeCopy.UnitText === "Per Year") {
-            oSafeCopy.TotalYears = iYears;
-            oSafeCopy.TotalMonths = 0;
-        }
+
+// 🔥 USE USER-SELECTED VALUE FIRST
+if (oSafeCopy.UnitText === "Per Month") {
+
+    oSafeCopy.TotalMonths =
+        Number(oSafeCopy.SelectedMonths || iMonths);
+
+    oSafeCopy.TotalYears = 0;
+}
+
+if (oSafeCopy.UnitText === "Per Year") {
+
+    oSafeCopy.TotalYears =
+        Number(oSafeCopy.SelectedMonths || iYears);
+
+    oSafeCopy.TotalMonths = 0;
+}
+
     }
 
     // =================================================
@@ -507,6 +519,14 @@ if (paymentType === "Per Month") {
     this._oEditModel = new sap.ui.model.json.JSONModel(oSafeCopy);
     this.getView().setModel(this._oEditModel, "edit");
 
+
+    if (oSafeCopy.TotalMonths) {
+    this._oEditModel.setProperty("/TotalMonths", String(oSafeCopy.TotalMonths));
+}
+
+if (oSafeCopy.TotalYears) {
+    this._oEditModel.setProperty("/TotalYears", String(oSafeCopy.TotalYears));
+}
     // =================================================
     // LOAD DIALOG IF NEEDED
     // =================================================
@@ -942,7 +962,7 @@ if (paymentType === "Per Month") {
     const oEnd = parseDate(oHostelModel.getProperty("/EndDate"));
 
    //  USE FACILITY-LEVEL DAYS (ALREADY CORRECT)
-const iDays = Number(oFacility.TotalDays || oEditModel.getProperty("/TotalDays") || 1);
+const iDays = Number(oEditModel.getProperty("/TotalDays") || 1);
 //  TAKE FROM EDIT MODEL IF PRESENT
 const iMonths = Number(
     oFacility.SelectedMonths ||
@@ -987,10 +1007,15 @@ oFacility.TotalAmount = this._calculateFacilityTotal(
     const paymentType = oHostelModel.getProperty("/SelectedPriceType");
     const selectedMonths = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
 
+    const bookingDays =
+    Number(oHostelModel.getProperty("/TotalDays")) ||
+    Number(oHostelModel.getProperty("/NoOfDays")) ||
+    iDays; 
+
     let roomRent = 0;
     switch (paymentType) {
         case "Per Day":
-            roomRent = baseRoomRent * iDays;
+            roomRent = baseRoomRent * bookingDays;
             break;
         case "Per Month":
             roomRent = baseRoomRent * selectedMonths;
@@ -1186,65 +1211,65 @@ oHostelModel.setProperty("/Persons", aPersons);
 },
 
 
-   onUnitTextChange: function (oEvent) {
+//    onUnitTextChange: function (oEvent) {
 
-    const oCombo = oEvent.getSource();
-    if (!oCombo.getSelectedItem()) {
-        MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
-        return;
-    }
+//     const oCombo = oEvent.getSource();
+//     if (!oCombo.getSelectedItem()) {
+//         MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
+//         return;
+//     }
 
-    const oEditModel = this.getView().getModel("edit");
-    const oFacilityModel = this.getView().getModel("FacilityModel");
-    const oHostelModel = this.getView().getModel("HostelModel");
+//     const oEditModel = this.getView().getModel("edit");
+//     const oFacilityModel = this.getView().getModel("FacilityModel");
+//     const oHostelModel = this.getView().getModel("HostelModel");
 
-    const sUnit = oCombo.getSelectedItem().getText();
-    const sFacilityName = oEditModel.getProperty("/FacilityName");
-    const sBranch = oHostelModel.getProperty("/BranchCode");
+//     const sUnit = oCombo.getSelectedItem().getText();
+//     const sFacilityName = oEditModel.getProperty("/FacilityName");
+//     const sBranch = oHostelModel.getProperty("/BranchCode");
 
-    oEditModel.setProperty("/UnitText", sUnit);
+//     oEditModel.setProperty("/UnitText", sUnit);
 
-    // 🔑 Reset ONLY what is unit-specific
-    oEditModel.setProperty("/StartTime", "");
-    oEditModel.setProperty("/EndTime", "");
-    oEditModel.setProperty("/TotalTime", "");
+//     // 🔑 Reset ONLY what is unit-specific
+//     oEditModel.setProperty("/StartTime", "");
+//     oEditModel.setProperty("/EndTime", "");
+//     oEditModel.setProperty("/TotalTime", "");
 
-    oEditModel.setProperty("/TotalMonths", 0);
-    oEditModel.setProperty("/TotalYears", 0);
-     oEditModel.setProperty("/StartDate", "");
-            oEditModel.setProperty("/EndDate", "");
-            oEditModel.setProperty("/TotalDays", "");
-            oEditModel.refresh(true);
+//     oEditModel.setProperty("/TotalMonths", 0);
+//     oEditModel.setProperty("/TotalYears", 0);
+//      oEditModel.setProperty("/StartDate", "");
+//             oEditModel.setProperty("/EndDate", "");
+//             oEditModel.setProperty("/TotalDays", "");
+//             oEditModel.refresh(true);
 
-    //  Do NOT touch TotalDays here
+//     //  Do NOT touch TotalDays here
 
-    // Resolve price
-    const aFacilities = oFacilityModel.getProperty("/Facilities") || [];
-    const oMatched = aFacilities.find(f =>
-        f.FacilityName === sFacilityName &&
-        f.BranchCode === sBranch
-    );
+//     // Resolve price
+//     const aFacilities = oFacilityModel.getProperty("/Facilities") || [];
+//     const oMatched = aFacilities.find(f =>
+//         f.FacilityName === sFacilityName &&
+//         f.BranchCode === sBranch
+//     );
 
-    if (!oMatched) {
-        MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
-        return;
-    }
+//     if (!oMatched) {
+//         MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
+//         return;
+//     }
 
-    let price = 0;
-    switch (sUnit) {
-        case "Per Day":   price = oMatched.PricePerDay; break;
-        case "Per Month": price = oMatched.PricePerMonth; break;
-        case "Per Year":  price = oMatched.PricePerYear; break;
-        case "Per Hour":  price = oMatched.PricePerHour; break;
-    }
+//     let price = 0;
+//     switch (sUnit) {
+//         case "Per Day":   price = oMatched.PricePerDay; break;
+//         case "Per Month": price = oMatched.PricePerMonth; break;
+//         case "Per Year":  price = oMatched.PricePerYear; break;
+//         case "Per Hour":  price = oMatched.PricePerHour; break;
+//     }
 
-    oEditModel.setProperty("/Price", price);
+//     oEditModel.setProperty("/Price", price);
 
-    if (sUnit === "Per Month") oEditModel.setProperty("/TotalMonths", 1);
-    if (sUnit === "Per Year")  oEditModel.setProperty("/TotalYears", 1);
-}
+//     if (sUnit === "Per Month") oEditModel.setProperty("/TotalMonths", 1);
+//     if (sUnit === "Per Year")  oEditModel.setProperty("/TotalYears", 1);
+// }
 
-,
+// ,
 
         onOpenDocumentPreview: function (oEvent) {
             const oCtx = oEvent.getSource().getBindingContext("HostelModel");
