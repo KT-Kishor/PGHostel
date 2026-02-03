@@ -887,6 +887,13 @@
                         press="CID_onPressGenerateSelectedPDF"
                         class="myUnifiedBtn"
                     />
+                    <m:Button
+                        visible="{visiablityPlay>/merge}"
+                        text="{i18n>summaryInvoice}"
+                        tooltip="{i18n>summaryInvoice}"
+                        press="CID_onPressGenerateSummaryPDF"
+                        class="myUnifiedBtn"
+                    />
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

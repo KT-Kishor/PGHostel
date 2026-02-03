@@ -2592,6 +2592,372 @@ sap.ui.define([
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
+            },
+
+            CID_onPressGenerateSummaryPDF: async function() {
+                try {
+                    sap.ui.core.BusyIndicator.show(0);
+                    const { jsPDF } = window.jspdf;
+                    const oView = this.getView();
+
+                    // ================= FETCH OVERALL INVOICE DATA =================
+                    const filterData = oView.getModel("SelectedCustomerModel").getData();
+
+                    const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
+                        CustomerID: [filterData.CustomerID]
+                    });
+
+                    const invoices = response.data || [];
+                    if (!invoices.length) {
+                        MessageToast.show("No data found");
+                        return;
+                    }
+
+                    // ================= COMPANY DETAILS =================
+                    const companyRes = await this.ajaxReadWithJQuery("HM_Branch", {
+                        BranchID: [invoices[0].BranchCode]
+                    });
+                    const company = companyRes.data[0];
+                    const companyImage = company.Photo1;
+
+                    // ================= PAYMENT HISTORY (COMMON) =================
+                    const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
+                        CustomerID: [filterData.CustomerID]
+                    });
+
+                    // ================= PDF INIT =================
+                    const doc = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    });
+
+                    const margin = 15;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const usableWidth = pageWidth - 2 * margin;
+
+                    // ================= LOOP EACH INVOICE =================
+                    for (let invIndex = 0; invIndex < invoices.length; invIndex++) {
+
+                        const oModel = invoices[invIndex];
+                        const oCompanyItemModel = oModel.InvoicePaymentDetail || [];
+
+                        if (invIndex > 0) {
+                            doc.addPage();
+                        }
+
+                        let currentY = 0;
+
+                        // ================= HEADER =================
+                        let headerMargin = 25.4;
+                        doc.setFontSize(14).setFont("times", "bold");
+                        doc.text(
+                            oModel.Status === "Payment Received" ? "TAX - INVOICE" : "DRAFT INVOICE",
+                            pageWidth - 18,
+                            headerMargin, {
+                                align: "right"
+                            }
+                        );
+
+                        if (companyImage && companyImage.trim() !== "") {
+                            const imgData = "data:image/png;base64," + companyImage;
+                            doc.addImage(imgData, "PNG", margin, 15, 40, 40);
+                        }
+
+                        // ================= INVOICE DETAILS =================
+                        const detailsStartY = 35;
+                        const rowHeight = 6.5;
+                        const columnWidths = [30, 30];
+                        const rightAlignX = pageWidth - 22 - columnWidths[0] - columnWidths[1];
+
+                        doc.setFontSize(12).setFont("times", "bold");
+
+                        const detailsTable = [{
+                                label: "Invoice No. :",
+                                value: oModel.InvNo
+                            },
+                            {
+                                label: "Date :",
+                                value: Formatter.formatDate(oModel.InvoiceDate)
+                            },
+                            {
+                                label: "Room No :",
+                                value: oModel.RoomNo
+                            }
+                        ];
+
+                        currentY = detailsStartY;
+                        detailsTable.forEach(row => {
+                            doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                            doc.text(String(row.value), rightAlignX + columnWidths[0] + 5, currentY + 5);
+                            currentY += rowHeight;
+                        });
+
+                        // ================= CUSTOMER DETAILS =================
+                        currentY += 15;
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("To,", margin, currentY);
+
+                        currentY += 5;
+                        doc.setFont("times", "normal").setFontSize(12);
+
+                        if (oModel.CustomerName) {
+                            doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.PermanentAddress) {
+                            const addressLines = doc.splitTextToSize(oModel.PermanentAddress, usableWidth / 2);
+                            doc.text(addressLines, margin, currentY);
+                            currentY += addressLines.length * 5;
+                        }
+
+                        if (oModel.MobileNo) {
+                            doc.text(`Mobile No : ${oModel.MobileNo}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.CustomerEmail) {
+                            doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.GST) {
+                            doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        currentY += 5;
+
+                        // ================= ITEM TABLE =================
+                        const showSAC = !!oModel.GST;
+
+                        const body = oCompanyItemModel.map((item, index) => {
+                            const row = [
+                                index + 1,
+                                item.Particulars,
+                                Formatter.formatDate(item.StartDate),
+                                Formatter.formatDate(item.EndDate),
+                                Formatter.fromatNumber(item.GrossPrice),
+                                item.UnitText,
+                                Formatter.fromatNumber(item.Total)
+                            ];
+                            if (showSAC) row.splice(2, 0, item.SAC);
+                            return row;
+                        });
+
+                        const head = showSAC ? [
+                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                        ] : [
+                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                        ];
+
+                        doc.autoTable({
+                            startY: currentY,
+                            head,
+                            body,
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                0: {
+                                    halign: 'center'
+                                },
+                                1: {
+                                    halign: 'left'
+                                },
+                                ...(showSAC ? {
+                                    2: {
+                                        halign: 'center'
+                                    },
+                                    3: {
+                                        halign: 'right'
+                                    },
+                                    4: {
+                                        halign: 'right'
+                                    },
+                                    5: {
+                                        halign: 'right'
+                                    },
+                                    6: {
+                                        halign: 'right'
+                                    },
+                                    7: {
+                                        halign: 'right'
+                                    }
+                                } : {
+                                    2: {
+                                        halign: 'center'
+                                    },
+                                    3: {
+                                        halign: 'right'
+                                    },
+                                    4: {
+                                        halign: 'right'
+                                    },
+                                    5: {
+                                        halign: 'right'
+                                    },
+                                    6: {
+                                        halign: 'right'
+                                    }
+                                })
+                            },
+                        });
+
+
+                        currentY = doc.lastAutoTable.finalY + 5;
+
+                        // ================= SUMMARY =================
+                        const summaryBody = [];
+
+                        if (+oModel.SubTotalInGST > 0) {
+                            summaryBody.push([
+                                `Sub-Total (${oModel.Currency}) :`,
+                                Formatter.fromatNumber(oModel.SubTotalInGST)
+                            ]);
+                        }
+
+                        if (oModel.Type === "IGST" && +oModel.IGST > 0) {
+                            summaryBody.push([
+                                `IGST (${oModel.Value}%) :`,
+                                Formatter.fromatNumber(oModel.IGST)
+                            ]);
+                        }
+
+                        const totalRowIndex = summaryBody.length;
+                        summaryBody.push([
+                            `Total (${oModel.Currency}) :`,
+                            Formatter.fromatNumber(oModel.TotalAmount)
+                        ]);
+
+                        doc.autoTable({
+                            startY: currentY,
+                            body: summaryBody,
+                            theme: 'plain',
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                halign: "right",
+                                cellPadding: 2,
+                                overflow: "ellipsize"
+                            },
+                            columnStyles: {
+                                0: {
+                                    halign: "right",
+                                    cellWidth: 60
+                                },
+                                1: {
+                                    halign: "right",
+                                    cellWidth: 40
+                                }
+                            },
+                            margin: {
+                                left: 95
+                            },
+                            didParseCell: function(data) {
+                                if (data.row.index === totalRowIndex) {
+                                    data.cell.styles.lineWidth = {
+                                        top: 0.5,
+                                        right: 0,
+                                        bottom: 0,
+                                        left: 0
+                                    };
+                                    data.cell.styles.lineColor = [0, 0, 0];
+                                    data.cell.styles.fontStyle = 'bold';
+                                }
+                            }
+                        });
+
+                        currentY = doc.lastAutoTable.finalY + 10;
+
+                        // ================= AMOUNT IN WORDS =================
+                        const totalInWords = await this.convertNumberToWords(oModel.TotalAmount, oModel.Currency);
+                        doc.setFont("times", "bold");
+                        doc.text("Amount in Words :", margin, currentY);
+                        currentY += 5;
+
+                        doc.setFont("times", "normal");
+                        doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY);
+                    }
+
+                    // ================= CUSTOMER TRANSACTION HISTORY (ONCE) =================
+                    if (paymentRes?.commentData?.length) {
+                        doc.addPage();
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("Customer Transaction History", margin, 20);
+
+                        doc.autoTable({
+                            startY: 25,
+                            head: [
+                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']
+                            ],
+                            body: paymentRes.commentData.map((p, i) => ([
+                                i + 1,
+                                Formatter.formatDate(p.Date),
+                                p.PaymentType,
+                                p.BankName,
+                                p.BankTransactionID || "-",
+                                Formatter.fromatNumber(p.Amount),
+                                p.Currency
+                            ])),
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                1: {
+                                    halign: "center"
+                                },
+                                2: {
+                                    halign: "left"
+                                },
+                                3: {
+                                    halign: "left"
+                                },
+                                4: {
+                                    halign: "left"
+                                },
+                                5: {
+                                    halign: "right"
+                                }
+                            }
+                        });
+                    }
+
+                    // ================= FOOTER =================
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, {
+                            data: [company]
+                        }, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${filterData.CustomerName}-Summary-Invoice.pdf`);
+                } catch (e) {
+                    MessageToast.show(e.message || "Error generating summary invoice");
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                }
             }
         });
     });
