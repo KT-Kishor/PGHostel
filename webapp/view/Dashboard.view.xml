@@ -27,51 +27,57 @@
                 />
 
                 <Carousel
-                    height="260px"
-                    showPageIndicator="false"
+                    height="auto"
+                    showPageIndicator="true"
                     pages="{todayModel>/pages}"
                 >
-                    <HBox
-                        wrap="NoWrap"
-                        justifyContent="Start"
-                        items="{path:'todayModel>', templateShareable:false}"
+                    <VBox
+                        class="todayPage"
+                        width="100%"
                     >
-                        <Panel
-                            width="260px"
-                            height="220px"
-                            class="todayCard sapUiContentPadding"
-                            expandable="false"
+                        <FlexBox
+                            items="{path: 'todayModel>'}"
+                            direction="Row"
+                            wrap="NoWrap"
+                            justifyContent="Start"
+                            class="todayCardsRow"
                         >
-                            <VBox height="100%" justifyContent="SpaceBetween">
-                            <VBox>
-                                <Title
-                                    text="Booking ID: {todayModel>BookingID}"
-                                    level="H4"
-                                    wrapping="true"
-                                />
-                                <Text
-                                    text="Booking Date: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
-                                />
-                                <Text
-                                    text="Customer Name: {todayModel>CustomerName} ({todayModel>CustomerID})"
-                                    wrapping="true"
-                                />
-                                <Text
-                                    text="Stay: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
-                                />
-                                </VBox>
-                                <HBox
-                                    justifyContent="End"
-                                >
-                                    <Button
-                                        text="View Booking"
-                                        type="Emphasized"
-                                        press="onBookingCardPress"
+                            <Panel
+                                class="todayCard"
+                                expandable="false"
+                            >
+                                <VBox>
+                                    <Title
+                                        text="Booking ID: {todayModel>BookingID}"
+                                        level="H4"
+                                        wrapping="true"
                                     />
-                                </HBox>
-                            </VBox>
-                        </Panel>
-                    </HBox>
+                                    <Text
+                                        text="Booking Date: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <Text
+                                        text="Customer Name: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="Stay: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
+                        to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                                    />
+
+                                    <HBox
+                                        justifyContent="End"
+                                        class="sapUiSmallMarginTop"
+                                    >
+                                        <Button
+                                            text="View Booking"
+                                            type="Emphasized"
+                                            press="onBookingCardPress"
+                                        />
+                                    </HBox>
+                                </VBox>
+                            </Panel>
+                        </FlexBox>
+                    </VBox>
                 </Carousel>
 
                 <VBox class="sapUiMediumMarginTop">
@@ -184,7 +190,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Monthly Booking Trend"
+                                    text="Monthly Booking"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -243,7 +249,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Daily Booking Trend"
+                                    text="Daily Booking"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -299,7 +305,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Status Wise Booking Trend"
+                                    text="Status Wise Booking"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -355,7 +361,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Payment Type Booking Trend"
+                                    text="Payment Type Booking"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"

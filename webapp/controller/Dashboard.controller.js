@@ -51,11 +51,14 @@ sap.ui.define([
         dashboardSetDate: function (aData) {
             const oToday = new Date();
             oToday.setHours(0, 0, 0, 0);
-
+            const aAllowedBranches = this.BranchID
             const aTodayCards = [];
             const oMonthlyDate = {};
             aData.forEach((oBooking) => {
                 if (!["New"].includes(oBooking.Status)) {
+                    return;
+                }
+                if (!aAllowedBranches.includes(oBooking.BranchCode)) {
                     return;
                 }
                 const dBookingDate = new Date(oBooking.BookingDate);
@@ -82,24 +85,37 @@ sap.ui.define([
         _groupCardsForCarousel: function (aCards, iPerPage) {
             const aPages = [];
             for (let i = 0; i < aCards.length; i += iPerPage) {
-                aPages.push(aCards.slice(i, i + iPerPage));
+                aPages.push(aCards.slice(i, iPerPage + i));
             }
             return aPages;
         },
 
+        // _getCardsPerPage: function () {
+        //     if (sap.ui.Device.system.phone) {
+        //         return 1;
+        //     }
+        //     if (sap.ui.Device.system.tablet) {
+        //         return 3;
+        //     }
+        //     return 5;
+        // },
+
         _getCardsPerPage: function () {
-            if (sap.ui.Device.system.phone) {
-                return 1;
-            }
-            if (sap.ui.Device.system.tablet) {
-                return 3;
-            }
-            return 5;
+            const w = window.innerWidth;
+
+            if (w < 600) return 1;      // Mobile
+            if (w < 900) return 2;      // Large phones / small tablets
+            if (w < 1200) return 3;     // Tablets
+            if (w < 1600) return 4;     // Small laptops
+            return 5;                  // Large screens
         },
 
         dashboardModels: function (aCards, oMonthMap) {
+            this._aTodayCards = aCards;
             const iPerPage = this._getCardsPerPage();
-            const aPages = this._groupCardsForCarousel(aCards, iPerPage);
+            const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
+            // const sWidth = (100 / iPerPage) + "%";
+            // this.getView().getDomRef()?.style.setProperty("--cardWidth", sWidth);
             this.getView().setModel(new JSONModel({ pages: aPages }), "todayModel");
 
             const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -196,7 +212,7 @@ sap.ui.define([
                     aData = this.switchForAllGraph("MONTH");
                 }
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "monthlyChartModel");
-                 console.table(aData);
+                console.table(aData);
                 this._bindMonthlyChart();
                 sap.ui.core.BusyIndicator.hide();
             })
