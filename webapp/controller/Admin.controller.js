@@ -765,6 +765,7 @@ HM_UnassignRoom: function () {
         } else if (oError.statusText) {
             sErrorMsg = oError.statusText;
         }
+        sap.ui.core.BusyIndicator.hide();
 
         sap.m.MessageBox.error(sErrorMsg);
     }
