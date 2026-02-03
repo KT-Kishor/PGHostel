@@ -11,12 +11,12 @@
         draggable="true"
     >
         <customHeader>
-            <Bar class="Coursetitle">
-                <contentLeft>
+            <Bar class="barheader">
+                <contentMiddle>
                     <Title
                         text="{i18n>monthlyinvoicefor} {dialogData>/month}"
                     />
-                </contentLeft>
+                </contentMiddle>
                 <contentRight>
                     <Button
                         icon="sap-icon://decline"
@@ -131,10 +131,7 @@
                                 number="{parts: [{ path: 'dialogData>Currency' },{ path: 'dialogData>TotalAmount' },{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="INR"
                             />
-                            <Text
-                                text="{dialogData>Status}"
-                               
-                            />
+                            <Text text="{dialogData>Status}" />
                         </cells>
                     </ColumnListItem>
                 </items>

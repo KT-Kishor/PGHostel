@@ -9,13 +9,13 @@
         resizable="true"
         draggable="true"
     >
-        <customHeader>
-            <Bar class="Coursetitle">
-                <contentLeft>
+            <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
                     <Title
                         text="{i18n>invoiceForCredit} {popoverData>/status}"
                     />
-                </contentLeft>
+                </contentMiddle>
                 <contentRight>
                     <Button
                         icon="sap-icon://decline"
