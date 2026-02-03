@@ -117,7 +117,8 @@ sap.ui.define([
 
         onBookingCardPress: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID)
+                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID),
+                from: "Dashboard"
             });
         },
 
