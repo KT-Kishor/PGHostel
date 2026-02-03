@@ -194,43 +194,44 @@ const bookingYears =
 const bookingDays =
     Math.floor((oEnd - oStart) / 86400000) + 1;
 
-    const perMonthFacility =
-    oPerson.Facilities.SelectedFacilities.find(
-        f => f.UnitText === "Per Month"
-    );
+    const selectedMonths =
+        Number(
+            oPerson.Facilities.SelectedFacilities
+                .find(f => f.UnitText === "Per Month")
+                ?.SelectedMonths
+        ) ||
+        Number(oPerson.SelectedMonths) ||
+        Number(oModel.getProperty("/SelectedMonths")) ||
+        1;
 
-// month source
-const selectedMonths =
-    Number(
-        oPerson.Facilities.SelectedFacilities
-            .find(f => f.UnitText === "Per Month")
-            ?.SelectedMonths
-    ) ||
-    Number(oPerson.SelectedMonths) ||
-    Number(oModel.getProperty("/SelectedMonths")) ||
-    1;
-
-
+    // 🔥 FORCE overwrite on all per-month facilities
+    oPerson.Facilities.SelectedFacilities.forEach(f => {
+         f.UnitText = f.SelectedPriceType; 
+        if (f.UnitText === "Per Month") {
+            f.SelectedMonths = selectedMonths;
+            f.TotalMonths = selectedMonths;
+        }
+    });
 
 // oPerson.SelectedMonths = oPerson.SelectedMonths || 1;
 /* ---- Facility totals (per facility units) ---- */
 oPerson.Facilities.SelectedFacilities.forEach(f => {
 
-    //  Ensure unit exists
-  f.UnitText = f.UnitText || f.SelectedPriceType;
+//     //  Ensure unit exists
+//   f.UnitText = f.UnitText || f.SelectedPriceType;
 
     const fDays =
         Number(f.TotalDays || bookingDays || 1);
 
    const fMonths =
-    f.UnitText === "Per Month"
-        ? Number(f.SelectedMonths || selectedMonths || 1)
-        : 0;
+     f.SelectedPriceType === "Per Month"
+                ? selectedMonths
+                : 0;
 
     const fYears =
-        f.UnitText === "Per Year"
-            ? Number(f.TotalYears || bookingYears || 1)
-            : 0;
+         f.SelectedPriceType === "Per Year"
+                ? Number(f.TotalYears || bookingYears || 1)
+                : 0;
 
     f.TotalAmount = this._calculateFacilityTotal(
         f,
