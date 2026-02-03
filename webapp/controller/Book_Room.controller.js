@@ -5876,7 +5876,8 @@ oHostelModel.setProperty(
 
             // Navigate
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(sCustomerID)
+                sPath: encodeURIComponent(sCustomerID),
+                from: "Profile"
             });
         },
 
