@@ -329,6 +329,12 @@
                                             liveChange="CID_onPressLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                         />
+                                        <m:Label text="{i18n>customerGSTNo}" />
+										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}"
+										    id="CI_id_InputCustomerGSTNO"
+											liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}"
+											editable="{visiablityPlay>/editable}"
+										/>
 										<m:Label
                                             text="{i18n>emailId}"
                                             required="true"

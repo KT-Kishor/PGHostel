@@ -853,6 +853,12 @@ sap.ui.define([
                 utils._LCvalidateDate(oEvent)
             },
 
+            CID_ValidateGstNumber:function(oEvent){
+                 var oInput = oEvent.getSource();
+                utils._LCvalidateGstNumber(oEvent)
+                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+            },
+
             CID_ValidateDatePayByDate: function(oEvent) {
                 utils._LCvalidateDate(oEvent)
                 var [day, month, year] = oEvent.getSource().getValue().split('/').map(Number);
@@ -923,6 +929,7 @@ sap.ui.define([
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
                     BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
+                    CustomerGSTNO:oSelectedCustomerModel.CustomerGSTNO || "",
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1924,8 +1931,9 @@ sap.ui.define([
                         doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
                         currentY += 5;
                     }
-                    if (oModel.GST) {
-                        doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
+
+                    if (oModel.CustomerGSTNO) {
+                        doc.text(`GSTIN : ${oModel.CustomerGSTNO}`, margin, currentY);
                         currentY += 5;
                     }
 
@@ -2423,8 +2431,8 @@ sap.ui.define([
                         doc.text(`Email : ${oCustomerModel.CustomerEmail}`, margin, currentY);
                         currentY += 5;
                     }
-                    if (isGSTEnabled) {
-                        doc.text(`GSTIN : ${oCustomerModel.GST}`, margin, currentY);
+                    if (oCustomerModel.CustomerGSTNO) {
+                        doc.text(`GSTIN : ${oCustomerModel.CustomerGSTNO}`, margin, currentY);
                         currentY += 5;
                     }
 
@@ -2723,8 +2731,8 @@ sap.ui.define([
                             currentY += 5;
                         }
 
-                        if (oModel.GST) {
-                            doc.text(`GSTIN : ${oModel.GST}`, margin, currentY);
+                        if (oModel.CustomerGSTNO) {
+                            doc.text(`GSTIN : ${oModel.CustomerGSTNO}`, margin, currentY);
                             currentY += 5;
                         }
 
