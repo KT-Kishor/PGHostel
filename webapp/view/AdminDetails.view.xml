@@ -78,7 +78,8 @@
                                 id="idGST"
                                 tooltip="Set GST"
                                 press="onGSTBooking"
-                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin') }"
+                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin') 
+                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
                             <Button
