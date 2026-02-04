@@ -1,0 +1,156 @@
+<mvc:View controllerName="sap.ui.com.project1.controller.Feedback"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+    displayBlock="true">
+	<Page title="Customer Feedback"
+        showHeader="true"
+        enableScrolling="true"
+        class="Homepage"
+        navButtonPress="BI_onButtonPress"
+        showNavButton="true"
+    >
+		<content>
+			<VBox class="sapUiSmallMargin">
+				<Title text="How was your stay?"
+                    level="H2"
+                    class="sapUiSmallMarginBottom custom-welcome"
+                />
+				<VBox class="feedbackFormContainer">
+					<f:SimpleForm
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="3"
+                    labelSpanM="4"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="0"
+                    emptySpanM="0"
+                    columnsXL="1"
+                    columnsL="1"
+                    columnsM="1"
+                >
+						<f:content>
+							<!-- Ratings Section -->
+							<Title text="Please rate your experience on a scale of 1-5" wrapping="true"
+                            titleStyle="H4" level="H4" class="sapUiMediumMarginBottom"/>
+							<Label
+                            text="1. Overall Experience"
+                            required="true"
+                        />
+							<RatingIndicator
+                            id="ratingOverall"
+                            maxValue="5"
+                            value="0"
+                            iconSize="1.5rem"
+                            change="onOverallRatingChange"
+                        />
+							<Label
+                            text="2. Room Cleanliness"
+                            required="true"
+                        />
+							<RatingIndicator
+                            id="ratingCleanliness"
+                            maxValue="5"
+                            value="0"
+                            iconSize="1.5rem"
+                            change="onCleanlinessRatingChange"
+                        />
+							<Label
+                            text="3. Staff Service"
+                            required="true"
+                        />
+							<RatingIndicator
+                            id="ratingStaff"
+                            maxValue="5"
+                            value="0"
+                            iconSize="1.5rem"
+                            change="onStaffRatingChange"
+                        />
+							<Label
+                            text="4. Amenities &amp; Facilities"
+                            required="true"
+                        />
+							<RatingIndicator
+                            id="ratingAmenities"
+                            maxValue="5"
+                            value="0"
+                            iconSize="1.5rem"
+                            change="onAmenitiesRatingChange"
+                        />
+							<Label
+                            text="5. Value for Money"
+                            required="true"
+                        />
+							<RatingIndicator
+                            id="ratingValue"
+                            maxValue="5"
+                            value="0"
+                            iconSize="1.5rem"
+                            change="onValueRatingChange"
+                        />
+							<Label
+                            text="Would you recommend our hostel?"
+                            required="true"
+                        />
+							<RadioButtonGroup
+                            id="rgRecommend"
+                            columns="2"
+                            select="onRecommendChange"
+                        >
+								<buttons>
+									<RadioButton
+                                    id="rbYes"
+                                    text="Yes"
+                                />
+									<RadioButton
+                                    id="rbNo"
+                                    text="No"
+                                />
+								</buttons>
+							</RadioButtonGroup>
+							<Label text="Would you stay with us again?" />
+							<RadioButtonGroup
+                            id="rgVisitAgain"
+                            columns="2"
+                            select="onVisitAgainChange"
+                        >
+								<buttons>
+									<RadioButton
+                                    id="rbAgainYes"
+                                    text="Yes"
+                                />
+									<RadioButton
+                                    id="rbAgainNo"
+                                    text="No"
+                                />
+								</buttons>
+							</RadioButtonGroup>
+							<Label text="Additional Comments" />
+							<TextArea
+                            id="feedbackComments"
+                            width="100%"
+                            rows="3"
+                            placeholder="Share your comments..."
+                            growing="true"
+                            liveChange="onCommentsChange"
+                        />
+							<Label text=""/>
+							<Button
+                    text="Submit Feedback"
+                    type="Emphasized"
+                    press="onSubmitFeedback"
+                />
+							<Button
+                    text="Cancel"
+                    press="onCancel"
+                />
+						</f:content>
+					</f:SimpleForm>
+				</VBox>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

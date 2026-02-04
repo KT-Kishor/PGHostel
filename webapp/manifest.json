@@ -310,7 +310,14 @@
           "name": "NotFound",
           "pattern": "NotFound",
           "target": "NotFound"
-        }
+        },
+        {
+      "name": "RouteFeedback",
+      "pattern": "feedback/{bookingId}",
+      "target": [
+        "targetFeedback"
+      ]
+    }
       ],
       "targets": {
         "TargetHostel": {
@@ -501,6 +508,13 @@
           "clearControlAggregation": false,
           "viewId": "NotFound",
           "viewName": "NotFound"
+        },
+        "targetFeedback": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "Feedback",
+          "viewId": "feedback"
         }
       }
     },

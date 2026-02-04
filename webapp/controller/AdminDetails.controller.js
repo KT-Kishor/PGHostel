@@ -176,7 +176,11 @@ sap.ui.define([
                 "Booking": [{
                     "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
                     "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
-                    "Status": "Completed"
+                    "Status": "Completed",
+                    "CustomerName" : oCustomerModel.CustomerName,
+                    "CustomerEmail" : oCustomerModel.CustomerEmail,
+                    "BookingID" : oCustomerModel.BookingID,
+                    "RoomNo": oCustomerModel.RoomNo
                 }]
             };
 

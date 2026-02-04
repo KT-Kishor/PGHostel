@@ -4041,3 +4041,24 @@ span.sapMBtnInner.sapMBtnEmphasized {
     max-width: 100%;
   }
 }
+
+.feedbackFormContainer {
+    width: 20%;
+    min-width: 48rem;
+    margin: 0 auto; /* center it */
+}
+
+/* Tablet & below */
+@media (max-width: 1024px) {
+    .feedbackFormContainer {
+        width: 80%;
+        min-width: unset;
+    }
+}
+ 
+/* Mobile */
+@media (max-width: 600px) {
+    .feedbackFormContainer {
+        width: 100%;
+    }
+}
