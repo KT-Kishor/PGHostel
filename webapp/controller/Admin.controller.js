@@ -442,6 +442,7 @@ sap.ui.define([
 
     }
             sap.ui.getCore().byId("id_DepositAmount").setValue(Deposit.Deposit);
+            this.Deposit=Deposit.Deposit
 
     this.HM_Dialog.open();
 },
@@ -671,6 +672,11 @@ HM_UnassignRoom: function () {
     }
 
     /* ================= PAYLOAD ================= */
+
+    if(DepositAmount > this.Deposit){
+        sap.m.MessageToast.show("Deposit amount cannot be more than the required deposit of "+this.Deposit);
+        return;
+    }
 
     let Payload, oBody;
 

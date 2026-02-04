@@ -4062,3 +4062,33 @@ span.sapMBtnInner.sapMBtnEmphasized {
         width: 100%;
     }
 }
+.imageWrapper {
+    position: relative;
+}
+
+.ratingOverlay {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 4px;
+    border-radius: 4px;
+    line-height: 1;
+    gap: 4px; /* spacing between stars & text */
+}
+
+/* Yellow stars */
+.ratingOverlay .sapMRIIconSel {
+    color: #f8c304 !important;
+}
+
+/* Grey empty stars */
+.ratingOverlay .sapMRIIconUnsel {
+    color: #d3d3d3 !important;
+}
+
+.ratingCountText {
+    font-size: 0.7rem;
+    color: #333;
+    margin-left: 2px;
+}

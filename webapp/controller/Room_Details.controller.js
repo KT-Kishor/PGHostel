@@ -520,6 +520,8 @@ sap.ui.define([
             var oRoomDetailsModel = oView.getModel("RoomDetailsModel");
             var oBedTypeModel = oView.getModel("BedTypeModel");
 
+         
+           var BranchCode = oRoomModel.getProperty("/BranchCode");
             var Payload = oRoomModel.getData();
 
             // Remove unnecessary fields
@@ -591,11 +593,35 @@ sap.ui.define([
 
                 if (aFiltered.length === 0 && !Payload._isEditing) {
                     sap.m.MessageToast.show(this.i18nModel.getText("allRoomsforthisBedTypeAlreadyCreated"));
+                       var oMatch = aRoomDetails.find(item =>
+                item.BedTypeName === Payload.BedTypeName &&
+                item.BranchCode === BranchCode
+            );
+
+            if (oMatch) {
+             
+                oRoomModel.setProperty("/editable", false);
+            } else {
+              
+                oRoomModel.setProperty("/editable", true);
+            }
                     return;
                 }
 
                 if (oExistingRoom && !Payload._isEditing && oExistingRoom.RoomNo === Payload.RoomNo) {
                     sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
+                       var oMatch = aRoomDetails.find(item =>
+                item.BedTypeName === Payload.BedTypeName &&
+                item.BranchCode === BranchCode
+            );
+
+            if (oMatch) {
+             
+                oRoomModel.setProperty("/editable", false);
+            } else {
+              
+                oRoomModel.setProperty("/editable", true);
+            }
                     return;
                 }
                 if (Payload._isEditing) {
@@ -614,6 +640,8 @@ sap.ui.define([
                     oRoomModel.setProperty("/YearPrice", "");
                     return;
                 }
+
+         
 
                 var sUrl = "https://rest.kalpavrikshatechnologies.com/HM_Rooms";
                 var sMethod = "POST";

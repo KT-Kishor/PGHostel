@@ -3390,7 +3390,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             ) {
                 var oCustomerModel = this.getView().getModel("CustomerData")
                 const CustData = this.getView().getModel("CustomerData").getData();
-                const oInput = sap.ui.getCore().byId(this.getView().createId("idGSTNumber"));
+                const oInput = sap.ui.getCore().byId(this.getView().createId("idGSTNumber")) || "";
               
                 var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
                 var oRadioGroup = sap.ui.getCore().byId("idGSTType");
@@ -3467,17 +3467,15 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
 
                 //             oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var Payload =
-                {
-                    "Booking": [{
+                    {
                         "GSTType": sValue,
                         "GSTValue": Percentage,
-                        "GSTIN": oInput?oInput.getValue().trim().toUpperCase() : ""
-                    }],
-                }
+                        "GSTIN": oInput?oInput.getValue().trim().toUpperCase() : CustData.GSTIN || ""
+                    }
 
                 sap.ui.core.BusyIndicator.show(0);
-                this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [Payload],
+                this.ajaxUpdateWithJQuery("HM_Booking", {
+                    data: Payload,
                     filters: {
                         CustomerID: CustData.CustomerID
                     }

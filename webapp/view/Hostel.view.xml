@@ -178,10 +178,7 @@
                                                                     class="custom-welcome sapUiTinyMarginTopBottom"
                                                                     text="{i18n>bookYourRoom} "
                                                                 />
-                                                                <!-- <Text
-                                                                    class="custom-welcome  sapUiTinyMarginTopBottom "
-                                                                    text="{i18n>companynameKT}"
-                                                                /> -->
+                                                                <!-- <Text class="custom-welcome  sapUiTinyMarginTopBottom " text="{i18n>companynameKT}" /> -->
                                                                 <Text
                                                                     text="{i18n>yourNewHomeAwayFromHome}"
                                                                     class="custom-tagline s apUiTinyMarginTop "
@@ -324,7 +321,7 @@
                                                                                 class="areaTagBox"
                                                                             >
                                                                                 <core:Icon
-                                                                                    src="sap-icon://map-fill"
+                                                                                    src="sap-icon://building"
                                                                                     size="0.9rem"
                                                                                     color="black"
                                                                                     class="sapUiTinyMarginEnd"
@@ -341,6 +338,21 @@
                                                                                 class="bedCardImage"
                                                                                 decorative="false"
                                                                             />
+                                                                            <HBox
+                                                                                class="ratingOverlay"
+                                                                                alignItems="Center"
+                                                                            >
+                                                                                <RatingIndicator
+                                                                                    value="4.5"
+                                                                                    maxValue="5"
+                                                                                    enabled="false"
+                                                                                    iconSize="0.8rem"
+                                                                                />
+                                                                                <Text
+                                                                                    text="(445)"
+                                                                                    class="ratingCountText"
+                                                                                />
+                                                                            </HBox>
                                                                         </VBox>
                                                                     </pages>
                                                                 </Carousel>
@@ -360,7 +372,7 @@
                                                                     />
                                                                     <Text
                                                                         text="{parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-                                    formatter: '.Formatter.formatStartingPrice'}"
+                                                                         formatter: '.Formatter.formatStartingPrice'}"
                                                                         class="bedCardPrice"
                                                                     />
                                                                     <HBox
