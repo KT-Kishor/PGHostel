@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core"
     displayBlock="true">
-	<Page title="Customer Feedback"
+	<Page title="Feedback"
         showHeader="true"
         enableScrolling="true"
         class="Homepage"

@@ -7,7 +7,6 @@ sap.ui.define([
 
     return BaseController.extend("sap.ui.com.project1.controller.Feedback", {
         onInit: function() {
-            // Attach route
             this.getOwnerComponent().getRouter().getRoute("RouteFeedback").attachMatched(this._onRouteMatched, this);
 
             // Initialize feedback model once
@@ -40,12 +39,10 @@ sap.ui.define([
 
             try {
                 const encodedBookingID = oEvent.getParameter("arguments")?.bookingId;
-
                 if (!encodedBookingID) {
                     return this._goToNotFound();
                 }
 
-                // Base64 format validation
                 const base64Regex =
                     /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
@@ -53,7 +50,6 @@ sap.ui.define([
                     return this._goToNotFound();
                 }
 
-                // Decode BookingID safely
                 let decodedBookingID;
                 try {
                     decodedBookingID = atob(encodedBookingID);
@@ -61,26 +57,25 @@ sap.ui.define([
                     return this._goToNotFound();
                 }
 
-                // Re-encode check (tamper protection)
                 if (btoa(decodedBookingID) !== encodedBookingID) {
                     return this._goToNotFound();
                 }
 
-                // Validate booking exists
-                const bValid = await this._validateBookingID(decodedBookingID);
-                if (!bValid) {
+                // Validate + fetch booking in ONE call
+                const booking = await this._validateAndFetchBooking(decodedBookingID);
+                if (!booking) {
                     return this._goToNotFound();
                 }
 
-                // Reset old feedback data
                 this._resetAllData();
 
-                // Store booking ID in model
                 const oModel = this.getView().getModel("feedbackData");
                 oModel.setProperty("/bookingId", decodedBookingID);
+                oModel.setProperty("/customerId", booking.CustomerID);
+                oModel.setProperty("/roomNo", booking.RoomNo);
+                oModel.setProperty("/branchCode", booking.BranchCode);
+                oModel.setProperty("/BedType", booking.BedType);
 
-                // Load booking details
-                await this._loadBookingDetails(decodedBookingID);
             } catch (e) {
                 this._goToNotFound();
             } finally {
@@ -88,8 +83,9 @@ sap.ui.define([
             }
         },
 
-        _validateBookingID: async function(sBookingID) {
+        _validateAndFetchBooking: async function(sBookingID) {
             try {
+                // Check if feedback already submitted
                 const oFeedbackResp = await this.ajaxReadWithJQuery("HM_Feedback", {
                     BookingID: sBookingID
                 });
@@ -100,61 +96,31 @@ sap.ui.define([
                     aFeedback.length > 0 &&
                     aFeedback[0].Status === "Submitted"
                 ) {
-                    return false;
+                    return null;
                 }
 
+                // Fetch booking ONCE
                 const oBookingResp = await this.ajaxReadWithJQuery("HM_Booking", {
                     BookingID: sBookingID
                 });
 
-                return (
-                    Array.isArray(oBookingResp?.commentData) &&
-                    oBookingResp.commentData.length === 1
-                );
+                if (
+                    !Array.isArray(oBookingResp?.commentData) ||
+                    oBookingResp.commentData.length !== 1
+                ) {
+                    return null;
+                }
+
+                return oBookingResp.commentData[0]; //  return booking object
 
             } catch (err) {
-                return false;
+                return null;
             }
         },
 
         _goToNotFound: function() {
             this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
         },
-
-        _loadBookingDetails: async function(bookingId) {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const payload = {
-                    filters: {
-                        BookingID: bookingId
-                    }
-                };
-
-                const oData = await this.ajaxReadWithJQuery("HM_Booking", payload);
-
-                if (!oData || !oData.commentData || oData.commentData.length === 0) {
-                    MessageBox.error("Invalid booking or booking not found.");
-                    return;
-                }
-
-                const booking = oData.commentData[0];
-                const oModel = this.getView().getModel("feedbackData");
-
-                oModel.setProperty("/customerId", booking.CustomerID);
-                oModel.setProperty("/customerName", booking.CustomerName);
-                oModel.setProperty("/customerEmail", booking.CustomerEmail);
-                oModel.setProperty("/roomNo", booking.RoomNo);
-                oModel.setProperty("/branchCode", booking.BranchCode);
-                oModel.setProperty("/BedType", booking.BedType);
-
-            } catch (error) {
-                MessageBox.error("Failed to load booking details");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
-        },
-
 
         // Helper to reset all data
         _resetAllData: function() {
@@ -274,10 +240,8 @@ sap.ui.define([
                     data: {
                         BookingID: modelData.bookingId,
                         CustomerID: modelData.customerId,
-                        CustomerName: modelData.customerName,
-                        CustomerEmail: modelData.customerEmail,
-                        RoomNo: modelData.RoomNo,
-                        BranchCode: modelData.BranchCode,
+                        RoomNo: modelData.roomNo,
+                        BranchCode: modelData.branchCode,
                         BedType: modelData.BedType,
                         OverallRating: uiValues.overall,
                         CleanlinessRating: uiValues.cleanliness,
