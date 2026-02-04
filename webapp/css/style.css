@@ -4041,27 +4041,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
     max-width: 100%;
   }
 }
-
-.feedbackFormContainer {
-    width: 20%;
-    min-width: 48rem;
-    margin: 0 auto; /* center it */
-}
-
-/* Tablet & below */
-@media (max-width: 1024px) {
-    .feedbackFormContainer {
-        width: 80%;
-        min-width: unset;
-    }
-}
- 
-/* Mobile */
-@media (max-width: 600px) {
-    .feedbackFormContainer {
-        width: 100%;
-    }
-}
 .imageWrapper {
     position: relative;
 }
@@ -4091,4 +4070,56 @@ span.sapMBtnInner.sapMBtnEmphasized {
     font-size: 0.7rem;
     color: #333;
     margin-left: 2px;
+}
+
+.feedbackFormContainer {
+    width: 95%;
+    min-width: 48rem;
+    max-width: 48rem;
+    margin: 0 auto;
+    box-sizing: border-box; 
+}
+
+/* Tablet & below */
+@media (max-width: 1024px) {
+    .feedbackFormContainer {
+        width: 80%;
+        min-width: unset;
+    }
+}
+ 
+@media (max-width: 600px) {
+    .feedbackFormContainer {
+        width: 100%;
+        min-width: unset !important;
+    }
+}
+
+
+.feedbackPageWrapper .sapMPageChildCanvas {
+  padding: 0 !important;
+  /* overflow: hidden !important; */
+  display: flex;
+  flex-direction: column;
+}
+
+.Feedbackpage {
+  min-height: calc(100vh - 3.5rem); 
+  height: auto !important;
+  margin: 0.5rem;
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: 0.6rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  overflow-y: hidden;
+}
+@media screen and (max-width: 600px) {
+    .Feedbackpage {
+        background-attachment: scroll; 
+        margin: 0; 
+        border-radius: 0;
+    }
 }
