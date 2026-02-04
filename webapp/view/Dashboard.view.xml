@@ -22,7 +22,7 @@
         <content>
             <VBox class=" todaySection sapUiSmallMargin">
                 <Title
-                    text="Today's Bookings"
+                    text="{i18n>dashTodayBookings}"
                     level="H3"
                 />
 
@@ -48,19 +48,19 @@
                             >
                                 <VBox>
                                     <Title
-                                        text="Booking ID: {todayModel>BookingID}"
+                                        text="{i18n>bookingID}: {todayModel>BookingID}"
                                         level="H4"
                                         wrapping="true"
                                     />
                                     <Text
-                                        text="Booking Date: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
+                                        text="{i18n>bookingDate}: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
                                     />
                                     <Text
-                                        text="Customer Name: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                                        text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
                                         wrapping="true"
                                     />
                                     <Text
-                                        text="Stay: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
+                                        text="{i18n>dashStay}: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
                         to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
                                     />
 
@@ -69,7 +69,7 @@
                                         class="sapUiSmallMarginTop"
                                     >
                                         <Button
-                                            text="View Booking"
+                                            text="{i18n>dashViewBooking}"
                                             type="Emphasized"
                                             press="onBookingCardPress"
                                         />
@@ -80,107 +80,106 @@
                     </VBox>
                 </Carousel>
 
-                <VBox class="sapUiMediumMarginTop">
-                </VBox>
+                <VBox class="sapUiMediumMarginTop" />
 
-                    <fb:FilterBar
-                        id="D_id_FilterbarEmployee"
-                        persistencyKey="myPersKey"
-                        useToolbar="false"
-                        clear="D_onPressClear"
-                        showClearOnFB="true"
-                        search="onFilterGo"
-                        filterChange="onFilterChange"
-                        afterVariantLoad="IA_.onAfterVariantLoad"
-                        showFilterConfiguration="false"
-                        filterContainerWidth="auto"
-                    >
-                        <fb:filterGroupItems>
-                            <fb:FilterGroupItem
-                                name="year"
-                                label="{i18n>year}"
-                                groupName="Group"
-                                visibleInFilterBar="true"
-                            >
-                                <fb:control>
-                                    <DatePicker
-                                        id="D_id_year"
-                                        valueFormat="yyyy"
-                                        displayFormat="yyyy"
-                                        change="onFilterChange"
-                                    />
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                        </fb:filterGroupItems>
+                <fb:FilterBar
+                    id="D_id_FilterbarEmployee"
+                    persistencyKey="myPersKey"
+                    useToolbar="false"
+                    clear="D_onPressClear"
+                    showClearOnFB="true"
+                    search="onFilterGo"
+                    filterChange="onFilterChange"
+                    afterVariantLoad="IA_.onAfterVariantLoad"
+                    showFilterConfiguration="false"
+                    filterContainerWidth="auto"
+                >
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="year"
+                            label="{i18n>dashYear}"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <DatePicker
+                                    id="D_id_year"
+                                    valueFormat="yyyy"
+                                    displayFormat="yyyy"
+                                    change="onFilterChange"
+                                />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
 
-                        <fb:filterGroupItems>
-                            <fb:FilterGroupItem
-                                name="month"
-                                label="{i18n>month}"
-                                groupName="Group"
-                                visibleInFilterBar="true"
-                            >
-                                <fb:control>
-                                    <Select
-                                        id="D_id_month"
-                                        selectedKey="{filterModel>/month}"
-                                        change="onFilterChange"
-                                    >
-                                        <items>
-                                            <core:Item
-                                                key="1"
-                                                text="Jan"
-                                            />
-                                            <core:Item
-                                                key="2"
-                                                text="Feb"
-                                            />
-                                            <core:Item
-                                                key="3"
-                                                text="Mar"
-                                            />
-                                            <core:Item
-                                                key="4"
-                                                text="Apr"
-                                            />
-                                            <core:Item
-                                                key="5"
-                                                text="May"
-                                            />
-                                            <core:Item
-                                                key="6"
-                                                text="Jun"
-                                            />
-                                            <core:Item
-                                                key="7"
-                                                text="Jul"
-                                            />
-                                            <core:Item
-                                                key="8"
-                                                text="Aug"
-                                            />
-                                            <core:Item
-                                                key="9"
-                                                text="Sep"
-                                            />
-                                            <core:Item
-                                                key="10"
-                                                text="Oct"
-                                            />
-                                            <core:Item
-                                                key="11"
-                                                text="Nov"
-                                            />
-                                            <core:Item
-                                                key="12"
-                                                text="Dec"
-                                            />
-                                        </items>
-                                    </Select>
-                                </fb:control>
-                            </fb:FilterGroupItem>
-                        </fb:filterGroupItems>
-                    </fb:FilterBar>
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="month"
+                            label="{i18n>dashMonth}"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <Select
+                                    id="D_id_month"
+                                    selectedKey="{filterModel>/month}"
+                                    change="onFilterChange"
+                                >
+                                    <items>
+                                        <core:Item
+                                            key="1"
+                                            text="Jan"
+                                        />
+                                        <core:Item
+                                            key="2"
+                                            text="Feb"
+                                        />
+                                        <core:Item
+                                            key="3"
+                                            text="Mar"
+                                        />
+                                        <core:Item
+                                            key="4"
+                                            text="Apr"
+                                        />
+                                        <core:Item
+                                            key="5"
+                                            text="May"
+                                        />
+                                        <core:Item
+                                            key="6"
+                                            text="Jun"
+                                        />
+                                        <core:Item
+                                            key="7"
+                                            text="Jul"
+                                        />
+                                        <core:Item
+                                            key="8"
+                                            text="Aug"
+                                        />
+                                        <core:Item
+                                            key="9"
+                                            text="Sep"
+                                        />
+                                        <core:Item
+                                            key="10"
+                                            text="Oct"
+                                        />
+                                        <core:Item
+                                            key="11"
+                                            text="Nov"
+                                        />
+                                        <core:Item
+                                            key="12"
+                                            text="Dec"
+                                        />
+                                    </items>
+                                </Select>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                </fb:FilterBar>
 
                 <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"
@@ -191,7 +190,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Monthly Booking"
+                                    text="{i18n>dashMonthlyBooking}"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -216,7 +215,6 @@
                             </Toolbar>
                         </f:header>
 
-                        <!-- CONTENT -->
                         <f:content>
                             <com:ChartContainer
                                 showFullScreen="true"
@@ -232,6 +230,7 @@
                                                 vizType="{chartTypeModel>/monthly}"
                                                 uiConfig="{applicationSet:'fiori'}"
                                                 vizProperties="{
+                                                title: {visible: false},
                                 plotArea: { dataLabel: { visible: true } },
                                 valueAxis: { title: { text: 'Number of Bookings' } },
                                 categoryAxis: { title: { text: 'Month' } },
@@ -250,7 +249,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Daily Booking"
+                                    text="{i18n>dashDailyBooking}"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -289,6 +288,7 @@
                                                 vizType="{chartTypeModel>/daily}"
                                                 uiConfig="{applicationSet:'fiori'}"
                                                 vizProperties="{
+                                                title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Day' } }
@@ -306,7 +306,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Status Wise Booking"
+                                    text="{i18n>dashStatusWiseBooking}"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -345,6 +345,7 @@
                                                 vizType="{chartTypeModel>/status}"
                                                 uiConfig="{applicationSet:'fiori'}"
                                                 vizProperties="{
+                                                title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Status' } }
@@ -362,7 +363,7 @@
                         <f:header>
                             <Toolbar class="customdashboard">
                                 <Title
-                                    text="Payment Type Booking"
+                                    text="{i18n>dashPaymentTypeBooking}"
                                     level="H5"
                                     wrapping="true"
                                     class="Dashboardtitle"
@@ -401,6 +402,7 @@
                                                 vizType="{chartTypeModel>/payment}"
                                                 uiConfig="{applicationSet:'fiori'}"
                                                 vizProperties="{
+                                                title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Payment Type' } }
