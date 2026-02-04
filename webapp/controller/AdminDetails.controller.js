@@ -1459,27 +1459,27 @@ sap.ui.define([
                 } else {
                     TotalAmount = SubTotal
                 }
-                if (CustData.CouponCode || this.Code) {
-                    var oCouponData = this.getView().getModel("CouponModel").getData();
-                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+                // if (CustData.CouponCode || this.Code) {
+                //     var oCouponData = this.getView().getModel("CouponModel").getData();
+                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
 
 
-                    if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
+                //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                            CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                            }
-                        } else {
-                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                        }
+                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                //             }
+                //         } else {
+                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                //         }
 
-                    }
-                }
+                //     }
+                // }
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
@@ -1651,28 +1651,28 @@ sap.ui.define([
             } else {
                 TotalAmount = SubTotal
             }
-            if (CustData.CouponCode || this.Code) {
-                var oCouponData = this.getView().getModel("CouponModel").getData();
-                var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+            // if (CustData.CouponCode || this.Code) {
+            //     var oCouponData = this.getView().getModel("CouponModel").getData();
+            //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+            //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
 
-                if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
+            //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
 
 
-                    if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                        this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                        CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                        if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                            CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                        }
-                    } else {
-                        CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                    }
+            //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+            //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+            //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+            //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+            //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
+            //             }
+            //         } else {
+            //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+            //         }
 
-                }
-            }
+            //     }
+            // }
 
             if (CustData.GSTType === "IGST") {
                 oCustomerData.setProperty("/IGST", CGST)
@@ -2092,27 +2092,27 @@ sap.ui.define([
                 } else {
                     TotalAmount = SubTotal
                 }
-                if (CustData.CouponCode || this.Code) {
-                    var oCouponData = this.getView().getModel("CouponModel").getData();
-                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+                // if (CustData.CouponCode || this.Code) {
+                //     var oCouponData = this.getView().getModel("CouponModel").getData();
+                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
 
 
-                    if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
+                //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                            CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                            }
-                        } else {
-                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                        }
+                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
+                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                //             }
+                //         } else {
+                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                //         }
 
-                    }
-                }
+                //     }
+                // }
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
@@ -2279,27 +2279,27 @@ sap.ui.define([
                 } else {
                     TotalAmount = SubTotal
                 }
-                if (CustData.CouponCode || this.Code) {
-                    var oCouponData = this.getView().getModel("CouponModel").getData();
-                    var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                    var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
+                // if (CustData.CouponCode || this.Code) {
+                //     var oCouponData = this.getView().getModel("CouponModel").getData();
+                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
 
-                    if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
+                //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
-                        if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
-                            && CustData.Discount) {
-                            this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                            CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                            if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                                CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                            }
-                        } else {
-                            CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                        }
+                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
+                //             && CustData.Discount) {
+                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+                //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
+                //             }
+                //         } else {
+                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+                //         }
 
-                    }
-                }
+                //     }
+                // }
 
 
 

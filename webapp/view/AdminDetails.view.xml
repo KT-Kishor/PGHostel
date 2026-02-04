@@ -27,7 +27,7 @@
                     <!-- Responsive Booking Status and Buttons -->
                     <!-- Left Side Info -->
                     <FlexBox
-                        wrap="NoWrap"
+                        wrap="Wrap"
                         justifyContent="SpaceBetween"
                         width="100%"
                     >
@@ -76,7 +76,7 @@
                             <Button
                                 text="Set GST"
                                 id="idGST"
-                                tooltip="Set GST"
+                                tooltip="GST Setup"
                                 press="onGSTBooking"
                                 visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"

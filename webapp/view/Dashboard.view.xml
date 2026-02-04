@@ -38,8 +38,8 @@
                         <FlexBox
                             items="{path: 'todayModel>'}"
                             direction="Row"
-                            wrap="NoWrap"
-                            justifyContent="Start"
+                            wrap="Wrap"
+                            justifyContent="SpaceBetween"
                             class="todayCardsRow"
                         >
                             <Panel
@@ -81,6 +81,8 @@
                 </Carousel>
 
                 <VBox class="sapUiMediumMarginTop">
+                </VBox>
+
                     <fb:FilterBar
                         id="D_id_FilterbarEmployee"
                         persistencyKey="myPersKey"
@@ -179,7 +181,6 @@
                             </fb:FilterGroupItem>
                         </fb:filterGroupItems>
                     </fb:FilterBar>
-                </VBox>
 
                 <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"
