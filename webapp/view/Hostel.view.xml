@@ -343,13 +343,13 @@
                                                                                 alignItems="Center"
                                                                             >
                                                                                 <RatingIndicator
-                                                                                    value="4.5"
+                                                                                    value="{VisibilityModel>AverageRating}"
                                                                                     maxValue="5"
                                                                                     enabled="false"
                                                                                     iconSize="0.8rem"
                                                                                 />
                                                                                 <Text
-                                                                                    text="(445)"
+                                                                                    text="({VisibilityModel>TotalFeedbacks})"
                                                                                     class="ratingCountText"
                                                                                 />
                                                                             </HBox>

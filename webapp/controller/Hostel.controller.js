@@ -2898,7 +2898,7 @@ sap.ui.define([
                 await this.model(response)
 
                 let matchedRooms = response.data.HM_BedType || [];
-                   let HM_RoomCount=response.data.HM_RoomCount
+                let HM_RoomCount=response.data.HM_RoomCount
 
                 // if (sACType) {
                 //     matchedRooms = matchedRooms.filter(
@@ -2967,6 +2967,11 @@ sap.ui.define([
                     const MonthPrice = firstRoom?.MonthPrice ? " " + firstRoom.MonthPrice : "";
                     const YearPrice = firstRoom?.YearPrice ? " " + firstRoom.YearPrice : "";
                     const Currency = firstRoom?.Currency ? " " + firstRoom.Currency : "";
+                    const AverageRating = firstRoom?.AverageRating ? " " + firstRoom.AverageRating : "0";
+                    const TotalFeedbacks = firstRoom?.TotalFeedbacks ? " " + firstRoom.TotalFeedbacks : "0";
+
+
+                    
 
                     // let totalBooked = 0;
                     // let totalCapacity = 0;
@@ -3007,6 +3012,8 @@ sap.ui.define([
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
 
+              
+
                     const aImages = [];
                     for (let i = 1; i <= 5; i++) {
                         const base64 = room[`Photo${i}`];
@@ -3014,7 +3021,9 @@ sap.ui.define([
                         if (base64) {
                             aImages.push({
                                 src: convertBase64ToImage(base64, type),
-                                Area: sArea
+                                Area: sArea,
+                                 AverageRating : AverageRating,
+                                 TotalFeedbacks : TotalFeedbacks
                             });
                         }
                     }
@@ -3042,6 +3051,8 @@ sap.ui.define([
                         GSTType: sGSTType,
                         GSTValue: sGSTValue,
                         GSTIN: sGSTIN,
+                        AverageRating:AverageRating,
+                        TotalFeedbacks:TotalFeedbacks
                     };
                 });
 
