@@ -973,7 +973,7 @@ sap.ui.define([
             const oComponent = this.getOwnerComponent();
             let oBRModel = oComponent.getModel("sBRModel");
 
-            if (!oBRModel) {
+            if (!oBRModel || !oBRModel.getData() || oBRModel.getData().length === 0) {
                 await oComponent._fetchCommonData("HM_Branch", "sBRModel");
                 oBRModel = oComponent.getModel("sBRModel");
             }
