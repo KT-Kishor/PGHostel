@@ -30,7 +30,8 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({
                 DialogMode: "Add",
                 CurrentCoupon: {},
-                isUptoEnabled: false
+                isUptoEnabled: false,
+                isReq: false
             }), "CouponView");
 
         },
@@ -353,6 +354,7 @@ sap.ui.define([
                 BranchCode: ""
             });
             oViewModel.setProperty("/isUptoEnabled", false);
+            oViewModel.setProperty("/isReq", false);
             oViewModel.setProperty("/CurrentCoupon/UptoValue", "");
 
             this._openCouponDialog();
@@ -375,47 +377,6 @@ sap.ui.define([
             this._openCouponDialog();
         },
 
-        // onDeleteCoupon: async function () {
-        //     var oTable = this.getView().byId("couponTable");
-        //     var aSelectedItems = oTable.getSelectedItems();
-        //     if (!aSelectedItems.length) {
-        //         MessageToast.show("Please select at least one coupon to delete.");
-        //         return;
-        //     }
-        //     MessageBox.confirm(
-        //         `Delete ${aSelectedItems.length} selected coupon(s)?`,
-        //         {
-        //             icon: MessageBox.Icon.WARNING,
-        //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-        //             emphasizedAction: MessageBox.Action.NO,
-        //             onClose: async function (sAction) {
-        //                 if (sAction !== MessageBox.Action.YES) return;
-        //                 sap.ui.core.BusyIndicator.show(0);
-        //                 try {
-        //                     for (let oItem of aSelectedItems) {
-        //                         let oCtx = oItem.getBindingContext("CouponModel");
-        //                         let oData = oCtx.getObject();
-        //                         await this.ajaxDeleteWithJQuery("HM_Coupon", {
-        //                             filters: {
-        //                                 CouponId: oData.CouponId    // ✅ SAFE ROW-LEVEL DELETE
-        //                             }
-        //                         });
-        //                     }
-        //                     MessageToast.show("Selected coupons deleted successfully.");
-        //                     // this._loadCoupons();
-        //                     this.onCouponSearch();
-
-        //                 } catch (err) {
-        //                     console.error("Delete failed:", err);
-        //                     MessageBox.error("Error while deleting coupons.");
-        //                 } finally {
-        //                     sap.ui.core.BusyIndicator.hide();
-        //                     oTable.removeSelections(true);
-        //                 }
-        //             }.bind(this)
-        //         }
-        //     );
-        // },
 
         onDeleteCoupon: async function () {
             var oTable = this.getView().byId("couponTable");
@@ -528,81 +489,6 @@ sap.ui.define([
             ];
         },
 
-        // _openCouponDialog: async function () {
-        //     var oView = this.getView();
-
-        //     if (!this._oCouponDialog) {
-        //         this._oCouponDialog = await Fragment.load({
-        //             id: oView.getId(),
-        //             name: "sap.ui.com.project1.fragment.CouponDialog",
-        //             controller: this
-        //         });
-        //         oView.addDependent(this._oCouponDialog);
-
-        //         // make DatePickers readonly (no manual typing)
-        //         var sViewId = oView.getId();
-        //         this._FragmentDatePickersReadOnly([
-        //             sViewId + "--dpStartDate",
-        //             sViewId + "--dpEndDate"
-        //         ]);
-
-        //         this._oCouponDialog.attachAfterClose(function () {
-        //             this._clearTableSelection();
-        //         }.bind(this));
-        //     }
-
-        //     const oVM = oView.getModel("CouponView");
-        //     const sMode = oVM.getProperty("/DialogMode");
-
-        //     if (sMode === "Add") {
-        //         oVM.setProperty("/CurrentCoupon/BranchCode", "");
-
-        //         const oBranchCB = sap.ui.getCore().byId(
-        //             oView.createId("cbBranchCode")
-        //         );
-        //         if (oBranchCB) {
-        //             oBranchCB.setSelectedItem(null);
-        //             oBranchCB.setValue("");
-        //         }
-        //     } else {
-        //         // ✏️ Edit mode → restore branch selection
-        //         this._syncBranchInEditMode();
-        //     }
-        //     // var oViewModel = new JSONModel({
-        //     //     DialogMode: "Add",
-        //     //     CurrentCoupon: {},
-        //     //     isUptoEnabled: false
-        //     // });
-        //     // this.getView().setModel(oViewModel, "CouponView");
-        //     // const oVM = this.getView().getModel("CouponView");
-        //     const sType = oVM.getProperty("/CurrentCoupon/DiscountType");
-
-        //     // derive enabled state from data
-        //     oVM.setProperty("/isUptoEnabled", sType === "Percentage");
-
-
-
-
-        //     this._oCouponDialog.open();
-
-        //     // ===== DATE CONSTRAINTS =====
-        //     const oStartDP = sap.ui.getCore().byId(oView.createId("dpStartDate"));
-        //     const oEndDP = sap.ui.getCore().byId(oView.createId("dpEndDate"));
-
-        //     const oToday = new Date();
-        //     oToday.setHours(0, 0, 0, 0); // normalize
-
-        //     if (oStartDP) {
-        //         oStartDP.setMinDate(oToday);
-        //     }
-
-        //     if (oEndDP) {
-        //         oEndDP.setMinDate(oToday);
-        //     }
-
-        //     this._oCouponDialog.open();
-        // },
-
 
         _openCouponDialog: async function () {
             const oView = this.getView();
@@ -638,6 +524,7 @@ sap.ui.define([
 
             // Derive UI flags from data (single source of truth)
             oVM.setProperty("/isUptoEnabled", sDiscountType === "Percentage");
+            oVM.setProperty("/isReq", sDiscountType === "Percentage");
 
             // --------------------------------------------------
             // 3. Mode-specific UI sync
@@ -859,6 +746,7 @@ sap.ui.define([
                 BranchCode: ""
             });
             oVM.setProperty("/isUptoEnabled", false);
+            oVM.setProperty("/isReq", false);
             oVM.setProperty("/CurrentCoupon/UptoValue", "");
 
             // Clear validation & fields
@@ -936,6 +824,7 @@ sap.ui.define([
         },
 
         onBranchSelect: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
             const oItem = oEvent.getParameter("selectedItem");
             if (!oItem) return;
 
@@ -965,64 +854,6 @@ sap.ui.define([
             this._isDateRangeCleared = true;
         },
 
-        // ===== Discount Type (STRICT combo) =====
-        // onChange_DiscountType: function (oEvent) {
-        //     utils._LCstrictValidationComboBox(oEvent);
-        //     const oCB = oEvent.getSource();
-        //     const sKey = oCB.getSelectedKey();
-        //     const oVM = this.getView().getModel("CouponView");
-
-        //     // validate combo (you already do this)
-        //     utils._LCstrictValidationComboBox(oEvent);
-
-        //     if (sKey === "Percentage") {
-        //         // enable Upto only for percentage
-        //         oVM.setProperty("/isUptoEnabled", true);
-        //     } else {
-        //         // disable + clear value for Fixed Amount
-        //         oVM.setProperty("/isUptoEnabled", false);
-        //         oVM.setProperty("/CurrentCoupon/UptoValue", "");
-        //     }
-        // },
-        // ===== Discount Value (PERCENT vs FIXED logic) =====
-        // onLiveChange_DiscountValue: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     const sValue = oInput.getValue().trim();
-        //     const sType = sap.ui.getCore()
-        //         .byId(this.getView().createId("cbDiscountType"))
-        //         .getSelectedKey();
-        //     // Must have discount type selected first
-        //     if (!sType) {
-        //         oInput.setValueState(sap.ui.core.ValueState.Error);
-        //         oInput.setValueStateText(this.i18nModel.getText("selectDiscountTypefirst"));
-        //         return;
-        //     }
-        //     // Only digits + optional decimal
-        //     if (!/^\d+(\.\d+)?$/.test(sValue)) {
-        //         oInput.setValueState(sap.ui.core.ValueState.Error);
-        //         oInput.setValueStateText(this.i18nModel.getText("onlynumbersallowed"));
-        //         return;
-        //     }
-        //     const fVal = parseFloat(sValue);
-        //     if (sType === "Percentage") {
-        //         // ✅ Validate 1 – 100
-        //         if (fVal <= 0 || fVal > 100) {
-        //             oInput.setValueState(sap.ui.core.ValueState.Error);
-        //             oInput.setValueStateText(this.i18nModel.getText("percentagemustbebetween1and100"));
-        //             return;
-        //         }
-        //     } else {
-        //         // ✅ Validate currency amount
-        //         if (fVal <= 0) {
-        //             oInput.setValueState(sap.ui.core.ValueState.Error);
-        //             oInput.setValueStateText(this.i18nModel.getText("amountmustbegreaterthan0"));
-        //             return;
-        //         }
-        //     }
-        //     // ✅ Clear error when valid
-        //     oInput.setValueState(sap.ui.core.ValueState.None);
-        // },
-
 
 
         onChange_DiscountType: function (oEvent) {
@@ -1038,9 +869,11 @@ sap.ui.define([
 
             if (sKey === "Percentage") {
                 oVM.setProperty("/isUptoEnabled", true);
+                oVM.setProperty("/isReq", true);
                 oDiscountInput.setMaxLength(5); // 99.99
             } else {
                 oVM.setProperty("/isUptoEnabled", false);
+                oVM.setProperty("/isReq", false);
                 oVM.setProperty("/CurrentCoupon/UptoValue", "");
                 oDiscountInput.setMaxLength(10); // fixed amount
             }

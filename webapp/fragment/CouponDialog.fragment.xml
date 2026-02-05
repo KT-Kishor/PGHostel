@@ -42,7 +42,7 @@
                     />
                     <ComboBox
                         valueStateText="{i18n>selectBranch}"
-                        change="onChange_DiscountType"
+                        change="onBranchSelect"
                         id="cbBranchCode"
                         width="100%"
                         placeholder="{i18n>selectBranch}"
@@ -92,7 +92,7 @@
 />
 
                     <Label
-                        required="true"
+                        required="{CouponView>/isReq}"
                         text="{i18n>UptoValue}"
                     />
                     <Input
