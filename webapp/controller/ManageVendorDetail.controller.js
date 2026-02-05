@@ -659,7 +659,7 @@ sap.ui.define([
                         Country: oData.Country,
                         State: oData.State,
                         City: oData.City,
-                        DateOfBirth: oData.DateOfBirth,
+                        DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
                         Status: statusMap[btnText], //  Approval-specific fields
                         AdminComment: remark
                     },
