@@ -1497,17 +1497,16 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                 
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                
                 }
 
-
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
 
@@ -1542,17 +1541,16 @@ sap.ui.define([
 
                       if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                 
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                
                 }
 
-         
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
 
@@ -1585,17 +1583,16 @@ sap.ui.define([
 
                       if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                  
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+              
                 }
 
-         
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
             }
@@ -1735,17 +1732,16 @@ sap.ui.define([
 
             if (CustData.GSTType === "IGST") {
                 oCustomerData.setProperty("/IGST", CGST)
-                oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+             
 
             } else {
                 oCustomerData.setProperty("/SGST", CGST)
                 oCustomerData.setProperty("/CGST", CGST)
-                oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+             
             }
 
-
+            oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+            oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
 
@@ -2148,7 +2144,7 @@ sap.ui.define([
 
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var SubTotal = fPrice + fFacilityPrice
-                var CGST = SubTotal * CustData.GSTValue0 / 100
+                var CGST = SubTotal * CustData.GSTValue / 100
 
                 let TotalAmount;
 
@@ -2183,16 +2179,15 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                 
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                  
                 }
-
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
@@ -2373,16 +2368,15 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                  
                 }
-
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
