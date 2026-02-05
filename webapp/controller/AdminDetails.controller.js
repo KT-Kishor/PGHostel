@@ -369,7 +369,7 @@ sap.ui.define([
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
-                    AllSelectedFacilities: oCustomer.c || [],
+                    AllSelectedFacilities: oCustomer.FaciltyItems || [],
                     Documents: oCustomer.Documents || []
                 };
                 let sDate = this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.BookingDate || "");
@@ -385,7 +385,7 @@ sap.ui.define([
                 const aPersons = [{
                     FullName: oCustomer.CustomerName,
                     Facilities: {
-                        SelectedFacilities: oCustomer.c || []
+                        SelectedFacilities: oCustomer.FaciltyItems || []
                     }
                 }];
                 // Calculate totals
