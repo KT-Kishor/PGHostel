@@ -1622,7 +1622,7 @@ sap.ui.define([
                                                         }
 
                                                         // If NOT selected → open popover to choose price
-                                                        const oActionSheet = that._createFacilityActionSheet(facility, iPersonIndex, oCard);
+                                                        const oActionSheet = that._createFacilityPopover(facility, iPersonIndex, oCard);
                                                         oActionSheet.openBy(oEvent.getSource());
                                                     }
                                                 }).addStyleClass("serviceImage"),
@@ -1697,47 +1697,64 @@ sap.ui.define([
 
         },
 
-        _createFacilityActionSheet: function (facility, iPersonIndex, oCard) {
-            var SelectedPriceType = this.getView().getModel("HostelModel").getProperty("/SelectedPriceType")
-            const that = this;
-            if (this._oFacilityActionSheet) {
-                this._oFacilityActionSheet.destroy();
-            }
-
-            const aButtons = [];
-
-            function addButton(price, label) {
-                // Convert string to number
-                const num = Number(price);
-
-                if (price !== "" && price !== null && Number.isFinite(num) && num > 0) {
-                    aButtons.push(
-                        new sap.m.Button({
-                            text: `${label} – ${num} ${facility.Currency}`,
-                            press: () => that._setFacilitySelectedPrice(facility, label, num, iPersonIndex, oCard)
-                        })
-                    );
-                }
-            }
-
-            if (SelectedPriceType === "Per Day") {
-                addButton(facility.PricePerDay, "Per Day");
-
-            } else if (SelectedPriceType === "Per Month") {
-                addButton(facility.PricePerMonth, "Per Month");
-            
-            } else if (SelectedPriceType === "Per Year") {
-                addButton(facility.PricePerYear, "Per Year");
-            }
-
-            this._oFacilityActionSheet = new sap.m.ActionSheet({
-                placement: sap.m.PlacementType.Top,
-                buttons: aButtons
-            });
-
-            this.getView().addDependent(this._oFacilityActionSheet);
-            return this._oFacilityActionSheet;
-        },
+        _createFacilityPopover: function (facility, iPersonIndex, oCard) {
+ 
+    const SelectedPriceType =
+        this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
+ 
+    const that = this;
+ 
+    if (this._oFacilityPopover) {
+        this._oFacilityPopover.destroy();
+    }
+ 
+    const aButtons = [];
+ 
+    function addButton(price, label) {
+ 
+        const num = Number(price);
+ 
+        if (price !== "" && price !== null && Number.isFinite(num) && num > 0) {
+ 
+            aButtons.push(
+                new sap.m.Button({
+                    width: "100%",
+                    text: `${label} – ${num} ${facility.Currency}`,
+                    type: "Transparent",
+                    press: function () {
+                        that._setFacilitySelectedPrice(
+                            facility,
+                            label,
+                            num,
+                            iPersonIndex,
+                            oCard
+                        );
+                        that._oFacilityPopover.close();
+                    }
+                })
+            );
+        }
+    }
+ 
+    if (SelectedPriceType === "Per Day") {
+        addButton(facility.PricePerDay, "Per Day");
+    } else if (SelectedPriceType === "Per Month") {
+        addButton(facility.PricePerMonth, "Per Month");
+    } else if (SelectedPriceType === "Per Year") {
+        addButton(facility.PricePerYear, "Per Year");
+    }
+ 
+    this._oFacilityPopover = new sap.m.Popover({
+        placement: sap.m.PlacementType.Top,
+        showHeader: false,
+        contentWidth: "220px",
+        content: aButtons
+    });
+ 
+    this.getView().addDependent(this._oFacilityPopover);
+ 
+    return this._oFacilityPopover;
+},
 
         _setFacilitySelectedPrice: function (facility, selectedType, selectedPrice, iPersonIndex, oCard) {
 
