@@ -16,7 +16,7 @@
                 <VBox class="sapUiSmallMargin">
                     <Title text="How was your stay?"
                         level="H2" wrapping="true"
-                        class="custom-welcome sapUiMediumMarginBottom heroTextBox"
+                        class="custom-feedback sapUiTinyMarginBottom heroFeedBox"
                     />
                     <VBox class="feedbackFormContainer  ">
                         <f:SimpleForm
@@ -36,7 +36,7 @@
                             <f:content>
                                 <!-- Ratings Section -->
                                 <Title text="Please rate your experience on a scale of 1 to 5" wrapping="true"
-                                titleStyle="H4" level="H4" class="sapUiMediumMarginBottom"/>
+                                titleStyle="H4" level="H4" class="sapUiSmallMarginBottom"/>
                                 <Label
                                 text="1. Overall Experience"
                                 required="true"
@@ -92,7 +92,7 @@
                                 value="0"
                                 iconSize="1.5rem"
                                 change="onValueRatingChange"
-                                class="sapUiMediumMarginBottom"
+                                class="sapUiSmallMarginBottom"
 
                             />
                                 <Label
@@ -129,7 +129,7 @@
                                     />
                                         <RadioButton
                                         id="rbAgainNo"
-                                class="sapUiSmallMarginBottom"
+                                class="sapUiTinyMarginBottom"
                                         text="No" 
                                     />
                                     </buttons>
