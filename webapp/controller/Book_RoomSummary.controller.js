@@ -327,7 +327,7 @@ if (paymentType === "Per Month") {
 } else if (paymentType === "Per Year") {
 
     const monthly =
-        oPerson.FinalTotalCost / 12;
+        oPerson.FinalTotalCost / selectedMonths;
 
     oPerson.MonthlyCostPerPerson =
         Number(monthly.toFixed(2));
