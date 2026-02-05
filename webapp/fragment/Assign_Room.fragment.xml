@@ -50,7 +50,7 @@
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
-                    valueStateText="Enter Deposit Amount"
+                    valueStateText="Enter deposit amount"
                     editable="false"
                 />
 
@@ -65,7 +65,7 @@
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="ActualAmountLiveChange"
-                    valueStateText="Enter Actual Amount"
+                    valueStateText="Enter actual amount"
                 />
 
                    <Label
@@ -76,7 +76,7 @@
                     id="idPaymentMode"
                     placeholder="Select Payment Mode"
                     selectedKey="{HostelModel>/PaymentMode}"
-                    valueStateText="Select Payment Mode"
+                    valueStateText="Select payment mode"
                     change="onPaymentModeChange"
                     visible="{Visiblemodel>/Visible}"
 
@@ -105,7 +105,7 @@
                     value="{HostelModel>/TransactionID}"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
-                    valueStateText="Enter Transaction ID"
+                    valueStateText="Enter transaction ID"
                     maxLength="20"
                     enabled="{= ${HostelModel>/PaymentMode} === 'Cash' ? false : true }"
                   

@@ -427,6 +427,8 @@ sap.ui.define([
     sap.ui.getCore().byId("id_TransactionID").setValue("");
 
     sap.ui.getCore().byId("idRoomNumber1").setSelectedKey("");
+    sap.ui.getCore().byId("id_ActualAmount").setValue("");
+
 
   if(this.data.Status === "Assigned"){
            sap.ui.getCore().byId("idRoomNumber1")
