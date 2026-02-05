@@ -1024,6 +1024,8 @@ sap.ui.define([
                         oSelectedCustomerModel.setProperty("/InvNo", response.InvoiceNo);
                         var CustomerName = oSelectedCustomerModel.getProperty("/Customer") || oPayload.payload.CustomerName;
                         oSelectedCustomerModel.setProperty("/CustomerName", CustomerName)
+                        var Status=  oSelectedCustomerModel.getProperty("/Status") || oPayload.payload.Status;
+                        oSelectedCustomerModel.setProperty("/Status", Status)
                         that.closeBusyDialog();
                         var oDialog = new sap.m.Dialog({
                             title: that.i18nModel.getText("success"),
@@ -2200,6 +2202,12 @@ sap.ui.define([
                     }
 
                     currentY += 15;
+
+                     // Page break check
+                        if (currentY + 20 > pageHeight) {
+                            doc.addPage();
+                            currentY = 20;
+                        }
                     doc.setFontSize(11);
                     doc.text("Thank you for staying with us.", margin - 2, currentY);
 
@@ -2586,6 +2594,11 @@ sap.ui.define([
                     doc.setFont("times", "normal");
                     doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY + 6);
 
+                    currentY += 15;
+                    doc.setFontSize(11);
+                    doc.setFont("times", "bold");
+                    doc.text("Thank you for staying with us.", margin, currentY + 5);
+
                     // ================= FOOTER =================
                     const totalPages = doc.internal.getNumberOfPages();
                     for (let i = 1; i <= totalPages; i++) {
@@ -2593,7 +2606,7 @@ sap.ui.define([
                         this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
                     }
 
-                    doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Selected-Invoice.pdf`);
+                    doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Invoice.pdf`);
 
                 } catch (e) {
                     sap.m.MessageToast.show(e.message || "PDF generation failed");
@@ -2960,7 +2973,7 @@ sap.ui.define([
                         }, pageWidth, pageHeight, i, totalPages);
                     }
 
-                    doc.save(`${filterData.CustomerName}-Summary-Invoice.pdf`);
+                    doc.save(`${filterData.CustomerName}-Invoice.pdf`);
                 } catch (e) {
                     MessageToast.show(e.message || "Error generating summary invoice");
                 } finally {
