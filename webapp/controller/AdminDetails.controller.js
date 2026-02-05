@@ -919,6 +919,9 @@ sap.ui.define([
             editdata.setProperty("/EndDate", "")
 
             editdata.setProperty("/TotalDays", "")
+            editdata.setProperty("/CouponCode", "")
+            editdata.setProperty("/CouponDiscount", "")
+            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
         },
 
@@ -964,6 +967,7 @@ sap.ui.define([
                 oEnd.setMonth(oEnd.getMonth() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
             } else if (sUnit === "Per Year" || sUnit === "yearly") {
+                
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
@@ -985,6 +989,9 @@ sap.ui.define([
             // Update model
             oModel.setProperty("/EndDate", oEnd ? this.Formatter.formatDate(oEnd.toISOString().split("T")[0]) : "");
             oModel.setProperty("/TotalDays", iDays);
+            oModel.setProperty("/CouponCode", "")
+            oModel.setProperty("/CouponDiscount", "")
+            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
 
         onMonthYearChange: function (oEvent) {
@@ -1030,6 +1037,9 @@ sap.ui.define([
 
             oModel.setProperty("/EndDate", this.Formatter.formatDate(sFormatted));
             oModel.setProperty("/TotalDays", iDays);
+            oModel.setProperty("/CouponCode", "")
+            oModel.setProperty("/CouponDiscount", "")
+            sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
 
         onEditFacilitySave: function () {
@@ -1755,6 +1765,8 @@ sap.ui.define([
                 var oStart = new Date(sStartDate);
                 var oEnd = new Date(sEndDate);
 
+
+                if(oSelectedData.UnitText==="Per Month"){
                 var iMonths =
                     (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
                     (oEnd.getMonth() - oStart.getMonth());
@@ -1763,7 +1775,13 @@ sap.ui.define([
                 if (oEnd.getDate() >= oStart.getDate()) {
                     iMonths += 1;
                 }
+            }else if(oSelectedData.UnitText==="Per Year"){
+                var iMonths =
+                    (oEnd.getFullYear() - oStart.getFullYear());
+                    
 
+            }
+            
             }
 
             // 👉 STORE INDEX for update later
@@ -2808,12 +2826,12 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                         }];
 
                         sap.ui.core.BusyIndicator.show(0);
-                        const custid = oData.CustomerID; // FIXED
+                        const custid = oData.BookingID; // FIXED
 
                         await that.ajaxUpdateWithJQuery("HM_Customer", {
                             data: personData,
                             filters: {
-                                CustomerID: custid
+                                BookingID: custid
                             }
                         });
 

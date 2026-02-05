@@ -1973,6 +1973,8 @@ if (paymentType !== "Per Day") {
         Number((oFirstPerson.FinalTotalCost - discountAmount).toFixed(2));
 
 } else {
+     oFirstPerson.MonthlyCostPerPerson =
+        Number(discountedAmount.toFixed(2));
 
     // only reduce final total
     oFirstPerson.FinalTotalCost =

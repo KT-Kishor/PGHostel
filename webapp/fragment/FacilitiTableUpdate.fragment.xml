@@ -196,13 +196,13 @@
                     valueFormat="dd/MM/yyyy"
                     change="onEditDateChange"
                     valueStateText="{i18n>selectEndDate}"
-                />
+                />  
 
                 <Label text="{i18n>days}" />
                 <Input
                     id="FT_id_editDays"
                     value="{edit>/TotalDays}"
-                    editable="true"
+                    editable="{= ${edit>/UnitText} !== 'Per Day' }"
                 />
             </VBox>
         </content>
