@@ -111,8 +111,7 @@
                 >
                     <Image
                         src="{HostelModel>Image}"
-                        width="180px"
-                        height="140px"
+                      class="FacilitySummaryImage"
                     />
                     <Text text="{HostelModel>FacilityName}" />
                     <Text

@@ -1394,7 +1394,7 @@ sap.ui.define([
             if (oEndDatePicker) {
                 oEndDatePicker.setMinDate(oStart);
             }
-
+             var CustData = oCustomerModel.getData();
             // DAILY CALCULATION
             if (sUnit === "daily" || sUnit === "Per Day") {
 
@@ -1420,7 +1420,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
                 oCustomerModel.setProperty("/Duration", diffDays);
 
-                var CustData = oCustomerModel.getData();
+               
                 var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
                 // if (CustData.CouponCode || this.Code) {
                 //     var oCouponData = this.getView().getModel("CouponModel").getData();
@@ -1460,7 +1460,7 @@ sap.ui.define([
 
                 // oCustomerModel.setProperty("/SubTotal", SubTotal);
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
-                var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")) - Number(CustData.Discount)
+                var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))
 
                 var SubTotal = SubTotal
                 var CGST = SubTotal * CustData.GSTValue / 100
@@ -1526,13 +1526,36 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1);
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
-                var SGST = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) * 0.09
+           
                 var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
 
-                oCustomerModel.setProperty("/SGST", SGST);
-                oCustomerModel.setProperty("/CGST", SGST);
+                  var CGST = SubTotal * CustData.GSTValue / 100
+                let TotalAmount;
+
+                if (CustData.GSTType === "IGST") {
+                    TotalAmount = SubTotal + CGST;
+                } else if (CustData.GSTType === "CGST/SGST") {
+                    TotalAmount = SubTotal + CGST + CGST;
+                } else {
+                    TotalAmount = SubTotal
+                }
+
+                      if (CustData.GSTType === "IGST") {
+                    oCustomerModel.setProperty("/IGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+                } else {
+                    oCustomerModel.setProperty("/SGST", CGST)
+                    oCustomerModel.setProperty("/CGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                }
+
+         
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-                oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
+                oCustomerModel.setProperty("/Discount", CustData.Discount)
+
             }
 
             // YEARLY CALCULATION
@@ -1546,13 +1569,35 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1);
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
-                var SGST = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) * 0.09
+          
                 var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
 
-                oCustomerModel.setProperty("/SGST", SGST);
-                oCustomerModel.setProperty("/CGST", SGST);
+                var CGST = SubTotal * CustData.GSTValue / 100
+                let TotalAmount;
+
+                if (CustData.GSTType === "IGST") {
+                    TotalAmount = SubTotal + CGST;
+                } else if (CustData.GSTType === "CGST/SGST") {
+                    TotalAmount = SubTotal + CGST + CGST;
+                } else {
+                    TotalAmount = SubTotal
+                }
+
+                      if (CustData.GSTType === "IGST") {
+                    oCustomerModel.setProperty("/IGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+
+                } else {
+                    oCustomerModel.setProperty("/SGST", CGST)
+                    oCustomerModel.setProperty("/CGST", CGST)
+                    oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
+                    oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                }
+
+         
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-                oCustomerModel.setProperty("/GrandTotal", diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice") || 0) + SGST + SGST);
+                oCustomerModel.setProperty("/Discount", CustData.Discount)
             }
 
             // Save final EndDate in yyyy-MM-dd

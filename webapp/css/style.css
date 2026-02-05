@@ -3772,10 +3772,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* Mobile devices */
 @media (max-width: 600px) {
-  .couponContainer {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
+.couponContainer {
+flex-direction: column;
+align-items: flex-end;
+justify-content: flex-end;
+}
 
   .couponInput {
     width: 100% !important;
@@ -4257,4 +4258,15 @@ span.sapMBtnInner.sapMBtnEmphasized {
         flex-shrink: 0 !important;
 
     }
+}
+.FacilitySummaryImage{
+width:180px;
+height:140px;
+border-radius: 2px;
+}
+@media (max-width: 400px) {
+.FacilitySummaryImage{
+width:270px;
+height:140px;
+}
 }
