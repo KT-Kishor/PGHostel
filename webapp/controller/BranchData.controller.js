@@ -835,9 +835,15 @@ sap.ui.define([
             });
             this.isEdit = true;
             const oVisible = this.getView().getModel("visiblePlay");
-            // Re-validate GST to refresh UI
+            // After setting GST validation, ensure tax percentage is preserved
             setTimeout(() => {
                 this.MC_ValidateGstNumber();
+
+                // Force update of tax percentage field
+                const taxInput = this.byId("CC_id_custValue");
+                if (taxInput && oData.Value) {
+                    taxInput.setValue(oData.Value.toString());
+                }
             }, 0);
             const bIsIndia = oData.Country === "India";
             oVisible.setProperty("/isIndia", bIsIndia);
@@ -1248,11 +1254,15 @@ sap.ui.define([
             const sValue = oInput.getValue().trim();
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
+            const isEdit = this.getView().getModel("editableModel").getProperty("/isEdit");
+
             if (!visiModel.getProperty("/isIndia")) {
                 oInput.setValueState("None");
                 return true;
             }
+
             const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+
             if (!sValue) {
                 oInput.setValueState("None");
                 visiModel.setProperty("/CC_id_CustInput", false);
@@ -1276,17 +1286,70 @@ sap.ui.define([
 
             const stateCode = sValue.substring(0, 2);
 
-            if (stateCode === "29") {
-                visiModel.setProperty("/selectedIndex", 0); // CGST
-                dataModel.setProperty("/Type", "CGST/SGST");
-                dataModel.setProperty("/Value", "9");
+            // Only set default values during creation (not edit mode)
+            if (!isEdit) {
+                if (stateCode === "29") {
+                    visiModel.setProperty("/selectedIndex", 0); // CGST
+                    dataModel.setProperty("/Type", "CGST/SGST");
+                    dataModel.setProperty("/Value", "9"); // Default value for creation
+                } else {
+                    visiModel.setProperty("/selectedIndex", 1); // IGST
+                    dataModel.setProperty("/Type", "IGST");
+                    dataModel.setProperty("/Value", "18"); // Default value for creation
+                }
             } else {
-                visiModel.setProperty("/selectedIndex", 1); // IGST
-                dataModel.setProperty("/Type", "IGST");
-                dataModel.setProperty("/Value", "18");
+                // In edit mode, don't override existing values
+                // Just update the radio button selection based on GST type
+                if (stateCode === "29") {
+                    visiModel.setProperty("/selectedIndex", 0); // CGST
+                    dataModel.setProperty("/Type", dataModel.getProperty("/Type") || "CGST/SGST");
+                    // Don't override Value if it's already set
+                    if (!dataModel.getProperty("/Value")) {
+                        dataModel.setProperty("/Value", "9");
+                    }
+                } else {
+                    visiModel.setProperty("/selectedIndex", 1); // IGST
+                    dataModel.setProperty("/Type", dataModel.getProperty("/Type") || "IGST");
+                    // Don't override Value if it's already set
+                    if (!dataModel.getProperty("/Value")) {
+                        dataModel.setProperty("/Value", "18");
+                    }
+                }
             }
 
             return true;
+        },
+        onTaxPercentageChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            const sValue = oInput.getValue();
+            const dataModel = this.getView().getModel("MDmodel");
+
+            // Allow only numbers and optional single decimal point
+            let filteredValue = sValue.replace(/[^0-9.]/g, '');
+
+            // Ensure only one decimal point
+            const parts = filteredValue.split('.');
+            if (parts.length > 2) {
+                filteredValue = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Limit to 2 decimal places
+            if (parts[1] && parts[1].length > 2) {
+                filteredValue = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+
+            oInput.setValue(filteredValue);
+            dataModel.setProperty("/Value", filteredValue);
+
+            // Validate range (0-100)
+            const numValue = parseFloat(filteredValue);
+            if (filteredValue && (numValue < 0 || numValue > 100)) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Tax percentage must be between 0 and 100");
+            } else {
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
+            }
         }
     })
 });

@@ -19,6 +19,27 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
+            const today = new Date();
+
+            const focusedDate = new Date(
+                today.getFullYear() - 18,
+                today.getMonth(),
+                today.getDate()
+            );
+
+            const minDate = new Date(
+                today.getFullYear() - 100,
+                today.getMonth(),
+                today.getDate()
+            );
+
+            const oDateModel = new sap.ui.model.json.JSONModel({
+                focusedDate: focusedDate,
+                minDate: minDate,
+                maxDate: today
+            });
+
+            this.getView().setModel(oDateModel, "controller");
         },
         _getBrowserLocation: function () {
             if (!navigator.geolocation) {
@@ -1895,37 +1916,7 @@ sap.ui.define([
                 oInput.setValueState("None");
             }
         },
-        onSTDChange: function (oEvent) {
 
-            // 🔑 Support BOTH UI-triggered and manual calls
-            const oSTD = oEvent?.getSource?.() || sap.ui.getCore().byId("signUpSTD");
-            if (!oSTD) return;
-
-            const sValue = (oSTD.getValue() || "").trim();
-            const oMobile = sap.ui.getCore().byId("signUpPhone");
-
-            // Mandatory check (only if event exists)
-            if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) {
-                return;
-            }
-
-            const STD_REGEX = /^\+[1-9][0-9]*$/;
-
-            if (!STD_REGEX.test(sValue)) {
-                oSTD.setValueState("Error");
-                oSTD.setValueStateText(
-                    "STD must start with + and contain only numbers (no leading zero)"
-                );
-
-                oMobile.setValue("");
-                oMobile.setMaxLength(18);
-                return;
-            }
-
-            oSTD.setValueState("None");
-            oMobile.setValue("");
-            oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
-        },
 
 
         onAddressChange: function () {
@@ -1992,6 +1983,39 @@ sap.ui.define([
                     )
                 ]);
             }
+        },
+
+
+        onSTDChange: function (oEvent) {
+
+            // 🔑 Support BOTH UI-triggered and manual calls
+            const oSTD = oEvent?.getSource?.() || sap.ui.getCore().byId("signUpSTD");
+            if (!oSTD) return;
+
+            const sValue = (oSTD.getValue() || "").trim();
+            const oMobile = sap.ui.getCore().byId("signUpPhone");
+
+            // Mandatory check (only if event exists)
+            if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) {
+                return;
+            }
+
+            const STD_REGEX = /^\+[1-9][0-9]*$/;
+
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText(
+                    "STD must start with + and contain only numbers (no leading zero)"
+                );
+
+                oMobile.setValue("");
+                oMobile.setMaxLength(18);
+                return;
+            }
+
+            oSTD.setValueState("None");
+            // oMobile.setValue("");
+            oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
         },
 
         _LCvalidateName: function (oEvent) {
@@ -4586,6 +4610,8 @@ sap.ui.define([
             }
         },
 ////
+
+
         onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment(
@@ -4610,12 +4636,12 @@ sap.ui.define([
                 });
 
             }
-            // Set DOB limits
+            // Set DOB limits - CHANGED: now 0 to 100 years (was 18 to 70)
             const oDate = sap.ui.getCore().byId("adminDOB");
             if (oDate) {
                 const now = new Date();
-                oDate.setMaxDate(new Date(now.getFullYear() - 18, now.getMonth(), now.getDate()));
-                oDate.setMinDate(new Date(now.getFullYear() - 70, now.getMonth(), now.getDate()));
+                oDate.setMaxDate(now); // Allow up to current date (age 0)
+                oDate.setMinDate(new Date(now.getFullYear() - 100, now.getMonth(), now.getDate()));
             }
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
@@ -4823,7 +4849,7 @@ sap.ui.define([
             oSTD.setValueState("None");
 
             // Reset mobile on STD change
-            oMobile.setValue("");
+            // oMobile.setValue("");
 
             // Length logic
             oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
@@ -4831,6 +4857,8 @@ sap.ui.define([
             // Update model
             oModel.setProperty("/STDCode", sValue);
         },
+
+
 
         ADMIN_onMobileLiveChange: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
@@ -4888,12 +4916,13 @@ sap.ui.define([
             }
         },
 
+
+
         ADMIN_onChangeDOB: function (oEvent) {
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
-            const raw = oDatePicker.getDateValue(); // JS Date or null
+            const raw = oDatePicker.getDateValue();
 
-            // ❌ No date
             if (!raw) {
                 oDatePicker.setValueState("Error");
                 oDatePicker.setValueStateText("Date of birth is required");
@@ -4903,25 +4932,20 @@ sap.ui.define([
 
             const today = new Date();
             let age = today.getFullYear() - raw.getFullYear();
-
             const m = today.getMonth() - raw.getMonth();
             if (m < 0 || (m === 0 && today.getDate() < raw.getDate())) {
                 age--;
             }
 
-            // ❌ Age invalid
-            if (age < 18 || age > 70) {
+            if (age < 0 || age > 100) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Age must be between 18 and 70");
+                oDatePicker.setValueStateText("Age must be between 0 and 100");
                 oModel.setProperty("/DOB", "");
                 return;
             }
 
-            // ✅ ALWAYS clear error — no conditions
             oDatePicker.setValueState("None");
-            oDatePicker.setValueStateText("");
 
-            // ✅ Store ISO format (never use getValue())
             const yyyy = raw.getFullYear();
             const mm = String(raw.getMonth() + 1).padStart(2, "0");
             const dd = String(raw.getDate()).padStart(2, "0");

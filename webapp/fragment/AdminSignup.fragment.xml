@@ -103,14 +103,28 @@
                     text="{i18n>MVDDOB}"
                     required="true"
                 />
-                <DatePicker
+                <!-- <DatePicker
                     id="adminDOB"
                     value="{AdminSignupModel>/DOB}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
-                    valueStateText="{i18n>agediff}"
                     change="ADMIN_onChangeDOB"
-                />
+                /> -->
+
+<DatePicker
+    id="adminDOB"
+    placeholder="DD/MM/YYYY"
+    displayFormat="dd/MM/yyyy"
+    valueFormat="yyyy-MM-dd"
+    value="{AdminSignupModel>/DOB}"
+    initialFocusedDateValue="{controller>/focusedDate}"
+    minDate="{controller>/minDate}"
+    maxDate="{controller>/maxDate}"
+    change="ADMIN_onChangeDOB"
+                    valueStateText="{i18n>agediff}"
+
+/>
+
 
                 <Label
                     text="{i18n>MVgender}"

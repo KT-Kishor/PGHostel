@@ -161,6 +161,7 @@
                     id="CC_id_custValue"
                     value="{MDmodel>/Value}"
                     maxLength="5"
+                    liveChange="onTaxPercentageChange"
                 />
                 <Label text="" />
                 <HBox width="100%">
