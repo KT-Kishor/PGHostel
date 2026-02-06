@@ -1550,8 +1550,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
   color: white !important;
 
-  transform: scale(1.1);
-  transform-origin: center;
+  /* transform: scale(1.1);
+  transform-origin: center; */
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
@@ -3092,8 +3092,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
   color: white !important;
 
-  transform: scale(1.1);
-  transform-origin: center;
+  /* transform: scale(1.1);
+  transform-origin: center; */
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
