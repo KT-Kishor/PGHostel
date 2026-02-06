@@ -3839,12 +3839,22 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
                 if (!oResp || oResp.success !== true) {
-                    MessageToast.show(this.i18nModel.getText("registrationFailedPleasetryagain"));
-                    console.error("SignUp Error Response:", oResp);
+                    const sFailMsg =
+                        oResp?.message ||
+                        this.i18nModel.getText("registrationFailedPleasetryagain");
+
+                    sap.m.MessageBox.error(sFailMsg, {
+                        title: "Registration Failed"
+                    });
                     return;
                 }
+                 const sUsername = data.fullname.trim();
+                const Salutation = C("signUpSalutation").getSelectedItem().getText();
+                const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
+                    "Your account has been created successfully. You will receive an email shortly with your login credentials.";
 
-                MessageBox.success("Registration Successful", {
+
+                MessageBox.success(sSuccessMsg, {
                     title: "Success",
                     onClose: () => {
 

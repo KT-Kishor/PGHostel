@@ -73,6 +73,7 @@
                 >
                     <!-- Image / PDF Thumbnail -->
                     <Image
+                    visible="{= ${HostelModel>FileType} !== 'application/pdf' }"
                         src="{HostelModel>Thumbnail}"
                         width="200px"
                         height="170px"
@@ -80,6 +81,12 @@
                         press="onOpenDocumentPreview"
                         class="serviceImage"
                     />
+                    <Link
+        visible="{= ${HostelModel>FileType} === 'application/pdf' }"
+        text="{HostelModel>FileName}"
+        press="onOpenDocumentPreview"
+        wrapping="true"
+    />
                 </VBox>
             </FlexBox>
         </VBox>

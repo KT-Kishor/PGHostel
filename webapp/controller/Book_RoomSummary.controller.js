@@ -1274,31 +1274,31 @@ oHostelModel.setProperty("/Persons", aPersons);
         onOpenDocumentPreview: function (oEvent) {
             const oCtx = oEvent.getSource().getBindingContext("HostelModel");
             const oDoc = oCtx && oCtx.getObject();
-
+ 
             if (!oDoc || !oDoc.Document) {
                 MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
                 return;
             }
-
+ 
             let sData = oDoc.Document;
-
+ 
             if (!sData.startsWith("data:")) {
                 const sType = oDoc.FileType || "application/octet-stream";
                 sData = `data:${sType};base64,${sData}`;
             }
-
+ 
             const sTitle = oDoc.FileName || "Document Preview";
-
+ 
             /** DESTROY OLD DIALOG IF EXISTS */
             if (this._oImageDialog) {
                 this._oImageDialog.destroy();
                 this._oImageDialog = null;
             }
-
+ 
             let oContent;
-
+ 
             if (oDoc.FileType.includes("image")) {
-
+ 
                 const oFlex = new sap.m.FlexBox({
                     width: "100%",
                     height: "100%",
@@ -1316,22 +1316,24 @@ oHostelModel.setProperty("/Persons", aPersons);
                         })
                     ]
                 });
-
+ 
                 oContent = oFlex;
             }
-
+ 
             /** ============================
-             *  PDF PREVIEW 
+             *  PDF PREVIEW
              * ============================ */
             else if (oDoc.FileType.includes("pdf")) {
-
+ 
                 const oHtml = new sap.ui.core.HTML({
-                    content: `<iframe src="${sData}" style="width:100%;height:100%;border:0;"></iframe>`
+                    content: `<iframe src="${sData}" style="width:100%;height:500%;border:none;display:block;"></iframe>`,
+                    sanitizeContent: false,
+                    horizontalScrolling: false,
                 });
-
+ 
                 oContent = oHtml;
             }
-
+ 
             /** ============================
              *  UNSUPPORTED FILE
              * ============================ */
@@ -1353,36 +1355,36 @@ oHostelModel.setProperty("/Persons", aPersons);
                     alignItems: "Center"
                 });
             }
-
+ 
             /** ============================
              *  CREATE DIALOG
              * ============================ */
             this._oImageDialog = new sap.m.Dialog({
                 title: sTitle,
                 contentWidth: "50%",
-                contentHeight: "60%",
+                contentHeight: "80%",
                 draggable: true,
                 resizable: true,
                 horizontalScrolling: false,
-                verticalScrolling: true,
+                verticalScrolling: false,
                 contentPadding: "0px",
                 content: [oContent],
-
+ 
                 beginButton: new sap.m.Button({
                     text: "Close",
                     press: function () {
                         this._oImageDialog.close();
                     }.bind(this)
                 }),
-
+ 
                 afterClose: function () {
                     this._oImageDialog.destroy();
                     this._oImageDialog = null;
                 }.bind(this)
             });
-
+ 
             this.getView().addDependent(this._oImageDialog);
-
+ 
             this._oImageDialog.open();
         },
 
