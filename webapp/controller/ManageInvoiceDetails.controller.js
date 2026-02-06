@@ -421,7 +421,8 @@ sap.ui.define([
                             CouponCode: bookingDetails.CouponCode,
                             GST: bookingDetails.GSTIN || "",
                             Type: bookingDetails.GSTType || "",
-                            Value: bookingDetails.GSTValue || ""
+                            Value: bookingDetails.GSTValue || "",
+                            CustomerGSTNO: bookingDetails.CustomerGSTIN || ""
                         });
                     }
 
