@@ -969,15 +969,16 @@ sap.ui.define([
         },
 
         Branch: async function () {
-            const oComponent = this.getOwnerComponent();
-            let oBRModel = oComponent.getModel("sBRModel");
+            // const oComponent = this.getOwnerComponent();
+            // let oBRModel = oComponent.getModel("sBRModel");
 
-            if (!oBRModel || !oBRModel.getData() || oBRModel.getData().length === 0) {
-                await oComponent._fetchCommonData("HM_Branch", "sBRModel");
-                oBRModel = oComponent.getModel("sBRModel");
-            }
+            // if (!oBRModel || !oBRModel.getData() || oBRModel.getData().length === 0) {
+            //     await oComponent._fetchCommonData("HM_Branch", "sBRModel");
+            //     oBRModel = oComponent.getModel("sBRModel");
+            // }
+          const response = await this.ajaxReadWithJQuery("HM_Branch", "");
 
-            const aData = oBRModel?.getData();
+            const aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
 
