@@ -17,7 +17,7 @@
             labelSpanS="12"
         >
             <f:content>
-                <core:Title text="{i18n>bookingDetailsTitle}" />
+                <core:Title text="Booking Details - {HostelModel>/Area}" />
                 <Label text="{i18n>roomtype}" />
                 <Text
                     id="idRoomType2"

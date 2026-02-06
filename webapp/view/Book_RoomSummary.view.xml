@@ -61,7 +61,7 @@
             </Column>
            <Column demandPopin="true">
                 <Text
-                    text="{i18n>firstpayment}"
+                    text="{= ${HostelModel>/SelectedPriceType} === 'Per Month' ?  'First Payment' : 'Full Payment'}"
                     tooltip="{i18n>roomplan}"
                 />
             </Column>
@@ -140,8 +140,6 @@
                 justifyContent="End"
                 alignItems="Center"
                 class="sapUiSmallMarginBottom couponContainer"
-                visible="{= (${LoginModel>/UserID} ? true : false)
-        || (${LoginModel>/EmployeeID} ? true : false) }"
             >
                 <!-- Coupon Label -->
                 <Label

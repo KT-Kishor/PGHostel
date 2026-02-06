@@ -308,7 +308,7 @@
                                                     id="MV_id_adminDocType"
                                                     selectedKey="{AdminSignupModel>/CurrentDocType}"
                                                     placeholder="{i18n>selectDocument}"
-                                                    width="200px"
+                                                    width="auto"
                                                     change="onDocumentTypeChange"
                                                     valueStateText="{i18n>MVDdoc}"
                                                 >

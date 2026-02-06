@@ -191,6 +191,7 @@ sap.ui.define([
                     State: oData[0].State,
                     City: oData[0].City,
                     Status: oData[0].Status,
+                    AdminComment: oData[0].AdminComment,
                     DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
                     Documents: (oData[0].Documents || []).map(doc => ({
                         FileName: doc.FileName,

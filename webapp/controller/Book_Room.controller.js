@@ -1296,8 +1296,8 @@ sap.ui.define([
                         new sap.ui.unified.FileUploader({
                             placeholder: "Choose File",
                             width: "100%",
-                            fileType: ["jpg", "jpeg", "png"],
-                            mimeType: ["image/jpeg", "image/png"],
+                            fileType: ["jpg", "jpeg", "png","pdf"],
+                            mimeType: ["image/jpeg", "image/png","application/pdf"],
                             multiple: false,
                             layoutData: new sap.ui.layout.form.ColumnElementData({
                                 cellsLarge: 7, ///8
@@ -3817,6 +3817,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     Salutation: C("signUpSalutation").getSelectedKey(),
                     UserName: data.fullname.trim(),
                     Role: "Customer",
+                    Type:"Customer",
                     EmailID: data.Email.trim(),
                     Password: btoa(data.password),
                     STDCode: data.STDCode || std,

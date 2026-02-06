@@ -13,11 +13,7 @@
     xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
     xmlns:u="sap.ui.unified">
-    <m:Page
-        navButtonPress="BI_onButtonPress"
-        showNavButton="true"
-        title="{i18n>MVDtitle}"
-    >
+    <m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>MVDtitle}">
         <ObjectPageLayout id="V_id_ObjectPageLayout">
             <sections>
                 <ObjectPageSection
@@ -26,6 +22,17 @@
                     title="{i18n>MVDpersonalDetails}"
                 >
                     <subSections>
+                    <ObjectPageSubSection>
+                        <blocks>
+                            <m:VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                            <m:Label text="Reason for Review Return" class="boldBlackText" />
+                            <m:MessageStrip
+                            text="{AdminSignupModel>/AdminComment}"
+                            type="Warning"
+                            showIcon="true" />
+                            </m:VBox>
+                        </blocks>
+                    </ObjectPageSubSection>
                         <ObjectPageSubSection id="V_id_dsd1">
                             <blocks>
                                 <f:SimpleForm
@@ -51,7 +58,7 @@
                                             <m:ToolbarSpacer />
                                             <m:Button
                                                 class="myUnifiedBtn"
-                                                text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
+                                                text="{= ${editable>/Edit} ? 'Submit' : 'Edit' }"
                                                 press="onEditOrSavePress"
                                                 enabled="{= ${AdminSignupModel>/Status} !== 'Submitted' }"
                                             />
@@ -301,7 +308,7 @@
                                                     id="V_id_adminDocType"
                                                     selectedKey="{AdminSignupModel>/CurrentDocType}"
                                                     placeholder="{i18n>selectDocument}"
-                                                    width="200px"
+                                                    width="auto"
                                                     change="onDocumentTypeChange"
                                                     valueStateText="{i18n>MVDdoc}"
                                                 >
