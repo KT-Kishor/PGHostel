@@ -693,7 +693,6 @@ sap.ui.define([
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
-                // console.log("HostelModel:", oView.getModel("HostelModel").getData());
 
                 oView.setModel(new sap.ui.model.json.JSONModel({
                     loading: true,
@@ -1263,10 +1262,26 @@ sap.ui.define([
             this._addPasswordGenerateIcon();
         },
 
-        SM_onGeneratePassword: function () {
+        // SM_onGeneratePassword: function () {
 
+        //     var oPwdInput = sap.ui.getCore().byId("signUpPassword");
+        //     var oStrength = sap.ui.getCore().byId("passwordStrengthText"); // signup label
+
+        //     if (!oPwdInput) {
+        //         console.error("❌ signUpPassword input not found");
+        //         return;
+        //     }
+
+        //     var pwd = utils._LCgenerateStrongPassword();
+        //     oPwdInput.setValue(pwd);
+
+        //     // Run same validation logic + update strength label
+        //     utils._LCvalidatePassword(oPwdInput, oStrength);
+        // },
+
+        SM_onGeneratePassword: function () {
             var oPwdInput = sap.ui.getCore().byId("signUpPassword");
-            var oStrength = sap.ui.getCore().byId("passwordStrengthText"); // signup label
+            var oStrength = sap.ui.getCore().byId("passwordStrengthText");
 
             if (!oPwdInput) {
                 console.error("❌ signUpPassword input not found");
@@ -1276,11 +1291,9 @@ sap.ui.define([
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
 
-            // Run same validation logic + update strength label
+            this.getView().getModel("LoginMode").setProperty("/password", pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-
-
         _addPasswordGenerateIcon: function () {
 
             const aInputs = [
@@ -1370,29 +1383,68 @@ sap.ui.define([
             oInput.setValue(sValue);
         },
 
+        // SM_onChnageSetAndConfirm: function (oEvent) {
+
+        //     const oInput = oEvent.getSource();
+
+
+        //     // ❌ REMOVE ALL SPACES IMMEDIATELY
+        //     let val = oInput.getValue();
+        //     if (/\s/.test(val)) {
+        //         val = val.replace(/\s+/g, "");
+        //         oInput.setValue(val);
+        //     }
+        //     const sId = oInput.getId();
+        //     let oStrengthText = null;
+
+        //     if (sId === "signUpPassword") {
+        //         oStrengthText = sap.ui.getCore().byId("passwordStrengthText");
+        //     }
+        //     else if (sId === "newPass") {
+        //         oStrengthText = sap.ui.getCore().byId("fpPasswordStrengthText");
+        //     }
+
+        //     utils._LCvalidatePassword(oInput, oStrengthText);
+        // },
         SM_onChnageSetAndConfirm: function (oEvent) {
-
             const oInput = oEvent.getSource();
-
-
-            // ❌ REMOVE ALL SPACES IMMEDIATELY
+            const sId = oInput.getId(); // 🔥 Sabse pehle ID lein
             let val = oInput.getValue();
+
+            // Remove spaces
             if (/\s/.test(val)) {
                 val = val.replace(/\s+/g, "");
                 oInput.setValue(val);
             }
-            const sId = oInput.getId();
-            let oStrengthText = null;
+            if (sId === "signUpPassword" || sId === "newPass") {
+                this.getView().getModel("LoginMode").setProperty("/password", val);
+            }
 
+            // Strength Label Logic
+            let oStrengthText = null;
             if (sId === "signUpPassword") {
                 oStrengthText = sap.ui.getCore().byId("passwordStrengthText");
-            }
-            else if (sId === "newPass") {
+            } else if (sId === "newPass") {
                 oStrengthText = sap.ui.getCore().byId("fpPasswordStrengthText");
             }
 
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
+        // SM_onGenerateForgotPassword: function () {
+
+        //     var oPwdInput = sap.ui.getCore().byId("newPass");
+        //     var oStrength = sap.ui.getCore().byId("fpPasswordStrengthText");
+
+        //     if (!oPwdInput) {
+        //         console.error("❌ newPass input not found");
+        //         return;
+        //     }
+
+        //     // ✅ Only generate + validate (NO copying here)
+        //     var pwd = utils._LCgenerateStrongPassword();
+        //     oPwdInput.setValue(pwd);
+        //     utils._LCvalidatePassword(oPwdInput, oStrength);
+        // },
 
         SM_onGenerateForgotPassword: function () {
 
@@ -1407,13 +1459,12 @@ sap.ui.define([
             // ✅ Only generate + validate (NO copying here)
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
+            this.getView().getModel("LoginMode").setProperty("/password", pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
 
 
-
         onSignUp: async function () {
-
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
@@ -1450,6 +1501,7 @@ sap.ui.define([
 
             // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
+            const sFinalPassword = sap.ui.getCore().byId("signUpPassword").getValue();
 
 
             const payload = {
@@ -1460,7 +1512,9 @@ sap.ui.define([
                     Type: "Customer",
 
                     EmailID: data.Email.trim(),
-                    Password: btoa(data.password),
+                    // Password: btoa(data.password),
+                    Password: btoa(sFinalPassword), 
+
 
                     STDCode: data.STDCode || std,
                     MobileNo: data.Mobileno,
