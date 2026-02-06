@@ -43,7 +43,7 @@
                     visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"
                 />
                  <Label
-                    text="GST Number"
+                    text="Cusomer GSTIN"
                 />
                 <Input
                     id="idGSTNumber"

@@ -1257,7 +1257,7 @@
                                     <!-- Due Amount -->
                                <HBox justifyContent="SpaceBetween">
                                 <Label
-                                    text="Due Amount:"
+                                    text="{= ${CustomerData>/DueAmount} >= 0 ? 'Due Amount:' : 'Refund Amount:'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text

@@ -363,10 +363,11 @@ sap.ui.define([
                     PaymentPaid: Paymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
-                    GSTType: Branch.Type|| "",
-                    GSTValue: Branch.Value || "",
+                    GSTType: oCustomer.Bookings?.[0]?.GSTType|| "",
+                    GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
+                    GSTNumber:oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -515,7 +516,7 @@ sap.ui.define([
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,Branch);
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,oCustomer);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -533,7 +534,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount,Branch) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount,oCustomer) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -694,13 +695,13 @@ sap.ui.define([
             let CGST = 0;
             let IGST = 0;
             let grandTotal = 0;
-            if (Branch.Type === "IGST") {
-                IGST = SubTotal * Branch.Value / 100;
+            if (oCustomer.Bookings?.[0]?.GSTType === "IGST") {
+                IGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
                 grandTotal = SubTotal + IGST - DiscountAmount;
 
             } else {
-                SGST = SubTotal * Branch.Value / 100;
-                CGST = SubTotal * Branch.Value / 100;
+                SGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                CGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
                 grandTotal = SubTotal + SGST + CGST - DiscountAmount;
 
             }
@@ -3004,113 +3005,169 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             }
         },
 
-    onFileNameLinkPress: function (oEvent) {
-            function autoDecodeBase64(b64) {
-                b64 = b64.replace(/\s/g, "");
-                let last = b64;
+   onFileNameLinkPress: function (oEvent) {
 
-                // Try decoding multiple times (max 5 to prevent infinite loop)
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        if (last.startsWith("iVB") || last.startsWith("/9j")) {
-                            return decoded;
-                        }
-                        let decoded = atob(last);
+    function autoDecodeBase64(b64) {
+        if (!b64) return "";
+        b64 = b64.replace(/\s/g, "");
+        let last = b64;
 
-                        // If decoded looks like IMAGE base64 → return
-
-                        // Continue decoding if possible
-                        last = decoded;
-                    } catch (e) {
-                        break;
-                    }
+        for (let i = 0; i < 5; i++) {
+            try {
+                if (
+                    last.startsWith("iVB") ||    // PNG
+                    last.startsWith("/9j") ||    // JPG
+                    last.startsWith("JVBER")     // PDF
+                ) {
+                    return last;
                 }
-
-                return last;
+                last = atob(last);
+            } catch (e) {
+                break;
             }
+        }
+        return last;
+    }
 
-            // Get document from model
-            var oContext = oEvent.getSource().getBindingContext("CustomerData");
-            var oDoc = oContext.getObject();
+    const oDoc = oEvent.getSource()
+        .getBindingContext("CustomerData")
+        ?.getObject();
 
-            if (!oDoc) {
-                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
-                return;
+    if (!oDoc || !(oDoc.FileContent || oDoc.File)) {
+        sap.m.MessageToast.show("No document found");
+        return;
+    }
+
+    const sBase64 = autoDecodeBase64(oDoc.FileContent || oDoc.File);
+
+    let sMimeType = "application/octet-stream";
+    let isPDF = false;
+
+    if (sBase64.startsWith("iVB")) {
+        sMimeType = "image/png";
+    } else if (sBase64.startsWith("/9j")) {
+        sMimeType = "image/jpeg";
+    } else if (sBase64.startsWith("JVBER")) {
+        sMimeType = "application/pdf";
+        isPDF = true;
+    }
+
+    /* ================= IMAGE PREVIEW ================= */
+    if (sMimeType.startsWith("image/")) {
+
+        const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+
+        if (!this._oDocPreviewDialog) {
+
+            const oFlex = new sap.m.FlexBox({
+                width: "100%",
+                height: "100%",
+                justifyContent: "Center",
+                alignItems: "Center",
+                items: [
+                    new sap.m.Image({
+                        id: this.createId("docPreviewImage"),
+                        densityAware: false,
+                        width: "100%",
+                        height: "100%"
+                    })
+                ]
+            });
+
+            this._oDocPreviewDialog = new sap.m.Dialog({
+                title: oDoc.FileName || "Document Preview",
+                contentWidth: "50%",
+                contentHeight: "60%",
+                draggable: true,
+                resizable: true,
+                contentPadding: "0rem",
+                content: [oFlex],
+                beginButton: new sap.m.Button({
+                    text: "Close",
+                    press: () => this._oDocPreviewDialog.close()
+                }),
+                afterClose: () => {
+                    this._oDocPreviewDialog.destroy();
+                    this._oDocPreviewDialog = null;
+                }
+            });
+
+            this.getView().addDependent(this._oDocPreviewDialog);
+        }
+
+        this.byId("docPreviewImage").setSrc(sImageSrc);
+        this._oDocPreviewDialog.open();
+        return;
+    }
+
+    /* ================= PDF PREVIEW ================= */
+    if (isPDF) {
+
+        if (!this._oDocPreviewDialog) {
+            this._oDocPreviewDialog = new sap.m.Dialog({
+                title: oDoc.FileName || "Document Preview",
+                stretch: true,
+                draggable: true,
+                resizable: true,
+                contentPadding: "0rem",
+                endButton: new sap.m.Button({
+                    text: "Close",
+                    press: () => {
+                        if (this._previewUrl) {
+                            URL.revokeObjectURL(this._previewUrl);
+                            this._previewUrl = null;
+                        }
+                        this._oDocPreviewDialog.close();
+                    }
+                }),
+                afterClose: () => {
+                    this._oDocPreviewDialog.destroy();
+                    this._oDocPreviewDialog = null;
+                }
+            });
+
+            this.getView().addDependent(this._oDocPreviewDialog);
+        }
+
+        this._oDocPreviewDialog.removeAllContent();
+
+        const byteCharacters = atob(sBase64);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+            const slice = byteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
             }
-            var sBase64 = oDoc.FileContent || oDoc.File;
+            byteArrays.push(new Uint8Array(byteNumbers));
+        }
 
-            if (!sBase64) {
-                sap.m.MessageBox.error(this.i18nModel.getText("noImageFoundforthisDocument"));
-                return;
-            }
+        const blob = new Blob(byteArrays, { type: sMimeType });
 
-            // Auto fix decoding
-            var fixed = autoDecodeBase64(sBase64);
+        if (this._previewUrl) {
+            URL.revokeObjectURL(this._previewUrl);
+        }
+        this._previewUrl = URL.createObjectURL(blob);
 
-            // Now detect type
-            let finalSrc = "";
+        this._oDocPreviewDialog.addContent(
+            new sap.ui.core.HTML({
+                sanitizeContent: false,
+                content: `
+                    <iframe
+                        src="${this._previewUrl}"
+                        style="width:100%; height:600px; border:none;">
+                    </iframe>
+                `
+            })
+        );
 
-            if (fixed.startsWith("iVB")) {
-                finalSrc = "data:image/png;base64," + fixed;
-            } else if (fixed.startsWith("/9j")) {
-                finalSrc = "data:image/jpeg;base64," + fixed;
-            } else {
-                finalSrc = fixed
+        this._oDocPreviewDialog.open();
+        return;
+    }
 
-            }
-
-            // Create or reuse dialog
-            if (!this._oDocPreviewDialog) {
-                var oFlex = new sap.m.FlexBox({
-                    width: "100%",
-                    height: "100%",
-                    renderType: "Div",
-                    justifyContent: "Center",
-                    alignItems: "Center",
-                    items: [
-                        new sap.m.Image({
-                            id: this.createId("docPreviewImage"),
-                            densityAware: false,
-                            width: "100%",
-                            height: "100%",
-                            style: "object-fit: contain; display:block;"
-                        })
-                    ]
-                });
-
-                this._oDocPreviewDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || "Document Image",
-                    contentWidth: "50%",
-                    contentHeight: "60%",
-                    draggable: true,
-                    resizable: true,
-                    contentPadding: "0rem",
-                    horizontalScrolling: false,
-                    verticalScrolling: true,
-                    content: [oFlex],
-
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            this._oDocPreviewDialog.close();
-                        }.bind(this)
-                    }),
-
-                    afterClose: function () {
-                        this._oDocPreviewDialog.destroy();
-                        this._oDocPreviewDialog = null;
-                    }.bind(this)
-                });
-
-                this.getView().addDependent(this._oDocPreviewDialog);
-            } else {
-                this._oDocPreviewDialog.setTitle(oDoc.FileName || "Document Image");
-            }
-
-            // Set final image
-            this.byId("docPreviewImage").setSrc(finalSrc);
-            this._oDocPreviewDialog.open();
-        },
+    sap.m.MessageToast.show("Preview not supported");
+},
 
         onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
@@ -3403,6 +3460,8 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                 oView.addDependent(this.GST_Dialog);
             }
             sap.ui.getCore().byId("idBranchGSTNumber").setValueState("None").setValue(CustData.GSTIN || "");
+            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue(CustData.GSTNumber || "");
+
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
             sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
 
@@ -3528,7 +3587,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                     {
                         "GSTType": sValue,
                         "GSTValue": Percentage,
-                        "GSTIN": oInput?oInput.getValue().trim().toUpperCase() : CustData.GSTIN || ""
+                        "CustomerGSTIN": oInput?oInput.getValue().trim().toUpperCase() : CustData.GSTIN || ""
                     }
 
                 sap.ui.core.BusyIndicator.show(0);
