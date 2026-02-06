@@ -77,7 +77,7 @@
                 />
                 <u:FileUploader
                     id="BT_id_FileUploader"
-                    fileType="jpg,jpeg,png"
+                    fileType="jpg,jpeg,png,PDF"
                     sameFilenameAllowed="false"
                     change="onFacilityFileChange"
                     visible="{VisibleModel>/visible}"

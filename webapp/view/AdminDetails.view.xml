@@ -21,7 +21,7 @@
             <content>
                 <VBox class="sapUiSmallMargin">
                     <Title
-                        text="{i18n>hostelBooking}"
+                        text="{i18n>hostelBooking} ( {CustomerData>/BranchName} )"
                         class="boldBlackText sapUiSmallMarginBottom"
                     />
                     <!-- Responsive Booking Status and Buttons -->
@@ -121,9 +121,9 @@
                             />
 
                             <Button
-                                text="{i18n>save}"
+                                text="Submit"
                                 id="idsave"
-                                tooltip="{i18n>save}"
+                                tooltip="Submit"
                                 press="onSaveBooking"
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
@@ -956,15 +956,17 @@
                                     />
                                     <!-- <Text text="{CustomerData>UnitText}" /> -->
                                     <Text
-                                        text="{= ${CustomerData>UnitText} === 'Per Hour'  ? ${CustomerData>UnitText} + ' (' + ${CustomerData>TotalHour} + ')' : ${CustomerData>UnitText}
-                                            }"
+                                        text="{CustomerData>UnitText}"
                                     />
-                    <Text
+                      <Text
     text="{= (${CustomerData>UnitText} === 'Per Month') 
         ? ${CustomerData>TotalMonths} + ' ' + (${CustomerData>TotalMonths} === 1 ? 'Month' : 'Months')
         : (${CustomerData>UnitText} === 'Per Year') 
             ? ${CustomerData>TotalYears} + ' ' + (${CustomerData>TotalYears} === 1 ? 'Year' : 'Years')
-            : ${CustomerData>TotalDays} + ' ' + (${CustomerData>TotalDays} === 1 ? 'Day' : 'Days') }" />
+            : ${CustomerData>UnitText}==='Per Day' ?
+             ${CustomerData>TotalDays} + ' ' + (${CustomerData>TotalDays} === 1 ? 'Day' : 'Days') : 
+              ${CustomerData>TotalHour} + ' ' + (${CustomerData>TotalHour} === 1 ? 'Hour' : 'Hours') }" />
+
 
 
 

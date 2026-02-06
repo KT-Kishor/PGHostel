@@ -213,11 +213,14 @@
                                                                 label="{i18n>city}"
                                                                 groupName="Group1"
                                                                 visibleInFilterBar="true"
+                                                                mandatory="true"
+                                                                
                                                             >
                                                                 <fb:control>
                                                                     <ComboBox
                                                                         id="id_Branch"
                                                                         placeholder="{i18n>cityValueText}"
+                                                                        valueStateText="{i18n>pleaseSelectCity}"
                                                                         showClearIcon="true"
                                                                         busyIndicatorDelay="0"
                                                                         enabled="true"
@@ -347,10 +350,12 @@
                                                                                     maxValue="5"
                                                                                     enabled="false"
                                                                                     iconSize="0.8rem"
+                                                                                    visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                                                                 />
                                                                                 <Text
                                                                                     text="({VisibilityModel>TotalFeedbacks})"
                                                                                     class="ratingCountText"
+                                                                                    visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                                                                 />
                                                                             </HBox>
                                                                         </VBox>
@@ -364,6 +369,7 @@
                                                                         text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
                                                                         class="bedCardTitle"
                                                                     />
+                                                                    
                                                                     <Text
                                                                         text="{VisibilityModel>Description}"
                                                                         class="bedCardDesc"

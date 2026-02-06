@@ -2720,6 +2720,8 @@ sap.ui.define([
         },
 
         onBranchSelectionChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
             const oView = this.getView();
             const oAreaCombo = oView.byId("id_Area");
             const oRoomType = oView.byId("id_Roomtype");
@@ -2752,7 +2754,6 @@ sap.ui.define([
 
         // 🔹 When Area is selected, enable Room Type combo
         onAreaSelectionChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
             const oRoomType = this.byId("id_Roomtype");
             const oSelectedItem = oEvent.getSource().getSelectedItem();
@@ -2776,6 +2777,7 @@ sap.ui.define([
             if (!oBranchcity) {
                 MessageToast.show(this.i18nModel.getText("pleaseSelectCity"));
                 oContainer.setBusy(false);
+                this.byId("id_Branch").setValueState("Error");
                 return;
             }
 

@@ -604,11 +604,10 @@ HM_UnassignRoom: function () {
     /* ================= VALIDATIONS ================= */
 
     if (ID.Status === "New") {
-           var bIsCash = PaymentMode === "Cash";
         if (
             !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
             !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
-            (!bIsCash && !utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID")) ||
+            (!utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID")) ||
             !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
         ) {
             sap.m.MessageToast.show(
@@ -675,7 +674,7 @@ HM_UnassignRoom: function () {
 
     /* ================= PAYLOAD ================= */
 
-    if(DepositAmount > this.Deposit){
+    if(Number(DepositAmount) > Number(this.Deposit)){
         sap.m.MessageToast.show("Deposit amount cannot be more than the required deposit of "+this.Deposit);
         return;
     }
@@ -975,13 +974,6 @@ HM_UnassignRoom: function () {
 
         onPaymentModeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-            var value=oEvent.getSource().getValue();
-            if(value==="Cash"){
-              sap.ui.getCore().byId("id_TransactionID").setEnabled(false).setValue("");
-            }else{
-                sap.ui.getCore().byId("id_TransactionID").setEnabled(true);
-            }
-            
         },
         onRoomNoChange:function(oEvent){
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");

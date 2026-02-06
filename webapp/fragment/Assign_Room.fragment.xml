@@ -96,19 +96,16 @@
                 </ComboBox>
 
                   <Label
-                    text="Transaction ID"
-                        required="{= ${HostelModel>/PaymentMode} === 'Cash' ? false : true }"
+                    text="Transaction / Person Name"
                 />
                 <Input
                     id="id_TransactionID"
-                    placeholder="Enter Transaction ID"
+                    placeholder="Enter Transaction / Person Name"
                     value="{HostelModel>/TransactionID}"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
-                    valueStateText="Enter transaction ID"
+                    valueStateText="Enter Transaction / Person Name"
                     maxLength="20"
-                    enabled="{= ${HostelModel>/PaymentMode} === 'Cash' ? false : true }"
-                  
 
                 />
 

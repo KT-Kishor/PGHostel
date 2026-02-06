@@ -363,9 +363,10 @@ sap.ui.define([
                     PaymentPaid: Paymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
-                    GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
-                    GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
-                    GSTIN: oCustomer.Bookings?.[0]?.GSTIN || "",
+                    GSTType: Branch.Type|| "",
+                    GSTValue: Branch.Value || "",
+                    GSTIN: Branch.GSTIN || "",
+                    BranchName: Branch.Name || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -514,7 +515,7 @@ sap.ui.define([
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer);
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,Branch);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -532,7 +533,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount,Branch) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -693,13 +694,13 @@ sap.ui.define([
             let CGST = 0;
             let IGST = 0;
             let grandTotal = 0;
-            if (oCustomer.Bookings?.[0]?.GSTType === "IGST") {
-                IGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+            if (Branch.Type === "IGST") {
+                IGST = SubTotal * Branch.Value / 100;
                 grandTotal = SubTotal + IGST - DiscountAmount;
 
             } else {
-                SGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
-                CGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                SGST = SubTotal * Branch.Value / 100;
+                CGST = SubTotal * Branch.Value / 100;
                 grandTotal = SubTotal + SGST + CGST - DiscountAmount;
 
             }
@@ -2420,7 +2421,7 @@ sap.ui.define([
             var diff = endHour - startHour;
 
             // Format (optional)
-            var formatted = diff.toFixed(2);
+            var formatted = diff;
             oModel.setProperty("/TotalHour", formatted);
         },
 
@@ -3003,7 +3004,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             }
         },
 
-        onFileNameLinkPress: function (oEvent) {
+    onFileNameLinkPress: function (oEvent) {
             function autoDecodeBase64(b64) {
                 b64 = b64.replace(/\s/g, "");
                 let last = b64;
@@ -3394,14 +3395,14 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
         onGSTBooking: function () {
               
               var oCustomerModel = this.getView().getModel("CustomerData")
-                const CustData = this.getView().getModel("CustomerData").getData();
+              const CustData = this.getView().getModel("CustomerData").getData();
 
             if (!this.GST_Dialog) {
                 var oView = this.getView();
                 this.GST_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.GST", this);
                 oView.addDependent(this.GST_Dialog);
             }
-            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue(CustData.GSTIN || "");
+            sap.ui.getCore().byId("idBranchGSTNumber").setValueState("None").setValue(CustData.GSTIN || "");
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
             sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
 
