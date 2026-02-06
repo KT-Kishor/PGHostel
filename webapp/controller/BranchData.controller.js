@@ -367,7 +367,7 @@ sap.ui.define([
                 baseLocation: "",
                 GSTIN: "",
                 Type: "",
-                Value: "",
+                Value: "",  // Start with empty value
                 Penalty: "",
                 CheckinTime: "",
                 CheckoutTime: ""
@@ -1105,6 +1105,8 @@ sap.ui.define([
         },
 
         onMobileLivechnage: function (oEvent) {
+            const taxInput = this.byId("CC_id_custValue");
+            const currentTaxValue = taxInput ? taxInput.getValue() : "";
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(sValue);
@@ -1254,10 +1256,11 @@ sap.ui.define([
             const sValue = oInput.getValue().trim();
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
-            const isEdit = this.getView().getModel("editableModel").getProperty("/isEdit");
+            const taxInput = this.byId("CC_id_custValue");
 
             if (!visiModel.getProperty("/isIndia")) {
                 oInput.setValueState("None");
+                visiModel.setProperty("/CC_id_CustInput", false);
                 return true;
             }
 
@@ -1285,36 +1288,29 @@ sap.ui.define([
             visiModel.setProperty("/CC_id_CustInput", true);
 
             const stateCode = sValue.substring(0, 2);
+            const currentTaxValue = dataModel.getProperty("/Value");
+            const taxInputValue = taxInput ? taxInput.getValue() : "";
 
-            // Only set default values during creation (not edit mode)
-            if (!isEdit) {
-                if (stateCode === "29") {
-                    visiModel.setProperty("/selectedIndex", 0); // CGST
-                    dataModel.setProperty("/Type", "CGST/SGST");
-                    dataModel.setProperty("/Value", "9"); // Default value for creation
-                } else {
-                    visiModel.setProperty("/selectedIndex", 1); // IGST
-                    dataModel.setProperty("/Type", "IGST");
-                    dataModel.setProperty("/Value", "18"); // Default value for creation
-                }
+            // Determine GST type based on state code
+            if (stateCode === "29") {
+                visiModel.setProperty("/selectedIndex", 0); // CGST
+                dataModel.setProperty("/Type", "CGST/SGST");
             } else {
-                // In edit mode, don't override existing values
-                // Just update the radio button selection based on GST type
+                visiModel.setProperty("/selectedIndex", 1); // IGST
+                dataModel.setProperty("/Type", "IGST");
+            }
+
+            // Only set default value if no value exists yet AND user hasn't typed anything
+            if (!currentTaxValue && (!taxInputValue || taxInputValue === "")) {
                 if (stateCode === "29") {
-                    visiModel.setProperty("/selectedIndex", 0); // CGST
-                    dataModel.setProperty("/Type", dataModel.getProperty("/Type") || "CGST/SGST");
-                    // Don't override Value if it's already set
-                    if (!dataModel.getProperty("/Value")) {
-                        dataModel.setProperty("/Value", "9");
-                    }
+                    dataModel.setProperty("/Value", "9");
                 } else {
-                    visiModel.setProperty("/selectedIndex", 1); // IGST
-                    dataModel.setProperty("/Type", dataModel.getProperty("/Type") || "IGST");
-                    // Don't override Value if it's already set
-                    if (!dataModel.getProperty("/Value")) {
-                        dataModel.setProperty("/Value", "18");
-                    }
+                    dataModel.setProperty("/Value", "18");
                 }
+            }
+            // If user has typed something in tax field, keep their input
+            else if (taxInputValue && taxInputValue !== currentTaxValue) {
+                dataModel.setProperty("/Value", taxInputValue);
             }
 
             return true;
@@ -1350,6 +1346,24 @@ sap.ui.define([
                 oInput.setValueState("None");
                 oInput.setValueStateText("");
             }
-        }
+        },
+        onRadioButtonChange: function (oEvent) {
+            const oButtonGroup = oEvent.getSource();
+            const selectedIndex = oButtonGroup.getSelectedIndex();
+            const dataModel = this.getView().getModel("MDmodel");
+            const visiModel = this.getView().getModel("visiblePlay");
+
+            visiModel.setProperty("/selectedIndex", selectedIndex);
+
+            // Update the Type in model based on selection
+            if (selectedIndex === 0) {
+                dataModel.setProperty("/Type", "CGST/SGST");
+            } else if (selectedIndex === 1) {
+                dataModel.setProperty("/Type", "IGST");
+            }
+
+            // Don't override tax percentage value when changing radio button
+            // Keep whatever value user has entered
+        },
     })
 });
