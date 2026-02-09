@@ -315,7 +315,7 @@ sap.ui.define([
                             sap.m.MessageBox.Action.YES,
                             sap.m.MessageBox.Action.NO
                         ],
-                        emphasizedAction: sap.m.MessageBox.Action.NO,
+                        // emphasizedAction: sap.m.MessageBox.Action.NO,
                         onClose: function (sAction) {
                             resolve(sAction === sap.m.MessageBox.Action.YES);
                         }

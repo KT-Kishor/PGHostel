@@ -133,30 +133,46 @@ sap.ui.define([
                 oView.setModel(new JSONModel(), "ManageInvoiceItemModel");
                 // this.byId("CID_id_TableInvoiceItem").setMode("Delete");
                 this.Update = false;
-                await this.onSearch();
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                     const sCustomerID = oNavCtx?.getProperty("/CustomerID");
-                    const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
+                    const sBookingID  = oNavCtx?.getProperty("/BookingID");
 
-                    if (sCustomerID) {
+                    const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
+                    const oBookingCombo  = this.byId("CID_id_AddBooking");
+
+                    if (sCustomerID && sBookingID) {
                         oCustomerCombo.setSelectedKey(null);
+                        oBookingCombo.setSelectedKey(null);
                         sap.ui.getCore().applyChanges();
 
-                        oCustomerCombo.setSelectedKey(sCustomerID);
-                        this.SelectKey = sCustomerID;
+                        oCustomerCombo.setSelectedKey(sCustomerID); // Set selected keys
+                        oBookingCombo.setSelectedKey(sBookingID);
+                        this.SelectKey = sCustomerID;  // Store customer for booking 
+                        oCustomerCombo.setEditable(false);  // Lock customer selection
 
-                        //  Lock only for Room Assign flow
-                        oCustomerCombo.setEditable(false);
+                        const bookingData = [{
+                            BookingID: sBookingID,
+                            Status: "Assigned"
+                        }];
+                        this.getView().setModel(new sap.ui.model.json.JSONModel(bookingData), "BookingModel");
 
-                        await this.onChangeAddCustomer({
-                            getSource: () => oCustomerCombo
+                        // Clear invoice items before loading
+                        this.getView().setModel(new sap.ui.model.json.JSONModel({
+                            ManageInvoiceItem: []
+                        }), "ManageInvoiceItemModel");
+
+                        await this.onChangeBookingID({
+                            getSource: () => oBookingCombo
                         });
 
-                        // Clear nav context AFTER use
+                        // Clear navigation context
                         oNavCtx.setProperty("/CustomerID", "");
-                    } else {
+                        oNavCtx.setProperty("/BookingID", "");
+                    } 
+                    else {
                         oCustomerCombo.setEditable(true);
+                        await this.onSearch(); 
                     }
                     sap.ui.core.BusyIndicator.hide();
                     return;

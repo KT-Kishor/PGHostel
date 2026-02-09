@@ -734,7 +734,9 @@ HM_UnassignRoom: function () {
 
         this.getOwnerComponent().setModel(
             new sap.ui.model.json.JSONModel({
-                CustomerID: ID.CustomerID
+                CustomerID: ID.CustomerID,
+                BookingID : ID.BookingID,
+                Status: "Assigned"
             }),
             "InvoiceNavContext"
         );
