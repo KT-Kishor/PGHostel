@@ -1,0 +1,41 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.CustomerReview"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.f"
+    xmlns:et="sap.m"
+    xmlns:card="sap.ui.integration.widgets"
+>
+    <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Title
+                    text="Customer's Review"
+                    level="H3"
+                />
+                <m:ScrollContainer
+                    horizontal="true"
+                    vertical="false"
+                    class="sapUiResponsiveContentPadding"
+                >
+                    <m:FlexBox
+                        id="CR_id_ReviewContainer"
+                        direction="Row"
+                        wrap="Wrap"
+                        alignItems="Start"
+                        class="reviewFlex"
+                    />
+                </m:ScrollContainer>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

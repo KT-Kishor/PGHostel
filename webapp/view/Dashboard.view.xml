@@ -39,7 +39,7 @@
                             items="{path: 'todayModel>'}"
                             direction="Row"
                             wrap="Wrap"
-                            justifyContent="SpaceBetween"
+                            justifyContent="Start"
                             class="todayCardsRow"
                         >
                             <Panel

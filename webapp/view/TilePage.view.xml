@@ -210,7 +210,7 @@
                 >
                     <TileContent unit="{i18n>customerReview}">
                         <ImageContent
-                            src="sap-icon://business-objects-experience"
+                            src="sap-icon://crm-sales"
                         />
                     </TileContent>
                 </GenericTile>

@@ -4286,3 +4286,9 @@ height:140px;
     height: 100% !important;
     display: block;
 }
+
+.reviewFlex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
