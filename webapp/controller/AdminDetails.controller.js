@@ -1049,6 +1049,8 @@ sap.ui.define([
             var oCustomerData = oCustomerModel.getData();
             var oPayload = this.getView().getModel("edit").getData();
 
+            oPayload.CouponCode= oPayload.CouponCode ?  oPayload.CouponCode :sap.ui.getCore().byId("ID_editCouponCode").getValue() || "" ;
+
             if (oPayload.UnitText === "Per Month") {
                 var Month = sap.ui.getCore().byId("idMonthYearSelectFragment").getSelectedKey();
                 oPayload.TotalHour = Month || "1";
@@ -1122,6 +1124,11 @@ sap.ui.define([
 
                 if (oCustomerData.minEndDate <= new Date(this._parseDate(oPayload.EndDate))) {
                     sap.m.MessageToast.show(this.i18nModel.getText("facilityEndDateExceedsBookingEndDate"));
+                    return;
+                }
+
+                if(oPayload.CouponDiscount==="" && oPayload.CouponCode){
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseapplycouponcode"));
                     return;
                 }
 
@@ -2563,7 +2570,7 @@ sap.ui.define([
 
         onSaveBooking: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
-            var CustomerData = this.getView().getModel("CustomerData").getData();
+            var CustomerData = this.getView().getModel("CustomerData").getData();   
             const oInput = this.byId("CD_ID_idPhone")
 
             // Mandatory validation
@@ -3277,6 +3284,9 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var edit = this.getView().getModel("edit").getData();
 
+ 
+
+
             var sEnteredCode = edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode").getValue();
             if (!sEnteredCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
@@ -3288,7 +3298,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                 Status: "Active"
             };
             sap.ui.core.BusyIndicator.show(0);
-            await this.ajaxReadWithJQuery("HM_Coupon", filter).then((oData) => {
+            await this.ajaxReadWithJQuery("HM_CouponFacilityCount", filter).then((oData) => {
                 var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(aCoupon);
                 this.getView().setModel(model, "CouponModel")
@@ -3303,6 +3313,47 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                 sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
                 return;
             }
+            var bCouponLimitReached = false;
+
+  if (oCouponData) {
+    for (let i = 0; i < oCustomerData.AllSelectedFacilities.length; i++) {
+        let item = oCustomerData.AllSelectedFacilities[i];
+
+        if (item.CouponCode) {
+
+            var oCoupon = oCouponData.find(c => c.CouponCode === item.CouponCode);
+            if (!oCoupon) {
+                continue;
+            }
+
+            // Count coupon usage in AllSelectedFacilities
+            var iUsedCount = oCustomerData.AllSelectedFacilities.filter(f =>
+                f.CouponCode === item.CouponCode
+            ).length;
+
+            if (iUsedCount === Number(oCoupon.MaxUses)) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText(
+                        "couponUsageLimitReached",  
+                        [oCoupon.MaxUses]
+                    )
+                );
+
+                bCouponLimitReached = true;
+                break; 
+            }
+        }
+    }
+}
+
+if (bCouponLimitReached) {
+    return;
+}
+            if(Number(oCoupon.MaxUses)===oCoupon.couponUsedCount){
+                sap.m.MessageToast.show(this.i18nModel.getText("couponUsageLimitReached"));
+                return;
+            }
+
             if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
                 return;
@@ -3507,7 +3558,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             ) {
                 var oCustomerModel = this.getView().getModel("CustomerData")
                 const CustData = this.getView().getModel("CustomerData").getData();
-                const oInput = sap.ui.getCore().byId(this.getView().createId("idGSTNumber")) || "";
+                const oInput = sap.ui.getCore().byId("idGSTNumber").getValue() || "";
               
                 var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
                 var oRadioGroup = sap.ui.getCore().byId("idGSTType");
@@ -3587,7 +3638,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
                     {
                         "GSTType": sValue,
                         "GSTValue": Percentage,
-                        "CustomerGSTIN": oInput?oInput.getValue().trim().toUpperCase() : CustData.GSTIN || ""
+                        "CustomerGSTIN": oInput?oInput.trim().toUpperCase() : CustData.GSTNumber || ""
                     }
 
                 sap.ui.core.BusyIndicator.show(0);
