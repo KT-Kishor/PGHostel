@@ -921,18 +921,21 @@ sap.ui.define([
 
                 const paidAmount   = Number(oSelectedCustomerModel.PaidAmount) || 0;
                 const totalAmount  = Number(oSelectedCustomerModel.TotalAmount) || 0;
+                const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
                 let sFinalStatus = "Submitted";
 
                 if (paidAmount === totalAmount) {
                     sFinalStatus = "Payment Received";
                 } 
+                else if (balanceAmount === totalAmount) {
+                    sFinalStatus = "Submitted";
+                }
                 else if (paidAmount < totalAmount) {
                     sFinalStatus = "Payment Partially";
                 } 
                 else if (paidAmount > totalAmount) {
                     sFinalStatus = "Refund Due";
-                }
-
+                } 
 
                 const oPayload = {
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
