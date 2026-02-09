@@ -15,6 +15,8 @@ sap.ui.define([
                 BranchID: "",
                 Name: "",
                 Address: "",
+                Latitude: "", 
+                Longitude: "",  
                 Pincode: "",
                 Contact: "",
                 stdCode: "",
@@ -225,6 +227,16 @@ sap.ui.define([
                 property: "Address",
                 type: "string"
             },
+                {
+                    label: "Latitude",      // Add this
+                    property: "Latitude",
+                    type: "string"
+                },
+                {
+                    label: "Longitude",     // Add this
+                    property: "Longitude",
+                    type: "string"
+                },
             {
                 label: "Pincode",
                 property: "Pincode",
@@ -359,6 +371,8 @@ sap.ui.define([
             oView.getModel("MDmodel").setData({
                 Name: "",
                 Address: "",
+                Latitude: "",      
+                Longitude: "", 
                 Pincode: "",
                 Contact: "",
                 stdCode: "",
@@ -387,20 +401,93 @@ sap.ui.define([
             const oUpload = oView.getModel("UploadModel").getData();
             var oFacilitiesModel = oView.getModel("MDmodel");
             var Payload = oFacilitiesModel.getData();
+
+            // First validate all mandatory fields
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idLatitude")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idLongitude")), "ID") &&
                 utils._LCvalidatePinCode(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID")) &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID")
+            );
+
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
+
+            // ===== ADD THIS COORDINATE VALIDATION SECTION =====
+            const oLatitude = sap.ui.getCore().byId(oView.createId("BD_idLatitude"));
+            const oLongitude = sap.ui.getCore().byId(oView.createId("BD_idLongitude"));
+
+            // Validate latitude format and range
+            const latValue = Payload.Latitude.trim();
+            const latDecimalPattern = /^-?\d+(\.\d+)?$/;
+
+            if (!latDecimalPattern.test(latValue)) {
+                oLatitude.setValueState("Error");
+                oLatitude.setValueStateText("Enter a valid decimal latitude (e.g. 19.22222)");
+                oLatitude.focus();
+                sap.m.MessageToast.show("Please enter a valid latitude coordinate");
+                return;
+            }
+
+            const latNum = Number(latValue);
+            if (isNaN(latNum) || latNum < -90 || latNum > 90) {
+                oLatitude.setValueState("Error");
+                oLatitude.setValueStateText("Latitude must be between -90 and 90");
+                oLatitude.focus();
+                sap.m.MessageToast.show("Latitude must be between -90 and 90");
+                return;
+            }
+
+            // Validate longitude format and range
+            const lonValue = Payload.Longitude.trim();
+            const lonDecimalPattern = /^-?\d+(\.\d+)?$/;
+
+            if (!lonDecimalPattern.test(lonValue)) {
+                oLongitude.setValueState("Error");
+                oLongitude.setValueStateText("Enter a valid decimal longitude (e.g. 72.8777)");
+                oLongitude.focus();
+                sap.m.MessageToast.show("Please enter a valid longitude coordinate");
+                return;
+            }
+
+            const lonNum = Number(lonValue);
+            if (isNaN(lonNum) || lonNum < -180 || lonNum > 180) {
+                oLongitude.setValueState("Error");
+                oLongitude.setValueStateText("Longitude must be between -180 and 180");
+                oLongitude.focus();
+                sap.m.MessageToast.show("Longitude must be between -180 and 180");
+                return;
+            }
+
+            // Check if values have too many decimal places (optional)
+            const latDecimalPlaces = (latValue.split('.')[1] || '').length;
+            const lonDecimalPlaces = (lonValue.split('.')[1] || '').length;
+
+            if (latDecimalPlaces > 8 || lonDecimalPlaces > 8) {
+                oLatitude.setValueState("Error");
+                oLatitude.setValueStateText("Maximum 8 decimal places allowed");
+                oLatitude.focus();
+                sap.m.MessageToast.show("Maximum 8 decimal places allowed for coordinates");
+                return;
+            }
+
+            // Ensure both fields pass validation state
+            if (oLatitude.getValueState() === "Error" || oLongitude.getValueState() === "Error") {
+                sap.m.MessageToast.show("Please correct the coordinate values");
+                return;
+            }
+            // ===== END COORDINATE VALIDATION SECTION =====
+
+            // Rest of your existing validations...
             const oMobile = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
             if (!oMobile.getValue()) {
                 oMobile.setValueState("Error");
@@ -412,6 +499,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("Please enter a valid mobile number");
                 return;
             }
+
             const oCurrency = sap.ui.getCore().byId(oView.createId("Bd_id_DepositCurrency"));
             if (!oCurrency.getSelectedKey()) {
                 oCurrency.setValueState("Error");
@@ -438,9 +526,11 @@ sap.ui.define([
                 sap.m.MessageToast.show("Please correct the Penalty amount");
                 return;
             }
+
             const aCountries = this.getOwnerComponent().getModel("CountryModel").getData();
             const aStates = this.getOwnerComponent().getModel("StateModel").getData();
             const aCities = this.getOwnerComponent().getModel("CityModel").getData();
+
             let validState = aStates.some(s =>
                 s.stateName === Payload.state &&
                 s.countryCode === aCountries.find(c => c.countryName === Payload.country)?.code
@@ -451,6 +541,7 @@ sap.ui.define([
                 sap.ui.getCore().byId(oView.createId("MC_id_State")).setValueState("Error");
                 return;
             }
+
             let validCity = aCities.some(c =>
                 c.cityName === Payload.baseLocation &&
                 c.stateName === Payload.state &&
@@ -466,6 +557,8 @@ sap.ui.define([
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
                 Address: Payload.Address,
+                Latitude: Payload.Latitude,
+                Longitude: Payload.Longitude,
                 Pincode: Payload.Pincode,
                 Contact: Payload.Contact,
                 STD: Payload.stdCode,
@@ -483,6 +576,7 @@ sap.ui.define([
                 CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
             };
+
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const aMainData = oView.getModel("mainModel").getData() || [];
@@ -492,7 +586,6 @@ sap.ui.define([
                         data: oData,
                         filters: {
                             BranchID: Payload.BranchID
-                            // UserID: oData.UserID
                         }
                     });
                 } else {
@@ -506,7 +599,7 @@ sap.ui.define([
                 await this.Onsearch();
                 this.oDialog.close();
                 sap.m.MessageToast.show(
-                    this.isEdit  ? this.i18nModel.getText("branchUpdatedSuccessfully")
+                    this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully")
                         : this.i18nModel.getText("branchaddedSuccessfully")
                 );
             } catch (err) {
@@ -549,7 +642,7 @@ sap.ui.define([
         _resetFacilityValueStates: function () {
             var oView = this.getView();
             var aFields = [
-                "idBranch", "idBName", "idAddress",
+                "idBranch", "idBName", "idAddress", "idLatitude", "idLongitude",   // Add Latitude/Longitude
                 "idPin", "idPhone", "idPenalty"
             ];
 
@@ -819,6 +912,8 @@ sap.ui.define([
                 BranchID: oData.BranchID,
                 Name: oData.Name,
                 Address: oData.Address,
+                Latitude: oData.Latitude, 
+                Longitude: oData.Longitude, 
                 Pincode: oData.Pincode,
                 Contact: oData.Contact,
                 stdCode: oData.STD,
@@ -873,6 +968,8 @@ sap.ui.define([
             const mControls = {
                 BD_idBName: "enterBranchName",
                 BD_idAddress: "enterAddress",
+                BD_idLatitude: "enterLatitude",      
+                BD_idLongitude: "enterLongitude",    
                 BD_idPin: "enterPincode",
                 MC_id_Country: "selectCountry",
                 MC_id_State: "selectState",
@@ -1364,6 +1461,116 @@ sap.ui.define([
 
             // Don't override tax percentage value when changing radio button
             // Keep whatever value user has entered
-        },
+            
+        }, 
+        
+
+        onLatitudeInputLiveChange: function (oEvent) {
+    const oInput = oEvent.getSource();
+    let value = oInput.getValue().trim();
+
+    utils._LCvalidateMandatoryField(oEvent);
+
+    if (!value) {
+        oInput.setValueState("None");
+        return;
+    }
+
+    // Clean the input - remove any non-numeric characters except decimal point and minus
+    value = value.replace(/[^0-9.\-]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Ensure minus sign is at the beginning and only once
+    if (value.includes('-')) {
+        const minusCount = (value.match(/-/g) || []).length;
+        if (minusCount > 1 || value.indexOf('-') > 0) {
+            value = value.replace(/-/g, '');
+            if (value.startsWith('-') || value === '') {
+                value = '-' + value.replace(/-/g, '');
+            }
+        }
+    }
+    
+    oInput.setValue(value);
+
+    const decimalPattern = /^-?\d+(\.\d+)?$/;
+
+    if (!decimalPattern.test(value)) {
+        oInput.setValueState("Error");
+        oInput.setValueStateText("Enter a valid decimal latitude (e.g. 19.22222)");
+        return;
+    }
+
+    const lat = Number(value);
+
+    if (lat < -90 || lat > 90) {
+        oInput.setValueState("Error");
+        oInput.setValueStateText("Latitude must be between -90 and 90");
+        return;
+    }
+
+    oInput.setValueState("None");
+},
+
+onLongitudeInputLiveChange: function (oEvent) {
+    const oInput = oEvent.getSource();
+    let value = oInput.getValue().trim();
+
+    utils._LCvalidateMandatoryField(oEvent);
+
+    if (!value) {
+        oInput.setValueState("None");
+        return;
+    }
+
+    // Clean the input - remove any non-numeric characters except decimal point and minus
+    value = value.replace(/[^0-9.\-]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Ensure minus sign is at the beginning and only once
+    if (value.includes('-')) {
+        const minusCount = (value.match(/-/g) || []).length;
+        if (minusCount > 1 || value.indexOf('-') > 0) {
+            value = value.replace(/-/g, '');
+            if (value.startsWith('-') || value === '') {
+                value = '-' + value.replace(/-/g, '');
+            }
+        }
+    }
+    
+    oInput.setValue(value);
+
+    const decimalPattern = /^-?\d+(\.\d+)?$/;
+
+    if (!decimalPattern.test(value)) {
+        oInput.setValueState("Error");
+        oInput.setValueStateText("Enter a valid decimal longitude (e.g. 72.8777)");
+        return;
+    }
+
+    const lng = Number(value);
+
+    if (lng < -180 || lng > 180) {
+        oInput.setValueState("Error");
+        oInput.setValueStateText("Longitude must be between -180 and 180");
+        return;
+    }
+
+    oInput.setValueState("None");
+}
+
+
+  
+
     })
 });

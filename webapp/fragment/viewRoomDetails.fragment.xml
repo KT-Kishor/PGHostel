@@ -114,10 +114,11 @@
                 
                 
                 
+<!-- Replace the existing HBox section with this enhanced version -->
 <HBox
     class="AddressBox AddressInline sapUiSmallMarginBegin sapUiMediumMarginEnd"
     alignItems="Center"
-    renderType="Bare" 
+    renderType="Bare"
 >
     <core:Icon
         src="sap-icon://addresses"
@@ -125,12 +126,16 @@
         class="AddressIcon"
     />
 
-    <Text
+    <Link
         text="{HostelModel>/Address}"
         class="AddressTextLarge"
         wrapping="true"
+        press=".onAddressClick"
+        tooltip="Open in Google Maps"
     />
 </HBox>
+
+
 
 
 

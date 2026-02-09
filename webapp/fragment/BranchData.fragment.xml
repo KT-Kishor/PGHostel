@@ -56,6 +56,31 @@
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
                 />
+                <!-- Add Latitude and Longitude fields after the Address field -->
+                <Label
+                    text="{i18n>latitude}"
+                    required="true"
+                />
+                <Input
+                    id="BD_idLatitude"
+                    value="{MDmodel>/Latitude}"
+                    placeholder="{i18n>enterLatitude}"
+                    maxLength="11"
+                    liveChange="onLatitudeInputLiveChange"
+                    valueStateText="{i18n>enterLatitude}"
+                />
+                <Label
+                    text="{i18n>longitude}"
+                    required="true"
+                />
+                <Input
+                    id="BD_idLongitude"
+                    value="{MDmodel>/Longitude}"
+                    placeholder="{i18n>enterLongitude}"
+                    maxLength="11"
+                    liveChange="onLongitudeInputLiveChange"
+                    valueStateText="{i18n>enterLongitude}"
+                />
                 <Label
                     text="{i18n>pinCode}"
                     required="true"
@@ -324,21 +349,21 @@
             </f:content>
         </f:SimpleForm>
         <beginButton>
-                <Button
-                    id="BD_id_saveButoon"
-                    text="{i18n>save}"
-                    tooltip="{i18n>save}"
-                    class="myUnifiedBtn"
-                    press="MD_onSaveButtonPress"
-                />
-                </beginButton>
-                <endButton>
-                <Button
-                    text="{i18n>CancelButton}"
-                    tooltip="{i18n>CancelButton}"
-                    class="myUnifiedBtn"
-                    press="MD_onCancelButtonPress"
-                />
-                </endButton>
+            <Button
+                id="BD_id_saveButoon"
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                class="myUnifiedBtn"
+                press="MD_onSaveButtonPress"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                class="myUnifiedBtn"
+                press="MD_onCancelButtonPress"
+            />
+        </endButton>
     </Dialog>
 </c:FragmentDefinition>
