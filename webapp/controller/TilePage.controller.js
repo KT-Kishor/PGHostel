@@ -107,23 +107,54 @@ sap.ui.define([
             oRouter.navTo("RouteCustomerReview");
         },
 
+        // onStartGuide: function () {
+        //     if (!this._oGuideDialog) {
+        //         this._oGuideDialog = new sap.m.Dialog({
+        //             title: "Steps to Know",
+        //             contentWidth: "40vw",
+        //             contentHeight: "auto",
+        //             resizable: true,
+        //             draggable: true,
+        //             content: [
+        //                 new sap.m.Image({
+        //                     src: "image/u11.png",
+        //                     width: "100%",
+        //                     height: "1000%",
+        //                     decorative: false,
+        //                     densityAware: false,
+        //                     style: "object-fit: cover; display:block; margin:0; padding:0;"
+        //                 })
+        //             ],
+        //             endButton: new sap.m.Button({
+        //                 text: "Close",
+        //                 press: function () {
+        //                     this._oGuideDialog.close();
+        //                 }.bind(this)
+        //             }).addStyleClass("myUnifiedBtn")
+        //         }).addStyleClass("barheader");
+        //         this.getView().addDependent(this._oGuideDialog);
+        //     }
+        //     this._oGuideDialog.open();
+        // },
         onStartGuide: function () {
             if (!this._oGuideDialog) {
+
                 this._oGuideDialog = new sap.m.Dialog({
                     title: "Steps to Know",
-                    contentWidth: "40vw",
-                    contentHeight: "auto",
+                    contentWidth: "60vw",
+                    contentHeight: "36.8vw",
                     resizable: true,
                     draggable: true,
+                    verticalScrolling: false,
+                    horizontalScrolling: false,
                     content: [
                         new sap.m.Image({
                             src: "image/u11.png",
                             width: "100%",
-                            height: "1000%",
+                            height: "100%",
                             decorative: false,
-                            densityAware: false,
-                            style: "object-fit: cover; display:block; margin:0; padding:0;"
-                        })
+                            densityAware: false
+                        }).addStyleClass("PG-fitImage") 
                     ],
                     endButton: new sap.m.Button({
                         text: "Close",
@@ -131,12 +162,12 @@ sap.ui.define([
                             this._oGuideDialog.close();
                         }.bind(this)
                     }).addStyleClass("myUnifiedBtn")
-                }).addStyleClass("barheader");
+                }).addStyleClass("barheader PG-noPaddingDialog"); 
+
                 this.getView().addDependent(this._oGuideDialog);
             }
             this._oGuideDialog.open();
         },
-
         Tile_onHomePress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");

@@ -4271,3 +4271,18 @@ width:270px;
 height:140px;
 }
 }
+/* Dialog ke scroll container ko image ke liye stretch karna */
+.PG-noPaddingDialog .sapMDialogScrollCont {
+    padding: 0 !important;
+    display: flex !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Image ko container ke hisaab se distort (shrink/skew) hone par majboor karna */
+.PG-fitImage {
+    object-fit: fill !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
