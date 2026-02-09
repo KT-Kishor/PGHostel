@@ -68,8 +68,8 @@ sap.ui.define([
                 editable: true,
             }), "visiablityPlay");
 
-            var sPath = oEvent.getParameter("arguments").sPath;
-            this.decodedPath = decodeURIComponent(decodeURIComponent(sPath));
+            var sPath = oEvent.getParameter("arguments").sPath; 
+              this.decodedPath = atob(decodeURIComponent(sPath));
             this.valuestate()
             sap.ui.core.BusyIndicator.show(0);
 
@@ -3050,11 +3050,11 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
     let sMimeType = "application/octet-stream";
     let isPDF = false;
 
-    if (sBase64.startsWith("iVB")) {
+    if (sBase64.startsWith("iVB") || sBase64.includes("image/png")) {
         sMimeType = "image/png";
-    } else if (sBase64.startsWith("/9j")) {
+    } else if (sBase64.startsWith("/9j") || sBase64.includes("image/jpeg")) {
         sMimeType = "image/jpeg";
-    } else if (sBase64.startsWith("JVBER")) {
+    } else if (sBase64.startsWith("JVBER") || sBase64.includes("application/pdf")) {
         sMimeType = "application/pdf";
         isPDF = true;
     }
@@ -3062,7 +3062,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
     /* ================= IMAGE PREVIEW ================= */
     if (sMimeType.startsWith("image/")) {
 
-        const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+        const sImageSrc = sMimeType.includes("data:") ? sBase64 : `data:${sMimeType};base64,${sBase64}`;
 
         if (!this._oDocPreviewDialog) {
 
@@ -3137,8 +3137,12 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
         }
 
         this._oDocPreviewDialog.removeAllContent();
+     let sPdfBase64 = sBase64;
+        if (sPdfBase64.includes("base64,")) {
+            sPdfBase64 = sPdfBase64.split("base64,").pop();
+        }
 
-        const byteCharacters = atob(sBase64);
+        const byteCharacters = atob(sPdfBase64);
         const byteArrays = [];
 
         for (let offset = 0; offset < byteCharacters.length; offset += 512) {
@@ -3175,7 +3179,6 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
 
     sap.m.MessageToast.show("Preview not supported");
 },
-
         onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
@@ -3515,6 +3518,12 @@ if (bCouponLimitReached) {
 
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
             sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
+
+            if(sap.ui.getCore().byId("idBranchGSTNumber").getValue()===""){
+                sap.ui.getCore().byId("idBranchGSTNumber").setVisible(false);
+            }else{
+                sap.ui.getCore().byId("idBranchGSTNumber").setVisible(true);
+            }
 
             this.GST_Dialog.open();
         },

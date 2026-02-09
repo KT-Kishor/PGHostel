@@ -988,12 +988,20 @@ HM_UnassignRoom: function () {
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
-        AD_onPressEditDetails: function (oEvent) {
-            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("HostelModel").getObject().CustomerID),
-                from: "Customerdetails"
-            });
-        },
+      AD_onPressEditDetails: function (oEvent) {
+    var sCustomerID = oEvent
+        .getSource()
+        .getBindingContext("HostelModel")
+        .getObject()
+        .CustomerID;
+
+    var sEncodedID = btoa(sCustomerID.toString());
+
+    this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
+        sPath: encodeURIComponent(sEncodedID),
+        from: "Customerdetails"
+    });
+},
 
         createTableSheet: function () {
             return [{
