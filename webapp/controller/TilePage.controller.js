@@ -102,6 +102,11 @@ sap.ui.define([
             oRouter.navTo("RouteHostelDashboard");
         },
 
+        TileV_onpresscustomerreview: function() {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteCustomerReview");
+        },
+
         onStartGuide: function () {
             if (!this._oGuideDialog) {
                 this._oGuideDialog = new sap.m.Dialog({

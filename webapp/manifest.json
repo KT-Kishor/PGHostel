@@ -318,6 +318,13 @@
         "targetFeedback"
       ]
     }
+      {
+      "name": "RouteCustomerReview",
+      "pattern": "CustomerReview",
+      "target": [
+        "targetCustomerReview"
+      ]
+    }
       ],
       "targets": {
         "TargetHostel": {
@@ -515,6 +522,13 @@
           "clearControlAggregation": false,
           "viewName": "Feedback",
           "viewId": "feedback"
+        },
+        "targetCustomerReview": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "CustomerReview",
+          "viewId": "CustomerReview"
         }
       }
     },

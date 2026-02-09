@@ -201,6 +201,19 @@
                         />
                     </TileContent>
                 </GenericTile>
+                <GenericTile
+                    id="id11roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
+                    header="{i18n>customerReview}"
+                    press="TileV_onpresscustomerreview"
+                >
+                    <TileContent unit="{i18n>customerReview}">
+                        <ImageContent
+                            src="sap-icon://business-objects-experience"
+                        />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <Button

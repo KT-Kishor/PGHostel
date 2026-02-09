@@ -767,7 +767,8 @@ sap.ui.define([
             "ManagePaymentDashboard": "/ManagePaymentDashboard",
             "ManageBookingDashboard": "/ManageBookingDashboard",
             "ManageSecurityDeposit": "/ManageSecurityDeposit",
-            "ManagePaymentHistory": "/ManagePaymentHistory"
+            "ManagePaymentHistory": "/ManagePaymentHistory",
+            "ManageCustomerReview": "/ManageCustomerReview"
           };
 
           const modelPath = tileMap[value];
