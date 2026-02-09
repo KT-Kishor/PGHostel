@@ -1221,7 +1221,7 @@ sap.ui.define([
             // -------------------------
             // RESET FORGOT FIELDS
             // -------------------------
-            ["fpUserId", "fpUserName", "fpOTP", "newPass", "confPass"]
+            ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = sap.ui.getCore().byId(id);
                     if (c) {
@@ -1234,7 +1234,7 @@ sap.ui.define([
             // -------------------------
             // 🚫 DISABLE FORGOT FORM
             // -------------------------
-            ["fpUserId", "fpUserName", "fpOTP", "newPass", "confPass"]
+            ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = sap.ui.getCore().byId(id);
                     if (c) c.setEnabled(false);
@@ -3355,7 +3355,7 @@ sap.ui.define([
         _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
-                "fpUserId", "fpUserName", "fpOTP",
+                "fpEmailId", "fpOTP",
                 "newPass", "confPass", "loginOTP"
             ];
             ids.forEach(id => {
@@ -3499,9 +3499,13 @@ sap.ui.define([
             // oConf.setValueStateText("Passwords matched");
             sap.ui.core.BusyIndicator.show(0);
             try {
+                const oFilters = this._oResetUser?.UserID
+                    ? { UserID: this._oResetUser.UserID }
+                    : { EmailID: this._oResetUser?.EmailID };
+
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: { Password: btoa(pass) },
-                    filters: { UserID: this._oResetUser?.UserID }
+                    filters: oFilters
                 });
 
 
@@ -3538,7 +3542,7 @@ sap.ui.define([
 
         _resetAllAuthFields: function () {
             ["signInuserid", "signInusername", "signinPassword",
-                "fpUserId", "fpUserName", "fpOTP", "newPass", "confPass", "loginOTP"
+                "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"
             ]
                 .forEach(id => {
                     let o = sap.ui.getCore().byId(id);
@@ -3551,8 +3555,12 @@ sap.ui.define([
 
             try {
                 const oPayload = {
-                    UserID: this._oResetUser.UserID,
-                    UserName: this._oResetUser.UserName,
+                    ...(this._oResetUser?.EmailID
+                        ? { EmailID: this._oResetUser.EmailID }
+                        : {
+                            UserID: this._oResetUser?.UserID,
+                            UserName: this._oResetUser?.UserName
+                        }),
                     OTP: otp.trim()
                 };
 
@@ -3767,8 +3775,7 @@ sap.ui.define([
 
             // Reset only values (not visibility/enabled state)
 
-            sap.ui.getCore().byId("fpUserId").setValue("");
-            sap.ui.getCore().byId("fpUserName").setValue("");
+            sap.ui.getCore().byId("fpEmailId").setValue("");
             sap.ui.getCore().byId("fpOTP").setValue("");
             sap.ui.getCore().byId("newPass").setValue("");
             sap.ui.getCore().byId("confPass").setValue("");
@@ -4459,43 +4466,36 @@ sap.ui.define([
         },
 
         onValidateUser: async function () {
+            const oEmailCtrl = sap.ui.getCore().byId("fpEmailId");
             const isValid =
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("fpUserId"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId("fpUserName"), "ID");
+                utils._LCvalidateMandatoryField(oEmailCtrl, "ID") &&
+                utils._LCvalidateEmail(oEmailCtrl, "ID");
 
             if (!isValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
-            const oIdCtrl = sap.ui.getCore().byId("fpUserId");
-            const oNameCtrl = sap.ui.getCore().byId("fpUserName");
-
-            const sUserId = oIdCtrl.getValue().trim();
-            const sUserName = oNameCtrl.getValue().trim();
-
-            const payload = {
-                UserID: sUserId,
-                UserName: sUserName,
-                Type: "OTP"
-            };
+            const sEmail = oEmailCtrl.getValue().trim();
 
             sap.ui.core.BusyIndicator.show(0);
 
             try {
-                const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
+                const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
+                    EmailID: sEmail,
+                    Type: "OTP"
+                });
 
                 if (oResp?.success) {
                     sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    // alert(oResp.OTP);
                     console.log("Use OTP : ", oResp.OTP);
 
-                    this._oResetUser = { UserID: sUserId, UserName: sUserName };
-                    // ✅ Start resend cooldown
-                    this._startOtpValidity();      // ✅ ADD THIS
+                    this._oResetUser = {
+                        EmailID: sEmail
+                    };
 
-
-                    this._startOtpResend(120);// 120xx
+                    this._startOtpValidity();
+                    this._startOtpResend(120);
 
                     this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
                 } else {
@@ -4503,7 +4503,10 @@ sap.ui.define([
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show("Record not found\nPlease check your\nUser ID / User Name");
+                const sMsg =
+                    err?.responseJSON?.message ||
+                    this.i18nModel.getText("forgotOtpSendFailed");
+                sap.m.MessageToast.show(sMsg);
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }

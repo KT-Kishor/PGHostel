@@ -208,29 +208,16 @@
                         visible="{= ${LoginViewModel>/forgotStep} >= 1 }"
                     >
                         <Label
-                            text="{i18n>enterUserID}"
+                            text="{i18n>emailId}"
                             required="true"
                         />
                         <Input
-                            id="fpUserId"
-                            placeholder="{i18n>yourUserID}"
-                            liveChange="onUserlivechange"
-                            valueStateText="{i18n>pleaseentervalidUserID}"
+                            id="fpEmailId"
+                            placeholder="{i18n>enteryourEmail}"
+                            liveChange="onEmailliveChange"
+                            valueStateText="{i18n>MSenterValidEmail}"
                             enabled="{= ${LoginViewModel>/forgotStep} === 1 }"
-                            maxLength="6"
-                        />
-                        <Label
-                            class="sapUiSmallMarginTop"
-                            text="{i18n>enterUserName}"
-                            required="true"
-                        />
-                        <Input
-                            id="fpUserName"
-                            placeholder="{i18n>registeredName}"
-                            liveChange="onUserlivechange"
-                            valueStateText="{i18n>pleaseenteravalidUserName}"
-                            enabled="{= ${LoginViewModel>/forgotStep} === 1 }"
-                            maxLength="40"
+                            maxLength="100"
                         />
                         <HBox justifyContent="End">
                             <Button
