@@ -2033,194 +2033,197 @@ sap.ui.define([
         },
 
         onPressAvatar: async function (oEvent) {
-            let oUser = this._oLoggedInUser;
-            // const fullUserData = this._oLoggedInUser || {};
-            let fullUserData = {};
-            try {
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+    oRouter.navTo("RouteManageProfile");
+            // let oUser = this._oLoggedInUser;
+            // // const fullUserData = this._oLoggedInUser || {};
+            // let fullUserData = {};
+            // try {
 
-                if (!oUser || !oUser.UserID) {
-                    oUser = this.getOwnerComponent()
-                        .getModel("UserModel")
-                        ?.getData();
-                }
-                const sUserID = oUser.UserID;
-                // const sUserID = oUser.UserID || "";
-                if (!sUserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
-                    return;
-                }
-                fullUserData = oUser;
+            //     if (!oUser || !oUser.UserID) {
+            //         oUser = this.getOwnerComponent()
+            //             .getModel("UserModel")
+            //             ?.getData();
+            //     }
+            //     const sUserID = oUser.UserID;
+            //     // const sUserID = oUser.UserID || "";
+            //     if (!sUserID) {
+            //         sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
+            //         return;
+            //     }
+            //     fullUserData = oUser;
 
 
-                if (!this._isProfileRequested) {
-                    this.createAvatarActionSheet();
-                    this._oProfileActionSheet.openBy(oEvent.getSource());
-                    return;
-                }
-                this._isProfileRequested = false;
+            //     if (!this._isProfileRequested) {
+            //         this.createAvatarActionSheet();
+            //         this._oProfileActionSheet.openBy(oEvent.getSource());
+            //         return;
+            //     }
+            //     this._isProfileRequested = false;
 
-                if (this._oProfileDialog) {
-                    this._oProfileDialog.destroy();
-                    this._oProfileDialog = null;
-                }
+            //     if (this._oProfileDialog) {
+            //         this._oProfileDialog.destroy();
+            //         this._oProfileDialog = null;
+            //     }
 
-                if (!this._oProfileDialog) {
-                    this._oProfileDialog = await sap.ui.core.Fragment.load({
-                        id: this.getView().getId(),
-                        name: "sap.ui.com.project1.fragment.ManageProfile",
-                        controller: this
-                    });
-                    this.getView().addDependent(this._oProfileDialog);
-                }
-                const oTempModel = new JSONModel({
-                    bookings: [],
-                    Payments: [],
-                    isEditMode: false,
-                    selectedTab: "Booking History",
-                    isTableBusy: true
-                });
+            //     if (!this._oProfileDialog) {
+            //         // this._oProfileDialog = await sap.ui.core.Fragment.load({
+            //         //     id: this.getView().getId(),
+            //         //     name: "sap.ui.com.project1.fragment.ManageProfile",
+            //         //     controller: this
+            //         // });
+            //         // this.getView().addDependent(this._oProfileDialog);
+            //         this.getOwnerComponent().getRouter().navTo("RouteNManageProfile");
+            //     }
+            //     const oTempModel = new JSONModel({
+            //         bookings: [],
+            //         Payments: [],
+            //         isEditMode: false,
+            //         selectedTab: "Booking History",
+            //         isTableBusy: true
+            //     });
 
-                this._oProfileDialog.setModel(oTempModel, "profileData");
-                // oProfileModel.refresh(true); 
-                this._oProfileDialog.open();
-                this.byId("id_tabBar").setSelectedKey("Booking History");
-                setTimeout(() => {
-                    this.byId("id_dialog")?.addStyleClass("dialogBlur");
-                }, 200);
+            //     this._oProfileDialog.setModel(oTempModel, "profileData");
+            //     // oProfileModel.refresh(true); 
+            //     this._oProfileDialog.open();
+            //     this.byId("id_tabBar").setSelectedKey("Booking History");
+            //     setTimeout(() => {
+            //         this.byId("id_dialog")?.addStyleClass("dialogBlur");
+            //     }, 200);
 
-                const filter = { UserID: sUserID }
-                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
-                const aBookings = response?.BookingData || [];
-                const aPayments = response?.PaymentData || [];
+            //     const filter = { UserID: sUserID }
+            //     const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
+            //     const aBookings = response?.BookingData || [];
+            //     const aPayments = response?.PaymentData || [];
 
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const aBookingData = aBookings.map(booking => {
-                    const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-                    if (oStart) {
-                        oStart.setHours(0, 0, 0, 0);
-                    }
+            //     const today = new Date();
+            //     today.setHours(0, 0, 0, 0);
+            //     const aBookingData = aBookings.map(booking => {
+            //         const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
+            //         if (oStart) {
+            //             oStart.setHours(0, 0, 0, 0);
+            //         }
 
-                    const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
-                    const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
-                    if (startDate) startDate.setHours(0, 0, 0, 0);
-                    if (endDate) endDate.setHours(0, 0, 0, 0);
+            //         const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
+            //         const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
+            //         if (startDate) startDate.setHours(0, 0, 0, 0);
+            //         if (endDate) endDate.setHours(0, 0, 0, 0);
 
-                    let bookingGroup = "Others";
-                    if (booking.Status === "Cancelled") {
-                        bookingGroup = "Cancelled";
-                    } else if (booking.Status === "Completed") {
-                        bookingGroup = "Completed";
-                    } else if (booking.Status === "New" || booking.Status === "Assigned") {
-                        // Ongoing = Today is between StartDate & EndDate
-                        if (startDate && endDate && startDate <= today && endDate >= today) {
-                            bookingGroup = "Ongoing";
-                            // Upcoming = Future StartDate
-                        } else if (startDate && startDate > today) {
-                            bookingGroup = "Upcoming";
-                        }
-                    }
-                    let GSTValue=0;
-                    if(booking.GSTType === "IGST"){
-                         GSTValue=Number(booking.GSTValue) /100 || 0;
-                    }else{
-                         GSTValue=(Number(booking.GSTValue) + Number(booking.GSTValue)) /100 || 0;
-                    }
-                    // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-                    return {
-                        customerName: booking.Salutation + " " + booking.CustomerName,
-                        room: booking.BedType || "",
-                        Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
-                        EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
-                        BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                        amount: (
-                            (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
-                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
-                        ).toString() || "",
+            //         let bookingGroup = "Others";
+            //         if (booking.Status === "Cancelled") {
+            //             bookingGroup = "Cancelled";
+            //         } else if (booking.Status === "Completed") {
+            //             bookingGroup = "Completed";
+            //         } else if (booking.Status === "New" || booking.Status === "Assigned") {
+            //             // Ongoing = Today is between StartDate & EndDate
+            //             if (startDate && endDate && startDate <= today && endDate >= today) {
+            //                 bookingGroup = "Ongoing";
+            //                 // Upcoming = Future StartDate
+            //             } else if (startDate && startDate > today) {
+            //                 bookingGroup = "Upcoming";
+            //             }
+            //         }
+            //         let GSTValue=0;
+            //         if(booking.GSTType === "IGST"){
+            //              GSTValue=Number(booking.GSTValue) /100 || 0;
+            //         }else{
+            //              GSTValue=(Number(booking.GSTValue) + Number(booking.GSTValue)) /100 || 0;
+            //         }
+            //         // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
+            //         return {
+            //             customerName: booking.Salutation + " " + booking.CustomerName,
+            //             room: booking.BedType || "",
+            //             Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
+            //             EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
+            //             BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
+            //             amount: (
+            //                 (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
+            //                 ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
+            //             ).toString() || "",
 
-                        status: booking.Status,
-                        currency: booking.Currency,
-                        customerID: booking.CustomerID,
-                        BookingID: booking.BookingID?.toString() || "",
-                    }
+            //             status: booking.Status,
+            //             currency: booking.Currency,
+            //             customerID: booking.CustomerID,
+            //             BookingID: booking.BookingID?.toString() || "",
+            //         }
 
-                });
-                // Format PAYMENTS
-                const aPaymentData = aPayments.map(payment => ({
-                    BookingID: payment.BookingID,
-                    InvNo: payment.InvNo?.toString() || "",
-                    InvoiceDate: payment.InvoiceDate,
-                    CustomerName: payment.CustomerName,
-                    TotalAmount: payment.TotalAmount?.toString() || "",
-                    DueAmount: payment.DueAmount ? payment.DueAmount.toString() : "Not Applicable",
-                    currency: payment.Currency,
-                    PaymentGroup: payment.Status || "Others"
-                }));
+            //     });
+            //     // Format PAYMENTS
+            //     const aPaymentData = aPayments.map(payment => ({
+            //         BookingID: payment.BookingID,
+            //         InvNo: payment.InvNo?.toString() || "",
+            //         InvoiceDate: payment.InvoiceDate,
+            //         CustomerName: payment.CustomerName,
+            //         TotalAmount: payment.TotalAmount?.toString() || "",
+            //         DueAmount: payment.DueAmount ? payment.DueAmount.toString() : "Not Applicable",
+            //         currency: payment.Currency,
+            //         PaymentGroup: payment.Status || "Others"
+            //     }));
 
-                const oProfileModel = new JSONModel({
-                    ...fullUserData,
-                    isEditMode: false,
-                    photo: "data:image/png;base64," + oUser.FileContent || "",
-                    initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
-                    name: oUser.UserName || "",
-                    UserID: oUser.UserID,
-                    Salutation: oUser.Salutation,
-                    email: oUser.EmailID || "",
-                    phone: oUser.MobileNo || "",
-                    dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
-                    gender: oUser.Gender || "",
-                    address: oUser.Address || "",
-                    State: oUser.State,
-                    Country: oUser.Country,
-                    City: oUser.City,
-                    stdCode: oUser.STDCode,
-                    branchCode: oUser.BranchCode,
-                    role: oUser.Role,
+            //     const oProfileModel = new JSONModel({
+            //         ...fullUserData,
+            //         isEditMode: false,
+            //         photo: "data:image/png;base64," + oUser.FileContent || "",
+            //         initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
+            //         name: oUser.UserName || "",
+            //         UserID: oUser.UserID,
+            //         Salutation: oUser.Salutation,
+            //         email: oUser.EmailID || "",
+            //         phone: oUser.MobileNo || "",
+            //         dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
+            //         gender: oUser.Gender || "",
+            //         address: oUser.Address || "",
+            //         State: oUser.State,
+            //         Country: oUser.Country,
+            //         City: oUser.City,
+            //         stdCode: oUser.STDCode,
+            //         branchCode: oUser.BranchCode,
+            //         role: oUser.Role,
 
-                    bookings: aBookingData,
-                    Payments: aPaymentData,
-                    bookingCount: aBookingData.length,
-                    paymentCount: aPaymentData.length,
-                    selectedTab: "Booking History",
-                    aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
-                    facility: [],
-                    isTableBusy: false
-                });
-                this._oProfileDialog.setModel(oProfileModel, "profileData");
-                this._applyCountryStateCityFilters();
-                oProfileModel.setProperty("/isEditMode", false);
-                oProfileModel.setProperty("/isTableBusy", false);
-                this.byId("id_dialog").removeStyleClass("dialogBlur");
+            //         bookings: aBookingData,
+            //         Payments: aPaymentData,
+            //         bookingCount: aBookingData.length,
+            //         paymentCount: aPaymentData.length,
+            //         selectedTab: "Booking History",
+            //         aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
+            //         facility: [],
+            //         isTableBusy: false
+            //     });
+            //     this._oProfileDialog.setModel(oProfileModel, "profileData");
+            //     this._applyCountryStateCityFilters();
+            //     oProfileModel.setProperty("/isEditMode", false);
+            //     oProfileModel.setProperty("/isTableBusy", false);
+            //     this.byId("id_dialog").removeStyleClass("dialogBlur");
 
-            } catch (err) {
-                console.error("Profile Load Error:", err);
+            // } catch (err) {
+            //     console.error("Profile Load Error:", err);
 
-                const oProfileModel = new sap.ui.model.json.JSONModel({
-                    ...fullUserData,
-                    photo: "data:image/png;base64," + oUser.FileContent || "",
-                    initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
-                    name: oUser.UserName || "",
-                    email: oUser.EmailID || "",
-                    phone: oUser.MobileNo || "",
-                    dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
-                    gender: oUser.Gender || "",
-                    address: oUser.Address || "",
-                    bookings: [],
-                    aCustomers: []
-                });
-                this._oProfileDialog.setModel(oProfileModel, "profileData");
-                this._applyCountryStateCityFilters();
-                oProfileModel.setProperty("/isEditMode", false);
-                oProfileModel.refresh(true);
-                this._oProfileDialog.open();
-                this.byId("id_tabBar").setSelectedKey("Booking History");
-                setTimeout(() => {
-                    this.byId("id_dialog")?.addStyleClass("dialogBlur");
-                }, 200);
+            //     const oProfileModel = new sap.ui.model.json.JSONModel({
+            //         ...fullUserData,
+            //         photo: "data:image/png;base64," + oUser.FileContent || "",
+            //         initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
+            //         name: oUser.UserName || "",
+            //         email: oUser.EmailID || "",
+            //         phone: oUser.MobileNo || "",
+            //         dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
+            //         gender: oUser.Gender || "",
+            //         address: oUser.Address || "",
+            //         bookings: [],
+            //         aCustomers: []
+            //     });
+            //     this._oProfileDialog.setModel(oProfileModel, "profileData");
+            //     this._applyCountryStateCityFilters();
+            //     oProfileModel.setProperty("/isEditMode", false);
+            //     oProfileModel.refresh(true);
+            //     this._oProfileDialog.open();
+            //     this.byId("id_tabBar").setSelectedKey("Booking History");
+            //     setTimeout(() => {
+            //         this.byId("id_dialog")?.addStyleClass("dialogBlur");
+            //     }, 200);
 
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+            // } finally {
+            //     sap.ui.core.BusyIndicator.hide();
+            // }
         },
 
         _applyCountryStateCityFilters: function () {
@@ -3793,7 +3796,11 @@ sap.ui.define([
             oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateOfBirth || "");
-
+//         if (user.FileContent) {
+//  oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
+//                 } else {
+//  oLoginModel.setProperty("/Photo", ""); // Clear if no photo
+//      }
             this._oLoggedInUser = user;
 
             if (user.Role === "Customer") {
@@ -4204,6 +4211,16 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
+//                  this._setLoggedInUser(user);
+//  // In onSignIn function after successful login:
+
+//  // Add this after setting _oLoggedInUser:
+// if (user.FileContent) {
+//  this._oLoggedInUser.FileContent = user.FileContent;
+//  this._oLoggedInUser.Photo = "data:image/png;base64," + user.FileContent;
+// }
+
+
 
                 // sap.m.MessageToast.show("Login Successful!");
 
@@ -4212,6 +4229,7 @@ sap.ui.define([
                 oLoginModel.setProperty("/EmployeeID", user.UserID);
                 oLoginModel.setProperty("/Salutation", user.Salutation);
                 oLoginModel.setProperty("/EmployeeName", user.UserName);
+                oLoginModel.setProperty("/UserName", user.UserName);
                 oLoginModel.setProperty("/EmailID", user.EmailID);
                 oLoginModel.setProperty("/Role", user.Role);
                 oLoginModel.setProperty("/BranchCode", user.BranchCode || "");

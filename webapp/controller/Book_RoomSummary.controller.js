@@ -1826,13 +1826,23 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
         /* =============================
            FETCH COUPON
         ============================== */
-        const response = await this.ajaxReadWithJQuery("HM_Coupon", filter);
+        const response = await this.ajaxReadWithJQuery("HM_CouponBookingCount", filter);
         const aCoupons = response?.data || [];
 
         if (!aCoupons.length) {
             MessageToast.show(this.i18nModel.getText("noCouponsFound"));
             return;
         }
+        const oCoupon = aCoupons[0];
+
+// Convert to numbers (important)
+const maxUses = Number(oCoupon.MaxUses);
+const usedCount = Number(oCoupon.couponUsedCount);
+
+if (usedCount >= maxUses) {
+    sap.m.MessageToast.show("Coupon not found");
+    return;
+}
 
         const oMatched = aCoupons.find(c =>
             String(c.CouponCode).toUpperCase() === sEnteredCode.toUpperCase()
@@ -1899,7 +1909,7 @@ _calculateDateUnits: function (sStartDate, sEndDate) {
         }
 
         const oFirstPerson = aPersons[0];
-        // ================================
+  
 // STORE LATEST VALUES BEFORE COUPON
 // ================================
 if (!oFirstPerson.__preCouponState) {
@@ -1988,7 +1998,6 @@ if (paymentType === "Per Day") {
 } else {
     oFirstPerson.MonthlyCostPerPerson = finalTotal;
 }
-
 
 
         /* =============================

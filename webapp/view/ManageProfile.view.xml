@@ -1,0 +1,389 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.ManageProfile"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+    xmlns:uxap="sap.uxap">
+
+    <Page
+        id="id_profilePage"
+        title="{i18n>myAccount}"
+        showNavButton="true"
+        navButtonPress="onNavBack">
+
+          <customHeader>
+            <Bar class="barheader">
+            <contentLeft>
+                    <Button
+                      icon="sap-icon://nav-back"
+                        class="myUnifiedBtn"
+                        tooltip="{i18n>MSedit}"
+                        press="onNavBack"
+                    />
+                </contentLeft>
+                <contentMiddle>
+                    <Title
+                        text="{i18n>myAccount}"
+                        level="H4"
+                    />
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        text="{= ${profileData>/isEditMode} ? 'Save' : 'Edit'}"
+                        class="myUnifiedBtn"
+                        tooltip="{i18n>MSedit}"
+                        press="onEditSaveProfile"
+                    />
+                    <Button
+                        icon="sap-icon://log"
+                        class="myUnifiedBtn"
+                        tooltip="{i18n>logout}"
+                        press="onlogout"
+                    />
+                    
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <!-- ================= PROFILE HEADER ================= -->
+
+        <FlexBox
+            direction="Row"
+            justifyContent="Center"
+            alignItems="Center"
+            class="myclass">
+
+            <!-- Avatar -->
+            <VBox>
+                <Avatar
+                    src="{profileData>/photo}"
+                    initials="{profileData>/initials}"
+                    displayShape="Circle"
+                    displaySize="XL"
+                    press="onPreviewProfilePhoto"
+                    class="sapUiTinyMargin myavatar"/>
+
+                <Button
+                    icon="sap-icon://edit"
+                    tooltip="{i18n>setProfilePhoto}"
+                    press="onPressAvatarEdit"
+                    class="avatarEditIcon"/>
+
+                <u:FileUploader
+                    id="id_fileUploaderAvatar1"
+                    uploadOnChange="false"
+                    change="onAvatarFileSelected"
+                    fileType="png,jpg,jpeg"
+                    class="hiddenUploader"
+                    buttonOnly="true"
+                    iconOnly="true"/>
+            </VBox>
+
+            <!-- Profile Forms -->
+            <VBox>
+
+                <!-- DISPLAY MODE -->
+                <f:SimpleForm
+                    layout="ColumnLayout"
+                    columnsM="3"
+                    columnsL="4"
+                    class="sapUiTinyMarginTop"
+                    visible="{= !${profileData>/isEditMode}}">
+
+                    <f:content>
+                        <Label text="{i18n>fullname}"/>
+                        <Text text="{= ${profileData>/Salutation} + ' ' + ${profileData>/name}}"/>
+
+                        <Label text="{i18n>email}"/>
+                        <Text text="{profileData>/email}"/>
+
+                        <Label text="{i18n>MVDDOB}"/>
+                        <Text text="{profileData>/dob}"/>
+
+                        <Label text="{i18n>MVDcountry}"/>
+                        <Text text="{profileData>/Country}"/>
+
+                        <Label text="{i18n>MVDstate}"/>
+                        <Text text="{profileData>/State}"/>
+
+                        <Label text="{i18n>city}"/>
+                        <Text text="{profileData>/City}"/>
+
+                        <Label text="{i18n>MSmobileNo}"/>
+                        <Text text="{= ${profileData>/STDCode} + ' ' + ${profileData>/phone}}"/>
+
+                        <Label text="{i18n>MVgender}"/>
+                        <Text text="{profileData>/gender}"/>
+
+                        <Label text="{i18n>address}"/>
+                        <Text text="{profileData>/address}" wrapping="true"/>
+                    </f:content>
+                </f:SimpleForm>
+
+                <!-- EDIT MODE -->
+                <f:SimpleForm
+                    layout="ColumnLayout"
+                    columnsM="3"
+                    columnsL="4"
+                    class="sapUiTinyMarginTop"
+                    visible="{profileData>/isEditMode}">
+
+                    <f:content>
+
+                        <Label text="{i18n>fullname}"  required="{profileData>/isEditMode}"/>
+                        <Select selectedKey="{profileData>/Salutation}">
+                            <core:Item key="Mr." text="Mr."/>
+                            <core:Item key="Mrs." text="Mrs."/>
+                            <core:Item key="Miss" text="Miss"/>
+                        </Select>
+
+                        <Input id="id_Name1"
+                             maxLength="20"
+                            placeholder="{i18n>enterFullName}"
+                            value="{profileData>/name}"
+                            valueStateText="{i18n>enterFullName}"
+                            liveChange="onNameInputLiveChange"/>
+
+                        <Label text="{i18n>email}" required="true"/>
+                        <Input id="id_mail1"
+                            placeholder="{i18n>enterEmailId}"
+                            value="{profileData>/email}"
+                            type="Email"
+                            maxLength="30"
+                            valueStateText="{i18n>enterEmailId}"
+                            liveChange="onEmailliveChange"/>
+
+                        <Label text="{i18n>MVDDOB}" required="true"/>
+                        <DatePicker
+                            id="id_dob1"
+                            value="{profileData>/dob}"
+                            displayFormat="dd/MM/yyyy"
+                            valueFormat="dd/MM/yyyy"
+                            valueStateText="{i18n>enterDateofBirth}"
+                            change="onChangeDOB"/>
+
+                        <Label text="{i18n>MVDcountry}" required="true"/>
+                       <ComboBox
+                            id="id_country1"
+                            items="{path:'CountryModel>/',length:1000}"
+                            selectedKey="{profileData>/Country}"
+                            showSecondaryValues="true"
+                            selectionChange="onCountrySelectionChange"
+                            change="MC_onChangeCountry"
+                            placeholder="{i18n>enterCountry}"
+                            valueStateText="{i18n>selectCountry}"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>countryName}"
+                                text="{CountryModel>countryName}"
+                                additionalText="{CountryModel>code}"
+                            />
+</ComboBox>
+                        <Label text="{i18n>MVDstate}" required="true"/>
+                         <ComboBox
+                            id="id_state1"
+                            change="CC_onChangeState"
+                            placeholder="{i18n>enterState}"
+                            valueStateText="{i18n>selectState}"
+                            showSecondaryValues="true"
+                            items="{path:'StateModel>/',length:1000}"
+                            selectedKey="{profileData>/State}"
+                        >
+                            <core:ListItem
+                                key="{StateModel>stateName}"
+                                text="{StateModel>stateName}"
+                            />
+                        </ComboBox>
+
+                        <Label text="{i18n>city}" required="true"/>
+                        <ComboBox
+                            id="id_city1"
+                            change="onChange"
+                            valueStateText="{i18n>cityValueText}"
+                            placeholder="{i18n>enterCity}"
+                            showSecondaryValues="true"
+                            items="{path:'CityModel>/',length:1000}"
+                            selectedKey="{profileData>/City}"
+                            selectionChange="CC_onChangeCity"
+                        >
+                            <core:ListItem
+                                key="{CityModel>cityName}"
+                                text="{CityModel>cityName}"
+                                additionalText="{CityModel>branchCode}"
+                            />
+                        </ComboBox>
+
+                        <Label text="{i18n>MSmobileNo}" required="true"/>
+                         <ComboBox
+                            change="_onProfileSTDChange"
+                            id="id_std1"
+                            placeholder="{i18n>code}"
+                            valueStateText="{i18n>MSselectCode}"
+                            showSecondaryValues="true"
+                            items="{path:'CountryModel>/', length:1000}"
+                            selectedKey="{profileData>/STDCode}"
+                            filterSecondaryValues="true"
+                        >
+                            <core:ListItem
+                                key="{CountryModel>stdCode}"
+                                text="{CountryModel>stdCode}"
+                                additionalText="{CountryModel>code}"
+                            />
+                        </ComboBox>
+                        <Input  
+                            id="id_phone1"
+                            value="{profileData>/phone}"
+                            placeholder="{i18n>enterContactNumber}"
+                            maxLength="18"
+                            liveChange="MPonMobileLivechnage"
+                            valueStateText="{i18n>enterContactNumber}"/>
+
+                        <Label text="{i18n>MVgender}" required="true"/>
+                        <ComboBox id="id_gender1"  placeholder="{i18n>selectGender}"
+                            selectedKey="{profileData>/gender}"
+                            valueStateText="{i18n>pleaseselectGender}"
+                            change="onChange">
+                            <core:Item key="Male" text="Male"/>
+                            <core:Item key="Female" text="Female"/>
+                            <core:Item key="Other" text="Other"/>
+                        </ComboBox>
+
+                        <Label text="{i18n>address}" required="true"/>
+                        <TextArea id="id_address1"
+                            placeholder="{i18n>enterAddress}"
+                            value="{profileData>/address}"
+                            rows="3"
+                            maxLength="120"
+                            liveChange="MPonAddressChange"
+                            growing="false"
+                            width="100%"/>
+
+                    </f:content>
+                </f:SimpleForm>
+
+            </VBox>
+        </FlexBox>
+
+        <!-- ================= TABS + SEARCH ================= -->
+
+        <FlexBox
+            direction="Row"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            wrap="Wrap"
+            class="responsiveFlex">
+
+            <IconTabHeader
+                id="id_tabBar1"
+                mode="Standard"
+                select="onTableSelect">
+
+                <items>
+                    <IconTabFilter
+                        key="Booking History"
+                        text="Booking History ({profileData>/bookingCount})"/>
+
+                    <IconTabFilter
+                        key="Payment"
+                        text="Payment ({= ${profileData>/paymentCount} })"/>
+                </items>
+            </IconTabHeader>
+
+            <ToolbarSpacer/>
+
+            <SearchField
+                width="auto"
+                class="sapUiSmallMargin searchField"
+                liveChange="onGlobalSearch"
+                placeholder="{i18n>search}"/>
+        </FlexBox>
+
+        <!-- ================= BOOKING HISTORY TABLE ================= -->
+
+        <Table
+            id="Id_ProfileaTable1"
+            visible="{= ${profileData>/selectedTab} !== 'Payment' }"
+            busy="{profileData>/isTableBusy}"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No booking history found"
+            items="{
+                path: 'profileData>/bookings',
+                sorter: [
+                    { path: 'bookingGroup', descending: false, group: true },
+                    { path: 'BookingDate', descending: true }
+                ]
+            }">
+
+            <columns>
+                <Column demandPopin="true">
+                <Text text="{i18n>customerName}"/></Column>
+                <Column demandPopin="true"><Text text="{i18n>bookingDate}"/></Column>
+                <Column demandPopin="true"><Text text="{i18n>room}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>amount}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
+            </columns>
+
+            <items>
+                <ColumnListItem type="Navigation" press="onPressBookingRow">
+                    <cells>
+                        <ObjectIdentifier
+                            title="{profileData>customerName}"
+                            text="{profileData>BookingID}"/>
+                        <Text text="{profileData>BookingDate}"/>
+                        <Text text="{profileData>room}"/>
+                        <Text
+                            text="{ parts:['profileData>amount','profileData>currency'],
+                                    formatter:'.Formatter.formatCurrency'}"/>
+                        <ObjectStatus
+                            text="{profileData>status}"
+                            state="{ path:'profileData>status',
+                                     formatter:'.Formatter.formatObjectStatus'}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <!-- ================= PAYMENT TABLE ================= -->
+
+        <Table
+            id="Id_PaymentTable1"
+            visible="{= ${profileData>/selectedTab} === 'Payment' }"
+            updateFinished="onTableUpdateFinished"
+            items="{
+                path:'profileData>/Payments',
+                sorter:[{ path:'PaymentGroup', group:true }]
+            }"
+            width="auto"
+            
+            >
+
+            <columns>
+                <Column><Text text="{i18n>bookingID}"/></Column>
+                <Column><Text text="{i18n>invoiceNo}"/></Column>
+                <Column><Text text="{i18n>invoiceDate}"/></Column>
+                <Column><Text text="{i18n>customerName}"/></Column>
+                <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
+                <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column>
+            </columns>
+
+            <items>
+                <ColumnListItem type="Navigation" press="onPressManageInvoice">
+                    <cells>
+                        <Text text="{profileData>BookingID}"/>
+                        <Text text="{profileData>InvNo}"/>
+                        <Text text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text text="{profileData>CustomerName}"/>
+                        <Text text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
+                        <Text text="{profileData>DueAmount}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+    </Page>
+
+</mvc:View>

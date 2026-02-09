@@ -307,6 +307,13 @@
                   ]
                 },
                 {
+                  "name": "RouteManageProfile",
+                  "pattern": "ManageProfile",
+                  "target": [
+                    "TargetManageProfile"
+                  ]
+                },
+                {
           "name": "NotFound",
           "pattern": "NotFound",
           "target": "NotFound"
@@ -325,6 +332,7 @@
         "targetCustomerReview"
       ]
     }
+        
       ],
       "targets": {
         "TargetHostel": {
@@ -509,6 +517,13 @@
           "viewId": "PaymentDashboard",
           "viewName": "PaymentDashboard"
         },
+         "TargetManageProfile": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageProfile",
+          "viewName": "ManageProfile"
+        },
         "NotFound": {
           "viewType": "XML",
           "transition": "slide",
@@ -516,7 +531,7 @@
           "viewId": "NotFound",
           "viewName": "NotFound"
         },
-        "targetFeedback": {
+         "targetFeedback": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -530,6 +545,7 @@
           "viewName": "CustomerReview",
           "viewId": "CustomerReview"
         }
+       
       }
     },
     "rootView": {

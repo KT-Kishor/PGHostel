@@ -3231,8 +3231,10 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     return;
                 }
 
+               this._oLoggedInUser = oMatchedUser;
                 // ---------- rest of your existing success logic (unchanged) ----------
                 oLoginModel.setProperty("/EmployeeID", oMatchedUser.UserID);
+                oLoginModel.setProperty("/UserID", oMatchedUser.UserID);
                 oLoginModel.setProperty("/UserName", oMatchedUser.UserName);
                 oLoginModel.setProperty("/EmailID", oMatchedUser.EmailID);
                 oLoginModel.setProperty("/MobileNo", oMatchedUser.MobileNo);
@@ -3247,7 +3249,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 oLoginModel.setProperty("/STDCode", oMatchedUser.STDCode);
                 oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
 
-                this._oLoggedInUser = oMatchedUser;
+               
                 this.getOwnerComponent()
                     .getModel("UserModel")
                     ?.setData(oMatchedUser);
@@ -5081,6 +5083,9 @@ oHostelModel.setProperty(
             oRoute.navTo("RouteHostel");
 
             setTimeout(function () {
+
+                  var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+    oRouter.navTo("RouteManageProfile");
                 this.resetAllBookingData();
 
                 // 🔑 RESET DYNAMIC UI FLAGS
@@ -5089,9 +5094,7 @@ oHostelModel.setProperty(
                 this._lastPersonCount = null;
                 this._iSelectedStepIndex = 0;
                 this._oSelectedStep = null;
-
-                // Optional: destroy old dynamic UI explicitly
-                this.openProfileDialog();
+              
             }.bind(this), 500);
 
             const oAvatar = this.byId("ProfileAvatar");
@@ -5100,60 +5103,49 @@ oHostelModel.setProperty(
             }
         },
 
-        openProfileDialog: function () {
-            const oUser = this._oLoggedInUser;
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-
-            if (oUser && oUser.UserID) {
-                oUIModel.setProperty("/isLoggedIn", true);
-            } else {
-                oUIModel.setProperty("/isLoggedIn", false);
+       onlogout: function () {
+            sap.ui.getCore().setModel(null, "profileData");
+            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            if (oLoginModel) {
+                oLoginModel.setData({});
             }
-            this.onPressAvatar()
-        },
-
-        _onLogout: function () {
-            this._oProfileActionSheet.close();
+            sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
+            this.CommonLogoutFunction();
             this._oLoggedInUser = null;
-            if (this._oProfileDialog) {
-                this._oProfileDialog.destroy();
-                this._oProfileDialog = null;
-            }
-            if (this._oProfileActionSheet) {
-                this._oProfileActionSheet.destroy();
-                this._oProfileActionSheet = null;
-            }
+            this._isProfileRequested = false;
+
+            // Reset Login State
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
         },
 
-        _onEnterProfile: async function () {
-            this._oProfileActionSheet.close();
-            this._isProfileRequested = true;
-            await this.onPressAvatar();
-        },
+        // _onEnterProfile: async function () {
+        //     this._oProfileActionSheet.close();
+        //     this._isProfileRequested = true;
+        //     await this.onPressAvatar();
+        // },
 
-        createAvatarActionSheet: function () {
-            if (!this._oProfileActionSheet) {
-                this._oProfileActionSheet = new sap.m.ActionSheet({
-                    placement: sap.m.PlacementType.Bottom,
-                    buttons: [
-                        new sap.m.Button({
-                            text: "Enter into Profile",
-                            icon: "sap-icon://customer",
-                            press: this._onEnterProfile.bind(this)
-                        }).addStyleClass("myUnifiedBtn"),
+        // createAvatarActionSheet: function () {
+        //     if (!this._oProfileActionSheet) {
+        //         this._oProfileActionSheet = new sap.m.ActionSheet({
+        //             placement: sap.m.PlacementType.Bottom,
+        //             buttons: [
+        //                 new sap.m.Button({
+        //                     text: "Enter into Profile",
+        //                     icon: "sap-icon://customer",
+        //                     press: this._onEnterProfile.bind(this)
+        //                 }).addStyleClass("myUnifiedBtn"),
 
-                        new sap.m.Button({
-                            text: "Logout",
-                            icon: "sap-icon://log",
-                            press: this._onLogout.bind(this)
-                        }).addStyleClass("myUnifiedBtn")
-                    ]
-                });
-                this.getView().addDependent(this._oProfileActionSheet);
-            }
-        },
+        //                 new sap.m.Button({
+        //                     text: "Logout",
+        //                     icon: "sap-icon://log",
+        //                     press: this._onLogout.bind(this)
+        //                 }).addStyleClass("myUnifiedBtn")
+        //             ]
+        //         });
+        //         this.getView().addDependent(this._oProfileActionSheet);
+        //     }
+        // },
 
         onPressAvatar: async function (oEvent) {
             const oUser = this._oLoggedInUser

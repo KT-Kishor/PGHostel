@@ -163,6 +163,7 @@
                             valueStateText="{i18n>enterPaymentType}"
                             maxLength="20"
                             editable="false"
+                          
                         />
 
                         <Label

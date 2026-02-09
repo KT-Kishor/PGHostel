@@ -157,7 +157,6 @@
                     id="BookingcouponInput"
                     showValueHelp="true"
                     valueHelpIconSrc="sap-icon://decline"
-                    tooltip="{i18n>cancelCoupon}"
                     valueHelpRequest="oncancelCoupon"
                     change="onCouponLiveChange"
                 />
@@ -173,84 +172,7 @@
                     visible="{HostelModel>/CouponButtonVisible}"
                 />
             </HBox>
-            <!-- <HBox justifyContent="End">
-                <Label
-                    text="Discount:"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{
-            parts: ['HostelModel>/AppliedDiscount','HostelModel>/Currency'],
-            formatter: '.Formatter.formatCurrency'
-        }"
-                    class="totalColumnBold1"
-                />
-            </HBox> -->
-            <!-- <HBox
-                justifyContent="End"
-                visible="{= !${HostelModel>/IsIndia} }"
-            >
-                <Label
-                    text="Sub-Total (Non-Taxable):"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{   parts: [
-        'HostelModel>/OverallTotalCost',
-        'HostelModel>/Currency'
-    ], formatter: '.Formatter.formatCurrency'}"
-                    class="totalColumnBold1"
-                />
-            </HBox>
-
-            <HBox
-                justifyContent="End"
-                class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
-            >
-                <Label
-                    text="Sub-Total (Taxable):"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{ parts: [
-        'HostelModel>/OverallTotalCost',
-        'HostelModel>/Currency'
-    ], formatter: '.Formatter.formatCurrency'}"
-                    class="totalColumnBold1"
-                />
-            </HBox>
-
-            <HBox
-                justifyContent="End"
-                class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
-            >
-                <Label
-                    text="CGST (9%):"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{parts:['HostelModel>/CGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
-                    class="totalColumnBold1"
-                />
-            </HBox>
-
-            <HBox
-                justifyContent="End"
-                class="sapUiSmallMarginTop"
-                visible="{HostelModel>/IsIndia}"
-            >
-                <Label
-                    text="SGST (9%):"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{parts:['HostelModel>/SGST','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
-                    class="totalColumnBold1"
-                />
-            </HBox>
-            -->
+   
 
             <HBox
                 justifyContent="End"
@@ -266,75 +188,8 @@
                 />
                 </HBox>
                 
-                <!--
-            <HBox
-                justifyContent="End"
-                class="sapUiSmallMarginTop"
-            >
-                <Label
-                    text="{i18n>securitydeposit}"
-                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{parts:['HostelModel>/Deposit','HostelModel>/DepositCurrency'], formatter: '.Formatter.formatCurrency'}"
-                    class="totalColumnBold1"
-                />
-            </HBox> -->
+            
         </VBox>
     </FlexBox>
-    <!--<VBox class="sapUiMediumMarginBottom">
-        <VBox
-            visible="{= ${oTCModel>/Visiblity/Services/TrafficManagement} || ${oTCModel>/Visiblity/Services/TrafficManagementVehicles} }"
-        >
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.PermitDisp"
-                type="XML"
-            />
-        </VBox>
-        <VBox
-            visible="{= ${oTCModel>/Visiblity/Services/TrafficManagement} || ${oTCModel>/Visiblity/Services/TrafficManagementVehicles} }"
-        >
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.NonSpecificServiceDisp"
-                type="XML"
-            />
-        </VBox>
-        <VBox visible="{oTCModel>/Visiblity/Services/TrafficManagement}">
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.TrafficManagementDisp"
-                type="XML"
-            />
-        </VBox>
-
-        <VBox
-            visible="{oTCModel>/Visiblity/Services/TrafficManagementVehicles}"
-        >
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.TrafficControlVehiclesDisp"
-                type="XML"
-            />
-        </VBox>
-
-        <VBox visible="{oTCModel>/Visiblity/Services/TrafficEquipment}">
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.TrafficEquipmentDisp"
-                type="XML"
-            />
-        </VBox>
-
-        <VBox visible="{oTCModel>/Visiblity/Services/SiteChecks}">
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.SiteChecksDisp"
-                type="XML"
-            />
-        </VBox>
-
-        <VBox visible="{oTCModel>/Visiblity/Services/Aftercare}">
-            <core:Fragment
-                fragmentName="com.sap.winslow.customerportal.customerportal.fragment.Traffic_Control.AftercareDisp"
-                type="XML"
-            />
-        </VBox> -->
-
-    <!-- </VBox> -->
+  
 </mvc:View>

@@ -267,7 +267,7 @@ sap.ui.define([
                 this._sLoggedUserID = sEmpID;
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
                 oUIModel.setProperty("/isLoggedIn", true);
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
             }

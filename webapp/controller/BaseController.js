@@ -726,6 +726,8 @@ sap.ui.define([
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
       if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
+        oLoginModel.setProperty("/UserID", "");
+        oLoginModel.setProperty("/UserName", "");
         oLoginModel.setProperty("/EmployeeName", "");
       }
       this.getOwnerComponent().getRouter().navTo("RouteHostel");
@@ -745,7 +747,7 @@ sap.ui.define([
         if (!oModel) return fail();
 
         const userId = oModel.getProperty("/EmployeeID");
-        const userName = oModel.getProperty("/EmployeeName");
+        const userName = oModel.getProperty("/UserName");
 
         if (!userId || !userName) {
           return fail();
