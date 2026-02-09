@@ -910,7 +910,7 @@
 .barheader .sapMBar,
 .barheader .sapMBarRight,
 .barheader .sapMBarMiddle,
-.barheader .sapMBarLeft {
+.barheader {
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
   color: white !important;
 }

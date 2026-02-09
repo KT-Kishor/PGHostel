@@ -363,9 +363,9 @@
 
             <columns>
                 <Column><Text text="{i18n>bookingID}"/></Column>
-                <Column><Text text="{i18n>invoiceNo}"/></Column>
-                <Column><Text text="{i18n>invoiceDate}"/></Column>
                 <Column><Text text="{i18n>customerName}"/></Column>
+                <Column><Text text="{i18n>invoiceDate}"/></Column>
+                <Column><Text text="{i18n>invoiceNo}"/></Column>
                 <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
                 <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column>
             </columns>
@@ -374,9 +374,9 @@
                 <ColumnListItem type="Navigation" press="onPressManageInvoice">
                     <cells>
                         <Text text="{profileData>BookingID}"/>
-                        <Text text="{profileData>InvNo}"/>
-                        <Text text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"/>
                         <Text text="{profileData>CustomerName}"/>
+                        <Text text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text text="{profileData>InvNo}"/>
                         <Text text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
                         <Text text="{profileData>DueAmount}"/>
                     </cells>

@@ -6,52 +6,52 @@ sap.ui.define([
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
     "../model/formatter",
-     "../utils/validation",
-], function (BaseController,Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter,utils) {
-    "use strict";       
+    "../utils/validation",
+], function (BaseController, Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter, utils) {
+    "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageProfile", {
         Formatter: Formatter,
-      onInit: function () {
-    const oView = this.getView();
+        onInit: function () {
+            const oView = this.getView();
 
-    // Login form model
-    oView.setModel(new sap.ui.model.json.JSONModel({
-        fullname: "",
-        Email: "",
-        Mobileno: "",
-        password: "",
-        comfirmpass: ""
-    }), "LoginMode");
+            // Login form model
+            oView.setModel(new sap.ui.model.json.JSONModel({
+                fullname: "",
+                Email: "",
+                Mobileno: "",
+                password: "",
+                comfirmpass: ""
+            }), "LoginMode");
 
-    // Edit / Save state model
-    oView.setModel(new sap.ui.model.json.JSONModel({
-        isEditMode: false
-    }), "saveModel");
+            // Edit / Save state model
+            oView.setModel(new sap.ui.model.json.JSONModel({
+                isEditMode: false
+            }), "saveModel");
 
-    // Logged-in user
-    const oUserModel = sap.ui.getCore().getModel("LoginModel");
-    this._oLoggedInUser = oUserModel ? oUserModel.getData() : {};
+            // Logged-in user
+            const oUserModel = sap.ui.getCore().getModel("LoginModel");
+            this._oLoggedInUser = oUserModel ? oUserModel.getData() : {};
 
-    // Router matched
-    this.getOwnerComponent()
-        .getRouter()
-        .getRoute("RouteManageProfile")
-        .attachPatternMatched(this._onRouteMatched, this);
-},
-_onRouteMatched: function () {
-    this.ManageData();
-    this.commonLoginFunction()
-    this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            // Router matched
+            this.getOwnerComponent()
+                .getRouter()
+                .getRoute("RouteManageProfile")
+                .attachPatternMatched(this._onRouteMatched, this);
+        },
+        _onRouteMatched: function () {
+            this.ManageData();
+            this.commonLoginFunction()
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
-},
+        },
 
-        
-        ManageData: async function() {
+
+        ManageData: async function () {
             let oUser = this._oLoggedInUser;
             // const fullUserData = this._oLoggedInUser || {};
             let fullUserData = {};
-        
-            try{
+
+            try {
                 if (!oUser || !oUser.UserID) {
                     oUser = this.getOwnerComponent()
                         .getModel("UserModel")
@@ -64,7 +64,7 @@ _onRouteMatched: function () {
                 //     return;
                 // }
                 fullUserData = oUser;
-  const oTempModel = new JSONModel({
+                const oTempModel = new JSONModel({
                     bookings: [],
                     Payments: [],
                     isEditMode: false,
@@ -80,7 +80,7 @@ _onRouteMatched: function () {
                 //     this.byId("id_dialog")?.addStyleClass("dialogBlur");
                 // }, 200);
 
-                const filter = { UserID: sUserID}
+                const filter = { UserID: sUserID }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
                 const aPayments = response?.PaymentData || [];
@@ -112,11 +112,11 @@ _onRouteMatched: function () {
                             bookingGroup = "Upcoming";
                         }
                     }
-                    let GSTValue=0;
-                    if(booking.GSTType === "IGST"){
-                         GSTValue=Number(booking.GSTValue) /100 || 0;
-                    }else{
-                         GSTValue=(Number(booking.GSTValue) + Number(booking.GSTValue)) /100 || 0;
+                    let GSTValue = 0;
+                    if (booking.GSTType === "IGST") {
+                        GSTValue = Number(booking.GSTValue) / 100 || 0;
+                    } else {
+                        GSTValue = (Number(booking.GSTValue) + Number(booking.GSTValue)) / 100 || 0;
                     }
                     // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
                     return {
@@ -182,9 +182,9 @@ _onRouteMatched: function () {
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
-             
-} catch (err) {
-    const oProfileModel = new sap.ui.model.json.JSONModel({
+
+            } catch (err) {
+                const oProfileModel = new sap.ui.model.json.JSONModel({
                     ...fullUserData,
                     photo: "data:image/png;base64," + oUser.FileContent || "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
@@ -200,15 +200,15 @@ _onRouteMatched: function () {
                 this.getView().setModel(oProfileModel, "profileData");
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
-               
+
 
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
-},
-        
-    
-_applyCountryStateCityFilters: function () {
+        },
+
+
+        _applyCountryStateCityFilters: function () {
 
             const oModel = this.getView().getModel("profileData");
             if (!oModel) return;
@@ -254,8 +254,8 @@ _applyCountryStateCityFilters: function () {
             oStateCB.setValue(sState);
             oSourceCB.setValue(sSource);
         },
-     onNavBack: function () {
-             const oUser = this._oLoggedInUser;
+        onNavBack: function () {
+            const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
             if (oUser && oUser.UserID) {
@@ -266,7 +266,7 @@ _applyCountryStateCityFilters: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteHostel");
         },
-          onPreviewProfilePhoto: function () {
+        onPreviewProfilePhoto: function () {
             const sPhoto = this.getView().getModel("profileData").getProperty("/photo");
             if (!sPhoto) {
                 sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
@@ -294,7 +294,7 @@ _applyCountryStateCityFilters: function () {
             sap.ui.getCore().byId("previewProfileImage").setSrc(sPhoto);
             this._oPreviewDialog.open();
         },
-         onPressAvatarEdit: function (oEvent) {
+        onPressAvatarEdit: function (oEvent) {
             this._oAvatarActionSheet = new sap.m.ActionSheet({
                 buttons: [
                     new sap.m.Button({
@@ -319,7 +319,7 @@ _applyCountryStateCityFilters: function () {
             this.getView().addDependent(this._oAvatarActionSheet);
             this._oAvatarActionSheet.openBy(oEvent.getSource());
         },
-          onTakePhoto: function () {
+        onTakePhoto: function () {
             if (!this.oCameraDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.ui.com.project1.fragment.SelfieCam",
@@ -337,7 +337,7 @@ _applyCountryStateCityFilters: function () {
                 this.oCameraDialog.open();
             }
         },
-         onUploadPhoto: function () {
+        onUploadPhoto: function () {
             const uploader = this.byId("id_fileUploaderAvatar1");
             if (!uploader) return;
 
@@ -355,7 +355,7 @@ _applyCountryStateCityFilters: function () {
                 oInput.click();
             }, 200);
         },
-         onAvatarFileSelected: function (oEvent) {
+        onAvatarFileSelected: function (oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
             const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -384,7 +384,7 @@ _applyCountryStateCityFilters: function () {
             };
             reader.readAsDataURL(file);
         },
-          onRemovePhoto: async function () {
+        onRemovePhoto: async function () {
             const oModel = this.getView().getModel("profileData");
             const initials = oModel.getProperty("/initials");
 
@@ -396,7 +396,7 @@ _applyCountryStateCityFilters: function () {
                 fileContent: ""
             });
         },
-          _StartCamera: function () {
+        _StartCamera: function () {
             var oVideo = document.getElementById("video");
             if (!oVideo) return;
 
@@ -493,7 +493,7 @@ _applyCountryStateCityFilters: function () {
             this._StopCamera();
             this.oCameraDialog.close();
         },
-          IC_onPressCloseCameraDialog: function () {
+        IC_onPressCloseCameraDialog: function () {
             this._StopCamera();
             if (this.oCameraDialog) {
                 this.oCameraDialog.close();
@@ -529,7 +529,7 @@ _applyCountryStateCityFilters: function () {
                 sap.m.MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
-         onUserlivechange: function (oEvent) {
+        onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
         onEmailliveChange: function (oEvent) {
@@ -576,7 +576,7 @@ _applyCountryStateCityFilters: function () {
 
             return true;
         },
-         onAreaSelectionChange: function (oEvent) {
+        onAreaSelectionChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
             const oRoomType = this.byId("id_Roomtype");
@@ -588,7 +588,7 @@ _applyCountryStateCityFilters: function () {
                 oRoomType.setEnabled(true);
             }
         },
-         onEditSaveProfile: async function () {
+        onEditSaveProfile: async function () {
             const oModel = this.getView().getModel("profileData");
             var data = oModel.getData()
             const isEditMode = oModel.getProperty("/isEditMode");
@@ -597,9 +597,9 @@ _applyCountryStateCityFilters: function () {
                 oModel.setProperty("/Country", data.Country);
 
                 sap.ui.core.BusyIndicator.show(0);
-              
+
                 sap.ui.core.BusyIndicator.hide();
-            
+
                 return;
             }
             const isMandatoryValid = (
@@ -649,10 +649,10 @@ _applyCountryStateCityFilters: function () {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
                 oModel.refresh(true);
-                
+
             }
         },
-         onPressBookingRow: function (oEvent) {
+        onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
 
@@ -724,14 +724,14 @@ _applyCountryStateCityFilters: function () {
 
             // Navigate
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(sCustomerID),
+                sPath: btoa(encodeURIComponent(sCustomerID)),
                 from: "ManageProfile"
             });
         },
-         onPressManageInvoice: function (oEvent) {
+        onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "Customerinvoice" });
         },
-          calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
+        calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
@@ -804,7 +804,7 @@ _applyCountryStateCityFilters: function () {
                 return new Date(sDate);
             }
         },
-         onTableUpdateFinished: function () {
+        onTableUpdateFinished: function () {
             this._updateRowCount();
         },
 
@@ -822,28 +822,35 @@ _applyCountryStateCityFilters: function () {
             }
         },
 
-         onTableSelect: async function (oEvent) {
+        onTableSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("key");
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
         },
-       onlogout: function () {
+        onlogout: function () {
 
-    sap.ui.getCore().setModel(null, "profileData");
+           this.getView().getModel("profileData").setData({});
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             if (oLoginModel) {
                 oLoginModel.setData({});
             }
+             if (oLoginModel) {
+        oLoginModel.setProperty("/EmployeeID", "");
+        oLoginModel.setProperty("/UserID", "");
+        oLoginModel.setProperty("/UserName", "");
+        oLoginModel.setProperty("/EmployeeName", "");
+      }
+           
             sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
-            // this.CommonLogoutFunction();
-            this._oLoggedInUser = null;
+
+            // this._oLoggedInUser = null;
             this._isProfileRequested = false;
 
             // Reset Login State
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
-},
-onGlobalSearch: function (oEvent) {
+        },
+        onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
 
             const oProfileModel = this.getView().getModel("profileData");
