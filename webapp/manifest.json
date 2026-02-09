@@ -317,7 +317,7 @@
       "target": [
         "targetFeedback"
       ]
-    }
+    },
       {
       "name": "RouteCustomerReview",
       "pattern": "CustomerReview",
