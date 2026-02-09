@@ -348,6 +348,7 @@
                                                         typeMissmatch="onFileTypeMissmatch"
                                                         sameFilenameAllowed="true"
                                                         iconFirst="true"
+                                                        enabled="{editable>/Edit}"
                                                     />
                                                 </m:VBox>
                                                 <m:Button
@@ -429,6 +430,7 @@
                         class="myUnifiedBtn"
                         tooltip="{i18n>MVDapprove}"
                         press="MI_onPressButtons"
+                        enabled="{= !${editable>/Edit} }"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
                         &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />
@@ -438,7 +440,7 @@
                         tooltip="{i18n>sendBackRemark}"
                         class="myUnifiedBtn"
                         press="MI_onPressButtons"
-                        enabled="{= ${AdminSignupModel>/Status} !== 'Send back' }"
+                        enabled="{= !${editable>/Edit} &amp;&amp; ${AdminSignupModel>/Status} !== 'Send back' }"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
                         &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />

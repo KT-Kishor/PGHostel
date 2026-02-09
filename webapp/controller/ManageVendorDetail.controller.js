@@ -870,7 +870,6 @@ sap.ui.define([
             const std = oSTD.getValue();
 
             // Reset mobile field
-            oMobile.setValue("");
             oMobile.setMaxLength(std === "+91" ? 10 : 18);
 
             // Clear value states

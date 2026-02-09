@@ -307,7 +307,7 @@ sap.ui.define([
         BT_onsavebuttonpress: async function () {
             const bConfirm = await new Promise((resolve) => {
                 sap.m.MessageBox.confirm(
-                    "You can submit the details only once. Are you sure you want to proceed?",
+                    "You can submit only once. Proceed?",
                     {
                         icon: sap.m.MessageBox.Icon.WARNING,
                         title: "Confirm Submission",
@@ -816,7 +816,6 @@ sap.ui.define([
             const std = oSTD.getValue();
 
             // Reset mobile field
-            oMobile.setValue("");
             oMobile.setMaxLength(std === "+91" ? 10 : 18);
 
             // Clear value states

@@ -350,6 +350,7 @@
                                                         typeMissmatch="onFileTypeMissmatch"
                                                         sameFilenameAllowed="true"
                                                         iconFirst="true"
+                                                        enabled="{editable>/Edit}"
                                                     />
                                                 </m:VBox>
                                                 <m:Button
