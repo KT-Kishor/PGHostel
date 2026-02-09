@@ -309,7 +309,7 @@ sap.ui.define([
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
 
                 var Paymentpaid = aPayment
-                    .filter(item => item.CustomerID === oCustomer.CustomerID)
+                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used!=="Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
 
