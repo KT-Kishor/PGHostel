@@ -77,7 +77,8 @@ sap.ui.define([
                     LUT: "",
                     IncomePerc: "10",
                     RoomNo: "",
-                    BranchCode: ""
+                    BranchCode: "",
+                    RefundAmount : ""
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
 
@@ -137,6 +138,7 @@ sap.ui.define([
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                     const sCustomerID = oNavCtx?.getProperty("/CustomerID");
                     const sBookingID  = oNavCtx?.getProperty("/BookingID");
+                    const sCustomerName = oNavCtx?.getProperty("/CustomerName");
 
                     const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
                     const oBookingCombo  = this.byId("CID_id_AddBooking");
@@ -150,6 +152,12 @@ sap.ui.define([
                         oBookingCombo.setSelectedKey(sBookingID);
                         this.SelectKey = sCustomerID;  // Store customer for booking 
                         oCustomerCombo.setEditable(false);  // Lock customer selection
+
+                        const customerData = [{
+                            CustomerID: sCustomerID,
+                            CustomerName: sCustomerName
+                        }];
+                        this.getView().setModel(new sap.ui.model.json.JSONModel(customerData), "ManageCustomerModel");
 
                         const bookingData = [{
                             BookingID: sBookingID,
@@ -287,6 +295,9 @@ sap.ui.define([
                     this.Readcall("HM_InvoicePaymentDetail", {
                         InvNo: this.decodedPath
                     })
+                    this.Readcall("HM_Payment", {
+                        InvNo: this.decodedPath, Used : "Y"
+                    })
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
@@ -318,8 +329,7 @@ sap.ui.define([
                             );
 
                             resolve(); // ✅ VERY IMPORTANT
-                        })
-                        .catch((err) => {
+                        }).catch((err) => {
                             MessageToast.show(err.responseText || "Failed to Load Customer Data.");
                             sap.ui.core.BusyIndicator.hide();
                         })
@@ -327,31 +337,13 @@ sap.ui.define([
             },
 
             onNavBack: function() {
-                const oLoginModel = this.getView().getModel("LoginModel");
-                const sRole = oLoginModel?.getProperty("/Role") || "";
-                const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-                // if (sRole === "Customer") {
-                //     this._sLoggedUserID = sEmpID;
-                //     const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                //     oUIModel.setProperty("/isLoggedIn", true);
-                //     this.getOwnerComponent().getRouter().navTo("RouteHostel");
-                // } else if (this.sourceView === "AdminPage") {
-                //     this.getOwnerComponent().getRouter().navTo("RouteAdmin");
-                // } else if (this.sourceView === "PaymentDashboard") {
-                //     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
-                // }else if (this.sourceView === "Customerinvoice") {
-                //     
-                //  } else {
-                //     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
-                // }
-                if(this.sourceView === "Customerinvoice"){
-                 this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-                }else if(this.sourceView === "AdminPage"){
+                if (this.sourceView === "Customerinvoice") {
+                    this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                } else if (this.sourceView === "AdminPage") {
                     this.getOwnerComponent().getRouter().navTo("RouteAdmin");
-                }else if(this.sourceView === "PaymentDashboard"){
-                     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
-                }
-                else{
+                } else if (this.sourceView === "PaymentDashboard") {
+                    this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+                } else {
                     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
                 }
             },
@@ -400,7 +392,7 @@ sap.ui.define([
                     const bookingID = oEvent.getSource().getSelectedKey();
                     const customerID = this.SelectKey;
 
-                    if (!bookingID || !customerID) return;
+                    if (!bookingID && !customerID) return;
 
                     sap.ui.core.BusyIndicator.show(0);
 
@@ -462,7 +454,7 @@ sap.ui.define([
                     const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
 
                     // ---- GST auto mapping from BranchDetails ----
-                    if (mergedData.GST) {
+                    if (mergedData.Type) {
                         oCustomerModel.setProperty("/GST", mergedData.GST);
                         oCustomerModel.setProperty("/GSTValid", true);
 
@@ -668,7 +660,7 @@ sap.ui.define([
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled = !!gstin &&
+                const isGSTEnabled = 
                     !!taxType &&
                     taxRate > 0 &&
                     currency === "INR";
@@ -761,12 +753,25 @@ sap.ui.define([
                 // ---------------- PAID & BALANCE ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
-                let balanceAmount = roundedAmount - paidAmount;
-                if (balanceAmount < 0) balanceAmount = 0;
+                let balanceAmount = 0;
+                let refundAmount = 0;
+
+                if (paidAmount > roundedAmount) {
+                    // Overpayment → refund required
+                    refundAmount = paidAmount - roundedAmount;
+                    balanceAmount = 0;
+                } else {
+                    // Normal balance
+                    balanceAmount = roundedAmount - paidAmount;
+                    refundAmount = 0;
+                }
 
                 oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                 oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                oCustomerModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
+
                 oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                oSOWModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
 
                 oInvoiceModel.refresh(true);
                 this.onChangeConversionRate();
@@ -914,11 +919,19 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
+                const paidAmount   = Number(oSelectedCustomerModel.PaidAmount) || 0;
+                const totalAmount  = Number(oSelectedCustomerModel.TotalAmount) || 0;
+                let sFinalStatus = "Submitted";
 
-                const sFinalStatus = balanceAmount === 0 ?
-                    "Payment Received" :
-                    (oSelectedCustomerModel.Status || "Submitted");
+                if (paidAmount === totalAmount) {
+                    sFinalStatus = "Payment Received";
+                } 
+                else if (paidAmount < totalAmount) {
+                    sFinalStatus = "Payment Partially";
+                } 
+                else if (paidAmount > totalAmount) {
+                    sFinalStatus = "Refund Due";
+                }
 
 
                 const oPayload = {
@@ -959,6 +972,7 @@ sap.ui.define([
                     BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
                     CustomerGSTNO:oSelectedCustomerModel.CustomerGSTNO || "",
+                    RefundAmount : oSelectedCustomerModel.RefundAmount || ""
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1413,6 +1427,18 @@ sap.ui.define([
                     return;
                 }
 
+                if (entity === "HM_Payment") {
+                    const items = oData.commentData || [];
+                    const refundEntry = items.find(item => item.Used === "Y");
+                    const refundAmount = refundEntry ? parseFloat(refundEntry.Amount) : 0;
+                    // Set in SelectedCustomerModel
+                    const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+                    if (oSelectedModel) {
+                        oSelectedModel.setProperty("/RefundProcessed", refundAmount.toFixed(2));
+                        oSelectedModel.refresh(true);
+                    }
+                }
+
                 const view = this.getView();
                 view.setModel(new JSONModel(oData.data), "InvoicePayment");
                 view.setModel(new JSONModel({
@@ -1528,6 +1554,10 @@ sap.ui.define([
 
             onLiveTransactionID: function(oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            onPaymentModeChange: function (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             },
 
             onReceivedDateDatePickerChange: function(oEvent) {
@@ -2340,7 +2370,7 @@ sap.ui.define([
                     const taxRate = parseFloat(oCustomerModel.Value) || 0;
                     const currency = oSOWModel.Currency;
 
-                    const isGSTEnabled = !!gstin &&
+                    const isGSTEnabled =
                         !!taxType &&
                         taxRate > 0 &&
                         currency === "INR";
@@ -3007,6 +3037,112 @@ sap.ui.define([
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
-            }
+            },
+
+             CID_onPressrefundAmount: function() {
+                    var that = this;   
+                    var oView = that.getView();
+                    if (!that.oDialog) {
+                        sap.ui.core.Fragment.load({
+                            name: "sap.ui.com.project1.fragment.RefundAmount",
+                            controller: that
+                        }).then(function(oDialog) {
+                            that.oDialog = oDialog;
+                            oView.addDependent(oDialog);
+                            oDialog.open();
+                            that.refundFunction();
+                        });
+                    } else {
+                        that.oDialog.open();
+                        that.refundFunction();
+                    }      
+            },
+
+            refundFunction: function() {
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+
+                var oModel = new sap.ui.model.json.JSONModel({
+                    InvNo: oNavigationModel.InvNo,
+                    TransactionId: "",
+                    ReceivedDate: "",
+                    RefundAmount: oNavigationModel.RefundAmount,
+                    Currency: oNavigationModel.Currency,
+                    CustomerName: oNavigationModel.CustomerName,
+                    CustomerID: oNavigationModel.CustomerID,
+                    BookingID: oNavigationModel.BookingID,
+                    BranchCode: oNavigationModel.BranchCode
+                });
+                this.getView().setModel(oModel, "RefundModel");
+            },
+
+            HM_onPressRefundAmount: async function() {
+                var RefundModel = this.getView().getModel("RefundModel").getData();
+                const isMandatoryValid =
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("HM_id_PaymentMode"), "ID") &&
+		            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("HM_id_ReceivedDate"), "ID");
+
+                    const isValid = isMandatoryValid
+                    if (!isValid) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+
+                sap.ui.core.BusyIndicator.show(0);
+                const jsonData = {
+                    InvNo: String(RefundModel.InvNo),
+                    BankTransactionID: String(RefundModel.TransactionId),
+                    Date : RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    Amount: String(RefundModel.RefundAmount),
+                    Currency: String(RefundModel.Currency),
+                    CustomerName: RefundModel.CustomerName,
+                    CustomerID: RefundModel.CustomerID,
+                    BookingID: RefundModel.BookingID,
+                    BranchCode: RefundModel.BranchCode,
+                    PaymentType: RefundModel.PaymentMode,
+                    BankName : RefundModel.PaymentMode,
+                    Used : "Y"
+                };
+
+                try {
+                    const oData = await this.ajaxCreateWithJQuery("HM_Payment", {
+                        data: jsonData
+                    });
+
+                    if (oData && oData.success) {
+                        this.oDialog.close();
+                        this.Readcall("HM_Payment", {
+                            InvNo: this.decodedPath, Used : "Y"
+                        });
+                        this.Readcall("HM_ManageInvoice", {
+                            InvNo: this.decodedPath
+                        });
+
+                        this.visiablityPlay.setProperty("/Edit", hasDue);
+                        this.visiablityPlay.setProperty("/editable", false);
+                        this.visiablityPlay.setProperty("/CInvoice", false);
+                        this.visiablityPlay.setProperty("/merge", true);
+                        this.visiablityPlay.setProperty("/addInvBtn", false);
+
+                        MessageToast.show(this.i18nModel.getText("refundMessage"));
+                    }
+                } catch (error) {
+                    MessageToast.show(error.responseText);
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                }
+            },
+
+            HM_onPressClose: function() {
+                sap.ui.getCore().byId("HM_id_PaymentMode").setValueState("None");
+                sap.ui.getCore().byId("HM_id_TransactionID").setValueState("None");
+                sap.ui.getCore().byId("HM_id_ReceivedDate").setValueState("None");
+
+                if (this.oDialog) {
+                    this.oDialog.close();
+                    this.oDialog.destroy(true);
+                    this.oDialog = null;
+                }
+            },
         });
     });

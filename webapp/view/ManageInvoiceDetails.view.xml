@@ -792,6 +792,36 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
+                                            <!-- Refund Due -->
+											<m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{= ${SelectedCustomerModel>/RefundAmount} > 0 }"
+                                            >
+												<m:Label
+                                                    text="{i18n>refundDue} ({FilteredSOWModel>/Currency}) :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+												<m:Text
+                                                    class="amountText"
+                                                    text="{path:'SelectedCustomerModel>/RefundAmount',formatter: '.Formatter.fromatNumber'}"
+                                                    textAlign="End"
+                                                />
+											</m:HBox>
+                                             <!-- Refund Processed -->
+											<m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{= ${SelectedCustomerModel>/RefundProcessed} > 0 }"
+                                            >
+                                                <m:Label
+                                                    text="{i18n>refundProcessed} ({FilteredSOWModel>/Currency}) :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{path:'SelectedCustomerModel>/RefundProcessed', formatter: '.Formatter.fromatNumber'}"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
 											<!-- Received Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -852,6 +882,17 @@
 		<m:footer>
 			<m:Bar>
 				<m:contentRight>
+                    <m:Button
+                            visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
+                                &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
+                                &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin')
+                                &amp;&amp; ${visiablityPlay>/merge}
+                            }"
+                            text="{i18n>refundAmount}"
+                            tooltip="{i18n>refundAmount}"
+                            press="CID_onPressrefundAmount"
+                            class="myUnifiedBtn"
+                        />
 					<m:Button
                         visible="{= ${visiablityPlay>/createVisi} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
                         text="{i18n>submit}"
