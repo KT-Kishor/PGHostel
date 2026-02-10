@@ -145,7 +145,7 @@
                                 growing="true"
                                 liveChange="onCommentsChange"
                                 class="sapUiSmallMarginBottom"
-
+                                maxLength="500"
                             />
                                 <Label text=""/>
                                 <Button

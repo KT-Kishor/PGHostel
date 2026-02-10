@@ -4,10 +4,10 @@
 >
     <Bar design="Header">
         <contentLeft>
-           
+            <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
             <Link
                 text="{i18n>devlopby}"
-                href="https://kvrikshatechnologies.com/"
+                href="https://www.kalpavrikshatechnologies.com/"
                 target="_blank"
                 class="customLinkWhiteBg"
             />
