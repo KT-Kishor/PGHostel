@@ -1,76 +1,105 @@
 {
-    "sap.app": {
-        "id": "sap.ui.com.project1.cards.CustomerCard",
-        "type": "card"
-    },
-    "sap.card": {
-        "type": "Object",
-   "configuration": {
-  "parameters": {
-    "CustomerName": { "type": "string" },
-    "BedType": { "type": "string" },
-    "BranchName": { "type": "string" },
-    "OverallRating": { "type": "number" },
-    "Comments": { "type": "string" },
-    "FeedbackDate": { "type": "string" }
+  "sap.app": {
+    "id": "sap.ui.com.project1.cards.CustomerCard",
+    "type": "card"
+  },
+  "sap.card": {
+    "type": "Object",
+   "header": {
+    "text": "✔ Verified Stay",
+  "title": "{parameters>/CustomerName/value}",
+  "subTitle": "{parameters>/BedType/value}",
+  "status": {
+    "text": "{parameters>/BranchName/value}"
+  },
+  "icon": {
+    "src": "sap-icon://customer",
+    "shape": "Circle"
   }
 },
-        "content": {
-            "groups": [
-                {
-                    "title": "Customer Name:",
-                    "items": [
-                        {
-                            "value": "{parameters>/CustomerName/value}"
-                        }
-                    ]
-                },
-                {
-                    "title": "Bed Type:",
-                    "items": [
-                        {
-                            "value": "{parameters>/BedType/value}"
-                        }
-                    ]
-                },
-                {
-                    "title": "Branch Name:",
-                    "items": [
-                        {
-                            "value": "{parameters>/BranchName/value}"
-                        }
-                    ]
-                },
-                {
-                    "title": "Rating:",
-                    "items": [
-                        {
-                            "type": "RatingIndicator",
-                            "value": "{parameters>/OverallRating/value}",
-                            "maxValue": 5
-                        },
-                        {
-                            "text": "{parameters>/OverallRating/value} / 5"
-                        }
-                    ]
-                },
-                {
-                    "title": "Comments:",
-                    "items": [
-                        {
-                            "value": "{parameters>/Comments/value}"
-                        }
-                    ]
-                },
-                {
-                    "title": "Feedback Date:",
-                    "items": [
-                        {
-                            "value": "{parameters>/FeedbackDate/value}"
-                        }
-                    ]
-                }
-            ]
+    "configuration": {
+      "parameters": {
+        "CustomerName": { "type": "string" },
+        "BedType": { "type": "string" },
+        "BranchName": { "type": "string" },
+        "OverallRating": { "type": "number" },
+        "CleanlinessRating": { "type": "number" },
+        "AmenitiesRating": { "type": "number" },
+        "StaffRating": { "type": "number" },
+        "ValueRating": { "type": "number" },
+        "Comments": { "type": "string" },
+        "FeedbackDate": { "type": "string" }
+      }
+    },
+ "content": {
+  "groups": [
+    {
+      "items": [
+        {
+          "label": "Overall",
+          "type": "RatingIndicator",
+          "value": "{parameters>/OverallRating/value}",
+          "maxValue": 5
         }
+      ]
+    },
+    {
+      "items": [
+        {
+          "label": "Room",
+          "type": "RatingIndicator",
+          "value": "{parameters>/CleanlinessRating/value}",
+          "maxValue": 5
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "label": "Amenities",
+          "type": "RatingIndicator",
+          "value": "{parameters>/AmenitiesRating/value}",
+          "maxValue": 5
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "label": "Staff",
+          "type": "RatingIndicator",
+          "value": "{parameters>/StaffRating/value}",
+          "maxValue": 5
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "label": "Value",
+          "type": "RatingIndicator",
+          "value": "{parameters>/ValueRating/value}",
+          "maxValue": 5
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "label": "Feedback Date",
+          "value": "{parameters>/FeedbackDate/value}"
+        }
+      ]
+    },
+    {
+      "heading": "Customer Comment",
+      "items": [
+        {
+          "value": "{parameters>/Comments/value}"
+        }
+      ]
     }
+  ]
+}
+  }
 }

@@ -14,57 +14,62 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            var data = this.getOwnerComponent().getModel("SelectedBedType").getData();
-            await this._loadCustomerReviews(data);
+            // var data = this.getOwnerComponent().getModel("SelectedBedType").getData();
+            // await this._loadCustomerReviews(data);
+            this.commonLoginFunction();
+            this._setDefaultDateRange();
+            await this._loadCustomers();
+            await this._buildBranchMap();
+            await this._loadCustomerReviews();
         },
 
         _getBranchName: function (sBranchCode) {
-            const aBranches = this.getOwnerComponent().getModel("sBRModel").getData() || [];
-            const oBranch = aBranches.find(b => b.BranchCode === sBranchCode);
-            return oBranch ? oBranch.Name : sBranchCode;
+            return this._mBranchMap?.[sBranchCode] || sBranchCode || "N/A";
+        },
+
+        _getCustomerName: function (sCustomerID) {
+            return this._mCustomerMap?.[sCustomerID] || sCustomerID || "N/A";
+        },
+
+        getBranch: async function () {
+            const oComponent = this.getOwnerComponent();
+            let oBRModel = oComponent.getModel("sBRModel");
+
+            if (!oBRModel) {
+                await oComponent._fetchCommonData("HM_Branch", "sBRModel");
+                oBRModel = oComponent.getModel("sBRModel");
+            }
+            const aData = oBRModel?.getData();
+            return Array.isArray(aData) ? aData : [];
+        },
+
+        _buildBranchMap: async function () {
+            const aBranches = await this.getBranch();
+            const mBranchMap = {};
+
+            aBranches.forEach(b => {
+                const sBranchCode = b.BranchID;
+                mBranchMap[sBranchCode] = b.Name;
+            });
+            this._mBranchMap = mBranchMap;
         },
 
         _loadCustomerReviews: function (data) {
-            var BedTypeName = `${data.Name} - ${data.ACType}`;
-
-            var filters = {
-                BranchCode: data.BranchCode,
-                BedType: BedTypeName
-            };
-
-
+            // var BedTypeName = `${data.Name} - ${data.ACType}`;
+            // var filters = {
+            //     BranchCode: data.BranchCode,
+            //     BedType: BedTypeName
+            // };
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
+            this.ajaxReadWithJQuery("HM_Feedback", {}).then(function (oData) {
                 console.log("HM_Feedback response:", oData.commentData);
                 const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                //                 if (!aFeedbacks.length) {
-                //     oBox.setBusy(false);
-                //     MessageToast.show("No customer reviews found");
-                //     return;
-                // }
-                aFeedbacks.forEach(function (oFeedback) {
-                    const sBranchName = that._getBranchName(oFeedback.BranchCode);
-
-                    const oCard = new sap.ui.integration.widgets.Card({
-                        manifest: "cards/CustomerCard.json",
-                        parameters: {
-                            CustomerName: oFeedback.CustomerID,
-                            BedType: oFeedback.BedType,
-                            OverallRating: Number(oFeedback.OverallRating),
-                            Comments: oFeedback.Comments,
-                            FeedbackDate: that.Formatter.formatDate(oFeedback.FeedbackDate),
-                            BranchName: sBranchName
-                        },
-                        width: "320px"
-                    });
-
-                    oBox.addItem(oCard);
-                });
-
+                that._aAllFeedbacks = aFeedbacks;
+                that._applyFilters();
                 sap.ui.core.BusyIndicator.hide();
             }).catch(function () {
                 sap.ui.core.BusyIndicator.hide();
@@ -80,6 +85,81 @@ sap.ui.define([
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+        },
+
+        _loadCustomers: function () {
+            return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
+                const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
+                const mCustomerMap = {};
+
+                aCustomers.forEach(c => {
+                    mCustomerMap[c.CustomerID] = c.CustomerName || c.Name;
+                });
+
+                this._mCustomerMap = mCustomerMap;
+            });
+        },
+
+        _setDefaultDateRange: function () {
+            const oDRS = this.byId("CR_id_BranchCode");
+            const oToday = new Date();
+            const oFrom = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
+            const oTo = new Date(oToday.getFullYear(), oToday.getMonth() + 1, 0);
+            oDRS.setDateValue(oFrom);
+            oDRS.setSecondDateValue(oTo);
+        },
+
+        _applyFilters: function () {
+            const oBox = this.byId("CR_id_ReviewContainer");
+            oBox.removeAllItems();
+            const oDRS = this.byId("CR_id_BranchCode");
+            const oRatingCB = this.byId("CR_id_Rating");
+
+            const dFrom = oDRS.getDateValue();
+            const dTo = oDRS.getSecondDateValue();
+            const sRating = oRatingCB.getSelectedKey();
+            let aFiltered = this._aAllFeedbacks || [];
+            if (dFrom && dTo) {
+                aFiltered = aFiltered.filter(f => {
+                    const dFeedback = new Date(f.FeedbackDate);
+                    return dFeedback >= dFrom && dFeedback <= dTo;
+                });
+            }
+            if (sRating) {
+                aFiltered = aFiltered.filter(f =>
+                    Number(f.OverallRating) === Number(sRating)
+                );
+            }
+            aFiltered.forEach(f => {
+                const oCard = new sap.ui.integration.widgets.Card({
+                    manifest: "cards/CustomerCard.json",
+                    parameters: {
+                        CustomerName: this._getCustomerName(f.CustomerID),
+                        BedType: f.BedType,
+                        OverallRating: Number(f.OverallRating),
+                        CleanlinessRating: Number(f.CleanlinessRating),
+                        AmenitiesRating: Number(f.AmenitiesRating),
+                        StaffRating: Number(f.StaffRating),
+                        ValueRating: Number(f.ValueRating),
+                        Comments: f.Comments,
+                        FeedbackDate: this.Formatter.formatDate(f.FeedbackDate),
+                        BranchName: this._getBranchName(f.BranchCode)
+                    },
+                    width: "100%",
+                    height: "auto"
+                });
+                oBox.addItem(oCard);
+            });
+        },
+
+        CR_onSearch: function () {
+            this._applyFilters();
+        },
+
+        CR_onPressClear: function () {
+            this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_BranchCode").setValue("");
+            this._applyFilters();
         },
     })
 })

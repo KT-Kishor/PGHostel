@@ -5,6 +5,7 @@
     xmlns:m="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:l="sap.ui.layout"
+    xmlns:fb="sap.ui.comp.filterbar"
     xmlns:f="sap.f"
     xmlns:et="sap.m"
     xmlns:card="sap.ui.integration.widgets"
@@ -21,10 +22,70 @@
                 <Title
                     text="Customer's Review"
                     level="H3"
+                    class="sapUiTinyMarginBottom"
                 />
+                <fb:FilterBar
+                    id="CR_id_Filterbar"
+                    useToolbar="false"
+                    clear="CR_onPressClear"
+                    showClearOnFB="true"
+                    search="CR_onSearch"
+                    showFilterConfiguration="false"
+                >
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="FeedbackDate"
+                            label="Feedback Date"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <DateRangeSelection
+                                    id="CR_id_BranchCode"
+                                    valueFormat="yyyy-MM-dd"
+                                    displayFormat="dd/MM/yyyy"
+                                    change="onDateRangeChange"
+                                />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="Rating"
+                            label="Rating"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <ComboBox id="CR_id_Rating">
+                                <core:Item
+                                    key="1"
+                                    text="1 Star"
+                                />
+                                <core:Item
+                                    key="2"
+                                    text="2 Stars"
+                                />
+                                <core:Item
+                                    key="3"
+                                    text="3 Stars"
+                                />
+                                <core:Item
+                                    key="4"
+                                    text="4 Stars"
+                                />
+                                <core:Item
+                                    key="5"
+                                    text="5 Stars"
+                                />
+                                </ComboBox>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                </fb:FilterBar>
                 <m:ScrollContainer
-                    horizontal="true"
-                    vertical="false"
+                    horizontal="false"
+                    vertical="true"
                     class="sapUiResponsiveContentPadding"
                 >
                     <m:FlexBox
