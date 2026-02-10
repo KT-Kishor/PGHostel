@@ -1,37 +1,34 @@
 sap.ui.define([
     "./BaseController",
-    "sap/m/MessageBox",
-    "sap/m/MessageToast",
-    "sap/ui/model/json/JSONModel",
     "../model/formatter"
-], function (BaseController, MessageBox, MessageToast, JSONModel, Formatter) {
+], function(BaseController, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.CustomerReview", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteCustomerReview").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-              var data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+            var data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             // await this._loadCustomerReviews(data);
-            this.commonLoginFunction();
+            // this.commonLoginFunction();
             this._setDefaultDateRange();
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews(data);
         },
 
-        _getBranchName: function (sBranchCode) {
+        _getBranchName: function(sBranchCode) {
             return this._mBranchMap?.[sBranchCode] || sBranchCode || "N/A";
         },
 
-        _getCustomerName: function (sCustomerID) {
+        _getCustomerName: function(sCustomerID) {
             return this._mCustomerMap?.[sCustomerID] || sCustomerID || "N/A";
         },
 
-        getBranch: async function () {
+        getBranch: async function() {
             const oComponent = this.getOwnerComponent();
             let oBRModel = oComponent.getModel("sBRModel");
 
@@ -43,7 +40,7 @@ sap.ui.define([
             return Array.isArray(aData) ? aData : [];
         },
 
-        _buildBranchMap: async function () {
+        _buildBranchMap: async function() {
             const aBranches = await this.getBranch();
             const mBranchMap = {};
 
@@ -54,22 +51,18 @@ sap.ui.define([
             this._mBranchMap = mBranchMap;
         },
 
-     
-        _loadCustomerReviews: function (data) {
-               const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+        _loadCustomerReviews: function(data) {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
-
             if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
 
-
-          
-              const oDRS = this.byId("CR_id_BranchCode");
+            const oDRS = this.byId("CR_id_BranchCode");
             const oRatingCB = this.byId("CR_id_Rating");
 
             const dFrom = oDRS.getDateValue();
@@ -79,11 +72,11 @@ sap.ui.define([
 
             var filters = {
                 BedType: BedTypeName,
-                StartDate : dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
-                EndDate : dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-")  : "",
+                StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
+                EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
                 OverallRating: sRating || ""
             };
-              if (oExistingModel.Role === "Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
@@ -94,29 +87,33 @@ sap.ui.define([
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
+            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function(oData) {
                 console.log("HM_Feedback response:", oData.commentData);
                 const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 that._aAllFeedbacks = aFeedbacks;
                 that._applyFilters();
                 sap.ui.core.BusyIndicator.hide();
-            }).catch(function () {
+            }).catch(function() {
                 sap.ui.core.BusyIndicator.hide();
                 sap.m.MessageToast.show("Failed to load customer reviews");
             });
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
-            this.getView().getModel("mainModel").setData({});
         },
 
-        onNavBack: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("TilePage");
+        onNavBack: function() {
+            const oLoginModel = this.getView().getModel("LoginModel");
+            const sRole = oLoginModel?.getProperty("/Role") || "";
+            if (sRole === "Admin") {
+                this.getOwnerComponent().getRouter().navTo("TilePage");
+            } else {
+                this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            }
         },
 
-        _sortFeedbacksDefault: function (aData) {
+        _sortFeedbacksDefault: function(aData) {
             if (!Array.isArray(aData)) {
                 return aData;
             }
@@ -140,7 +137,7 @@ sap.ui.define([
             });
         },
 
-        _loadCustomers: function () {
+        _loadCustomers: function() {
             return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
                 const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
                 const mCustomerMap = {};
@@ -153,7 +150,7 @@ sap.ui.define([
             });
         },
 
-        _setDefaultDateRange: function () {
+        _setDefaultDateRange: function() {
             const oDRS = this.byId("CR_id_BranchCode");
             const oToday = new Date();
             const oFrom = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
@@ -162,7 +159,7 @@ sap.ui.define([
             oDRS.setSecondDateValue(oTo);
         },
 
-        _applyFilters: function () {
+        _applyFilters: function() {
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             let aFiltered = this._aAllFeedbacks || [];
@@ -188,11 +185,11 @@ sap.ui.define([
             });
         },
 
-        CR_onSearch: function () {
+        CR_onSearch: function() {
             this._applyFilters();
         },
 
-        CR_onPressClear: function () {
+        CR_onPressClear: function() {
             this.byId("CR_id_Rating").setSelectedKey("");
             this.byId("CR_id_BranchCode").setValue("");
             this._applyFilters();
