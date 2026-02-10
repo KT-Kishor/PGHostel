@@ -5,7 +5,9 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../utils/validation",
     "../model/formatter",
-], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter) {
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
@@ -15,6 +17,7 @@ sap.ui.define([
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
+            this.getView().setModel(new JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
             this.getView().setModel(new JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
@@ -43,7 +46,7 @@ sap.ui.define([
         },
         _getBrowserLocation: function () {
             if (!navigator.geolocation) {
-                sap.m.MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
+                MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
                 return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -75,24 +78,18 @@ sap.ui.define([
                     this.City = city
                 },
                 error: (err) => {
-                    console.error("Reverse geocoding failed", err);
+                    console.log("Reverse geocoding failed", err);
                 }
             });
         },
 
         _onRouteMatched: async function () {
-
-
             var oNavContainer = this.byId("pageContainer");
             var oTabHeader = this.byId("mainTabHeader");
 
-            if (oNavContainer) {
-                oNavContainer.to(this.byId("idHome"));
-            }
+            if (oNavContainer) oNavContainer.to(this.byId("idHome"));
 
-            if (oTabHeader) {
-                oTabHeader.setSelectedKey("idHome");
-            }
+            if (oTabHeader) oTabHeader.setSelectedKey("idHome");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.iTop = 4; // records per load
@@ -155,27 +152,6 @@ sap.ui.define([
                 selectedSection: "profile"
             }), "profileSectionModel");
 
-            //  Hardcoded branches (initial fallback)
-            const aBranches = [{
-                BranchCode: "KLB01",
-                BranchName: "Kalaburagi"
-            },
-            {
-                BranchCode: "BR002",
-                BranchName: "Mumbai"
-            },
-            {
-                BranchCode: "BR003",
-                BranchName: "Nagpur"
-            },
-            {
-                BranchCode: "BR004",
-                BranchName: "Nashik"
-            }
-            ];
-            oView.setModel(new JSONModel({
-                Branches: aBranches
-            }), "BranchModel");
             this.oViewModel.setProperty("/showOTPField", false);
 
             const oState = $C("signUpState");
@@ -183,13 +159,13 @@ sap.ui.define([
 
             if (oState?.getBinding("items")) {
                 oState.getBinding("items").filter([
-                    new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
+                    new Filter("stateName", "EQ", "__NONE__")
                 ]);
             }
 
             if (oCity?.getBinding("items")) {
                 oCity.getBinding("items").filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                    new Filter("cityName", "EQ", "__NONE__")
                 ]);
             }
             this.oViewModel.setProperty("/canResendOTP", true);
@@ -246,8 +222,6 @@ sap.ui.define([
             }, 1000);
         },
 
-
-
         _onOtpExpired: function () {
             const vm = this.oViewModel;
 
@@ -273,38 +247,13 @@ sap.ui.define([
             otpCtrl?.setEnabled(false);
             otpCtrl?.setValueState("None");
 
-            sap.m.MessageToast.show("OTP expired. Please resend OTP.");
-        },
-
-
-        CustomerDetails: async function () {
-            try {
-                const oData = await this.ajaxReadWithJQuery("HM_Customer", {});
-                const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [oData.Customers];
-
-                const oCustomerModel = new JSONModel(aCustomers);
-                this.getView().setModel(oCustomerModel, "CustomerModel");
-            } catch (err) {
-                console.error("Error while fetching Customer details:", err);
-            }
+            MessageToast.show("OTP expired. Please resend OTP.");
         },
 
         onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onReadcallforRoom: async function () {
-            try {
-                const oView = this.getView();
-                const oResponse = await this.ajaxReadWithJQuery("HM_Rooms", {});
-                const aRooms = oResponse?.commentData || [];
-                const oRoomModel = new JSONModel({ Rooms: aRooms });
-                oView.setModel(oRoomModel, "RoomCountModel"); //  Bind model to the view
-            } catch (err) {
-                console.error("Error reading rooms:", err);
-                sap.m.MessageToast.show(this.i18nModel.getText("failedloadroomdata"));
-            }
-        },
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = { id_Branch: new Set(), };
 
@@ -389,12 +338,12 @@ sap.ui.define([
             // BASIC VALIDATIONS
             // -------------------------
             if (!oData.Visible) {
-                sap.m.MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
+                MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
                 return;
             }
 
             if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
+                MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
                 return;
             }
 
@@ -454,7 +403,7 @@ sap.ui.define([
             const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
 
             if (iAvailableBeds <= 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("nobedsavailableforbooking"));
+                MessageToast.show(this.i18nModel.getText("nobedsavailableforbooking"));
                 return;
             }
 
@@ -609,7 +558,6 @@ sap.ui.define([
 
 
         _LoadFacilities: function (sBranchCode) {
-            const oView = this.getView();
             if (!this._oRoomDetailFragment) return; // Safety check
 
             if (!sBranchCode) return;
@@ -667,14 +615,12 @@ sap.ui.define([
                         })
                         .filter(Boolean);   // removes null entries (facilities with all prices = 0)
 
-
                     oFacilityModel.setProperty("/Facilities", formatted);
                     oFacilityModel.setProperty("/loading", false);
 
                     oFacilityModel.refresh(true);
                 })
                 .catch(err => {
-                    console.error("Failed to load facilities:", err);
                     oFacilityModel.setProperty("/loading", false);
                 });
         },
@@ -750,7 +696,6 @@ sap.ui.define([
                         this._bindCarousel();
                         this._LoadFacilities(oSelected.BranchCode);
                         this._updateBookTileState();
-
                     });
 
 
@@ -773,7 +718,7 @@ sap.ui.define([
                 this._updateBookTileState();
 
             } catch (err) {
-                console.error(" viewDetails error:", err);
+                console.log(" viewDetails error:", err);
             }
         },
         _updateBookTileState: function () {
@@ -811,21 +756,13 @@ sap.ui.define([
                 const branchList = allList.filter(x => (x.BranchCode || "").trim() === (sBranchCode || "").trim());
 
                 if (branchList.length > 0) {
-
                     oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchList));
-                    // } else {
-                    //     // 🔄 Branch not found → show ONLY blank fallback
-                    //     const fallbackList = allList.filter(x => (x.BranchCode || "").trim() === "");
-                    //     console.warn("↩️ Showing fallback amenities:", fallbackList);
-                    //     oAmenityModel.setProperty("/Amenities", this._convertAmenities(fallbackList));
-                    // }
                 } else {
-                    console.warn("🚫 No amenities found for this branch:", sBranchCode);
                     oAmenityModel.setProperty("/Amenities", []); // show nothing
                 }
 
             } catch (err) {
-                console.error("❌ Amenity load error:", err);
+                console.log("❌ Amenity load error:", err);
             }
             oAmenityModel.setProperty("/loading", false);
         },
@@ -856,83 +793,19 @@ sap.ui.define([
             if (!oImage.data("hasFallback")) {
                 oImage.data("hasFallback", true);
                 setTimeout(() => oImage.setSrc(sFallback), 0); // Agar image load nahi hui, toh fallback set hoga
-            } else {
-                console.warn("⚠️ Final fallback image also failed to load:", sFallback);
             }
         },
 
         onCloseRoomDetail: function () {
-            if (this._oRoomDetailFragment) {
-                this._oRoomDetailFragment.close(); // close FIRST
-            }
-
+            if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
             this._clearRoomDetailDialog(); // destroy AFTER
         },
 
         onDialogAfterClose: function () {
-            if (this._oRoomDetailFragment) {
-                this._oRoomDetailFragment.close(); // close FIRST
-            }
-
+            if (this._oRoomDetailFragment) this._oRoomDetailFragment.close(); // close FIRST
             this._clearRoomDetailDialog();
         },
 
-        // onTabSelect: async function (oEvent) {
-        //     var oItem = oEvent.getParameter("item");
-        //     const sKey = oItem.getKey();
-
-        //     this.byId("pageContainer").to(this.byId(sKey));
-
-        //     var page = this.byId(sKey);
-        //     if (page && page.scrollTo) page.scrollTo(0, 0);
-        //     this.flag = true
-        //     this.iTop = 4;
-        //     this.iSkip = 0;
-        //     this.roomtype = true
-
-        //     if (sKey === "idRooms") {
-        //         await this._loadRoomsPageData();
-        //     }
-
-
-        // },
-
-        // onTabSelect: async function (oEvent) {
-        //     var oItem = oEvent.getParameter("item");
-        //     const sKey = oItem.getKey();
-
-        //     this.byId("pageContainer").to(this.byId(sKey));
-
-        //     var page = this.byId(sKey);
-        //     if (page && page.scrollTo) page.scrollTo(0, 0);
-
-        //     this.flag = true;
-        //     this.iTop = 4;
-        //     this.iSkip = 0;
-        //     this.roomtype = true;
-
-        //     // 🔑 Footer control (added, not disturbing existing flow)
-        //     const oFooterModel = this.getView().getModel("FooterModel");
-
-        //     if (sKey === "idRooms") {
-        //         // entering Rooms
-        //         oFooterModel.setProperty("/showGlobalFooter", false);
-        //         oFooterModel.setProperty("/showRoomsFooter", false);
-
-        //         // keep original behavior
-        //         await this._loadRoomsPageData();
-
-        //     } else {
-        //         // Home / Contact
-        //         oFooterModel.setProperty("/showGlobalFooter", true);
-        //         oFooterModel.setProperty("/showRoomsFooter", false);
-        //     }
-        //     const oNav = this.byId("pageContainer");
-        // oNav.setDefaultTransitionName("Slide");
-
-        // const sKeys = oEvent.getParameter("item").getKey();
-        // oNav.to(this.byId(sKeys));
-        // },
         onTabSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("item").getKey();
             const oNav = this.byId("pageContainer");
@@ -945,9 +818,7 @@ sap.ui.define([
 
             /* 3️⃣ Reset scroll (safe) */
             const page = this.byId(sKey);
-            if (page && page.scrollTo) {
-                page.scrollTo(0, 0);
-            }
+            if (page && page.scrollTo) page.scrollTo(0, 0);
 
             /* 4️⃣ State flags (unchanged) */
             this.flag = true;
@@ -995,13 +866,6 @@ sap.ui.define([
         },
 
         Branch: async function () {
-            // const oComponent = this.getOwnerComponent();
-            // let oBRModel = oComponent.getModel("sBRModel");
-
-            // if (!oBRModel || !oBRModel.getData() || oBRModel.getData().length === 0) {
-            //     await oComponent._fetchCommonData("HM_Branch", "sBRModel");
-            //     oBRModel = oComponent.getModel("sBRModel");
-            // }
             const response = await this.ajaxReadWithJQuery("HM_Branch", "");
              this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
             const aData = response?.data || [];
@@ -1018,13 +882,6 @@ sap.ui.define([
             oContainer.setBusy(true)
             await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
             oContainer.setBusy(false);
-
-
-            // Set flag to true if needed
-
-            // iTop stays the same (number of items per page)
-            // iSkip is automatically incremented in _dRoomsPageData
-            // So you don't need to manually change them here
         },
 
         _loadRoomsPageData: async function () {
@@ -1033,29 +890,21 @@ sap.ui.define([
 
             this.roomtype = false
 
-            const oContainer = this.byId("idBedTypeFlex");
-            const oBranch = this.byId("id_Branch");
-            const oArea = this.byId("id_Area");
-            const oRoomType = this.byId("id_Roomtype");
+            this.byId("idBedTypeFlex").setBusy(true);
+            this.byId("id_Branch").setBusy(true);
+            this.byId("id_Area").setBusy(true);
+            this.byId("id_Roomtype").setBusy(true);
 
-            oContainer.setBusy(true);
-            oBranch.setBusy(true);
-            oArea.setBusy(true);
-            oRoomType.setBusy(true);
             const oFooterModel = this.getView().getModel("FooterModel");
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                // await this.onReadcallforRoom();
-                // await this.CustomerDetails();
                 const oModelData = await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
                 const sCity = this.City ? this.City : oModelData[0].City;
 
-                const aFiltered = oModelData.filter(
-                    item => item.City === sCity
-                );
+                const aFiltered = oModelData.filter(item => item.City === sCity);
 
                 if (aFiltered.length === 0 || sCity) {
                     await this._loadFilteredData(sCity, "", "All");
@@ -1068,17 +917,14 @@ sap.ui.define([
                 // Default selections
                 this.byId("id_Branch").setSelectedKey(sCity);
                 this.byId("id_Area").setEnabled(true).setSelectedKey("");
-                if (this.roomtype !== true) {
-                    this.byId("id_Roomtype").setEnabled(true).setSelectedKey("All");
-                }
-
+                if (this.roomtype !== true) this.byId("id_Roomtype").setEnabled(true).setSelectedKey("All");
             } catch (error) {
-                console.error("Error loading Rooms:", error);
+                console.log("Error loading Rooms:", error);
             } finally {
-                oContainer.setBusy(false);
-                oBranch.setBusy(false);
-                oArea.setBusy(false);
-                oRoomType.setBusy(false);
+                this.byId("idBedTypeFlex").setBusy(false);
+                this.byId("id_Branch").setBusy(false);
+                this.byId("id_Area").setBusy(false);
+                this.byId("id_Roomtype").setBusy(false);
                 // ✅ show ROOMS footer after success OR failure
                 oFooterModel.setProperty("/showRoomsFooter", true);
             }
@@ -1101,19 +947,6 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        // onpressBookrooms: async function () {
-        //     var oTabHeader = this.byId("mainTabHeader");
-        //     oTabHeader.setSelectedKey("idRooms");
-        //     this.byId("pageContainer").to(this.byId("idRooms"));
-
-        //     var page = this.byId("idRooms");
-        //     if (page && page.scrollTo) {
-        //         page.scrollTo(0, 0);
-        //     }
-
-        //     await this._loadRoomsPageData();
-        // },
-
         onpressBookrooms: function () {
             const oTabHeader = this.byId("mainTabHeader");
             const oItem = oTabHeader.getItems().find(i => i.getKey() === "idRooms");
@@ -1123,28 +956,21 @@ sap.ui.define([
         },
 
         onpressLogin: function () {
-
             if (!this._oSignDialog) {
-                this._oSignDialog = sap.ui.xmlfragment(
-                    "sap.ui.com.project1.fragment.SignInSignup",
-                    this
-                );
+                this._oSignDialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.SignInSignup", this);
                 this.getView().addDependent(this._oSignDialog);
                 this._oSignDialog.addStyleClass("authDialog"); // Add our custom style class
                 this._oSignDialog.attachAfterClose(this._resetAuthDialog, this);
             }
-
-            const vm = this.oViewModel;
-
             // COMPLETE reset of all auth-related states
-            vm.setProperty("/authFlow", "signin");
-            vm.setProperty("/loginMode", "password");
-            vm.setProperty("/showOTPField", false);
-            vm.setProperty("/isOtpEntered", false);
+            this.oViewModel.setProperty("/authFlow", "signin");
+            this.oViewModel.setProperty("/loginMode", "password");
+            this.oViewModel.setProperty("/showOTPField", false);
+            this.oViewModel.setProperty("/isOtpEntered", false);
 
             // 🔥 FIX: You forgot these
-            vm.setProperty("/isOtpSelected", false);
-            vm.setProperty("/isPasswordSelected", true);
+            this.oViewModel.setProperty("/isOtpSelected", false);
+            this.oViewModel.setProperty("/isPasswordSelected", true);
 
             // Reset fields
             this._resetAllAuthFields?.();
@@ -1169,17 +995,14 @@ sap.ui.define([
             }
 
             // Reset dialog title
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
-
+            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
             this.getView().addStyleClass("blur-background");
-
             this._oSignDialog.open();
         },
 
         onDialogClose: function () {
             // The afterClose event will handle removing the blur class
             this._resetOtpState();
-
             if (this._oSignDialog) this._oSignDialog.close();
             if (this._oSignDialog) {
                 this.getView().removeStyleClass("blur-background");
@@ -1188,25 +1011,15 @@ sap.ui.define([
         },
 
         onSwitchToSignIn: function () {
+            this.oViewModel.setProperty("/authFlow", "signin");
+            this.oViewModel.setProperty("/loginMode", "password");
+            this.oViewModel.setProperty("/forgotStep", 0);
+            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
 
-            const vm = this.oViewModel;
-
-            // -------------------------
-            // FLOW RESET
-            // -------------------------
-            vm.setProperty("/authFlow", "signin");
-            vm.setProperty("/loginMode", "password");
-            vm.setProperty("/forgotStep", 0);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
-
-            // -------------------------
             // RESET OTP + TIMER
-            // -------------------------
             this._resetOtpState();
 
-            // -------------------------
             // RESET SIGN-IN FIELDS
-            // -------------------------
             ["signInEmail", "signinPassword", "signInOTP"]
                 .forEach(id => {
                     const c = $C(id);
@@ -1221,9 +1034,7 @@ sap.ui.define([
             $C("signInOTP")?.setEnabled(false);
             $C("btnSignInSendOTP")?.setVisible(false);
 
-            // -------------------------
             // RESET FORGOT FIELDS
-            // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = $C(id);
@@ -1234,24 +1045,18 @@ sap.ui.define([
                     }
                 });
 
-            // -------------------------
             // 🚫 DISABLE FORGOT FORM
-            // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = $C(id);
                     if (c) c.setEnabled(false);
                 });
 
-            // -------------------------
             // PANELS
-            // -------------------------
             $C("signInPanel")?.setVisible(true);
             $C("signUpPanel")?.setVisible(false);
 
-            // -------------------------
             // HEADER
-            // -------------------------
             $C("authDialog")
                 ?.getCustomHeader()
                 ?.getContentMiddle()[0]
@@ -1259,8 +1064,6 @@ sap.ui.define([
         },
 
         onSwitchToSignUp: function () {
-            const vm = this.oViewModel;
-
             const oSignInPanel = $C("signInPanel");
             const oSignUpPanel = $C("signUpPanel");
 
@@ -1270,8 +1073,8 @@ sap.ui.define([
             oSignInPanel?.setVisible(false);
             oSignUpPanel?.setVisible(true);
 
-            vm.setProperty("/authFlow", "signup");
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            this.oViewModel.setProperty("/authFlow", "signup");
+            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
             // Set min and max dates for the Date of Birth picker
             const oDOBpicker = $C("signUpDOB");
             if (oDOBpicker) {
@@ -1289,31 +1092,11 @@ sap.ui.define([
             this._addPasswordGenerateIcon();
         },
 
-        // SM_onGeneratePassword: function () {
-
-        //     var oPwdInput = $C("signUpPassword");
-        //     var oStrength = $C("passwordStrengthText"); // signup label
-
-        //     if (!oPwdInput) {
-        //         console.error("❌ signUpPassword input not found");
-        //         return;
-        //     }
-
-        //     var pwd = utils._LCgenerateStrongPassword();
-        //     oPwdInput.setValue(pwd);
-
-        //     // Run same validation logic + update strength label
-        //     utils._LCvalidatePassword(oPwdInput, oStrength);
-        // },
-
         SM_onGeneratePassword: function () {
             var oPwdInput = $C("signUpPassword");
             var oStrength = $C("passwordStrengthText");
 
-            if (!oPwdInput) {
-                console.error("❌ signUpPassword input not found");
-                return;
-            }
+            if (!oPwdInput) return;
 
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
@@ -1322,47 +1105,31 @@ sap.ui.define([
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
         _addPasswordGenerateIcon: function () {
-
-            const aInputs = [
-                $C("signUpPassword"),
-                $C("newPass")
-            ];
+            const aInputs = [$C("signUpPassword"), $C("newPass")];
 
             aInputs.forEach((oInput) => {
-
                 if (!oInput || oInput._hasCopyIcon) return;
-
                 oInput.addEndIcon({
                     src: "sap-icon://copy",
                     tooltip: "Copy password",
                     press: this.SM_onCopyPassword.bind(this)
                 });
-
                 oInput._hasCopyIcon = true;
             });
         },
 
-
         SM_onCopyPassword: function (oEvent) {
-
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent();  // 👈 actual input owning the icon
-
             if (!oInput || !oInput.getValue) return;
-
             const pwd = oInput.getValue();
-
-            if (!pwd) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
-                return;
-            }
+            if (!pwd) return sap.m.MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
 
             navigator.clipboard.writeText(pwd)
                 .then(() => {
-                    sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
+                    MessageToast.show(this.i18nModel.getText("passwordCopied"));
                 })
                 .catch(() => {
-
                     try {
                         const oTemp = document.createElement("textarea");
                         oTemp.value = pwd;
@@ -1370,11 +1137,9 @@ sap.ui.define([
                         oTemp.select();
                         document.execCommand("copy");
                         document.body.removeChild(oTemp);
-
-                        sap.m.MessageToast.show(this.i18nModel.getText("passwordCopied"));
-
+                        MessageToast.show(this.i18nModel.getText("passwordCopied"));
                     } catch (err) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("copyFailed"));
+                        MessageToast.show(this.i18nModel.getText("copyFailed"));
                     }
                 });
         },
@@ -1383,17 +1148,8 @@ sap.ui.define([
             utils._LCvalidateEmail(oEvent);
         },
 
-        // SM_onTogglePasswordVisibility: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     const isPassword = oInput.getType() === "Password";
-
-        //     oInput.setType(isPassword ? "Text" : "Password");
-        //     oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
-        // },
-
         SM_onTogglePasswordVisibility: function (oEvent) {
             var oInput = oEvent.getSource();
-
             // 1. Capture value BEFORE type change
             var sValue = oInput.getValue();
 
@@ -1402,37 +1158,12 @@ sap.ui.define([
             oInput.setType(bIsPassword ? "Text" : "Password");
 
             // 3. Toggle icon
-            oInput.setValueHelpIconSrc(
-                bIsPassword ? "sap-icon://hide" : "sap-icon://show"
-            );
+            oInput.setValueHelpIconSrc(bIsPassword ? "sap-icon://hide" : "sap-icon://show");
 
             // 4. Restore value AFTER re-render
             oInput.setValue(sValue);
         },
 
-        // SM_onChnageSetAndConfirm: function (oEvent) {
-
-        //     const oInput = oEvent.getSource();
-
-
-        //     // ❌ REMOVE ALL SPACES IMMEDIATELY
-        //     let val = oInput.getValue();
-        //     if (/\s/.test(val)) {
-        //         val = val.replace(/\s+/g, "");
-        //         oInput.setValue(val);
-        //     }
-        //     const sId = oInput.getId();
-        //     let oStrengthText = null;
-
-        //     if (sId === "signUpPassword") {
-        //         oStrengthText = $C("passwordStrengthText");
-        //     }
-        //     else if (sId === "newPass") {
-        //         oStrengthText = $C("fpPasswordStrengthText");
-        //     }
-
-        //     utils._LCvalidatePassword(oInput, oStrengthText);
-        // },
         SM_onChnageSetAndConfirm: function (oEvent) {
             const oInput = oEvent.getSource();
             const sId = oInput.getId(); // 🔥 Sabse pehle ID lein
@@ -1457,31 +1188,11 @@ sap.ui.define([
 
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
-        // SM_onGenerateForgotPassword: function () {
-
-        //     var oPwdInput = $C("newPass");
-        //     var oStrength = $C("fpPasswordStrengthText");
-
-        //     if (!oPwdInput) {
-        //         console.error("❌ newPass input not found");
-        //         return;
-        //     }
-
-        //     // ✅ Only generate + validate (NO copying here)
-        //     var pwd = utils._LCgenerateStrongPassword();
-        //     oPwdInput.setValue(pwd);
-        //     utils._LCvalidatePassword(oPwdInput, oStrength);
-        // },
 
         SM_onGenerateForgotPassword: function () {
-
             var oPwdInput = $C("newPass");
             var oStrength = $C("fpPasswordStrengthText");
-
-            if (!oPwdInput) {
-                console.error("❌ newPass input not found");
-                return;
-            }
+            if (!oPwdInput) return;
 
             // ✅ Only generate + validate (NO copying here)
             var pwd = utils._LCgenerateStrongPassword();
@@ -1489,7 +1200,6 @@ sap.ui.define([
             this.getView().getModel("LoginMode").setProperty("/password", pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-
 
         onSignUp: async function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
@@ -1515,21 +1225,12 @@ sap.ui.define([
                     C("signUpPassword"),
                     $C("passwordStrengthText")
                 ) &&
+                this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") }));
 
-                this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") })
-            );
-
-            if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                return;
-            }
-
-            // ---- PAYLOAD BUILD ----
-
+            if (!isValid) return MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
             const sFinalPassword = $C("signUpPassword").getValue();
-
 
             const payload = {
                 data: {
@@ -1537,40 +1238,26 @@ sap.ui.define([
                     UserName: data.fullname.trim(),
                     Role: "Customer",
                     Type: "Customer",
-
                     EmailID: data.Email.trim(),
-                    // Password: btoa(data.password),
                     Password: btoa(sFinalPassword),
-
-
                     STDCode: data.STDCode || std,
                     MobileNo: data.Mobileno,
-
                     Status: "Active",
                     TimeDate,
                     DateOfBirth: data.DateOfBirth || "",
                     Gender: C("signUpGender").getSelectedKey(),
-
                     Country: data.Country,
                     State: data.State,
                     City: data.City,
                     Address: data.Address.trim()
                 }
             };
-
-
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
                 if (!oResp || oResp.success !== true) {
-                    const sFailMsg =
-                        oResp?.message ||
-                        this.i18nModel.getText("registrationFailedPleasetryagain");
-
-                    MessageBox.error(sFailMsg, {
-                        title: "Registration Failed"
-                    });
-                    return;
+                    const sFailMsg = oResp?.message || this.i18nModel.getText("registrationFailedPleasetryagain");
+                    return MessageBox.error(sFailMsg, { title: "Registration Failed" });
                 }
 
                 const sUsername = data.fullname.trim();
@@ -1585,37 +1272,19 @@ sap.ui.define([
                     contentWidth: "500px",
                     onClose: () => {
                         // ✅ Credentials trigger FIRST
-                        oCtrl._triggerBrowserSaveCredentials(
-                            sUsername,
-                            sPassword
-                        );
+                        oCtrl._triggerBrowserSaveCredentials(sUsername, sPassword);
 
-                        const vm = oCtrl.oViewModel;
-
-                        vm.setProperty("/authFlow", "signin");
-                        vm.setProperty("/loginMode", "password");
-                        vm.setProperty("/showOTPField", false);
-                        vm.setProperty("/isOtpEntered", false);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
-                        vm.setProperty("/forgotStep", 1);
+                        oCtrl.oViewModel.setProperty("/authFlow", "signin");
+                        oCtrl.oViewModel.setProperty("/loginMode", "password");
+                        oCtrl.oViewModel.setProperty("/showOTPField", false);
+                        oCtrl.oViewModel.setProperty("/isOtpEntered", false);
+                        oCtrl.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+                        oCtrl.oViewModel.setProperty("/forgotStep", 1);
 
                         oCtrl._resetAllAuthFields?.();
                         oCtrl._clearAllAuthFields?.();
 
-                        oModel.setData({
-                            fullname: "",
-                            Email: "",
-                            Mobileno: "",
-                            password: "",
-                            comfirmpass: "",
-                            STDCode: "",
-                            Address: "",
-                            Country: "",
-                            State: "",
-                            City: "",
-                            Gender: "",
-                            DateOfBirth: ""
-                        });
+                        oModel.setData({ fullname: "", Email: "", Mobileno: "", password: "", comfirmpass: "", STDCode: "", Address: "", Country: "", State: "", City: "", Gender: "", DateOfBirth: "" });
 
                         $C("signInPanel")?.setVisible(true);
                         $C("signUpPanel")?.setVisible(false);
@@ -1626,17 +1295,12 @@ sap.ui.define([
                         $C("signInEmail")?.setValue("");
 
                         oCtrl._oSignDialog?.close();
-
                         setTimeout(() => {
                             oCtrl._oSignDialog?.open();
                         }, 200);
                     }
                 });
-
-
-
             } catch (err) {
-
                 let sMsg =
                     err?.responseJSON?.message ||
                     (() => {
@@ -1649,22 +1313,14 @@ sap.ui.define([
                         return this.i18nModel.getText("registrationFailedPleasetryagain");
                     })();
 
-                MessageBox.error(sMsg, {
-                    title: "Registration Failed"
-                });
-
-                console.error("SignUp Error:", err);
-
+                MessageBox.error(sMsg, { title: "Registration Failed" });
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
-
-
         },
 
 
         _triggerBrowserSaveCredentials: function (username, password) {
-
             const form = document.createElement("form");
             form.method = "POST";
             form.action = window.location.href;
@@ -1688,14 +1344,11 @@ sap.ui.define([
 
             form.append(u, p);
             document.body.appendChild(form);
-
             form.submit();
-
             setTimeout(() => form.remove(), 300);
         },
 
         onChangeState: function (oEvent) {
-
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -1718,7 +1371,7 @@ sap.ui.define([
             oCity.setValue("").setSelectedKey("");
 
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                new Filter("cityName", "EQ", "__NONE__")
             ]);
 
             // release cities only if country is valid
@@ -1729,59 +1382,41 @@ sap.ui.define([
             if (!sCountryCode || !sStateText) return;
 
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", "EQ", sStateText),
-                new sap.ui.model.Filter("countryCode", "EQ", sCountryCode)
+                new Filter("stateName", "EQ", sStateText),
+                new Filter("countryCode", "EQ", sCountryCode)
             ]);
         },
         onChangeCity: function (oEvent) {
-
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
-
             // sanitize manual typing
             oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
-
             const oCountry = $C("signUpCountry");
             const oState = $C("signUpState");
-
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem() || !!oState.getValue();
-
             // parent missing → block
             if (!hasCountry || !hasState) {
-
                 oCity.setValue("");
                 oCity.setSelectedKey("");
-
-                oCity.getBinding("items")?.filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
-                ]);
-
+                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
                 oCity.setValueState("None");
                 return;
             }
-
             utils._LCvalidateMandatoryField(oEvent);
-
             // ✅ ALWAYS WRITE TO MODEL
-            const sCityText =
-                oCity.getSelectedItem()?.getText() ||
-                oCity.getValue() ||
-                "";
+            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
 
             oModel.setProperty("/City", sCityText);
         },
 
         onChangeSalutation: function (oEvent) {
-
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = $C("signUpGender");
-
             // Reset gender
             oGender.setSelectedKey("");
             oGender.setEnabled(true);
-
             if (sKey === "Mr.") {
                 oGender.setSelectedKey("Male");
                 oGender.setEnabled(false);
@@ -1790,21 +1425,14 @@ sap.ui.define([
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
             }
-            // Dr. → user must choose gender manually
-
-            // ✅ STRICT validation -- pass CONTROL, not event
             utils._LCstrictValidationSelect(oSalutation);
         },
 
         onChangeDOB: function (oEventOrControl) {
-
             const oDP =
                 (typeof oEventOrControl.getSource === "function")
-                    ? oEventOrControl.getSource()
-                    : oEventOrControl;
-
+                    ? oEventOrControl.getSource() : oEventOrControl;
             if (!oDP) return false;
-
             const v = oDP.getDateValue();
 
             if (!v) {
@@ -1834,19 +1462,15 @@ sap.ui.define([
 
             const oModel = this.getView().getModel("LoginMode");
             oModel.setProperty("/DateOfBirth", sDob);
-
             return true;
         },
+
         onCityChange: function (oEvent) {
-
             const oCity = oEvent.getSource();
-
             // Sanitize manual typing
             oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
-
             const oCountry = $C("signUpCountry");
             const oState = $C("signUpState");
-
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem();
 
@@ -1854,48 +1478,33 @@ sap.ui.define([
             if (!hasCountry || !hasState) {
                 oCity.setValue("");
                 oCity.setSelectedKey("");
-
-                oCity.getBinding("items")?.filter([
-                    new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
-                ]);
-
+                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
                 oCity.setValueState("None");
                 return;
             }
-
             // Normal mandatory check when parents are valid
             utils._LCvalidateMandatoryField(oEvent);
-
             // 🔥 PUSH CITY TO MODEL when valid
             const oModel = this.getView().getModel("LoginMode");
             const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/City", sCityText);
         },
 
-
         onChangeGender: function (oEvent) {
             utils._LCstrictValidationSelect(oEvent.getSource());
         },
 
         onMobileLivechnage: function (oEvent) {
-
             const oInput = oEvent.getSource();
-
             // Digits only
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
-
             const stdRaw = $C("signUpSTD").getValue() || "";
             const std = stdRaw.replace(/\s+/g, "").startsWith("+")
-                ? stdRaw.replace(/\s+/g, "")
-                : "+" + stdRaw.replace(/\s+/g, "");
+                ? stdRaw.replace(/\s+/g, "") : "+" + stdRaw.replace(/\s+/g, "");
 
-            // ✅ NEW RULE:
             // Don't show error for empty untouched field
-            if (val.length === 0) {
-                oInput.setValueState("None");
-                return;
-            }
+            if (val.length === 0) return oInput.setValueState("None");
 
             // If STD not chosen yet
             if (!std) {
@@ -1903,59 +1512,38 @@ sap.ui.define([
                 oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
-
             // 🔥 STRICT validation while typing
             const isValid = utils._LCvalidateISDmobile(oInput, std);
 
             if (!isValid) {
                 oInput.setValueState("Error");
-
-                // 🔑 ONLY MESSAGE DIFFERENCE
-                oInput.setValueStateText(
-                    std === "+91"
-                        ? this.i18nModel.getText("MSmobileNoValueStateIN")
-                        : this.i18nModel.getText("MSmobileNoValueStateINT")
-                );
+                oInput.setValueStateText(std === "+91" ? this.i18nModel.getText("MSmobileNoValueStateIN") : this.i18nModel.getText("MSmobileNoValueStateINT"));
             } else {
                 oInput.setValueState("None");
             }
         },
 
-
-
-        onAddressChange: function () {
-            utils._LCvalidateAddress($C("signUpAddress"));
-        },
-
+        onAddressChange: function () { utils._LCvalidateAddress($C("signUpAddress")) },
 
         onChangeCountry: function (oEvent) {
-
             const oCountry = oEvent.getSource();
             oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
-
             if (!utils._LCvalidateMandatoryField(oEvent)) {
                 return;
             }
 
             const oModel = this.getView().getModel("LoginMode");
-
             const oState = $C("signUpState");
             const oCity = $C("signUpCity");
             const oSTD = $C("signUpSTD");
 
-            ["State", "City", "Mobileno", "STDCode"].forEach(p =>
-                oModel.setProperty("/" + p, "")
-            );
+            ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
             oState.setSelectedKey("");
             oCity.setSelectedKey("");
             oSTD.setSelectedKey("");
-            oState.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
-            ]);
+            oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
 
-            oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
-            ]);
+            oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
 
             const oItem = oCountry.getSelectedItem();
             if (!oItem) return;
@@ -1964,11 +1552,7 @@ sap.ui.define([
             const sCountryCode = oItem.getAdditionalText()?.trim();
 
             oModel.setProperty("/Country", sCountryName);
-
-
-            const aCountries = this.getOwnerComponent()
-                .getModel("CountryModel")
-                .getProperty("/");
+            const aCountries = this.getOwnerComponent().getModel("CountryModel").getProperty("/");
 
             const oMatch = aCountries?.find(c => c.countryName === sCountryName);
 
@@ -1979,52 +1563,35 @@ sap.ui.define([
             }
 
             if (sCountryCode) {
-                oState.getBinding("items")?.filter([
-                    new sap.ui.model.Filter(
-                        "countryCode",
-                        sap.ui.model.FilterOperator.EQ,
-                        sCountryCode
-                    )
-                ]);
+                oState.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
             }
         },
 
-
         onSTDChange: function (oEvent) {
-
-            // 🔑 Support BOTH UI-triggered and manual calls
             const oSTD = oEvent?.getSource?.() || $C("signUpSTD");
             if (!oSTD) return;
 
             const sValue = (oSTD.getValue() || "").trim();
             const oMobile = $C("signUpPhone");
-
             // Mandatory check (only if event exists)
-            if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) {
-                return;
-            }
+            if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) return;
 
             const STD_REGEX = /^\+[1-9][0-9]*$/;
 
             if (!STD_REGEX.test(sValue)) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText(
-                    "STD must start with + and contain only numbers (no leading zero)"
-                );
+                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
 
                 oMobile.setValue("");
                 oMobile.setMaxLength(18);
                 return;
             }
-
             oSTD.setValueState("None");
             // oMobile.setValue("");
             oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
         },
 
-        _LCvalidateName: function (oEvent) {
-            utils._LCvalidateName(oEvent);
-        },
+        _LCvalidateName: function (oEvent) { utils._LCvalidateName(oEvent); },
 
         onCloseManageProfile: function () {
             if (this._oProfileDialog) {
@@ -2037,195 +1604,6 @@ sap.ui.define([
         onPressAvatar: async function (oEvent) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteManageProfile");
-            // let oUser = this._oLoggedInUser;
-            // // const fullUserData = this._oLoggedInUser || {};
-            // let fullUserData = {};
-            // try {
-
-            //     if (!oUser || !oUser.UserID) {
-            //         oUser = this.getOwnerComponent()
-            //             .getModel("UserModel")
-            //             ?.getData();
-            //     }
-            //     const sUserID = oUser.UserID;
-            //     // const sUserID = oUser.UserID || "";
-            //     if (!sUserID) {
-            //         sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
-            //         return;
-            //     }
-            //     fullUserData = oUser;
-
-
-            //     if (!this._isProfileRequested) {
-            //         this.createAvatarActionSheet();
-            //         this._oProfileActionSheet.openBy(oEvent.getSource());
-            //         return;
-            //     }
-            //     this._isProfileRequested = false;
-
-            //     if (this._oProfileDialog) {
-            //         this._oProfileDialog.destroy();
-            //         this._oProfileDialog = null;
-            //     }
-
-            //     if (!this._oProfileDialog) {
-            //         // this._oProfileDialog = await sap.ui.core.Fragment.load({
-            //         //     id: this.getView().getId(),
-            //         //     name: "sap.ui.com.project1.fragment.ManageProfile",
-            //         //     controller: this
-            //         // });
-            //         // this.getView().addDependent(this._oProfileDialog);
-            //         this.getOwnerComponent().getRouter().navTo("RouteNManageProfile");
-            //     }
-            //     const oTempModel = new JSONModel({
-            //         bookings: [],
-            //         Payments: [],
-            //         isEditMode: false,
-            //         selectedTab: "Booking History",
-            //         isTableBusy: true
-            //     });
-
-            //     this._oProfileDialog.setModel(oTempModel, "profileData");
-            //     // oProfileModel.refresh(true); 
-            //     this._oProfileDialog.open();
-            //     this.byId("id_tabBar").setSelectedKey("Booking History");
-            //     setTimeout(() => {
-            //         this.byId("id_dialog")?.addStyleClass("dialogBlur");
-            //     }, 200);
-
-            //     const filter = { UserID: sUserID }
-            //     const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
-            //     const aBookings = response?.BookingData || [];
-            //     const aPayments = response?.PaymentData || [];
-
-            //     const today = new Date();
-            //     today.setHours(0, 0, 0, 0);
-            //     const aBookingData = aBookings.map(booking => {
-            //         const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-            //         if (oStart) {
-            //             oStart.setHours(0, 0, 0, 0);
-            //         }
-
-            //         const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
-            //         const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
-            //         if (startDate) startDate.setHours(0, 0, 0, 0);
-            //         if (endDate) endDate.setHours(0, 0, 0, 0);
-
-            //         let bookingGroup = "Others";
-            //         if (booking.Status === "Cancelled") {
-            //             bookingGroup = "Cancelled";
-            //         } else if (booking.Status === "Completed") {
-            //             bookingGroup = "Completed";
-            //         } else if (booking.Status === "New" || booking.Status === "Assigned") {
-            //             // Ongoing = Today is between StartDate & EndDate
-            //             if (startDate && endDate && startDate <= today && endDate >= today) {
-            //                 bookingGroup = "Ongoing";
-            //                 // Upcoming = Future StartDate
-            //             } else if (startDate && startDate > today) {
-            //                 bookingGroup = "Upcoming";
-            //             }
-            //         }
-            //         let GSTValue=0;
-            //         if(booking.GSTType === "IGST"){
-            //              GSTValue=Number(booking.GSTValue) /100 || 0;
-            //         }else{
-            //              GSTValue=(Number(booking.GSTValue) + Number(booking.GSTValue)) /100 || 0;
-            //         }
-            //         // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-            //         return {
-            //             customerName: booking.Salutation + " " + booking.CustomerName,
-            //             room: booking.BedType || "",
-            //             Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
-            //             EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
-            //             BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-            //             amount: (
-            //                 (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
-            //                 ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
-            //             ).toString() || "",
-
-            //             status: booking.Status,
-            //             currency: booking.Currency,
-            //             customerID: booking.CustomerID,
-            //             BookingID: booking.BookingID?.toString() || "",
-            //         }
-
-            //     });
-            //     // Format PAYMENTS
-            //     const aPaymentData = aPayments.map(payment => ({
-            //         BookingID: payment.BookingID,
-            //         InvNo: payment.InvNo?.toString() || "",
-            //         InvoiceDate: payment.InvoiceDate,
-            //         CustomerName: payment.CustomerName,
-            //         TotalAmount: payment.TotalAmount?.toString() || "",
-            //         DueAmount: payment.DueAmount ? payment.DueAmount.toString() : "Not Applicable",
-            //         currency: payment.Currency,
-            //         PaymentGroup: payment.Status || "Others"
-            //     }));
-
-            //     const oProfileModel = new JSONModel({
-            //         ...fullUserData,
-            //         isEditMode: false,
-            //         photo: "data:image/png;base64," + oUser.FileContent || "",
-            //         initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
-            //         name: oUser.UserName || "",
-            //         UserID: oUser.UserID,
-            //         Salutation: oUser.Salutation,
-            //         email: oUser.EmailID || "",
-            //         phone: oUser.MobileNo || "",
-            //         dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
-            //         gender: oUser.Gender || "",
-            //         address: oUser.Address || "",
-            //         State: oUser.State,
-            //         Country: oUser.Country,
-            //         City: oUser.City,
-            //         stdCode: oUser.STDCode,
-            //         branchCode: oUser.BranchCode,
-            //         role: oUser.Role,
-
-            //         bookings: aBookingData,
-            //         Payments: aPaymentData,
-            //         bookingCount: aBookingData.length,
-            //         paymentCount: aPaymentData.length,
-            //         selectedTab: "Booking History",
-            //         aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
-            //         facility: [],
-            //         isTableBusy: false
-            //     });
-            //     this._oProfileDialog.setModel(oProfileModel, "profileData");
-            //     this._applyCountryStateCityFilters();
-            //     oProfileModel.setProperty("/isEditMode", false);
-            //     oProfileModel.setProperty("/isTableBusy", false);
-            //     this.byId("id_dialog").removeStyleClass("dialogBlur");
-
-            // } catch (err) {
-            //     console.error("Profile Load Error:", err);
-
-            //     const oProfileModel = new JSONModel({
-            //         ...fullUserData,
-            //         photo: "data:image/png;base64," + oUser.FileContent || "",
-            //         initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
-            //         name: oUser.UserName || "",
-            //         email: oUser.EmailID || "",
-            //         phone: oUser.MobileNo || "",
-            //         dob: this.Formatter.DateFormat(oUser.DateOfBirth) || "",
-            //         gender: oUser.Gender || "",
-            //         address: oUser.Address || "",
-            //         bookings: [],
-            //         aCustomers: []
-            //     });
-            //     this._oProfileDialog.setModel(oProfileModel, "profileData");
-            //     this._applyCountryStateCityFilters();
-            //     oProfileModel.setProperty("/isEditMode", false);
-            //     oProfileModel.refresh(true);
-            //     this._oProfileDialog.open();
-            //     this.byId("id_tabBar").setSelectedKey("Booking History");
-            //     setTimeout(() => {
-            //         this.byId("id_dialog")?.addStyleClass("dialogBlur");
-            //     }, 200);
-
-            // } finally {
-            //     sap.ui.core.BusyIndicator.hide();
-            // }
         },
 
         _applyCountryStateCityFilters: function () {
@@ -2255,21 +1633,18 @@ sap.ui.define([
                     const sCountryCode = oCountryObj.code;
 
                     // Filter States by Country
-                    oStateCB.getBinding("items")?.filter([
-                        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-                    ]);
+                    oStateCB.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
 
                     if (sState) {
                         // Filter Cities by State + Country
                         const aFilters = [
-                            new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sState),
-                            new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                            new Filter("stateName", FilterOperator.EQ, sState),
+                            new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                         ];
                         oSourceCB.getBinding("items")?.filter(aFilters);
                     }
                 }
             }
-
             // Ensure values are set back in UI
             oCountryCB.setValue(sCountry);
             oStateCB.setValue(sState);
@@ -2284,20 +1659,6 @@ sap.ui.define([
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
-
-                // this._applyCountryStateCityFilters();
-                // this._oProfileDialog.close();
-                sap.ui.core.BusyIndicator.show(0);
-                // if (!this._oProfileEditDialog) {
-                // this._oProfileEditDialog = await sap.ui.core.Fragment.load({
-                //     name: "sap.ui.com.project1.fragment.ManageProfileEdit",
-                //     controller: this
-                // });
-                // this.getView().addDependent(this._oProfileEditDialog);
-                // this._oProfileEditDialog.setModel(oModel, "profileData");
-                // }
-                sap.ui.core.BusyIndicator.hide();
-                // this._oProfileEditDialog.open();
                 return;
             }
             const isMandatoryValid = (
@@ -2312,10 +1673,8 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(this.byId("id_address"), "ID")
             );
 
-            if (!isMandatoryValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-                return;
-            }
+            if (!isMandatoryValid) return MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+
             const payload = {
                 data: {
                     UserName: oModel.getProperty("/name"),
@@ -2338,27 +1697,18 @@ sap.ui.define([
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
-                sap.m.MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
-
+                MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
             } catch (err) {
-                console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
+                MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
-                // this._oProfileEditDialog.close();
-                // this._oProfileDialog.open();
             }
         },
 
-        onProfileclose: function () {
-            // Close the dialog and perform logout logic
-            if (this._oProfileDialog) this._oProfileDialog.close();
-        },
+        onProfileclose: function () { if (this._oProfileDialog) this._oProfileDialog.close() },
 
-        onEditProfilePic: function () {
-            sap.m.MessageToast.show(this.i18nModel.getText("profilepictureeditnotimplementedyet"));
-        },
+        onEditProfilePic: function () { MessageToast.show(this.i18nModel.getText("profilepictureeditnotimplementedyet")) },
 
         onProfileDialogClose: function () {
             if (this._oProfileDialog) {
@@ -2379,14 +1729,11 @@ sap.ui.define([
                     DateofBirth: ""
                 });
             }
-
             this._oLoggedInUser = null;
-
             if (this._oProfileDialog) {
                 this._oProfileDialog.destroy();
                 this._oProfileDialog = null;
             }
-
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
         },
 
@@ -2415,7 +1762,7 @@ sap.ui.define([
             if (oLoginModel) {
                 oLoginModel.setData({});
             }
-            sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
+            MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
             this.CommonLogoutFunction();
             this._oLoggedInUser = null;
             this._isProfileRequested = false;
@@ -2452,72 +1799,15 @@ sap.ui.define([
                 var oView = this.getView();
                 this.FCIA_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Book_Room", this);
                 oView.addDependent(this.FCIA_Dialog);
-
                 this.FCIA_Dialog.open();
-
             } else {
                 this.FCIA_Dialog.open();
             }
         },
 
-        onRoomBookPress: function (oEvent) {
-            this.getOwnerComponent().getRouter().navTo("TilePage")
-            // try {
-            //     // Get the clicked button and its custom data
-            //     const oButton = oEvent.getSource();
-            //     const sRoomType = oButton.data("roomType"); 
+        onRoomBookPress: function (oEvent) { this.getOwnerComponent().getRouter().navTo("TilePage") },
 
-            //     // Get VisibilityModel from the view
-            //     const oVisibilityModel = this.getView().getModel("VisibilityModel");
-            //     if (!oVisibilityModel) {
-            //         sap.m.MessageToast.show("Room details not found.");
-            //         return;
-            //     }
-
-            //     // Get logged-in user ID
-            //     const sUserID = sap.ui.getCore().getModel("HostelModel")?.getProperty("/UserID") || "";
-
-            //     // Get the correct price based on room type
-            //     let sPrice = "";
-            //     switch (sRoomType) {
-            //         case "Single Bed":
-            //             sPrice = oVisibilityModel.getProperty("/singlePrice");
-            //             break;
-            //         case "Double Bed":
-            //             sPrice = oVisibilityModel.getProperty("/doublePrice");
-            //             break;
-            //         case "Four Bed":
-            //             sPrice = oVisibilityModel.getProperty("/fourPrice");
-            //             break;
-            //         default:
-            //             sPrice = "";
-            //     }
-
-            //     // Create or update global HostelModel
-            //     const oHostelModel = new JSONModel({
-            //         UserID: sUserID,
-            //         RoomType: sRoomType,
-            //         Price: sPrice,
-            //         PaymentType: "",
-            //         Person: "",
-            //         StartDate: "",
-            //         EndDate: ""
-            //     });
-
-            //     sap.ui.getCore().setModel(oHostelModel, "HostelModel");
-
-            //     // Navigate to booking page
-            //     this.getOwnerComponent().getRouter().navTo("RouteBookRoom");
-
-            // } catch (err) {
-            //     console.error("Booking navigation error:", err);
-            //     sap.m.MessageToast.show("Error while booking room.");
-            // }
-        },
-
-        onCancelDialog: function () {
-            this.FCIA_Dialog.close();
-        },
+        onCancelDialog: function () { this.FCIA_Dialog.close() },
 
         onAdminPress: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -2525,20 +1815,15 @@ sap.ui.define([
         },
 
         onWizardNext: function () {
-            const oDialog = this.FCIA_Dialog;
             const oWizard = $C("idHostelWizard");
             const oNextButton = $C("idWizardNextBtn");
             const oBackButton = $C("idWizardBackBtn");
             const oSubmitButton = $C("idWizardSubmitBtn");
-
             oWizard.nextStep();
-
             const aSteps = oWizard.getSteps();
             const oCurrentStep = oWizard.getProgressStep();
-
             // If current step is last, adjust button visibility
             const bIsLast = aSteps[aSteps.length - 1].getId() === oCurrentStep.getId();
-
             if (bIsLast) {
                 oNextButton.setVisible(false);
                 oSubmitButton.setVisible(true);
@@ -2546,7 +1831,6 @@ sap.ui.define([
                 oNextButton.setVisible(true);
                 oSubmitButton.setVisible(false);
             }
-
             oBackButton.setEnabled(true);
         },
 
@@ -2566,37 +1850,14 @@ sap.ui.define([
             oSubmitButton.setVisible(false);
         },
 
-        onWizardComplete: function () {
-            MessageToast.show(this.i18nModel.getText("wizardcompletedsuccessfully"));
-        },
+        onWizardComplete: function () { MessageToast.show(this.i18nModel.getText("wizardcompletedsuccessfully")); },
 
         onCancelDialog: function () {
             this.FCIA_Dialog.close();
             $C("idHostelWizardDialog").close();
         },
 
-        onDoubleRoomPress: function (oEvent) {
-
-            // var oRouter = this.getOwnerComponent().getRouter();
-            // oRouter.navTo("TilePage");
-            this.Bookfragment()
-            // if (this._oLoggedInUser === undefined) {
-            //     MessageBox.alert("Please signin to book a room.");
-            //     return;
-            // }
-
-            // this.Bookfragment();
-            // const oButton = oEvent.getSource();
-            // var price = this.getView().getModel("VisibilityModel").getData();
-
-            // this.sRoomType = oButton.data("roomType");
-            // $C("idRoomType").setValue(this.sRoomType);
-            // $C("idPrice1").setValue(price.doublePrice);
-            // $C("idFullName").setValue(this._oLoggedInUser.UserName);
-            // $C("idE-mail").setValue(this._oLoggedInUser.EmailID);
-            // $C("idMobile").setValue(this._oLoggedInUser.MobileNo);
-
-        },
+        onDoubleRoomPress: function () { this.Bookfragment() },
 
         SectionPress: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("listItem");
@@ -2625,11 +1886,7 @@ sap.ui.define([
 
         onSearchChange: function (oEvent) {
             var sBranchCode = oEvent.getParameter("value").trim();
-            if (!sBranchCode) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseenterlocationsearch"));
-                return;
-            }
-            // Call your function with new search value
+            if (!sBranchCode) return MessageToast.show(this.i18nModel.getText("pleaseenterlocationsearch"));
             this._loadFilteredData(sBranchCode);
         },
 
@@ -2638,12 +1895,10 @@ sap.ui.define([
             const oBranchCombo = oView.byId("id_Branch");
             const oAreaTypeCombo = oView.byId("id_Area");
             const oRoomTypeCombo = oView.byId("id_Roomtype");
-
             // 🔹 Reset all selected keys
             if (oBranchCombo) oBranchCombo.setSelectedKey("");
             if (oAreaTypeCombo) oAreaTypeCombo.setSelectedKey("");
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
-
             // 🔹 Make Area and Room Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(true);
@@ -2652,7 +1907,6 @@ sap.ui.define([
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this._oProfileDialog.getModel("profileData");
             var aCustomers = oProfileModel.getProperty("/aCustomers");
@@ -2660,16 +1914,10 @@ sap.ui.define([
 
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
-            if (!sCustomerID) {
-                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
-                return;
-            }
+            if (!sCustomerID) return MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
-            if (!oCustomer) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
-                return;
-            }
+            if (!oCustomer) return MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
 
             var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
 
@@ -2685,10 +1933,7 @@ sap.ui.define([
                 oBookingData.EndDate,
                 oBookingData.RoomPrice
             );
-            if (!oTotals) {
-                return;
-            }
-
+            if (!oTotals) return;
             // Prepare data for details view
             var oFullCustomerData = {
                 salutation: oCustomer.salutation,
@@ -2720,10 +1965,7 @@ sap.ui.define([
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
 
             // Navigate
-            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(sCustomerID),
-                from: "ManageProfile"
-            });
+            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", { sPath: encodeURIComponent(sCustomerID), from: "ManageProfile" });
         },
 
         onPressManageInvoice: function (oEvent) {
@@ -2736,7 +1978,7 @@ sap.ui.define([
             const oEndDate = this._parseDate(sEndDate);
 
             if (!oStartDate || !oEndDate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartEndDate"));
+                MessageToast.show(this.i18nModel.getText("invalidStartEndDate"));
                 return null;
             }
 
@@ -2744,7 +1986,7 @@ sap.ui.define([
             const iDays = Math.ceil(diffTime / (1000 * 3600 * 24));
 
             if (iDays <= 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
 
@@ -2790,12 +2032,8 @@ sap.ui.define([
         // 🗓️ Helper date parser
         _parseDate: function (sDate) {
             if (!sDate) return null;
-
             // If it's already a Date object
-            if (sDate instanceof Date) {
-                return sDate;
-            }
-
+            if (sDate instanceof Date) return sDate;
             // Convert from DD/MM/YYYY or YYYY-MM-DD
             if (sDate.includes("/")) {
                 const [d, m, y] = sDate.split("/");
@@ -2807,48 +2045,34 @@ sap.ui.define([
 
         onBranchSelectionChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-
             const oView = this.getView();
             const oAreaCombo = oView.byId("id_Area");
             const oRoomType = oView.byId("id_Roomtype");
-
             // Reset previous selections
             oAreaCombo.setSelectedKey("").setEnabled(false);
             oRoomType.setSelectedKey("");
-
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
-
             // 🔹 Selected Branch Name
             const sSelectedBranch = oSelectedItem.getText();
-
             // 🔹 Fetch existing Branch model data
             const oModelData = oView.getModel("sBRModel").getData();
-
             // 🔹 Filter the data for the selected branch name
             const aFiltered = oModelData.filter(function (item) {
                 return item.City === sSelectedBranch;
             });
-
             // 🔹 Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
             oView.setModel(oAreaModel, "AreaModel");
-
             // 🔹 Enable the Area dropdown now that data is ready
             oAreaCombo.setEnabled(true);
         },
 
         // 🔹 When Area is selected, enable Room Type combo
         onAreaSelectionChange: function (oEvent) {
-
             const oRoomType = this.byId("id_Roomtype");
             const oSelectedItem = oEvent.getSource().getSelectedItem();
-
-            if (oSelectedItem) {
-                oRoomType.setEnabled(true);
-            } else {
-                oRoomType.setEnabled(true);
-            }
+            (oSelectedItem) ? oRoomType.setEnabled(true) : oRoomType.setEnabled(true);
         },
 
         onSearchRooms: async function () {
@@ -2857,8 +2081,7 @@ sap.ui.define([
             oContainer.setBusy(true);
 
             // City
-            var oBranchcity = this.byId("id_Branch").getSelectedKey() ||
-                this.byId("id_Branch").getValue();
+            var oBranchcity = this.byId("id_Branch").getSelectedKey() || this.byId("id_Branch").getValue();
 
             if (!oBranchcity) {
                 MessageToast.show(this.i18nModel.getText("pleaseSelectCity"));
@@ -2866,13 +2089,9 @@ sap.ui.define([
                 this.byId("id_Branch").setValueState("Error");
                 return;
             }
-
             // AC Type
             const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey();
-
-            if (sSelectedACType === "") {
-                this.byId("id_Roomtype").setSelectedKey("All")
-            }
+            if (sSelectedACType === "") this.byId("id_Roomtype").setSelectedKey("All")
             if (sSelectedACType === "All" || oBranchcity) {
                 this.iTop = 4
                 this.iSkip = 0
@@ -2889,13 +2108,9 @@ sap.ui.define([
             // Locality ComboBox
             var oAreaCB = this.byId("id_Area");
             var sSelectedBranch = oAreaCB.getSelectedKey() || oAreaCB.getValue();
-
             var areaList = this.getView().getModel("AreaModel").getData() || [];
-
             // Check if selected or typed locality is valid
-            var validArea = areaList.find(item =>
-                item.Address === sSelectedBranch || item.BranchID === sSelectedBranch
-            );
+            var validArea = areaList.find(item => item.Address === sSelectedBranch || item.BranchID === sSelectedBranch);
 
             if (sSelectedBranch && !validArea) {
                 // User typed something, but it does not match the list
@@ -2903,16 +2118,13 @@ sap.ui.define([
                 oContainer.setBusy(false);
                 return;
             }
-
             // If locality is empty, keep it empty (search by city only)
             var finalBranch = validArea ? validArea.BranchID : "";
-            if (finalBranch === "") {
-                this.byId("id_Area").setValueState("None");
-            }
+            if (finalBranch === "") this.byId("id_Area").setValueState("None");
             try {
                 await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
             } catch (e) {
-                console.error(e);
+                console.log(e);
             } finally {
                 oContainer.setBusy(false);
             }
@@ -2945,7 +2157,7 @@ sap.ui.define([
 
         },
 
-        _loadFilteredData: async function (Scity, sBranchCode, sACType) {
+       _loadFilteredData: async function (Scity, sBranchCode, sACType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
 
@@ -3004,26 +2216,6 @@ sap.ui.define([
                 let matchedRooms = response.data.HM_BedType || [];
                 let HM_RoomCount = response.data.HM_RoomCount
 
-                // if (sACType) {
-                //     matchedRooms = matchedRooms.filter(
-                //         room => room.ACType?.toLowerCase() === sACType.toLowerCase()
-                //     );
-                // }
-
-                // if (sBranchCode && sBranchCode.trim() !== "") {
-                //     matchedRooms = matchedRooms.filter(
-                //         room =>
-                //             room.BranchCode?.toLowerCase() === sBranchCode.toLowerCase()
-                //     );
-                // } else {
-                //     matchedRooms = matchedRooms.filter(
-                //         room =>
-                //             aBranchCodes
-                //                 .map(code => code.toLowerCase())
-                //                 .includes(room.BranchCode?.toLowerCase())
-                //     );
-                // }
-
                 const oRoomDetailsModel = oView.getModel("RoomCountModel");
                 const oCustomerModel = oView.getModel("CustomerModel");
 
@@ -3074,25 +2266,6 @@ sap.ui.define([
                     const AverageRating = firstRoom?.AverageRating ? " " + firstRoom.AverageRating : "0";
                     const TotalFeedbacks = firstRoom?.TotalFeedbacks ? " " + firstRoom.TotalFeedbacks : "0";
 
-
-
-
-                    // let totalBooked = 0;
-                    // let totalCapacity = 0;
-
-                    // totalCapacity = Number(room.NoOfPerson) * Number(room.MaxBeds) || 0;
-                    // matchingRooms.forEach(rm => {
-                    //     const bookedCount = customerData.filter(cust =>
-                    //         cust.BranchCode?.toLowerCase() === rm.BranchCode?.toLowerCase() &&
-                    //         cust.BedType?.trim().toLowerCase() === rm.BedTypeName?.trim().toLowerCase() &&
-                    //         cust.Status === "Assigned"
-                    //     ).length;
-                    //     totalBooked = bookedCount;
-                    // });
-
-
-                    // var AvailbleBeds = totalCapacity - totalBooked
-                    // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
                     const isVisible = room?.Status === "Available";
 
                     const PriceVisible = price !== "" || MonthPrice !== "" || YearPrice !== ""
@@ -3108,16 +2281,8 @@ sap.ui.define([
                     const sGSTType = oBranchInfo?.Type || "";
                     const sGSTValue = oBranchInfo?.Value || "";
                     const sGSTIN = oBranchInfo?.GSTIN || "";
-
-
-
-
-
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
-
-
-
                     const aImages = [];
                     for (let i = 1; i <= 5; i++) {
                         const base64 = room[`Photo${i}`];
@@ -3189,21 +2354,11 @@ sap.ui.define([
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
                 }
-                // console.log("VisibilityModel (excluding images):", JSON.stringify(Object.keys(oVisibilityModel.getData())
-                //     .filter(key => key !== "Images")
-                //     .reduce((obj, key) => {
-                //         obj[key] = oVisibilityModel.getData()[key];
-                //         return obj;
-                //     }, {}), null, 4));
-                // console.log("VisibilityModel:", JSON.stringify(oVisibilityModel.getData(), null, 4));
-            } catch (err) {
-                console.error("Error loading data:", err);
-                sap.m.MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
+               } catch (err) {
+                MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
             }
         },
-
         onBookNow: function (oEvent) {
-            // Get selected bed type object
             const oItem = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
@@ -3211,18 +2366,15 @@ sap.ui.define([
                 oHostelModel = new JSONModel({});
                 sap.ui.getCore().setModel(oHostelModel, "HostelModel");
             }
-
             //  Set RoomType and Price in HostelModel
             oHostelModel.setProperty("/RoomType", oItem.Name || "");
             oHostelModel.setProperty("/Price", oItem.Price || 0);
             oHostelModel.setProperty("/ACType", oItem.ACType || 0);
             oHostelModel.setProperty("/BranchCode", oItem.BranchCode || 0);
 
-
             // Optionally set other details
             oHostelModel.setProperty("/Image", oItem.Image || "");
             oHostelModel.setProperty("/Description", oItem.Description || "");
-
 
             //  Navigate to the booking route (or open fragment)
             const oRouter = this.getOwnerComponent().getRouter();
@@ -3233,56 +2385,43 @@ sap.ui.define([
             var oSaveModel = this.getView().getModel("saveModel");
             var oedit = oSaveModel.getProperty("/isEditMode");
             var oEdit = this._oProfileDialog.getModel("profileData").getData();
-            if (!oedit) {
-                oSaveModel.setProperty("/isEditMode", true);
-                return;
-            }
-            var oPayload = {
-                UserName: oEdit.name
-            }
+            if (!oedit) return oSaveModel.setProperty("/isEditMode", true);
+
+            var oPayload = { UserName: oEdit.name }
 
             const oId = this._oLoggedInUser || {};
             const ID = oId.UserID || "";
-            const filter = {
-                UserID: ID
-            };
+            const filter = { UserID: ID };
             try {
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: oPayload,
                     filters: filter
                 });
-                sap.m.MessageToast.show(this.i18nModel.getText("dataSavedSuccessfully"));
+                MessageToast.show(this.i18nModel.getText("dataSavedSuccessfully"));
                 oSaveModel.setProperty("/isEditMode", false);
             } catch (error) {
-                sap.m.MessageToast.show(this.i18nModel.getText("failed"));
+                MessageToast.show(this.i18nModel.getText("failed"));
             }
         },
-        OnpressBookingDetails: function () {
 
-        },
-        //.,.,.,.,.,.
         FSM_onConfirm: function (oEvent) {
-
             const oInput = oEvent?.getSource();
             if (!oInput) return false;
 
             const confirm = (oInput.getValue() || "").trim();
             const pass = $C("signUpPassword").getValue().trim();
-
             // Required
             if (!confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
                 return false;      // ✅ EXPLICIT FAIL
             }
-
             // Compare
             if (pass !== confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
                 return false;      // ✅ EXPLICIT FAIL
             }
-
             // Success
             oInput.setValueState("None");
             return true;           // ✅ EXPLICIT PASS
@@ -3292,19 +2431,16 @@ sap.ui.define([
             const confirm = oEvent.getSource().getValue().trim();
             const pass = $C("newPass").getValue().trim();
             const oInput = $C("confPass");
-
             if (!confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
                 return;
             }
-
             if (pass !== confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
                 return;
             }
-
             oInput.setValueState("None");
             oInput.setValueStateText(this.i18nModel.getText("passwordsmatched"));
         },
@@ -3312,9 +2448,7 @@ sap.ui.define([
         onOtpLive: function (oEvent) {
             const sInput = oEvent.getSource();
             const sVal = oEvent.getParameter("value").replace(/\D/g, ""); // allow digits only
-
             sInput.setValue(sVal);
-
             // Keep it in error state until full 6 digits
             if (sVal.length === 6) {
                 sInput.setValueState(sap.ui.core.ValueState.None);
@@ -3325,46 +2459,38 @@ sap.ui.define([
         },
 
         onBackToForgot: function () {
-            const vm = this.oViewModel;
-            vm.setProperty("/authFlow", "forgot");
-            vm.setProperty("/forgotStep", 1); // RESET to step 1
+            this.oViewModel.setProperty("/authFlow", "forgot");
+            this.oViewModel.setProperty("/forgotStep", 1); // RESET to step 1
         },
 
         onForgotPassword: function () {
-            const vm = this.oViewModel;
-
             this._resetOtpState();
-
-            vm.setProperty("/authFlow", "forgot");
-            vm.setProperty("/forgotStep", 1); // safe, runtime only
-            vm.setProperty("/dialogTitle", "Set / Reset Password"); //
+            this.oViewModel.setProperty("/authFlow", "forgot");
+            this.oViewModel.setProperty("/forgotStep", 1); // safe, runtime only
+            this.oViewModel.setProperty("/dialogTitle", "Set / Reset Password"); //
             this._addPasswordGenerateIcon();
         },
 
         onSelectLoginMode: function (e) {
-            const vm = this.oViewModel;
             const mode = e.getSource().getText().toLowerCase(); // "password" or "otp"
 
-            vm.setProperty("/loginMode", mode);
+            this.oViewModel.setProperty("/loginMode", mode);
 
             // 🔥 Always reset OTP field visibility when switching modes
-            vm.setProperty("/showOTPField", false);
-            vm.setProperty("/isOtpEntered", false);
-
+            this.oViewModel.setProperty("/showOTPField", false);
+            this.oViewModel.setProperty("/isOtpEntered", false);
             // 🔥 Clean OTP input field and disable it
             const otpCtrl = $C("signInOTP");
             if (otpCtrl) {
                 otpCtrl.setValue("");
                 otpCtrl.setEnabled(false);
             }
-
             // 🔥 Reset password field too (fresh mode)
             const passCtrl = $C("signinPassword");
             if (passCtrl) {
                 passCtrl.setValue("");
                 passCtrl.setValueState("None");
             }
-
             // 🔥 Hide Send OTP button unless user is in OTP mode
             const btnSendOtp = $C("btnSignInSendOTP");
             if (btnSendOtp) {
@@ -3373,11 +2499,7 @@ sap.ui.define([
         },
 
         _clearAllAuthFields: function () {
-            const ids = [
-                "signInEmail", "signinPassword",
-                "fpEmailId", "fpOTP",
-                "newPass", "confPass", "loginOTP"
-            ];
+            const ids = ["signInEmail", "signinPassword", "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"];
             ids.forEach(id => {
                 const c = $C(id);
                 if (c) {
@@ -3410,8 +2532,7 @@ sap.ui.define([
                 Address: "",
                 DateOfBirth: ""
             });
-            //  Reset UI controls
-            //  Reset Sign-Up controls
+
             [
                 "signUpSalutation", "signUpName", "signUpEmail", "signUpPassword",
                 "signUpConfirmPassword", "signUpDOB", "signUpGender", "signUpCountry",
@@ -3424,7 +2545,6 @@ sap.ui.define([
                     if (ctrl.setSelectedKey) ctrl.setSelectedKey("");
                 }
             });
-
             //  Reset Sign-In controls
             ["signInEmail", "signinPassword"].forEach(id => {
                 const ctrl = $C(id);
@@ -3433,8 +2553,6 @@ sap.ui.define([
                     if (ctrl.setValue) ctrl.setValue("");
                 }
             });
-
-
             // Re-enable STD & Gender
             const STD = $C("signUpSTD");
             const GEN = $C("signUpGender");
@@ -3452,23 +2570,14 @@ sap.ui.define([
 
             // Remove blur effect from the background
             this.getView().removeStyleClass("blur-background");
-
-            // Ensure only Sign In panel is visible when dialog opens next time
-
         },
 
         _showPanel: function (panelId) {
-            const aPanels = [
-                "signInPanel",
-                "signUpPanel",
-                "forgotFlowPanel"
-            ];
+            const aPanels = ["signInPanel", "signUpPanel", "forgotFlowPanel"];
 
             aPanels.forEach(id => {
                 const c = $C(id);
-                if (c) {
-                    c.setVisible(id === panelId);
-                }
+                if (c) c.setVisible(id === panelId);
             });
         },
 
@@ -3482,36 +2591,29 @@ sap.ui.define([
             // RESET state before validation
             oNew.setValueState("None");
             oConf.setValueState("None");
-
             // 1) Required check for New Password
             if (!pass) {
                 oNew.setValueState("Error");
                 oNew.setValueStateText(this.i18nModel.getText("passwordRequired"));
-                sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("passwordRequired"));
             }
-
             // 2) Format rule check
             if (!utils._LCvalidatePassword(oNew)) {
                 oNew.setValueState("Error");
                 oNew.setValueStateText(this.i18nModel.getText("mustContainUppercaseLowercaseNumberSpecialCharacter"));
                 return;
             }
-
             // 3) Required check for Confirm Password
             if (!confirm) {
                 oConf.setValueState("Error");
                 oConf.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
-                sap.m.MessageToast.show(this.i18nModel.getText("confirmPasswordRequired"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("confirmPasswordRequired"));
             }
-
             // 4) Match both
             if (pass !== confirm) {
                 oConf.setValueState("Error");
                 oConf.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
-                sap.m.MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
             }
 
             // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
@@ -3528,11 +2630,9 @@ sap.ui.define([
                     filters: oFilters
                 });
 
-
                 MessageBox.success("Password updated successfully", {
                     title: "Success",
                     onClose: () => {
-
                         // fully clean values
                         this._clearAllAuthFields?.();
                         this._clearForgotFlow?.();
@@ -3540,19 +2640,16 @@ sap.ui.define([
                         // reset dialog title
                         $C("authDialog").getCustomHeader().getContentMiddle()[0].setText("Hostel Access Portal");
 
-                        // switch flow back to signin
-                        const vm = this.oViewModel;
-                        vm.setProperty("/authFlow", "signin");
-
+                        this.oViewModel.setProperty("/authFlow", "signin");
                         // show login panel
-                        vm.setProperty("/authFlow", "signin");
-                        vm.setProperty("/forgotStep", 1);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                        this.oViewModel.setProperty("/authFlow", "signin");
+                        this.oViewModel.setProperty("/forgotStep", 1);
+                        this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
                     }
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
+                MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
                 sap.ui.core.BusyIndicator.hide();  // ALWAYS stop
@@ -3561,9 +2658,7 @@ sap.ui.define([
         },
 
         _resetAllAuthFields: function () {
-            ["signInEmail", "signinPassword",
-                "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"
-            ]
+            ["signInEmail", "signinPassword", "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"]
                 .forEach(id => {
                     let o = $C(id);
                     if (o) o.setValue("");
@@ -3572,7 +2667,6 @@ sap.ui.define([
 
         _verifyOTPWithBackend: async function (otp) {
             sap.ui.core.BusyIndicator.show(0);
-
             try {
                 const oPayload = {
                     ...(this._oResetUser?.EmailID
@@ -3583,23 +2677,17 @@ sap.ui.define([
                         }),
                     OTP: otp.trim()
                 };
-
                 // Call the BaseController Generic Read method
                 const oResp = await this.ajaxReadWithJQuery("HM_Login", oPayload);
-
                 return oResp?.success === true;
-
             } catch (err) {
-                console.error("OTP Verify Error:", err);
                 return false;
-
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
         },
 
         onLoginOtpLive: function (e) {
-            const vm = this.oViewModel;
             const input = e.getSource();
 
             // allow only digits and enforce 6 max
@@ -3609,7 +2697,7 @@ sap.ui.define([
             input.setValue(val);
 
             const isValid = val.length === 6;
-            vm.setProperty("/isOtpEntered", isValid);
+            this.oViewModel.setProperty("/isOtpEntered", isValid);
 
             if (val.length === 0) {
                 input.setValueState("None");
@@ -3624,38 +2712,20 @@ sap.ui.define([
         onPressOTP: async function () {
             const oEmailCtrl = $C("signInEmail");
             const sEmail = oEmailCtrl?.getValue()?.trim() || "";
-
             // Validate input
-            if (
-                !utils._LCvalidateMandatoryField(oEmailCtrl, "ID") ||
-                !utils._LCvalidateEmail(oEmailCtrl, "ID")
-            ) {
-                sap.m.MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
-                return;
-            }
+            if (!utils._LCvalidateMandatoryField(oEmailCtrl, "ID") || !utils._LCvalidateEmail(oEmailCtrl, "ID")) return MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
 
             const payload = {
                 EmailID: sEmail,
                 Type: "OTP"
             };
-
             sap.ui.core.BusyIndicator.show(0);
-
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
-
                 if (oResp?.success) {
-
-                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    // alert(oResp.OTP);
-                    console.log("Use OTP : ", oResp.OTP);
-
+                    MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
                     this._oResetUser = { EmailID: sEmail };
-
-                    const vm = this.oViewModel;
-
-                    // Show OTP input
-                    vm.setProperty("/showOTPField", true);
+                    this.oViewModel.setProperty("/showOTPField", true);
 
                     const oOtpCtrl = $C("signInOTP");
                     oOtpCtrl.setEnabled(true);
@@ -3663,21 +2733,12 @@ sap.ui.define([
                     oOtpCtrl.setValueState("None");
                     oOtpCtrl.setValueStateText("");
                     oOtpCtrl.focus();
-
-
                     this._startOtpValidity();   // 🔥 10-minute validity starts HERE
-
-
-
                     this._startOtpResend(120) //120xx
-
-
-
                 }
                 else {
-                    sap.m.MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
+                    MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
                 }
-
             } catch (err) {
                 console.error("OTP Send Error:", err);
                  const sMsg =
@@ -3689,129 +2750,79 @@ sap.ui.define([
             }
         },
 
-
         _onVerifyOTP: async function () {
-
-            const vm = this.oViewModel;
-            const flow = vm.getProperty("/authFlow");
-
+            const flow = this.oViewModel.getProperty("/authFlow");
             // Resolve OTP control by flow
-            const oOtpInput = (flow === "forgot")
-                ? $C("fpOTP")
-                : $C("signInOTP");
-
+            const oOtpInput = (flow === "forgot") ? $C("fpOTP") : $C("signInOTP");
             const otp = oOtpInput.getValue().trim();
-
             // --- Basic validation ---
             if (!otp) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
                 oOtpInput.setValueStateText(this.i18nModel.getText("pleaseEnterOTP"));
-                sap.m.MessageToast.show(this.i18nModel.getText("enterOTP"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("enterOTP"));
             }
-
             if (!/^\d{6}$/.test(otp)) {
                 oOtpInput.setValueState(sap.ui.core.ValueState.Error);
                 oOtpInput.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidOTP"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("invalidOTP"));
             }
-
             // Clear any previous error state
             oOtpInput.setValueState(sap.ui.core.ValueState.None);
             oOtpInput.setValueStateText("");
-
             // --- Backend verification ---
             let isValid = false;
-
-
-
             try {
-                const expiryTs = vm.getProperty("/otpExpiryTs");
-
-                if (!expiryTs || Date.now() > expiryTs) {
-                    this._onOtpExpired();
-                    return;
-                }
-
+                const expiryTs = this.oViewModel.getProperty("/otpExpiryTs");
+                if (!expiryTs || Date.now() > expiryTs) return this._onOtpExpired();
                 isValid = await this._verifyOTPWithBackend(otp);
             } catch (e) {
-                sap.m.MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
-                console.error("OTP verify error:", e);
-                return;
+                return MessageToast.show(this.i18nModel.getText("oTPVerificationFailed"));
             }
-
-            if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
-                return;
-            }
+            if (!isValid) return MessageToast.show(this.i18nModel.getText("incorrectOTP"));
 
             // 🔥 OTP VERIFIED SUCCESSFULLY → DESTROY EXPIRY STATE (INLINE)
             this._clearOtpValidityTimer();
             this._clearOtpResendTimer();
-            vm.setProperty("/otpExpiryTs", null);
-            vm.setProperty("/otpValidityText", "");
+            this.oViewModel.setProperty("/otpExpiryTs", null);
+            this.oViewModel.setProperty("/otpValidityText", "");
 
-
-            // --------------------------
             // 📌 Forgot Password Flow
-            // --------------------------
-            if (flow === "forgot") {
-                vm.setProperty("/forgotStep", 3);
-                return;
-            }
+            if (flow === "forgot") return this.oViewModel.setProperty("/forgotStep", 3);
 
-            // --------------------------
-            // 📌 Normal OTP Login Flow
-            // --------------------------
             try {
-
                 const resp = await this.ajaxReadWithJQuery("HM_Login", {
                     UserID: this._oResetUser?.UserID,
                     UserName: this._oResetUser?.UserName,
                     OTP: otp
                 });
 
-                sap.m.MessageToast.show(this.i18nModel.getText("loginSuccessful"));
+                MessageToast.show(this.i18nModel.getText("loginSuccessful"));
                 this._setLoggedInUser(resp.data[0]);
                 this._resetAllAuthFields();
                 this._oSignDialog.close();
-
             } catch (e) {
-
-                sap.m.MessageToast.show(this.i18nModel.getText("loginFailed"));
-                console.error("OTP login error:", e);
-
+                MessageToast.show(this.i18nModel.getText("loginFailed"));
             }
         },
 
-        onShowForgotUser: function () {
-            this._showForgotSection("secForgotUser");
-        },
+        onShowForgotUser: function () { this._showForgotSection("secForgotUser") },
 
         onBackToLogin: function () {
-
-            // Clean auth data & any internal flags
             this._clearAllAuthFields();
-
             // Reset only values (not visibility/enabled state)
-
             $C("fpEmailId").setValue("");
             $C("fpOTP").setValue("");
             $C("newPass").setValue("");
             $C("confPass").setValue("");
 
-            // Update flow using ViewModel
-            const vm = this.oViewModel;
-            vm.setProperty("/loginMode", "password");
-            vm.setProperty("/authFlow", "signin");
-            vm.setProperty("/forgotStep", 1);
+            this.oViewModel.setProperty("/loginMode", "password");
+            this.oViewModel.setProperty("/authFlow", "signin");
+            this.oViewModel.setProperty("/forgotStep", 1);
 
-            vm.setProperty("/authFlow", "signin");
-            vm.setProperty("/forgotStep", 1);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            this.oViewModel.setProperty("/authFlow", "signin");
+            this.oViewModel.setProperty("/forgotStep", 1);
+            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
             this._resetOtpState();
-
         },
 
         _setLoggedInUser: function (user) {
@@ -3824,11 +2835,7 @@ sap.ui.define([
             oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateOfBirth || "");
-            //         if (user.FileContent) {
-            //  oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
-            //                 } else {
-            //  oLoginModel.setProperty("/Photo", ""); // Clear if no photo
-            //      }
+
             this._oLoggedInUser = user;
 
             if (user.Role === "Customer") {
@@ -3866,7 +2873,6 @@ sap.ui.define([
         _StartCamera: function () {
             var oVideo = document.getElementById("video");
             if (!oVideo) return;
-
             // Create segmentation instance only once
             if (!this.selfieSegmentation) {
                 this.selfieSegmentation = new SelfieSegmentation({
@@ -3874,18 +2880,15 @@ sap.ui.define([
                         return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
                     },
                 });
-
                 this.selfieSegmentation.setOptions({
                     modelSelection: 1, // 0 = general, 1 = landscape
                 });
-
                 // Store segmentation results
                 this.latestSegmentation = null;
                 this.selfieSegmentation.onResults((results) => {
                     this.latestSegmentation = results;
                 });
             }
-
             // Always create a new Camera instance when starting
             this.camera = new Camera(oVideo, {
                 onFrame: async () => {
@@ -3933,20 +2936,14 @@ sap.ui.define([
 
         IC_onCapturePress: function () {
             var oVideo = document.getElementById("video");
-
             if (!oVideo || !this.latestSegmentation) return;
-
             const oCanvas = document.createElement("canvas");
             const oContext = oCanvas.getContext("2d");
-
             oCanvas.width = oVideo.videoWidth;
             oCanvas.height = oVideo.videoHeight;
-
             oContext.fillStyle = "white";
             oContext.fillRect(0, 0, oCanvas.width, oCanvas.height);
-
             oContext.drawImage(oVideo, 0, 0, oCanvas.width, oCanvas.height);
-
             const mask = this.latestSegmentation.segmentationMask;
             oContext.globalCompositeOperation = "destination-in";
             oContext.drawImage(mask, 0, 0, oCanvas.width, oCanvas.height);
@@ -3994,10 +2991,8 @@ sap.ui.define([
 
             setTimeout(() => {
                 const oInput = uploader.getFocusDomRef();
-                if (!oInput) {
-                    console.error("Uploader input not ready");
-                    return;
-                }
+                if (!oInput) return;
+
                 uploader.clear();
                 uploader.setValue("");
                 oInput.value = "";
@@ -4012,11 +3007,7 @@ sap.ui.define([
             if (!file) return;
             const MAX_SIZE = 2 * 1024 * 1024; // 2MB
             if (file.size > MAX_SIZE) {
-                sap.m.MessageToast.show(
-                    "File size must be less than 2 MB.\nSelected file size: " +
-                    (file.size / 1024 / 1024).toFixed(2) + " MB"
-                );
-
+                MessageToast.show("File size must be less than 2 MB.\nSelected file size: " + (file.size / 1024 / 1024).toFixed(2) + " MB");
                 // reset uploader field
                 oEvent.getSource().clear();
                 return;
@@ -4053,10 +3044,6 @@ sap.ui.define([
         updateUserPhoto: async function ({ fileName, fileType, fileContent }) {
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
-                // if (!sUserID) {
-                //     sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
-                //     return;
-                // }
                 const payload = {
                     data: {
                         FileName: fileName,
@@ -4069,24 +3056,16 @@ sap.ui.define([
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
 
-                if (!fileContent) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("profilephotoremovedsuccessfully"));
-                } else {
-                    sap.m.MessageToast.show(this.i18nModel.getText("profilephotoupdatedsuccessfully"));
-                }
-
+                (!fileContent) ? MessageToast.show(this.i18nModel.getText("profilephotoremovedsuccessfully")) : MessageToast.show(this.i18nModel.getText("profilephotoupdatedsuccessfully"));
             } catch (err) {
-                console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
+                MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
 
         onPreviewProfilePhoto: function () {
             const sPhoto = this._oProfileDialog.getModel("profileData").getProperty("/photo");
-            if (!sPhoto) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
-                return;
-            }
+            if (!sPhoto) return MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
+
             if (!this._oPreviewDialog) {
                 this._oPreviewDialog = new sap.m.Dialog({
                     title: "Profile Photo",
@@ -4110,16 +3089,11 @@ sap.ui.define([
             this._oPreviewDialog.open();
         },
 
-        onSigninPasswordLive: function (oEvent) {
-            utils._LCvalidatePassword(oEvent.getSource());
-        },
+        onSigninPasswordLive: function (oEvent) { utils._LCvalidatePassword(oEvent.getSource()) },
 
         onSignIn: async function () {
             const vm = this.oViewModel;
-            // const isOTP = vm.getProperty("/isOtpSelected");
             const isOTP = vm.getProperty("/loginMode") === "otp";
-
-
             const oLoginModel = this.getView().getModel("LoginModel");
 
             const oEmailCtrl = $C("signInEmail");
@@ -4132,18 +3106,15 @@ sap.ui.define([
                 !utils._LCvalidateMandatoryField(oEmailCtrl, "ID") ||
                 !utils._LCvalidateEmail(oEmailCtrl, "ID")
             ) {
-                sap.m.MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
-                return;
+                return MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
             }
 
             try {
                 sap.ui.core.BusyIndicator.show(0);
 
                 let payload, oResponse;
-
                 // ----------------------------- OTP MODE -----------------------------
                 if (isOTP) {
-
                     const vm = this.oViewModel;
                     const showOTPField = vm.getProperty("/showOTPField");
                     const isOtpEntered = vm.getProperty("/isOtpEntered");
@@ -4151,39 +3122,25 @@ sap.ui.define([
                     const otpCtrl = $C("signInOTP");
 
                     // 1️⃣ OTP has NOT been generated
-                    if (!showOTPField) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
-                        return;
-                    }
-
+                    if (!showOTPField) return MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
                     // 2️⃣ OTP was generated but user has not typed anything
                     if (!isOtpEntered) {
                         otpCtrl.setValueState("Error");
                         otpCtrl.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                        return;
+                        return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                     }
-
                     // 3️⃣ Validate OTP format strictly
                     if (!/^\d{6}$/.test(sOTP)) {
                         otpCtrl.setValueState("Error");
                         otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                        return;
+                        return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
                     }
                     const expiryTs = vm.getProperty("/otpExpiryTs");
-                    if (!expiryTs || Date.now() > expiryTs) {
-                        this._onOtpExpired();
-                        return;
-                    }
-
+                    if (!expiryTs || Date.now() > expiryTs) return this._onOtpExpired();
 
                     // 4️⃣ Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
-                    if (!isValid) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
-                        return;
-                    }
+                    if (!isValid) return MessageToast.show(this.i18nModel.getText("incorrectOTP"));
 
                     // 5️⃣ Construct payload and continue login
                     payload = { EmailID: sEmail, OTP: sOTP };
@@ -4197,58 +3154,31 @@ sap.ui.define([
                     if (!sPassword) {
                         passCtrl.setValueState("Error");
                         passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("passwordRequired"));
-                        return;
+                        return MessageToast.show(this.i18nModel.getText("passwordRequired"));
                     }
-
                     // Format validation
                     if (!utils._LCvalidatePassword(passCtrl)) {
                         passCtrl.setValueState("Error");
                         passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
-                        sap.m.MessageToast.show(this.i18nModel.getText("enterValidPassword"));
-                        return;
+                        return MessageToast.show(this.i18nModel.getText("enterValidPassword"));
                     }
-
                     // If valid
                     passCtrl.setValueState("None");
-
-                    if (!utils._LCvalidatePassword($C("signinPassword"))) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("entervalidpassword"));
-                        return;
-                    }
+                    if (!utils._LCvalidatePassword($C("signinPassword"))) return MessageToast.show(this.i18nModel.getText("entervalidpassword"));
 
                     payload = {
                         EmailID: sEmail,
                         Password: btoa(sPassword)
                     };
-
                     oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
-
                 }
-
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
                 // if (!user?.UserID) {
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
-                if (!user?.UserID) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentials"));
-                    return;
-                }
-                //                  this._setLoggedInUser(user);
-                //  // In onSignIn function after successful login:
+                if (!user?.UserID) return MessageToast.show(this.i18nModel.getText("invalidCredentials"));
 
-                //  // Add this after setting _oLoggedInUser:
-                // if (user.FileContent) {
-                //  this._oLoggedInUser.FileContent = user.FileContent;
-                //  this._oLoggedInUser.Photo = "data:image/png;base64," + user.FileContent;
-                // }
-
-
-
-                // sap.m.MessageToast.show("Login Successful!");
-
-                // Global access + Model update
                 this._oLoggedInUser = user;
                 oLoginModel.setProperty("/EmployeeID", user.UserID);
                 oLoginModel.setProperty("/Salutation", user.Salutation);
@@ -4274,19 +3204,14 @@ sap.ui.define([
                 } else {
                     this.getOwnerComponent().getRouter().navTo("TilePage");
                 }
-
                 // Reset login fields
                 $C("signInEmail").setValue("");
                 $C("signinPassword").setValue("");
                 $C("signInOTP").setValue("");
-
                 // Close dialog
-                if (this._oSignDialog) {
-                    this._oSignDialog.close();
-                }
-
+                if (this._oSignDialog) this._oSignDialog.close();
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Invalid credentials, please try again");
+                MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -4307,9 +3232,7 @@ sap.ui.define([
         onCountrySelectionChange: function (oEvent) {
             const oCountry = oEvent.getSource();
             const oModel = this._oProfileDialog.getModel("profileData");
-
             utils._LCvalidateMandatoryField(oEvent);
-
             const oStateCB = this.byId("id_state");
             const oCityCB = this.byId("id_city");
             const oSTD = this.byId("id_std");
@@ -4319,9 +3242,7 @@ sap.ui.define([
             oCountry.setValueState("None");
 
             /* ---------------- Reset Model ---------------- */
-            ["State", "City", "STDCode", "phone"].forEach(p =>
-                oModel.setProperty("/" + p, "")
-            );
+            ["State", "City", "STDCode", "phone"].forEach(p => oModel.setProperty("/" + p, ""));
 
             /* ---------------- Reset UI ---------------- */
             oStateCB?.setSelectedKey("");
@@ -4334,38 +3255,27 @@ sap.ui.define([
             oCityCB?.getBinding("items")?.filter([]);
 
             const oItem = oCountry.getSelectedItem();
-            if (!oItem) {
-                oModel.setProperty("/Country", "");
-                return;
-            }
+            if (!oItem) return oModel.setProperty("/Country", "");
 
             const sCountryName = oItem.getText();
             const sCountryCode = oItem.getAdditionalText()?.trim();
-
             oModel.setProperty("/Country", sCountryName);
-
             /* ---------------- STD Handling (Same as MC_onChangeCountry) ---------------- */
             const aCountries = this.getOwnerComponent()
                 .getModel("CountryModel")
                 .getData();
 
             const oCountryData = aCountries.find(c => c.countryName === sCountryName);
-
             if (oCountryData?.stdCode) {
                 oModel.setProperty("/STDCode", oCountryData.stdCode);
                 oSTD.setValue(oCountryData.stdCode);
-
                 this._onProfileSTDChange(); // ⬅ same behavior
             }
 
             /* ---------------- Filter States ---------------- */
             if (sCountryCode) {
                 oStateCB?.getBinding("items")?.filter([
-                    new sap.ui.model.Filter(
-                        "countryCode",
-                        sap.ui.model.FilterOperator.EQ,
-                        sCountryCode
-                    )
+                    new Filter("countryCode", FilterOperator.EQ, sCountryCode)
                 ]);
             }
         },
@@ -4373,44 +3283,30 @@ sap.ui.define([
         _onProfileSTDChange: function () {
             const oSTD = this.byId("id_std");
             const oMobile = this.byId("id_phone");
-
             const std = oSTD.getValue();
             oMobile.setValue("");
-
             // Dynamic mobile length
-            if (std === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
+            (std === "+91") ? oMobile.setMaxLength(10) : oMobile.setMaxLength(18);
         },
 
         MPonMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
-
             // Digits only
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
-
             const stdRaw = this.byId("id_std").getValue() || "";
             const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
                 stdRaw.replace(/\s+/g, "") :
                 "+" + stdRaw.replace(/\s+/g, "");
-
             // Untouched empty field → no error
-            if (val.length === 0) {
-                oInput.setValueState("None");
-                return;
-            }
+            if (val.length === 0) return oInput.setValueState("None");
 
             if (!std) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
-
             const isValid = utils._LCvalidateISDmobile(oInput, std);
-
             if (!isValid) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
@@ -4421,65 +3317,44 @@ sap.ui.define([
 
         CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
-
             const oModel = this._oProfileDialog.getModel("profileData");
             const oItem = oEvent.getSource().getSelectedItem();
 
             const oCityCB = this.byId("id_city");
             const oCountryCB = this.byId("id_country");
-
             // Clear value state on state
             oEvent.getSource().setValueState("None");
-
             // Reset city-related things
             oModel.setProperty("/City", "");
             // if you have a separate city property:
-            // oModel.setProperty("/city", "");
-
             oCityCB?.setSelectedKey("");
             oCityCB?.setValue("");
             oCityCB?.getBinding("items")?.filter([]);
-
             // No state selected → clear state in model and exit
-            if (!oItem) {
-                oModel.setProperty("/State", "");
-                return;
-            }
+            if (!oItem) return oModel.setProperty("/State", "");
 
             const sStateName = oItem.getKey(); // or getText(), depending on your binding
             const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
-
             // Save state in model
             oModel.setProperty("/State", sStateName);
-
             // Filter cities by state + country
             oCityCB?.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
-                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+                new Filter("stateName", FilterOperator.EQ, sStateName),
+                new Filter("countryCode", FilterOperator.EQ, sCountryCode)
             ]);
         },
 
         CC_onChangeCity: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
-
             const oModel = this._oProfileDialog.getModel("profileData");
             const oItem = oEvent.getSource().getSelectedItem();
-
             // Clear value state on city
             oEvent.getSource().setValueState("None");
-
-            if (!oItem) {
-                oModel.setProperty("/City", "");
-                // oModel.setProperty("/city", "");
-                return;
-            }
+            if (!oItem) return oModel.setProperty("/City", "");
 
             const sCityName = oItem.getKey(); // or getText(), as per your binding
-
             // Save in model
             oModel.setProperty("/City", sCityName);
-            // If you also track explicit city:
-            // oModel.setProperty("/city", sCityName);
         },
 
         onValidateUser: async function () {
@@ -4488,24 +3363,17 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEmailCtrl, "ID") &&
                 utils._LCvalidateEmail(oEmailCtrl, "ID");
 
-            if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-                return;
-            }
+            if (!isValid) return MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
 
             const sEmail = oEmailCtrl.getValue().trim();
-
             sap.ui.core.BusyIndicator.show(0);
-
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
                     EmailID: sEmail,
                     Type: "OTP"
                 });
-
                 if (oResp?.success) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    console.log("Use OTP : ", oResp.OTP);
+                    MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
 
                     this._oResetUser = {
                         EmailID: sEmail
@@ -4516,14 +3384,12 @@ sap.ui.define([
 
                     this.oViewModel.setProperty("/forgotStep", 2);
                 } else {
-                    sap.m.MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
+                    MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
                 }
 
             } catch (err) {
-                const sMsg =
-                    err?.responseJSON?.message ||
-                    this.i18nModel.getText("forgotOtpSendFailed");
-                sap.m.MessageToast.show(sMsg);
+                const sMsg = err?.responseJSON?.message || this.i18nModel.getText("forgotOtpSendFailed");
+                MessageToast.show(sMsg);
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -4537,40 +3403,33 @@ sap.ui.define([
         },
 
         _startOtpResend: function (seconds = 120) { //120xx
-            const vm = this.oViewModel;
             let remaining = seconds;
-
             this._clearOtpResendTimer();
-
-            vm.setProperty("/canResendOTP", false);
-            vm.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
-
+            this.oViewModel.setProperty("/canResendOTP", false);
+            this.oViewModel.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
             this._otpResendInterval = setInterval(() => {
                 remaining--;
 
                 if (remaining <= 0) {
                     this._clearOtpResendTimer();
-                    vm.setProperty("/canResendOTP", true);
-                    vm.setProperty("/otpButtonText", "Resend OTP");
+                    this.oViewModel.setProperty("/canResendOTP", true);
+                    this.oViewModel.setProperty("/otpButtonText", "Resend OTP");
                     return;
                 }
-
-                vm.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
+                this.oViewModel.setProperty("/otpButtonText", `Resend OTP (${remaining}s)`);
             }, 1000);
         },
 
         _resetOtpState: function () {
-            const vm = this.oViewModel;
-
             this._clearOtpResendTimer();
             this._clearOtpValidityTimer();
 
-            vm.setProperty("/otpExpiryTs", null);
-            vm.setProperty("/otpValidityText", "");
-            vm.setProperty("/canResendOTP", true);
-            vm.setProperty("/otpButtonText", "Send OTP");
-            vm.setProperty("/showOTPField", false);
-            vm.setProperty("/isOtpEntered", false);
+            this.oViewModel.setProperty("/otpExpiryTs", null);
+            this.oViewModel.setProperty("/otpValidityText", "");
+            this.oViewModel.setProperty("/canResendOTP", true);
+            this.oViewModel.setProperty("/otpButtonText", "Send OTP");
+            this.oViewModel.setProperty("/showOTPField", false);
+            this.oViewModel.setProperty("/isOtpEntered", false);
 
             const otpCtrl = $C("signInOTP");
             otpCtrl?.setValue("");
@@ -4581,14 +3440,11 @@ sap.ui.define([
 
         onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
-
             const oProfileModel = this._oProfileDialog.getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
-
             // Decide Table
             const oTable = sSelectedTab === "Payment" ? this.byId("Id_PaymentTable") : this.byId("Id_ProfileaTable");
             const oBinding = oTable.getBinding("items");
-
             // Apply filters for booking or payment table
             let aFilters = [];
             if (sQuery) {
@@ -4596,12 +3452,12 @@ sap.ui.define([
                     aFilters = [
                         new sap.ui.model.Filter({
                             filters: [
-                                new sap.ui.model.Filter("BookingID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("InvNo", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("InvoiceDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("CustomerName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("TotalAmount", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("DueAmount", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                                new Filter("BookingID", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("InvNo", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("InvoiceDate", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("CustomerName", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("TotalAmount", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("DueAmount", FilterOperator.Contains, sQuery.toString())
                             ],
                             and: false
                         })
@@ -4610,13 +3466,13 @@ sap.ui.define([
                     aFilters = [
                         new sap.ui.model.Filter({
                             filters: [
-                                new sap.ui.model.Filter("customerName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("BookingID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("BookingDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("room", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("amount", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
-                                new sap.ui.model.Filter("currency", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                                new Filter("customerName", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("BookingID", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("BookingDate", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("room", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("status", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("amount", FilterOperator.Contains, sQuery.toString()),
+                                new Filter("currency", FilterOperator.Contains, sQuery.toString())
                             ],
                             and: false
                         })
@@ -4633,10 +3489,7 @@ sap.ui.define([
             oModel.setProperty("/selectedTab", sKey);
         },
 
-        onTableUpdateFinished: function () {
-            this._updateRowCount();
-        },
-
+        onTableUpdateFinished: function () { this._updateRowCount() },
 
         _updateRowCount: function () {
             const oProfileModel = this._oProfileDialog.getModel("profileData");
@@ -4645,38 +3498,23 @@ sap.ui.define([
             const oBinding = oTable.getBinding("items");
             const length = oBinding ? oBinding.getLength() : 0;
 
-            if (sSelectedTab === "Payment") {
-                oProfileModel.setProperty("/paymentCount", length);
-            } else {
-                oProfileModel.setProperty("/bookingCount", length);
-            }
+            (sSelectedTab === "Payment") ? oProfileModel.setProperty("/paymentCount", length) : oProfileModel.setProperty("/bookingCount", length);
         },
-        ////
-
 
         onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
-                this._oAdminSignup = sap.ui.xmlfragment(
-                    "sap.ui.com.project1.fragment.AdminSignup",
-                    this
-                );
+                this._oAdminSignup = sap.ui.xmlfragment("sap.ui.com.project1.fragment.AdminSignup", this);
                 this.getView().addDependent(this._oAdminSignup);
-
-                // 🔒 MAKE DOB READ-ONLY (calendar-only)
                 this._FragmentDatePickersReadOnly(["adminDOB"]);
-
-                // 🔐 CACHE ORIGINAL DOC TYPES (ONCE)
                 const oDocType = $C("adminDocType");
                 this._adminDocTypeBackup = oDocType.getItems().map(i => ({
                     key: i.getKey(),
                     text: i.getText()
                 }));
-
                 this._oAdminSignup.attachAfterClose(() => {
                     this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
                 });
-
             }
             // Set DOB limits - CHANGED: now 0 to 100 years (was 18 to 70)
             const oDate = $C("adminDOB");
@@ -4696,11 +3534,9 @@ sap.ui.define([
             }
         },
 
-
         ADMIN_onChangeCountry: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
-
             const oCountry = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
 
@@ -4715,34 +3551,25 @@ sap.ui.define([
             // --- 1) SANITIZE TYPED COUNTRY TEXT ---
             const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
             oCountry.setValue(val);
-
             if (oCountry.getSelectedItem() &&
                 val !== oCountry.getSelectedItem().getText()) {
                 oCountry.setSelectedKey(null);
                 oCountry.setSelectionItem(null);
             }
-
             // --- 2) RESET dependent model properties ---
             oModel.setProperty("/State", "");
             oModel.setProperty("/City", "");
             oModel.setProperty("/STDCode", "");
-
             oState.setValue("").setSelectedKey("");
             oCity.setValue("").setSelectedKey("");
             oSTD.setValue("").setSelectedKey("");
             oMobile.setValue("");
-
             oStateModel.setProperty("/filtered", []);
             oCityModel.setProperty("/filtered", []);
-
             const selected = oCountry.getSelectedItem();
             oCountry.setValueState("None");
-
             // CASE B — MANUAL COUNTRY TYPED
-            if (!selected) {
-                oModel.setProperty("/Country", val);
-                return;
-            }
+            if (!selected) return oModel.setProperty("/Country", val);
 
             // CASE A — COUNTRY SELECTED
             oModel.setProperty("/Country", selected.getText());
@@ -4751,17 +3578,13 @@ sap.ui.define([
             oCity.setValueState("None");
             oSTD.setValueState("None");
             oMobile.setValueState("None");
-
             const sCountryCode = selected.getAdditionalText().trim();
-
             // Mobile length rule
             oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
-
             // Filter states
             const allStates = oStateModel.getData();
             const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
             oStateModel.setProperty("/filtered", filteredStates);
-
             //  AUTO-SELECT STD WITHOUT FILTERING LIST
             let matchedKey = null;
             oSTD.getItems().some(item => {
@@ -4779,90 +3602,59 @@ sap.ui.define([
                 oSTD.setSelectedKey("");
                 oModel.setProperty("/STDCode", "");
             }
-
             // If no states exist → empty city list
-            if (filteredStates.length === 0) {
-                oCityModel.setProperty("/filtered", []);
-            }
+            if (filteredStates.length === 0) oCityModel.setProperty("/filtered", []);
         },
-
 
         ADMIN_onChangeState: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
-
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
-
             const oCountry = $C("adminsignUpCountry");
             const oCity = $C("adminsignUpCity");
             const oCityModel = this.getView().getModel("CityModel");
-
             // --- SANITIZE INPUT ---
             const val = oState.getValue().replace(/[^a-zA-Z\s]/g, "");
             oState.setValue(val);
-
             // Clear state error always (typed or selected)
             oState.setValueState("None");
-
             // Clear city (dependent)
             oModel.setProperty("/City", "");
             oCity.setSelectedKey("").setValue("");
             oCityModel.setProperty("/filtered", []);
-
             // Detect manual typing: break auto-selection
             if (oState.getSelectedItem() &&
                 val !== oState.getSelectedItem().getText()) {
-
                 oState.setSelectedKey(null);
                 oState.setSelectionItem(null);
             }
-
             const selected = oState.getSelectedItem();
             const selectedCountry = oCountry.getSelectedItem();
-
-
-            if (!selected || !selectedCountry) {
-                oModel.setProperty("/State", val);
-                return;
-            }
+            if (!selected || !selectedCountry) return oModel.setProperty("/State", val);
 
             const sStateText = selected.getText();
             oModel.setProperty("/State", sStateText);
 
             const sCountryCode = selectedCountry.getAdditionalText().trim();
-
             // Filter cities
             const allCities = oCityModel.getData();
-            const filteredCities = allCities.filter(c =>
-                c.countryCode === sCountryCode &&
-                c.stateName === sStateText
-            );
-
+            const filteredCities = allCities.filter(c => c.countryCode === sCountryCode && c.stateName === sStateText);
             oCityModel.setProperty("/filtered", filteredCities);
         },
 
         ADMIN_onChangeCity: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
-
             const oCityCtrl = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
-
             // --- SANITIZE INPUT ---
             const val = oCityCtrl.getValue().replace(/[^a-zA-Z\s]/g, "");
             oCityCtrl.setValue(val);
-
             // City clears its own error ALWAYS (typed or selected)
             oCityCtrl.setValueState("None");
-
             const selected = oCityCtrl.getSelectedItem();
-
-            if (selected) {
-                oModel.setProperty("/City", selected.getText());
-                return;
-            }
-
+            if (selected) return oModel.setProperty("/City", selected.getText());
             oModel.setProperty("/City", val);
         },
 
@@ -4873,29 +3665,19 @@ sap.ui.define([
             const oModel = this.getView().getModel("AdminSignupModel");
 
             // Mandatory check
-            if (!utils._LCvalidateMandatoryField(oEvent)) {
-                return;
-            }
+            if (!utils._LCvalidateMandatoryField(oEvent)) return;
 
             // ✅ + followed by digits, but NOT +0 / +09 / +01
             const STD_REGEX = /^\+[1-9][0-9]*$/;
-
             if (!STD_REGEX.test(sValue)) {
                 oSTD.setValueState("Error");
                 oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
                 oModel.setProperty("/STDCode", "");
                 return;
             }
-
             // Clean state
-            oSTD.setValueState("None");
-
-            // Reset mobile on STD change
-            // oMobile.setValue("");
-
-            // Length logic
+            oSTD.setValueState("None")
             oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
-
             // Update model
             oModel.setProperty("/STDCode", sValue);
         },
@@ -4913,22 +3695,16 @@ sap.ui.define([
             const stdRaw = oSTD?.getValue() || "";
             const std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
 
-            if (!val) {
-                oInput.setValueState("None");
-                return;
-            }
+            if (!val) return oInput.setValueState("None");
 
             if (!std || std === "+") {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
-
             const valid = utils._LCvalidateISDmobile(oInput, std);
-
             oInput.setValueState(valid ? "None" : "Error");
             if (!valid) {
-                // 🔑 ONLY MESSAGE DIFFERENCE (same pattern as before)
                 oInput.setValueStateText(
                     std === "+91"
                         ? this.i18nModel.getText("MSmobileNoValueStateIN")
@@ -4939,39 +3715,24 @@ sap.ui.define([
 
         onAdminLiveValidate: function (oEvent) {
             const id = oEvent.getSource().getId();
-
             // Vendor name
-            if (id.includes("adminVendorName")) {
-                utils._LCvalidateName(oEvent);
-                return;
-            }
+            if (id.includes("adminVendorName")) return utils._LCvalidateName(oEvent);
             // Email
-            if (id.includes("adminEmail")) {
-                utils._LCvalidateEmail(oEvent);
-                return;
-            }
-
+            if (id.includes("adminEmail")) return utils._LCvalidateEmail(oEvent);
             // Address
-            if (id.includes("adminAddress")) {
-                utils._LCvalidateMandatoryField(oEvent);
-                return;
-            }
+            if (id.includes("adminAddress")) return utils._LCvalidateMandatoryField(oEvent);
         },
-
-
 
         ADMIN_onChangeDOB: function (oEvent) {
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
             const raw = oDatePicker.getDateValue();
-
             if (!raw) {
                 oDatePicker.setValueState("Error");
                 oDatePicker.setValueStateText("Date of birth is required");
                 oModel.setProperty("/DOB", "");
                 return;
             }
-
             const today = new Date();
             let age = today.getFullYear() - raw.getFullYear();
             const m = today.getMonth() - raw.getMonth();
@@ -4985,59 +3746,15 @@ sap.ui.define([
                 oModel.setProperty("/DOB", "");
                 return;
             }
-
             oDatePicker.setValueState("None");
-
             const yyyy = raw.getFullYear();
             const mm = String(raw.getMonth() + 1).padStart(2, "0");
             const dd = String(raw.getDate()).padStart(2, "0");
-
             oModel.setProperty("/DOB", `${yyyy}-${mm}-${dd}`);
         },
 
-        // ADMIN_onChangeDOB: function (oEvent) {
-        //     const oDatePicker = oEvent.getSource();
-        //     const oModel = this.getView().getModel("AdminSignupModel");
-
-        //     const value = oDatePicker.getValue();  // formatted date (dd/MM/yyyy)
-        //     const raw = oDatePicker.getDateValue(); // JS Date object or null
-
-        //     // If no valid date selected
-        //     if (!raw) {
-        //         oDatePicker.setValueState("Error");
-        //         // valueStateText comes from XML
-        //         return;
-        //     }
-
-        //     // Calculate age
-        //     const today = new Date();
-        //     const birth = new Date(raw);
-        //     let age = today.getFullYear() - birth.getFullYear();
-
-        //     const m = today.getMonth() - birth.getMonth();
-        //     if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-        //         age--;
-        //     }
-
-        //     // Validate range
-        //     if (age < 18 || age > 70) {
-        //         oDatePicker.setValueState("Error");
-        //         // XML valueStateText handles the message
-        //         return;
-        //     }
-
-        //     // All good → clear error
-        //     oDatePicker.setValueState("None");
-
-        //     // Save to model in yyyy-MM-dd format for payload
-        //     // oModel.setProperty("/DOB", oDatePicker.getValue());
-        //     oModel.setProperty("/DOB", oDatePicker.getValue("yyyy-MM-dd"));
-
-        //  },
-
         onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
-
             const oModel = this.getView().getModel("AdminSignupModel");
             const data = oModel.getData();
             const oAdmin = data;
@@ -5067,7 +3784,6 @@ sap.ui.define([
                 }
             };
             sap.ui.core.BusyIndicator.show(0);
-
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
 
@@ -5085,11 +3801,8 @@ sap.ui.define([
                         }
                     }
                 );
-
             } catch (err) {
-
                 let sErrorMessage = "Registration failed. Please try again later.";
-
                 // 🔹 Case 1: jQuery AJAX error with JSON response
                 if (err?.responseJSON?.message) {
                     sErrorMessage = err.responseJSON.message;
@@ -5110,7 +3823,6 @@ sap.ui.define([
                         sErrorMessage = err.responseText;
                     }
                 }
-
                 MessageBox.error(sErrorMessage, {
                     title: "Registration Failed"
                 });
@@ -5137,7 +3849,7 @@ sap.ui.define([
             ];
 
             if (forbiddenExt.includes(ext) || forbiddenMimes.includes(file.type)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("filetypeNotAllowed") || "This file type is not allowed.");
+                MessageToast.show(this.i18nModel.getText("filetypeNotAllowed") || "This file type is not allowed.");
                 oUploader.clear();
                 return;
             }
@@ -5145,41 +3857,33 @@ sap.ui.define([
 
             const MAX_SIZE = 2 * 1024 * 1024; // 5 MB
             if (file.size > MAX_SIZE) {
-                sap.m.MessageToast.show(this.i18nModel.getText("filesizemustnotexceed5MB"));
+                MessageToast.show(this.i18nModel.getText("filesizemustnotexceed5MB"));
                 oUploader.clear();
                 return;
             }
-
             const selectedDocType = oDocType.getSelectedKey();
-
             // 🔒 Guard 1: Doc type mandatory
             if (!selectedDocType) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 oUploader.clear();
                 return;
             }
-
             // 🔒 Guard 2: Duplicate file check
             if (this._isDuplicateFile(file.name)) {
-                sap.m.MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded"));
+                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded"));
                 oUploader.clear();
                 return;
             }
-
             // 🔒 Lock controls during processing
             oModel.setProperty("/UploadEnabled", false);
             oModel.setProperty("/DocTypeEnabled", false);
-
             const reader = new FileReader();
-
             reader.onload = () => {
                 const base64 = reader.result.split(",")[1];
                 const docs = oModel.getProperty("/Documents") || [];
 
                 // 🔑 ADDITION: preview URL for images ONLY
                 const previewUrl = URL.createObjectURL(file);
-
-
                 docs.push({
                     FileName: file.name,
                     DocumentType: file.type,      // MIME
@@ -5194,38 +3898,28 @@ sap.ui.define([
                 // ✅ CLEAR ERROR STATE HERE (this is what you asked)
                 const table = $C("adminAttachmentTable");
                 table?.removeStyleClass("fileErrorHighlight");
-
                 // 🔥 Remove used document type from ComboBox
                 oDocType.getItems().forEach(i => {
                     if (i.getKey() === selectedDocType) {
                         oDocType.removeItem(i);
                     }
                 });
-
                 // 🔁 Reset doc type
                 oModel.setProperty("/CurrentDocType", "");
                 oUploader.clear();
-
                 // 🔓 Re-enable ONLY if options remain
                 const hasMoreTypes = oDocType.getItems().length > 0;
                 oModel.setProperty("/DocTypeEnabled", hasMoreTypes);
                 oModel.setProperty("/UploadEnabled", false);
-
-                if (!hasMoreTypes) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("alldocumentsuploaded"));
-                }
+                if (!hasMoreTypes) MessageToast.show(this.i18nModel.getText("alldocumentsuploaded"));
             };
-
             reader.readAsDataURL(file);
         },
 
         ADMIN_onChangeGender: function (oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
-
-            this.getView().getModel("AdminSignupModel")
-                .setProperty("/Gender", key);
-
+            this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
             oSelect.setValueState(key ? "None" : "Error");
         },
 
@@ -5234,60 +3928,26 @@ sap.ui.define([
             const oModel = this.getView().getModel("AdminSignupModel");
 
             // -------- MODEL RESET (SAFE WAY) --------
-            [
-                "/Salutation",
-                "/VendorName",
-                "/DOB",
-                "/Gender",
-                "/Email",
-                "/Country",
-                "/State",
-                "/City",
-                "/STDCode",
-                "/Mobile",
-                "/Address",
-                "/CurrentDocType"
-            ].forEach(p => oModel.setProperty(p, ""));
-
+            ["/Salutation", "/VendorName", "/DOB", "/Gender", "/Email", "/Country", "/State", "/City", "/STDCode", "/Mobile", "/Address", "/CurrentDocType"].forEach(p => oModel.setProperty(p, ""));
             oModel.setProperty("/Documents", []);
-
             // -------- FORCE TABLE REFRESH --------
             const oTable = C("adminAttachmentTable");
             oTable?.getBinding("items")?.refresh(true);
             oTable?.removeStyleClass("fileErrorHighlight");
-
             // -------- RESET CONTROLS (IMPORTANT ORDER) --------
-            [
-                "adminSalutation",
-                "adminVendorName",
-                "adminDOB",
-                "adminGender",
-                "adminEmail",
-                "adminsignUpCountry",
-                "adminsignUpState",
-                "adminsignUpCity",
-                "adminsignUpSTD",
-                "adminMobileNo",
-                "adminAddress",
-                "adminDocType"
-            ].forEach(id => {
+            ["adminSalutation", "adminVendorName", "adminDOB", "adminGender", "adminEmail", "adminsignUpCountry", "adminsignUpState", "adminsignUpCity", "adminsignUpSTD", "adminMobileNo", "adminAddress", "adminDocType"].forEach(id => {
                 const c = C(id);
                 if (!c) return;
-
                 // ComboBox / Select
                 c.setSelectedKey?.("");
                 c.setValue?.("");
-
                 // Inputs / DatePicker
                 c.setValueState?.("None");
             });
-
             // -------- RESTORE DOCUMENT TYPE DROPDOWN --------
             const oDocType = $C("adminDocType");
-
             if (oDocType && this._adminDocTypeBackup) {
                 oDocType.removeAllItems();
-
                 this._adminDocTypeBackup.forEach(d => {
                     oDocType.addItem(
                         new sap.ui.core.ListItem({
@@ -5297,18 +3957,15 @@ sap.ui.define([
                     );
                 });
             }
-
             // Reset flags
             oModel.setProperty("/CurrentDocType", "");
             oModel.setProperty("/DocTypeEnabled", true);
-
         },
 
         _validateAdminSignupFields: function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const M = this.getView().getModel("AdminSignupModel");
             const std = (C("adminsignUpSTD").getValue() || "").trim();
-
             // Pick actual UI5 controls
             const oName = C("adminVendorName");
             const oDOB = C("adminDOB");
@@ -5320,7 +3977,6 @@ sap.ui.define([
             const oSTD = C("adminsignUpSTD");
             const oMobile = C("adminMobileNo");
             const oAddress = C("adminAddress");
-
             const isValid =
                 utils._LCstrictValidationSelect($C("adminSalutation"))
                 &&
@@ -5342,18 +3998,13 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
                 return false;
             }
-
             const docs = M.getProperty("/Documents");
-
             if (!docs || docs.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseuploadatleastonedocument"));
-
+                MessageToast.show(this.i18nModel.getText("pleaseuploadatleastonedocument"));
                 const table = C("adminAttachmentTable");
                 table?.addStyleClass("fileErrorHighlight");
-
                 return false;
             }
-
             return true;
         },
 
@@ -5372,19 +4023,15 @@ sap.ui.define([
                 Address: "",
                 CurrentDocType: "",
                 Documents: [],
-
-                // 🔥 NEW CONTROL FLAGS
                 UploadEnabled: false,
                 DocTypeEnabled: true
             });
-
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
         onAdminDocTypeChange: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();
-
             oModel.setProperty("/UploadEnabled", !!key);
         },
 
@@ -5392,21 +4039,18 @@ sap.ui.define([
             const docs = this.getView()
                 .getModel("AdminSignupModel")
                 .getProperty("/Documents") || [];
-
             return docs.some(d => d.FileName === fileName);
         },
 
         _onCollectAdminSignupPayloadDocs: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
             const aDocs = oModel.getProperty("/Documents") || [];
-
             const aPayloadDocs = aDocs.map(d => ({
                 FileName: d.FileName,
                 DocumentType: d.DocumentType,
                 FileType: d.FileType,
                 Base64: d.Base64
-            }));
-
+            }))
             return aPayloadDocs;
         },
 
@@ -5416,42 +4060,29 @@ sap.ui.define([
             const table = $C("adminAttachmentTable");
             const oCtx = oEvent.getParameter("listItem").getBindingContext("AdminSignupModel");
             const doc = oCtx.getObject(); // ✅ define first
-
             // 🧹 Cleanup preview blob
-            if (doc.PreviewUrl) {
-                URL.revokeObjectURL(doc.PreviewUrl);
-            }
+            if (doc.PreviewUrl) URL.revokeObjectURL(doc.PreviewUrl);
 
             const index = parseInt(oCtx.getPath().split("/").pop(), 10);
             const docs = oModel.getProperty("/Documents") || [];
-
             docs.splice(index, 1);
             oModel.setProperty("/Documents", docs);
-
             // ♻️ Restore doc type option
             oDocType.addItem(new sap.ui.core.ListItem({
                 key: doc.VdocType,
                 text: doc.VdocType
             }));
-
             oModel.setProperty("/DocTypeEnabled", true);
-
             // 🔴 If no documents left → show error highlight
-            if (docs.length === 0) {
-                table?.addStyleClass("fileErrorHighlight");
-            }
+            if (docs.length === 0) table?.addStyleClass("fileErrorHighlight");
         },
 
         onAdminDocTypeSelected: function () {
             const uploader = $C("hiddenAdminUploader");
-
-            if (uploader && uploader.openFileDialog) {
-                uploader.openFileDialog();   // <--- THIS opens Browse dialog
-            }
+            if (uploader && uploader.openFileDialog) uploader.openFileDialog();   // <--- THIS opens Browse dialog
         },
 
         onAdminPreviewDoc: function (oEvent) {
-
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -5473,18 +4104,12 @@ sap.ui.define([
                 }
                 return last;
             }
-
             const oDoc = oEvent.getSource()
                 .getBindingContext("AdminSignupModel")
                 ?.getObject();
 
-            if (!oDoc || !oDoc.File) {
-                MessageBox.error(this.i18nModel.getText("nodocfound"));
-                return;
-            }
-
+            if (!oDoc || !oDoc.File) return MessageBox.error(this.i18nModel.getText("nodocfound"));
             const sBase64 = autoDecodeBase64(oDoc.File);
-
             let sMimeType = "application/octet-stream";
             if (sBase64.startsWith("iVB")) {
                 sMimeType = "image/png";
@@ -5493,13 +4118,9 @@ sap.ui.define([
             } else if (sBase64.startsWith("JVBER")) {
                 sMimeType = "application/pdf";
             }
-
             if (sMimeType.startsWith("image/")) {
-
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-
                 if (!this._previewDialog) {
-
                     const oFlex = new sap.m.FlexBox({
                         width: "100%",
                         height: "100%",
@@ -5536,19 +4157,15 @@ sap.ui.define([
                             this._previewDialog = null;
                         }
                     });
-
                     this.getView().addDependent(this._previewDialog);
                 } else {
                     this._previewDialog.setTitle(oDoc.FileName || "Document Image");
                 }
-
                 this.byId("adminDocPreviewImage").setSrc(sImageSrc);
                 this._previewDialog.open();
                 return;
             }
-
             if (sMimeType === "application/pdf") {
-
                 if (!this._previewDialog) {
                     this._previewDialog = new sap.m.Dialog({
                         title: oDoc.FileName || "Document Preview",
@@ -5575,15 +4192,11 @@ sap.ui.define([
                             this._previewDialog = null;
                         }
                     });
-
                     this.getView().addDependent(this._previewDialog);
                 }
-
                 this._previewDialog.removeAllContent();
-
                 const byteChars = atob(sBase64);
                 const byteArrays = [];
-
                 for (let offset = 0; offset < byteChars.length; offset += 512) {
                     const slice = byteChars.slice(offset, offset + 512);
                     const byteNumbers = new Array(slice.length);
@@ -5592,14 +4205,10 @@ sap.ui.define([
                     }
                     byteArrays.push(new Uint8Array(byteNumbers));
                 }
-
                 const blob = new Blob(byteArrays, { type: sMimeType });
+                if (this._previewUrl) URL.revokeObjectURL(this._previewUrl);
 
-                if (this._previewUrl) {
-                    URL.revokeObjectURL(this._previewUrl);
-                }
                 this._previewUrl = URL.createObjectURL(blob);
-
                 this._previewDialog.addContent(
                     new sap.ui.core.HTML({
                         sanitizeContent: false,
@@ -5613,32 +4222,22 @@ sap.ui.define([
         `
                     })
                 );
-
                 this._previewDialog.open();
                 return;
             }
-
-            sap.m.MessageToast.show("Preview not supported.");
+            MessageToast.show("Preview not supported.");
         },
-
-
-
 
         onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-
             const oGender = $C("adminGender");
-
             // 🔥 Clear salutation error immediately
             oSalutation.setValueState("None");
-
             if (!oGender) return;
-
             // Reset gender first
             oGender.setSelectedKey("");
             oGender.setEnabled(true);
-
             // Auto-map gender
             if (sKey === "Mr.") {
                 oGender.setSelectedKey("Male");
@@ -5653,22 +4252,16 @@ sap.ui.define([
             // ✅ Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
-        ADMIN_onAddressChange: function (oEvent) {
-            utils._LCvalidateAddress(oEvent.getSource());
-        },
+        ADMIN_onAddressChange: function (oEvent) { utils._LCvalidateAddress(oEvent.getSource()) },
 
-        MPonAddressChange: function (oEvent) {
-            utils._LCvalidateAddress(oEvent.getSource());
-        },
+        MPonAddressChange: function (oEvent) { utils._LCvalidateAddress(oEvent.getSource()) },
+
         onNameInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateName(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        // MP_onChangeDOB: function (oEvent) {
-        //     utils._LCvalidateDate(oEvent);
-        // },
         onAddressClick: function () {
             try {
                 let oHostelModel;
@@ -5677,31 +4270,19 @@ sap.ui.define([
                 } else {
                     oHostelModel = this.oHostelModel;
                 }
-
-                if (!oHostelModel) {
-                    sap.m.MessageToast.show("Location data not available.");
-                    return;
-                }
+                if (!oHostelModel) return MessageToast.show("Location data not available.");
 
                 const sGeoUrl = oHostelModel.getProperty("/GeoLocation") || "";
 
-                if (!sGeoUrl || sGeoUrl.trim() === "" || sGeoUrl === "null" || sGeoUrl === "undefined") {
-                    sap.m.MessageToast.show("Geo Location is not available.");
-                    return;
-                }
+                if (!sGeoUrl || sGeoUrl.trim() === "" || sGeoUrl === "null" || sGeoUrl === "undefined") return MessageToast.show("Geo Location is not available.");
 
                 const urlPattern = /^(http|https):\/\/[^ "]+(\.com|\.co|\.in|\.net|\.org|maps\.app\.goo\.gl)/i;
 
-                if (!urlPattern.test(sGeoUrl.trim())) {
-                    sap.m.MessageToast.show("Invalid Geo location link");
-                    return;
-                }
+                if (!urlPattern.test(sGeoUrl.trim())) return MessageToast.show("Invalid Geo location link");
 
                 window.open(sGeoUrl.trim(), "_blank");
-
             } catch (err) {
-                console.error("Error opening Google Maps:", err);
-                sap.m.MessageToast.show("Error opening maps.");
+                MessageToast.show("Error opening maps.");
             }
         },
     });
