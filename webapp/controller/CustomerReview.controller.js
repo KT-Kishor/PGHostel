@@ -14,13 +14,13 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            // var data = this.getOwnerComponent().getModel("SelectedBedType").getData();
+              var data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             // await this._loadCustomerReviews(data);
             this.commonLoginFunction();
             this._setDefaultDateRange();
             await this._loadCustomers();
             await this._buildBranchMap();
-            await this._loadCustomerReviews();
+            await this._loadCustomerReviews(data);
         },
 
         _getBranchName: function (sBranchCode) {
@@ -54,22 +54,51 @@ sap.ui.define([
             this._mBranchMap = mBranchMap;
         },
 
+     
         _loadCustomerReviews: function (data) {
-            // var BedTypeName = `${data.Name} - ${data.ACType}`;
-            // var filters = {
-            //     BranchCode: data.BranchCode,
-            //     BedType: BedTypeName
-            // };
+               const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+
+          
+              const oDRS = this.byId("CR_id_BranchCode");
+            const oRatingCB = this.byId("CR_id_Rating");
+
+            const dFrom = oDRS.getDateValue();
+            const dTo = oDRS.getSecondDateValue();
+            const sRating = oRatingCB.getSelectedKey();
+            var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
+
+            var filters = {
+                BedType: BedTypeName,
+                StartDate : dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
+                EndDate : dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-")  : "",
+                OverallRating: sRating || ""
+            };
+              if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchCode = aBranchCodes;
+                filters.Role = "Admin";
+            } else {
+                filters.BranchCode = data.BranchCode || "";
+            }
+            const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", {}).then((oData) => {
+            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
                 console.log("HM_Feedback response:", oData.commentData);
-                let aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                aFeedbacks = this._sortFeedbacksDefault(aFeedbacks);
-                this._aAllFeedbacks = aFeedbacks;
-                this._applyFilters();
+                const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+                that._aAllFeedbacks = aFeedbacks;
+                that._applyFilters();
                 sap.ui.core.BusyIndicator.hide();
             }).catch(function () {
                 sap.ui.core.BusyIndicator.hide();
@@ -136,24 +165,7 @@ sap.ui.define([
         _applyFilters: function () {
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
-            const oDRS = this.byId("CR_id_BranchCode");
-            const oRatingCB = this.byId("CR_id_Rating");
-
-            const dFrom = oDRS.getDateValue();
-            const dTo = oDRS.getSecondDateValue();
-            const sRating = oRatingCB.getSelectedKey();
             let aFiltered = this._aAllFeedbacks || [];
-            // if (dFrom && dTo) {
-            //     aFiltered = aFiltered.filter(f => {
-            //         const dFeedback = new Date(f.FeedbackDate);
-            //         return dFeedback >= dFrom && dFeedback <= dTo;
-            //     });
-            // }
-            if (sRating) {
-                aFiltered = aFiltered.filter(f =>
-                    Number(f.OverallRating) === Number(sRating)
-                );
-            }
             aFiltered.forEach(f => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/CustomerCard.json",

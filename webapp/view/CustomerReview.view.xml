@@ -29,7 +29,7 @@
                     useToolbar="false"
                     clear="CR_onPressClear"
                     showClearOnFB="true"
-                    search="CR_onSearch"
+                    search="_loadCustomerReviews"
                     showFilterConfiguration="false"
                 >
                     <fb:filterGroupItems>
