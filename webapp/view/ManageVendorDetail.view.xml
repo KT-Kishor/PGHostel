@@ -430,7 +430,7 @@
                         class="myUnifiedBtn"
                         tooltip="{i18n>MVDapprove}"
                         press="MI_onPressButtons"
-                        enabled="{= !${editable>/Edit} }"
+                        enabled="{= !${editable>/Edit} &amp;&amp; ${AdminSignupModel>/Status} !== 'Send back' }"
                         visible="{= ${AdminSignupModel>/Status} !== 'Approved'
                         &amp;&amp; ${AdminSignupModel>/Status} !== 'Active' }"
                     />

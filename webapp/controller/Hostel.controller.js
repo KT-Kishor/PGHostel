@@ -3679,8 +3679,11 @@ sap.ui.define([
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
                 console.error("OTP Send Error:", err);
+                 const sMsg =
+                    err?.responseJSON?.message ||
+                    this.i18nModel.getText("invalidCredentialsPleasetryagain");
+                sap.m.MessageToast.show(sMsg);
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
