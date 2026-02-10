@@ -525,7 +525,7 @@ sap.ui.define([
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
-                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid + oCustomerData.RefundPaymentpaid;
+                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid + Number(oCustomerData.RefundPaymentpaid);
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
 
                 this.getView().setModel(oCustomerModel, "CustomerData");
@@ -1265,7 +1265,7 @@ sap.ui.define([
 
                 // Update model
                 oCustomerModel.setData(oCustomerData);
-                oCustomerModel.refresh();
+                oCustomerModel.refresh(true);
 
                 this.HM_Dialog.close();
                 sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
@@ -2745,7 +2745,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
     var that = this;
 
     sap.m.MessageBox.confirm(
-    "Would you like to extend your facility duration until your booking end date?"  ,     
+    "“Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",     
         {
             title: "Upgrade Required",
             actions: [sap.m.MessageBox.Action.OK,"NO"],
@@ -3062,12 +3062,12 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
     } else if (sBase64.startsWith("JVBER") || sBase64.includes("application/pdf")) {
         sMimeType = "application/pdf";
         isPDF = true;
-    }
+    }   
 
     /* ================= IMAGE PREVIEW ================= */
     if (sMimeType.startsWith("image/")) {
 
-        const sImageSrc = sMimeType.includes("data:") ? sBase64 : `data:${sMimeType};base64,${sBase64}`;
+        const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${sMimeType};base64,${sBase64}`;
 
         if (!this._oDocPreviewDialog) {
 
