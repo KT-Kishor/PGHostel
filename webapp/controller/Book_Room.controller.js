@@ -5170,6 +5170,24 @@ oHostelModel.setProperty(
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
         },
+         onCancelPress: function () {
+            const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+            this._isPersonUIInitialized = false;
+            this._mustRecreatePersonUI = true;
+            this._lastPersonCount = null;
+            this._iSelectedStepIndex = 0;
+            this._oSelectedStep = null;
+            this.resetAllBookingData()
+            var oRouter = this.getOwnerComponent().getRouter()
+            oRouter.navTo("RouteHostel")
+        },
 
         resetAllBookingData: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
