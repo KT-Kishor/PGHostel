@@ -1282,6 +1282,10 @@ sap.ui.define([
             onChangeInvoiceStatus: function(oEventOrStatus) {
                 var that = this;
                 var status = "";
+                if (that.oDialog) {
+                     that.oDialog.destroy();
+                     that.oDialog = null;
+                }
 
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
                     var oSource = oEventOrStatus.getSource();
@@ -1517,6 +1521,11 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+
+                        if (this.oDialog) {
+                                this.oDialog.destroy();
+                                this.oDialog = null;
+                        }
 
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         MessageToast.show(this.i18nModel.getText("paymentMessage"));
@@ -3057,6 +3066,10 @@ sap.ui.define([
 
              CID_onPressrefundAmount: function() {
                     var that = this;   
+                    if (this.oDialog) {
+                        this.oDialog.destroy();
+                        this.oDialog = null;
+                    }
                     var oView = that.getView();
                     if (!that.oDialog) {
                         sap.ui.core.Fragment.load({
@@ -3127,19 +3140,31 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                    
-                        var oResult =await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
+                       
+                        var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
                         });
 
                         const oInvoice = oResult.data.ManageInvoice[0];
                         const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+
+                        // Format dates
+                        oInvoice.InvoiceDate = this.Formatter.formatDate(oInvoice.InvoiceDate);
+                        oInvoice.PayByDate   = this.Formatter.formatDate(oInvoice.PayByDate);
+
+                        // Set model
                         oSelectedModel.setData(oInvoice);
+                        oSelectedModel.refresh(true);
                         oSelectedModel.refresh(true);  
+                        this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        if (this.oDialog) {
+                                this.oDialog.destroy();
+                                this.oDialog = null;
+                        }
                         MessageToast.show(this.i18nModel.getText("refundMessage"));
                     }
                 } catch (error) {
