@@ -5,16 +5,11 @@
   },
   "sap.card": {
     "type": "Object",
-   "header": {
-    "text": "✔ Verified Stay",
+    "header": {
   "title": "{parameters>/CustomerName/value}",
   "subTitle": "{parameters>/BedType/value}",
   "status": {
     "text": "{parameters>/BranchName/value}"
-  },
-  "icon": {
-    "src": "sap-icon://customer",
-    "shape": "Circle"
   }
 },
     "configuration": {
@@ -31,75 +26,51 @@
         "FeedbackDate": { "type": "string" }
       }
     },
- "content": {
-  "groups": [
-    {
-      "items": [
+    "content": {
+      "groups": [
         {
-          "label": "Overall",
-          "type": "RatingIndicator",
-          "value": "{parameters>/OverallRating/value}",
-          "maxValue": 5
-        }
-      ]
-    },
-    {
-      "items": [
-        {
-          "label": "Room",
-          "type": "RatingIndicator",
-          "value": "{parameters>/CleanlinessRating/value}",
-          "maxValue": 5
-        }
-      ]
-    },
-    {
-      "items": [
-        {
-          "label": "Amenities",
-          "type": "RatingIndicator",
-          "value": "{parameters>/AmenitiesRating/value}",
-          "maxValue": 5
-        }
-      ]
-    },
-    {
-      "items": [
-        {
-          "label": "Staff",
-          "type": "RatingIndicator",
-          "value": "{parameters>/StaffRating/value}",
-          "maxValue": 5
-        }
-      ]
-    },
-    {
-      "items": [
-        {
-          "label": "Value",
-          "type": "RatingIndicator",
-          "value": "{parameters>/ValueRating/value}",
-          "maxValue": 5
-        }
-      ]
-    },
-    {
-      "items": [
-        {
-          "label": "Feedback Date",
-          "value": "{parameters>/FeedbackDate/value}"
-        }
-      ]
-    },
-    {
-      "heading": "Customer Comment",
-      "items": [
-        {
-          "value": "{parameters>/Comments/value}"
+          "items": [
+            {
+              "label": "Overall Rating",
+              "type": "RatingIndicator",
+              "value": "{parameters>/OverallRating/value}",
+              "maxValue": 5
+            },
+             {
+              "label": "Room Cleanliness",
+              "type": "RatingIndicator",
+              "value": "{parameters>/CleanlinessRating/value}",
+              "maxValue": 5
+            },
+             {
+              "label": "Amenities & Facilities",
+              "type": "RatingIndicator",
+              "value": "{parameters>/AmenitiesRating/value}",
+              "maxValue": 5
+            },
+             {
+              "label": "Staff Service",
+              "type": "RatingIndicator",
+              "value": "{parameters>/StaffRating/value}",
+              "maxValue": 5
+            },
+              {
+              "label": "Value for Money",
+              "type": "RatingIndicator",
+              "value": "{parameters>/ValueRating/value}",
+              "maxValue": 5
+            },
+            {
+              "label": "Comments",
+              "value": "{parameters>/Comments/value}"
+            },
+            {
+              "label": "Feedback Date",
+              "value": "{parameters>/FeedbackDate/value}"
+            }
+          ]
         }
       ]
     }
-  ]
-}
   }
 }
