@@ -1254,6 +1254,24 @@
                                     textAlign="End"
                                 />
                             </HBox>
+                                <!-- Refund -->
+                              <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }">
+                                <Label
+                                    text="Refund credited:"
+                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                                />
+                                <Text
+                                    class="amountText totalColumnBold1"
+                                    text="{
+                            parts: [
+                                { path: 'CustomerData>/RefundPaymentpaid' },
+                                { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
+                                    textAlign="End"
+                                />
+                            </HBox>
                                     <!-- Due Amount -->
                                <HBox justifyContent="SpaceBetween">
                                 <Label

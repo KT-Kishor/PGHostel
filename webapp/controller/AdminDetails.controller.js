@@ -312,6 +312,10 @@ sap.ui.define([
                     .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used!=="Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
+                var RefundPaymentpaid = aPayment
+                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used==="Y")
+                    .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
+
 
                 var bedname = oCustomer.Bookings?.[0]?.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
                 var acname = oCustomer.Bookings?.[0]?.BedType.includes("NON-AC") ? "NON-AC" : "AC"
@@ -361,6 +365,7 @@ sap.ui.define([
                     CouponCode: oCustomer.Bookings?.[0]?.CouponCode || "",
                     Deposit: Deposit.Deposit || "0.00",
                     PaymentPaid: Paymentpaid || "0.00",
+                    RefundPaymentpaid: RefundPaymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
                     GSTType: oCustomer.Bookings?.[0]?.GSTType|| "",
@@ -520,7 +525,7 @@ sap.ui.define([
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
-                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
+                oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid + oCustomerData.RefundPaymentpaid;
                 const oCustomerModel = new sap.ui.model.json.JSONModel(oCustomerData);
 
                 this.getView().setModel(oCustomerModel, "CustomerData");

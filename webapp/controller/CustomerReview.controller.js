@@ -14,7 +14,8 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            await this._loadCustomerReviews();
+            var data = this.getOwnerComponent().getModel("SelectedBedType").getData();
+            await this._loadCustomerReviews(data);
         },
 
         _getBranchName: function (sBranchCode) {
@@ -23,13 +24,21 @@ sap.ui.define([
             return oBranch ? oBranch.Name : sBranchCode;
         },
 
-        _loadCustomerReviews: function () {
+        _loadCustomerReviews: function (data) {
+            var BedTypeName = `${data.Name} - ${data.ACType}`;
+
+            var filters = {
+                BranchCode: data.BranchCode,
+                BedType: BedTypeName
+            };
+
+
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", {}).then(function (oData) {
+            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
                 console.log("HM_Feedback response:", oData.commentData);
                 const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 //                 if (!aFeedbacks.length) {
@@ -63,7 +72,7 @@ sap.ui.define([
             });
         },
 
-            onHome: function () {
+        onHome: function () {
             this.CommonLogoutFunction();
             this.getView().getModel("mainModel").setData({});
         },

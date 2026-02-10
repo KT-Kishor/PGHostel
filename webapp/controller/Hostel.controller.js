@@ -1986,6 +1986,22 @@ sap.ui.define([
                 ]);
             }
         },
+             onRatingPress: function (oEvent) {
+            var oSource = oEvent.getSource();
+
+            // Get binding context of the clicked bed type
+            var oCtx = oSource.getBindingContext("VisibilityModel");
+
+            if (!oCtx) {
+                return;
+            }
+
+            var oBedData = oCtx.getObject();
+            this.getOwnerComponent().setModel(new JSONModel(oBedData), "SelectedBedType");
+
+            this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
+
+        },
 
 
         onSTDChange: function (oEvent) {
@@ -3109,7 +3125,10 @@ sap.ui.define([
                                 src: convertBase64ToImage(base64, type),
                                 Area: sArea,
                                 AverageRating: AverageRating,
-                                TotalFeedbacks: TotalFeedbacks
+                                TotalFeedbacks: TotalFeedbacks,
+                                BranchCode: room.BranchCode,
+                                Name: room.Name,
+                                ACType: room.ACType,
                             });
                         }
                     }

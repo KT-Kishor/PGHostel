@@ -338,7 +338,7 @@ sap.ui.define([
     var selected = table.getSelectedItem();
 
     if (!selected) {
-        sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"));
+        MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"));
         return;
     }
 
@@ -759,7 +759,9 @@ HM_UnassignRoom: function () {
                                 sPath: "X",
                                 dash: "AdminPage"
                             });
-                    }
+                    } else {
+                          this.getOwnerComponent().getModel("InvoiceNavContext").setData({}); 
+                         }
                 }
             }
         );
