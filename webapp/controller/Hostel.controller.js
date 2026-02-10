@@ -740,40 +740,71 @@ sap.ui.define([
 
 
         _LoadAmenities: async function (sBranchCode) {
-            const oAmenityModel = new JSONModel({
-                loading: true,
-                Amenities: []
-            });
+    console.log("🔍 Loading amenities for BranchCode:", sBranchCode || "N/A");  // Debug log
+    
+    const oAmenityModel = new JSONModel({
+        loading: true,
+        Amenities: [],
+        BranchCode: sBranchCode  // Store for reference
+    });
+    this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
 
-            this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
+    try {
+        let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
+        let allList = resp?.data || [];
 
-            try {
-                // 1️⃣ Fetch ALL once (don’t rely on server filter)
-                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
-                let allList = resp?.data || [];
+        // Filter: strict BranchCode AND Type in static amenities
+        const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
+        const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+        const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
 
-                // 2️⃣ Filter branch only (strict match)
-                const branchList = allList.filter(x => (x.BranchCode || "").trim() === (sBranchCode || "").trim());
+        const branchAmenities = allList.filter(x => 
+            (x.BranchCode || "").trim() === (sBranchCode || "").trim() &&
+            validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
+        );
 
-                if (branchList.length > 0) {
-                    oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchList));
-                } else {
-                    oAmenityModel.setProperty("/Amenities", []); // show nothing
-                }
+        console.log("📊 Found amenities for branch:", branchAmenities.length);
 
-            } catch (err) {
-                console.log("❌ Amenity load error:", err);
-            }
-            oAmenityModel.setProperty("/loading", false);
-        },
+        if (branchAmenities.length > 0) {
+            oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchAmenities));
+        } else {
+            console.warn("🚫 No matching amenities for BranchCode:", sBranchCode);
+            oAmenityModel.setProperty("/Amenities", []);
+        }
+    } catch (err) {
+        console.error("❌ Amenity load error:", err);
+    }
+    oAmenityModel.setProperty("/loading", false);
+},
+_convertAmenities: function (list) {
+    const defaultImages = {
+        "Wi-Fi": "../image/WifiHostel.png",
+        "Bathrooms": "../image/Bathroom.jpg", 
+        "Personal lockers": "../image/locker.jpg",
+        "Communal spaces": "../image/CommonSpace.jpg",
+        "Lounge areas": "../image/LoungeArea.jpg"
+    };
 
-        _convertAmenities: function (list) {
-            return list.map(item => ({
-                ...item,
-                ImageSrc: item.Photo1 ?
-                    `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` : ""
-            }));
-        },
+    return list.map(item => {
+        const amenityType = (item.AmenityType || item.Type || "").trim();
+        const hasImage = !!(item.Photo1 && item.Photo1.trim());
+        
+        return {
+            ...item,
+            ImageSrc: hasImage ? 
+                `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` :
+                defaultImages[amenityType] || "./images/default.png"
+        };
+    });
+},
+
+        // _convertAmenities: function (list) {
+        //     return list.map(item => ({
+        //         ...item,
+        //         ImageSrc: item.Photo1 ?
+        //             `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` : ""
+        //     }));
+        // },
 
         onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
