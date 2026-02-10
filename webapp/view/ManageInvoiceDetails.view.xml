@@ -1,44 +1,26 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.ManageInvoiceDetails"
+<mvc:View controllerName="sap.ui.com.project1.controller.ManageInvoiceDetails"
 	xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
 	xmlns:core="sap.ui.core"
 	xmlns:m="sap.m"
 	xmlns="sap.uxap"
-	xmlns:f="sap.ui.layout.form"
->
-	<m:Page
-        title="{i18n>invoiceDetails}"
-        showNavButton="true"
-        navButtonPress="onNavBack"
-        id="CID_id_MyPageId"
-    >
+	xmlns:f="sap.ui.layout.form">
+	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="onNavBack" id="CID_id_MyPageId">
 		<m:headerContent>
-			<m:Button
-                press="onHome"
-                icon="sap-icon://log"
-                tooltip="{i18n>logoutTooltip}"
-                type="Transparent"
-            />
+			<m:Button press="onHome" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}"
+            type="Transparent"/>
 		</m:headerContent>
 		<!-- <m:ScrollContainer > -->
-		<ObjectPageLayout
-            id="CID_id_CmpInvObjectPageLayout"
+		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout"
             useIconTabBar="false"
-            class="sapUiSmallmarginResponsive"
-        >
+            class="sapUiSmallmarginResponsive">
 			<!-- Sections in the ObjectPage -->
 			<sections>
-				<!-- First section containing MSA details -->
-				<ObjectPageSection
-                    id="CID_id_CmpInvGoals"
-                    showTitle="false"
-                >
+				<!-- First section containing Customer details -->
+				<ObjectPageSection id="CID_id_CmpInvGoals" showTitle="false">
 					<subSections>
-						<ObjectPageSubSection
-                            id="CID_id_CmpInvGoalsSS1"
-                            title="{i18n>invoiceBasicDetails}"
-                        >
+						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" 
+                        title="{i18n>invoiceBasicDetails}">
 							<blocks>
 								<f:SimpleForm
                                     editable="true"
@@ -54,8 +36,7 @@
                                     emptySpanS="0"
                                     columnsXL="2"
                                     columnsL="2"
-                                    columnsM="1"
-                                >
+                                    columnsM="1">
 									<f:content>
 										<m:Label
                                             visible="{visiablityPlay>/createVisi}"
@@ -329,7 +310,7 @@
                                             liveChange="CID_onPressLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                         />
-                                        <m:Label text="{i18n>customerGSTNo}" />
+										<m:Label text="{i18n>customerGSTNo}" />
 										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}"
 										    id="CI_id_InputCustomerGSTNO"
 											liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}"
@@ -402,13 +383,10 @@
 						<ObjectPageSubSection>
 							<blocks>
 								<m:VBox>
-									<m:Table
-                                        id="CID_id_TableInvoiceItem"
+									<m:Table id="CID_id_TableInvoiceItem"
                                         sticky="ColumnHeaders,HeaderToolbar"
                                         items="{ManageInvoiceItemModel>/ManageInvoiceItem}"
-                                        mode="MultiSelect"
-                                        
-                                    >
+                                        mode="MultiSelect">
 										<m:headerToolbar>
 											<m:Toolbar>
 												<m:Title
@@ -430,7 +408,7 @@
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressAddInvoiceItems"
                                                 />
-                                                <m:Button
+												<m:Button
                                                    id="deleteItem"
                                                     visible="{visiablityPlay>/addInvBtn}"
                                                     text="{i18n>MSdelete}"
@@ -534,8 +512,7 @@
 											</m:Column>
 										</m:columns>
 										<m:items>
-											<m:ColumnListItem  type="Active"
-        >
+											<m:ColumnListItem  type="Active">
 												<m:cells>
 													<m:Input
                                                         value="{ManageInvoiceItemModel>IndexNo}"
@@ -717,7 +694,7 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-                                            <!-- Coupon Discount -->
+											<!-- Coupon Discount -->
 											<m:HBox
                                                     justifyContent="SpaceBetween"
                                                     visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
@@ -737,17 +714,14 @@
 											<!-- Round of -->
 											<!-- <m:HBox
                                                 justifyContent="SpaceBetween"
-                                            >
-												<m:Label
+                                            ><m:Label
                                                     text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
-												<m:Text
+                                                /><m:Text
                                                     class="amountText"
                                                     text="{FilteredSOWModel>/RoundOf}"
                                                     textAlign="End"
-                                                />
-											</m:HBox> -->
+                                                /></m:HBox> -->
 											<!-- Total Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -792,7 +766,7 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-                                            <!-- Refund Due -->
+											<!-- Refund Due -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/RefundAmount} > 0 }"
@@ -807,21 +781,21 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-                                             <!-- Refund Processed -->
+											<!-- Refund Processed -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/RefundProcessed} > 0 }"
                                             >
-                                                <m:Label
+												<m:Label
                                                     text="{i18n>refundProcessed} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-                                                <m:Text
+												<m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/RefundProcessed', formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-                                            </m:HBox>
+											</m:HBox>
 											<!-- Received Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -882,7 +856,7 @@
 		<m:footer>
 			<m:Bar>
 				<m:contentRight>
-                    <m:Button
+					<m:Button
                             visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
                                 &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
                                 &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin')
@@ -920,27 +894,22 @@
                         press="CID_onPressSendMultipalEmail"
                         class="myUnifiedBtn"
                     />
-					<m:Button
-                        visible="{visiablityPlay>/merge}"
-                        text="{i18n>GeneratePDF}"
-                        tooltip="{i18n>GeneratePDF}"
-                        press="CID_onPressGeneratePdf"
-                        class="myUnifiedBtn"
-                    />
-                    <m:Button
-                        visible="{visiablityPlay>/merge}"
-                        text="{i18n>printInvoice}"
-                        tooltip="{i18n>GenerateSelectedInvoicePDF}"
-                        press="CID_onPressGenerateSelectedPDF"
-                        class="myUnifiedBtn"
-                    />
-                    <m:Button
-                        visible="{visiablityPlay>/merge}"
-                        text="{i18n>summaryInvoice}"
-                        tooltip="{i18n>summaryInvoice}"
-                        press="CID_onPressGenerateSummaryPDF"
-                        class="myUnifiedBtn"
-                    />
+					<m:MenuButton visible="{visiablityPlay>/merge}" text="{i18n>GeneratePDF}"
+                    tooltip="{i18n>GeneratePDF}" class="myUnifiedBtn">
+						<m:menu>
+							<m:Menu>
+								<m:MenuItem
+                                text="{i18n>GeneratePDF}"
+                                press="CID_onPressGeneratePdf" />
+								<m:MenuItem
+                                text="{i18n>printInvoice}"
+                                press="CID_onPressGenerateSelectedPDF" />
+								<m:MenuItem
+                                text="{i18n>summaryInvoice}"
+                                press="CID_onPressGenerateSummaryPDF" />
+							</m:Menu>
+						</m:menu>
+					</m:MenuButton>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>
