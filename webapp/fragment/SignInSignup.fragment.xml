@@ -74,29 +74,17 @@
                     columnsM="1"
                 >
                     <Label
-                        text="{i18n>MVUserID}"
+                        text="{i18n>emailId}"
                         required="true"
                     />
                     <Input
-                        id="signInuserid"
-                        placeholder="{i18n>MVUserID}"
+                        id="signInEmail"
+                        placeholder="{i18n>enteryourEmail}"
+                        type="Email"
                         valueLiveUpdate="true"
-                        liveChange="onUserlivechange"
-                        valueStateText="{i18n>pleaseentervalidUserID}"
-                        maxLength="6"
-                        submit="onSignIn"
-                    />
-                    <Label
-                        text="{i18n>MVusername}"
-                        required="true"
-                    />
-                    <Input
-                        id="signInusername"
-                        placeholder="{i18n>MVusername}"
-                        valueLiveUpdate="true"
-                        liveChange="onUserlivechange"
-                        valueStateText="{i18n>pleaseenteravalidUserName}"
-                        maxLength="40"
+                        liveChange="onEmailliveChange"
+                        valueStateText="{i18n>MSenterValidEmail}"
+                        maxLength="100"
                         submit="onSignIn"
                     />
                     <Label text="{i18n>loginwith}" />
