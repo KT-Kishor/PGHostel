@@ -5340,5 +5340,18 @@ oHostelModel.setProperty(
                 MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
             }
         },
+         onHome: function () {
+            const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+            var oRouter = this.getOwnerComponent().getRouter()
+            oRouter.navTo("RouteHostel")
+
+        },
     });
 });
