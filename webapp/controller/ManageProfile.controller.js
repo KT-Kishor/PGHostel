@@ -897,6 +897,179 @@ sap.ui.define([
             oBinding.filter(aFilters);
             this._updateRowCount();
         },
+        onCountrySelectionChange: function (oEvent) {
+            const oCountry = oEvent.getSource();
+            const oModel = this.getView().getModel("profileData");
+
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const oStateCB = this.byId("id_state1");
+            const oCityCB = this.byId("id_city1");
+            const oSTD = this.byId("id_std1");
+            const oMobile = this.byId("id_phone1");
+
+            // Clear value state
+            oCountry.setValueState("None");
+
+            /* ---------------- Reset Model ---------------- */
+            ["State", "City", "STDCode", "phone"].forEach(p =>
+                oModel.setProperty("/" + p, "")
+            );
+
+            /* ---------------- Reset UI ---------------- */
+            oStateCB?.setSelectedKey("");
+            oCityCB?.setSelectedKey("");
+            oCityCB?.setValue("");
+            oSTD?.setValue("");
+            oMobile?.setValue("");
+
+            oStateCB?.getBinding("items")?.filter([]);
+            oCityCB?.getBinding("items")?.filter([]);
+
+            const oItem = oCountry.getSelectedItem();
+            if (!oItem) {
+                oModel.setProperty("/Country", "");
+                return;
+            }
+
+            const sCountryName = oItem.getText();
+            const sCountryCode = oItem.getAdditionalText()?.trim();
+
+            oModel.setProperty("/Country", sCountryName);
+
+            /* ---------------- STD Handling (Same as MC_onChangeCountry) ---------------- */
+            const aCountries = this.getOwnerComponent()
+                .getModel("CountryModel")
+                .getData();
+
+            const oCountryData = aCountries.find(c => c.countryName === sCountryName);
+
+            if (oCountryData?.stdCode) {
+                oModel.setProperty("/STDCode", oCountryData.stdCode);
+                oSTD.setValue(oCountryData.stdCode);
+
+                this._onProfileSTDChange(); // ⬅ same behavior
+            }
+
+            /* ---------------- Filter States ---------------- */
+            if (sCountryCode) {
+                oStateCB?.getBinding("items")?.filter([
+                    new sap.ui.model.Filter(
+                        "countryCode",
+                        sap.ui.model.FilterOperator.EQ,
+                        sCountryCode
+                    )
+                ]);
+            }
+        },
+         CC_onChangeState: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const oModel = this.getView().getModel("profileData");
+            const oItem = oEvent.getSource().getSelectedItem();
+
+            const oCityCB = this.byId("id_city1");
+            const oCountryCB = this.byId("id_country1");
+
+            // Clear value state on state
+            oEvent.getSource().setValueState("None");
+
+            // Reset city-related things
+            oModel.setProperty("/City", "");
+            // if you have a separate city property:
+            // oModel.setProperty("/city", "");
+
+            oCityCB?.setSelectedKey("");
+            oCityCB?.setValue("");
+            oCityCB?.getBinding("items")?.filter([]);
+
+            // No state selected → clear state in model and exit
+            if (!oItem) {
+                oModel.setProperty("/State", "");
+                return;
+            }
+
+            const sStateName = oItem.getKey(); // or getText(), depending on your binding
+            const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+
+            // Save state in model
+            oModel.setProperty("/State", sStateName);
+
+            // Filter cities by state + country
+            oCityCB?.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
+                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+            ]);
+        },
+
+        CC_onChangeCity: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+
+            const oModel = this.getView().getModel("profileData");
+            const oItem = oEvent.getSource().getSelectedItem();
+
+            // Clear value state on city
+            oEvent.getSource().setValueState("None");
+
+            if (!oItem) {
+                oModel.setProperty("/City", "");
+                // oModel.setProperty("/city", "");
+                return;
+            }
+
+            const sCityName = oItem.getKey(); // or getText(), as per your binding
+
+            // Save in model
+            oModel.setProperty("/City", sCityName);
+        },
+         _onProfileSTDChange: function () {
+            const oSTD = this.byId("id_std1");
+            const oMobile = this.byId("id_phone1");
+
+            const std = oSTD.getValue();
+            oMobile.setValue("");
+
+            // Dynamic mobile length
+            if (std === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
+        },
+
+        MPonMobileLivechnage: function (oEvent) {
+            const oInput = oEvent.getSource();
+
+            // Digits only
+            let val = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(val);
+
+            const stdRaw = this.byId("id_std1").getValue() || "";
+            const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
+                stdRaw.replace(/\s+/g, "") :
+                "+" + stdRaw.replace(/\s+/g, "");
+
+            // Untouched empty field → no error
+            if (val.length === 0) {
+                oInput.setValueState("None");
+                return;
+            }
+
+            if (!std) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
+                return;
+            }
+
+            const isValid = utils._LCvalidateISDmobile(oInput, std);
+
+            if (!isValid) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText(this.i18nModel.getText("mobileNoValueState"));
+            } else {
+                oInput.setValueState("None");
+            }
+        },
 
     });
 });

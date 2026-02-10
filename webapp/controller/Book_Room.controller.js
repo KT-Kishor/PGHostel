@@ -769,9 +769,9 @@ sap.ui.define([
 
 
                                                 that._oLoginAlertDialog.open();
-                                                sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signInusername").setValue("").setValueState("None");
+                                                sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signInEmail").setValue("").setValueState("None");
                                                 sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signinPassword").setValue("").setValueState("None");
-                                                sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signInuserid").setValue("").setValueState("None");
+                                               
                                                 //    sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signupvisible").setVisible(false)
                                                 oEvent.getSource().setSelected(false);
                                                 return;
@@ -788,7 +788,7 @@ sap.ui.define([
                                             oLoginModel.setProperty("/UserName", oUser.EmployeeName || oUser.UserName);
                                             oLoginModel.setProperty("/EmailID", oUser.EmailID);
                                             oLoginModel.setProperty("/MobileNo", oUser.MobileNo);
-                                            oLoginModel.setProperty("/DateOfBirth", oUser.DateOfBirth || oUser.DateofBirth);
+                                            oLoginModel.setProperty("/DateOfBirth", that.Formatter.DateFormat(oUser.DateOfBirth) || oUser.DateofBirth);
                                             const DOB = that.Formatter.DateFormat(oUser.DateOfBirth)
                                             if (oUser.Role !== "Customer") {
                                                 MessageToast.show("Only customers are allowed to use self check-in.");
@@ -807,12 +807,14 @@ sap.ui.define([
                                                 p.City = oUser.City || "";
                                                 p.Address = oUser.Address || "";
                                                 p.STDCode = oUser.STDCode || "";
+                                                p.DateOfBirth = that.Formatter.DateFormat(oUser.DateOfBirth)
+ || "";
 
                                                 // ---------- FIRST PERSON ONLY ----------
                                                 if (index === 0) {
                                                     p.Salutation = oUser.Salutation || "";
                                                     p.FullName = oUser.EmployeeName || oUser.UserName || "";
-                                                    p.DateOfBirth = that.Formatter.DateFormat(oUser.DateOfBirth) || "";
+                                                    p.DateOfBirth = oUser.DateOfBirth || that.Formatter.DateFormat(oUser.DateOfBirth);
                                                     p.Gender = oUser.Gender || "";
                                                 }
                                                 // ---------- REST PERSONS ----------
@@ -3097,20 +3099,18 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             var oFragment = this._oLoginAlertDialog; // Correct reference to fragment dialog
 
             // fragment controls (use safe lookup)
-            const ctrlUserId = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInuserid");
-            const ctrlUserName = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInusername");
+            const ctrlEmailId = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
             const ctrlPassword = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signinPassword");
             const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
 
-            var sUserid = ctrlUserId && ctrlUserId.getValue ? ctrlUserId.getValue().trim() : "";
-            var sUsername = ctrlUserName && ctrlUserName.getValue ? ctrlUserName.getValue().trim() : "";
+            var sUserid = ctrlEmailId && ctrlEmailId.getValue ? ctrlEmailId.getValue().trim() : "";
+           
             var sPassword = ctrlPassword && ctrlPassword.getValue ? ctrlPassword.getValue() : "";
             const sOTP = ctrlOTP && ctrlOTP.getValue ? ctrlOTP.getValue().trim() : "";
 
             // --- VALIDATION ---
             // Always validate UserID and UserName
-            if (!utils._LCvalidateMandatoryField(ctrlUserId, "ID") ||
-                !utils._LCvalidateMandatoryField(ctrlUserName, "ID")) {
+            if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -3173,7 +3173,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     }
 
                     // 5️⃣ Construct payload and continue login
-                    payload = { UserID: sUserid, UserName: sUsername, OTP: sOTP };
+                    payload = { EmailID: sUserid, OTP: sOTP };
                     oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
                 } else {
                     // -------------------------- PASSWORD MODE -------------------------
@@ -3202,8 +3202,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     if (passCtrl) passCtrl.setValueState("None");
 
                     payload = {
-                        UserID: sUserid,
-                        UserName: sUsername,
+                        EmailID: sUserid,
                         Password: btoa(sPassword)
                     };
 
@@ -3212,7 +3211,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
                 const oMatchedUser = oResponse?.data?.[0];
 
-                if (!oMatchedUser || !oMatchedUser.UserID) {
+                if (!oMatchedUser || !oMatchedUser.EmailID) {
                     MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
@@ -3255,7 +3254,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     ?.setData(oMatchedUser);
 
                 // Clear input fields
-                if (ctrlUserName) ctrlUserName.setValue("");
+                if (ctrlEmailId) ctrlEmailId.setValue("");
                 if (ctrlPassword) ctrlPassword.setValue("");
 
                 // Close dialog
@@ -3536,21 +3535,19 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onPressOTP: async function () {
-            const oUserIdCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInuserid");
-            const oUserNameCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInusername");
-            const sUserId = oUserIdCtrl.getValue().trim();
-            const sUserName = oUserNameCtrl.getValue().trim();
+            const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
+            
+            const sUserId = oEmailIDCtrl.getValue().trim();
+            // const sUserName = oUserNameCtrl.getValue().trim();
 
             // Validate inputs
-            if (!utils._LCvalidateMandatoryField(oUserIdCtrl, "ID") ||
-                !utils._LCvalidateMandatoryField(oUserNameCtrl, "ID")) {
+            if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID") ) {
                 MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
                 return;
             }
 
             const payload = {
-                UserID: sUserId,
-                UserName: sUserName,
+                EmailID: sUserId,
                 Type: "OTP"
             };
 
@@ -3564,7 +3561,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
 
 
-                    this._oResetUser = { UserID: sUserId, UserName: sUserName };
+                    this._oResetUser = { EmailID: sUserId, };
 
                     const vm = this.getView().getModel("LoginViewModel");
 
