@@ -64,7 +64,7 @@
                     displayShape="Circle"
                     displaySize="XL"
                     press="onPreviewProfilePhoto"
-                    class="sapUiTinyMargin myavatar"/>
+                    class="sapUiMediumMargin myavatar"/>
 
                 <Button
                     icon="sap-icon://edit"

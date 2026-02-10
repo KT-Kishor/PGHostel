@@ -3040,7 +3040,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
-                "fpUserId", "fpUserName", "fpOTP",
+                "fpEmailId", "fpOTP",
                 "newPass", "confPass", "loginOTP"
             ];
             ids.forEach(id => {
@@ -3461,37 +3461,33 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onValidateUser: async function () {
+             const oEmailCtrl =sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId");
             const isValid =
-                utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserId"), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName"), "ID");
+                utils._LCvalidateEmail(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId"), "ID")
+               
 
             if (!isValid) {
                 MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
-            const oIdCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserId");
-            const oNameCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName");
-
-            const sUserId = oIdCtrl.getValue().trim();
-            const sUserName = oNameCtrl.getValue().trim();
-
-            const payload = {
-                UserID: sUserId,
-                UserName: sUserName,
-                Type: "OTP"
-            };
+              const sEmail = oEmailCtrl.getValue().trim();
 
             BusyIndicator.show(0);
 
             try {
-                const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
+                const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
+                    EmailID: sEmail,
+                    Type: "OTP"
+                });;
 
                 if (oResp?.success) {
                     MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-                    alert(oResp.OTP);
+                    // alert(oResp.OTP);
 
-                    this._oResetUser = { UserID: sUserId, UserName: sUserName };
+                    this._oResetUser = {
+                        EmailID: sEmail
+                    };
                     // ✅ Start resend cooldown
                     this._startOtpCooldown(20);
 
@@ -3502,7 +3498,10 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 }
 
             } catch (err) {
-                MessageToast.show("Record not found\nPlease check your\nUser ID / User Name");
+                const sMsg =
+                    err?.responseJSON?.message ||
+                    this.i18nModel.getText("forgotOtpSendFailed");
+                sap.m.MessageToast.show(sMsg);
             } finally {
                 BusyIndicator.hide();
             }
@@ -3513,8 +3512,12 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             try {
                 const oPayload = {
-                    UserID: this._oResetUser.UserID,
-                    UserName: this._oResetUser.UserName,
+                     ...(this._oResetUser?.EmailID
+                        ? { EmailID: this._oResetUser.EmailID }
+                        : {
+                            UserID: this._oResetUser?.UserID,
+                            UserName: this._oResetUser?.UserName
+                        }),
                     OTP: otp.trim()
                 };
 
@@ -3733,8 +3736,8 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             // Reset only values (not visibility/enabled state)
 
-            sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserId").setValue("");
-            sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpUserName").setValue("");
+            sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId").setValue("");
+          
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpOTP").setValue("");
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass").setValue("");
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass").setValue("");
@@ -3753,7 +3756,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
         _resetAllAuthFields: function () {
             ["signInuserid", "signInusername", "signinPassword",
-                "fpUserId", "fpUserName", "fpOTP", "newPass", "confPass", "loginOTP"
+                "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"
             ]
                 .forEach(id => {
                     let o = sap.ui.getCore().byId(id);
@@ -4363,7 +4366,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             // -------------------------
             // RESET FORGOT FIELDS
             // -------------------------
-            ["fpUserId", "fpUserName", "fpOTP", "newPass", "confPass"]
+            ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = sap.ui.getCore().byId(id);
                     if (c) {
@@ -4376,7 +4379,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             // -------------------------
             // 🚫 DISABLE FORGOT FORM
             // -------------------------
-            ["fpUserId", "fpUserName", "fpOTP", "newPass", "confPass"]
+            ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = sap.ui.getCore().byId(id);
                     if (c) c.setEnabled(false);

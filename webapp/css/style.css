@@ -1601,8 +1601,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 .avatarEditIcon {
   position: absolute;
-  bottom: 1px;
-  right: 10px;
+  bottom: 60px;
+  right: 30px;
   background: white;
   border-radius: 50%;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
@@ -2140,7 +2140,9 @@ span.sapMBtnInner.sapMBtnEmphasized {
   /* Push entire block to the right */
   justify-content: flex-end !important;
 }
-
+.responsiveFlex {
+   background: white;
+  }
 @media only screen and (min-width: 811px) {
   .responsiveFlex {
     justify-content: space-between !important;
@@ -4291,4 +4293,17 @@ height:140px;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+.sapFAvatarXL {
+    height: 10rem;
+    width: 10rem;
+    font-size: 3rem;
+}
+.customLinkWhiteBg,
+.customLinkWhiteBg:active,
+.customLinkWhiteBg:focus,
+.customLinkWhiteBg:visited {
+    outline: none;
+    color:#0070c9;
+    background: white;
 }

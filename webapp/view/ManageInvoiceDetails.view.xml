@@ -855,6 +855,15 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Bar>
+            <m:contentLeft>
+             <m:Link
+                text="{i18n>devlopby}"
+                href="https://kvrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+            
+            </m:contentLeft>
 				<m:contentRight>
 					<m:Button
                             visible="{= ${SelectedCustomerModel>/RefundAmount} > 0

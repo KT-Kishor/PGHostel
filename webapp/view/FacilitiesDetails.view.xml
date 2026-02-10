@@ -159,6 +159,14 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Bar id="FD_id_FooterBar">
+			<m:contentLeft>
+			   <m:Link
+                text="{i18n>devlopby}"
+                href="https://kvrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+			</m:contentLeft>
 				<m:contentRight>
 					<m:Button id="FD_id_editButton" visible="{= !${editable>/Edit} }" text="{i18n>MSedit}"
                         tooltip="{i18n>MSedit}" class="myUnifiedBtn" press="BI_onEditButtonPress"/>

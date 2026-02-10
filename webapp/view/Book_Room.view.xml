@@ -113,6 +113,7 @@
         </content>
         <footer>
             <OverflowToolbar>
+            
                 <Button
     id="messagePopoverBtn"
     icon="sap-icon://alert"

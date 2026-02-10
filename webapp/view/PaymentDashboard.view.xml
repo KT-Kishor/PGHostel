@@ -899,5 +899,11 @@
                 </layout:Grid> -->
             </VBox>
         </content>
+        <footer>
+         <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.AppFooter"
+                type="XML"
+            />
+        </footer>
     </Page>
 </mvc:View>

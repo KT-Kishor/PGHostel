@@ -276,6 +276,14 @@
         </ObjectPageLayout>
         <m:footer>
             <m:Bar id="IA_id_FooterBar">
+            <m:contentLeft>
+             <m:Link
+                text="{i18n>devlopby}"
+                href="https://kvrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+            </m:contentLeft>
                 <m:contentRight>
                     <m:Button
                         id="BI_ideditButton"
