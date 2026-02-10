@@ -83,17 +83,17 @@ sap.ui.define([
         _onRouteMatched: async function () {
 
 
-             var oNavContainer = this.byId("pageContainer");
-    var oTabHeader = this.byId("mainTabHeader");
+            var oNavContainer = this.byId("pageContainer");
+            var oTabHeader = this.byId("mainTabHeader");
 
-    if (oNavContainer) {
-        oNavContainer.to(this.byId("idHome"));
-    }
+            if (oNavContainer) {
+                oNavContainer.to(this.byId("idHome"));
+            }
 
-    if (oTabHeader) {
-        oTabHeader.setSelectedKey("idHome");
-    }
-            
+            if (oTabHeader) {
+                oTabHeader.setSelectedKey("idHome");
+            }
+
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.iTop = 4; // records per load
             this.iSkip = 0;   // starting index
@@ -136,12 +136,12 @@ sap.ui.define([
                 otpValidityText: ""
             }), "LoginViewModel");
 
-            const vm = oView.getModel("LoginViewModel");
+            this.oViewModel = oView.getModel("LoginViewModel");
 
             // Add only your required properties (safe, isolated)
-            vm.setProperty("/loginMode", "password");   // "password" or "otp"
-            vm.setProperty("/showOTPField", false);     // show OTP input box only after Send OTP success
-            vm.setProperty("/isOtpEntered", false);     // enable Sign In only when OTP entered
+            this.oViewModel.setProperty("/loginMode", "password");   // "password" or "otp"
+            this.oViewModel.setProperty("/showOTPField", false);     // show OTP input box only after Send OTP success
+            this.oViewModel.setProperty("/isOtpEntered", false);     // enable Sign In only when OTP entered
 
             oView.setModel(new JSONModel({
                 fullname: "",
@@ -175,7 +175,7 @@ sap.ui.define([
             oView.setModel(new JSONModel({
                 Branches: aBranches
             }), "BranchModel");
-            oView.getModel("LoginViewModel").setProperty("/showOTPField", false);
+            this.oViewModel.setProperty("/showOTPField", false);
 
             const oState = sap.ui.getCore().byId("signUpState");
             const oCity = sap.ui.getCore().byId("signUpCity");
@@ -191,9 +191,9 @@ sap.ui.define([
                     new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
                 ]);
             }
-            vm.setProperty("/canResendOTP", true);
-            vm.setProperty("/otpTimer", 0);
-            vm.setProperty("/otpButtonText", "Send OTP");
+            this.oViewModel.setProperty("/canResendOTP", true);
+            this.oViewModel.setProperty("/otpTimer", 0);
+            this.oViewModel.setProperty("/otpButtonText", "Send OTP");
 
             const oFooterModel = this.getView().getModel("FooterModel");
 
@@ -218,7 +218,7 @@ sap.ui.define([
             }
         },/**/
         _startOtpValidity: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             const expiryTs = Date.now() + (10 * 60 * 1000); //1000xx
 
@@ -248,7 +248,7 @@ sap.ui.define([
 
 
         _onOtpExpired: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             this._clearOtpValidityTimer();
             this._clearOtpResendTimer();
@@ -416,7 +416,7 @@ sap.ui.define([
                 ACType: oData.ACType || "",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
-                Area: oData.Area || "",  
+                Area: oData.Area || "",
                 Description: oData.Description || "",
                 BranchCode: oData.BranchCode || "",
                 SelectedPriceType: oData.SelectedPriceType,
@@ -436,9 +436,9 @@ sap.ui.define([
                 GSTValue: oData.GSTValue,
                 GSTType: oData.GSTType,
                 GSTIN: oData.GSTIN || ""
-                
+
             };
-            
+
             // -------------------------
             // MERGE WITH GLOBAL MODEL
             // -------------------------
@@ -705,7 +705,7 @@ sap.ui.define([
                     AvailbleBeds: oSelected.AvailbleBeds,
                     CheckInTime: oSelected.CheckInTime,
                     CheckOutTime: oSelected.CheckOutTime,
-                    Deposit: oSelected.Deposit  ,
+                    Deposit: oSelected.Deposit,
                     DepositCurrency: oSelected.DepositCurrency,
                     GSTType: oSelected.GSTType,
                     GSTValue: oSelected.GSTValue,
@@ -1000,7 +1000,7 @@ sap.ui.define([
             //     await oComponent._fetchCommonData("HM_Branch", "sBRModel");
             //     oBRModel = oComponent.getModel("sBRModel");
             // }
-          const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
 
             const aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
@@ -1132,7 +1132,7 @@ sap.ui.define([
                 this._oSignDialog.attachAfterClose(this._resetAuthDialog, this);
             }
 
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             // COMPLETE reset of all auth-related states
             vm.setProperty("/authFlow", "signin");
@@ -1187,7 +1187,7 @@ sap.ui.define([
 
         onSwitchToSignIn: function () {
 
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             // -------------------------
             // FLOW RESET
@@ -1205,7 +1205,7 @@ sap.ui.define([
             // -------------------------
             // RESET SIGN-IN FIELDS
             // -------------------------
-            ["signInuserid", "signInusername", "signinPassword", "signInOTP"]
+            ["signInEmail", "signinPassword", "signInOTP"]
                 .forEach(id => {
                     const c = sap.ui.getCore().byId(id);
                     if (c) {
@@ -1257,7 +1257,7 @@ sap.ui.define([
         },
 
         onSwitchToSignUp: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             const oSignInPanel = sap.ui.getCore().byId("signInPanel");
             const oSignUpPanel = sap.ui.getCore().byId("signUpPanel");
@@ -1538,7 +1538,7 @@ sap.ui.define([
 
                     EmailID: data.Email.trim(),
                     // Password: btoa(data.password),
-                    Password: btoa(sFinalPassword), 
+                    Password: btoa(sFinalPassword),
 
 
                     STDCode: data.STDCode || std,
@@ -1588,7 +1588,7 @@ sap.ui.define([
                             sPassword
                         );
 
-                        const vm = oCtrl.getView().getModel("LoginViewModel");
+                        const vm = oCtrl.oViewModel;
 
                         vm.setProperty("/authFlow", "signin");
                         vm.setProperty("/loginMode", "password");
@@ -1621,8 +1621,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("signinPassword")?.setEnabled(true).setValue("");
                         sap.ui.getCore().byId("signInOTP")?.setEnabled(false).setValue("");
                         sap.ui.getCore().byId("btnSignInSendOTP")?.setVisible(false);
-                        sap.ui.getCore().byId("signInuserid")?.setValue("");
-                        sap.ui.getCore().byId("signInusername")?.setValue("");
+                        sap.ui.getCore().byId("signInEmail")?.setValue("");
 
                         oCtrl._oSignDialog?.close();
 
@@ -1947,7 +1946,7 @@ sap.ui.define([
             );
             oState.setSelectedKey("");
             oCity.setSelectedKey("");
-            oSTD.setSelectedKey("");  
+            oSTD.setSelectedKey("");
             oState.getBinding("items")?.filter([
                 new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
             ]);
@@ -2035,7 +2034,7 @@ sap.ui.define([
 
         onPressAvatar: async function (oEvent) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-    oRouter.navTo("RouteManageProfile");
+            oRouter.navTo("RouteManageProfile");
             // let oUser = this._oLoggedInUser;
             // // const fullUserData = this._oLoggedInUser || {};
             // let fullUserData = {};
@@ -2905,7 +2904,7 @@ sap.ui.define([
 
             // If locality is empty, keep it empty (search by city only)
             var finalBranch = validArea ? validArea.BranchID : "";
-              if(finalBranch===""){
+            if (finalBranch === "") {
                 this.byId("id_Area").setValueState("None");
             }
             try {
@@ -2952,7 +2951,7 @@ sap.ui.define([
                 var sBranchCode = this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
 
 
-                if (Scity && !sBranchCode)  {
+                if (Scity && !sBranchCode) {
                     // Filter branches by city
                     var aFilteredBranches = aBranchesData.filter(function (branch) {
                         return branch.City === Scity;
@@ -2985,7 +2984,7 @@ sap.ui.define([
                 await this.model(response)
 
                 let matchedRooms = response.data.HM_BedType || [];
-                let HM_RoomCount=response.data.HM_RoomCount
+                let HM_RoomCount = response.data.HM_RoomCount
 
                 // if (sACType) {
                 //     matchedRooms = matchedRooms.filter(
@@ -3058,7 +3057,7 @@ sap.ui.define([
                     const TotalFeedbacks = firstRoom?.TotalFeedbacks ? " " + firstRoom.TotalFeedbacks : "0";
 
 
-                    
+
 
                     // let totalBooked = 0;
                     // let totalCapacity = 0;
@@ -3076,10 +3075,10 @@ sap.ui.define([
 
                     // var AvailbleBeds = totalCapacity - totalBooked
                     // const isFull = totalBooked >= totalCapacity && totalCapacity > 0;
-                   const isVisible = room?.Status === "Available";
+                    const isVisible = room?.Status === "Available";
 
-                     const PriceVisible= price !== "" || MonthPrice !== "" || YearPrice !== ""
-                
+                    const PriceVisible = price !== "" || MonthPrice !== "" || YearPrice !== ""
+
 
                     const oBranchInfo = aBranchData.find(b =>
                         b.BranchID?.toLowerCase() === room.BranchCode?.toLowerCase()
@@ -3095,11 +3094,11 @@ sap.ui.define([
 
 
 
-                    
+
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
 
-              
+
 
                     const aImages = [];
                     for (let i = 1; i <= 5; i++) {
@@ -3109,8 +3108,8 @@ sap.ui.define([
                             aImages.push({
                                 src: convertBase64ToImage(base64, type),
                                 Area: sArea,
-                                 AverageRating : AverageRating,
-                                 TotalFeedbacks : TotalFeedbacks
+                                AverageRating: AverageRating,
+                                TotalFeedbacks: TotalFeedbacks
                             });
                         }
                     }
@@ -3138,7 +3137,7 @@ sap.ui.define([
                         GSTType: sGSTType,
                         GSTValue: sGSTValue,
                         GSTIN: sGSTIN,
-                        AverageRating:AverageRating,
+                        AverageRating: AverageRating,
                         TotalFeedbacks: TotalFeedbacks,
                         GeoLocation: oBranchInfo?.GeoLocation || ""
                     };
@@ -3305,13 +3304,13 @@ sap.ui.define([
         },
 
         onBackToForgot: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             vm.setProperty("/authFlow", "forgot");
             vm.setProperty("/forgotStep", 1); // RESET to step 1
         },
 
         onForgotPassword: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             this._resetOtpState();
 
@@ -3322,7 +3321,7 @@ sap.ui.define([
         },
 
         onSelectLoginMode: function (e) {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             const mode = e.getSource().getText().toLowerCase(); // "password" or "otp"
 
             vm.setProperty("/loginMode", mode);
@@ -3354,7 +3353,7 @@ sap.ui.define([
 
         _clearAllAuthFields: function () {
             const ids = [
-                "signInuserid", "signInusername", "signinPassword",
+                "signInEmail", "signinPassword",
                 "fpEmailId", "fpOTP",
                 "newPass", "confPass", "loginOTP"
             ];
@@ -3406,7 +3405,7 @@ sap.ui.define([
             });
 
             //  Reset Sign-In controls
-            ["signInuserid", "signInusername", "signinPassword"].forEach(id => {
+            ["signInEmail", "signinPassword"].forEach(id => {
                 const ctrl = $C(id);
                 if (ctrl) {
                     ctrl.setValueState("None");
@@ -3422,7 +3421,7 @@ sap.ui.define([
             if (GEN) GEN.setEnabled(true);
 
             // Reset account type
-            const oVM = this.getView().getModel("LoginViewModel");
+            const oVM = this.oViewModel;
             oVM.setProperty("/selectedAccountType", "personal");
             oVM.setProperty("/authFlow", "signin");
             this._resetOtpState();
@@ -3521,7 +3520,7 @@ sap.ui.define([
                         sap.ui.getCore().byId("authDialog").getCustomHeader().getContentMiddle()[0].setText("Hostel Access Portal");
 
                         // switch flow back to signin
-                        const vm = this.getView().getModel("LoginViewModel");
+                        const vm = this.oViewModel;
                         vm.setProperty("/authFlow", "signin");
 
                         // show login panel
@@ -3541,7 +3540,7 @@ sap.ui.define([
         },
 
         _resetAllAuthFields: function () {
-            ["signInuserid", "signInusername", "signinPassword",
+            ["signInEmail", "signinPassword",
                 "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"
             ]
                 .forEach(id => {
@@ -3579,7 +3578,7 @@ sap.ui.define([
         },
 
         onLoginOtpLive: function (e) {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             const input = e.getSource();
 
             // allow only digits and enforce 6 max
@@ -3602,22 +3601,20 @@ sap.ui.define([
         },
 
         onPressOTP: async function () {
-            const oUserIdCtrl = sap.ui.getCore().byId("signInuserid");
-            const oUserNameCtrl = sap.ui.getCore().byId("signInusername");
+            const oEmailCtrl = sap.ui.getCore().byId("signInEmail");
+            const sEmail = oEmailCtrl?.getValue()?.trim() || "";
 
-            const sUserId = oUserIdCtrl.getValue().trim();
-            const sUserName = oUserNameCtrl.getValue().trim();
-
-            // Validate inputs
-            if (!utils._LCvalidateMandatoryField(oUserIdCtrl, "ID") ||
-                !utils._LCvalidateMandatoryField(oUserNameCtrl, "ID")) {
-                sap.m.MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
+            // Validate input
+            if (
+                !utils._LCvalidateMandatoryField(oEmailCtrl, "ID") ||
+                !utils._LCvalidateEmail(oEmailCtrl, "ID")
+            ) {
+                sap.m.MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
                 return;
             }
 
             const payload = {
-                UserID: sUserId,
-                UserName: sUserName,
+                EmailID: sEmail,
                 Type: "OTP"
             };
 
@@ -3632,9 +3629,9 @@ sap.ui.define([
                     // alert(oResp.OTP);
                     console.log("Use OTP : ", oResp.OTP);
 
-                    this._oResetUser = { UserID: sUserId, UserName: sUserName };
+                    this._oResetUser = { EmailID: sEmail };
 
-                    const vm = this.getView().getModel("LoginViewModel");
+                    const vm = this.oViewModel;
 
                     // Show OTP input
                     vm.setProperty("/showOTPField", true);
@@ -3648,9 +3645,9 @@ sap.ui.define([
 
 
                     this._startOtpValidity();   // 🔥 10-minute validity starts HERE
-                   
-                   
-                   
+
+
+
                     this._startOtpResend(120) //120xx
 
 
@@ -3671,7 +3668,7 @@ sap.ui.define([
 
         _onVerifyOTP: async function () {
 
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             const flow = vm.getProperty("/authFlow");
 
             // Resolve OTP control by flow
@@ -3739,7 +3736,7 @@ sap.ui.define([
                 vm.setProperty("/forgotStep", 3);
                 return;
             }
-            
+
             // --------------------------
             // 📌 Normal OTP Login Flow
             // --------------------------
@@ -3781,7 +3778,7 @@ sap.ui.define([
             sap.ui.getCore().byId("confPass").setValue("");
 
             // Update flow using ViewModel
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             vm.setProperty("/loginMode", "password");
             vm.setProperty("/authFlow", "signin");
             vm.setProperty("/forgotStep", 1);
@@ -3803,11 +3800,11 @@ sap.ui.define([
             oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateOfBirth || "");
-//         if (user.FileContent) {
-//  oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
-//                 } else {
-//  oLoginModel.setProperty("/Photo", ""); // Clear if no photo
-//      }
+            //         if (user.FileContent) {
+            //  oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
+            //                 } else {
+            //  oLoginModel.setProperty("/Photo", ""); // Clear if no photo
+            //      }
             this._oLoggedInUser = user;
 
             if (user.Role === "Customer") {
@@ -4094,22 +4091,24 @@ sap.ui.define([
         },
 
         onSignIn: async function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             // const isOTP = vm.getProperty("/isOtpSelected");
             const isOTP = vm.getProperty("/loginMode") === "otp";
 
 
             const oLoginModel = this.getView().getModel("LoginModel");
 
-            const sUserid = sap.ui.getCore().byId("signInuserid").getValue().trim();
-            const sUsername = sap.ui.getCore().byId("signInusername").getValue().trim();
+            const oEmailCtrl = sap.ui.getCore().byId("signInEmail");
+            const sEmail = oEmailCtrl?.getValue()?.trim() || "";
             const sPassword = sap.ui.getCore().byId("signinPassword").getValue().trim();
             const sOTP = sap.ui.getCore().byId("signInOTP").getValue().trim();
 
             // Common mandatory fields
-            if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId("signInuserid"), "ID") ||
-                !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("signInusername"), "ID")) {
-                sap.m.MessageToast.show(this.i18nModel.getText("entervalidUserIDName"));
+            if (
+                !utils._LCvalidateMandatoryField(oEmailCtrl, "ID") ||
+                !utils._LCvalidateEmail(oEmailCtrl, "ID")
+            ) {
+                sap.m.MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
                 return;
             }
 
@@ -4121,7 +4120,7 @@ sap.ui.define([
                 // ----------------------------- OTP MODE -----------------------------
                 if (isOTP) {
 
-                    const vm = this.getView().getModel("LoginViewModel");
+                    const vm = this.oViewModel;
                     const showOTPField = vm.getProperty("/showOTPField");
                     const isOtpEntered = vm.getProperty("/isOtpEntered");
 
@@ -4163,7 +4162,7 @@ sap.ui.define([
                     }
 
                     // 5️⃣ Construct payload and continue login
-                    payload = { UserID: sUserid, UserName: sUsername, OTP: sOTP };
+                    payload = { EmailID: sEmail, OTP: sOTP };
                     oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
                 }
                 else {
@@ -4195,8 +4194,7 @@ sap.ui.define([
                     }
 
                     payload = {
-                        UserID: sUserid,
-                        UserName: sUsername,
+                        EmailID: sEmail,
                         Password: btoa(sPassword)
                     };
 
@@ -4207,25 +4205,20 @@ sap.ui.define([
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
                 // if (!user?.UserID) {
-                 oLoginModel.setProperty("/isLoggedIn", true);
+                oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
-                // 💡 FIX: Enforce case-sensitive username check for password login
-                if (!user?.UserID || (!isOTP && user.UserName !== sUsername)) {
-                    if (!isOTP && user?.UserID) {
-                        // This case happens if backend returns a user but the case doesn't match
-                        console.warn("Login failed: Username case mismatch.");
-                    }
+                if (!user?.UserID) {
                     sap.m.MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
                 }
-//                  this._setLoggedInUser(user);
-//  // In onSignIn function after successful login:
+                //                  this._setLoggedInUser(user);
+                //  // In onSignIn function after successful login:
 
-//  // Add this after setting _oLoggedInUser:
-// if (user.FileContent) {
-//  this._oLoggedInUser.FileContent = user.FileContent;
-//  this._oLoggedInUser.Photo = "data:image/png;base64," + user.FileContent;
-// }
+                //  // Add this after setting _oLoggedInUser:
+                // if (user.FileContent) {
+                //  this._oLoggedInUser.FileContent = user.FileContent;
+                //  this._oLoggedInUser.Photo = "data:image/png;base64," + user.FileContent;
+                // }
 
 
 
@@ -4259,7 +4252,7 @@ sap.ui.define([
                 }
 
                 // Reset login fields
-                sap.ui.getCore().byId("signInusername").setValue("");
+                sap.ui.getCore().byId("signInEmail").setValue("");
                 sap.ui.getCore().byId("signinPassword").setValue("");
                 sap.ui.getCore().byId("signInOTP").setValue("");
 
@@ -4269,7 +4262,7 @@ sap.ui.define([
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Invalid credentials, Please try again");
+                sap.m.MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -4497,7 +4490,7 @@ sap.ui.define([
                     this._startOtpValidity();
                     this._startOtpResend(120);
 
-                    this.getView().getModel("LoginViewModel").setProperty("/forgotStep", 2);
+                    this.oViewModel.setProperty("/forgotStep", 2);
                 } else {
                     sap.m.MessageToast.show(this.i18nModel.getText("noUserFoundwithGivenIDName"));
                 }
@@ -4520,7 +4513,7 @@ sap.ui.define([
         },
 
         _startOtpResend: function (seconds = 120) { //120xx
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
             let remaining = seconds;
 
             this._clearOtpResendTimer();
@@ -4543,7 +4536,7 @@ sap.ui.define([
         },
 
         _resetOtpState: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+            const vm = this.oViewModel;
 
             this._clearOtpResendTimer();
             this._clearOtpValidityTimer();
@@ -4561,7 +4554,7 @@ sap.ui.define([
             otpCtrl?.setValueState("None");
         },
 
-     
+
         onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
 
@@ -4634,7 +4627,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/bookingCount", length);
             }
         },
-////
+        ////
 
 
         onAdminSIGNUP: function () {
@@ -5648,7 +5641,7 @@ sap.ui.define([
             utils._LCvalidateName(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
-        
+
         // MP_onChangeDOB: function (oEvent) {
         //     utils._LCvalidateDate(oEvent);
         // },
@@ -5689,3 +5682,4 @@ sap.ui.define([
         },
     });
 });
+
