@@ -3699,6 +3699,22 @@ span.sapMBtnInner.sapMBtnEmphasized {
   line-height: 1.5;
   word-break: normal;
   white-space: normal;
+  transition: background-color 0.2s; 
+}
+
+.AddressTextLarge.sapMLnk:focus,
+.AddressTextLarge.sapMLnk:active,
+.AddressTextLarge.sapMLnk.sapMLnkFocus {
+    outline: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important; 
+    border: none !important;
+    color: #0064d1 !important;
+}
+
+.AddressTextLarge.sapMLnk:hover {
+    background-color: transparent !important;
+    text-decoration: underline !important;
 }
 
 .AddressBox {

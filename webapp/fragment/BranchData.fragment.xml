@@ -56,31 +56,15 @@
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
                 />
-                <!-- Add Latitude and Longitude fields after the Address field -->
-                <Label
-                    text="{i18n>latitude}"
-                    required="true"
-                />
-                <Input
-                    id="BD_idLatitude"
-                    value="{MDmodel>/Latitude}"
-                    placeholder="{i18n>enterLatitude}"
-                    maxLength="11"
-                    liveChange="onLatitudeInputLiveChange"
-                    valueStateText="{i18n>enterLatitude}"
-                />
-                <Label
-                    text="{i18n>longitude}"
-                    required="true"
-                />
-                <Input
-                    id="BD_idLongitude"
-                    value="{MDmodel>/Longitude}"
-                    placeholder="{i18n>enterLongitude}"
-                    maxLength="11"
-                    liveChange="onLongitudeInputLiveChange"
-                    valueStateText="{i18n>enterLongitude}"
-                />
+              
+              <Label text="GeoLocation" required="true" />
+<Input 
+    id="BD_idGeoLocation" 
+    value="{MDmodel>/GeoLocation}" 
+    placeholder="Enter your GeoLocation Link" 
+    liveChange="onGeoLocationLiveChange"
+    valueStateText="Paste your GeoLocation Link"
+/>
                 <Label
                     text="{i18n>pinCode}"
                     required="true"

@@ -710,12 +710,13 @@ sap.ui.define([
                     GSTType: oSelected.GSTType,
                     GSTValue: oSelected.GSTValue,
                     GSTIN: oSelected.GSTIN || "",
-                    Latitude: oSelected.Latitude,
-                    Longitude: oSelected.Longitude
+                    GeoLocation: oSelected.GeoLocation
+
                 };
 
                 const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
+                console.log("HostelModel:", oHostelModel.getData());
 
                 oView.setModel(new sap.ui.model.json.JSONModel({
                     loading: true,
@@ -3139,8 +3140,7 @@ sap.ui.define([
                         GSTIN: sGSTIN,
                         AverageRating:AverageRating,
                         TotalFeedbacks: TotalFeedbacks,
-                        Latitude: oBranchInfo?.Latitude || "",
-                        Longitude: oBranchInfo?.Longitude || ""
+                        GeoLocation: oBranchInfo?.GeoLocation || ""
                     };
                 });
 
@@ -5652,12 +5652,9 @@ sap.ui.define([
         // MP_onChangeDOB: function (oEvent) {
         //     utils._LCvalidateDate(oEvent);
         // },
-        // Update the onAddressClick method with the necessary logic
         onAddressClick: function () {
             try {
-                // Get the HostelModel data - check if fragment exists
                 let oHostelModel;
-
                 if (this._oRoomDetailFragment) {
                     oHostelModel = this._oRoomDetailFragment.getModel("HostelModel");
                 } else {
@@ -5669,92 +5666,26 @@ sap.ui.define([
                     return;
                 }
 
-                const sLatitude = oHostelModel.getProperty("/Latitude") || "";
-                const sLongitude = oHostelModel.getProperty("/Longitude") || "";
-                // const sAddress = oHostelModel.getProperty("/Address") || "";
-                const sAddress = "Furqan Manzil, KBN College Road";
+                const sGeoUrl = oHostelModel.getProperty("/GeoLocation") || "";
 
-                // Validate coordinates - more robust check
-                if (!sLatitude || !sLongitude ||
-                    sLatitude.trim() === "" || sLongitude.trim() === "" ||
-                    sLatitude === "undefined" || sLongitude === "undefined" ||
-                    sLatitude === "null" || sLongitude === "null") {
-
-                    const msg = this.i18nModel?.getText("geoCoordinatesNotAvailable");
-                    sap.m.MessageToast.show(msg);
+                if (!sGeoUrl || sGeoUrl.trim() === "" || sGeoUrl === "null" || sGeoUrl === "undefined") {
+                    sap.m.MessageToast.show("Geo Location is not available.");
                     return;
                 }
 
-                // Try to parse coordinates
-                let lat, lng;
-                try {
-                    lat = parseFloat(sLatitude.trim());
-                    lng = parseFloat(sLongitude.trim());
-                } catch (e) {
-                    console.error("Error parsing coordinates:", e);
-                    sap.m.MessageToast.show("Invalid coordinate format");
+                const urlPattern = /^(http|https):\/\/[^ "]+(\.com|\.co|\.in|\.net|\.org|maps\.app\.goo\.gl)/i;
+
+                if (!urlPattern.test(sGeoUrl.trim())) {
+                    sap.m.MessageToast.show("Invalid Geo location link");
                     return;
                 }
 
-                // Check if parsing was successful
-                if (isNaN(lat) || isNaN(lng)) {
-                    sap.m.MessageToast.show("Invalid coordinate values");
-                    return;
-                }
-
-                // Validate coordinate ranges
-                if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-                    sap.m.MessageToast.show("Coordinates are outside valid ranges");
-                    return;
-                }
-
-
-                // // 1. Address aur Coordinates ko combine karke ek query string banayein
-                // // Format: "Address @ Lat,Long" ya "Address, Lat, Long"
-                // const sCombinedQuery = `${sAddress} @${lat},${lng}`;
-
-                // // 2. Pure string ko encode karein
-                // const sEncodedQuery = encodeURIComponent(sCombinedQuery);
-
-                // // 3. Official Google Search URL use karein
-                // const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${sEncodedQuery}`;
-
-                // // Open in new tab
-                // window.open(mapsUrl, "_blank");
-
-                const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-
-                // Open in new tab
-                window.open(mapsUrl, "_blank");
+                window.open(sGeoUrl.trim(), "_blank");
 
             } catch (err) {
                 console.error("Error opening Google Maps:", err);
-                const msg = this.i18nModel?.getText("errorOpeningMaps");
-                sap.m.MessageToast.show(msg);
+                sap.m.MessageToast.show("Error opening maps.");
             }
         },
-        // Add this formatter method to your controller
-        hasValidCoordinates: function (sLatitude) {
-            // This formatter will check if coordinates are valid
-            const oHostelModel = this.getView().getModel("HostelModel");
-            if (!oHostelModel) return false;
-
-            const sLat = oHostelModel.getProperty("/Latitude") || "";
-            const sLng = oHostelModel.getProperty("/Longitude") || "";
-
-            // Check if both exist and are non-empty
-            if (!sLat || !sLng || sLat.trim() === "" || sLng.trim() === "") {
-                return false;
-            }
-
-            // Try to parse them
-            try {
-                const lat = parseFloat(sLat.trim());
-                const lng = parseFloat(sLng.trim());
-                return !isNaN(lat) && !isNaN(lng);
-            } catch (e) {
-                return false;
-            }
-        }.bind(this)
     });
 });

@@ -135,23 +135,15 @@
                         />
                     </Column>
                     <Column
-    demandPopin="true"
-    minScreenWidth="Tablet"
->
-    <Text
-        text="{i18n>latitude}"
-        tooltip="{i18n>latitude}"
-    />
-</Column>
-<Column
-    demandPopin="true"
-    minScreenWidth="Tablet"
->
-    <Text
-        text="{i18n>longitude}"
-        tooltip="{i18n>longitude}"
-    />
-</Column>
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="GeoLocation"
+                            tooltip="Geo Location"
+                        />
+                    </Column>
+
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -219,8 +211,7 @@
                             <Text text="{mainModel>BranchID}" />
                             <Text text="{mainModel>Name}" />
                             <Text text="{mainModel>Address}" />
-                            <Text text="{mainModel>Latitude}" />     
-                            <Text text="{mainModel>Longitude}" />    
+                            <Text text="{mainModel>GeoLocation}" />
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <Text text="{mainModel>Country}" />
@@ -229,7 +220,7 @@
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
-                            <Button 
+                            <Button
                                 text="{i18n>view}"
                                 press="HF_viewroom"
                             />
