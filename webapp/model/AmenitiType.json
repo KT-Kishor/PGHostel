@@ -1,0 +1,23 @@
+[
+    {
+        "ID": 1,
+        "AmenitiName": "Wi-Fi"
+    },
+    {
+        "ID": 2,
+        "AmenitiName": "Bathrooms"
+    },
+    {
+        "ID": 3,
+        "AmenitiName": "Personal lockers"
+    },
+    {
+        "ID": 4,
+        "AmenitiName": "Communal spaces"
+    },
+    {
+        "ID": 5,
+        "AmenitiName": "Lounge areas"
+    }
+    
+]

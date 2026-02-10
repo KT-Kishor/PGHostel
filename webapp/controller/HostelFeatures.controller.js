@@ -27,7 +27,7 @@ sap.ui.define([
                     Photo1Type: "",
                     Photo1Name: ""
                 }), "UploadModel");
-
+                
                 // Token model
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     tokens: []
@@ -88,7 +88,8 @@ sap.ui.define([
                 BranchCode: "",
                 FacilityName: "",
                 Description: "",
-                ID: ""
+                ID: "",
+                Type:""
             });
 
             oView.getModel("UploadModel").setData({
@@ -185,16 +186,12 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_BranchCode")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_FacilityName")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId(           "HFF_id_Amenities")), "ID") && 
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_Description")), "ID")
             );
 
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                return;
-            }
-
-            if (!oUpload.Photo1Name) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
                 return;
             }
 
@@ -204,7 +201,7 @@ sap.ui.define([
                 return (
                     facility.BranchCode === Payload.BranchCode &&
                     facility.FacilityName.trim().toLowerCase() === Payload.FacilityName.trim().toLowerCase()
-                );
+                );  
             });
 
             if (bDuplicate) {
@@ -219,7 +216,8 @@ sap.ui.define([
                     Description: Payload.Description,
                     Photo1: oUpload.Photo1,
                     Photo1Type: oUpload.Photo1Type,
-                    Photo1Name: oUpload.Photo1Name
+                    Photo1Name: oUpload.Photo1Name,
+                    Type:Payload.Type
                 };
 
                 if (Payload.ID) {
@@ -500,6 +498,11 @@ sap.ui.define([
 
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
-        }
+        },
+        onAmenitieTypeChange: function(oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+        },
     });
 });

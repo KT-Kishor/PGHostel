@@ -38,13 +38,30 @@
 				<Label text="{i18n>amenitiesName}" required="true"/>
 				<Input id="HFF_id_FacilityName" value="{HostelFeaturesModel>/FacilityName}"
                 placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterAmenitiesName}"/>
+				<Label
+                    text="{i18n>type}"
+                    required="true"
+                />
+				<ComboBox
+                    id="HFF_id_Amenities"
+                    items="{AmenitiType>/}"
+                    value="{HostelFeaturesModel>/Type}"
+                    placeholder="{i18n>enterType}"
+                    valueStateText="{i18n>enterType}"
+                    change="onAmenitieTypeChange"
+                >
+				<core:Item
+                        key="{AmenitiType>ID}"
+                        text="{AmenitiType>AmenitiName}"
+                    />
+				</ComboBox>
 				<!-- Description -->
 				<Label text="{i18n>description}" required="true"/>
 				<TextArea id="HFF_id_Description" value="{HostelFeaturesModel>/Description}"
                 placeholder="{i18n>enterDescription}" liveChange="onNameInputLiveChange" valueStateText="{i18n>enterDescription}"
                 maxLength="150"/>
 				<!-- Upload -->
-				<Label text="{i18n>addImage}" required="true"/>
+				<Label text="{i18n>addImage}" />
 				<VBox alignItems="Start" width="100%" renderType="Bare">
 					<HBox width="25%">
 						<u:FileUploader

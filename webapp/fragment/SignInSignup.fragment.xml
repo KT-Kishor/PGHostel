@@ -311,6 +311,7 @@
                             valueStateText="{i18n>MSenterConfirmPassword}"
                             maxLength="50"
                             enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
+                            submit="onSubmitNewPassword"
                         />
                         <HBox justifyContent="End">
                             <Button
@@ -666,6 +667,7 @@
                             valueHelpIconSrc="sap-icon://show"
                             valueHelpRequest="SM_onTogglePasswordVisibility"
                             maxLength="50"
+                            submit="onSignUp"
                         />
                     </f:SimpleForm>
                     <HBox

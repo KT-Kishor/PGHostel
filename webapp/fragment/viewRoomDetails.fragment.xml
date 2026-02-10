@@ -246,7 +246,7 @@
                     </HBox>
                 </VBox>
                 <VBox
-                    visible="{= ${AmenityModel>/Amenities}.length > 0 || ${AmenityModel>/loading} }"
+                
                 >
                     <!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
                     <Bar

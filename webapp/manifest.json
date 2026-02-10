@@ -68,6 +68,11 @@
         "uri": "model/FacilityType.json",
         "preload": true
       },
+      "AmenitiType": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/AmenitiType.json",
+        "preload": true
+      },
       "CompanyInvoiceStatus": {
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/CompanyInvoiceStatus.json",
