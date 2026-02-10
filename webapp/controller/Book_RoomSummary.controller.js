@@ -5,8 +5,13 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
-    "sap/m/MessageBox"
-], (Controller, JSONModel, Formatter, utils, BusyIndicator, MessageToast, MessageBox) => {
+    "sap/m/MessageBox",
+    "sap/m/FlexBox",
+    "sap/m/Dialog",
+    "sap/m/Button",
+    "sap/m/Image", 
+     "sap/ui/core/HTML"
+], (Controller, JSONModel, Formatter, utils, BusyIndicator, MessageToast, MessageBox,FlexBox,Dialog,Button,Image,HTML) => {
     "use strict";
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,
@@ -1271,121 +1276,284 @@ oHostelModel.setProperty("/Persons", aPersons);
 
 // ,
 
+        // onOpenDocumentPreview: function (oEvent) {
+        //     const oCtx = oEvent.getSource().getBindingContext("HostelModel");
+        //     const oDoc = oCtx && oCtx.getObject();
+ 
+        //     if (!oDoc || !oDoc.Document) {
+        //         MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
+        //         return;
+        //     }
+ 
+        //     let sData = oDoc.Document;
+ 
+        //     if (!sData.startsWith("data:")) {
+        //         const sType = oDoc.FileType || "application/octet-stream";
+        //         sData = `data:${sType};base64,${sData}`;
+        //     }
+ 
+        //     const sTitle = oDoc.FileName || "Document Preview";
+ 
+        //     /** DESTROY OLD DIALOG IF EXISTS */
+        //     if (this._oImageDialog) {
+        //         this._oImageDialog.destroy();
+        //         this._oImageDialog = null;
+        //     }
+ 
+        //     let oContent;
+ 
+        //     if (oDoc.FileType.includes("image")) {
+ 
+        //         const oFlex = new sap.m.FlexBox({
+        //             width: "100%",
+        //             height: "100%",
+        //             renderType: "Div",
+        //             justifyContent: "Center",
+        //             alignItems: "Center",
+        //             items: [
+        //                 new sap.m.Image({
+        //                     id: this.createId("previewImage"),
+        //                     src: sData,
+        //                     densityAware: false,
+        //                     width: "100%",
+        //                     height: "100%",
+        //                     style: "object-fit:cover;display:block;margin:0;padding:0;"
+        //                 })
+        //             ]
+        //         });
+ 
+        //         oContent = oFlex;
+        //     }
+ 
+        //     /** ============================
+        //      *  PDF PREVIEW
+        //      * ============================ */
+        //     // else if (oDoc.FileType.includes("pdf")) {
+ 
+        //     //     const oHtml = new sap.ui.core.HTML({
+        //     //         content: `<iframe src="${sData}" style="width:100%;height:500%;border:none;display:block;"></iframe>`,
+        //     //         sanitizeContent: false,
+        //     //         horizontalScrolling: false,
+        //     //     });
+ 
+        //     //     oContent = oHtml;
+        //     // }
+ 
+        //     /** ============================
+        //      *  UNSUPPORTED FILE
+        //      * ============================ */
+        //     else {
+        //         oContent = new sap.m.VBox({
+        //             items: [
+        //                 new sap.m.Text({
+        //                     text: "Preview not supported."
+        //                 }),
+        //                 new sap.m.Link({
+        //                     text: "Download File",
+        //                     href: sData,
+        //                     download: oDoc.FileName
+        //                 })
+        //             ],
+        //             width: "100%",
+        //             height: "100%",
+        //             justifyContent: "Center",
+        //             alignItems: "Center"
+        //         });
+        //     }
+ 
+        //     /** ============================
+        //      *  CREATE DIALOG
+        //      * ============================ */
+        //     this._oImageDialog = new sap.m.Dialog({
+        //         title: sTitle,
+        //         contentWidth: "50%",
+        //         contentHeight: "80%",
+        //         draggable: true,
+        //         resizable: true,
+        //         horizontalScrolling: false,
+        //         verticalScrolling: false,
+        //         contentPadding: "0px",
+        //         content: [oContent],
+ 
+        //         beginButton: new sap.m.Button({
+        //             text: "Close",
+        //             press: function () {
+        //                 this._oImageDialog.close();
+        //             }.bind(this)
+        //         }),
+ 
+        //         afterClose: function () {
+        //             this._oImageDialog.destroy();
+        //             this._oImageDialog = null;
+        //         }.bind(this)
+        //     });
+ 
+        //     this.getView().addDependent(this._oImageDialog);
+ 
+        //     this._oImageDialog.open();
+        // },
         onOpenDocumentPreview: function (oEvent) {
             const oCtx = oEvent.getSource().getBindingContext("HostelModel");
             const oDoc = oCtx && oCtx.getObject();
- 
+
             if (!oDoc || !oDoc.Document) {
-                MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
+                MessageToast.show(this.i18nModel.getText("noDocumentPreview") || "No document available");
                 return;
             }
- 
-            let sData = oDoc.Document;
- 
-            if (!sData.startsWith("data:")) {
-                const sType = oDoc.FileType || "application/octet-stream";
-                sData = `data:${sType};base64,${sData}`;
+
+            // PDF handling
+            if (oDoc.FileType && oDoc.FileType.includes("pdf")) {
+                this.openPDFPreview(oDoc);
+                return;
             }
- 
-            const sTitle = oDoc.FileName || "Document Preview";
- 
-            /** DESTROY OLD DIALOG IF EXISTS */
+
+            // Image handling
+            this.openImagePreview(oDoc);
+        },
+
+        /** ========================================
+         *  SEPARATE PDF OPENER FUNCTION
+         * ======================================= */
+         openPDFPreview: function (oDoc) {
+            const sTitle = oDoc.FileName || "PDF Preview";
+            
+            // Create clean data URL
+            let sBase64 = oDoc.Document;
+            if (sBase64.startsWith("data:")) {
+                sBase64 = sBase64.split(',')[1];
+            }
+            const sDataUrl = `data:application/pdf;base64,${sBase64}`;
+
+            if (this._oPDFDialog) {
+                this._oPDFDialog.destroy();
+                this._oPDFDialog = null;
+            }
+
+            // PURE IFRAME with browser's native PDF viewer
+            const oIframe = new HTML({
+                content: `
+                    <iframe id="pdfIframe" 
+                            src="${sDataUrl}" 
+                            style="width:100%; height:85vh; border:none; background:white;" 
+                            frameborder="0"
+                            scrolling="auto">
+                    </iframe>`,
+                sanitizeContent: false,
+                preferDOM: true
+            });
+
+            this._oPDFDialog = new Dialog({
+                title: sTitle,
+                contentWidth: "90%",
+                contentHeight: "90vh",
+                draggable: true,
+                resizable: true,
+                contentPadding: false,
+                content: [oIframe],
+                beginButton: new Button({
+                    text: "Close",
+                    press: () => this._oPDFDialog.close()
+                }),
+                endButton: new Button({
+                    text: "Download",
+                    press: () => {
+                        const link = document.createElement('a');
+                        link.href = sDataUrl;
+                        link.download = sTitle;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }),
+                afterClose: () => {
+                    this._oPDFDialog.destroy();
+                    this._oPDFDialog = null;
+                }
+            });
+
+            this.getView().addDependent(this._oPDFDialog);
+            this._oPDFDialog.open();
+        },
+
+        /** ========================================
+         *  IMAGE PREVIEW (your original logic)
+         * ======================================= */
+        openImagePreview: function (oDoc) {
+    let sData = oDoc.Document;
+    if (!sData.startsWith("data:")) {
+        const sType = oDoc.FileType || "image/png";
+        sData = `data:${sType};base64,${sData}`;
+    }
+
+    const sTitle = oDoc.FileName || "Image Preview";
+
+    if (this._oImageDialog) {
+        this._oImageDialog.destroy();
+        this._oImageDialog = null;
+    }
+
+    // FIXED IMAGE - Perfect fit, no scroll
+    const oImage = new Image({
+        id: this.createId("previewImage"),
+        src: sData,
+        densityAware: false,
+        width: "100%",
+        height: "100%",
+        maxWidth: "100%",
+        maxHeight: "70vh",
+        style: "max-width: 100%; max-height: 70vh; object-fit: cover; display: block; margin: 0 auto;"
+    });
+
+    // SIMPLIFIED CONTAINER - No FlexBox needed
+    const oVBox = new sap.m.VBox({
+        width: "100%",
+        height: "75vh",
+        alignItems: "Center",
+        justifyContent: "Center",
+        fitContainer: true,
+        items: [oImage]
+    });
+
+    this._oImageDialog = new Dialog({
+        title: sTitle,
+        contentWidth: "80%",
+        contentHeight: "80vh",
+        draggable: true,
+        resizable: true,
+        contentPadding: false,
+        content: [oVBox],
+        beginButton: new Button({
+            text: "Close",
+            press: function () {
+                this._oImageDialog.close();
+            }.bind(this)
+        }),
+        afterClose: function () {
+            this._oImageDialog.destroy();
+            this._oImageDialog = null;
+        }.bind(this)
+    });
+
+    this.getView().addDependent(this._oImageDialog);
+    this._oImageDialog.open();
+}
+,
+
+        /** ========================================
+         *  CLEANUP ON EXIT
+         * ======================================= */
+        onExit: function() {
+            // Cleanup PDFViewer blob URL
+            const oPDFViewer = sap.ui.getCore().byId("pdfViewerGlobal");
+            if (oPDFViewer && oPDFViewer._blobUrl) {
+                URL.revokeObjectURL(oPDFViewer._blobUrl);
+            }
+            
+            // Destroy image dialog
             if (this._oImageDialog) {
                 this._oImageDialog.destroy();
                 this._oImageDialog = null;
             }
- 
-            let oContent;
- 
-            if (oDoc.FileType.includes("image")) {
- 
-                const oFlex = new sap.m.FlexBox({
-                    width: "100%",
-                    height: "100%",
-                    renderType: "Div",
-                    justifyContent: "Center",
-                    alignItems: "Center",
-                    items: [
-                        new sap.m.Image({
-                            id: this.createId("previewImage"),
-                            src: sData,
-                            densityAware: false,
-                            width: "100%",
-                            height: "100%",
-                            style: "object-fit:cover;display:block;margin:0;padding:0;"
-                        })
-                    ]
-                });
- 
-                oContent = oFlex;
-            }
- 
-            /** ============================
-             *  PDF PREVIEW
-             * ============================ */
-            else if (oDoc.FileType.includes("pdf")) {
- 
-                const oHtml = new sap.ui.core.HTML({
-                    content: `<iframe src="${sData}" style="width:100%;height:500%;border:none;display:block;"></iframe>`,
-                    sanitizeContent: false,
-                    horizontalScrolling: false,
-                });
- 
-                oContent = oHtml;
-            }
- 
-            /** ============================
-             *  UNSUPPORTED FILE
-             * ============================ */
-            else {
-                oContent = new sap.m.VBox({
-                    items: [
-                        new sap.m.Text({
-                            text: "Preview not supported."
-                        }),
-                        new sap.m.Link({
-                            text: "Download File",
-                            href: sData,
-                            download: oDoc.FileName
-                        })
-                    ],
-                    width: "100%",
-                    height: "100%",
-                    justifyContent: "Center",
-                    alignItems: "Center"
-                });
-            }
- 
-            /** ============================
-             *  CREATE DIALOG
-             * ============================ */
-            this._oImageDialog = new sap.m.Dialog({
-                title: sTitle,
-                contentWidth: "50%",
-                contentHeight: "80%",
-                draggable: true,
-                resizable: true,
-                horizontalScrolling: false,
-                verticalScrolling: false,
-                contentPadding: "0px",
-                content: [oContent],
- 
-                beginButton: new sap.m.Button({
-                    text: "Close",
-                    press: function () {
-                        this._oImageDialog.close();
-                    }.bind(this)
-                }),
- 
-                afterClose: function () {
-                    this._oImageDialog.destroy();
-                    this._oImageDialog = null;
-                }.bind(this)
-            });
- 
-            this.getView().addDependent(this._oImageDialog);
- 
-            this._oImageDialog.open();
         },
 
         // Close preview

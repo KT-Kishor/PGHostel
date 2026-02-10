@@ -2895,6 +2895,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   object-fit: cover !important;
 }
 
+
 /* remove any square background that might peek through */
 .imageContainer .sapMImg,
 .imageContainer .sapMImg img {
@@ -2967,7 +2968,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
     width: 100% !important;
     max-width: 320px;
     margin: 0.5rem auto;
-  }
+  } 
+}
+@media screen and (max-width:600px){
+.serviceImage{
+  width:230px !important;
+}
 }
 
 .profileActionSheet .sapMBtn {
@@ -4283,7 +4289,7 @@ width:180px;
 height:140px;
 border-radius: 2px;
 }
-@media (max-width: 400px) {
+@media (max-width: 600px) {
 .FacilitySummaryImage{
 width:270px;
 height:140px;
