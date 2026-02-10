@@ -1003,7 +1003,7 @@ sap.ui.define([
             //     oBRModel = oComponent.getModel("sBRModel");
             // }
             const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-
+             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
             const aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },

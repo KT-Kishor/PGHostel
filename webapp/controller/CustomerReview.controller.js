@@ -15,6 +15,7 @@ sap.ui.define([
             // await this._loadCustomerReviews(data);
             // this.commonLoginFunction();
             this._setDefaultDateRange();
+            sap.ui.core.BusyIndicator.show(0);
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews(data);
@@ -178,8 +179,8 @@ sap.ui.define([
                         FeedbackDate: this.Formatter.formatDate(f.FeedbackDate),
                         BranchName: this._getBranchName(f.BranchCode)
                     },
-                    width: "100%",
-                    height: "550px"
+                    height: "550px",
+                    width: "100%"
                 });
                 oBox.addItem(oCard);
             });
