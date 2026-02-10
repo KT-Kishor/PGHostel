@@ -4368,12 +4368,12 @@ height:140px;
 } */
 
 /* ===== Card Header ===== */
-/* .sapFCardHeader {
+ .sapFCardHeader {
   background: linear-gradient(135deg, #0aa6b5, #0d8fa3);
   color: #fff;
   border-radius: 14px 14px 0 0;
   padding: 1rem;
-}
+} 
 
 .sapFCardHeader .sapFCardTitle {
   font-weight: 600;
@@ -4383,7 +4383,26 @@ height:140px;
 .sapFCardHeader .sapFCardSubtitle {
   font-size: 0.85rem;
   opacity: 0.9;
-} */
+} 
+
+/* Force all header texts to white */
+.sapFCardHeader,
+.sapFCardHeader * {
+  color: #ffffff !important;
+}
+
+/* Customer name (title) */
+.sapFCardHeader .sapFCardTitle,
+.sapFCardHeader .sapMTitle,
+.sapFCardHeader .sapMText {
+  color: #ffffff !important;
+}
+
+/* Hostel name / subtitle */
+.sapFCardHeader .sapFCardSubtitle {
+  color: #ffffff !important;
+  opacity: 0.9;
+}
 
 /* ===== Ratings Section ===== */
 /* .reviewRatings {

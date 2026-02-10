@@ -60,16 +60,16 @@ sap.ui.define([
             //     BranchCode: data.BranchCode,
             //     BedType: BedTypeName
             // };
-            const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", {}).then(function (oData) {
+            this.ajaxReadWithJQuery("HM_Feedback", {}).then((oData) => {
                 console.log("HM_Feedback response:", oData.commentData);
-                const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                that._aAllFeedbacks = aFeedbacks;
-                that._applyFilters();
+                let aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+                aFeedbacks = this._sortFeedbacksDefault(aFeedbacks);
+                this._aAllFeedbacks = aFeedbacks;
+                this._applyFilters();
                 sap.ui.core.BusyIndicator.hide();
             }).catch(function () {
                 sap.ui.core.BusyIndicator.hide();
@@ -85,6 +85,30 @@ sap.ui.define([
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+        },
+
+        _sortFeedbacksDefault: function (aData) {
+            if (!Array.isArray(aData)) {
+                return aData;
+            }
+
+            return [...aData].sort((a, b) => {
+                const dateDiff =
+                    new Date(b.FeedbackDate) - new Date(a.FeedbackDate);
+
+                if (dateDiff !== 0) {
+                    return dateDiff;
+                }
+
+                const ratingDiff =
+                    Number(b.OverallRating) - Number(a.OverallRating);
+
+                if (ratingDiff !== 0) {
+                    return ratingDiff;
+                }
+
+                return 0;
+            });
         },
 
         _loadCustomers: function () {
@@ -119,12 +143,12 @@ sap.ui.define([
             const dTo = oDRS.getSecondDateValue();
             const sRating = oRatingCB.getSelectedKey();
             let aFiltered = this._aAllFeedbacks || [];
-            if (dFrom && dTo) {
-                aFiltered = aFiltered.filter(f => {
-                    const dFeedback = new Date(f.FeedbackDate);
-                    return dFeedback >= dFrom && dFeedback <= dTo;
-                });
-            }
+            // if (dFrom && dTo) {
+            //     aFiltered = aFiltered.filter(f => {
+            //         const dFeedback = new Date(f.FeedbackDate);
+            //         return dFeedback >= dFrom && dFeedback <= dTo;
+            //     });
+            // }
             if (sRating) {
                 aFiltered = aFiltered.filter(f =>
                     Number(f.OverallRating) === Number(sRating)
@@ -146,7 +170,7 @@ sap.ui.define([
                         BranchName: this._getBranchName(f.BranchCode)
                     },
                     width: "100%",
-                    height: "auto"
+                    height: "550px"
                 });
                 oBox.addItem(oCard);
             });
