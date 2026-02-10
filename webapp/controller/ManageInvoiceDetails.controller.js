@@ -295,9 +295,6 @@ sap.ui.define([
                     this.Readcall("HM_InvoicePaymentDetail", {
                         InvNo: this.decodedPath
                     })
-                    this.Readcall("HM_Payment", {
-                        InvNo: this.decodedPath, Used : "Y"
-                    })
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
@@ -381,7 +378,7 @@ sap.ui.define([
                     // Reset invoice model
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
                 } catch (err) {
-                    sap.m.MessageToast.show(err.message);
+                    MessageToast.show(err.message);
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -537,7 +534,7 @@ sap.ui.define([
                     await this.totalAmountCalculation();
                     utils._LCvalidateMandatoryField(oEvent);
                 } catch (err) {
-                    sap.m.MessageToast.show(err.message);
+                    MessageToast.show(err.message);
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -1103,7 +1100,7 @@ sap.ui.define([
                         });
                         oDialog.open();
                     } catch (error) {
-                        sap.m.MessageToast.show(error.responseText || "Submission Failed");
+                        MessageToast.show(error.responseText || "Submission Failed");
                     }
                 } catch (error) {
                     MessageToast.show(that.i18nModel.getText("technicalError"));
@@ -1306,7 +1303,7 @@ sap.ui.define([
                     var fReceivedAmount = parseFloat(oNavData.PaidAmount) || 0;
 
                     if (fTotalAmount === fReceivedAmount) {
-                        sap.m.MessageToast.show("Advance payment has already done for this month");
+                        MessageToast.show("Advance payment has already done for this month");
                         return; // stop fragment open
                     }
 
@@ -1428,18 +1425,6 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
                     return;
-                }
-
-                if (entity === "HM_Payment") {
-                    const items = oData.commentData || [];
-                    const refundEntry = items.find(item => item.Used === "Y");
-                    const refundAmount = refundEntry ? parseFloat(refundEntry.Amount) : 0;
-                    // Set in SelectedCustomerModel
-                    const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
-                    if (oSelectedModel) {
-                        oSelectedModel.setProperty("/RefundProcessed", refundAmount.toFixed(2));
-                        oSelectedModel.refresh(true);
-                    }
                 }
 
                 const view = this.getView();
@@ -2133,6 +2118,20 @@ sap.ui.define([
                         }
                     }
 
+                    if (parseFloat(oModel.RefundAmount) > 0) {
+                        summaryBody.push([
+                            `Refund Due (${data.Currency}) :`,
+                            Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
+                        ]);
+                    }
+
+                    if (parseFloat(oModel.RefundProcessed) > 0) {
+                        summaryBody.push([
+                            `Refund Processed (${data.Currency}) :`,
+                            Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
+                        ]);
+                    }
+                    
                     // if (data.RoundOf && data.RoundOf !== "0") {
                     //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     // }
@@ -2354,7 +2353,7 @@ sap.ui.define([
                     const aSelectedItems = oTable.getSelectedItems();
 
                     if (!aSelectedItems.length) {
-                        sap.m.MessageToast.show("Please select at least one invoice item");
+                        MessageToast.show("Please select at least one invoice item");
                         return;
                     }
 
@@ -2670,7 +2669,7 @@ sap.ui.define([
                     doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Invoice.pdf`);
 
                 } catch (e) {
-                    sap.m.MessageToast.show(e.message || "PDF generation failed");
+                    MessageToast.show(e.message || "PDF generation failed");
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -2917,6 +2916,20 @@ sap.ui.define([
                             ]);
                         }
 
+                        if (parseFloat(oModel.RefundAmount) > 0) {
+                            summaryBody.push([
+                                `Refund Due (${oModel.Currency}) :`,
+                                Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
+                            ]);
+                        }
+
+                        if (parseFloat(oModel.RefundProcessed) > 0) {
+                            summaryBody.push([
+                                `Refund Processed (${oModel.Currency}) :`,
+                                Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
+                            ]);
+                        }
+
                         const totalRowIndex = summaryBody.length;
                         summaryBody.push([
                             `Total (${oModel.Currency}) :`,
@@ -3114,19 +3127,19 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this.Readcall("HM_Payment", {
-                            InvNo: this.decodedPath, Used : "Y"
-                        });
-                        this.Readcall("HM_ManageInvoice", {
+                    
+                        var oResult =await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
                         });
 
-                        this.visiablityPlay.setProperty("/Edit", hasDue);
+                        const oInvoice = oResult.data.ManageInvoice[0];
+                        const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+                        oSelectedModel.setData(oInvoice);
+                        oSelectedModel.refresh(true);  
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
-
                         MessageToast.show(this.i18nModel.getText("refundMessage"));
                     }
                 } catch (error) {

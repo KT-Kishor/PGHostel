@@ -18,9 +18,5 @@
     {
       "ID": 5,
       "InvoiceStatus": "Refund Due"
-    },
-    {
-      "ID": 6,
-      "InvoiceStatus": "Refund Processed"
     }
   ]
