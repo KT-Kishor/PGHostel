@@ -8,14 +8,14 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
-    const $V = (id) => $C(id)?.getValue()?.trim() || "";
+    // const $V = (id) => $C(id)?.getValue()?.trim() || "";
     this._otpResendInterval = null;
     this._otpValidityInterval = null;
     return BaseController.extend("sap.ui.com.project1.controller.Hostel", {
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
-            this.getView().setModel(new sap.ui.model.json.JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
+            this.getView().setModel(new JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
@@ -33,7 +33,7 @@ sap.ui.define([
                 today.getDate()
             );
 
-            const oDateModel = new sap.ui.model.json.JSONModel({
+            const oDateModel = new JSONModel({
                 focusedDate: focusedDate,
                 minDate: minDate,
                 maxDate: today
@@ -102,7 +102,7 @@ sap.ui.define([
             this.roomtype = false
 
             if (!this.getView().getModel("VisibilityModel")) {
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                this.getView().setModel(new JSONModel({
                     BedTypes: [],
                     NoData: false,
                     ShowViewMore: false
@@ -117,7 +117,7 @@ sap.ui.define([
             this.byId("id_Roomtype").setEnabled(true);
 
             //  Create all static local models
-            oView.setModel(new sap.ui.model.json.JSONModel({
+            oView.setModel(new JSONModel({
                 CustomerName: "",
                 MobileNo: "",
                 Gender: "",
@@ -125,6 +125,7 @@ sap.ui.define([
                 CustomerEmail: "",
                 RoomType: ""
             }), "HostelModel");
+            this.oHostelModel = oView.getModel("HostelModel");
             oView.setModel(new JSONModel({ isEditMode: false }), "saveModel");
             // oView.setModel(new JSONModel({ isOtpSelected: false, isPasswordSelected: true }), "LoginViewModel");
             oView.setModel(new JSONModel({
@@ -177,8 +178,8 @@ sap.ui.define([
             }), "BranchModel");
             this.oViewModel.setProperty("/showOTPField", false);
 
-            const oState = sap.ui.getCore().byId("signUpState");
-            const oCity = sap.ui.getCore().byId("signUpCity");
+            const oState = $C("signUpState");
+            const oCity = $C("signUpCity");
 
             if (oState?.getBinding("items")) {
                 oState.getBinding("items").filter([
@@ -265,8 +266,8 @@ sap.ui.define([
 
             const otpCtrl =
                 vm.getProperty("/authFlow") === "forgot"
-                    ? sap.ui.getCore().byId("fpOTP")
-                    : sap.ui.getCore().byId("signInOTP");
+                    ? $C("fpOTP")
+                    : $C("signInOTP");
 
             otpCtrl?.setValue("");
             otpCtrl?.setEnabled(false);
@@ -328,7 +329,7 @@ sap.ui.define([
             const oTile = oEvent.getSource();
             const sType = oTile.data("type"); // "daily", "monthly", or "yearly"
             const oView = this.getView();
-            const oModel = oView.getModel("HostelModel");
+            const oModel = this.oHostelModel;
             const oData = oModel.getData();
             const sCurrency = oData.Currency || "INR";
 
@@ -381,7 +382,7 @@ sap.ui.define([
         onConfirmBooking: function () {
 
             const oView = this.getView();
-            const oLocalModel = oView.getModel("HostelModel");
+            const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
 
             // -------------------------
@@ -402,7 +403,7 @@ sap.ui.define([
             // -------------------------
             let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
             if (!oGlobalModel) {
-                oGlobalModel = new sap.ui.model.json.JSONModel({});
+                oGlobalModel = new JSONModel({});
                 sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
             }
 
@@ -714,11 +715,12 @@ sap.ui.define([
 
                 };
 
-                const oHostelModel = new sap.ui.model.json.JSONModel(oFullDetails);
+                const oHostelModel = new JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
+                this.oHostelModel = oHostelModel;
                 console.log("HostelModel:", oHostelModel.getData());
 
-                oView.setModel(new sap.ui.model.json.JSONModel({
+                oView.setModel(new JSONModel({
                     loading: true,
                     Facilities: []
                 }), "FacilityModel");
@@ -782,7 +784,7 @@ sap.ui.define([
             if (!oTile) return;
 
             const bOccupied =
-                !this.getView().getModel("HostelModel").getProperty("/Visible");
+                !this.oHostelModel.getProperty("/Visible");
 
             if (bOccupied) {
                 oTile.addStyleClass("occupied");
@@ -793,7 +795,7 @@ sap.ui.define([
 
 
         _LoadAmenities: async function (sBranchCode) {
-            const oAmenityModel = new sap.ui.model.json.JSONModel({
+            const oAmenityModel = new JSONModel({
                 loading: true,
                 Amenities: []
             });
@@ -1149,17 +1151,17 @@ sap.ui.define([
             this._clearAllAuthFields?.();
 
             // Reset OTP UI
-            const otpCtrl = sap.ui.getCore().byId("signInOTP");
+            const otpCtrl = $C("signInOTP");
             if (otpCtrl) {
                 otpCtrl.setValue("");
                 otpCtrl.setEnabled(false);
             }
 
-            const btnSendOTP = sap.ui.getCore().byId("btnSignInSendOTP");
+            const btnSendOTP = $C("btnSignInSendOTP");
             if (btnSendOTP) btnSendOTP.setVisible(false);
 
             // Reset password valid state
-            const passCtrl = sap.ui.getCore().byId("signinPassword");
+            const passCtrl = $C("signinPassword");
             if (passCtrl) {
                 passCtrl.setEnabled(true);
                 passCtrl.setValue("");
@@ -1207,7 +1209,7 @@ sap.ui.define([
             // -------------------------
             ["signInEmail", "signinPassword", "signInOTP"]
                 .forEach(id => {
-                    const c = sap.ui.getCore().byId(id);
+                    const c = $C(id);
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
@@ -1215,16 +1217,16 @@ sap.ui.define([
                     }
                 });
 
-            sap.ui.getCore().byId("signinPassword")?.setEnabled(true);
-            sap.ui.getCore().byId("signInOTP")?.setEnabled(false);
-            sap.ui.getCore().byId("btnSignInSendOTP")?.setVisible(false);
+            $C("signinPassword")?.setEnabled(true);
+            $C("signInOTP")?.setEnabled(false);
+            $C("btnSignInSendOTP")?.setVisible(false);
 
             // -------------------------
             // RESET FORGOT FIELDS
             // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
-                    const c = sap.ui.getCore().byId(id);
+                    const c = $C(id);
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
@@ -1237,20 +1239,20 @@ sap.ui.define([
             // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
-                    const c = sap.ui.getCore().byId(id);
+                    const c = $C(id);
                     if (c) c.setEnabled(false);
                 });
 
             // -------------------------
             // PANELS
             // -------------------------
-            sap.ui.getCore().byId("signInPanel")?.setVisible(true);
-            sap.ui.getCore().byId("signUpPanel")?.setVisible(false);
+            $C("signInPanel")?.setVisible(true);
+            $C("signUpPanel")?.setVisible(false);
 
             // -------------------------
             // HEADER
             // -------------------------
-            sap.ui.getCore().byId("authDialog")
+            $C("authDialog")
                 ?.getCustomHeader()
                 ?.getContentMiddle()[0]
                 ?.setText("Hostel Access Portal");
@@ -1259,8 +1261,8 @@ sap.ui.define([
         onSwitchToSignUp: function () {
             const vm = this.oViewModel;
 
-            const oSignInPanel = sap.ui.getCore().byId("signInPanel");
-            const oSignUpPanel = sap.ui.getCore().byId("signUpPanel");
+            const oSignInPanel = $C("signInPanel");
+            const oSignUpPanel = $C("signUpPanel");
 
             // 🔒 MAKE DOB READ-ONLY (calendar-only)
             this._FragmentDatePickersReadOnly(["signUpDOB"]);
@@ -1271,7 +1273,7 @@ sap.ui.define([
             vm.setProperty("/authFlow", "signup");
             vm.setProperty("/dialogTitle", "Hostel Access Portal");
             // Set min and max dates for the Date of Birth picker
-            const oDOBpicker = sap.ui.getCore().byId("signUpDOB");
+            const oDOBpicker = $C("signUpDOB");
             if (oDOBpicker) {
                 const oToday = new Date();
 
@@ -1289,8 +1291,8 @@ sap.ui.define([
 
         // SM_onGeneratePassword: function () {
 
-        //     var oPwdInput = sap.ui.getCore().byId("signUpPassword");
-        //     var oStrength = sap.ui.getCore().byId("passwordStrengthText"); // signup label
+        //     var oPwdInput = $C("signUpPassword");
+        //     var oStrength = $C("passwordStrengthText"); // signup label
 
         //     if (!oPwdInput) {
         //         console.error("❌ signUpPassword input not found");
@@ -1305,8 +1307,8 @@ sap.ui.define([
         // },
 
         SM_onGeneratePassword: function () {
-            var oPwdInput = sap.ui.getCore().byId("signUpPassword");
-            var oStrength = sap.ui.getCore().byId("passwordStrengthText");
+            var oPwdInput = $C("signUpPassword");
+            var oStrength = $C("passwordStrengthText");
 
             if (!oPwdInput) {
                 console.error("❌ signUpPassword input not found");
@@ -1322,8 +1324,8 @@ sap.ui.define([
         _addPasswordGenerateIcon: function () {
 
             const aInputs = [
-                sap.ui.getCore().byId("signUpPassword"),
-                sap.ui.getCore().byId("newPass")
+                $C("signUpPassword"),
+                $C("newPass")
             ];
 
             aInputs.forEach((oInput) => {
@@ -1423,10 +1425,10 @@ sap.ui.define([
         //     let oStrengthText = null;
 
         //     if (sId === "signUpPassword") {
-        //         oStrengthText = sap.ui.getCore().byId("passwordStrengthText");
+        //         oStrengthText = $C("passwordStrengthText");
         //     }
         //     else if (sId === "newPass") {
-        //         oStrengthText = sap.ui.getCore().byId("fpPasswordStrengthText");
+        //         oStrengthText = $C("fpPasswordStrengthText");
         //     }
 
         //     utils._LCvalidatePassword(oInput, oStrengthText);
@@ -1448,17 +1450,17 @@ sap.ui.define([
             // Strength Label Logic
             let oStrengthText = null;
             if (sId === "signUpPassword") {
-                oStrengthText = sap.ui.getCore().byId("passwordStrengthText");
+                oStrengthText = $C("passwordStrengthText");
             } else if (sId === "newPass") {
-                oStrengthText = sap.ui.getCore().byId("fpPasswordStrengthText");
+                oStrengthText = $C("fpPasswordStrengthText");
             }
 
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
         // SM_onGenerateForgotPassword: function () {
 
-        //     var oPwdInput = sap.ui.getCore().byId("newPass");
-        //     var oStrength = sap.ui.getCore().byId("fpPasswordStrengthText");
+        //     var oPwdInput = $C("newPass");
+        //     var oStrength = $C("fpPasswordStrengthText");
 
         //     if (!oPwdInput) {
         //         console.error("❌ newPass input not found");
@@ -1473,8 +1475,8 @@ sap.ui.define([
 
         SM_onGenerateForgotPassword: function () {
 
-            var oPwdInput = sap.ui.getCore().byId("newPass");
-            var oStrength = sap.ui.getCore().byId("fpPasswordStrengthText");
+            var oPwdInput = $C("newPass");
+            var oStrength = $C("fpPasswordStrengthText");
 
             if (!oPwdInput) {
                 console.error("❌ newPass input not found");
@@ -1511,7 +1513,7 @@ sap.ui.define([
                 utils._LCvalidateAddress(C("signUpAddress")) &&
                 utils._LCvalidatePassword(
                     C("signUpPassword"),
-                    sap.ui.getCore().byId("passwordStrengthText")
+                    $C("passwordStrengthText")
                 ) &&
 
                 this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") })
@@ -1526,7 +1528,7 @@ sap.ui.define([
 
             // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
-            const sFinalPassword = sap.ui.getCore().byId("signUpPassword").getValue();
+            const sFinalPassword = $C("signUpPassword").getValue();
 
 
             const payload = {
@@ -1565,7 +1567,7 @@ sap.ui.define([
                         oResp?.message ||
                         this.i18nModel.getText("registrationFailedPleasetryagain");
 
-                    sap.m.MessageBox.error(sFailMsg, {
+                    MessageBox.error(sFailMsg, {
                         title: "Registration Failed"
                     });
                     return;
@@ -1578,7 +1580,7 @@ sap.ui.define([
 
                 const sPassword = data.password;
                 const oCtrl = this;   // 👈 REQUIRED
-                sap.m.MessageBox.success(sSuccessMsg, {
+                MessageBox.success(sSuccessMsg, {
                     title: "Success",
                     contentWidth: "500px",
                     onClose: () => {
@@ -1615,13 +1617,13 @@ sap.ui.define([
                             DateOfBirth: ""
                         });
 
-                        sap.ui.getCore().byId("signInPanel")?.setVisible(true);
-                        sap.ui.getCore().byId("signUpPanel")?.setVisible(false);
+                        $C("signInPanel")?.setVisible(true);
+                        $C("signUpPanel")?.setVisible(false);
 
-                        sap.ui.getCore().byId("signinPassword")?.setEnabled(true).setValue("");
-                        sap.ui.getCore().byId("signInOTP")?.setEnabled(false).setValue("");
-                        sap.ui.getCore().byId("btnSignInSendOTP")?.setVisible(false);
-                        sap.ui.getCore().byId("signInEmail")?.setValue("");
+                        $C("signinPassword")?.setEnabled(true).setValue("");
+                        $C("signInOTP")?.setEnabled(false).setValue("");
+                        $C("btnSignInSendOTP")?.setVisible(false);
+                        $C("signInEmail")?.setValue("");
 
                         oCtrl._oSignDialog?.close();
 
@@ -1647,7 +1649,7 @@ sap.ui.define([
                         return this.i18nModel.getText("registrationFailedPleasetryagain");
                     })();
 
-                sap.m.MessageBox.error(sMsg, {
+                MessageBox.error(sMsg, {
                     title: "Registration Failed"
                 });
 
@@ -1711,7 +1713,7 @@ sap.ui.define([
             oModel.setProperty("/State", sStateText);
 
             // reset city whenever state changes
-            const oCity = sap.ui.getCore().byId("signUpCity");
+            const oCity = $C("signUpCity");
             oModel.setProperty("/City", "");
             oCity.setValue("").setSelectedKey("");
 
@@ -1720,7 +1722,7 @@ sap.ui.define([
             ]);
 
             // release cities only if country is valid
-            const oCountry = sap.ui.getCore().byId("signUpCountry");
+            const oCountry = $C("signUpCountry");
             const sCountryCode =
                 oCountry.getSelectedItem()?.getAdditionalText()?.trim();
 
@@ -1739,8 +1741,8 @@ sap.ui.define([
             // sanitize manual typing
             oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
-            const oCountry = sap.ui.getCore().byId("signUpCountry");
-            const oState = sap.ui.getCore().byId("signUpState");
+            const oCountry = $C("signUpCountry");
+            const oState = $C("signUpState");
 
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem() || !!oState.getValue();
@@ -1774,7 +1776,7 @@ sap.ui.define([
 
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = sap.ui.getCore().byId("signUpGender");
+            const oGender = $C("signUpGender");
 
             // Reset gender
             oGender.setSelectedKey("");
@@ -1842,8 +1844,8 @@ sap.ui.define([
             // Sanitize manual typing
             oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
-            const oCountry = sap.ui.getCore().byId("signUpCountry");
-            const oState = sap.ui.getCore().byId("signUpState");
+            const oCountry = $C("signUpCountry");
+            const oState = $C("signUpState");
 
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem();
@@ -1883,7 +1885,7 @@ sap.ui.define([
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
 
-            const stdRaw = sap.ui.getCore().byId("signUpSTD").getValue() || "";
+            const stdRaw = $C("signUpSTD").getValue() || "";
             const std = stdRaw.replace(/\s+/g, "").startsWith("+")
                 ? stdRaw.replace(/\s+/g, "")
                 : "+" + stdRaw.replace(/\s+/g, "");
@@ -1922,7 +1924,7 @@ sap.ui.define([
 
 
         onAddressChange: function () {
-            utils._LCvalidateAddress(sap.ui.getCore().byId("signUpAddress"));
+            utils._LCvalidateAddress($C("signUpAddress"));
         },
 
 
@@ -1937,9 +1939,9 @@ sap.ui.define([
 
             const oModel = this.getView().getModel("LoginMode");
 
-            const oState = sap.ui.getCore().byId("signUpState");
-            const oCity = sap.ui.getCore().byId("signUpCity");
-            const oSTD = sap.ui.getCore().byId("signUpSTD");
+            const oState = $C("signUpState");
+            const oCity = $C("signUpCity");
+            const oSTD = $C("signUpSTD");
 
             ["State", "City", "Mobileno", "STDCode"].forEach(p =>
                 oModel.setProperty("/" + p, "")
@@ -1986,32 +1988,16 @@ sap.ui.define([
                 ]);
             }
         },
-             onRatingPress: function (oEvent) {
-            var oSource = oEvent.getSource();
-
-            // Get binding context of the clicked bed type
-            var oCtx = oSource.getBindingContext("VisibilityModel");
-
-            if (!oCtx) {
-                return;
-            }
-
-            var oBedData = oCtx.getObject();
-            this.getOwnerComponent().setModel(new JSONModel(oBedData), "SelectedBedType");
-
-            this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
-
-        },
 
 
         onSTDChange: function (oEvent) {
 
             // 🔑 Support BOTH UI-triggered and manual calls
-            const oSTD = oEvent?.getSource?.() || sap.ui.getCore().byId("signUpSTD");
+            const oSTD = oEvent?.getSource?.() || $C("signUpSTD");
             if (!oSTD) return;
 
             const sValue = (oSTD.getValue() || "").trim();
-            const oMobile = sap.ui.getCore().byId("signUpPhone");
+            const oMobile = $C("signUpPhone");
 
             // Mandatory check (only if event exists)
             if (oEvent && !utils._LCvalidateMandatoryField(oEvent)) {
@@ -2214,7 +2200,7 @@ sap.ui.define([
             // } catch (err) {
             //     console.error("Profile Load Error:", err);
 
-            //     const oProfileModel = new sap.ui.model.json.JSONModel({
+            //     const oProfileModel = new JSONModel({
             //         ...fullUserData,
             //         photo: "data:image/png;base64," + oUser.FileContent || "",
             //         initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
@@ -2407,7 +2393,7 @@ sap.ui.define([
         _onEnterProfile: async function () {
             this._oProfileActionSheet.close();
             this._isProfileRequested = true;
-            const oTempModel = new sap.ui.model.json.JSONModel({
+            const oTempModel = new JSONModel({
                 bookings: [],
                 isTableBusy: true
             });
@@ -2540,10 +2526,10 @@ sap.ui.define([
 
         onWizardNext: function () {
             const oDialog = this.FCIA_Dialog;
-            const oWizard = sap.ui.getCore().byId("idHostelWizard");
-            const oNextButton = sap.ui.getCore().byId("idWizardNextBtn");
-            const oBackButton = sap.ui.getCore().byId("idWizardBackBtn");
-            const oSubmitButton = sap.ui.getCore().byId("idWizardSubmitBtn");
+            const oWizard = $C("idHostelWizard");
+            const oNextButton = $C("idWizardNextBtn");
+            const oBackButton = $C("idWizardBackBtn");
+            const oSubmitButton = $C("idWizardSubmitBtn");
 
             oWizard.nextStep();
 
@@ -2565,10 +2551,10 @@ sap.ui.define([
         },
 
         onWizardBack: function () {
-            const oWizard = sap.ui.getCore().byId("idHostelWizard");
-            const oNextButton = sap.ui.getCore().byId("idWizardNextBtn");
-            const oBackButton = sap.ui.getCore().byId("idWizardBackBtn");
-            const oSubmitButton = sap.ui.getCore().byId("idWizardSubmitBtn");
+            const oWizard = $C("idHostelWizard");
+            const oNextButton = $C("idWizardNextBtn");
+            const oBackButton = $C("idWizardBackBtn");
+            const oSubmitButton = $C("idWizardSubmitBtn");
             oWizard.previousStep();
 
             const aSteps = oWizard.getSteps();
@@ -2586,7 +2572,7 @@ sap.ui.define([
 
         onCancelDialog: function () {
             this.FCIA_Dialog.close();
-            sap.ui.getCore().byId("idHostelWizardDialog").close();
+            $C("idHostelWizardDialog").close();
         },
 
         onDoubleRoomPress: function (oEvent) {
@@ -2604,11 +2590,11 @@ sap.ui.define([
             // var price = this.getView().getModel("VisibilityModel").getData();
 
             // this.sRoomType = oButton.data("roomType");
-            // sap.ui.getCore().byId("idRoomType").setValue(this.sRoomType);
-            // sap.ui.getCore().byId("idPrice1").setValue(price.doublePrice);
-            // sap.ui.getCore().byId("idFullName").setValue(this._oLoggedInUser.UserName);
-            // sap.ui.getCore().byId("idE-mail").setValue(this._oLoggedInUser.EmailID);
-            // sap.ui.getCore().byId("idMobile").setValue(this._oLoggedInUser.MobileNo);
+            // $C("idRoomType").setValue(this.sRoomType);
+            // $C("idPrice1").setValue(price.doublePrice);
+            // $C("idFullName").setValue(this._oLoggedInUser.UserName);
+            // $C("idE-mail").setValue(this._oLoggedInUser.EmailID);
+            // $C("idMobile").setValue(this._oLoggedInUser.MobileNo);
 
         },
 
@@ -2730,7 +2716,7 @@ sap.ui.define([
             };
 
             // Set model for next screen
-            var oHostelModel = new sap.ui.model.json.JSONModel(oFullCustomerData);
+            var oHostelModel = new JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
 
             // Navigate
@@ -2845,7 +2831,7 @@ sap.ui.define([
             });
 
             // 🔹 Update Area model dynamically
-            const oAreaModel = new sap.ui.model.json.JSONModel(aFiltered);
+            const oAreaModel = new JSONModel(aFiltered);
             oView.setModel(oAreaModel, "AreaModel");
 
             // 🔹 Enable the Area dropdown now that data is ready
@@ -3125,10 +3111,7 @@ sap.ui.define([
                                 src: convertBase64ToImage(base64, type),
                                 Area: sArea,
                                 AverageRating: AverageRating,
-                                TotalFeedbacks: TotalFeedbacks,
-                                BranchCode: room.BranchCode,
-                                Name: room.Name,
-                                ACType: room.ACType,
+                                TotalFeedbacks: TotalFeedbacks
                             });
                         }
                     }
@@ -3206,7 +3189,7 @@ sap.ui.define([
 
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
-                oHostelModel = new sap.ui.model.json.JSONModel({});
+                oHostelModel = new JSONModel({});
                 sap.ui.getCore().setModel(oHostelModel, "HostelModel");
             }
 
@@ -3265,7 +3248,7 @@ sap.ui.define([
             if (!oInput) return false;
 
             const confirm = (oInput.getValue() || "").trim();
-            const pass = sap.ui.getCore().byId("signUpPassword").getValue().trim();
+            const pass = $C("signUpPassword").getValue().trim();
 
             // Required
             if (!confirm) {
@@ -3288,8 +3271,8 @@ sap.ui.define([
 
         Forget_onConfirm: function (oEvent) {
             const confirm = oEvent.getSource().getValue().trim();
-            const pass = sap.ui.getCore().byId("newPass").getValue().trim();
-            const oInput = sap.ui.getCore().byId("confPass");
+            const pass = $C("newPass").getValue().trim();
+            const oInput = $C("confPass");
 
             if (!confirm) {
                 oInput.setValueState("Error");
@@ -3350,21 +3333,21 @@ sap.ui.define([
             vm.setProperty("/isOtpEntered", false);
 
             // 🔥 Clean OTP input field and disable it
-            const otpCtrl = sap.ui.getCore().byId("signInOTP");
+            const otpCtrl = $C("signInOTP");
             if (otpCtrl) {
                 otpCtrl.setValue("");
                 otpCtrl.setEnabled(false);
             }
 
             // 🔥 Reset password field too (fresh mode)
-            const passCtrl = sap.ui.getCore().byId("signinPassword");
+            const passCtrl = $C("signinPassword");
             if (passCtrl) {
                 passCtrl.setValue("");
                 passCtrl.setValueState("None");
             }
 
             // 🔥 Hide Send OTP button unless user is in OTP mode
-            const btnSendOtp = sap.ui.getCore().byId("btnSignInSendOTP");
+            const btnSendOtp = $C("btnSignInSendOTP");
             if (btnSendOtp) {
                 btnSendOtp.setVisible(mode === "otp");
             }
@@ -3377,7 +3360,7 @@ sap.ui.define([
                 "newPass", "confPass", "loginOTP"
             ];
             ids.forEach(id => {
-                const c = sap.ui.getCore().byId(id);
+                const c = $C(id);
                 if (c) {
                     c.setValue("");
                     c.setValueState("None");
@@ -3463,7 +3446,7 @@ sap.ui.define([
             ];
 
             aPanels.forEach(id => {
-                const c = sap.ui.getCore().byId(id);
+                const c = $C(id);
                 if (c) {
                     c.setVisible(id === panelId);
                 }
@@ -3471,8 +3454,8 @@ sap.ui.define([
         },
 
         onSubmitNewPassword: async function () {
-            const oNew = sap.ui.getCore().byId("newPass");
-            const oConf = sap.ui.getCore().byId("confPass");
+            const oNew = $C("newPass");
+            const oConf = $C("confPass");
 
             const pass = oNew.getValue().trim();
             const confirm = oConf.getValue().trim();
@@ -3527,7 +3510,7 @@ sap.ui.define([
                 });
 
 
-                sap.m.MessageBox.success("Password updated successfully", {
+                MessageBox.success("Password updated successfully", {
                     title: "Success",
                     onClose: () => {
 
@@ -3536,7 +3519,7 @@ sap.ui.define([
                         this._clearForgotFlow?.();
 
                         // reset dialog title
-                        sap.ui.getCore().byId("authDialog").getCustomHeader().getContentMiddle()[0].setText("Hostel Access Portal");
+                        $C("authDialog").getCustomHeader().getContentMiddle()[0].setText("Hostel Access Portal");
 
                         // switch flow back to signin
                         const vm = this.oViewModel;
@@ -3563,7 +3546,7 @@ sap.ui.define([
                 "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"
             ]
                 .forEach(id => {
-                    let o = sap.ui.getCore().byId(id);
+                    let o = $C(id);
                     if (o) o.setValue("");
                 });
         },
@@ -3620,7 +3603,7 @@ sap.ui.define([
         },
 
         onPressOTP: async function () {
-            const oEmailCtrl = sap.ui.getCore().byId("signInEmail");
+            const oEmailCtrl = $C("signInEmail");
             const sEmail = oEmailCtrl?.getValue()?.trim() || "";
 
             // Validate input
@@ -3655,7 +3638,7 @@ sap.ui.define([
                     // Show OTP input
                     vm.setProperty("/showOTPField", true);
 
-                    const oOtpCtrl = sap.ui.getCore().byId("signInOTP");
+                    const oOtpCtrl = $C("signInOTP");
                     oOtpCtrl.setEnabled(true);
                     oOtpCtrl.setValue("");
                     oOtpCtrl.setValueState("None");
@@ -3692,8 +3675,8 @@ sap.ui.define([
 
             // Resolve OTP control by flow
             const oOtpInput = (flow === "forgot")
-                ? sap.ui.getCore().byId("fpOTP")
-                : sap.ui.getCore().byId("signInOTP");
+                ? $C("fpOTP")
+                : $C("signInOTP");
 
             const otp = oOtpInput.getValue().trim();
 
@@ -3791,10 +3774,10 @@ sap.ui.define([
 
             // Reset only values (not visibility/enabled state)
 
-            sap.ui.getCore().byId("fpEmailId").setValue("");
-            sap.ui.getCore().byId("fpOTP").setValue("");
-            sap.ui.getCore().byId("newPass").setValue("");
-            sap.ui.getCore().byId("confPass").setValue("");
+            $C("fpEmailId").setValue("");
+            $C("fpOTP").setValue("");
+            $C("newPass").setValue("");
+            $C("confPass").setValue("");
 
             // Update flow using ViewModel
             const vm = this.oViewModel;
@@ -4101,7 +4084,7 @@ sap.ui.define([
                 });
                 this.getView().addDependent(this._oPreviewDialog);
             }
-            sap.ui.getCore().byId("previewProfileImage").setSrc(sPhoto);
+            $C("previewProfileImage").setSrc(sPhoto);
             this._oPreviewDialog.open();
         },
 
@@ -4117,10 +4100,10 @@ sap.ui.define([
 
             const oLoginModel = this.getView().getModel("LoginModel");
 
-            const oEmailCtrl = sap.ui.getCore().byId("signInEmail");
+            const oEmailCtrl = $C("signInEmail");
             const sEmail = oEmailCtrl?.getValue()?.trim() || "";
-            const sPassword = sap.ui.getCore().byId("signinPassword").getValue().trim();
-            const sOTP = sap.ui.getCore().byId("signInOTP").getValue().trim();
+            const sPassword = $C("signinPassword").getValue().trim();
+            const sOTP = $C("signInOTP").getValue().trim();
 
             // Common mandatory fields
             if (
@@ -4143,7 +4126,7 @@ sap.ui.define([
                     const showOTPField = vm.getProperty("/showOTPField");
                     const isOtpEntered = vm.getProperty("/isOtpEntered");
 
-                    const otpCtrl = sap.ui.getCore().byId("signInOTP");
+                    const otpCtrl = $C("signInOTP");
 
                     // 1️⃣ OTP has NOT been generated
                     if (!showOTPField) {
@@ -4186,7 +4169,7 @@ sap.ui.define([
                 }
                 else {
                     // -------------------------- PASSWORD MODE -------------------------
-                    const passCtrl = sap.ui.getCore().byId("signinPassword");
+                    const passCtrl = $C("signinPassword");
 
                     // Required
                     if (!sPassword) {
@@ -4207,7 +4190,7 @@ sap.ui.define([
                     // If valid
                     passCtrl.setValueState("None");
 
-                    if (!utils._LCvalidatePassword(sap.ui.getCore().byId("signinPassword"))) {
+                    if (!utils._LCvalidatePassword($C("signinPassword"))) {
                         sap.m.MessageToast.show(this.i18nModel.getText("entervalidpassword"));
                         return;
                     }
@@ -4263,7 +4246,7 @@ sap.ui.define([
 
                 // Role Based Access
                 if (user.Role === "Customer") {
-                    const oUserModel = new sap.ui.model.json.JSONModel(user);
+                    const oUserModel = new JSONModel(user);
                     sap.ui.getCore().setModel(oUserModel, "LoginModel");
                     this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
                 } else {
@@ -4271,9 +4254,9 @@ sap.ui.define([
                 }
 
                 // Reset login fields
-                sap.ui.getCore().byId("signInEmail").setValue("");
-                sap.ui.getCore().byId("signinPassword").setValue("");
-                sap.ui.getCore().byId("signInOTP").setValue("");
+                $C("signInEmail").setValue("");
+                $C("signinPassword").setValue("");
+                $C("signInOTP").setValue("");
 
                 // Close dialog
                 if (this._oSignDialog) {
@@ -4478,7 +4461,7 @@ sap.ui.define([
         },
 
         onValidateUser: async function () {
-            const oEmailCtrl = sap.ui.getCore().byId("fpEmailId");
+            const oEmailCtrl = $C("fpEmailId");
             const isValid =
                 utils._LCvalidateMandatoryField(oEmailCtrl, "ID") &&
                 utils._LCvalidateEmail(oEmailCtrl, "ID");
@@ -4567,7 +4550,7 @@ sap.ui.define([
             vm.setProperty("/showOTPField", false);
             vm.setProperty("/isOtpEntered", false);
 
-            const otpCtrl = sap.ui.getCore().byId("signInOTP");
+            const otpCtrl = $C("signInOTP");
             otpCtrl?.setValue("");
             otpCtrl?.setEnabled(false);
             otpCtrl?.setValueState("None");
@@ -4661,7 +4644,7 @@ sap.ui.define([
                 this._FragmentDatePickersReadOnly(["adminDOB"]);
 
                 // 🔐 CACHE ORIGINAL DOC TYPES (ONCE)
-                const oDocType = sap.ui.getCore().byId("adminDocType");
+                const oDocType = $C("adminDocType");
                 this._adminDocTypeBackup = oDocType.getItems().map(i => ({
                     key: i.getKey(),
                     text: i.getText()
@@ -4674,7 +4657,7 @@ sap.ui.define([
 
             }
             // Set DOB limits - CHANGED: now 0 to 100 years (was 18 to 70)
-            const oDate = sap.ui.getCore().byId("adminDOB");
+            const oDate = $C("adminDOB");
             if (oDate) {
                 const now = new Date();
                 oDate.setMaxDate(now); // Allow up to current date (age 0)
@@ -4702,10 +4685,10 @@ sap.ui.define([
             const oStateModel = this.getView().getModel("StateModel");
             const oCityModel = this.getView().getModel("CityModel");
 
-            const oState = sap.ui.getCore().byId("adminsignUpState");
-            const oCity = sap.ui.getCore().byId("adminsignUpCity");
-            const oSTD = sap.ui.getCore().byId("adminsignUpSTD");
-            const oMobile = sap.ui.getCore().byId("adminMobileNo");
+            const oState = $C("adminsignUpState");
+            const oCity = $C("adminsignUpCity");
+            const oSTD = $C("adminsignUpSTD");
+            const oMobile = $C("adminMobileNo");
 
             // --- 1) SANITIZE TYPED COUNTRY TEXT ---
             const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
@@ -4789,8 +4772,8 @@ sap.ui.define([
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
 
-            const oCountry = sap.ui.getCore().byId("adminsignUpCountry");
-            const oCity = sap.ui.getCore().byId("adminsignUpCity");
+            const oCountry = $C("adminsignUpCountry");
+            const oCity = $C("adminsignUpCity");
             const oCityModel = this.getView().getModel("CityModel");
 
             // --- SANITIZE INPUT ---
@@ -4864,7 +4847,7 @@ sap.ui.define([
         ADMIN_onChangeSTD: function (oEvent) {
             const oSTD = oEvent.getSource();
             const sValue = (oSTD.getValue() || "").trim();
-            const oMobile = sap.ui.getCore().byId("adminMobileNo");
+            const oMobile = $C("adminMobileNo");
             const oModel = this.getView().getModel("AdminSignupModel");
 
             // Mandatory check
@@ -4904,7 +4887,7 @@ sap.ui.define([
             let val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
 
-            const oSTD = sap.ui.getCore().byId("adminsignUpSTD");
+            const oSTD = $C("adminsignUpSTD");
             const stdRaw = oSTD?.getValue() || "";
             const std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
 
@@ -5066,7 +5049,7 @@ sap.ui.define([
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
 
-                sap.m.MessageBox.success(
+                MessageBox.success(
                     "Thank you for signing up.\n\n" +
                     "The team will review all submitted details and documents. Once verification is finished, an email will be shared along with the user credentials.\n\n" +
                     "Please check your inbox (and spam folder) for further updates.",
@@ -5074,7 +5057,7 @@ sap.ui.define([
                         title: "Registration Submitted Successfully",
                         contentWidth: "500px", // Try adding this directly here
                         // styleClass: "myCustomMessageBoxSize",
-                        emphasizedAction: sap.m.MessageBox.Action.OK,
+                        emphasizedAction: MessageBox.Action.OK,
                         onClose: () => {
                             this._oAdminSignup.close();
                         }
@@ -5106,7 +5089,7 @@ sap.ui.define([
                     }
                 }
 
-                sap.m.MessageBox.error(sErrorMessage, {
+                MessageBox.error(sErrorMessage, {
                     title: "Registration Failed"
                 });
 
@@ -5116,8 +5099,8 @@ sap.ui.define([
         },
 
         onAdminFileSelect: function (oEvent) {
-            const oUploader = sap.ui.getCore().byId("adminFileUploader");
-            const oDocType = sap.ui.getCore().byId("adminDocType");
+            const oUploader = $C("adminFileUploader");
+            const oDocType = $C("adminDocType");
             const oModel = this.getView().getModel("AdminSignupModel");
 
             const file = oEvent.getParameter("files")?.[0];
@@ -5187,7 +5170,7 @@ sap.ui.define([
 
                 oModel.setProperty("/Documents", docs);
                 // ✅ CLEAR ERROR STATE HERE (this is what you asked)
-                const table = sap.ui.getCore().byId("adminAttachmentTable");
+                const table = $C("adminAttachmentTable");
                 table?.removeStyleClass("fileErrorHighlight");
 
                 // 🔥 Remove used document type from ComboBox
@@ -5278,7 +5261,7 @@ sap.ui.define([
             });
 
             // -------- RESTORE DOCUMENT TYPE DROPDOWN --------
-            const oDocType = sap.ui.getCore().byId("adminDocType");
+            const oDocType = $C("adminDocType");
 
             if (oDocType && this._adminDocTypeBackup) {
                 oDocType.removeAllItems();
@@ -5317,7 +5300,7 @@ sap.ui.define([
             const oAddress = C("adminAddress");
 
             const isValid =
-                utils._LCstrictValidationSelect(sap.ui.getCore().byId("adminSalutation"))
+                utils._LCstrictValidationSelect($C("adminSalutation"))
                 &&
                 utils._LCvalidateName(oName, "ID") &&
                 utils._LCvalidateMandatoryField(oDOB, "ID") &&
@@ -5353,7 +5336,7 @@ sap.ui.define([
         },
 
         _initAdminSignupModel: function () {
-            const oModel = new sap.ui.model.json.JSONModel({
+            const oModel = new JSONModel({
                 Salutation: "",
                 VendorName: "",
                 DOB: "",
@@ -5407,8 +5390,8 @@ sap.ui.define([
 
         onAdminDeleteDoc: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
-            const oDocType = sap.ui.getCore().byId("adminDocType");
-            const table = sap.ui.getCore().byId("adminAttachmentTable");
+            const oDocType = $C("adminDocType");
+            const table = $C("adminAttachmentTable");
             const oCtx = oEvent.getParameter("listItem").getBindingContext("AdminSignupModel");
             const doc = oCtx.getObject(); // ✅ define first
 
@@ -5438,7 +5421,7 @@ sap.ui.define([
         },
 
         onAdminDocTypeSelected: function () {
-            const uploader = sap.ui.getCore().byId("hiddenAdminUploader");
+            const uploader = $C("hiddenAdminUploader");
 
             if (uploader && uploader.openFileDialog) {
                 uploader.openFileDialog();   // <--- THIS opens Browse dialog
@@ -5474,7 +5457,7 @@ sap.ui.define([
                 ?.getObject();
 
             if (!oDoc || !oDoc.File) {
-                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
+                MessageBox.error(this.i18nModel.getText("nodocfound"));
                 return;
             }
 
@@ -5623,7 +5606,7 @@ sap.ui.define([
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
 
-            const oGender = sap.ui.getCore().byId("adminGender");
+            const oGender = $C("adminGender");
 
             // 🔥 Clear salutation error immediately
             oSalutation.setValueState("None");
@@ -5670,7 +5653,7 @@ sap.ui.define([
                 if (this._oRoomDetailFragment) {
                     oHostelModel = this._oRoomDetailFragment.getModel("HostelModel");
                 } else {
-                    oHostelModel = this.getView().getModel("HostelModel");
+                    oHostelModel = this.oHostelModel;
                 }
 
                 if (!oHostelModel) {
