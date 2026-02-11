@@ -179,7 +179,17 @@ sap.ui.define([
                         oNavCtx.setProperty("/BookingID", "");
                     } 
                     else {
-                        oCustomerCombo.setEditable(true);
+                    const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
+                    if (oNavCtx) {
+                        oNavCtx.setProperty("/CustomerID", "");
+                        oNavCtx.setProperty("/BookingID", "");
+                    }
+
+                    oCustomerCombo.setSelectedKey(null); // Also clear ComboBox UI state
+                    oBookingCombo.setSelectedKey(null);
+                    sap.ui.getCore().applyChanges();
+
+                    oCustomerCombo.setEditable(true);
                         await this.onSearch(); 
                     }
                     sap.ui.core.BusyIndicator.hide();
