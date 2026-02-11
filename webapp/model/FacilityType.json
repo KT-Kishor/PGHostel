@@ -1,50 +1,18 @@
 [
-    {
-        "ID": 1,
-        "FacilityName": "Wi-Fi"
-    },
-    {
-        "ID": 2,
-        "FacilityName": "Laundry"
-    },
-    {
-        "ID": 3,
-        "FacilityName": "CCTV Surveillance"
-    },
-    {
-        "ID": 4,
-        "FacilityName": "Housekeeping"
-    },
-    {
-        "ID": 5,
-        "FacilityName": "Gym"
-    },
-    {
-        "ID": 6,
-        "FacilityName": "Dining Area"
-    },
-    {
-        "ID": 7,
-        "FacilityName": "Water Purifier"
-    },
-    {
-        "ID": 8,
-        "FacilityName": "Parking"
-    },
-    {
-        "ID": 9,
-        "FacilityName": "24/7 Power Backup"
-    },
-    {
-        "ID": 10,
-        "FacilityName": "Study Room"
-    },
-    {
-        "ID": 11,
-        "FacilityName": "Locker Facilities"
-    },
-    {
-        "ID": 12,
-        "FacilityName": "Others"
-    }
+    { "ID": 1, "FacilityName": "High-Speed Wi-Fi (Premium Plan)" },
+    { "ID": 2, "FacilityName": "Laundry Service" },
+    { "ID": 3, "FacilityName": "Ironing Service" },
+    { "ID": 4, "FacilityName": "Housekeeping (Extra Cleaning)" },
+    { "ID": 5, "FacilityName": "Meals / Food Subscription" },
+    { "ID": 6, "FacilityName": "Gym Membership" },
+    { "ID": 7, "FacilityName": "Two-Wheeler Parking" },
+    { "ID": 8, "FacilityName": "Four-Wheeler Parking" },
+    { "ID": 9, "FacilityName": "Locker / Storage Facility" },
+    { "ID": 10, "FacilityName": "Power Backup (Extra Usage Charges)" },
+    { "ID": 11, "FacilityName": "Air Conditioner (AC Room Charges)" },
+    { "ID": 12, "FacilityName": "Room Heater (Winter Charges)" },
+    { "ID": 13, "FacilityName": "Television / OTT Subscription" },
+    { "ID": 14, "FacilityName": "Daily Drinking Water Supply" },
+    { "ID": 15, "FacilityName": "Study Room Access" },
+    { "ID": 16, "FacilityName": "Others" }
 ]

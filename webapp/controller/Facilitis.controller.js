@@ -304,10 +304,10 @@ sap.ui.define([
             }
 
             // File validation
-            var Attachment = oView.getModel("tokenModel").getData();
-            if (!Attachment.tokens || Attachment.tokens.length === 0) {
-                return sap.m.MessageToast.show(this.i18nModel.getText("uploadFile"));
-            }
+            // var Attachment = oView.getModel("tokenModel").getData();
+            // if (!Attachment.tokens || Attachment.tokens.length === 0) {
+            //     return sap.m.MessageToast.show(this.i18nModel.getText("uploadFile"));
+            // }
 
             //  Duplicate check
             var bDuplicate = aFacilitiesData.some(function(facility) {
@@ -323,10 +323,10 @@ sap.ui.define([
                 return;
             }
 
-            if (attachments.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
-                return;
-            }
+            // if (attachments.length === 0) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+            //     return;
+            // }
 
             if (attachments.length > 3) {
                 sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));

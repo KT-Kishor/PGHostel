@@ -269,10 +269,10 @@ sap.ui.define([
                 });
 
                 // Validation: at least one image required
-                if (uploadedImages.length === 0) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
-                    return;
-                }
+                // if (uploadedImages.length === 0) {
+                //     sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
+                //     return;
+                // }
 
                 // Validation: maximum 3 images
                 if (uploadedImages.length > 3) {

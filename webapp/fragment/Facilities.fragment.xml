@@ -166,10 +166,10 @@
                     change="onFacilityFileChange"
                     class="myUnifiedBtn"
                 />
-				<Text
+				<!-- <Text
                     text="*"
                     class="upload-star"
-                />
+                /> -->
 			</HBox>
 			<Table
                 id="id_AttachmentTable"
