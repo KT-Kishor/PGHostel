@@ -143,8 +143,15 @@ sap.ui.define([
         },
 
         onBookingCardPress: function (oEvent) {
+               var sCustomerID = oEvent
+        .getSource()
+        .getBindingContext("todayModel")
+        .getObject()
+        .CustomerID;
+
+    var sEncodedID = btoa(sCustomerID.toString());
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID),
+                sPath: encodeURIComponent(sEncodedID),
                 from: "Dashboard"
             });
         },
