@@ -84,15 +84,11 @@
 
                 <fb:FilterBar
                     id="D_id_FilterbarEmployee"
-                    persistencyKey="myPersKey"
                     useToolbar="false"
                     clear="D_onPressClear"
                     showClearOnFB="true"
                     search="onFilterGo"
                     filterChange="onFilterChange"
-                    afterVariantLoad="IA_.onAfterVariantLoad"
-                    showFilterConfiguration="false"
-                    filterContainerWidth="auto"
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
