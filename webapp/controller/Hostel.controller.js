@@ -189,6 +189,12 @@ sap.ui.define([
             const response = await this.ajaxReadWithJQuery("HM_Branch", "");
             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
         },
+        //    Branch: async function () {
+        //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+        //      this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+        //     const aData = response?.data || [];
+        //     return Array.isArray(aData) ? aData : [];
+        // },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
                 clearInterval(this._otpValidityInterval);

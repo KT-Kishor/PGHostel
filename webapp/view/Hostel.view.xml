@@ -224,12 +224,12 @@
                                                                         showClearIcon="true"
                                                                         busyIndicatorDelay="0"
                                                                         enabled="true"
-                                                                        items="{path:'CityModel>/',length:3000}"
+                                                                        items="{path:'sBRModel>/'}"
                                                                         selectionChange=".onBranchSelectionChange"
                                                                     >
                                                                         <core:ListItem
-                                                                            key="{CityModel>cityName}"
-                                                                            text="{CityModel>cityName}"
+                                                                            key="{sBRModel>cityName}"
+                                                                            text="{sBRModel>cityName}"
                                                                         />
                                                                     </ComboBox>
                                                                 </fb:control>
