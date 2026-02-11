@@ -950,7 +950,7 @@ _convertAmenities: function (list) {
             this.roomtype = false
 
             this.byId("idBedTypeFlex").setBusy(true);
-            this.byId("id_Branch").setBusy(true);
+            this.byId("id_Branch").setBusy(true).setValueState("None");;
             this.byId("id_Area").setBusy(true);
             this.byId("id_Roomtype").setBusy(true);
 
