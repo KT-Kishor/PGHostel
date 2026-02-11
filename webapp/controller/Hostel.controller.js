@@ -562,75 +562,105 @@ sap.ui.define([
             oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
         },
 
+       _convertFacilities: function (list) {
+    const defaultImages = {
+        "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+        "Laundry Service": "../image/Laundry Service.jpg",
+        "Ironing Service": "../image/Ironing Service.jpg",
+        "Housekeeping": "../image/Housekeeping.jpg",
+        "Meals / Food Subscription": "../image/Meals.jpg",
+        "Gym Membership": "../image/gym.jpg",
+        "Two-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+        "Four-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+        "Locker / Storage Facility": "../image/locker.jpg",
+        "Power Backup": "../image/Power Backup.jpeg",
+        "Air Conditioner": "../image/Air Conditioner.jpeg",
+        "Room Heater": "../image/Room Heater.jpeg",
+        "Study Room Access": "../image/Study Room.png",
+        "Others": "../image/defaultFacility.png"
+    };
 
+    return list
+        .map(f => {
 
-        _LoadFacilities: function (sBranchCode) {
-            if (!this._oRoomDetailFragment) return; // Safety check
+            // Price logic
+            let price = 0;
+            let unit = "";
 
-            if (!sBranchCode) return;
+            if (parseFloat(f.PerHourPrice) > 0) {
+                price = f.PerHourPrice;
+                unit = "Per Hour";
+            } else if (parseFloat(f.PerDayPrice) > 0) {
+                price = f.PerDayPrice;
+                unit = "Per Day";
+            } else if (parseFloat(f.PerMonthPrice) > 0) {
+                price = f.PerMonthPrice;
+                unit = "Per Month";
+            } else if (parseFloat(f.PerYearPrice) > 0) {
+                price = f.PerYearPrice;
+                unit = "Per Year";
+            } else {
+                return null; 
+            }
 
-            // 💡 FIX: Get the model from the view, not the fragment, to ensure it's always found.
-            const oFacilityModel = this.getView().getModel("FacilityModel");
-            if (!oFacilityModel) return;
-            oFacilityModel.setProperty("/loading", true);
-            this.ajaxReadWithJQuery("HM_Facilities", {
-                BranchCode: sBranchCode
-            })
-                .then((Response) => {
-                    const aFacilities = (Response && Response.data) ? Response.data : [];
+            const hasImage = !!(f.Photo1 && f.Photo1.trim());
+            const name = (f.Type || "").trim();
 
-                    const convert = (base64, type) => {
-                        if (!base64) {
-                            return sap.ui.require.toUrl("sap/ui/com/project1/image/no-image.png");
-                        }
-                        return `data:${type || "image/jpeg"};base64,${base64}`;
-                    };
+            return {
+                FacilityID: f.ID,
+                FacilityName: name,
+                Price: price,
+                UnitText: unit,
+                Currency: f.Currency || "INR",
 
-                    const formatted = aFacilities
-                        .map(f => {
-                            let price = 0;
-                            let unit = "";
+                Image: hasImage
+                    ? `data:${f.Photo1Type || "image/jpeg"};base64,${f.Photo1}`
+                    : defaultImages[name] || "../image/defaultFacility.png"
+            };
+        })
+        .filter(Boolean); // remove null
+},
+_LoadFacilities: async function (sBranchCode) {
 
-                            if (parseFloat(f.PerHourPrice) > 0) {
-                                price = f.PerHourPrice;
-                                unit = "Per Hour";
-                            }
-                            else if (parseFloat(f.PerDayPrice) > 0) {
-                                price = f.PerDayPrice;
-                                unit = "Per Day";
-                            }
-                            else if (parseFloat(f.PerMonthPrice) > 0) {
-                                price = f.PerMonthPrice;
-                                unit = "Per Month";
-                            }
-                            else if (parseFloat(f.PerYearPrice) > 0) {
-                                price = f.PerYearPrice;
-                                unit = "Per Year";
-                            }
-                            else {
-                                return null; // ❌ NO prices at all → drop facility
-                            }
+    if (!this._oRoomDetailFragment || !sBranchCode) return;
+    
+    const oFacilityModel = new JSONModel({
+        loading: true,
+        Facilities: [],
+        BranchCode: sBranchCode
+    });
+    this._oRoomDetailFragment.setModel(oFacilityModel, "FacilityModel");
 
-                            return {
-                                FacilityID: f.ID,
-                                FacilityName: f.FacilityName,
-                                Image: convert(f.Photo1, f.Photo1Type),
-                                Price: price,
-                                UnitText: unit,
-                                Currency: f.Currency
-                            };
-                        })
-                        .filter(Boolean);   // removes null entries (facilities with all prices = 0)
+    try {
+        let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
+        let allFacilities = resp?.data || [];
 
-                    oFacilityModel.setProperty("/Facilities", formatted);
-                    oFacilityModel.setProperty("/loading", false);
+        // Get static types
+        const oStaticModel = this.getView().getModel("FacilityType");
+        const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+        const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
 
-                    oFacilityModel.refresh(true);
-                })
-                .catch(err => {
-                    oFacilityModel.setProperty("/loading", false);
-                });
-        },
+        // Case-insensitive filter
+        const branchFacilities = allFacilities.filter(f => {
+            const fBranch = (f.BranchCode || "").trim();
+            const fNameLower = (f.Type || "").trim();
+            
+            const branchMatch = fBranch === sBranchCode.trim();
+            const typeMatch = validTypesLower.includes(fNameLower);
+            
+            return branchMatch && typeMatch;
+        });
+
+        if (branchFacilities.length > 0) {
+            oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));
+        } else {
+            oFacilityModel.setProperty("/Facilities", []);
+        }
+    } catch (err) {
+        console.error("❌ Facility load error:", err);
+    }
+    oFacilityModel.setProperty("/loading", false);
+},
 
 
         viewDetails: function (oEvent) {
@@ -671,8 +701,7 @@ sap.ui.define([
                 const oHostelModel = new JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
                 this.oHostelModel = oHostelModel;
-                console.log("HostelModel:", oHostelModel.getData());
-
+               
                 oView.setModel(new JSONModel({
                     loading: true,
                     Facilities: []
@@ -747,8 +776,7 @@ sap.ui.define([
 
 
         _LoadAmenities: async function (sBranchCode) {
-    console.log("🔍 Loading amenities for BranchCode:", sBranchCode || "N/A");  // Debug log
-    
+
     const oAmenityModel = new JSONModel({
         loading: true,
         Amenities: [],
@@ -770,22 +798,22 @@ sap.ui.define([
             validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
         );
 
-        console.log("📊 Found amenities for branch:", branchAmenities.length);
+     
 
         if (branchAmenities.length > 0) {
             oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchAmenities));
         } else {
-            console.warn("🚫 No matching amenities for BranchCode:", sBranchCode);
+       
             oAmenityModel.setProperty("/Amenities", []);
         }
     } catch (err) {
-        console.error("❌ Amenity load error:", err);
+        console.log("❌ Amenity load error:", err);
     }
     oAmenityModel.setProperty("/loading", false);
 },
 _convertAmenities: function (list) {
     const defaultImages = {
-        "Wi-Fi": "../image/WifiHostel.png",
+        "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
         "Bathrooms": "../image/Bathroom.jpg", 
         "Personal lockers": "../image/locker.jpg",
         "Communal spaces": "../image/CommonSpace.jpg",
@@ -2763,14 +2791,13 @@ _convertAmenities: function (list) {
                     oOtpCtrl.setValueState("None");
                     oOtpCtrl.setValueStateText("");
                     oOtpCtrl.focus();
-                    this._startOtpValidity();   // 🔥 10-minute validity starts HERE
+                    this._startOtpValidity();   //  10-minute validity starts HERE
                     this._startOtpResend(120) //120xx
                 }
                 else {
                     MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
                 }
             } catch (err) {
-                console.error("OTP Send Error:", err);
                  const sMsg =
                     err?.responseJSON?.message ||
                     this.i18nModel.getText("invalidCredentialsPleasetryagain");

@@ -204,7 +204,7 @@
                 </FlexBox>
                 <!-- Facilities Header -->
                 <VBox
-                    visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }"
+                  
                 >
                     <Bar
                         id="focus"

@@ -4576,48 +4576,6 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             );
             oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
 
-    //         // ============================
-    //         // CALCULATE ONCE (NON-DESTRUCTIVE)
-    //         // ============================
-    //         const grandTotal =
-    //             Number(oHostelModel.getProperty("/MonthlyCostPerPerson")) || 0;
-
-    //         const selectedMonths =
-    //             Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
-
-    //         const selectedPersons =
-    //             Number(oHostelModel.getProperty("/SelectedPerson")) ||
-    //             (oHostelModel.getProperty("/Persons") || []).length || 1;
-
-    //         // Sum of each person's monthly cost
-    //       const paymentType =
-    //     oHostelModel.getProperty("/SelectedPriceType");
-
-    // const aPersons =
-    //     oHostelModel.getProperty("/Persons") || [];
-
-    // let totalPersonsMonthly = 0;
-
-    // if (paymentType === "Per Day") {
-
-    //     totalPersonsMonthly = aPersons.reduce(
-    //         (s, p) => s + (Number(p.FinalTotalCost) || 0),
-    //         0
-    //     );
-
-    // } else {
-
-    //     totalPersonsMonthly = aPersons.reduce(
-    //         (s, p) => s + (Number(p.MonthlyCostPerPerson) || 0),
-    //         0
-    //     );
-    // }
-
-    // oHostelModel.setProperty(
-    //     "/PerMonthNoPerson",
-    //     Number(totalPersonsMonthly.toFixed(2))
-    // );
-
     // Default radio = PayOnCheckIn
     const oRadio = sap.ui.getCore().byId("idPaymentTypeGroup");
     if (oRadio) {
@@ -5319,13 +5277,11 @@ oHostelModel.setProperty(
                         PermanentAddress: oData.Address || "",
                         Booking: bookingData,
                         FacilityItems: facilityData,
-                        //  PaymentDetails: [paymentDetails]
                     }];
 
                     //  Final payload structure
                     const oPayload = personData;
                     var custid = bookingData[0].Customerid
-                    // --- AJAX CALL (Update to backend) ---
                     await this.ajaxUpdateWithJQuery("HM_Customer", {
                         data: oPayload,
                         filters: {
