@@ -204,7 +204,7 @@
                 </FlexBox>
                 <!-- Facilities Header -->
                 <VBox
-                  
+                   visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }"
                 >
                     <Bar
                         id="focus"
@@ -245,10 +245,8 @@
                         </items>
                     </HBox>
                 </VBox>
-                <VBox
-                
-                >
-                    <!-- <VBox visible="{= !${AmenityModel>/loading} && ${AmenityModel>/Amenities}.length > 0 }"> -->
+               
+                    <VBox visible="{= !${AmenityModel>/loading} &amp;&amp; ${AmenityModel>/Amenities}.length > 0 }">
                     <Bar
                         design="Header"
                         class="sapUiMediumMarginTop"

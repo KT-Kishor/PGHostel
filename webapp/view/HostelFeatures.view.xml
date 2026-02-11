@@ -117,11 +117,11 @@
                     <ColumnListItem>
                         <cells>
                             <Text text="{HostelFeatures>FacilityName}" />
+                            <Text text="{HostelFeatures>Type}" />
                             <ExpandableText
                                 text="{HostelFeatures>Description}"
                                 maxCharacters="20"
                             />
-                            <Text text="{HostelFeatures>Type}" />
                             <Button
                                 text="{i18n>view}"
                                 press="HF_viewroom"
