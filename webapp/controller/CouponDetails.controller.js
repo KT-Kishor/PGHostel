@@ -1192,7 +1192,7 @@ sap.ui.define([
                     StartDate: c.StartDate,
                     EndDate: c.EndDate,
                     MinOrderValue: c.MinOrderValue,
-                    // PerUserLimit: c.PerUserLimit,
+                    UptoValue: c.DiscountType === "Percentage" ? c.UptoValue : "", // 🔥 Added this
                     BranchName: c.BranchName
                 });
             });
@@ -1209,6 +1209,7 @@ sap.ui.define([
                         StartDate: c.StartDate,
                         EndDate: c.EndDate,
                         MinOrderValue: c.MinOrderValue,
+                        UptoValue: c.DiscountType === "Percentage" ? c.UptoValue : "", // 🔥 Added this
                         // PerUserLimit: c.PerUserLimit,
                         BranchName: c.BranchName
                     });
@@ -1438,19 +1439,24 @@ sap.ui.define([
             this._oSharePopover.openBy(oEvent.getSource());
         },
         _buildCouponShareMessage: function (oCoupon) {
-            const sBranchName =
-                this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
-
+            const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+
+            // 🔥 Check for Max Discount
+            let sMaxDiscountLine = "";
+            if (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue) {
+                sMaxDiscountLine = `💰 Max Discount: ${oCoupon.UptoValue}\n`;
+            }
 
             return (
                 `🎉 ${sBranchName} Special Deal! 🎊\n\n` +
                 `Don't miss out on this exclusive coupon 🎉\n\n` +
                 `🔑 Code: ${oCoupon.CouponCode}\n` +
                 `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
-                `💰 Min Order: ${oCoupon.MinOrderValue}\n\n` +
-                `Use this coupon during booking and save instantly 🙌\n\n` +
+                `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
+                sMaxDiscountLine + // 🔥 Inserted here
+                `\nUse this coupon during booking and save instantly 🙌\n\n` +
                 `Terms: \n` +
                 ` • New bookings only\n` +
                 ` • No other offers applicable\n\n` +
@@ -1468,11 +1474,14 @@ sap.ui.define([
 
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+            const sMaxDiscountText = (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue)
+                ? ` (Maximum discount up to ${oCoupon.UptoValue})`
+                : "";
 
             return (
                 `Dear Customer,\n\n` +
-                `We are pleased to share your coupon code with you.\n\n` +
-                `Coupon Code: ${oCoupon.CouponCode}\n\n` +
+                `We are pleased to share your coupon code: ${oCoupon.CouponCode}${sMaxDiscountText}\n\n` + // 🔥 Added here
+                // `Coupon Code: ${oCoupon.CouponCode}\n\n` +
                 `You can use this coupon during the booking creation process ` +
                 `to avail the applicable discount.\n` +
                 `Please ensure to enter the code correctly at the time of booking.\n\n` +
