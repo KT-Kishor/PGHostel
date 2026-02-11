@@ -135,8 +135,9 @@ sap.ui.define([
             var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
             var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
             var model = new sap.ui.model.json.JSONModel(aBranchData);
+    
             this.getOwnerComponent().setModel(model, "mainModel")
-        },
+        },  
 
         MD_onPressClear: function () {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
@@ -544,7 +545,6 @@ sap.ui.define([
 
         onHome: function () {
             this.CommonLogoutFunction();
-            this.getView().getModel("mainModel").setData({});
         },
 
         MD_onCancelButtonPress: function () {

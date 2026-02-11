@@ -186,7 +186,8 @@ sap.ui.define([
 
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
-
+            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
         },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -895,14 +896,6 @@ _convertAmenities: function (list) {
                 oWrapper.removeStyleClass("explore-enter");
             }, 1900);
         },
-
-        Branch: async function () {
-            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
-            const aData = response?.data || [];
-            return Array.isArray(aData) ? aData : [];
-        },
-
         onViewMoreRooms: async function () {
             // Load next page
             this.flag = false
