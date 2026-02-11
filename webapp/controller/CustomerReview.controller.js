@@ -65,17 +65,21 @@ sap.ui.define([
 
             const oDRS = this.byId("CR_id_BranchCode");
             const oRatingCB = this.byId("CR_id_Rating");
+            const oSortCB = this.byId("CR_id_Sort");   
 
             const dFrom = oDRS.getDateValue();
             const dTo = oDRS.getSecondDateValue();
             const sRating = oRatingCB.getSelectedKey();
+            const sSortKey = oSortCB.getSelectedKey(); 
+
             var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
 
             var filters = {
                 BedType: BedTypeName,
                 StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
                 EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
-                OverallRating: sRating || ""
+                OverallRating: sRating || "",
+                SortKey: sSortKey || ""   
             };
             if (oExistingModel.Role === "Admin" && aBranchCodes && BedTypeName==="") {
                 filters.BranchCode = aBranchCodes;
@@ -88,16 +92,15 @@ sap.ui.define([
             oBox.removeAllItems();
             sap.ui.core.BusyIndicator.show(0);
 
-            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function(oData) {
-                console.log("HM_Feedback response:", oData.commentData);
-                const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                that._aAllFeedbacks = aFeedbacks;
-                that._applyFilters();
-                sap.ui.core.BusyIndicator.hide();
-            }).catch(function() {
-                sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show("Failed to load customer reviews");
-            });
+            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
+                    const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+                    that._aAllFeedbacks = aFeedbacks;
+                    that._applyFilters();
+                    sap.ui.core.BusyIndicator.hide();
+                }).catch(function () {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show("Failed to load customer reviews");
+                });
         },
 
         onHome: function() {

@@ -82,6 +82,23 @@
                             </fb:control>
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
+                     <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="sort"
+                            label="Sort By"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <ComboBox id="CR_id_Sort">
+                                    <core:Item key="1" text="Highest to Lowest Rating" />
+                                    <core:Item key="2" text="Lowest to Highest Rating" />
+                                    <core:Item key="3" text="Latest Date" />
+                                    <core:Item key="4" text="Oldest Date" />
+                                </ComboBox>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
                 </fb:FilterBar>
                 <m:ScrollContainer
                     horizontal="false"
