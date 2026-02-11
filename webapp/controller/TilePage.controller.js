@@ -149,7 +149,7 @@ sap.ui.define([
                     horizontalScrolling: false,
                     content: [
                         new sap.m.Image({
-                            src: "image/u11.png",
+                            src: "image/Guide.jpg",
                             width: "100%",
                             height: "100%",
                             decorative: false,
