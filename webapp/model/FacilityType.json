@@ -11,8 +11,6 @@
     { "ID": 10, "FacilityName": "Power Backup (Extra Usage Charges)" },
     { "ID": 11, "FacilityName": "Air Conditioner (AC Room Charges)" },
     { "ID": 12, "FacilityName": "Room Heater (Winter Charges)" },
-    { "ID": 13, "FacilityName": "Television / OTT Subscription" },
-    { "ID": 14, "FacilityName": "Daily Drinking Water Supply" },
-    { "ID": 15, "FacilityName": "Study Room Access" },
-    { "ID": 16, "FacilityName": "Others" }
+    { "ID": 13, "FacilityName": "Study Room Access" },
+    { "ID": 14, "FacilityName": "Others" }
 ]
