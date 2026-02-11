@@ -249,47 +249,62 @@ sap.ui.define([
             const oView = this.getView();
 
             try {
-                // SHOW busy immediately
-                // BusyIndicator.show(0);
-
                 const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
                 const oBranch = oHostelModel.BranchCode;
 
-                const filter = {
-                    Brach: oBranch
-                };
-
-                const Response = await this.ajaxReadWithJQuery("HM_Facilities", filter);
-
+                const Response = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: oBranch });
                 const aFacilities = Response?.data || [];
 
-                // Helper: Base64 → Image URL
-                const convertBase64ToImage = (base64String, fileType) => {
-                    if (!base64String) {
-                        return "./image/Fallback.png";
-                    }
-
-                    let sBase64 = base64String.replace(/\s/g, "");
-
-                    try {
-                        if (!sBase64.startsWith("data:image")) {
-                            atob(sBase64.substring(0, 40)); // validate only
-                        }
-                    } catch (e) {
-                        console.warn("Invalid base64 image", e);
-                        return "./image/Fallback.png";
-                    }
-
-                    const mimeType = fileType || "image/jpeg";
-                    return sBase64.startsWith("data:image")
-                        ? sBase64
-                        : `data:${mimeType};base64,${sBase64}`;
+                //  Default images ONLY by Type
+                const defaultTypeImages = {
+                    "high-speed wi-fi": "./image/High-Speed Wi-Fi.jpg",
+                    "laundry service": "./image/Laundry Service.jpg",
+                    "ironing service": "./image/Ironing Service.jpg",
+                    "housekeeping": "./image/Housekeeping.jpg",
+                    "meals / food subscription": "./image/Meals.jpg",
+                    "gym membership": "./image/gym.jpg",
+                    "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
+                    "four-wheeler parking": "./image/Four-Wheeler Parking.jpg",
+                    "locker / storage facility": "./image/locker.jpg",
+                    "power backup": "./image/Power Backup.jpeg",
+                    "air conditioner": "./image/Air Conditioner.jpeg",
+                    "room heater": "./image/Room Heater.jpeg",
+                    "study room access": "./image/StudyRoom.png"
                 };
 
+                //Base64 Convert Logic
+                const convertBase64ToImage = (base64String, fileType, type) => {
+
+                    const typeKey = (type || "").toLowerCase().trim();
+                    const fallback = defaultTypeImages[typeKey] || "./image/Fallback.png";
+
+                    // Case 1️⃣ DB Image exists
+                    if (base64String && base64String.trim()) {
+                        let sBase64 = base64String.replace(/\s/g, "");
+
+                        try {
+                            if (!sBase64.startsWith("data:image")) {
+                                atob(sBase64.substring(0, 40)); // Validate base64
+                            }
+                        } catch (e) {
+                            console.warn("Invalid base64 image:", type);
+                            return fallback;
+                        }
+
+                        const mimeType = fileType || "image/jpeg";
+                        return `data:${mimeType};base64,${sBase64}`;
+                    }
+
+                    // Case 2️⃣ No image → Type default
+                    return fallback;
+                };
+
+                // Map Facilities
                 const aFinalFacilities = aFacilities.map(f => ({
                     FacilityID: f.ID,
                     FacilityName: f.FacilityName,
-                    Image: convertBase64ToImage(f.Photo1, f.Photo1Type),
+                    Type: f.Type,
+                    Image: convertBase64ToImage(f.Photo1, f.Photo1Type, f.Type),
                     PricePerHour: f.PerHourPrice,
                     PricePerDay: f.PerDayPrice,
                     PricePerMonth: f.PerMonthPrice,
@@ -299,22 +314,13 @@ sap.ui.define([
                     BranchCode: f.BranchCode
                 }));
 
-                const oFacilityModel = new JSONModel({
-                    Facilities: aFinalFacilities
-                });
+                oView.setModel(new sap.ui.model.json.JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
 
-                oView.setModel(oFacilityModel, "FacilityModel");
-
-            } catch (error) {
-                console.error("Failed to load facilities", error);
-                MessageBox.error("Unable to load facilities. Please try again.");
-
-            } finally {
-                //  ALWAYS hide busy
-                // BusyIndicator.hide();
+            } catch (err) {
+                console.error("Facility Load Error", err);
+                sap.m.MessageBox.error("Unable to load facilities.");
             }
-        }
-        ,
+        },
 
         onDialogClose: function () {
             this._oLoginAlertDialog.close()
