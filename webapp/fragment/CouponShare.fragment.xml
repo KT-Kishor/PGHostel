@@ -58,7 +58,7 @@
             />
         </ComboBox>
         <!-- Contact recipients -->
-        <Label text="{i18n>selectrecipients}" />
+        <Label text="{i18n>selectrecipients}" required="true" />
         <MultiComboBox
             selectionChange="onUserSelectionChange"
             valueStateText="{i18n>selectrecipients}"
@@ -76,14 +76,14 @@
             />
         </MultiComboBox>
         <!-- Manual email entry -->
-        <Label text="{i18n>addmail}" />
+        <!-- <Label text="{i18n>addmail}" />
         <Input
             id="inpManualEmail"
             width="100%"
             placeholder="{i18n>checkEmail}"
             liveChange="onManualEmailLiveChange"
             valueStateText="{i18n>checkEmail}"
-        />
+        /> -->
     </f:SimpleForm>
     <beginButton>
         <Button

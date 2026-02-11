@@ -1157,33 +1157,28 @@ sap.ui.define([
         },
 
         onConfirmShareCoupon: async function () {
-
             const oView = this.getView();
             const oRole = sap.ui.getCore().byId(oView.createId("cbRole"));
             const oMCB = sap.ui.getCore().byId(oView.createId("cbUser"));
-            const oMail = sap.ui.getCore().byId(oView.createId("inpManualEmail"));
 
+            // 1. Role Validation
             if (!utils._LCstrictValidationComboBox(oRole, "ID")) {
                 MessageToast.show(this.i18nModel.getText("pleaseselectvalidRole"));
                 return;
             }
 
-            const sEmails = oMail.getValue().trim();
-            if (sEmails && !utils._LCvalidateEmail(oMail, "ID")) {
-                MessageToast.show(this.i18nModel.getText("pleaseentervalidemailaddress"));
-                return;
-            }
-
-            const bHasRecipients = oMCB.getSelectedKeys().length > 0;
-            if (!bHasRecipients && !sEmails) {
-                MessageToast.show(this.i18nModel.getText("selectleastoneuserentermanualemail"));
+            // 2. Recipients Validation (Mandatory check)
+            const aSelectedKeys = oMCB.getSelectedKeys();
+            if (aSelectedKeys.length === 0) {
+                oMCB.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("selectleastoneuser"));
                 return;
             }
 
             const c = this._oCouponToShare;
             const aUsers = [];
 
-            // MultiComboBox selections
+            // MultiComboBox se users nikalna
             oMCB.getSelectedItems().forEach(item => {
                 aUsers.push({
                     UserName: item.getText(),
@@ -1192,48 +1187,19 @@ sap.ui.define([
                     StartDate: c.StartDate,
                     EndDate: c.EndDate,
                     MinOrderValue: c.MinOrderValue,
-                    UptoValue: c.DiscountType === "Percentage" ? c.UptoValue : "", // 🔥 Added this
+                    UptoValue: c.DiscountType === "Percentage" ? c.UptoValue : "",
+                    DiscountValue: c.DiscountType === "Fixed Amount" ? c.DiscountValue : "",
                     BranchName: c.BranchName
                 });
             });
 
-            // Manual emails
-            if (sEmails) {
-                sEmails.split(/[,;]+/).forEach(email => {
-                    email = email.trim();
-                    if (!email) return;
-                    aUsers.push({
-                        UserName: "Customer",
-                        toEmailID: email,
-                        COUPONNUMBER: c.CouponCode,
-                        StartDate: c.StartDate,
-                        EndDate: c.EndDate,
-                        MinOrderValue: c.MinOrderValue,
-                        UptoValue: c.DiscountType === "Percentage" ? c.UptoValue : "", // 🔥 Added this
-                        // PerUserLimit: c.PerUserLimit,
-                        BranchName: c.BranchName
-                    });
-                });
-            }
-
-            if (!aUsers.length) {
-                MessageToast.show(this.i18nModel.getText("novalidrecipientsfound"));
-                return;
-            }
-
             try {
                 sap.ui.core.BusyIndicator.show(0);
-
                 await this.ajaxCreateWithJQuery("CouponCodeEmail", { users: aUsers });
                 MessageToast.show(this.i18nModel.getText("couponsent"));
                 this._oShareDialog.close();
-
             } catch (err) {
-
-                sap.m.MessageBox.error(
-                    err?.responseJSON?.message || "Failed to send coupon."
-                );
-
+                sap.m.MessageBox.error(err?.responseJSON?.message || "Failed to send coupon.");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -1438,15 +1404,45 @@ sap.ui.define([
 
             this._oSharePopover.openBy(oEvent.getSource());
         },
+        // _buildCouponShareMessage: function (oCoupon) {
+        //     const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
+        //     const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
+        //     const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+
+        //     // 🔥 Check for Max Discount
+        //     let sMaxDiscountLine = "";
+        //     if (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue) {
+        //         sMaxDiscountLine = `💰 Max Discount: ${oCoupon.UptoValue}\n`;
+        //     }
+
+        //     return (
+        //         `🎉 ${sBranchName} Special Deal! 🎊\n\n` +
+        //         `Don't miss out on this exclusive coupon 🎉\n\n` +
+        //         `🔑 Code: ${oCoupon.CouponCode}\n` +
+        //         `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
+        //         `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
+        //         sMaxDiscountLine + // 🔥 Inserted here
+        //         `\nUse this coupon during booking and save instantly 🙌\n\n` +
+        //         `Terms: \n` +
+        //         ` • New bookings only\n` +
+        //         ` • No other offers applicable\n\n` +
+        //         `— ${sBranchName} Management`
+        //     );
+        // },
+
+
         _buildCouponShareMessage: function (oCoupon) {
             const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-            // 🔥 Check for Max Discount
-            let sMaxDiscountLine = "";
-            if (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue) {
-                sMaxDiscountLine = `💰 Max Discount: ${oCoupon.UptoValue}\n`;
+            // 🔥 Dynamic Discount Line Logic
+            let sDiscountDetailLine = "";
+            if (oCoupon.DiscountType === "Percentage") {
+                sDiscountDetailLine = oCoupon.UptoValue ? `💰 Max Discount: ${oCoupon.UptoValue}\n` : "";
+            } else {
+                // Fixed Amount ke liye direct value dikhayenge
+                sDiscountDetailLine = `💰 Discount Value: ${oCoupon.DiscountValue}\n`;
             }
 
             return (
@@ -1455,7 +1451,7 @@ sap.ui.define([
                 `🔑 Code: ${oCoupon.CouponCode}\n` +
                 `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
                 `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
-                sMaxDiscountLine + // 🔥 Inserted here
+                sDiscountDetailLine + // 🔥 Yahan dynamic line add hogi
                 `\nUse this coupon during booking and save instantly 🙌\n\n` +
                 `Terms: \n` +
                 ` • New bookings only\n` +
@@ -1463,25 +1459,23 @@ sap.ui.define([
                 `— ${sBranchName} Management`
             );
         },
-
-
-
-
-
         _buildCouponShareMessageEmail: function (oCoupon) {
-            const sBranchName =
-                this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
-
+            const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
-            const sMaxDiscountText = (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue)
-                ? ` (Maximum discount up to ${oCoupon.UptoValue})`
-                : "";
+
+            // 🔥 Dynamic Discount Text for Email body
+            let sOfferText = "";
+            if (oCoupon.DiscountType === "Percentage") {
+                sOfferText = oCoupon.UptoValue ? ` Maximum discount up to ${oCoupon.UptoValue}` : "";
+            } else {
+                sOfferText = ` Discount Value of ${oCoupon.DiscountValue}`;
+            }
 
             return (
                 `Dear Customer,\n\n` +
-                `We are pleased to share your coupon code: ${oCoupon.CouponCode}${sMaxDiscountText}\n\n` + // 🔥 Added here
-                // `Coupon Code: ${oCoupon.CouponCode}\n\n` +
+                `We are pleased to share with you the coupon code:  ${oCoupon.CouponCode}, with a ${sOfferText}\n\n` +
+                // `We are pleased to share you coupon code: ${oCoupon.CouponCode} and ${sOfferText}\n\n` + // 🔥 Updated logic
                 `You can use this coupon during the booking creation process ` +
                 `to avail the applicable discount.\n` +
                 `Please ensure to enter the code correctly at the time of booking.\n\n` +
@@ -1500,5 +1494,39 @@ sap.ui.define([
                 `${sBranchName} Management`
             );
         },
+
+
+        // _buildCouponShareMessageEmail: function (oCoupon) {
+        //     const sBranchName =
+        //         this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
+
+        //     const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
+        //     const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
+        //     const sMaxDiscountText = (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue)
+        //         ? ` (Maximum discount up to ${oCoupon.UptoValue})`
+        //         : "";
+
+        //     return (
+        //         `Dear Customer,\n\n` +
+        //         `We are pleased to share your coupon code: ${oCoupon.CouponCode}${sMaxDiscountText}\n\n` + // 🔥 Added here
+        //         // `Coupon Code: ${oCoupon.CouponCode}\n\n` +
+        //         `You can use this coupon during the booking creation process ` +
+        //         `to avail the applicable discount.\n` +
+        //         `Please ensure to enter the code correctly at the time of booking.\n\n` +
+
+        //         `If you have any questions or need support, feel free to contact us.\n\n` +
+
+        //         `Terms & Conditions\n` +
+        //         `This coupon code is valid from ${sStartDate} to ${sEndDate}.\n` +
+        //         `The coupon is applicable only for new bookings made during the validity period ` +
+        //         `and requires a minimum order value of ${oCoupon.MinOrderValue}.\n` +
+        //         `This coupon cannot be combined with any other offers or discounts.\n` +
+        //         `The company reserves the right to modify or cancel the coupon at any time.\n\n` +
+
+        //         `Thank you for choosing our service.\n\n` +
+        //         `Best regards,\n` +
+        //         `${sBranchName} Management`
+        //     );
+        // },
     }); 
 });
