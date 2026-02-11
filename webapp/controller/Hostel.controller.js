@@ -1111,6 +1111,41 @@ _convertAmenities: function (list) {
                     if (c) c.setEnabled(false);
                 });
 
+            // RESET SIGN-UP FIELDS
+            [
+                "signUpSalutation", "signUpName", "signUpEmail", "signUpPassword",
+                "signUpConfirmPassword", "signUpDOB", "signUpGender", "signUpCountry",
+                "signUpState", "signUpCity", "signUpSTD", "signUpPhone", "signUpAddress"
+            ].forEach(id => {
+                const ctrl = $C(id);
+                if (ctrl) {
+                    ctrl.setValueState("None");
+                    if (ctrl.setValue) ctrl.setValue("");
+                    if (ctrl.setSelectedKey) ctrl.setSelectedKey("");
+                }
+            });
+
+            // Also reset the model for signup
+            const oLoginModeModel = this.getView().getModel("LoginMode");
+            if (oLoginModeModel) {
+                oLoginModeModel.setData({
+                    Salutation: "",
+                    fullname: "",
+                    Email: "",
+                    STDCode: "",
+                    Mobileno: "",
+                    password: "",
+                    comfirmpass: "",
+                    UserID: "",
+                    Gender: "",
+                    Country: "",
+                    State: "",
+                    City: "",
+                    Address: "",
+                    DateOfBirth: ""
+                });
+            }
+
             // PANELS
             $C("signInPanel")?.setVisible(true);
             $C("signUpPanel")?.setVisible(false);
@@ -1322,7 +1357,7 @@ _convertAmenities: function (list) {
                 const sUsername = data.fullname.trim();
                 const Salutation = C("signUpSalutation").getSelectedItem().getText();
                 const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
-                    "Your account has been created successfully. You will receive an email shortly with your login credentials.";
+                    "Your account has been created successfully";
 
                 const sPassword = data.password;
                 const oCtrl = this;   // 👈 REQUIRED
@@ -1381,14 +1416,9 @@ _convertAmenities: function (list) {
 
         _triggerBrowserSaveCredentials: function (username, password) {
             const form = document.createElement("form");
-            form.method = "POST";
-            form.action = window.location.href;
+            form.style.display = "none";
 
-            // Off-screen, not hidden
-            form.style.position = "absolute";
-            form.style.top = "-2000px";
-            form.style.opacity = "0.01";
-
+            // 2. Username input
             const u = document.createElement("input");
             u.type = "text";
             u.name = "username";
@@ -1398,13 +1428,23 @@ _convertAmenities: function (list) {
             const p = document.createElement("input");
             p.type = "password";
             p.name = "password";
-            p.autocomplete = "new-password";
+            p.autocomplete = "current-password";
             p.value = password;
 
             form.append(u, p);
             document.body.appendChild(form);
-            form.submit();
-            setTimeout(() => form.remove(), 300);
+
+            if (window.fetch) {
+                fetch(window.location.href, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: new FormData(form)
+                }).catch(() => {
+                });
+            }
+
+            // 5. Cleanup
+            setTimeout(() => form.remove(), 500);
         },
 
         onChangeState: function (oEvent) {
