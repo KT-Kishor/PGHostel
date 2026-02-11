@@ -5017,7 +5017,20 @@ oHostelModel.setProperty(
                                     onClose: function () {
                                         oModel.setProperty("/CouponCode", "")
                                         // Continue navigation after warning
-                                        this._navigateAfterBooking();
+                                        if(isLoggedIn){
+                                           this._navigateAfterBooking();
+                                        }
+                                         this.resetAllBookingData();
+
+                //  RESET DYNAMIC UI FLAGS
+                this._isPersonUIInitialized = false;
+                this._mustRecreatePersonUI = true;
+                this._lastPersonCount = null;
+                this._iSelectedStepIndex = 0;
+                this._oSelectedStep = null;
+                 var oRoute = this.getOwnerComponent().getRouter();
+            oRoute.navTo("RouteHostel");
+                                       
                                     }.bind(this)
                                 }
                             );
