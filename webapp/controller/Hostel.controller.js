@@ -923,7 +923,7 @@ _convertAmenities: function (list) {
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                const oModelData = await this.Branch();
+                var oModelData=this.getOwnerComponent().getModel("sBRModel").getData();
                 this._populateUniqueFilterValues(oModelData)
 
                 const sCity = this.City ? this.City : oModelData[0].City;
