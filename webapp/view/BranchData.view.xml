@@ -134,15 +134,6 @@
                             tooltip="{i18n>address}"
                         />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>GeoLocation}"
-                            tooltip="{i18n>GeoLocation}"
-                        />
-                    </Column>
 
                     <Column
                         demandPopin="true"
@@ -210,8 +201,10 @@
                         <cells>
                             <Text text="{mainModel>BranchID}" />
                             <Text text="{mainModel>Name}" />
-                            <Text text="{mainModel>Address}" />
-                            <ExpandableText text="{mainModel>GeoLocation}" maxCharacters="20"/>
+                            <ExpandableText
+                                text="{mainModel>Address}"
+                                maxCharacters="20"
+                            />
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <Text text="{mainModel>Country}" />
@@ -230,7 +223,7 @@
             </Table>
         </content>
         <footer>
-         <core:Fragment
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />

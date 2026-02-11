@@ -89,6 +89,7 @@
                     showClearOnFB="true"
                     search="onFilterGo"
                     filterChange="onFilterChange"
+                    showFilterConfiguration="false"
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
