@@ -57,7 +57,10 @@
                             visibleInFilterBar="true"
                         >
                             <fb:control>
-                                <ComboBox id="CR_id_Rating">
+                                <ComboBox
+                                    id="CR_id_Rating"
+                                    showClearIcon="true"
+                                >
                                     <core:Item
                                         key="1"
                                         text="1 Star"
@@ -90,7 +93,10 @@
                             visibleInFilterBar="true"
                         >
                             <fb:control>
-                                <ComboBox id="CR_id_Sort">
+                                <ComboBox
+                                    id="CR_id_Sort"
+                                    showClearIcon="true"
+                                >
                                     <core:Item
                                         key="1"
                                         text="Highest to Lowest Rating"

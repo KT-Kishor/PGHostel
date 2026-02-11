@@ -106,8 +106,11 @@ sap.ui.define([
         },
 
         onHome: function () {
+            const oBox = this.byId("CR_id_ReviewContainer");
             this.CommonLogoutFunction();
             this.getOwnerComponent().getModel("SelectedBedType").setData("");
+            oBox.removeAllItems();
+            this._aAllFeedbacks = [];
         },
 
         onNavBack: function () {
@@ -178,7 +181,7 @@ sap.ui.define([
                         AmenitiesRating: Number(f.AmenitiesRating),
                         StaffRating: Number(f.StaffRating),
                         ValueRating: Number(f.ValueRating),
-                        Comments: f.Comments || "/* NO COMMENTS PROVIDED */",
+                        Comments: f.Comments || "NO COMMENTS PROVIDED",
                         FeedbackDate: this.Formatter.formatDate(f.FeedbackDate),
                         BranchName: this._getBranchName(f.BranchCode)
                     },
