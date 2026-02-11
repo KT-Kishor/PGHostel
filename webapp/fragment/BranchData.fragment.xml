@@ -57,13 +57,13 @@
                     valueStateText="{i18n>enterAddress}"
                 />
               
-              <Label text="GeoLocation" required="true" />
+              <Label text="{i18n>MapLink}" required="true" />
 <Input 
     id="BD_idGeoLocation" 
     value="{MDmodel>/GeoLocation}" 
-    placeholder="Enter your GeoLocation Link" 
+    placeholder="{i18n>GL_placeHolder}" 
     liveChange="onGeoLocationLiveChange"
-    valueStateText="Paste your GeoLocation Link"
+    valueStateText="{i18n>GL_error}"
 />
                 <Label
                     text="{i18n>pinCode}"

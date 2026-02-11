@@ -139,8 +139,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="GeoLocation"
-                            tooltip="Geo Location"
+                            text="{i18n>GeoLocation}"
+                            tooltip="{i18n>GeoLocation}"
                         />
                     </Column>
 
@@ -211,7 +211,7 @@
                             <Text text="{mainModel>BranchID}" />
                             <Text text="{mainModel>Name}" />
                             <Text text="{mainModel>Address}" />
-                            <Text text="{mainModel>GeoLocation}" />
+                            <ExpandableText text="{mainModel>GeoLocation}" maxCharacters="20"/>
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <Text text="{mainModel>Country}" />
