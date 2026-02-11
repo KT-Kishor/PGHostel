@@ -123,6 +123,11 @@ sap.ui.define([
                     minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
+                oView.setModel(new JSONModel({
+                    AllReceivedAmount: 0,
+                    AllDueAmount: 0
+                }), "InvoicePayment");
+
                 var SowDataModel = new JSONModel({
                     items: []
                 });
@@ -1519,10 +1524,9 @@ sap.ui.define([
                         this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
-                        this.Readcall("HM_ManageInvoice", {
-                            InvNo: this.decodedPath
-                        });
-
+                        // this.Readcall("HM_ManageInvoice", {
+                        //     InvNo: this.decodedPath
+                        // });
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
                         this.visiablityPlay.setProperty("/MultiEmail", hasDue);

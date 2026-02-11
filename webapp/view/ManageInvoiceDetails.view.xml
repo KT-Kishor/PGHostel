@@ -798,17 +798,14 @@
 											</m:HBox>
 											<!-- Received Amount -->
 											<m:HBox
-                                                justifyContent="SpaceBetween"
-                                                visible="{=
-                                                    (
-                                                        ${SelectedCustomerModel>/Status} === 'Payment Received' ||
-                                                        ${SelectedCustomerModel>/Status} === 'Payment Partially'
-                                                    )
-                                                    &amp;&amp; (
-                                                        Number(${SelectedCustomerModel>/TotalAmount}) !==
-                                                        Number(${SelectedCustomerModel>/PaidAmount})
-                                                    )
-                                                }"
+                                                    justifyContent="SpaceBetween"
+                                                    visible="{=
+                                                        (
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Received' ||
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Partially'
+                                                        ) &amp;&amp;
+                                                        Number(${InvoicePayment>/AllReceivedAmount}) > 0
+                                                    }"
                                             >
 												<m:Label
                                                     text="{i18n>invoiceReceivedAmount} ({FilteredSOWModel>/Currency}) :"
@@ -824,15 +821,12 @@
 											<m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{=
-                                                    (
-                                                        ${SelectedCustomerModel>/Status} === 'Payment Received' ||
-                                                        ${SelectedCustomerModel>/Status} === 'Payment Partially'
-                                                    )
-                                                    &amp;&amp; (
-                                                        Number(${SelectedCustomerModel>/TotalAmount}) !==
-                                                        Number(${SelectedCustomerModel>/PaidAmount})
-                                                    )
-                                                }"
+                                                        (
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Received' ||
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Partially'
+                                                        ) &amp;&amp;
+                                                        Number(${InvoicePayment>/AllDueAmount}) > 0
+                                                    }"
                                             >
 												<m:Label
                                                     text="{i18n>invoiceDueAmount} ({FilteredSOWModel>/Currency}) :"
