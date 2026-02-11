@@ -96,6 +96,12 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
+                            text="{i18n>type}"
+                            tooltip="{i18n>type}"
+                        />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text
                             text="{i18n>description}"
                             tooltip="{i18n>description}"
                         />
@@ -115,6 +121,7 @@
                                 text="{HostelFeatures>Description}"
                                 maxCharacters="20"
                             />
+                            <Text text="{HostelFeatures>Type}" />
                             <Button
                                 text="{i18n>view}"
                                 press="HF_viewroom"

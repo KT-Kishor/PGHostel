@@ -186,7 +186,7 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_BranchCode")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_FacilityName")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId(           "HFF_id_Amenities")), "ID") && 
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_Amenities")), "ID") && 
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_Description")), "ID")
             );
 
@@ -501,7 +501,7 @@ sap.ui.define([
         },
         onAmenitieTypeChange: function(oEvent) {
             var oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
+            utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
     });
