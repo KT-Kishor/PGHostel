@@ -58,31 +58,31 @@
                         >
                             <fb:control>
                                 <ComboBox id="CR_id_Rating">
-                                <core:Item
-                                    key="1"
-                                    text="1 Star"
-                                />
-                                <core:Item
-                                    key="2"
-                                    text="2 Stars"
-                                />
-                                <core:Item
-                                    key="3"
-                                    text="3 Stars"
-                                />
-                                <core:Item
-                                    key="4"
-                                    text="4 Stars"
-                                />
-                                <core:Item
-                                    key="5"
-                                    text="5 Stars"
-                                />
+                                    <core:Item
+                                        key="1"
+                                        text="1 Star"
+                                    />
+                                    <core:Item
+                                        key="2"
+                                        text="2 Stars"
+                                    />
+                                    <core:Item
+                                        key="3"
+                                        text="3 Stars"
+                                    />
+                                    <core:Item
+                                        key="4"
+                                        text="4 Stars"
+                                    />
+                                    <core:Item
+                                        key="5"
+                                        text="5 Stars"
+                                    />
                                 </ComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
-                     <fb:filterGroupItems>
+                    <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="sort"
                             label="Sort By"
@@ -91,10 +91,22 @@
                         >
                             <fb:control>
                                 <ComboBox id="CR_id_Sort">
-                                    <core:Item key="1" text="Highest to Lowest Rating" />
-                                    <core:Item key="2" text="Lowest to Highest Rating" />
-                                    <core:Item key="3" text="Latest Date" />
-                                    <core:Item key="4" text="Oldest Date" />
+                                    <core:Item
+                                        key="1"
+                                        text="Highest to Lowest Rating"
+                                    />
+                                    <core:Item
+                                        key="2"
+                                        text="Lowest to Highest Rating"
+                                    />
+                                    <core:Item
+                                        key="3"
+                                        text="Latest Date"
+                                    />
+                                    <core:Item
+                                        key="4"
+                                        text="Oldest Date"
+                                    />
                                 </ComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
@@ -105,12 +117,9 @@
                     vertical="true"
                     class="sapUiResponsiveContentPadding"
                 >
-                    <m:FlexBox
+                    <m:VBox
                         id="CR_id_ReviewContainer"
-                        direction="Row"
-                        wrap="Wrap"
-                        alignItems="Start"
-                        class="reviewFlex"
+                        class="reviewGrid"
                     />
                 </m:ScrollContainer>
             </VBox>

@@ -4310,17 +4310,11 @@ height:140px;
     height: 100% !important;
     display: block;
 }
-
-.reviewFlex {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-.sapFAvatarXL {
+/* .sapFAvatarXL {
     height: 10rem;
     width: 10rem;
     font-size: 3rem;
-}
+} */
 .customLinkWhiteBg,
 .customLinkWhiteBg:active,
 .customLinkWhiteBg:focus,
@@ -4329,45 +4323,6 @@ height:140px;
     color:#0070c9;
     background: white;
 }
-
-/* .reviewFlex {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-} */
-
-/* .reviewFlex .sapUiIntegrationCard {
-  width: 320px;
-  min-height: 420px;
-  display: flex;
-}
-
-.reviewFlex .sapUiIntegrationCardContent {
-  flex: 1;
-} */
-
-/* ===== Review Grid ===== */
-/* .reviewFlex {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.25rem;
-  align-items: stretch;
-} */
-
-/* ===== Card Base ===== */
-/* .sapFCard {
-  border-radius: 14px !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
-  background: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-} */
-
-/* .sapFCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.12) !important;
-} */
-
-/* ===== Card Header ===== */
  .sapFCardHeader {
   background: linear-gradient(135deg, #0aa6b5, #0d8fa3);
   color: #fff;
@@ -4404,152 +4359,19 @@ height:140px;
   opacity: 0.9;
 }
 
-/* ===== Ratings Section ===== */
-/* .reviewRatings {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-} */
+/* Make all card labels bold */
+.sapFCardContent .sapMLabel {
+  font-weight: 700 !important;
+  color: #1f2937; /* optional: darker for better emphasis */
+}
+.sapFCardContent .sapUiFormLabel {
+  font-weight: 700 !important;
+}
 
-/* ===== Labels ===== */
-/* .reviewLabel {
+.sapFCardContent .sapMLabel {
+  font-weight: 700 !important;
   font-size: 0.75rem;
-  color: #6b7280;
-  margin-bottom: 2px;
-} */
-
-/* ===== Comments Box ===== */
-/* .reviewComments {
-  background: #f8fafc;
-  border-left: 4px solid #0aa6b5;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #374151;
-  max-height: 120px;
-  overflow-y: auto;
-  line-height: 1.4;
-} */
-
-/* ===== Date ===== */
-/* .reviewDate {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  text-align: right;
-  margin-top: 0.5rem;
-} */
-
-/* ===== Mobile Tweaks ===== */
-/* @media (max-width: 600px) {
-  .reviewFlex {
-    grid-template-columns: 1fr;
-  }
-} */
-
-/* ===== Force equal card body layout ===== */
-/* .sapFCardContent {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-} */
-
-/* ===== Customer Comments Scroll Area ===== */
-/* .sapFCard .sapUiForm .sapUiFormElement:last-of-type .sapMText {
-  max-height: 120px;
-  overflow-y: auto;
-  background: #f8fafc;
-  border-left: 4px solid #0aa6b5;
-  padding: 0.75rem;
-  border-radius: 8px;
-  line-height: 1.45;
-} */
-
-/* ===== Feedback Date Footer ===== */
-/* .sapFCard .sapUiForm .sapUiFormElement:last-child {
-  margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
-} */
-
-/* .sapFCard .sapMText::-webkit-scrollbar {
-  width: 6px;
-}
-.sapFCard .sapMText::-webkit-scrollbar-thumb {
-  background: #0aa6b5;
-  border-radius: 6px;
-} */
-
-/* ===== Card content layout ===== */
-/* .sapFCardContent {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-} */
-
-/* ===== Form container should stretch ===== */
-/* .sapFCardContent .sapUiForm {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-} */
-
-/* ===== COMMENTS: detect by label text ===== */
-/* .sapFCardContent
-.sapUiFormElement:has(.sapMLabel:contains("Customer Comments"))
-.sapMText {
-  max-height: 120px;
-  overflow-y: auto;
-  background: #f8fafc;
-  border-left: 4px solid #0aa6b5;
-  padding: 0.75rem;
-  border-radius: 8px;
-  line-height: 1.45;
-} */
-
-/* ===== DATE: force footer position ===== */
-/* .sapFCardContent
-.sapUiFormElement:has(.sapMLabel:contains("Feedback Date")) {
-  margin-top: auto;
-  padding-top: 0.6rem;
-  border-top: 1px solid #e5e7eb;
-} */
-
-/* ===== Scrollbar polish ===== */
-/* .sapFCardContent .sapMText::-webkit-scrollbar {
-  width: 6px;
-}
-.sapFCardContent .sapMText::-webkit-scrollbar-thumb {
-  background: #0aa6b5;
-  border-radius: 6px;
-} */
-
-/* ===== Twitter / Pinterest masonry layout ===== */
-.reviewFlex {
-  column-count: 3;
-  column-gap: 1.25rem;
-}
-
-/* Each card flows naturally */
-.reviewFlex .sapFCard {
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 1.25rem;
-  break-inside: avoid;
-}
-
-/* Tablet */
-@media (max-width: 1024px) {
-  .reviewFlex {
-    column-count: 2;
-  }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .reviewFlex {
-    column-count: 1;
-  }
+  letter-spacing: 0.02em;
 }
 
 /* Compact ratings block */
@@ -4575,4 +4397,40 @@ height:140px;
 
 .sapFCardContent .sapMText {
   line-height: 1.45;
+}
+
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Make cards full width inside grid cell */
+.reviewGrid .sapFCard {
+  width: 100% !important;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Stretch content inside */
+.reviewGrid .sapFCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fix comments height */
+.sapFCardContent .sapUiFormElement:last-child .sapMText {
+  min-height: 80px;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix long names */
+.sapFCardHeader .sapFCardTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

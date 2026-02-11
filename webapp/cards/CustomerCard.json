@@ -6,24 +6,44 @@
   "sap.card": {
     "type": "Object",
     "header": {
-  "title": "{parameters>/CustomerName/value}",
-  "subTitle": "{parameters>/BedType/value}",
-  "status": {
-    "text": "{parameters>/BranchName/value}"
-  }
-},
+      "title": "{parameters>/CustomerName/value}",
+      "subTitle": "{parameters>/BedType/value}",
+      "status": {
+        "text": "{parameters>/BranchName/value}"
+      }
+    },
     "configuration": {
       "parameters": {
-        "CustomerName": { "type": "string" },
-        "BedType": { "type": "string" },
-        "BranchName": { "type": "string" },
-        "OverallRating": { "type": "number" },
-        "CleanlinessRating": { "type": "number" },
-        "AmenitiesRating": { "type": "number" },
-        "StaffRating": { "type": "number" },
-        "ValueRating": { "type": "number" },
-        "Comments": { "type": "string" },
-        "FeedbackDate": { "type": "string" }
+        "CustomerName": {
+          "type": "string"
+        },
+        "BedType": {
+          "type": "string"
+        },
+        "BranchName": {
+          "type": "string"
+        },
+        "OverallRating": {
+          "type": "number"
+        },
+        "CleanlinessRating": {
+          "type": "number"
+        },
+        "AmenitiesRating": {
+          "type": "number"
+        },
+        "StaffRating": {
+          "type": "number"
+        },
+        "ValueRating": {
+          "type": "number"
+        },
+        "Comments": {
+          "type": "string"
+        },
+        "FeedbackDate": {
+          "type": "string"
+        }
       }
     },
     "content": {
@@ -36,25 +56,25 @@
               "value": "{parameters>/OverallRating/value}",
               "maxValue": 5
             },
-             {
+            {
               "label": "Room Cleanliness",
               "type": "RatingIndicator",
               "value": "{parameters>/CleanlinessRating/value}",
               "maxValue": 5
             },
-             {
+            {
               "label": "Amenities & Facilities",
               "type": "RatingIndicator",
               "value": "{parameters>/AmenitiesRating/value}",
               "maxValue": 5
             },
-             {
+            {
               "label": "Staff Service",
               "type": "RatingIndicator",
               "value": "{parameters>/StaffRating/value}",
               "maxValue": 5
             },
-              {
+            {
               "label": "Value for Money",
               "type": "RatingIndicator",
               "value": "{parameters>/ValueRating/value}",
@@ -66,7 +86,7 @@
             },
             {
               "label": "Comments",
-              "value": "{parameters>/Comments/value}"
+              "value": "{= ${parameters>/Comments/value} ? ${parameters>/Comments/value} : 'No comments provided'}"
             }
           ]
         }

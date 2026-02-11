@@ -1,35 +1,35 @@
 sap.ui.define([
     "./BaseController",
     "../model/formatter"
-], function(BaseController, Formatter) {
+], function (BaseController, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.CustomerReview", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteCustomerReview").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            var data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+            this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             // await this._loadCustomerReviews(data);
             // this.commonLoginFunction();
             this._setDefaultDateRange();
             sap.ui.core.BusyIndicator.show(0);
             await this._loadCustomers();
             await this._buildBranchMap();
-            await this._loadCustomerReviews(data);
+            await this._loadCustomerReviews();
         },
 
-        _getBranchName: function(sBranchCode) {
+        _getBranchName: function (sBranchCode) {
             return this._mBranchMap?.[sBranchCode] || sBranchCode || "N/A";
         },
 
-        _getCustomerName: function(sCustomerID) {
+        _getCustomerName: function (sCustomerID) {
             return this._mCustomerMap?.[sCustomerID] || sCustomerID || "N/A";
         },
 
-        getBranch: async function() {
+        getBranch: async function () {
             const oComponent = this.getOwnerComponent();
             let oBRModel = oComponent.getModel("sBRModel");
 
@@ -41,7 +41,7 @@ sap.ui.define([
             return Array.isArray(aData) ? aData : [];
         },
 
-        _buildBranchMap: async function() {
+        _buildBranchMap: async function () {
             const aBranches = await this.getBranch();
             const mBranchMap = {};
 
@@ -52,7 +52,8 @@ sap.ui.define([
             this._mBranchMap = mBranchMap;
         },
 
-        _loadCustomerReviews: function(data) {
+        _loadCustomerReviews: function () {
+            var data = this.data;
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -65,12 +66,12 @@ sap.ui.define([
 
             const oDRS = this.byId("CR_id_BranchCode");
             const oRatingCB = this.byId("CR_id_Rating");
-            const oSortCB = this.byId("CR_id_Sort");   
+            const oSortCB = this.byId("CR_id_Sort");
 
             const dFrom = oDRS.getDateValue();
             const dTo = oDRS.getSecondDateValue();
             const sRating = oRatingCB.getSelectedKey();
-            const sSortKey = oSortCB.getSelectedKey(); 
+            const sSortKey = oSortCB.getSelectedKey();
 
             var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
 
@@ -79,9 +80,9 @@ sap.ui.define([
                 StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
                 EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
                 OverallRating: sRating || "",
-                SortKey: sSortKey || ""   
+                SortKey: sSortKey || ""
             };
-            if (oExistingModel.Role === "Admin" && aBranchCodes && BedTypeName==="") {
+            if (oExistingModel.Role === "Admin" && aBranchCodes && BedTypeName === "") {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
@@ -93,23 +94,24 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
-                    const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                    that._aAllFeedbacks = aFeedbacks;
-                    that._applyFilters();
-                    sap.ui.core.BusyIndicator.hide();
-                }).catch(function () {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show("Failed to load customer reviews");
-                });
+                const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+
+                that._aAllFeedbacks = aFeedbacks;
+                that._applyFilters();
+                sap.ui.core.BusyIndicator.hide();
+            }).catch(function () {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show("Failed to load customer reviews");
+            });
         },
 
-        onHome: function() {
+        onHome: function () {
             this.CommonLogoutFunction();
-            this.getOwnerComponent().getModel("SelectedBedType").setData("")
-
+            this.getOwnerComponent().getModel("SelectedBedType").setData("");
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
+            const oBox = this.byId("CR_id_ReviewContainer");
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
             if (sRole === "Admin") {
@@ -118,33 +120,28 @@ sap.ui.define([
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
                 this.getOwnerComponent().getModel("SelectedBedType").setData("")
             }
+            oBox.removeAllItems();
+            this._aAllFeedbacks = [];
         },
 
-        _sortFeedbacksDefault: function(aData) {
+        _sortFeedbacksDefault: function (aData) {
             if (!Array.isArray(aData)) {
                 return aData;
             }
-
             return [...aData].sort((a, b) => {
-                const dateDiff =
-                    new Date(b.FeedbackDate) - new Date(a.FeedbackDate);
-
+                const dateDiff = new Date(b.FeedbackDate) - new Date(a.FeedbackDate);
                 if (dateDiff !== 0) {
                     return dateDiff;
                 }
-
-                const ratingDiff =
-                    Number(b.OverallRating) - Number(a.OverallRating);
-
+                const ratingDiff = Number(b.OverallRating) - Number(a.OverallRating);
                 if (ratingDiff !== 0) {
                     return ratingDiff;
                 }
-
                 return 0;
             });
         },
 
-        _loadCustomers: function() {
+        _loadCustomers: function () {
             return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
                 const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
                 const mCustomerMap = {};
@@ -157,7 +154,7 @@ sap.ui.define([
             });
         },
 
-        _setDefaultDateRange: function() {
+        _setDefaultDateRange: function () {
             const oDRS = this.byId("CR_id_BranchCode");
             const oToday = new Date();
             const oFrom = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
@@ -166,7 +163,7 @@ sap.ui.define([
             oDRS.setSecondDateValue(oTo);
         },
 
-        _applyFilters: function() {
+        _applyFilters: function () {
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             let aFiltered = this._aAllFeedbacks || [];
@@ -181,7 +178,7 @@ sap.ui.define([
                         AmenitiesRating: Number(f.AmenitiesRating),
                         StaffRating: Number(f.StaffRating),
                         ValueRating: Number(f.ValueRating),
-                        Comments: f.Comments,
+                        Comments: f.Comments || "/* NO COMMENTS PROVIDED */",
                         FeedbackDate: this.Formatter.formatDate(f.FeedbackDate),
                         BranchName: this._getBranchName(f.BranchCode)
                     },
@@ -192,14 +189,17 @@ sap.ui.define([
             });
         },
 
-        CR_onSearch: function() {
-            this._applyFilters();
+        CR_onSearch: function () {
+            // this._applyFilters();
+            // const data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+            this._loadCustomerReviews(data);
         },
 
-        CR_onPressClear: function() {
+        CR_onPressClear: function () {
             this.byId("CR_id_Rating").setSelectedKey("");
             this.byId("CR_id_BranchCode").setValue("");
-            this._applyFilters();
+            this.byId("CR_id_Sort").setValue("");
+            // this._applyFilters();
         },
     })
 })
