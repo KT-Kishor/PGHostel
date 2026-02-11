@@ -77,7 +77,7 @@ sap.ui.define([
                 EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
                 OverallRating: sRating || ""
             };
-            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+            if (oExistingModel.Role === "Admin" && aBranchCodes && BedTypeName==="") {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
@@ -102,6 +102,8 @@ sap.ui.define([
 
         onHome: function() {
             this.CommonLogoutFunction();
+            this.getOwnerComponent().getModel("SelectedBedType").setData("")
+
         },
 
         onNavBack: function() {
@@ -111,6 +113,7 @@ sap.ui.define([
                 this.getOwnerComponent().getRouter().navTo("TilePage");
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                this.getOwnerComponent().getModel("SelectedBedType").setData("")
             }
         },
 

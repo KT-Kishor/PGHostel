@@ -186,15 +186,8 @@ sap.ui.define([
 
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
-            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+      
         },
-        //    Branch: async function () {
-        //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-        //      this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
-        //     const aData = response?.data || [];
-        //     return Array.isArray(aData) ? aData : [];
-        // },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
                 clearInterval(this._otpValidityInterval);
@@ -942,6 +935,14 @@ _convertAmenities: function (list) {
             oContainer.setBusy(false);
         },
 
+        
+           Branch: async function () {
+            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+            const aData = response?.data || [];
+            return Array.isArray(aData) ? aData : [];
+        },
+
         _loadRoomsPageData: async function () {
             this.iTop = 4;
             this.iSkip = 0;
@@ -957,7 +958,7 @@ _convertAmenities: function (list) {
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                var oModelData=this.getOwnerComponent().getModel("sBRModel").getData();
+                var oModelData=await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
                 const sCity = this.City ? this.City : oModelData[0].City;
