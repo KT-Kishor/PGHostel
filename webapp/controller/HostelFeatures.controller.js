@@ -451,7 +451,6 @@ sap.ui.define([
 
         onHome: function() {
             this.CommonLogoutFunction();
-            this.getView().getModel("HostelFeatures").setData({});
         },
 
         HF_viewroom: function(oEvent) {

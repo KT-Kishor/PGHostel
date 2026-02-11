@@ -576,7 +576,6 @@ sap.ui.define([
 
         onHome: function() {
             this.CommonLogoutFunction();
-            this.getView().getModel("Faciilties").setData({});
         },
 
         FD_onFacilityRowPress: function(oEvent) {
