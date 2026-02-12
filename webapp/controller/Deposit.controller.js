@@ -688,6 +688,7 @@ sap.ui.define([
             var oView = this.getView();
             var oVM = oView.getModel("DepositView");
             var oDeposit = Object.assign({}, oVM.getProperty("/CurrentDeposit"));
+            var sBookingID = oDeposit?.BookingID || "";
 
             // Validate return fields
             if (!this._validateReturnFields()) {
@@ -762,10 +763,9 @@ sap.ui.define([
                     ReturnDepositMode: returnMode,
                     ReturnDepositTransactionID: transactionID || "",
                     ReturnDepositBy: currentUser,
+                    BookingID:sBookingID
                     // Status: newStatus
                 };
-
-
 
                 // Call API with proper structure
                 const apiPayload = {

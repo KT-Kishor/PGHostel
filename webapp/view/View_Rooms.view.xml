@@ -120,6 +120,13 @@
                                     text="View Details"
                                     tooltip="View Details"
                                     press="viewDetails"
+                                    class="btnViewDetails sapUiLargeMarginEnd"
+                                />
+
+                                <Link
+                                    text="Inquiry"
+                                    tooltip="Inquiry"
+                                    press="viewDetails"
                                     class="btnViewDetails"
                                 />
                             </HBox>

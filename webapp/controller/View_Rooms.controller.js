@@ -212,6 +212,578 @@ sap.ui.define([
                 // MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
             }
         },
+          viewDetails: function (oEvent) {
+            try {
+                const oView = this.getView();
+                const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+                const oFullDetails = {
+                    RoomNo: oSelected.RoomNo || "",
+                    BedType: oSelected.Name || "",
+                    Address: oSelected.Address || "",
+                    Area: oSelected.Images?.[0]?.Area,   // hostel's name                  
+                    ACType: oSelected.ACType || "AC",
+                    Description: oSelected.Description || "No description available",
+                    Price: oSelected.Price || "N/A",
+                    MonthPrice: oSelected.MonthPrice || "N/A",
+                    YearPrice: oSelected.YearPrice || "N/A",
+                    Currency: oSelected.Currency || "INR",
+                    Address: oSelected.Address || "",
+                    BranchCode: oSelected.BranchCode || "",
+                    Capacity: oSelected.NoOfPerson || "",
+                    ImageList: (oSelected.Images || []).map(img => img.src),
+                    SelectedPriceType: "",
+                    SelectedPriceValue: "",
+                    Country: oSelected.Country,
+                    Visible: oSelected.Visible,
+                    AvailbleBeds: oSelected.AvailbleBeds,
+                    CheckInTime: oSelected.CheckInTime,
+                    CheckOutTime: oSelected.CheckOutTime,
+                    Deposit: oSelected.Deposit,
+                    DepositCurrency: oSelected.DepositCurrency,
+                    GSTType: oSelected.GSTType,
+                    GSTValue: oSelected.GSTValue,
+                    GSTIN: oSelected.GSTIN || "",
+                    GeoLocation: oSelected.GeoLocation
+
+                };
+
+                const oHostelModel = new JSONModel(oFullDetails);
+                oView.setModel(oHostelModel, "HostelModel");
+                this.oHostelModel = oHostelModel;
+
+                oView.setModel(new JSONModel({
+                    loading: true,
+                    Facilities: []
+                }), "FacilityModel");
+
+                // Load / reuse fragment
+                if (!this._oRoomDetailFragment) {
+                    sap.ui.core.Fragment.load({
+                        id: "roomDetailsFrag",
+                        name: "sap.ui.com.project1.fragment.viewRoomDetails",
+                        controller: this
+                    }).then(fragment => {
+
+                        this._oRoomDetailFragment = fragment;
+                        this.getView().addDependent(fragment);
+
+                        // ✅ Attach models
+                        fragment.setModel(oHostelModel, "HostelModel");
+                        fragment.setModel(oView.getModel("FacilityModel"), "FacilityModel");
+
+                        // ✅ THIS WAS THE MISSING LINE
+                        const bPhone = sap.ui.Device.system.phone;
+                        fragment.setContentWidth(bPhone ? "100%" : "70%");
+
+                        // ✅ Open dialog AFTER models are set
+                        fragment.open();
+
+                        this._bindCarousel();
+                        this._LoadFacilities(oSelected.BranchCode);
+                        this._updateBookTileState();
+                    });
+
+
+                    return; // stop here because first-time load is async via .then()
+                }
+
+                // Fragment already exists (2nd, 3rd, nth time)
+
+                this._oRoomDetailFragment.setModel(oHostelModel, "HostelModel");
+                this._oRoomDetailFragment.setModel(oView.getModel("FacilityModel"), "FacilityModel");
+
+                // Open instantly
+                this._oRoomDetailFragment.open();
+
+                // Bind carousel
+                this._bindCarousel();
+
+                // Load facilities asynchronously
+                this._LoadFacilities(oSelected.BranchCode);
+                this._updateBookTileState();
+
+            } catch (err) {
+                console.log(" viewDetails error:", err);
+            }
+        },
+         onCloseRoomDetail: function () {
+            if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
+            this._clearRoomDetailDialog(); // destroy AFTER
+        },
+
+        onDialogAfterClose: function () {
+            if (this._oRoomDetailFragment) this._oRoomDetailFragment.close(); // close FIRST
+            this._clearRoomDetailDialog();
+        },
+          _clearRoomDetailDialog: function () {
+            if (!this._oRoomDetailFragment) return;
+
+            const oFrag = this._oRoomDetailFragment;
+
+            // Reset price tile classes
+            oFrag.findAggregatedObjects(true, obj => obj.hasStyleClass && obj.hasStyleClass("priceItem"))
+                .forEach(item => {
+                    item.removeStyleClass("selectedTile");
+                    item.addStyleClass("defaultTile");
+                });
+
+            // Destroy carousel pages
+            const oCarousel = oFrag.findAggregatedObjects(true, obj => obj.isA && obj.isA("sap.m.Carousel"))[0];
+            if (oCarousel) oCarousel.destroyPages();
+
+            // Destroy integration card
+            const oCard = oFrag.findAggregatedObjects(true, obj => obj.isA && obj.isA("sap.ui.integration.widgets.Card"))[0];
+            if (oCard) oCard.destroy();
+
+            // Destroy fragment models
+            ["HostelModel", "FacilityModel"].forEach(name => {
+                const m = oFrag.getModel(name);
+                if (m) m.destroy();
+            });
+
+            // Remove the fragment entirely
+            this.getView().removeDependent(oFrag);
+            oFrag.destroy();
+            this._oRoomDetailFragment = null;
+
+            if (this._carouselInterval) {
+                clearInterval(this._carouselInterval);
+                this._carouselInterval = null;
+            }
+        },
+         onSelectPricePlan: function (oEvent) {
+            const oTile = oEvent.getSource();
+            const sType = oTile.data("type"); // "daily", "monthly", or "yearly"
+            const oView = this.getView();
+            const oModel = this.oHostelModel;
+            const oData = oModel.getData();
+            const sCurrency = oData.Currency || "INR";
+
+            // Map type -> model property
+            const mPriceMap = {
+                daily: "Price",
+                monthly: "MonthPrice",
+                yearly: "YearPrice"
+            };
+
+            // Map type -> backend label
+            const mTypeLabel = {
+                daily: "Per Day",
+                monthly: "Per Month",
+                yearly: "Per Year"
+            };
+
+            const sPriceKey = mPriceMap[sType];
+            const sPriceValue = sPriceKey ? oData[sPriceKey] : "N/A";
+
+            // Reset then set values
+            oModel.setProperty("/SelectedPriceType", "");
+            oModel.setProperty("/SelectedPriceValue", "");
+
+            oModel.setProperty("/SelectedPriceType", mTypeLabel[sType] || sType);
+            oModel.setProperty("/SelectedPriceValue", sPriceValue);
+            oModel.setProperty("/SelectedCurrency", sCurrency);
+
+            // --- VISUAL FEEDBACK SECTION ---
+            const oParent = oTile.getParent();
+            let aSiblings = [];
+
+            if (oParent.getItems) {
+                aSiblings = oParent.getItems();
+            } else if (oParent.getContent) {
+                aSiblings = oParent.getContent();
+            }
+
+            aSiblings.forEach(oItem => {
+                if (oItem.removeStyleClass) {
+                    oItem.removeStyleClass("selectedTile");
+                    oItem.addStyleClass("defaultTile");
+                }
+            });
+
+            oTile.removeStyleClass("defaultTile");
+            oTile.addStyleClass("selectedTile");
+        },
+        
+        onConfirmBooking: function () {
+
+            const oView = this.getView();
+            const oLocalModel = this.oHostelModel;
+            const oData = oLocalModel?.getData?.() || {};
+
+            // -------------------------
+            // BASIC VALIDATIONS
+            // -------------------------
+            if (!oData.Visible) {
+                MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
+                return;
+            }
+
+            if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
+                MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
+                return;
+            }
+
+            // -------------------------
+            // GET / CREATE GLOBAL MODEL
+            // -------------------------
+            let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
+            if (!oGlobalModel) {
+                oGlobalModel = new JSONModel({});
+                sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
+            }
+
+            // -------------------------
+            // BUILD BOOKING DATA
+            // -------------------------
+            const oBookingData = {
+                BookingDate: new Date().toISOString(),
+                RoomNo: oData.RoomNo || "",
+                BedType: oData.BedType || "",
+                ACType: oData.ACType || "",
+                Capacity: parseInt(oData.Capacity, 10) || 1,
+                Address: oData.Address || "",
+                Area: oData.Area || "",
+                Description: oData.Description || "",
+                BranchCode: oData.BranchCode || "",
+                SelectedPriceType: oData.SelectedPriceType,
+                FinalPrice: oData.SelectedPriceValue,
+                Currency: oData.Currency || "INR",
+                Source: "UI5_HostelApp",
+                Status: "Pending",
+                Country: oData.Country,
+                AvailbleBeds: parseInt(oData.AvailbleBeds, 10) || 0,
+                Price: oData.Price,
+                MonthPrice: oData.MonthPrice,
+                YearPrice: oData.YearPrice,
+                CheckInTime: oData.CheckInTime,
+                CheckOutTime: oData.CheckOutTime,
+                Deposit: oData.Deposit,
+                DepositCurrency: oData.DepositCurrency,
+                GSTValue: oData.GSTValue,
+                GSTType: oData.GSTType,
+                GSTIN: oData.GSTIN || ""
+
+            };
+
+            // -------------------------
+            // MERGE WITH GLOBAL MODEL
+            // -------------------------
+            const oMergedData = {
+                ...oGlobalModel.getData(),
+                ...oBookingData
+            };
+
+            // -------------------------
+            // ✅ FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
+            // -------------------------
+            const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
+
+            if (iAvailableBeds <= 0) {
+                MessageToast.show(this.i18nModel.getText("nobedsavailableforbooking"));
+                return;
+            }
+
+            const aPersonsList = [];
+            for (let i = 1; i <= iAvailableBeds; i++) {
+                aPersonsList.push({
+                    key: i.toString(),
+                    text: i.toString()
+                });
+            }
+
+            oMergedData.NoOfPersonsList = aPersonsList;
+
+            // Optional: auto-select max available persons
+            oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
+
+            // -------------------------
+            // UPDATE GLOBAL MODEL
+            // -------------------------
+            oGlobalModel.setData(oMergedData, true);
+
+            // -------------------------
+            // CLOSE ROOM DETAIL DIALOG
+            // -------------------------
+            if (this._oRoomDetailFragment) {
+                this._oRoomDetailFragment.close();
+            }
+
+            this._clearRoomDetailDialog();
+
+            // -------------------------
+            // NAVIGATE TO BOOKING PAGE
+            // -------------------------
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteBookRoom");
+        },
+          onRoomDetailOpened: function () {
+            // Get the branch code from the dialog's model
+            if (this._oRoomDetailFragment) {
+                const oModel = this._oRoomDetailFragment.getModel("HostelModel");
+                if (oModel) {
+                    const sBranchCode = oModel.getProperty("/BranchCode");
+                    this._LoadAmenities(sBranchCode);
+                }
+            }
+        },
+          _updateBookTileState: function () {
+
+            const oTile =
+                sap.ui.core.Fragment.byId("roomDetailsFrag", "bookTile");
+
+            if (!oTile) return;
+
+            const bOccupied =
+                !this.oHostelModel.getProperty("/Visible");
+
+            if (bOccupied) {
+                oTile.addStyleClass("occupied");
+            } else {
+                oTile.removeStyleClass("occupied");
+            }
+        },
+         _bindCarousel: function () {
+
+            const oCarousel =
+                this._oRoomDetailFragment
+                    .findAggregatedObjects(true,
+                        obj => obj.isA && obj.isA("sap.m.Carousel")
+                    )[0];
+
+            if (!oCarousel) return;
+
+            // ---------- bind carousel images ----------
+            oCarousel.unbindAggregation("pages");
+
+            oCarousel.bindAggregation("pages", {
+                path: "HostelModel>/ImageList",
+                template: new sap.m.Image({
+                    src: "{HostelModel>}",
+                    width: "100%",
+                    densityAware: false,
+                    decorative: false,
+                    error: this.onImageLoadError.bind(this)
+                })
+            });
+
+            // ---------- AUTO SCROLL ----------
+            const START_AUTOSCROLL = () => {
+
+                const imgs =
+                    this._oRoomDetailFragment
+                        ?.getModel("HostelModel")
+                        ?.getProperty("/ImageList") || [];
+
+                if (imgs.length <= 1) return;
+
+                this._carouselInterval = setInterval(() => {
+
+                    if (oCarousel && oCarousel.getPages().length > 1) {
+                        oCarousel.next();
+                    }
+
+                }, 3000);
+            };
+
+            // kill old autoplay timer
+            if (this._carouselInterval) {
+                clearInterval(this._carouselInterval);
+                this._carouselInterval = null;
+            }
+
+            START_AUTOSCROLL();
+
+            // ---------- PAUSE HANDLING ----------
+            const PAUSE_FOR_10_SECONDS = () => {
+
+                // stop current autoplay
+                if (this._carouselInterval) {
+                    clearInterval(this._carouselInterval);
+                    this._carouselInterval = null;
+                }
+
+                // stop any existing "resume" timer
+                if (this._carouselResumeTimeout) {
+                    clearTimeout(this._carouselResumeTimeout);
+                }
+
+                // resume after 10s
+                this._carouselResumeTimeout = setTimeout(() => {
+                    START_AUTOSCROLL();
+                }, 10000);
+            };
+
+            // ---------- USER INTERACTION EVENTS ----------
+            oCarousel.attachBrowserEvent("touchstart", PAUSE_FOR_10_SECONDS);
+            oCarousel.attachBrowserEvent("mousedown", PAUSE_FOR_10_SECONDS);
+            oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
+        },
+         onImageLoadError: function (oEvent) {
+            const oImage = oEvent.getSource();
+            const sFallback = sap.ui.require.toUrl("sap/ui/com/project1/image/no-image.png");
+
+            if (!oImage.data("hasFallback")) {
+                oImage.data("hasFallback", true);
+                setTimeout(() => oImage.setSrc(sFallback), 0); // Agar image load nahi hui, toh fallback set hoga
+            }
+        },
+          _convertFacilities: function (list) {
+            const defaultImages = {
+                "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "Laundry Service": "../image/Laundry Service.jpg",
+                "Ironing Service": "../image/Ironing Service.jpg",
+                "Housekeeping": "../image/Housekeeping.jpg",
+                "Meals / Food Subscription": "../image/Meals.jpg",
+                "Gym Membership": "../image/gym.jpg",
+                "Two-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+                "Four-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+                "Locker / Storage Facility": "../image/locker.jpg",
+                "Power Backup": "../image/Power Backup.jpeg",
+                "Air Conditioner": "../image/Air Conditioner.jpeg",
+                "Room Heater": "../image/Room Heater.jpeg",
+                "Study Room Access": "../image/Study Room.png",
+                "Others": "../image/defaultFacility.png"
+            };
+
+            return list
+                .map(f => {
+
+                    // Price logic
+                    let price = 0;
+                    let unit = "";
+
+                    if (parseFloat(f.PerHourPrice) > 0) {
+                        price = f.PerHourPrice;
+                        unit = "Per Hour";
+                    } else if (parseFloat(f.PerDayPrice) > 0) {
+                        price = f.PerDayPrice;
+                        unit = "Per Day";
+                    } else if (parseFloat(f.PerMonthPrice) > 0) {
+                        price = f.PerMonthPrice;
+                        unit = "Per Month";
+                    } else if (parseFloat(f.PerYearPrice) > 0) {
+                        price = f.PerYearPrice;
+                        unit = "Per Year";
+                    } else {
+                        return null;
+                    }
+
+                    const hasImage = !!(f.Photo1 && f.Photo1.trim());
+                    const name = (f.Type || "").trim();
+
+                    return {
+                        FacilityID: f.ID,
+                        FacilityName: name,
+                        Price: price,
+                        UnitText: unit,
+                        Currency: f.Currency || "INR",
+
+                        Image: hasImage
+                            ? `data:${f.Photo1Type || "image/jpeg"};base64,${f.Photo1}`
+                            : defaultImages[name] || "../image/defaultFacility.png"
+                    };
+                })
+                .filter(Boolean); // remove null
+        },
+        _LoadFacilities: async function (sBranchCode) {
+
+            if (!this._oRoomDetailFragment || !sBranchCode) return;
+
+            const oFacilityModel = new JSONModel({
+                loading: true,
+                Facilities: [],
+                BranchCode: sBranchCode
+            });
+            this._oRoomDetailFragment.setModel(oFacilityModel, "FacilityModel");
+
+            try {
+                let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
+                let allFacilities = resp?.data || [];
+
+                // Get static types
+                const oStaticModel = this.getView().getModel("FacilityType");
+                const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+                const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
+
+                // Case-insensitive filter
+                const branchFacilities = allFacilities.filter(f => {
+                    const fBranch = (f.BranchCode || "").trim();
+                    const fNameLower = (f.Type || "").trim();
+
+                    const branchMatch = fBranch === sBranchCode.trim();
+                    const typeMatch = validTypesLower.includes(fNameLower);
+
+                    return branchMatch && typeMatch;
+                });
+
+                if (branchFacilities.length > 0) {
+                    oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));
+                } else {
+                    oFacilityModel.setProperty("/Facilities", []);
+                }
+            } catch (err) {
+                console.error("❌ Facility load error:", err);
+            }
+            oFacilityModel.setProperty("/loading", false);
+        },
+          _LoadAmenities: async function (sBranchCode) {
+
+            const oAmenityModel = new JSONModel({
+                loading: true,
+                Amenities: [],
+                BranchCode: sBranchCode  // Store for reference
+            });
+            this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
+
+            try {
+                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
+                let allList = resp?.data || [];
+
+                // Filter: strict BranchCode AND Type in static amenities
+                const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
+                const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+                const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
+
+                const branchAmenities = allList.filter(x =>
+                    (x.BranchCode || "").trim() === (sBranchCode || "").trim() &&
+                    validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
+                );
+
+
+
+                if (branchAmenities.length > 0) {
+                    oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchAmenities));
+                } else {
+
+                    oAmenityModel.setProperty("/Amenities", []);
+                }
+            } catch (err) {
+                console.log("❌ Amenity load error:", err);
+            }
+            oAmenityModel.setProperty("/loading", false);
+        },
+        _convertAmenities: function (list) {
+            const defaultImages = {
+                "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "Bathrooms": "../image/Bathroom.jpg",
+                "Personal lockers": "../image/locker.jpg",
+                "Communal spaces": "../image/CommonSpace.jpg",
+                "Lounge areas": "../image/LoungeArea.jpg"
+            };
+
+            return list.map(item => {
+                const amenityType = (item.AmenityType || item.Type || "").trim();
+                const hasImage = !!(item.Photo1 && item.Photo1.trim());
+
+                return {
+                    ...item,
+                    ImageSrc: hasImage ?
+                        `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` :
+                        defaultImages[amenityType] || "./images/default.png"
+                };
+            });
+        },
 		   onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");

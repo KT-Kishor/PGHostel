@@ -7,7 +7,7 @@
     xmlns:et="sap.m"
     xmlns:card="sap.ui.integration.widgets"
 >
-    <!-- <Dialog draggable="true" afterOpen=".onRoomDetailOpened" resizable="true" contentHeight="auto" contentWidth="{= ${device>/system/phone} ? '100%' : '70%' }" id="roomDetailID" title="Room Details" type="Message" class="sapUiContentPadding" afterClose=".onDialogAfterClose"> -->
+ 
     <Dialog
         id="roomDetailID"
         initialFocus="focus"
@@ -134,12 +134,6 @@
         tooltip="Open in Google Maps"
     />
 </HBox>
-
-
-
-
-
-
                 <FlexBox
                     id="priceFlex"
                     class="priceFlex sapUiSmallMarginTop"
@@ -191,7 +185,7 @@
                                 />
                             </customData>
                         </GenericTile>
-                        <!-- <GenericTile header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }" state="{= ${HostelModel>/Visible} ? 'Loaded' : 'Disabled' }" class="priceItem defaultTile bookNowTile" frameType="OneByHalf" press=".onConfirmBooking"/> -->
+                     
                         <GenericTile
                             id="bookTile"
                             class="priceItem defaultTile bookNowTile"

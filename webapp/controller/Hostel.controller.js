@@ -893,14 +893,6 @@ sap.ui.define([
             });
         },
 
-        // _convertAmenities: function (list) {
-        //     return list.map(item => ({
-        //         ...item,
-        //         ImageSrc: item.Photo1 ?
-        //             `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` : ""
-        //     }));
-        // },
-
         onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
             if (this._oRoomDetailFragment) {
