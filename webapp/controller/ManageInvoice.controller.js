@@ -154,30 +154,30 @@ sap.ui.define(
                             delete params.FinancialYear;
                             this._isClearPressed = false;
                         }
-                        /* ---------------- Default Financial Year ---------------- */
-                        else if (!invoiceDateProvided) {
-                            params.InvoiceStartDate = formatDate(fyStart);
-                            params.InvoiceEndDate = formatDate(fyEnd);
-                            params.FinancialYear = financialYearLabel;
+                        // /* ---------------- Default Financial Year ---------------- */
+                        // else if (!invoiceDateProvided) {
+                        //     params.InvoiceStartDate = formatDate(fyStart);
+                        //     params.InvoiceEndDate = formatDate(fyEnd);
+                        //     params.FinancialYear = financialYearLabel;
 
-                            const oDateRange = this.byId("CI_id_InvoiceDatePicker");
-                            if (oDateRange) {
-                                oDateRange.setDateValue(fyStart);
-                                oDateRange.setSecondDateValue(fyEnd);
-                            }
-                        }
+                        //     const oDateRange = this.byId("CI_id_InvoiceDatePicker");
+                        //     if (oDateRange) {
+                        //         oDateRange.setDateValue(fyStart);
+                        //         oDateRange.setSecondDateValue(fyEnd);
+                        //     }
+                        // }
                         /* ---------------- User Selected Date ---------------- */
-                        else {
-                            const startDate = new Date(params.InvoiceStartDate);
-                            const endDate = new Date(params.InvoiceEndDate);
+                        // else {
+                        //     const startDate = new Date(params.InvoiceStartDate);
+                        //     const endDate = new Date(params.InvoiceEndDate);
 
-                            if (
-                                formatDate(startDate) === formatDate(fyStart) &&
-                                formatDate(endDate) === formatDate(fyEnd)
-                            ) {
-                                params.FinancialYear = financialYearLabel;
-                            }
-                        }
+                        //     if (
+                        //         formatDate(startDate) === formatDate(fyStart) &&
+                        //         formatDate(endDate) === formatDate(fyEnd)
+                        //     ) {
+                        //         params.FinancialYear = financialYearLabel;
+                        //     }
+                        // }
 
                         /* ---------------- Filter Model Fetch (WITH BranchCode) ---------------- */
                         let filterModelParams = {
@@ -227,8 +227,7 @@ sap.ui.define(
                         sap.ui.core.BusyIndicator.hide();
                     } catch (err) {
                         sap.ui.core.BusyIndicator.hide();
-                        console.error(err);
-                        sap.m.MessageToast.show("Technical Error");
+                        sap.m.MessageToast.show(err.message || err.responseText);
                     }
                 },
 

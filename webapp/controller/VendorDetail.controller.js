@@ -219,10 +219,6 @@ sap.ui.define([
             }
         },
 
-        onDocumentTypeChange: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
-        },
-
         onAdminFileSelect: function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -302,6 +298,20 @@ sap.ui.define([
                     oEditableModel.setProperty("/Save", false);
                 }
             }
+            this._updateUploaderState();
+        },
+
+        _updateUploaderState: function () {
+            const oView = this.getView();
+            const bEdit = oView.getModel("editable").getProperty("/Edit");
+            const sDocType = oView.getModel("AdminSignupModel").getProperty("/CurrentDocType");
+
+            this.byId("V_id_adminFileUploader").setEnabled(bEdit && !!sDocType);
+        },
+
+        onDocumentTypeChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+            this._updateUploaderState();
         },
 
         BT_onsavebuttonpress: async function () {

@@ -355,7 +355,7 @@
                                                         typeMissmatch="onFileTypeMissmatch"
                                                         sameFilenameAllowed="true"
                                                         iconFirst="true"
-                                                        enabled="{editable>/Edit}"
+                                                        enabled="{= ${editable>/Edit} &amp;&amp; ${AdminSignupModel>/CurrentDocType} !== '' }"
                                                     />
                                                 </m:VBox>
                                                 <m:Button
