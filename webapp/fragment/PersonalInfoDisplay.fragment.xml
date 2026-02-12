@@ -79,7 +79,7 @@
                         height="170px"
                         densityAware="false"
                         press="onOpenDocumentPreview"
-                        class="serviceImage"
+                        class="serviceImage1"
                     />
                     <Link
         visible="{= ${HostelModel>FileType} === 'application/pdf' }"

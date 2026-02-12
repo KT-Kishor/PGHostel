@@ -2008,7 +2008,7 @@ const maxUses = Number(oCoupon.MaxUses);
 const usedCount = Number(oCoupon.couponUsedCount);
 
 if (usedCount >= maxUses) {
-    sap.m.MessageToast.show("Coupon not found");
+    sap.m.MessageToast.show("This coupon has already been used");
     return;
 }
 

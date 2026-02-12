@@ -220,11 +220,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             this._perDayInfoShown = false;
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
-            // 🔥 MessageManager setup
-            // this.oMessageManager = sap.ui.getCore().getMessageManager();
-            //     this.oMessageManager.registerObject(this.getView(), true);
-            //     this.getView().setModel(this.oMessageManager.getMessageModel(), "message");
-            //     this.oMessageManager.addMessageProcessor(new sap.ui.core.message.ControlMessageProcessor());
+            
         },
 
         Roomdetails: async function () {
@@ -313,14 +309,44 @@ sap.ui.define([
                     Currency: f.Currency,
                     BranchCode: f.BranchCode
                 }));
-
-                oView.setModel(new sap.ui.model.json.JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
-
+                
+                this._aAllFacilities = aFinalFacilities;
+               
+                oView.setModel(new JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
+  this._applyFacilityPriceFilter();
             } catch (err) {
                 console.error("Facility Load Error", err);
                 sap.m.MessageBox.error("Unable to load facilities.");
             }
         },
+        _applyFacilityPriceFilter: function () {
+    const oView = this.getView();
+    const oHostelModel = oView.getModel("HostelModel");
+    const oFacilityModel = oView.getModel("FacilityModel");
+
+    if (!oFacilityModel || !this._aAllFacilities) return;
+
+    const sPriceType = oHostelModel.getProperty("/SelectedPriceType");
+
+    const aFiltered = this._aAllFacilities.filter(fac => {
+        switch (sPriceType) {
+            case "Per Day":
+                return fac.PricePerDay && fac.PricePerDay > 0;
+
+            case "Per Month":
+                return fac.PricePerMonth && fac.PricePerMonth > 0;
+
+            case "Per Year":
+                return fac.PricePerYear && fac.PricePerYear > 0;
+
+            default:
+                return true;
+        }
+    });
+
+    oFacilityModel.setProperty("/Facilities", aFiltered);
+},
+
 
         onDialogClose: function () {
             this._oLoginAlertDialog.close()
@@ -330,7 +356,7 @@ sap.ui.define([
             const oModel = this.getView().getModel("HostelModel");
             const aPersons = oModel.getProperty("/Persons") || [];
 
-            // 🔥 Clear previous messages FIRST
+            //  Clear previous messages FIRST
             const oMessageManager = sap.ui.getCore().getMessageManager();
             oMessageManager.removeAllMessages();
 
@@ -341,7 +367,7 @@ sap.ui.define([
 
                 if (!person.Salutation) {
                     aMissingFields.push(prefix + "Salutation");
-                    // 🔥 CORRECT WAY: Create Message instance
+                    //  CORRECT WAY: Create Message instance
                     const oMessage = new sap.ui.core.message.Message({
                         type: sap.ui.core.MessageType.Error,
                         title: "Required Field Missing",
@@ -778,7 +804,6 @@ sap.ui.define([
                                                 sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signInEmail").setValue("").setValueState("None");
                                                 sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signinPassword").setValue("").setValueState("None");
                                                
-                                                //    sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signupvisible").setVisible(false)
                                                 oEvent.getSource().setSelected(false);
                                                 return;
                                             }
@@ -897,7 +922,6 @@ sap.ui.define([
                             required: true
                         }),
                         new sap.m.Input({
-
                             value: "{HostelModel>/Persons/" + i + "/UserID}",
                             editable: false,
                             visible: false
@@ -1592,9 +1616,9 @@ sap.ui.define([
                                                         const aSelected = aPersons[iPersonIndex].Facilities.SelectedFacilities;
 
                                                         // Check if facility already selected
-                                                        const existsIndex = aSelected.findIndex(
-                                                            f => f.FacilityName === facility.FacilityName
-                                                        );
+                                                         const existsIndex = aSelected.findIndex(
+            f => f.FacilityID === facility.FacilityID
+        );
 
                                                         // If selected → REMOVE it
                                                         if (existsIndex > -1) {
@@ -1908,11 +1932,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     c.getValueState && c.getValueState() === sap.ui.core.ValueState.Error
                 );
             }
-
-            // if (bHasError) {
-            //     MessageBox.error(this.i18nModel.getText("pleasecorrecthighlightederrorsbeforeproceeding"));
-            //     return; //  STOP wizard navigation
-            // }
+ 
             const oModel = this.getView().getModel("HostelModel");
             const sCurrentBranch = oModel.getProperty("/BranchCode");
 
@@ -1930,17 +1950,25 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
 
             // STEP 1: validations
-            if (this._iSelectedStepIndex === 1) {
-                // this._resetCouponAndDiscount();
-                const aMissing = this._checkMandatoryFields();
+           if (this._iSelectedStepIndex === 1) {
+    const aMissing = this._checkMandatoryFields();
+    const aMessages = this.getView().getModel("message")?.getProperty("/") || [];
 
-                //  Check MessageModel for errors (no need to count manually)
-                if (aMissing.length > 0 || this.getView().getModel("message")?.getProperty("/").length > 0) {
-                    // Button becomes visible automatically via binding
-                    MessageToast.show("Please review the errors and fix them");
-                    return;
+    if (aMissing.length > 0 || aMessages.length > 0) {
+        MessageToast.show("Please review the errors and fix them");
+
+        const oMessageButton = this.byId("messagePopoverBtn"); 
+        if (oMessageButton) {
+            oMessageButton.addEventDelegate({
+                onAfterRendering: () => {
+                    this._openMessagePopover(oMessageButton);
                 }
-            }
+            });
+        }
+        return;
+    }
+}
+
 
 
             if (!this._oSelectedStep) {
@@ -1967,22 +1995,29 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             this.handleButtonsVisibility();
         },
         onMessagePopoverPress: function (oEvent) {
-            if (!this._oMessagePopover) {
-                this._oMessagePopover = sap.ui.xmlfragment(this.getView().getId(), "sap.ui.com.project1.fragment.MessagePopOver", this);
-                this.getView().addDependent(this._oMessagePopover);
-            }
-
-            this._oMessagePopover.toggle(oEvent.getSource());
+    this._openMessagePopover(oEvent.getSource());
         },
+        _openMessagePopover: function (oSource) {
+    if (!this._oMessagePopover) {
+        this._oMessagePopover = sap.ui.xmlfragment(
+            this.getView().getId(),
+            "sap.ui.com.project1.fragment.MessagePopOver",
+            this
+        );
+        this.getView().addDependent(this._oMessagePopover);
+    }
+
+    this._oMessagePopover.openBy(oSource);
+},
+
+
 
 
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
-            //   var oBtn = this.byId("couponApplyBtn");
             // Clear coupon & discount UI
             oModel.setProperty("/CouponCode", "");
             oModel.setProperty("/AppliedDiscount", 0);
-            // oBtn.setVisible(true);
             oModel.setProperty("/CouponButtonVisible", true);
             //  Skip totals recalculation if user is still on Step 0 or Step 1
             if (this._iSelectedStepIndex < 2) {
@@ -2005,9 +2040,6 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             oModel.setProperty("/FinalTotalCost", result.FinalTotal);
 
             // Reset button text
-            // oModel.setProperty("/CouponButtonVisible", true);
-
-
             oModel.refresh(true);
         },
 
@@ -2872,13 +2904,8 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             if (!oHostelModel || !oRoomDetailModel || !oBTN) return;
 
-            // Reset all selected facilities
-            // const aPersons = oHostelModel.getData().Persons;
-            // aPersons?.forEach(p => p.AllSelectedFacilities = []);
-
             //  Now we read value instead of key
             const sValue = oEvent.getSource().getValue();
-            // sValue = "Per Day" / "Per Month" / "Per Year"
 
             const iMonths = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10);
             const sStartDate = oHostelModel.getProperty("/StartDate");
@@ -2916,7 +2943,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             }
             // Update selected type
             oHostelModel.setProperty("/SelectedPriceType", sValue);
-
+    this._applyFacilityPriceFilter();
             const oEndDatePicker = oView.byId("idEndDate1");
             const sBranchCode = oHostelModel.getProperty("/BranchCode") || "";
 
@@ -3002,6 +3029,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             oBTN.refresh(true);
             oHostelModel.refresh(true);
             this._validateGeneralInfo()
+        
         },
 
         //login
@@ -4992,6 +5020,7 @@ oHostelModel.setProperty(
                 // Extract BookingDetails array
                 const aBookingDetails = oResponse.BookingDetails || [];
                 BusyIndicator.hide()
+                
 
                 let sMessage = "Booking Successful!\n\n";
 

@@ -2894,6 +2894,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
   object-fit: cover !important;
 }
+.serviceImage1,
+.imageContainer img {
+  width: 100% !important;
+
+  object-fit: cover !important;
+}
 
 
 /* remove any square background that might peek through */
@@ -2971,7 +2977,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   } 
 }
 @media screen and (max-width:600px){
-.serviceImage{
+.serviceImage1{
   width:230px !important;
 }
 }
