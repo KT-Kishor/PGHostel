@@ -2,7 +2,9 @@ sap.ui.define([
     "./BaseController",
     "sap/m/MessageBox",
     "../utils/validation",
-], function(BaseController, MessageBox, utils) {
+     "sap/ui/model/json/JSONModel",
+     "sap/m/MessageToast",
+], function(BaseController, MessageBox, utils,JSONModel,MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.FacilitiesDetails", {
 
@@ -18,14 +20,11 @@ sap.ui.define([
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Editable control model
-                const oEditableModel = new sap.ui.model.json.JSONModel({
-                    Edit: false,
-                    Save: false
-                });
+                const oEditableModel = new JSONModel({Edit: false,Save: false});
                 this.getView().setModel(oEditableModel, "editable");
 
                 // Reset facility model
-                const oFacilityModel = new sap.ui.model.json.JSONModel({
+                const oFacilityModel = new JSONModel({
                     BranchCode: "",
                     Type: "",
                     FacilityName: "",
@@ -44,7 +43,7 @@ sap.ui.define([
                 await this._refreshFacilityDetails(this.BedID);
                 sap.ui.core.BusyIndicator.hide();
             } catch (err) {
-                sap.m.MessageToast.show(err.message || err.responseText);
+                MessageToast.show(err.message || err.responseText);
             } finally {}
         },
 
@@ -81,12 +80,12 @@ sap.ui.define([
                     oResponse.data :
                     (oResponse?.data ? [oResponse.data] : []);
 
-                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                const oBranchModel = new JSONModel(aBranches);
                 oView.setModel(oBranchModel, "BranchModel");
 
             } catch (err) {
                 sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show(err.message || err.responseText);
+                MessageToast.show(err.message || err.responseText);
             }
         },
 
@@ -187,7 +186,7 @@ sap.ui.define([
             if (!oFile) return;
 
             if (oFile.size > 2 * 1024 * 1024) {
-                sap.m.MessageToast.show(`"${oFile.name}" Exceeds the 2 MB File Size Limit.`);
+                MessageToast.show(`"${oFile.name}" Exceeds the 2 MB File Size Limit.`);
                 return;
             }
 
@@ -200,13 +199,13 @@ sap.ui.define([
                 const aRealImages = aImages.filter(img => !img.isPlaceholder);
                 const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
                 if (bFileNameDuplicate) {
-                    sap.m.MessageToast.show(`"${oFile.name}" is already Added.`);
+                    MessageToast.show(`"${oFile.name}" is already Added.`);
                     return;
                 }
 
                 const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
+                    MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
                     return;
                 }
 
@@ -245,7 +244,7 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_ExtraFacilities", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                var model = new sap.ui.model.json.JSONModel(oFCIAerData);
+                var model = new JSONModel(oFCIAerData);
                 this.getView().setModel(model, "Facilities")
             })
         },
@@ -267,14 +266,6 @@ sap.ui.define([
                 var uploadedImages = attachments.filter(function(item) {
                     return !item.isPlaceholder;
                 });
-
-                // Validation: at least one image required
-                // if (uploadedImages.length === 0) {
-                //     sap.m.MessageToast.show(this.i18nModel.getText("pleaseUploadatLeastOneImage"));
-                //     return;
-                // }
-
-                // Validation: maximum 3 images
                 if (uploadedImages.length > 3) {
                     sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
                     return;
@@ -290,7 +281,7 @@ sap.ui.define([
                 });
 
                 if (bDuplicate) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("facilitywithSameRatetypeExistsforBranch"));
+                    MessageToast.show(this.i18nModel.getText("facilitywithSameRatetypeExistsforBranch"));
                     return;
                 }
 
@@ -298,7 +289,7 @@ sap.ui.define([
                     (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0) &&
                     (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0) &&
                     (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
+                    MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }
 
@@ -366,9 +357,9 @@ sap.ui.define([
 
                     await this._refreshFacilityDetails(Payload.ID);
                     this.getView().getModel("editable").setProperty("/Edit", false)
-                    sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
+                    MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
                 } catch (err) {
-                    sap.m.MessageToast.show(err.message || err.responseText);
+                    MessageToast.show(err.message || err.responseText);
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
@@ -402,13 +393,13 @@ sap.ui.define([
 
                 //  Add model flag for uploader visibility
                 const bCanAddMore = aDisplayImages.length < 3;
-                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                this.getView().setModel(new JSONModel({
                     DisplayImages: aDisplayImages,
                     CanAddMore: bCanAddMore
                 }), "DisplayImagesModel");
                 sap.ui.core.BusyIndicator.hide();
             } catch (err) {
-                sap.m.MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
+                MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -456,19 +447,15 @@ sap.ui.define([
                             this._oImageDialog.close();
                         }.bind(this)
                     }),
-
                     afterClose: function() {
                         this._oImageDialog.destroy();
                         this._oImageDialog = null;
                     }.bind(this)
                 });
-
                 this.getView().addDependent(this._oImageDialog);
-
             } else {
                 this._oImageDialog.setTitle(sFileName);
             }
-
             // Set clicked image
             this.byId("previewImage").setSrc(sImageSrc);
             this._oImageDialog.open();

@@ -22,10 +22,8 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
 
-            if (!oLogin || !oLogin.BranchCode) {
-                sap.m.MessageToast.show("Login branch not found");
-                return;
-            }
+            if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
+
             this.BranchID = oLogin.BranchCode;
             await this._loadCustomers();
             this.commonLoginFunction();
@@ -55,12 +53,9 @@ sap.ui.define([
             const aTodayCards = [];
             const oMonthlyDate = {};
             aData.forEach((oBooking) => {
-                if (!["New"].includes(oBooking.Status)) {
-                    return;
-                }
-                if (!aAllowedBranches.includes(oBooking.BranchCode)) {
-                    return;
-                }
+                if (!["New"].includes(oBooking.Status)) return;
+                if (!aAllowedBranches.includes(oBooking.BranchCode)) return;
+
                 const dBookingDate = new Date(oBooking.BookingDate);
                 dBookingDate.setHours(0, 0, 0, 0);
                 if (dBookingDate.getTime() === oToday.getTime()) {
@@ -90,16 +85,6 @@ sap.ui.define([
             return aPages;
         },
 
-        // _getCardsPerPage: function () {
-        //     if (sap.ui.Device.system.phone) {
-        //         return 1;
-        //     }
-        //     if (sap.ui.Device.system.tablet) {
-        //         return 3;
-        //     }
-        //     return 5;
-        // },
-
         _getCardsPerPage: function () {
             const w = window.innerWidth;
 
@@ -114,8 +99,6 @@ sap.ui.define([
             this._aTodayCards = aCards;
             const iPerPage = this._getCardsPerPage();
             const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
-            // const sWidth = (100 / iPerPage) + "%";
-            // this.getView().getDomRef()?.style.setProperty("--cardWidth", sWidth);
             this.getView().setModel(new JSONModel({ pages: aPages }), "todayModel");
 
             const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -143,13 +126,9 @@ sap.ui.define([
         },
 
         onBookingCardPress: function (oEvent) {
-               var sCustomerID = oEvent
-        .getSource()
-        .getBindingContext("todayModel")
-        .getObject()
-        .CustomerID;
+            var sCustomerID = oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID;
 
-    var sEncodedID = btoa(sCustomerID.toString());
+            var sEncodedID = btoa(sCustomerID.toString());
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
                 from: "Dashboard"
@@ -213,11 +192,9 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentYearBarChart", oPayload).then((oData) => {
-                console.log("month wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.data;
-                if (aData.length === 0) {
-                    aData = this.switchForAllGraph("MONTH");
-                }
+                if (aData.length === 0) aData = this.switchForAllGraph("MONTH");
+                
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "monthlyChartModel");
                 console.table(aData);
                 this._bindMonthlyChart();
@@ -233,12 +210,9 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentMonthBarChart", oPayload).then((oData) => {
-                console.log("daily wise response:", oData);
                 let aData = oData.results || [];
-                //   console.log("Parsed daily data:", aData);
-                if (aData.length === 0) {
-                    aData = this.switchForAllGraph("DAY");
-                }
+                if (aData.length === 0) aData = this.switchForAllGraph("DAY");
+                
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "dailyChartModel");
                 this._bindDailyChart();
                 sap.ui.core.BusyIndicator.hide();
@@ -343,7 +317,6 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             this.ajaxReadWithJQuery("HM_GetCurrentYearPaymentTypeBarChart", oPayload).then((oData) => {
-                console.log("payment wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.results || [];
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("PAYMENT");
@@ -502,10 +475,7 @@ sap.ui.define([
         },
 
         onFilterGo: function () {
-            if (!this.BranchID) {
-                MessageToast.show("Branch not ready");
-                return;
-            }
+            if (!this.BranchID) return MessageToast.show("Branch not ready");
 
             const oRange = this._getStartEndDate();
             const oMonthPayload = {
@@ -531,10 +501,6 @@ sap.ui.define([
                 EndDate: oRange.yearEnd,
                 BranchCode: this.BranchID
             };
-            console.log("monthly payload:", oMonthPayload)
-            console.log("daily payload:", oDailyPayload)
-            console.log("status payload:", oStatusPayload)
-            console.log("payment payload:", oPaymentPayload)
             this._loadMonthChart(oMonthPayload);
             this._loadDayChart(oDailyPayload);
             this._loadStatusChart(oStatusPayload);

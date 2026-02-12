@@ -32,12 +32,10 @@ sap.ui.define([
       });
     },
 
-
     // 1. Router access - completely safe
     getRouter: function () {
       return sap.ui.core.UIComponent.getRouterFor(this);
     },
-
 
     // 3. Navigation helper (optional, but consistent with other controllers)
     navTo: function (routeName, parameters, bReplace) {
@@ -54,8 +52,6 @@ sap.ui.define([
       return this.getView().setModel(oModel, sName);
     },
 
-
-    
     //Common create call for all the app
     async ajaxCreateWithJQuery(sUrl, oPayLoad) {
       return new Promise((resolve, reject) => {

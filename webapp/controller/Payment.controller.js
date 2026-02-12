@@ -56,15 +56,14 @@ sap.ui.define([
             } else {
                 filters.BranchID = aBranchCodes;
             }
-
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
-                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                const oBranchModel = new JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.m.MessageToast.show(err.message || err.responseText);
+                MessageToast.show(err.message || err.responseText);
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -73,13 +72,11 @@ sap.ui.define([
         buildBranchMap: function () {
             const aBranches = this.getView().getModel("PayBranchModel")?.getData() || [];
             const mBranchMap = {};
-
             aBranches.forEach(b => {
                 if (b.BranchCode && b.BranchName) {
                     mBranchMap[b.BranchCode] = b.BranchName;
                 }
             });
-
             return mBranchMap;
         },
 
@@ -116,12 +113,9 @@ sap.ui.define([
         Onsearch: function (bInitialLoad) {
             const oView = this.getView();
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
-            const omainModel = this.getView().getModel("mainModel")?.getData() || [];
             const oDateRange = this.byId("P_id_Date");
-            const sCustomerID =
-                oView.byId("P_id_CustomerID").getSelectedKey() || oView.byId("P_id_CustomerID").getValue();
-            const sBookingID =
-                oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
+            const sCustomerID = oView.byId("P_id_CustomerID").getSelectedKey() || oView.byId("P_id_CustomerID").getValue();
+            const sBookingID = oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
             let sBranch = "";
             const oBranchCombo = oView.byId("P_id_BranchCode");
             if (oBranchCombo) {
@@ -134,32 +128,20 @@ sap.ui.define([
                         (item.getText() || "").toLowerCase() === sTyped ||
                         (item.getAdditionalText() || "").toLowerCase() === sTyped
                     );
-
-                    if (oMatch) {
-                        sBranch = oMatch.getKey();
-                    }
+                    if (oMatch) sBranch = oMatch.getKey();
                 }
             }
             let filters = {};
-            if (sCustomerID) {
-                filters.CustomerID = sCustomerID;
-            }
-
-            if (sBookingID) {
-                filters.BookingID = sBookingID;
-            }
-            if (sBranch) {
-                filters.BranchCode = sBranch;
-            }
+            if (sCustomerID) filters.CustomerID = sCustomerID;
+            if (sBookingID) filters.BookingID = sBookingID;
+            if (sBranch) filters.BranchCode = sBranch;
             if (oLogin.Role === "Admin") {
                 filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
                 filters.Role = "Admin";
             }
 
-            if (oLogin.Role === "Super Admin" && !filters.StartDate) {
-                filters.GetAll = true;
-            }
-
+            if (oLogin.Role === "Super Admin" && !filters.StartDate) filters.GetAll = true;
+            
             function formatLocalDate(d) {
                 return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(d);
             }
@@ -199,10 +181,10 @@ sap.ui.define([
                         item.BranchName = mBranchMap[item.BranchCode] || item.BranchCode;
                     }
                 });
-                this.getView().setModel(new sap.ui.model.json.JSONModel(aData), "mainModel");
+                this.getView().setModel(new JSONModel(aData), "mainModel");
             })
                 .catch((err) => {
-                    sap.m.MessageToast.show(err.message || err.responseText);
+                    MessageToast.show(err.message || err.responseText);
                 })
                 .finally(() => {
                     sap.ui.core.BusyIndicator.hide();
@@ -291,10 +273,8 @@ sap.ui.define([
 
         P_onDownload: function () {
             const oModel = this.byId("P_id_PaymentTable").getModel("mainModel").getData();
-            if (!oModel || oModel.length === 0) {
-                MessageToast.show(this.i18nModel.getText("MSnodata"));
-                return;
-            }
+            if (!oModel || oModel.length === 0) return MessageToast.show(this.i18nModel.getText("MSnodata"));
+             
             const adjustedData = oModel.map(item => ({
                 ...item,
                 Date: Formatter.displayFormatDate(item.Date)

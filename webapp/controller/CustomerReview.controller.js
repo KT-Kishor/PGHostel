@@ -1,7 +1,8 @@
 sap.ui.define([
     "./BaseController",
-    "../model/formatter"
-], function (BaseController, Formatter) {
+    "../model/formatter",
+    "sap/m/MessageToast"
+], function (BaseController, Formatter,MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.CustomerReview", {
         Formatter: Formatter,
@@ -12,8 +13,6 @@ sap.ui.define([
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
-            // await this._loadCustomerReviews(data);
-            // this.commonLoginFunction();
             this._setDefaultDateRange();
             sap.ui.core.BusyIndicator.show(0);
             await this._loadCustomers();
@@ -101,7 +100,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }).catch(function () {
                 sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageToast.show("Failed to load customer reviews");
+                MessageToast.show("Failed to load customer reviews");
             });
         },
 
@@ -223,8 +222,6 @@ sap.ui.define([
         },
 
         CR_onSearch: function () {
-            // this._applyFilters();
-            // const data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             this._loadCustomerReviews(data);
         },
 
@@ -232,7 +229,6 @@ sap.ui.define([
             this.byId("CR_id_Rating").setSelectedKey("");
             this.byId("CR_id_BranchCode").setValue("");
             this.byId("CR_id_Sort").setValue("");
-            // this._applyFilters();
         },
     })
 })
