@@ -886,7 +886,7 @@ sap.ui.define([
                             maxLength: 40
                         }),
                         new sap.m.Select({
-                            width: "100%",
+                            width: "8rem",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Salutation}",
                             items: [
                                 new sap.ui.core.ListItem({

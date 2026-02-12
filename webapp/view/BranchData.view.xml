@@ -191,6 +191,12 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
+                            text="{i18n>logo}"
+                            tooltip="{i18n>logo}"
+                        />
+                    </Column>
+                      <Column demandPopin="true">
+                        <Text
                             text="{i18n>image}"
                             tooltip="{i18n>image}"
                         />
@@ -213,9 +219,13 @@
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
-                            <Button
+                            <Link
                                 text="{i18n>view}"
                                 press="HF_viewroom"
+                            />
+                            <Link
+                                text="{i18n>view}"
+                                press="HF_viewimage"
                             />
                         </cells>
                     </ColumnListItem>

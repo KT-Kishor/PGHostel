@@ -1285,6 +1285,50 @@ sap.ui.define([
             });
         },
 
+        HF_viewimage: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext("mainModel");
+            var oData = oContext.getObject();
+
+            if (!oData.Attachment || !oData.Attachment.length) {
+                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisbranch"));
+                return;
+            }
+            var sBase64 = oData.Attachment.replace(/\s/g, "");
+            var sPhotoName = oData.AttachmentName || "Attachment";
+            if (sBase64 && !sBase64.startsWith("data:image")) {
+                sBase64 = "data:image/jpeg;base64," + sBase64;
+            }
+            var oImage = new sap.m.Image({
+                src: sBase64,
+                densityAware: false,
+                decorative: false,
+                width: "100%",
+                height: "100%",
+                style: "object-fit: contain; display:block; margin:0; padding:0;"
+            });
+
+            var oDialog = new sap.m.Dialog({
+                title: sPhotoName,
+                contentWidth: "50%",
+                contentHeight: "60%",
+                horizontalScrolling: false,
+                verticalScrolling: false,
+                content: [oImage],
+                endButton: new sap.m.Button({
+                    text: "Close",
+                    press: function () {
+                        oDialog.close();
+                    }
+                }).addStyleClass("myUnifiedBtn"),
+                afterClose: function () {
+                    oDialog.destroy();
+                }
+            }).addStyleClass("barheader");
+
+            oDialog.addStyleClass("ImageDialogNoPadding");
+            oDialog.open();
+        },
+
         HF_viewroom: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
             var oData = oContext.getObject();
