@@ -49,7 +49,7 @@ sap.ui.define([
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
 			 
-       _loadFilteredData: async function (Scity, sBranchCode) {
+       _loadFilteredData: async function (sBranchCode) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
 
@@ -57,40 +57,11 @@ sap.ui.define([
 
             try {
 
-                const oView = this.getView();
-
-                var aBranchCodes = [];
-                var oBRModel = this.getView().getModel("sBRModel");
-                var aBranchesData = oBRModel.getData(); // adjust path if needed
-                var sBranchCode = this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
-
-
-                if (Scity && !sBranchCode) {
-                    // Filter branches by city
-                    var aFilteredBranches = aBranchesData.filter(function (branch) {
-                        return branch.City === Scity;
-                    });
-
-                    if (aFilteredBranches.length === 0) {
-                        const oVisibilityModel = this.getView().getModel("VisibilityModel");
-                        oVisibilityModel.setProperty("/BedTypes", []);
-                        oVisibilityModel.setProperty("/NoData", true);
-                        oVisibilityModel.setProperty("/ShowViewMore", false);
-                        return;
-                    }
-
-                    aBranchCodes = aFilteredBranches.map(function (branch) {
-                        return branch.BranchID;
-                    });
-
-                } else if (sBranchCode) {
-                    // Branch already selected
-                    aBranchCodes = [sBranchCode];
-                }
+              
 
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
-                    BranchCode: aBranchCodes,
+                    BranchCode: sBranchCode,
                     top: this.iTop,
                     skip: this.iSkip
                 });
@@ -223,10 +194,7 @@ sap.ui.define([
                     this.iSkip += this.iTop;
                     //  this.iTop= this.iSkip * this.iSkip
                 }
-                this.Scity = Scity
-                this.sACType = sACType
 
-                this.sBranchCode = sBranchCode
 
                 aFinal = aFinal.filter(b => b.PriceVisible !== false);
 
@@ -238,7 +206,10 @@ sap.ui.define([
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
                 }
                } catch (err) {
-                MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
+                         console.log(err);
+                         
+
+                // MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
             }
         },
 		   onNavBack: function () {

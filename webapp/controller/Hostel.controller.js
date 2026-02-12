@@ -2462,7 +2462,7 @@ sap.ui.define([
 
        
                this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
-                sPath: oBranchData.BranchCode
+                sPath: oBranchData.BranchID
             });
         },
 
