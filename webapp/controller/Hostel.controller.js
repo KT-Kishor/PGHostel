@@ -44,11 +44,57 @@ sap.ui.define([
 
             this.getView().setModel(oDateModel, "controller");
         },
+        // _getBrowserLocation: function () {
+        //     if (!navigator.geolocation) {
+        //         MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
+        //         return;
+        //     }
+        //     navigator.geolocation.getCurrentPosition(
+        //         (pos) => {
+        //             let lat = pos.coords.latitude;
+        //             let lng = pos.coords.longitude;
+        //             this._getLocationName(lat, lng);
+        //         },
+        //         (err) => {
+        //             console.error("Location error:", err);
+        //         }
+        //     );
+        // },
+        // _getLocationName: function (lat, lng) {
+        //     let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+
+        //     $.ajax({
+        //         url: url,
+        //         method: "GET",
+        //         success: (data) => {
+        //             if (!data || !data.address) {
+        //                 return;
+        //             }
+
+        //             let city = data.address.city ||
+        //                 data.address.town ||
+        //                 data.address.village ||
+        //                 data.address.municipality;
+        //             this.City = city
+        //         },
+        //         error: (err) => {
+        //             console.log("Reverse geocoding failed", err);
+        //         }
+        //     });
+        // },
         _getBrowserLocation: function () {
             if (!navigator.geolocation) {
                 MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
                 return;
             }
+
+            // Options for better reliability
+            const options = {
+                enableHighAccuracy: true, // trying to use GPS
+                timeout: 10000,          // 10 secs wait 
+                maximumAge: 0            // Fresh location, every time
+            };
+
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     let lat = pos.coords.latitude;
@@ -56,31 +102,52 @@ sap.ui.define([
                     this._getLocationName(lat, lng);
                 },
                 (err) => {
-                    console.error("Location error:", err);
-                }
+                    // Error handling based on specific reasons
+                    switch (err.code) {
+                        case err.PERMISSION_DENIED:
+                            console.log("User Discarded Location Request");
+                            break;
+                        case err.POSITION_UNAVAILABLE:
+                            console.log("Location info unavailable. Signal may be poor");
+                            break;
+                        case err.TIMEOUT:
+                            console.log("Request timeout");
+                            break;
+                        default:
+                            console.log("Unknown error occurred.");
+                    }
+                },
+                options
             );
         },
         _getLocationName: function (lat, lng) {
-            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+            let url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
 
-            $.ajax({
-                url: url,
+            fetch(url, {
                 method: "GET",
-                success: (data) => {
-                    if (!data || !data.address) {
-                        return;
-                    }
-
-                    let city = data.address.city ||
-                        data.address.town ||
-                        data.address.village ||
-                        data.address.municipality;
-                    this.City = city
-                },
-                error: (err) => {
-                    console.log("Reverse geocoding failed", err);
+                headers: {
+                    "Accept": "application/json",
+                    // Nominatim need how is requesting
+                    "User-Agent": "SAP-UI5-App-Hostel-App"
                 }
-            });
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok " + response.statusText);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.address) {
+                        this.City = data.address.city || data.address.town || data.address.village || data.address.municipality;
+                        this.State = data.address.state;
+                        this.Country = data.address.country;
+                        this.CountryCode = data.address.country_code?.toUpperCase();
+
+                        console.log("Success! Location found:", this.City);
+                    }
+                })
+                .catch(err => {
+                    console.log("Reverse geocoding failed:", err);
+                });
         },
 
         _onRouteMatched: async function () {
@@ -186,7 +253,7 @@ sap.ui.define([
 
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
-      
+
         },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -555,105 +622,105 @@ sap.ui.define([
             oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
         },
 
-       _convertFacilities: function (list) {
-    const defaultImages = {
-        "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
-        "Laundry Service": "../image/Laundry Service.jpg",
-        "Ironing Service": "../image/Ironing Service.jpg",
-        "Housekeeping": "../image/Housekeeping.jpg",
-        "Meals / Food Subscription": "../image/Meals.jpg",
-        "Gym Membership": "../image/gym.jpg",
-        "Two-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
-        "Four-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
-        "Locker / Storage Facility": "../image/locker.jpg",
-        "Power Backup": "../image/Power Backup.jpeg",
-        "Air Conditioner": "../image/Air Conditioner.jpeg",
-        "Room Heater": "../image/Room Heater.jpeg",
-        "Study Room Access": "../image/Study Room.png",
-        "Others": "../image/defaultFacility.png"
-    };
-
-    return list
-        .map(f => {
-
-            // Price logic
-            let price = 0;
-            let unit = "";
-
-            if (parseFloat(f.PerHourPrice) > 0) {
-                price = f.PerHourPrice;
-                unit = "Per Hour";
-            } else if (parseFloat(f.PerDayPrice) > 0) {
-                price = f.PerDayPrice;
-                unit = "Per Day";
-            } else if (parseFloat(f.PerMonthPrice) > 0) {
-                price = f.PerMonthPrice;
-                unit = "Per Month";
-            } else if (parseFloat(f.PerYearPrice) > 0) {
-                price = f.PerYearPrice;
-                unit = "Per Year";
-            } else {
-                return null; 
-            }
-
-            const hasImage = !!(f.Photo1 && f.Photo1.trim());
-            const name = (f.Type || "").trim();
-
-            return {
-                FacilityID: f.ID,
-                FacilityName: name,
-                Price: price,
-                UnitText: unit,
-                Currency: f.Currency || "INR",
-
-                Image: hasImage
-                    ? `data:${f.Photo1Type || "image/jpeg"};base64,${f.Photo1}`
-                    : defaultImages[name] || "../image/defaultFacility.png"
+        _convertFacilities: function (list) {
+            const defaultImages = {
+                "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "Laundry Service": "../image/Laundry Service.jpg",
+                "Ironing Service": "../image/Ironing Service.jpg",
+                "Housekeeping": "../image/Housekeeping.jpg",
+                "Meals / Food Subscription": "../image/Meals.jpg",
+                "Gym Membership": "../image/gym.jpg",
+                "Two-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+                "Four-Wheeler Parking": "../image/Two-Wheeler Parking.webp",
+                "Locker / Storage Facility": "../image/locker.jpg",
+                "Power Backup": "../image/Power Backup.jpeg",
+                "Air Conditioner": "../image/Air Conditioner.jpeg",
+                "Room Heater": "../image/Room Heater.jpeg",
+                "Study Room Access": "../image/Study Room.png",
+                "Others": "../image/defaultFacility.png"
             };
-        })
-        .filter(Boolean); // remove null
-},
-_LoadFacilities: async function (sBranchCode) {
 
-    if (!this._oRoomDetailFragment || !sBranchCode) return;
-    
-    const oFacilityModel = new JSONModel({
-        loading: true,
-        Facilities: [],
-        BranchCode: sBranchCode
-    });
-    this._oRoomDetailFragment.setModel(oFacilityModel, "FacilityModel");
+            return list
+                .map(f => {
 
-    try {
-        let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
-        let allFacilities = resp?.data || [];
+                    // Price logic
+                    let price = 0;
+                    let unit = "";
 
-        // Get static types
-        const oStaticModel = this.getView().getModel("FacilityType");
-        const staticTypes = oStaticModel ? oStaticModel.getData() : [];
-        const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
+                    if (parseFloat(f.PerHourPrice) > 0) {
+                        price = f.PerHourPrice;
+                        unit = "Per Hour";
+                    } else if (parseFloat(f.PerDayPrice) > 0) {
+                        price = f.PerDayPrice;
+                        unit = "Per Day";
+                    } else if (parseFloat(f.PerMonthPrice) > 0) {
+                        price = f.PerMonthPrice;
+                        unit = "Per Month";
+                    } else if (parseFloat(f.PerYearPrice) > 0) {
+                        price = f.PerYearPrice;
+                        unit = "Per Year";
+                    } else {
+                        return null;
+                    }
 
-        // Case-insensitive filter
-        const branchFacilities = allFacilities.filter(f => {
-            const fBranch = (f.BranchCode || "").trim();
-            const fNameLower = (f.Type || "").trim();
-            
-            const branchMatch = fBranch === sBranchCode.trim();
-            const typeMatch = validTypesLower.includes(fNameLower);
-            
-            return branchMatch && typeMatch;
-        });
+                    const hasImage = !!(f.Photo1 && f.Photo1.trim());
+                    const name = (f.Type || "").trim();
 
-        if (branchFacilities.length > 0) {
-            oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));
-        } else {
-            oFacilityModel.setProperty("/Facilities", []);
-        }
-    } catch (err) {
-        console.error("❌ Facility load error:", err);
-    }
-    oFacilityModel.setProperty("/loading", false);
-},
+                    return {
+                        FacilityID: f.ID,
+                        FacilityName: name,
+                        Price: price,
+                        UnitText: unit,
+                        Currency: f.Currency || "INR",
+
+                        Image: hasImage
+                            ? `data:${f.Photo1Type || "image/jpeg"};base64,${f.Photo1}`
+                            : defaultImages[name] || "../image/defaultFacility.png"
+                    };
+                })
+                .filter(Boolean); // remove null
+        },
+        _LoadFacilities: async function (sBranchCode) {
+
+            if (!this._oRoomDetailFragment || !sBranchCode) return;
+
+            const oFacilityModel = new JSONModel({
+                loading: true,
+                Facilities: [],
+                BranchCode: sBranchCode
+            });
+            this._oRoomDetailFragment.setModel(oFacilityModel, "FacilityModel");
+
+            try {
+                let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
+                let allFacilities = resp?.data || [];
+
+                // Get static types
+                const oStaticModel = this.getView().getModel("FacilityType");
+                const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+                const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
+
+                // Case-insensitive filter
+                const branchFacilities = allFacilities.filter(f => {
+                    const fBranch = (f.BranchCode || "").trim();
+                    const fNameLower = (f.Type || "").trim();
+
+                    const branchMatch = fBranch === sBranchCode.trim();
+                    const typeMatch = validTypesLower.includes(fNameLower);
+
+                    return branchMatch && typeMatch;
+                });
+
+                if (branchFacilities.length > 0) {
+                    oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));
+                } else {
+                    oFacilityModel.setProperty("/Facilities", []);
+                }
+            } catch (err) {
+                console.error("❌ Facility load error:", err);
+            }
+            oFacilityModel.setProperty("/loading", false);
+        },
 
 
         viewDetails: function (oEvent) {
@@ -694,7 +761,7 @@ _LoadFacilities: async function (sBranchCode) {
                 const oHostelModel = new JSONModel(oFullDetails);
                 oView.setModel(oHostelModel, "HostelModel");
                 this.oHostelModel = oHostelModel;
-               
+
                 oView.setModel(new JSONModel({
                     loading: true,
                     Facilities: []
@@ -770,61 +837,61 @@ _LoadFacilities: async function (sBranchCode) {
 
         _LoadAmenities: async function (sBranchCode) {
 
-    const oAmenityModel = new JSONModel({
-        loading: true,
-        Amenities: [],
-        BranchCode: sBranchCode  // Store for reference
-    });
-    this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
+            const oAmenityModel = new JSONModel({
+                loading: true,
+                Amenities: [],
+                BranchCode: sBranchCode  // Store for reference
+            });
+            this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
 
-    try {
-        let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
-        let allList = resp?.data || [];
+            try {
+                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
+                let allList = resp?.data || [];
 
-        // Filter: strict BranchCode AND Type in static amenities
-        const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
-        const staticTypes = oStaticModel ? oStaticModel.getData() : [];
-        const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
+                // Filter: strict BranchCode AND Type in static amenities
+                const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
+                const staticTypes = oStaticModel ? oStaticModel.getData() : [];
+                const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
 
-        const branchAmenities = allList.filter(x => 
-            (x.BranchCode || "").trim() === (sBranchCode || "").trim() &&
-            validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
-        );
+                const branchAmenities = allList.filter(x =>
+                    (x.BranchCode || "").trim() === (sBranchCode || "").trim() &&
+                    validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
+                );
 
-     
 
-        if (branchAmenities.length > 0) {
-            oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchAmenities));
-        } else {
-       
-            oAmenityModel.setProperty("/Amenities", []);
-        }
-    } catch (err) {
-        console.log("❌ Amenity load error:", err);
-    }
-    oAmenityModel.setProperty("/loading", false);
-},
-_convertAmenities: function (list) {
-    const defaultImages = {
-        "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
-        "Bathrooms": "../image/Bathroom.jpg", 
-        "Personal lockers": "../image/locker.jpg",
-        "Communal spaces": "../image/CommonSpace.jpg",
-        "Lounge areas": "../image/LoungeArea.jpg"
-    };
 
-    return list.map(item => {
-        const amenityType = (item.AmenityType || item.Type || "").trim();
-        const hasImage = !!(item.Photo1 && item.Photo1.trim());
-        
-        return {
-            ...item,
-            ImageSrc: hasImage ? 
-                `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` :
-                defaultImages[amenityType] || "./images/default.png"
-        };
-    });
-},
+                if (branchAmenities.length > 0) {
+                    oAmenityModel.setProperty("/Amenities", this._convertAmenities(branchAmenities));
+                } else {
+
+                    oAmenityModel.setProperty("/Amenities", []);
+                }
+            } catch (err) {
+                console.log("❌ Amenity load error:", err);
+            }
+            oAmenityModel.setProperty("/loading", false);
+        },
+        _convertAmenities: function (list) {
+            const defaultImages = {
+                "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "Bathrooms": "../image/Bathroom.jpg",
+                "Personal lockers": "../image/locker.jpg",
+                "Communal spaces": "../image/CommonSpace.jpg",
+                "Lounge areas": "../image/LoungeArea.jpg"
+            };
+
+            return list.map(item => {
+                const amenityType = (item.AmenityType || item.Type || "").trim();
+                const hasImage = !!(item.Photo1 && item.Photo1.trim());
+
+                return {
+                    ...item,
+                    ImageSrc: hasImage ?
+                        `data:${item.Photo1Type || "image/jpeg"};base64,${item.Photo1}` :
+                        defaultImages[amenityType] || "./images/default.png"
+                };
+            });
+        },
 
         // _convertAmenities: function (list) {
         //     return list.map(item => ({
@@ -935,10 +1002,10 @@ _convertAmenities: function (list) {
             oContainer.setBusy(false);
         },
 
-        
-           Branch: async function () {
+
+        Branch: async function () {
             const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
             const aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
@@ -958,7 +1025,7 @@ _convertAmenities: function (list) {
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                var oModelData=await this.Branch();
+                var oModelData = await this.Branch();
                 this._populateUniqueFilterValues(oModelData)
 
                 const sCity = this.City ? this.City : oModelData[0].City;
@@ -1169,19 +1236,39 @@ _convertAmenities: function (list) {
 
             this.oViewModel.setProperty("/authFlow", "signup");
             this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
-            // Set min and max dates for the Date of Birth picker
+
+            // DOB Limits Logic
             const oDOBpicker = $C("signUpDOB");
             if (oDOBpicker) {
                 const oToday = new Date();
-
-                // Max date: 10 years ago from today
                 const oMaxDate = new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate());
                 oDOBpicker.setMaxDate(oMaxDate);
-
-                // Min date: 100 years ago from today
                 const oMinDate = new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate());
                 oDOBpicker.setMinDate(oMinDate);
             }
+
+            // 🔥 AUTO-POPULATE LOCATION DATA
+            const oLoginModel = this.getView().getModel("LoginMode");
+            if (this.Country) {
+                oLoginModel.setProperty("/Country", this.Country);
+                this.onChangeCountry(null); // Manual trigger (Safe call)
+
+                if (this.State) {
+                    // Delay is important for binding filters to react
+                    setTimeout(() => {
+                        oLoginModel.setProperty("/State", this.State);
+                        this.onChangeState(null);
+
+                        if (this.City) {
+                            setTimeout(() => {
+                                oLoginModel.setProperty("/City", this.City);
+                                this.onChangeCity(null);
+                            }, 200);
+                        }
+                    }, 200);
+                }
+            }
+
             this._resetOtpState();
             this._addPasswordGenerateIcon();
         },
@@ -1447,67 +1534,122 @@ _convertAmenities: function (list) {
             setTimeout(() => form.remove(), 500);
         },
 
+
+
+        // --- Refactored State Change ---
         onChangeState: function (oEvent) {
-            const oState = oEvent.getSource();
-            const oModel = this.getView().getModel("LoginMode");
-
-            // sanitize free typing
+            const oState = oEvent ? oEvent.getSource() : $C("signUpState");
             oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
 
-            utils._LCvalidateMandatoryField(oEvent);
+            const oModel = this.getView().getModel("LoginMode");
+            const oCity = $C("signUpCity");
 
-            // ✅ ALWAYS WRITE TO MODEL
-            const sStateText =
-                oState.getSelectedItem()?.getText() ||
-                oState.getValue() ||
-                "";
+            if (oEvent) {
+                oModel.setProperty("/City", "");
+                oCity.setValue("").setSelectedKey("");
+                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+            }
 
+            // Auto-select for location fetch
+            let oSelectedItem = oState.getSelectedItem();
+            if (!oSelectedItem && oModel.getProperty("/State")) {
+                oState.setSelectedKey(oModel.getProperty("/State"));
+                oSelectedItem = oState.getSelectedItem();
+            }
+
+            const sStateText = oSelectedItem?.getText() || oState.getValue() || "";
             oModel.setProperty("/State", sStateText);
 
-            // reset city whenever state changes
-            const oCity = $C("signUpCity");
-            oModel.setProperty("/City", "");
-            oCity.setValue("").setSelectedKey("");
-
-            oCity.getBinding("items")?.filter([
-                new Filter("cityName", "EQ", "__NONE__")
-            ]);
-
-            // release cities only if country is valid
             const oCountry = $C("signUpCountry");
-            const sCountryCode =
-                oCountry.getSelectedItem()?.getAdditionalText()?.trim();
+            const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
 
-            if (!sCountryCode || !sStateText) return;
-
-            oCity.getBinding("items")?.filter([
-                new Filter("stateName", "EQ", sStateText),
-                new Filter("countryCode", "EQ", sCountryCode)
-            ]);
-        },
-        onChangeCity: function (oEvent) {
-            const oCity = oEvent.getSource();
-            const oModel = this.getView().getModel("LoginMode");
-            // sanitize manual typing
-            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
-            const oCountry = $C("signUpCountry");
-            const oState = $C("signUpState");
-            const hasCountry = !!oCountry.getSelectedItem();
-            const hasState = !!oState.getSelectedItem() || !!oState.getValue();
-            // parent missing → block
-            if (!hasCountry || !hasState) {
-                oCity.setValue("");
-                oCity.setSelectedKey("");
-                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
-                oCity.setValueState("None");
-                return;
+            if (sCountryCode && sStateText) {
+                oCity.getBinding("items")?.filter([
+                    new Filter("stateName", "EQ", sStateText),
+                    new Filter("countryCode", "EQ", sCountryCode)
+                ]);
             }
-            utils._LCvalidateMandatoryField(oEvent);
-            // ✅ ALWAYS WRITE TO MODEL
-            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
+        },
 
+        // --- Refactored City Change ---
+        onChangeCity: function (oEvent) {
+            const oCity = oEvent ? oEvent.getSource() : $C("signUpCity");
+            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
+
+            const oModel = this.getView().getModel("LoginMode");
+
+            // Auto-select logic
+            if (!oCity.getSelectedItem() && oModel.getProperty("/City")) {
+                oCity.setSelectedKey(oModel.getProperty("/City"));
+            }
+
+            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/City", sCityText);
         },
+        // onChangeState: function (oEvent) {
+        //     const oState = oEvent.getSource();
+        //     const oModel = this.getView().getModel("LoginMode");
+
+        //     // sanitize free typing
+        //     oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
+
+        //     utils._LCvalidateMandatoryField(oEvent);
+
+        //     // ✅ ALWAYS WRITE TO MODEL
+        //     const sStateText =
+        //         oState.getSelectedItem()?.getText() ||
+        //         oState.getValue() ||
+        //         "";
+
+        //     oModel.setProperty("/State", sStateText);
+
+        //     // reset city whenever state changes
+        //     const oCity = $C("signUpCity");
+        //     oModel.setProperty("/City", "");
+        //     oCity.setValue("").setSelectedKey("");
+
+        //     oCity.getBinding("items")?.filter([
+        //         new Filter("cityName", "EQ", "__NONE__")
+        //     ]);
+
+        //     // release cities only if country is valid
+        //     const oCountry = $C("signUpCountry");
+        //     const sCountryCode =
+        //         oCountry.getSelectedItem()?.getAdditionalText()?.trim();
+
+        //     if (!sCountryCode || !sStateText) return;
+
+        //     oCity.getBinding("items")?.filter([
+        //         new Filter("stateName", "EQ", sStateText),
+        //         new Filter("countryCode", "EQ", sCountryCode)
+        //     ]);
+        // },
+        // onChangeCity: function (oEvent) {
+        //     const oCity = oEvent.getSource();
+        //     const oModel = this.getView().getModel("LoginMode");
+        //     // sanitize manual typing
+        //     oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+        //     const oCountry = $C("signUpCountry");
+        //     const oState = $C("signUpState");
+        //     const hasCountry = !!oCountry.getSelectedItem();
+        //     const hasState = !!oState.getSelectedItem() || !!oState.getValue();
+        //     // parent missing → block
+        //     if (!hasCountry || !hasState) {
+        //         oCity.setValue("");
+        //         oCity.setSelectedKey("");
+        //         oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+        //         oCity.setValueState("None");
+        //         return;
+        //     }
+        //     utils._LCvalidateMandatoryField(oEvent);
+        //     // ✅ ALWAYS WRITE TO MODEL
+        //     const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
+
+        //     oModel.setProperty("/City", sCityText);
+        // },
 
         onChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
@@ -1624,43 +1766,94 @@ _convertAmenities: function (list) {
 
         onAddressChange: function () { utils._LCvalidateAddress($C("signUpAddress")) },
 
+        // onChangeCountry: function (oEvent) {
+        //     const oCountry = oEvent.getSource();
+        //     oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
+        //     if (!utils._LCvalidateMandatoryField(oEvent)) {
+        //         return;
+        //     }
+
+        //     const oModel = this.getView().getModel("LoginMode");
+        //     const oState = $C("signUpState");
+        //     const oCity = $C("signUpCity");
+        //     const oSTD = $C("signUpSTD");
+
+        //     ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
+        //     oState.setSelectedKey("");
+        //     oCity.setSelectedKey("");
+        //     oSTD.setSelectedKey("");
+        //     oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
+
+        //     oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+
+        //     const oItem = oCountry.getSelectedItem();
+        //     if (!oItem) return;
+
+        //     const sCountryName = oItem.getText();
+        //     const sCountryCode = oItem.getAdditionalText()?.trim();
+
+        //     oModel.setProperty("/Country", sCountryName);
+        //     const aCountries = this.getOwnerComponent().getModel("CountryModel").getProperty("/");
+
+        //     const oMatch = aCountries?.find(c => c.countryName === sCountryName);
+
+        //     if (oMatch?.stdCode) {
+        //         oModel.setProperty("/STDCode", oMatch.stdCode);
+        //         oSTD.setSelectedKey(oMatch.stdCode); //  correct
+        //         this.onSTDChange();
+        //     }
+
+        //     if (sCountryCode) {
+        //         oState.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
+        //     }
+        // },
+        // --- Refactored Country Change ---
         onChangeCountry: function (oEvent) {
-            const oCountry = oEvent.getSource();
+            const oCountry = oEvent ? oEvent.getSource() : $C("signUpCountry");
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
+
+            // Sanitize
             oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
-            if (!utils._LCvalidateMandatoryField(oEvent)) {
-                return;
-            }
 
             const oModel = this.getView().getModel("LoginMode");
             const oState = $C("signUpState");
             const oCity = $C("signUpCity");
             const oSTD = $C("signUpSTD");
 
-            ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
-            oState.setSelectedKey("");
-            oCity.setSelectedKey("");
-            oSTD.setSelectedKey("");
-            oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
+            // Reset dependents ONLY if it's a manual change
+            if (oEvent) {
+                ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
+                oState.setSelectedKey("").setValue("");
+                oCity.setSelectedKey("").setValue("");
+                oSTD.setSelectedKey("");
+                oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
+                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+            }
 
-            oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+            // Auto-select item in list if not selected (for location fetch)
+            let oItem = oCountry.getSelectedItem();
+            if (!oItem && oModel.getProperty("/Country")) {
+                oCountry.setSelectedKey(oModel.getProperty("/Country"));
+                oItem = oCountry.getSelectedItem();
+            }
 
-            const oItem = oCountry.getSelectedItem();
             if (!oItem) return;
 
             const sCountryName = oItem.getText();
             const sCountryCode = oItem.getAdditionalText()?.trim();
 
             oModel.setProperty("/Country", sCountryName);
+
+            // Set STD Code
             const aCountries = this.getOwnerComponent().getModel("CountryModel").getProperty("/");
-
             const oMatch = aCountries?.find(c => c.countryName === sCountryName);
-
             if (oMatch?.stdCode) {
                 oModel.setProperty("/STDCode", oMatch.stdCode);
-                oSTD.setSelectedKey(oMatch.stdCode); //  correct
-                this.onSTDChange();
+                oSTD.setSelectedKey(oMatch.stdCode);
+                this.onSTDChange(); // Trigger mobile length logic
             }
 
+            // Filter States
             if (sCountryCode) {
                 oState.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
             }
@@ -2239,7 +2432,7 @@ _convertAmenities: function (list) {
             const oCustomerModel = new JSONModel(aCustomers);
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
-           onRatingPress: function (oEvent) {
+        onRatingPress: function (oEvent) {
             var oSource = oEvent.getSource();
 
             // Get binding context of the clicked bed type
@@ -2256,7 +2449,7 @@ _convertAmenities: function (list) {
 
         },
 
-       _loadFilteredData: async function (Scity, sBranchCode, sACType) {
+        _loadFilteredData: async function (Scity, sBranchCode, sACType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
 
@@ -2453,7 +2646,7 @@ _convertAmenities: function (list) {
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
                 }
-               } catch (err) {
+            } catch (err) {
                 MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
             }
         },
@@ -2839,7 +3032,7 @@ _convertAmenities: function (list) {
                     MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
                 }
             } catch (err) {
-                 const sMsg =
+                const sMsg =
                     err?.responseJSON?.message ||
                     this.i18nModel.getText("invalidCredentialsPleasetryagain");
                 sap.m.MessageToast.show(sMsg);
@@ -3614,13 +3807,39 @@ _convertAmenities: function (list) {
                     this._resetAdminSignupForm();
                 });
             }
-            // Set DOB limits - CHANGED: now 0 to 100 years (was 18 to 70)
+
+            const oModel = this.getView().getModel("AdminSignupModel");
+
+            // --- AUTO-POPULATION LOGIC ---
+            if (this.Country) {
+                oModel.setProperty("/Country", this.Country);
+                // Bina event ke trigger karein
+                this.ADMIN_onChangeCountry(null);
+
+                if (this.State) {
+                    // Thoda delay zaroori hai taaki State list filter ho chuki ho
+                    setTimeout(() => {
+                        oModel.setProperty("/State", this.State);
+                        this.ADMIN_onChangeState(null);
+
+                        if (this.City) {
+                            setTimeout(() => {
+                                oModel.setProperty("/City", this.City);
+                                this.ADMIN_onChangeCity(null);
+                            }, 100);
+                        }
+                    }, 100);
+                }
+            }
+
+            // DOB Limits
             const oDate = $C("adminDOB");
             if (oDate) {
                 const now = new Date();
-                oDate.setMaxDate(now); // Allow up to current date (age 0)
+                oDate.setMaxDate(now);
                 oDate.setMinDate(new Date(now.getFullYear() - 100, now.getMonth(), now.getDate()));
             }
+
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
         },
@@ -3633,11 +3852,11 @@ _convertAmenities: function (list) {
         },
 
         ADMIN_onChangeCountry: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-            const oCountry = oEvent.getSource();
-            const oModel = this.getView().getModel("AdminSignupModel");
+            // 1. Get Control reference safely
+            const oCountry = oEvent ? oEvent.getSource() : $C("adminsignUpCountry");
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
 
+            const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
             const oCityModel = this.getView().getModel("CityModel");
 
@@ -3646,44 +3865,46 @@ _convertAmenities: function (list) {
             const oSTD = $C("adminsignUpSTD");
             const oMobile = $C("adminMobileNo");
 
-            // --- 1) SANITIZE TYPED COUNTRY TEXT ---
-            const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
-            oCountry.setValue(val);
-            if (oCountry.getSelectedItem() &&
-                val !== oCountry.getSelectedItem().getText()) {
-                oCountry.setSelectedKey(null);
-                oCountry.setSelectionItem(null);
+            // 2. Sanitize typing only if user is interacting
+            if (oEvent) {
+                const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
+                oCountry.setValue(val);
             }
-            // --- 2) RESET dependent model properties ---
-            oModel.setProperty("/State", "");
-            oModel.setProperty("/City", "");
-            oModel.setProperty("/STDCode", "");
-            oState.setValue("").setSelectedKey("");
-            oCity.setValue("").setSelectedKey("");
-            oSTD.setValue("").setSelectedKey("");
-            oMobile.setValue("");
-            oStateModel.setProperty("/filtered", []);
-            oCityModel.setProperty("/filtered", []);
-            const selected = oCountry.getSelectedItem();
-            oCountry.setValueState("None");
-            // CASE B — MANUAL COUNTRY TYPED
-            if (!selected) return oModel.setProperty("/Country", val);
 
-            // CASE A — COUNTRY SELECTED
-            oModel.setProperty("/Country", selected.getText());
+            // 3. Reset dependent fields logic (Reset tabhi karein jab user manual change kare)
+            if (oEvent) {
+                oModel.setProperty("/State", "");
+                oModel.setProperty("/City", "");
+                oStateModel.setProperty("/filtered", []);
+                oCityModel.setProperty("/filtered", []);
+            }
 
-            oState.setValueState("None");
-            oCity.setValueState("None");
-            oSTD.setValueState("None");
-            oMobile.setValueState("None");
+            // 4. Get Selected Item or Find from Model (for Auto-populate)
+            let selected = oCountry.getSelectedItem();
+            let sCountryName = oModel.getProperty("/Country");
+
+            // Agar item select nahi hua (auto-populate case), toh model se search karein
+            if (!selected && sCountryName) {
+                const aCountries = this.getView().getModel("CountryModel").getData();
+                const oMatch = aCountries.find(c => c.countryName === sCountryName);
+                if (oMatch) {
+                    // Select the item in ComboBox so getAdditionalText works
+                    oCountry.setSelectedKey(oMatch.countryName);
+                    selected = oCountry.getSelectedItem();
+                }
+            }
+
+            if (!selected) return;
+
+            // 5. Filtering States
             const sCountryCode = selected.getAdditionalText().trim();
-            // Mobile length rule
             oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
-            // Filter states
+
             const allStates = oStateModel.getData();
             const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
             oStateModel.setProperty("/filtered", filteredStates);
-            //  AUTO-SELECT STD WITHOUT FILTERING LIST
+
+            // 6. Auto-select STD
             let matchedKey = null;
             oSTD.getItems().some(item => {
                 if (item.getAdditionalText().trim() === sCountryCode) {
@@ -3696,48 +3917,46 @@ _convertAmenities: function (list) {
             if (matchedKey) {
                 oSTD.setSelectedKey(matchedKey);
                 oModel.setProperty("/STDCode", matchedKey);
-            } else {
-                oSTD.setSelectedKey("");
-                oModel.setProperty("/STDCode", "");
             }
-            // If no states exist → empty city list
-            if (filteredStates.length === 0) oCityModel.setProperty("/filtered", []);
         },
 
         ADMIN_onChangeState: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-            const oState = oEvent.getSource();
-            const oModel = this.getView().getModel("AdminSignupModel");
-            const oCountry = $C("adminsignUpCountry");
-            const oCity = $C("adminsignUpCity");
-            const oCityModel = this.getView().getModel("CityModel");
-            // --- SANITIZE INPUT ---
-            const val = oState.getValue().replace(/[^a-zA-Z\s]/g, "");
-            oState.setValue(val);
-            // Clear state error always (typed or selected)
-            oState.setValueState("None");
-            // Clear city (dependent)
-            oModel.setProperty("/City", "");
-            oCity.setSelectedKey("").setValue("");
-            oCityModel.setProperty("/filtered", []);
-            // Detect manual typing: break auto-selection
-            if (oState.getSelectedItem() &&
-                val !== oState.getSelectedItem().getText()) {
-                oState.setSelectedKey(null);
-                oState.setSelectionItem(null);
-            }
-            const selected = oState.getSelectedItem();
-            const selectedCountry = oCountry.getSelectedItem();
-            if (!selected || !selectedCountry) return oModel.setProperty("/State", val);
+            const oState = oEvent ? oEvent.getSource() : $C("adminsignUpState");
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
 
-            const sStateText = selected.getText();
-            oModel.setProperty("/State", sStateText);
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const oCityModel = this.getView().getModel("CityModel");
+            const oCountry = $C("adminsignUpCountry");
+
+            if (oEvent) {
+                oModel.setProperty("/City", "");
+                oCityModel.setProperty("/filtered", []);
+            }
+
+            let selectedState = oState.getSelectedItem();
+            let sStateText = oModel.getProperty("/State");
+
+            // Auto-populate case: find and select in list
+            if (!selectedState && sStateText) {
+                const aFilteredStates = oStateModel.getProperty("/filtered");
+                const oMatch = aFilteredStates.find(s => s.stateName === sStateText);
+                if (oMatch) {
+                    oState.setSelectedKey(oMatch.stateName);
+                    selectedState = oState.getSelectedItem();
+                }
+            }
+
+            const selectedCountry = oCountry.getSelectedItem();
+            if (!selectedState || !selectedCountry) return;
 
             const sCountryCode = selectedCountry.getAdditionalText().trim();
+            const sActualStateText = selectedState.getText();
+
             // Filter cities
-            const allCities = oCityModel.getData();
-            const filteredCities = allCities.filter(c => c.countryCode === sCountryCode && c.stateName === sStateText);
+            const allCities = this.getView().getModel("CityModel").getData();
+            const filteredCities = allCities.filter(c =>
+                c.countryCode === sCountryCode && c.stateName === sActualStateText
+            );
             oCityModel.setProperty("/filtered", filteredCities);
         },
 
@@ -4362,23 +4581,18 @@ _convertAmenities: function (list) {
 
         onAddressClick: function () {
             try {
-                let oHostelModel;
-                if (this._oRoomDetailFragment) {
-                    oHostelModel = this._oRoomDetailFragment.getModel("HostelModel");
-                } else {
-                    oHostelModel = this.oHostelModel;
-                }
+                let oHostelModel = this._oRoomDetailFragment ? this._oRoomDetailFragment.getModel("HostelModel") : this.oHostelModel;
                 if (!oHostelModel) return MessageToast.show("Location data not available.");
+                const sGeoUrl = (oHostelModel.getProperty("/GeoLocation") || "").trim();
+                if (!sGeoUrl || sGeoUrl === "null" || sGeoUrl === "undefined") {
+                    return MessageToast.show("Geo Location is not available");
+                }
+                const urlPattern = /^https:\/\/[^ "]+(\.[a-z]{2,})/i;
+                if (!urlPattern.test(sGeoUrl)) {
+                    return MessageToast.show("Invalid Geo Location link");
+                }
 
-                const sGeoUrl = oHostelModel.getProperty("/GeoLocation") || "";
-
-                if (!sGeoUrl || sGeoUrl.trim() === "" || sGeoUrl === "null" || sGeoUrl === "undefined") return MessageToast.show("Geo Location is not available.");
-
-                const urlPattern = /^(http|https):\/\/[^ "]+(\.com|\.co|\.in|\.net|\.org|maps\.app\.goo\.gl)/i;
-
-                if (!urlPattern.test(sGeoUrl.trim())) return MessageToast.show("Invalid Geo location link");
-
-                window.open(sGeoUrl.trim(), "_blank");
+                window.open(sGeoUrl, "_blank");
             } catch (err) {
                 MessageToast.show("Error opening maps.");
             }
