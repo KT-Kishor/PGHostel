@@ -187,6 +187,8 @@ sap.ui.define([
                     return "Error";
                 case "Offer Sent":
                     return "Indication06";
+              case "Received":
+                    return "Success";
                 case "Invoiced":
                     return "Success";
                 case "Payment Received":

@@ -415,12 +415,12 @@ sap.ui.define([
 
                 // ================= Calculate Status =================
                 filteredData.forEach(deposit => {
-                    // SIMPLIFIED STATUS LOGIC: Only "Pending" or "Returned"
+                    // SIMPLIFIED STATUS LOGIC: Only "Pending" or "
                     const depositAmount = parseFloat(deposit.DepositAmount || 0);
                     const returnAmount = parseFloat(deposit.ReturnDepositAmount || 0);
 
                     // Simple binary logic
-                    deposit.Status = returnAmount > 0 ? "Returned" : "Pending";
+                    deposit.Status = returnAmount > 0 ? "Returned" : "Received";
                 });
 
                 // ================= Update Model =================
