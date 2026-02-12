@@ -725,9 +725,7 @@ HM_UnassignRoom: function () {
         sap.ui.core.BusyIndicator.show(0);
         await this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
 
-        sap.m.MessageToast.show(
-            this.i18nModel.getText("recordUpdatedSuccessfully")
-        );
+    
 
         await this.Cust_read(true);
         this.HM_Dialog.close();
@@ -760,6 +758,9 @@ HM_UnassignRoom: function () {
                                 dash: "AdminPage"
                             });
                     } else {
+                            sap.m.MessageToast.show(
+            this.i18nModel.getText("recordUpdatedSuccessfully")
+        );
                           this.getOwnerComponent().getModel("InvoiceNavContext").setData({}); 
                          }
                 }
@@ -780,7 +781,30 @@ HM_UnassignRoom: function () {
         sap.ui.core.BusyIndicator.hide();
 
         sap.m.MessageBox.error(sErrorMsg);
+       sap.m.MessageBox.error(sErrorMsg, {
+    title: "Error",
+    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+    emphasizedAction: sap.m.MessageBox.Action.OK,
+
+    onClose: function (sAction) {
+
+        if (sAction === sap.m.MessageBox.Action.OK) {
+
+            var sCustomerID = ID.CustomerID;
+            var sEncodedID = btoa(sCustomerID.toString());
+
+            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
+                sPath: encodeURIComponent(sEncodedID),
+                from: "Customerdetails"
+            });
+        }
+
+        // If Cancel → Do nothing
+    }.bind(this)
+});
+
     }
+    
 },
 
         onTableUpdateFinished: function () {
