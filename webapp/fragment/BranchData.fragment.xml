@@ -288,32 +288,30 @@
                     class="sapUiSmallMarginBottom"
                 />
                 <Label text="{i18n>addLogo}" />
-
                 <VBox
                     alignItems="Start"
                     width="100%"
                     renderType="Bare"
                 >
-                    <HBox width="25%">
+                    <HBox>
                         <u:FileUploader
                             id="BD_id_FileUploader"
-                            width="120px"
                             fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="2"
+                            maximumFileSize="5MB"
                             typeMissmatch="onFileTypeMissmatch"
                             fileType="jpg,jpeg,png"
                             change="onFacilityFileChange"
                             buttonOnly="true"
                             sameFilenameAllowed="true"
                             iconFirst="true"
-                            buttonText="Upload Images"
+                            buttonText="Upload Logo"
                             multiple="false"
                             uploadOnChange="false"
                             tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
                         />
                     </HBox>
                     <!-- Tokenizer -->
-                    <HBox width="75%">
+                    <HBox>
                         <ScrollContainer
                             height="60px"
                             width="100%"
@@ -323,13 +321,60 @@
                             <Tokenizer
                                 id="BD_id_TokenList"
                                 width="100%"
-                                class="wrapTokenizer"
                                 tokenDelete="onTokenDelete"
                                 tokens="{tokenModel>/tokens}"
                             >
                                 <Token
                                     key="{tokenModel>key}"
                                     text="{tokenModel>text}"
+                                />
+                            </Tokenizer>
+                        </ScrollContainer>
+                    </HBox>
+                </VBox>
+                <Label
+                    text="{i18n>addImage}"
+                    required="true"
+                />
+                <VBox
+                    alignItems="Start"
+                    width="100%"
+                    renderType="Bare"
+                >
+                    <HBox>
+                        <u:FileUploader
+                            id="BD_id_FileUploader1"
+                            fileSizeExceed="onFileSizeExceeds"
+                            maximumFileSize="5MB"
+                            typeMissmatch="onFileTypeMissmatch"
+                            fileType="jpg,jpeg,png"
+                            change="onImageChange"
+                            buttonOnly="true"
+                            sameFilenameAllowed="true"
+                            iconFirst="true"
+                            buttonText="Upload Image"
+                            multiple="false"
+                            uploadOnChange="false"
+                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                        />
+                    </HBox>
+                    <!-- Tokenizer -->
+                    <HBox>
+                        <ScrollContainer
+                            height="60px"
+                            width="100%"
+                            horizontal="false"
+                            vertical="true"
+                        >
+                            <Tokenizer
+                                id="BD_id_TokenList1"
+                                width="100%"
+                                tokenDelete="onTokenImageDelete"
+                                tokens="{tokenImageModel>/imageTokens}"
+                            >
+                                <Token
+                                    key="{tokenImageModel>key}"
+                                    text="{tokenImageModel>text}"
                                 />
                             </Tokenizer>
                         </ScrollContainer>

@@ -59,7 +59,8 @@ sap.ui.define([
             try {
                 sap.ui.core.BusyIndicator.show(0);
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                // await this.onClearAndSearch("MD_id_Filterbar");
+                this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
+                this.getView().setModel(new sap.ui.model.json.JSONModel({ imageTokens: [] }), "tokenImageModel");
                 await this.Onsearch();
                 this.commonLoginFunction();
                 await this.Customerdata()
@@ -135,9 +136,9 @@ sap.ui.define([
             var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
             var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
             var model = new sap.ui.model.json.JSONModel(aBranchData);
-    
+
             this.getOwnerComponent().setModel(model, "mainModel")
-        },  
+        },
 
         MD_onPressClear: function () {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
@@ -229,11 +230,11 @@ sap.ui.define([
                 property: "Address",
                 type: "string"
             },
-                {
-                    label: "GeoLocation",      // Add this
-                    property: "GeoLocation",
-                    type: "string"
-                },
+            {
+                label: "GeoLocation",      // Add this
+                property: "GeoLocation",
+                type: "string"
+            },
             {
                 label: "Pincode",
                 property: "Pincode",
@@ -345,6 +346,9 @@ sap.ui.define([
             oView.getModel("tokenModel").setData({
                 tokens: []
             });
+            oView.getModel("tokenImageModel").setData({
+                imageTokens: []
+            });
             const oCountry = sap.ui.getCore().byId(oView.createId("MC_id_Country"));
             const oState = sap.ui.getCore().byId(oView.createId("MC_id_State"));
             const oCity = sap.ui.getCore().byId(oView.createId("MC_id_City"));
@@ -395,10 +399,10 @@ sap.ui.define([
         MD_onSaveButtonPress: async function () {
             var oView = this.getView();
             const oUpload = oView.getModel("UploadModel").getData();
+            const oImage = oView.getModel("imageModel").getData();
             var oFacilitiesModel = oView.getModel("MDmodel");
             var Payload = oFacilitiesModel.getData();
 
-            // First validate all mandatory fields
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
@@ -482,11 +486,15 @@ sap.ui.define([
                 return;
             }
 
+            if (!oImage.Attachment) {
+                const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
+                sap.m.MessageToast.show("Please upload branch image");
+                return;
+            }
             var oData = {
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
                 Address: Payload.Address,
-                // ===== ADD THIS COORDINATE VALIDA
                 GeoLocation: Payload.GeoLocation,
                 Pincode: Payload.Pincode,
                 Contact: Payload.Contact,
@@ -497,11 +505,14 @@ sap.ui.define([
                 Penalty: Payload.Penalty,
                 Currency: Payload.Currency,
                 Photo1: oUpload.Photo1,
+                Attachment: oImage.Attachment,
                 GSTIN: Payload.GSTIN,
                 Type: Payload.Type,
                 Value: Payload.Value,
                 Photo1Type: oUpload.Photo1Type,
                 Photo1Name: oUpload.Photo1Name,
+                AttachmentType: oImage.AttachmentType,
+                AttachmentName: oImage.AttachmentName,
                 CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
             };
@@ -528,9 +539,7 @@ sap.ui.define([
                 await this.Onsearch();
                 this.oDialog.close();
                 sap.m.MessageToast.show(
-                    this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully")
-                        : this.i18nModel.getText("branchaddedSuccessfully")
-                );
+                    this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
@@ -574,10 +583,7 @@ sap.ui.define([
 
         _resetFacilityValueStates: function () {
             var oView = this.getView();
-            var aFields = [
-                "idBranch", "idBName", "idAddress", "BD_idGeoLocation",   // Add Latitude/Longitude
-                "idPin", "idPhone", "idPenalty"
-            ];
+            var aFields = ["idBranch", "idBName", "idAddress", "BD_idGeoLocation", "idPin", "idPhone", "idPenalty"];
 
             aFields.forEach(function (sId) {
                 var oField = sap.ui.getCore().byId(oView.createId(sId));
@@ -776,14 +782,10 @@ sap.ui.define([
                                     });
                                 }
                                 await this.Onsearch();
-                                sap.m.MessageToast.show(
-                                    this.i18nModel.getText("selectedRecordsDeletedSuccessfully")
-                                );
+                                sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully"));
                             } catch (err) {
                                 console.error("Delete failed:", err);
-                                sap.m.MessageBox.error(
-                                    this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain")
-                                );
+                                sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain"));
                             } finally {
                                 sap.ui.core.BusyIndicator.hide();
                                 oTable.removeSelections(true);
@@ -793,7 +795,6 @@ sap.ui.define([
                 }
             );
         },
-
 
         MD_UpdateTableRow: function () {
             var oView = this.getView();
@@ -827,6 +828,17 @@ sap.ui.define([
                 Photo1Name: oData.Photo1Name || ""
             });
 
+            this.getView().getModel("imageModel").setData({
+                Attachment: oData.Attachment || "",
+                AttachmentType: oData.AttachmentType || "",
+                AttachmentName: oData.AttachmentName || ""
+            });
+
+            const aTokenImages = oData.AttachmentName ? [{
+                key: oData.AttachmentName,
+                text: oData.AttachmentName
+            }] : [];
+
             // Add existing file to tokens
             const aTokens = oData.Photo1Name ? [{
                 key: oData.Photo1Name,
@@ -835,6 +847,9 @@ sap.ui.define([
 
             this.getView().getModel("tokenModel").setData({
                 tokens: aTokens
+            });
+            this.getView().getModel("tokenImageModel").setData({
+                imageTokens: aTokenImages
             });
             if (!this.oDialog) {
                 this.oDialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.BranchData", this);
@@ -875,11 +890,10 @@ sap.ui.define([
             const bIsIndia = oData.Country === "India";
             oVisible.setProperty("/isIndia", bIsIndia);
 
-            // 2️⃣ GST present or not
+            // GST present or not
             const bHasGST = !!oData.GSTIN;
             oVisible.setProperty("/CC_id_CustInput", bHasGST);
 
-            // 3️⃣ Lock radio selection based on saved Type
             if (oData.Type === "CGST") {
                 oVisible.setProperty("/selectedIndex", 0);
             } else if (oData.Type === "IGST") {
@@ -1016,7 +1030,7 @@ sap.ui.define([
 
             const sCountry = oItem.getText();
             const sCountryCode = oItem.getAdditionalText()?.trim();
-            // ✅ GST only for India
+            // GST only for India
             if (sCountry === "India") {
                 oVisible.setProperty("/isIndia", true);
             } else {
@@ -1216,13 +1230,40 @@ sap.ui.define([
 
             oReader.readAsDataURL(oFile);
         },
+
+        onImageChange: function (oEvent) {
+            const oFiles = oEvent.getParameter("files")[0];
+            if (!oFiles) {
+                return;
+            }
+
+            const oReader = new FileReader();
+
+            oReader.onload = (e) => {
+                const base64 = e.target.result.split(",")[1];
+                this.getView().getModel("imageModel").setData({
+                    Attachment: base64,
+                    AttachmentType: oFiles.type,
+                    AttachmentName: oFiles.name
+                });
+                this.getView().getModel("tokenImageModel").setData({
+                    imageTokens: [{
+                        key: oFiles.name,
+                        text: oFiles.name
+                    }]
+                });
+                sap.m.MessageToast.show("Image uploaded successfully");
+            };
+            oReader.readAsDataURL(oFiles);
+        },
+
         onFileSizeExceeds: function () {
             sap.m.MessageToast.show(
                 "This file is more than 2 MB and cannot be uploaded"
             );
         },
 
-        onTokenDelete: function (oEvent) {
+        onTokenDelete: function () {
             this.getView().getModel("UploadModel").setData({
                 Photo1: "",
                 Photo1Type: "",
@@ -1230,6 +1271,17 @@ sap.ui.define([
             });
             this.getView().getModel("tokenModel").setData({
                 tokens: []
+            });
+        },
+
+        onTokenImageDelete: function () {
+            this.getView().getModel("imageModel").setData({
+                Attachment: "",
+                AttachmentType: "",
+                AttachmentName: ""
+            });
+            this.getView().getModel("tokenImageModel").setData({
+                imageTokens: []
             });
         },
 
@@ -1361,7 +1413,6 @@ sap.ui.define([
             if (parts[1] && parts[1].length > 2) {
                 filteredValue = parts[0] + '.' + parts[1].substring(0, 2);
             }
-
             oInput.setValue(filteredValue);
             dataModel.setProperty("/Value", filteredValue);
 
@@ -1375,6 +1426,7 @@ sap.ui.define([
                 oInput.setValueStateText("");
             }
         },
+
         onRadioButtonChange: function (oEvent) {
             const oButtonGroup = oEvent.getSource();
             const selectedIndex = oButtonGroup.getSelectedIndex();
@@ -1382,23 +1434,12 @@ sap.ui.define([
             const visiModel = this.getView().getModel("visiblePlay");
 
             visiModel.setProperty("/selectedIndex", selectedIndex);
-
             // Update the Type in model based on selection
             if (selectedIndex === 0) {
                 dataModel.setProperty("/Type", "CGST/SGST");
             } else if (selectedIndex === 1) {
                 dataModel.setProperty("/Type", "IGST");
             }
-
-            // Don't override tax percentage value when changing radio button
-            // Keep whatever value user has entered
-            
-        }, 
-        
-
-
-
-  
-
+        },
     })
 });

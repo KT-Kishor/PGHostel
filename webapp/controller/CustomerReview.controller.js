@@ -170,6 +170,15 @@ sap.ui.define([
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
             let aFiltered = this._aAllFeedbacks || [];
+            if (aFiltered.length === 0) {
+                    this._showIllustration(
+                        sap.m.IllustratedMessageType.NoData,
+                        "No Reviews Found",
+                        "There are no customer reviews available."
+
+                    )
+                    return;
+            }
             aFiltered.forEach(f => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/CustomerCard.json",
@@ -190,6 +199,27 @@ sap.ui.define([
                 });
                 oBox.addItem(oCard);
             });
+        },
+
+        _showIllustration: function (type, title, description) {
+            const oBox = this.byId("CR_id_ReviewContainer");
+            oBox.removeAllItems();
+            const oIllustration = new sap.m.IllustratedMessage({
+                illustrationType: type,
+                illustrationSize: sap.m.IllustratedMessageSize.Scene,
+                title: title,
+                description: description
+            });
+
+            const oWrapper = new sap.m.VBox({
+                width: "100%",
+                height: "100%",
+                alignItems: "Center",
+                justifyContent: "Center",
+                items: [oIllustration]
+            });
+
+            oBox.addItem(oWrapper);
         },
 
         CR_onSearch: function () {
