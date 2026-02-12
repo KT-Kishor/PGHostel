@@ -69,16 +69,16 @@ sap.ui.define([
             }
         },
 
-        buildBranchMap: function () {
-            const aBranches = this.getView().getModel("PayBranchModel")?.getData() || [];
-            const mBranchMap = {};
-            aBranches.forEach(b => {
-                if (b.BranchCode && b.BranchName) {
-                    mBranchMap[b.BranchCode] = b.BranchName;
-                }
-            });
-            return mBranchMap;
-        },
+        // buildBranchMap: function () {
+        //     const aBranches = this.getView().getModel("PayBranchModel")?.getData() || [];
+        //     const mBranchMap = {};
+        //     aBranches.forEach(b => {
+        //         if (b.BranchCode && b.Name) {
+        //             mBranchMap[b.BranchCode] = b.Name;
+        //         }
+        //     });
+        //     return mBranchMap;
+        // },
 
         prepareMasterFilterData: function (aData) {
             const mBranch = new Map();
@@ -89,7 +89,7 @@ sap.ui.define([
                 if (item.BranchCode && !mBranch.has(item.BranchCode)) {
                     mBranch.set(item.BranchCode, {
                         BranchCode: item.BranchCode,
-                        BranchName: item.BranchName
+                        Name: item.Name
                     });
                 }
                 if (item.CustomerID && !mCustomer.has(item.CustomerID)) {
@@ -141,7 +141,7 @@ sap.ui.define([
             }
 
             if (oLogin.Role === "Super Admin" && !filters.StartDate) filters.GetAll = true;
-            
+
             function formatLocalDate(d) {
                 return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(d);
             }
@@ -169,19 +169,28 @@ sap.ui.define([
             }
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
-                const aData = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
+                const aDatas = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
+                const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+
+                const oDatas = aDatas.map(item => {
+                    const branch = branchData.find(br => br.BranchID === item.BranchCode);
+                    return {
+                        ...item,
+                        BranchName: branch ? branch.Name : item.BranchCode
+                    };
+                });
 
                 if (bInitialLoad && this.fullPaymentData.length === 0) {
-                    this.fullPaymentData = aData;
-                    this.prepareMasterFilterData(aData);
+                    this.fullPaymentData = oDatas;
+                    this.prepareMasterFilterData(oDatas);
                 }
-                const mBranchMap = this.buildBranchMap();
-                aData.forEach(item => {
-                    if (!item.BranchName && item.BranchCode) {
-                        item.BranchName = mBranchMap[item.BranchCode] || item.BranchCode;
-                    }
-                });
-                this.getView().setModel(new JSONModel(aData), "mainModel");
+                // const mBranchMap = this.buildBranchMap();
+                // aData.forEach(item => {
+                //     if (!item.Name && item.BranchCode) {
+                //         item.Name = mBranchMap[item.BranchCode] || item.BranchCode;
+                //     }
+                // });
+                this.getView().setModel(new JSONModel(oDatas), "mainModel");
             })
                 .catch((err) => {
                     MessageToast.show(err.message || err.responseText);
@@ -274,7 +283,7 @@ sap.ui.define([
         P_onDownload: function () {
             const oModel = this.byId("P_id_PaymentTable").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) return MessageToast.show(this.i18nModel.getText("MSnodata"));
-             
+
             const adjustedData = oModel.map(item => ({
                 ...item,
                 Date: Formatter.displayFormatDate(item.Date)

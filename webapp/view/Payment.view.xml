@@ -83,7 +83,7 @@
                             >
 								<core:ListItem
                                     key="{BranchFilterModel>BranchCode}"
-                                    text="{BranchFilterModel>BranchName}"
+                                    text="{BranchFilterModel>Name}"
                                     additionalText="{BranchFilterModel>BranchCode}"
                                 />
 							</ComboBox>
