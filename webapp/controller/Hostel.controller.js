@@ -2448,208 +2448,99 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
 
         },
+         viewRooms: function (oEvent) {
+              var oSource = oEvent.getSource();
 
-        _loadFilteredData: async function (Scity, sBranchCode, sACType) {
-            const oView = this.getView();
-            const oVisibilityModel = oView.getModel("VisibilityModel")
+            // Get binding context of the clicked bed type
+            var oCtx = oSource.getBindingContext("VisibilityModel");
 
-            if (sACType === "All") {
-                sACType = "";
-            } else {
-                sACType = this.getView().byId("id_Roomtype").getSelectedKey()
+            if (!oCtx) {
+                return;
             }
 
-            if (sACType === "All") {
-                sACType = "";
-            }
+            var oBranchData = oCtx.getObject();
 
-            try {
-
-                const oView = this.getView();
-
-                var aBranchCodes = [];
-                var oBRModel = this.getView().getModel("sBRModel");
-                var aBranchesData = oBRModel.getData(); // adjust path if needed
-                var sBranchCode = this.byId("id_Area").getSelectedKey() || this.byId("id_Area").getValue();
-
-
-                if (Scity && !sBranchCode) {
-                    // Filter branches by city
-                    var aFilteredBranches = aBranchesData.filter(function (branch) {
-                        return branch.City === Scity;
-                    });
-
-                    if (aFilteredBranches.length === 0) {
-                        const oVisibilityModel = this.getView().getModel("VisibilityModel");
-                        oVisibilityModel.setProperty("/BedTypes", []);
-                        oVisibilityModel.setProperty("/NoData", true);
-                        oVisibilityModel.setProperty("/ShowViewMore", false);
-                        return;
-                    }
-
-                    aBranchCodes = aFilteredBranches.map(function (branch) {
-                        return branch.BranchID;
-                    });
-
-                } else if (sBranchCode) {
-                    // Branch already selected
-                    aBranchCodes = [sBranchCode];
-                }
-
-                let response;
-                response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
-                    BranchCode: aBranchCodes,
-                    ACType: sACType,
-                    top: this.iTop,
-                    skip: this.iSkip
-                });
-                await this.model(response)
-
-                let matchedRooms = response.data.HM_BedType || [];
-                let HM_RoomCount = response.data.HM_RoomCount
-
-                const oRoomDetailsModel = oView.getModel("RoomCountModel");
-                const oCustomerModel = oView.getModel("CustomerModel");
-
-                const roomDetails = oRoomDetailsModel.getData()?.Rooms || [];
-                const customerData = oCustomerModel.getData() || [];
-
-
-                const oBranchModel = oView.getModel("sBRModel");
-                const aBranchData = oBranchModel?.getData() || [];
-
-                const convertBase64ToImage = (base64String, fileType) => {
-                    if (!base64String) return "./image/Fallback.png";
-                    let sBase64 = base64String.replace(/\s/g, "");
-                    try {
-                        if (!sBase64.startsWith("iVB") && !sBase64.startsWith("data:image")) {
-                            const decoded = atob(sBase64);
-                            if (decoded.startsWith("iVB")) sBase64 = decoded;
-                        }
-                    } catch (e) { }
-
-                    const mimeType = fileType || "image/jpeg";
-                    if (sBase64.startsWith("data:image")) return sBase64;
-                    return `data:${mimeType};base64,${sBase64}`;
-                };
-
-                const aBedTypes = matchedRooms.map(room => {
-                    const matchingRooms = roomDetails.filter(
-                        rd =>
-                            rd.BranchCode?.toLowerCase() === room.BranchCode?.toLowerCase() &&
-                            rd.BedTypeName?.trim().toLowerCase() ===
-                            (room.Name?.trim().toLowerCase() +
-                                " - " +
-                                room.ACType?.trim().toLowerCase())
-                    );
-
-                    const firstRoom = matchingRooms[0];
-                    const getValidPrice = (value) => value && value !== "0.00" && value !== "0";
-
-                    const BasicPrice =
-                        (getValidPrice(firstRoom?.Price) ? " " + firstRoom.Price : "") ||
-                        (getValidPrice(firstRoom?.MonthPrice) ? " " + firstRoom.MonthPrice : "") ||
-                        (getValidPrice(firstRoom?.YearPrice) ? " " + firstRoom.YearPrice : "");
-
-                    const price = firstRoom?.Price ? " " + firstRoom.Price : "";
-                    const MonthPrice = firstRoom?.MonthPrice ? " " + firstRoom.MonthPrice : "";
-                    const YearPrice = firstRoom?.YearPrice ? " " + firstRoom.YearPrice : "";
-                    const Currency = firstRoom?.Currency ? " " + firstRoom.Currency : "";
-                    const AverageRating = firstRoom?.AverageRating ? " " + firstRoom.AverageRating : "0";
-                    const TotalFeedbacks = firstRoom?.TotalFeedbacks ? " " + firstRoom.TotalFeedbacks : "0";
-
-                    const isVisible = room?.Status === "Available";
-
-                    const PriceVisible = price !== "" || MonthPrice !== "" || YearPrice !== ""
-
-
-                    const oBranchInfo = aBranchData.find(b =>
-                        b.BranchID?.toLowerCase() === room.BranchCode?.toLowerCase()
-                    );
-                    // const sLogo = oBranchInfo?.Photo1 ? `data:${oBranchInfo.Photo1Type};base64,${oBranchInfo.Photo1}` : "";
-                    const sArea = oBranchInfo?.Name || "";
-                    const sAddress = oBranchInfo?.Address || "";
-                    const sCountry = oBranchInfo?.Country || "";
-                    const sGSTType = oBranchInfo?.Type || "";
-                    const sGSTValue = oBranchInfo?.Value || "";
-                    const sGSTIN = oBranchInfo?.GSTIN || "";
-                    const sCheckInTime = oBranchInfo?.CheckinTime || "";
-                    const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
-                    const aImages = [];
-                    for (let i = 1; i <= 5; i++) {
-                        const base64 = room[`Photo${i}`];
-                        const type = room[`Photo${i}Type`];
-                        if (base64) {
-                            aImages.push({
-                                src: convertBase64ToImage(base64, type),
-                                Area: sArea,
-                                AverageRating: AverageRating,
-                                TotalFeedbacks: TotalFeedbacks,
-                                BranchCode: room.BranchCode,
-                                Name: room.Name,
-                                ACType: room.ACType,
-                            });
-                        }
-                    }
-                    return {
-                        Name: room.Name,
-                        ACType: room.ACType,
-                        NoOfPerson: room.NoOfPerson,
-                        Description: room.Description || "",
-                        Deposit: room.Deposit || "",
-                        DepositCurrency: room.DepositCurrency || "",
-                        Price: price,
-                        BasicPrice: BasicPrice,
-                        MonthPrice: MonthPrice,
-                        YearPrice: YearPrice,
-                        Currency: Currency,
-                        BranchCode: room.BranchCode,
-                        Images: aImages,
-                        Country: sCountry,
-                        PriceVisible: PriceVisible,
-                        Visible: isVisible,
-                        AvailbleBeds: room.AvailableRooms,
-                        Address: sAddress,
-                        CheckInTime: sCheckInTime,
-                        CheckOutTime: sCheckOutTime,
-                        GSTType: sGSTType,
-                        GSTValue: sGSTValue,
-                        GSTIN: sGSTIN,
-                        AverageRating: AverageRating,
-                        TotalFeedbacks: TotalFeedbacks,
-                        GeoLocation: oBranchInfo?.GeoLocation || ""
-                    };
-                });
-
-                const aExisting = oVisibilityModel.getProperty("/BedTypes") || [];
-                let aFinal;
-
-                if (this.flag) { // Search / filter
-                    aFinal = aBedTypes;
-                    this.iSkip = aBedTypes.length;
-                } else { // View More
-                    aFinal = aExisting.concat(aBedTypes);
-                    this.iSkip += this.iTop;
-                    //  this.iTop= this.iSkip * this.iSkip
-                }
-                this.Scity = Scity
-                this.sACType = sACType
-
-                this.sBranchCode = sBranchCode
-
-                aFinal = aFinal.filter(b => b.PriceVisible !== false);
-
-                oVisibilityModel.setProperty("/BedTypes", aFinal);
-                oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
-                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
-                    oView.getModel("VisibilityModel").setProperty("/NoData", true);
-                } else {
-                    oView.getModel("VisibilityModel").setProperty("/NoData", false);
-                }
-            } catch (err) {
-                MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
-            }
+       
+               this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
+                sPath: oBranchData.BranchCode
+            });
         },
+
+     _loadFilteredData: function (Scity, sBranchCode) {
+
+    const oView = this.getView();
+    const oVisibilityModel = oView.getModel("VisibilityModel");
+
+    try {
+
+        const oBRModel = oView.getModel("sBRModel");
+        const aBranchesData = oBRModel?.getData() || [];
+
+        let aFilteredBranches = [];
+
+        if (Scity && !sBranchCode) {
+            aFilteredBranches = aBranchesData.filter(branch =>
+                branch.City === Scity
+            );
+        } 
+        else if (sBranchCode) {
+            aFilteredBranches = aBranchesData.filter(branch =>
+                branch.BranchID === sBranchCode
+            );
+        } 
+        else {
+            aFilteredBranches = aBranchesData;
+        }
+
+        if (aFilteredBranches.length === 0) {
+            oVisibilityModel.setProperty("/Branches", []);
+            oVisibilityModel.setProperty("/NoData", true);
+            return;
+        }
+
+        // 🔥 Convert Base64 to Image
+        const convertBase64ToImage = (base64String, fileType) => {
+            if (!base64String) return "./image/Fallback.png";
+
+            let sBase64 = base64String.replace(/\s/g, "");
+
+            if (sBase64.startsWith("data:image")) {
+                return sBase64;
+            }
+
+            const mimeType = fileType || "image/jpeg";
+            return `data:${mimeType};base64,${sBase64}`;
+        };
+
+        const aBranches = aFilteredBranches.map(branch => {
+
+            const sImage = convertBase64ToImage(
+                branch.Attachment,
+                branch.AttachmentType
+            );
+
+            return {
+                BranchID: branch.BranchID,
+                Name: branch.Name,
+                City: branch.City,
+                Address: branch.Address,
+                Country: branch.Country,
+                GSTIN: branch.GSTIN,
+                CheckInTime: branch.CheckinTime,
+                CheckOutTime: branch.CheckoutTime,
+                GeoLocation: branch.GeoLocation,
+                Image: sImage 
+            };
+        });
+
+        oVisibilityModel.setProperty("/Branches", aBranches);
+        oVisibilityModel.setProperty("/NoData", false);
+
+    } catch (err) {
+        MessageToast.show("Failed to load branch data");
+    }
+}
+,
         onBookNow: function (oEvent) {
             const oItem = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 

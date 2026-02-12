@@ -1,0 +1,169 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.View_Rooms"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+    height="100%"
+    busyIndicatorDelay="0"
+>
+
+    <Page showHeader="true" enableScrolling="true">
+
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+
+        <content>
+
+            <VBox class="sapUiTinyMarginTop">
+
+                <l:Grid
+                    id="idBedTypeFlex"
+                    defaultSpan="XL3 L4 M6 S12"
+                    containerQuery="true"
+                    hSpacing="2"
+                    vSpacing="2"
+                    content="{path: 'VisibilityModel>/BedTypes'}"
+                >
+
+                    <VBox class="bedCard">
+
+                        <Carousel
+                            height="300px"
+                            width="100%"
+                            loop="true"
+                            showPageIndicator="false"
+                            backgroundDesign="Transparent"
+                            pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+                        >
+
+                            <pages>
+                                <VBox class="imageWrapper">
+
+                                    <HBox class="areaTagBox">
+                                        <core:Icon
+                                            src="sap-icon://building"
+                                            size="0.9rem"
+                                            color="black"
+                                            class="sapUiTinyMarginEnd"
+                                        />
+                                        <Text text="{VisibilityModel>Area}" />
+                                    </HBox>
+
+                                    <Image
+                                        src="{VisibilityModel>src}"
+                                        width="100%"
+                                        height="300px"
+                                        class="bedCardImage"
+                                        decorative="false"
+                                    />
+
+                                    <CustomListItem
+                                        type="Active"
+                                        press=".onRatingPress"
+                                        visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
+                                        tooltip="Tap to See Reviews"
+                                    >
+                                        <HBox class="ratingOverlay" alignItems="Center">
+                                            <RatingIndicator
+                                                value="{VisibilityModel>AverageRating}"
+                                                maxValue="5"
+                                                enabled="false"
+                                                iconSize="0.8rem"
+                                            />
+                                            <Text
+                                                text="({VisibilityModel>TotalFeedbacks})"
+                                                class="ratingCountText"
+                                            />
+                                        </HBox>
+                                    </CustomListItem>
+
+                                </VBox>
+                            </pages>
+
+                        </Carousel>
+
+                        <VBox class="bedCardContent">
+
+                            <Text
+                                text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+                                class="bedCardTitle"
+                            />
+
+                            <Text
+                                text="{VisibilityModel>Description}"
+                                class="bedCardDesc"
+                                maxLines="4"
+                                wrapping="true"
+                            />
+
+                            <Text
+                                text="{
+                                    parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+                                    formatter: '.Formatter.formatStartingPrice'
+                                }"
+                                class="bedCardPrice"
+                            />
+
+                            <HBox
+                                justifyContent="Center"
+                                alignItems="Center"
+                                class="sapUiTinyMarginTop"
+                            >
+                                <Link
+                                    text="View Details"
+                                    tooltip="View Details"
+                                    press="viewDetails"
+                                    class="btnViewDetails"
+                                />
+                            </HBox>
+
+                        </VBox>
+
+                    </VBox>
+
+                </l:Grid>
+
+                <VBox
+                    height="400px"
+                    justifyContent="Center"
+                    alignItems="Center"
+                    visible="{VisibilityModel>/NoData}"
+                >
+                    <Text
+                        text="{i18n>noRoomsFound}"
+                        class="cssNoDataMessage"
+                    />
+                    <Text
+                        text="{i18n>pleaseselectanotherCity}"
+                        class="cssNoDataSubMessage"
+                    />
+                </VBox>
+
+                <VBox
+                    alignItems="Center"
+                    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                    visible="{VisibilityModel>/ShowViewMore}"
+                >
+                    <Link
+                        id="idViewMoreBusy"
+                        text="{i18n>viewmorerooms}"
+                        press="onViewMoreRooms"
+                        class="btnViewDetails"
+                    />
+                    <VBox height="2rem" />
+                </VBox>
+
+            </VBox>
+
+        </content>
+
+    </Page>
+
+</mvc:View>

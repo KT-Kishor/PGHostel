@@ -336,6 +336,13 @@
       "target": [
         "targetCustomerReview"
       ]
+    },
+     {
+      "name": "RouteViewRooms",
+      "pattern": "ViewRooms/{sPath}",
+      "target": [
+        "targetViewRooms"
+      ]
     }
         
       ],
@@ -549,6 +556,13 @@
           "clearControlAggregation": false,
           "viewName": "CustomerReview",
           "viewId": "CustomerReview"
+        },
+         "targetViewRooms": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "View_Rooms",
+          "viewId": "View_Rooms"
         }
        
       }
