@@ -14,9 +14,5 @@
     {
       "ID": 4,
       "InvoiceStatus": "Invoice Sent"
-    },
-    {
-      "ID": 5,
-      "InvoiceStatus": "Refund Due"
     }
   ]

@@ -296,13 +296,7 @@
                                     >
                                         <m:headerToolbar>
                                             <m:OverflowToolbar>
-                                                <m:Title
-                                                    text="{i18n>MVDdocument}"
-                                                />
-                                                <m:Text
-                                                    text="*"
-                                                    class="requiredStar"
-                                                />
+                                                <m:Title text="{i18n>MVDdocument}"/>
                                                 <m:ToolbarSpacer />
                                                 <m:ComboBox
                                                     id="MV_id_adminDocType"
@@ -333,6 +327,7 @@
                                                         text="Other"
                                                     />
                                                 </m:ComboBox>
+                                                <m:ToolbarSeparator />
                                                 <!-- Upload button -->
                                                 <m:VBox id="MV_id_adminUploaderWrapper">
                                                     <u:FileUploader

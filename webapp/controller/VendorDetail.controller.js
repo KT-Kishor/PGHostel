@@ -307,7 +307,7 @@ sap.ui.define([
         BT_onsavebuttonpress: async function () {
             const bConfirm = await new Promise((resolve) => {
                 sap.m.MessageBox.confirm(
-                    "You can submit only once. Proceed?",
+                     "Are you sure you want to Submit?",
                     {
                         icon: sap.m.MessageBox.Icon.WARNING,
                         title: "Confirm Submission",

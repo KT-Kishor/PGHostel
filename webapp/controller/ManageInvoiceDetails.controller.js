@@ -60,7 +60,7 @@ sap.ui.define([
                     InvNo: "",
                     InvoiceDate: "",
                     Name: "",
-                    PAN: "",
+                    // PAN: "",
                     GST: "",
                     PermanentAddress: "",
                     CustomerEmail: "",
@@ -545,6 +545,27 @@ sap.ui.define([
                         });
                     });
 
+                    // REFUND PROCESSED LINE ITEM AUTO CREATE
+                    const refundAmount = parseFloat(oData.data.ManageInvoice?.[0]?.RefundAmount || 0);
+                    const refundProcessed = oData.data.ManageInvoice?.[0]?.RefundProcessed;
+
+                    if (refundAmount > 0 && (!refundProcessed || refundProcessed === "")) {
+                        finalInvoiceItems.push({
+                            IndexNo: finalInvoiceItems.length + 1,
+                            InvNo: this.newID,
+                            Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
+                            UnitText: bookingDetails.PaymentType,
+                            SAC: "996322",
+                            GSTCalculation: "NO", 
+                            Discount: "0.00",
+                            GrossPrice: -refundAmount,
+                            Total: -refundAmount,
+                            StartDate: this.Formatter.DateFormat(new Date()),
+                            EndDate: this.Formatter.DateFormat(new Date()),
+                            Currency: bookingDetails.Currency
+                        });
+                    }
+                
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalInvoiceItems);
                     await this.totalAmountCalculation();
                     utils._LCvalidateMandatoryField(oEvent);
@@ -946,7 +967,7 @@ sap.ui.define([
                     sFinalStatus = "Payment Partially";
                 } 
                 else if (paidAmount > totalAmount) {
-                    sFinalStatus = "Refund Due";
+                    sFinalStatus = "Payment Received";
                 } 
 
                 const oPayload = {
@@ -954,7 +975,7 @@ sap.ui.define([
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.CustomerName,
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: (oSelectedCustomerModel.PermanentAddress) || "",
-                    PAN: (oSelectedCustomerModel.PAN) || "",
+                    // PAN: (oSelectedCustomerModel.PAN) || "",
                     MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
                     AmountInFCurrency: FilterModel.Currency === "INR" ?
                         (!isNaN(oSelectedCustomerModel.AmountInFCurrency) ? oSelectedCustomerModel.AmountInFCurrency : "0") : parseFloat(oModel.subTotal) || 0,

@@ -25,7 +25,7 @@
                     <ObjectPageSubSection>
                         <blocks>
                             <m:VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
-                            <m:Label text="Reason for Review Return" class="boldBlackText" />
+                            <m:Label text="Reason for Sending Back" class="boldBlackText" />
                             <m:MessageStrip
                             text="{AdminSignupModel>/AdminComment}"
                             type="Warning"
@@ -35,6 +35,14 @@
                     </ObjectPageSubSection>
                         <ObjectPageSubSection id="V_id_dsd1">
                             <blocks>
+                            <m:VBox >
+                            <m:VBox >
+                            <m:MessageStrip
+                                            id="MV_id_infoStrip"
+                                            text="Please note that details can be submitted only once. Kindly review all information before submitting."
+                                            type="Information"
+                                        />
+                                        </m:VBox>
                                 <f:SimpleForm
                                     id="V_id_DimpleForm"
                                     editable="true"
@@ -261,6 +269,7 @@
                                         />
                                     </f:content>
                                 </f:SimpleForm>
+                               </m:VBox>
                             </blocks>
                         </ObjectPageSubSection>
                     </subSections>
@@ -298,10 +307,6 @@
                                             <m:OverflowToolbar>
                                                 <m:Title
                                                     text="{i18n>MVDdocument}"
-                                                />
-                                                <m:Text
-                                                    text="*"
-                                                    class="requiredStar"
                                                 />
                                                 <m:ToolbarSpacer />
                                                 <m:ComboBox
