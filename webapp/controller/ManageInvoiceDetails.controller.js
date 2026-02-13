@@ -22,7 +22,7 @@ sap.ui.define([
                 this.sourceView = sSource || "ManageInvoice";
 
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
-                this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status"]);
+                this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_Date", "CID_id_NavInvDate"]);
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.loginModel = this.getView().getModel("LoginModel");
@@ -58,6 +58,7 @@ sap.ui.define([
                     BookingID: "",
                     CustomerName: "",
                     InvNo: "",
+                    InvDate: "",
                     InvoiceDate: "",
                     Name: "",
                     // PAN: "",
@@ -226,7 +227,8 @@ sap.ui.define([
                     oHeader.InvoiceDate = this.Formatter.DateFormat(oHeader.InvoiceDate);
                     var PayByDate = oHeader.PayByDate;
                     oHeader.PayByDate = this.Formatter.DateFormat(oHeader.PayByDate);
-
+                    var InvDate = oHeader.InvDate 
+                    oHeader.InvDate = this.Formatter.formatDate(InvDate);
                     this.SelectedCustomerModel.setData(oHeader);
 
                     // ---- GST checkbox derived selection ----
@@ -460,6 +462,7 @@ sap.ui.define([
 
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
+                    mergedData.InvDate = new Date();
                     mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate);
                     oModel.setData(mergedData);
 
@@ -554,7 +557,7 @@ sap.ui.define([
                             IndexNo: finalInvoiceItems.length + 1,
                             InvNo: this.newID,
                             Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
-                            UnitText: bookingDetails.PaymentType,
+                            UnitText: "Fix",
                             SAC: "996322",
                             GSTCalculation: "NO", 
                             Discount: "0.00",
@@ -595,6 +598,10 @@ sap.ui.define([
             },
 
             onPayByDateDatePickerChange: function(oEvent) {
+                    utils._LCvalidateDate(oEvent);
+            },
+
+            onChangeDate: function(oEvent) {
                 utils._LCvalidateDate(oEvent);
             },
 
@@ -626,7 +633,7 @@ sap.ui.define([
                     GSTCalculation: (currency === "INR") ? "YES" : "",
                     StartDate: this.Formatter.formatDate(new Date()),
                     EndDate: this.Formatter.formatDate(new Date()),
-                    UnitText: "Fix Bid",
+                    UnitText: "Fix",
                     Currency: currency,
                     Discount: "0.00",
                     GrossPrice: "0.00",
@@ -654,7 +661,7 @@ sap.ui.define([
                     case 'Per Hour':
                         data.Unit = 168;
                         break;
-                    case 'Fixed Bid':
+                    case 'Fix':
                         data.Unit = 1;
                         break;
                     default:
@@ -971,6 +978,7 @@ sap.ui.define([
                 } 
 
                 const oPayload = {
+                    InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.CustomerName,
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
@@ -1077,6 +1085,7 @@ sap.ui.define([
                     const bMandatoryValid =
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddBooking"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Date"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
@@ -1269,6 +1278,7 @@ sap.ui.define([
                 try {
                     // var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bIsValid =
+                        utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") && this.mobileNo &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
                         (!!this.Discount && !!this.Particulars)
@@ -1415,7 +1425,7 @@ sap.ui.define([
 
                 var totalReceivedAmount = 0;
                 if (allPaymentData) {
-                    totalReceivedAmount = allPaymentData.getProperty("/AllReceivedAmount");
+                    totalReceivedAmount = allPaymentData.getProperty("/AllReceivedAmount") || 0;
                 }
 
                 var sValue = paymentModel.getProperty("/ReceivedAmount") || "";
@@ -1450,8 +1460,8 @@ sap.ui.define([
             onChangePaymentConvertionRate: function(oEvent) {
                 if (oEvent) utils._LCvalidateAmount(oEvent);
                 var oModelData = this.getView().getModel("PaymentModel");
-                var receivedAmount = parseFloat(oModelData.getData().ReceivedAmount);
-                var conversionRate = parseFloat(oModelData.getData().ConversionRate);
+                var receivedAmount = parseFloat(oModelData.getData().ReceivedAmount) || 0;
+                var conversionRate = parseFloat(oModelData.getData().ConversionRate) || 0;
                 var AmountInINR = receivedAmount * conversionRate;
                 (isNaN(AmountInINR)) ? oModelData.setProperty("/AmountInINR", '0.00'): oModelData.setProperty("/AmountInINR", AmountInINR.toFixed(2));
             },
@@ -1474,11 +1484,28 @@ sap.ui.define([
                 }), "PaymentDetailModel");
 
                 const items = oData.data || [];
-                const totalReceivedAmount = items.reduce((sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0), 0);
 
-                const totalAmount = parseFloat(items[0]?.TotalAmount || 0);
+            // Case 1: Only 1 record and it is Used = X → Do NOTHING
+            if (items.length === 1 && items[0].Used === "X") {
+                return; // Exit function
+            }
+
+            // Case 2: Normal calculation but ignore Used = X rows
+                const validItems = items.filter(item => item.Used !== "X");
+
+                // Sum received amount only from valid items
+                const totalReceivedAmount = validItems.reduce(
+                    (sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0),
+                    0
+                );
+
+                // Get TotalAmount from first valid record (NOT items[0])
+                const totalAmount = parseFloat(validItems[0]?.TotalAmount || 0);
+
+                // Calculate due amount
                 const totalDueAmount = totalAmount - totalReceivedAmount;
 
+                // Update model
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
                 invoiceModel.setProperty("/AllDueAmount", totalDueAmount.toFixed(2));
@@ -1982,7 +2009,7 @@ sap.ui.define([
                         },
                         {
                             label: 'Date :',
-                            value: typeof oModel.InvoiceDate === "string" ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)
+                            value: typeof oModel.InvDate === "string" ? oModel.InvDate : Formatter.formatDate(oModel.InvDate)
                         },
                         {
                             label: 'Room No :',
@@ -2511,7 +2538,7 @@ sap.ui.define([
 
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
-                        ["Date :", Formatter.formatDate(oCustomerModel.InvoiceDate)],
+                        ["Date :", Formatter.formatDate(oCustomerModel.InvDate)],
                         ["Room No :", oCustomerModel.RoomNo]
                     ];
 
@@ -2804,7 +2831,7 @@ sap.ui.define([
                             },
                             {
                                 label: "Date :",
-                                value: Formatter.formatDate(oModel.InvoiceDate)
+                                value: Formatter.formatDate(oModel.InvDate)
                             },
                             {
                                 label: "Room No :",
@@ -3157,7 +3184,7 @@ sap.ui.define([
                     InvNo: String(RefundModel.InvNo),
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date : RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    Amount: String(RefundModel.RefundAmount),
+                    Amount: (RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
                     CustomerID: RefundModel.CustomerID,

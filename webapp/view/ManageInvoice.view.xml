@@ -205,7 +205,7 @@
                                 text="{ManageInvoiceModel>BookingID}"
                             />
                             <Text
-                                text="{path:'ManageInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}"
+                                text="{path:'ManageInvoiceModel>InvDate',formatter: '.Formatter.formatDate'}"
                             />
                             <ExpandableText
                                 text="{ManageInvoiceModel>InvoiceDescription}"

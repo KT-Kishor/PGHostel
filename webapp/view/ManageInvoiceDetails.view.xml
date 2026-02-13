@@ -129,40 +129,86 @@
                                             value="{SelectedCustomerModel>/BookingID}"
                                             editable="false"
                                         />
-										<m:Label
-                                            visible="{visiablityPlay>/createVisi}"
+                                        <m:Label  visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
 										<m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
-                                            visible="{visiablityPlay>/createVisi}"
+                                            id="CID_id_Date"
+                                            value="{path:'SelectedCustomerModel>/InvDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
+                                            change="onChangeDate" visible="{visiablityPlay>/createVisi}"
+                                        />
+
+                                        <m:Label
+                                            visible="{visiablityPlay>/editVisi}"
+                                            text="{i18n>invoiceDate}"
+                                            required="true"
+                                        />
+										<m:DatePicker
+                                            valueStateText="{i18n>dateValueState}"
+                                            minDate="{visiablityPlay>/minDate}"
+                                            visible="{visiablityPlay>/editVisi}"
+                                            id="CID_id_NavInvDate"
+                                            displayFormat="dd/MM/yyyy"
+                                            valueFormat="dd/MM/yyyy"
+                                            value="{SelectedCustomerModel>/InvDate}"
+                                            editable="{visiablityPlay>/editable}"
+                                            change="onChangeDate"
+                                        />
+
+                                        <m:Label
+                                            visible="false"
+                                            text="{i18n>invoiceDate}"
+                                            required="true"
+                                        />
+										<m:DatePicker
+                                            valueStateText="{i18n>dateValueState}"
+                                            minDate="{visiablityPlay>/minDate}"
+                                            visible="false"
+                                            id="CID_id_NavDate"
+                                            displayFormat="dd/MM/yyyy"
+                                            valueFormat="dd/MM/yyyy"
+                                            value="{SelectedCustomerModel>/InvDate}"
+                                            editable="{visiablityPlay>/editable}"
+                                            change="CID_ValidateDate"
+                                        />
+                                        
+										<m:Label
+                                            visible="false"
+                                            text="{i18n>invoiceDate}"
+                                            required="true"
+                                        />
+										<m:DatePicker
+                                            valueStateText="{i18n>dateValueState}"
+                                            minDate="{visiablityPlay>/minDate}"
+                                            visible="false"
                                             id="CID_id_Invoice"
                                             value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onChangeInvoiceDate"
                                         />
 										<m:Label
-                                            visible="{visiablityPlay>/createVisi}"
+                                            visible="false"
                                             text="{i18n>PayByDate}"
                                             required="true"
                                         />
 										<m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
-                                            visible="{visiablityPlay>/createVisi}"
+                                            visible="false"
                                             id="CID_id_Payby"
                                             value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onPayByDateDatePickerChange"
                                         />
 										<m:Label
-                                            visible="{visiablityPlay>/editVisi}"
+                                            visible="false"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
 										<m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
-                                            visible="{visiablityPlay>/editVisi}"
+                                            visible="false"
                                             id="CID_id_NavInvoice"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
@@ -171,13 +217,13 @@
                                             change="CID_ValidateDate"
                                         />
 										<m:Label
-                                            visible="{visiablityPlay>/editVisi}"
+                                             visible="false"
                                             text="{i18n>PayByDate}"
                                             required="true"
                                         />
 										<m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
-                                            visible="{visiablityPlay>/editVisi}"
+                                            visible="false"
                                             id="CID_id_NavPayby"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
