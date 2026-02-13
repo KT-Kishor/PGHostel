@@ -18,7 +18,7 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
-             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
                 BedTypes: [],
                 NoData: false,
@@ -169,7 +169,8 @@ sap.ui.define([
                         GSTIN: sGSTIN,
                         AverageRating: AverageRating,
                         TotalFeedbacks: TotalFeedbacks,
-                        GeoLocation: oBranchInfo?.GeoLocation || ""
+                        GeoLocation: oBranchInfo?.GeoLocation || "",
+                        EmailID: oBranchInfo?.EmailID || ""
                     };
                 });
 
@@ -872,7 +873,10 @@ sap.ui.define([
         },
 
         onEnquiryPress: function (oEvent) {
-            const oData = oEvent.getSource()
+            var  oData= oEvent.getSource()
+                .getBindingContext("VisibilityModel")
+                .getObject();
+                 this.oData = oEvent.getSource()
                 .getBindingContext("VisibilityModel")
                 .getObject();
 
@@ -903,69 +907,69 @@ sap.ui.define([
             this._oEnquiry.close();
         },
 
-        E_onsavebuttonpress: async function () {
+        E_onsavebuttonpress: async function (oEvent) {
+            var Data=this.oData
             var oView = this.getView();
+            const oModel = oView.getModel("EnquiryModel").getData();
+            const oEmail=oView.getModel("sBRModel").getData().find((item)=>{
+                return item.BranchID===Data.BranchCode;
+            });
+            // const oLogin = this.getOwnerComponent().getModel("EnquiryModel").getData();
+            const oBranch = oModel.RoomType;
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_Salutation")), "ID") &&
                 utils._LCvalidateName(sap.ui.getCore().byId(oView.createId("id_enq_Name")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_enq_STD")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_MobileNo")), "ID") &&
-                 utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("id_enq_Email")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_Comments")), "ID") 
-               
+                utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("id_enq_Email")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_Comments")), "ID")
+
             );
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            var oData = {
-                Name: Payload.Name,
-                UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
-                LandMark: Payload.LandMark,
-                Address: Payload.Address,
-                GeoLocation: Payload.GeoLocation,
-                Pincode: Payload.Pincode,
-                Contact: Payload.Contact,
-                STD: Payload.stdCode,
-                Country: Payload.country,
-                State: Payload.state,
-                City: Payload.baseLocation,
-                Penalty: Payload.Penalty,
-                Currency: Payload.Currency,
-                Photo1: oUpload.Photo1,
-                Attachment: oImage.Attachment,
-                GSTIN: Payload.GSTIN,
-                Type: Payload.Type,
-                Value: Payload.Value,
-                Photo1Type: oUpload.Photo1Type,
-                Photo1Name: oUpload.Photo1Name,
-                AttachmentType: oImage.AttachmentType,
-                AttachmentName: oImage.AttachmentName,
-                CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
-                CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
-            };
+            const oMobile = sap.ui.getCore().byId(oView.createId("id_enq_MobileNo"));
+            const oSTD = sap.ui.getCore().byId(oView.createId("id_enq_STD"));
+            const sSTD = oSTD.getSelectedKey();
+            const sMobile = oMobile.getValue();
 
+            let isMobileValid = false;
+            //             if (!isMobileValid) {
+            //     sap.m.MessageToast.show("Please correct mobile number");
+            //     return;
+            // }
+            if (sSTD === "+91") {
+                isMobileValid = /^[6-9]\d{9}$/.test(sMobile);
+            } else {
+                isMobileValid = /^\d{4,14}$/.test(sMobile);
+            }
+
+            if (!isMobileValid) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText("Enter valid mobile number");
+                sap.m.MessageToast.show("Please enter valid mobile number");
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            var oData = {
+                BranchName: oBranch,
+                BranchCreatedEmailID: oEmail.EmailID,
+                CustomerName: (oModel.Salutation || "") + " " + (oModel.UserName || ""),
+                CustomerEmail: oModel.Email || "",
+                CustomerPhone: (oModel.STDCode || "") + oModel.Mobile,
+                CustomerComment: oModel.Comments || ""
+            };
+            console.log("Enquiry Payload:", oData);
             sap.ui.core.BusyIndicator.show(0);
             try {
-                const aMainData = oView.getModel("mainModel").getData() || [];
-                if (this.isEdit && Payload.BranchID) {
-                    delete oData.UserID;
-                    await this.ajaxUpdateWithJQuery("HM_Branch", {
+                 const oresponse=   await this.ajaxCreateWithJQuery("HM_EnquiryEmail", {
                         data: oData,
-                        filters: {
-                            BranchID: Payload.BranchID
-                        }
+                       
                     });
-                } else {
-                    await this.ajaxCreateWithJQuery("HM_Branch", {
-                        data: oData,
-                        filters: {
-                            UserID: oData.UserID
-                        }
-                    });
-                }
-                await this.Onsearch();
-                this.oDialog.close();
+                    const oResult = oresponse?.data || {};
+                this._oEnquiry.close();
                 sap.m.MessageToast.show(
                     this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
             } catch (err) {
@@ -986,66 +990,168 @@ sap.ui.define([
         },
 
         ADMIN_onMobileLiveChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            let sValue = oInput.getValue().replace(/\D/g, "");
-            oInput.setValue(sValue);
-
-            const sSTD = this.byId("id_enq_STD").getSelectedKey();
-            if (!sValue) {
-                oInput.setValueState("None");
-                oInput.setValueStateText("");
-                return;
-            }
-
-            if (!sSTD) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText("Please select ISD code first");
-                return;
-            }
-            if (sSTD === "+91") {
-                if (sValue.length !== 10) {
-                    oInput.setValueState("Error");
-                    oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
-                    return;
-                }
-            }
-            else {
-                if (sValue.length < 4) {
-                    oInput.setValueState("Error");
-                    oInput.setValueStateText("Mobile number must be at least 4 digits");
-                    return;
-                }
-
-                if (sValue.length > 14) {
-                    sValue = sValue.substring(0, 14);
-                    oInput.setValue(sValue);
-                }
-            }
-            oInput.setValueState("None");
-            oInput.setValueStateText("");
+            this._validateMobileStrict();
         },
 
+        // ADMIN_onMobileLiveChange: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     let sValue = oInput.getValue().replace(/\D/g, "");
+        //     oInput.setValue(sValue);
+
+        //     const sSTD = this.byId("id_enq_STD").getSelectedKey();
+        //     if (!sValue) {
+        //         oInput.setValueState("None");
+        //         oInput.setValueStateText("");
+        //         return;
+        //     }
+
+        //     if (!sSTD) {
+        //         oInput.setValueState("Error");
+        //         oInput.setValueStateText("Please select ISD code first");
+        //         return;
+        //     }
+        //     if (sSTD === "+91") {
+        //         if (sValue.length !== 10) {
+        //             oInput.setValueState("Error");
+        //             oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
+        //             return;
+        //         }
+        //     }
+        //     else {
+        //         if (sValue.length < 4) {
+        //             oInput.setValueState("Error");
+        //             oInput.setValueStateText("Mobile number must be at least 4 digits");
+        //             return;
+        //         }
+
+        //         if (sValue.length > 14) {
+        //             sValue = sValue.substring(0, 14);
+        //             oInput.setValue(sValue);
+        //         }
+        //     }
+        //     oInput.setValueState("None");
+        //     oInput.setValueStateText("");
+        // },
+
+        // ADMIN_onChangeSTD: function (oEvent) {
+        //     const oSTD = oEvent.getSource();
+        //     const sValue = (oSTD.getValue() || "").trim();
+        //     // const oMobile = $C("adminMobileNo");
+        //     const oModel = this.getView().getModel("EnquiryModel");
+
+        //     // Mandatory check
+        //     if (!utils._LCvalidateMandatoryField(oEvent)) return;
+
+        //     // ✅ + followed by digits, but NOT +0 / +09 / +01
+        //     const STD_REGEX = /^\+[1-9][0-9]*$/;
+        //     if (!STD_REGEX.test(sValue)) {
+        //         oSTD.setValueState("Error");
+        //         oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
+        //         oModel.setProperty("/STDCode", "");
+        //         return;
+        //     }
+        //     // Clean state
+        //     oSTD.setValueState("None")
+        //     // Update model
+        //     oModel.setProperty("/STDCode", sValue);
+        // },
+
         ADMIN_onChangeSTD: function (oEvent) {
+
             const oSTD = oEvent.getSource();
-            const sValue = (oSTD.getValue() || "").trim();
-            // const oMobile = $C("adminMobileNo");
-            const oModel = this.getView().getModel("EnquiryModel");
+            const oMobile = this.byId("id_enq_MobileNo");
+            const sKey = oSTD.getSelectedKey();
 
-            // Mandatory check
-            if (!utils._LCvalidateMandatoryField(oEvent)) return;
-
-            // ✅ + followed by digits, but NOT +0 / +09 / +01
-            const STD_REGEX = /^\+[1-9][0-9]*$/;
-            if (!STD_REGEX.test(sValue)) {
+            if (!sKey) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
-                oModel.setProperty("/STDCode", "");
+                oSTD.setValueStateText("Please select ISD code");
                 return;
             }
-            // Clean state
-            oSTD.setValueState("None")
-            // Update model
-            oModel.setProperty("/STDCode", sValue);
+
+            oSTD.setValueState("None");
+            oSTD.setValueStateText("");
+
+            // 🔥 Set maxLength strictly
+            if (sKey === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(14);
+            }
+
+            // Do NOT clear mobile value automatically
+            this._validateMobileStrict();
+        },
+
+        _validateMobileStrict: function () {
+
+            const oMobile = this.byId("id_enq_MobileNo");
+            const oSTD = this.byId("id_enq_STD");
+
+            const sSTD = oSTD.getSelectedKey();
+            const sValue = (oMobile.getValue() || "").replace(/\D/g, "");
+
+            oMobile.setValue(sValue);
+
+            // If empty
+            if (!sValue) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText("Mobile number is required");
+                return false;
+            }
+
+            // If no STD
+            if (!sSTD) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText("Select ISD code first");
+                return false;
+            }
+            if (sSTD === "+91") {
+
+                if (sValue.length < 10) {
+                    oMobile.setValueState("Error");
+                    oMobile.setValueStateText("Indian mobile number must be exactly 10 digits");
+                    return false;
+                }
+
+                if (sValue.length > 10) {
+                    oMobile.setValueState("Error");
+                    oMobile.setValueStateText("Indian mobile number cannot exceed 10 digits");
+                    return false;
+                }
+
+                if (sValue.startsWith("0")) {
+                    oMobile.setValueState("Error");
+                    oMobile.setValueStateText("Indian mobile number cannot start with 0");
+                    return false;
+                }
+
+                // if (!/^[6-9]\d{9}$/.test(sValue)) {
+                //     oMobile.setValueState("Error");
+                //     oMobile.setValueStateText("Indian mobile number must start with 6, 7, 8 or 9");
+                //     return false;
+                // }
+
+                // oMobile.setValueState(""); // 🔥 KEEP RED UNTIL FULLY VALID
+                oMobile.setValueState("None");
+                oMobile.setValueStateText("");
+                return true;
+            }
+
+            if (sValue.length < 4) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText("Mobile number must be at least 4 digits");
+                return false;
+            }
+
+            if (sValue.length > 14) {
+                oMobile.setValueState("Error");
+                oMobile.setValueStateText("Mobile number cannot exceed 14 digits");
+                return false;
+            }
+
+            oMobile.setValueState("None");
+            oMobile.setValueStateText("");
+            return true;
         },
 
         onAdminChangeSalutation: function (oEvent) {
