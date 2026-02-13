@@ -1569,12 +1569,12 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
-                        this.Readcall("HM_InvoicePaymentDetail", {
+                        await this.Readcall("HM_ManageInvoice", {
                             InvNo: this.decodedPath
                         });
-                        // this.Readcall("HM_ManageInvoice", {
-                        //     InvNo: this.decodedPath
-                        // });
+                        await this.Readcall("HM_InvoicePaymentDetail", {
+                        InvNo: this.decodedPath
+                        });
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
                         this.visiablityPlay.setProperty("/MultiEmail", hasDue);
@@ -3202,6 +3202,10 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
+
+                        await this.Readcall("HM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
                        
                         var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
