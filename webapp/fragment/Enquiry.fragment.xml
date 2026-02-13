@@ -161,7 +161,7 @@
             <Button
                 text="Send"
                 tooltip="Send"
-                press="AR_onsavebuttonpress"
+                press="E_onsavebuttonpress"
                 id="E_id_saveButton"
                 class="marginRight myUnifiedBtn"
             />

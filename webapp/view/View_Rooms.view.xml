@@ -9,9 +9,10 @@
     height="100%"
     busyIndicatorDelay="0"
 >
-
-    <Page showHeader="true" enableScrolling="true">
-
+    <Page
+        showHeader="true"
+        enableScrolling="true"
+    >
         <headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.BookingHeader"
@@ -20,30 +21,31 @@
         </headerContent>
 
         <content>
-        <VBox
-    height="600px"
-    justifyContent="Center"
-    alignItems="Center"
-    visible="{VisibilityModel>/ShowGlobalNoData}">
-    <Text
-        text="{i18n>noRoomsFound}"
-        class="cssNoDataMessage"/>
-    <Text
-        text="{i18n>pleaseselectanotherCity}"
-        class="cssNoDataSubMessage"/>
-   </VBox>
+            <VBox
+                height="600px"
+                justifyContent="Center"
+                alignItems="Center"
+                visible="{VisibilityModel>/ShowGlobalNoData}"
+            >
+                <Text
+                    text="{i18n>noRoomsFound}"
+                    class="cssNoDataMessage"
+                />
+                <Text
+                    text="{i18n>pleaseselectanotherCity}"
+                    class="cssNoDataSubMessage"
+                />
+            </VBox>
 
-      <Title 
-    text="AC Rooms"
-    level="H2"
-    class="roomHeaderTitle sapUiMediumMarginBeginEnd"
-    visible="{= ${VisibilityModel>/ACRooms}.length > 0}"
-/>
-
+            <Title
+                text="AC Rooms"
+                level="H2"
+                class="roomHeaderTitle sapUiMediumMarginBeginEnd"
+                visible="{= ${VisibilityModel>/ACRooms}.length > 0}"
+            />
 
             <VBox class="sapUiTinyMarginTop">
-
-                <l:Grid 
+                <l:Grid
                     id="idBedTypeFlex2"
                     defaultSpan="XL3 L4 M6 S12"
                     containerQuery="true"
@@ -51,9 +53,7 @@
                     vSpacing="2"
                     content="{path: 'VisibilityModel>/ACRooms'}"
                 >
-
                     <VBox class="bedCard">
-
                         <Carousel
                             height="300px"
                             width="100%"
@@ -62,10 +62,8 @@
                             backgroundDesign="Transparent"
                             pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                         >
-
                             <pages>
                                 <VBox class="imageWrapper">
-
                                     <HBox class="areaTagBox">
                                         <core:Icon
                                             src="sap-icon://building"
@@ -90,7 +88,10 @@
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                         tooltip="Tap to See Reviews"
                                     >
-                                        <HBox class="ratingOverlay" alignItems="Center">
+                                        <HBox
+                                            class="ratingOverlay"
+                                            alignItems="Center"
+                                        >
                                             <RatingIndicator
                                                 value="{VisibilityModel>AverageRating}"
                                                 maxValue="5"
@@ -103,14 +104,11 @@
                                             />
                                         </HBox>
                                     </CustomListItem>
-
                                 </VBox>
                             </pages>
-
                         </Carousel>
 
                         <VBox class="bedCardContent">
-
                             <Text
                                 text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
                                 class="bedCardTitle"
@@ -136,30 +134,29 @@
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                <SegmentedButton
-                                id="idSegmentedBtn"
-                                    tooltip="View Details"
-                                    class="btnViewDetails sapUiLargeMarginEnd"
-                                    selectionChange="onSegmentedButtonChange"
+                                <Toolbar
+                                    class="pillActionBar sapUiTinyMarginTop"
+                                    design="Transparent"
                                 >
-                                    <items>
-                                        <SegmentedButtonItem
-                                            key="details"
-                                            text="View Details"
-                                        />
-                                        <SegmentedButtonItem
-                                            key="Enquiry"
-                                            text="Enquiry"
-                                            tooltip="Enquiry"
-                                            class="btnViewDetails"
-                                        />
-                                    </items>
-                                </SegmentedButton>
+                                    <Button
+                                        text="View Details"
+                                        type="Transparent"
+                                        press="onViewDetailsPress"
+                                        class="pillActionBtn pillLeft"
+                                    />
+
+                                    <ToolbarSpacer width="1px" />
+
+                                    <Button
+                                        text="Enquiry"
+                                        type="Transparent"
+                                        press="onEnquiryPress"
+                                        class="pillActionBtn pillRight"
+                                    />
+                                </Toolbar>
                             </HBox>
                         </VBox>
-
                     </VBox>
-
                 </l:Grid>
                 <VBox
                     alignItems="Center"
@@ -174,20 +171,17 @@
                     />
                     <VBox height="2rem" />
                 </VBox>
-
             </VBox>
 
-            <Title 
-    text="Non-AC Rooms"
-    level="H2"
-    class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
-    visible="{= ${VisibilityModel>/NonACRooms}.length > 0}"
-/>
-
+            <Title
+                text="Non-AC Rooms"
+                level="H2"
+                class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
+                visible="{= ${VisibilityModel>/NonACRooms}.length > 0}"
+            />
 
             <VBox class="sapUiTinyMarginTop">
-
-                <l:Grid 
+                <l:Grid
                     id="idBedTypeFlex1"
                     defaultSpan="XL3 L4 M6 S12"
                     containerQuery="true"
@@ -195,9 +189,7 @@
                     vSpacing="2"
                     content="{path: 'VisibilityModel>/NonACRooms'}"
                 >
-
                     <VBox class="bedCard">
-
                         <Carousel
                             height="300px"
                             width="100%"
@@ -206,10 +198,8 @@
                             backgroundDesign="Transparent"
                             pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                         >
-
                             <pages>
                                 <VBox class="imageWrapper">
-
                                     <HBox class="areaTagBox">
                                         <core:Icon
                                             src="sap-icon://building"
@@ -234,7 +224,10 @@
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                         tooltip="Tap to See Reviews"
                                     >
-                                        <HBox class="ratingOverlay" alignItems="Center">
+                                        <HBox
+                                            class="ratingOverlay"
+                                            alignItems="Center"
+                                        >
                                             <RatingIndicator
                                                 value="{VisibilityModel>AverageRating}"
                                                 maxValue="5"
@@ -247,14 +240,11 @@
                                             />
                                         </HBox>
                                     </CustomListItem>
-
                                 </VBox>
                             </pages>
-
                         </Carousel>
 
                         <VBox class="bedCardContent">
-
                             <Text
                                 text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
                                 class="bedCardTitle"
@@ -287,11 +277,8 @@
                                     class="btnViewDetails"
                                 />
                             </HBox>
-
                         </VBox>
-
                     </VBox>
-
                 </l:Grid>
 
                 <VBox
@@ -307,11 +294,7 @@
                     />
                     <VBox height="2rem" />
                 </VBox>
-
             </VBox>
-
         </content>
-
     </Page>
-
 </mvc:View>

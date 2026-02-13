@@ -4280,3 +4280,47 @@ height:140px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Outer pill */
+.pillActionBar {
+    background: linear-gradient(135deg, #00b7c2, #008b96);
+    border-radius: 22px;
+    padding: 4px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    width: fit-content;
+    margin: auto;
+}
+
+/* Buttons inside */
+.pillActionBtn {
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 6px 18px;
+    border-radius: 18px;
+    transition: background 0.2s ease;
+}
+
+/* Hover */
+.pillActionBtn:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* Left / Right shaping */
+.pillLeft {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.pillRight {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Remove button outline */
+.pillActionBtn:focus {
+    outline: none;
+}
+.pillActionBtn .sapMBtnContent,
+.pillActionBtn .sapMBtnText {
+    color: #ffffff !important;
+}

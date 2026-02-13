@@ -1,43 +1,43 @@
 sap.ui.define([
-	 "./BaseController",
-	"../model/formatter",
+    "./BaseController",
+    "../model/formatter",
     "sap/ui/model/json/JSONModel",
-	 "sap/m/MessageToast",
-], function(
-	BaseController,
-	Formatter,
-	JSONModel,
-	MessageToast
-		
-) {
-	"use strict";
+    "sap/m/MessageToast",
+], function (
+    BaseController,
+    Formatter,
+    JSONModel,
+    MessageToast
 
-	return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
-            Formatter: Formatter,
-		    onInit: function () {
+) {
+    "use strict";
+
+    return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
+        Formatter: Formatter,
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteViewRooms").attachMatched(this._onRouteMatched, this);
 
-			},
-			_onRouteMatched:async function (oEvent) {
-           if (performance.navigation && performance.navigation.type === 1) {
+        },
+        _onRouteMatched: async function (oEvent) {
+            if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
-				    var model = new JSONModel({
-                   BedTypes: [],
-                    NoData: false,
-                    ShowViewMore: false
+            var model = new JSONModel({
+                BedTypes: [],
+                NoData: false,
+                ShowViewMore: false
 
             });
             this.getView().setModel(model, "VisibilityModel")
 
-              var sPath = oEvent.getParameter("arguments").sPath;
-			  this.getView().setBusy(true);
-			  await this._loadFilteredData(sPath) 
-			  this.getView().setBusy(false);
+            var sPath = oEvent.getParameter("arguments").sPath;
+            this.getView().setBusy(true);
+            await this._loadFilteredData(sPath)
+            this.getView().setBusy(false);
 
-			},
-			  model: function (response) {
+        },
+        model: function (response) {
             const aRooms = response.data.HM_Rooms || [];
             const oRoomModel = new JSONModel({ Rooms: aRooms });
             this.getView().setModel(oRoomModel, "RoomCountModel");
@@ -47,8 +47,8 @@ sap.ui.define([
             const oCustomerModel = new JSONModel(aCustomers);
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
-			 
-       _loadFilteredData: async function (sBranchCode) {
+
+        _loadFilteredData: async function (sBranchCode) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
             try {
@@ -190,26 +190,26 @@ sap.ui.define([
 
 
                 aFinal = aFinal.filter(b => b.PriceVisible !== false);
-                  const aACRooms = aFinal.filter(r =>
-            r.ACType?.toLowerCase() === "ac"
-        );
+                const aACRooms = aFinal.filter(r =>
+                    r.ACType?.toLowerCase() === "ac"
+                );
 
-           const NonACRooms = aFinal.filter(r =>
-            r.ACType?.toLowerCase() === "non-ac"
-        );
-                  const bHasAC = aACRooms.length > 0;
-                  const bHasNonAC = NonACRooms.length > 0;
+                const NonACRooms = aFinal.filter(r =>
+                    r.ACType?.toLowerCase() === "non-ac"
+                );
+                const bHasAC = aACRooms.length > 0;
+                const bHasNonAC = NonACRooms.length > 0;
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
                 oVisibilityModel.setProperty("/ACRooms", aACRooms);
-                   oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
-                  oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
+                oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
+                oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
-              
-               } catch (err) {
-                         console.log(err);
+
+            } catch (err) {
+                console.log(err);
             }
         },
-          viewDetails: function (oEvent) {
+        viewDetails: function (oEvent) {
             try {
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
@@ -303,7 +303,7 @@ sap.ui.define([
                 console.log(" viewDetails error:", err);
             }
         },
-         onCloseRoomDetail: function () {
+        onCloseRoomDetail: function () {
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
             this._clearRoomDetailDialog(); // destroy AFTER
         },
@@ -312,7 +312,7 @@ sap.ui.define([
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close(); // close FIRST
             this._clearRoomDetailDialog();
         },
-          _clearRoomDetailDialog: function () {
+        _clearRoomDetailDialog: function () {
             if (!this._oRoomDetailFragment) return;
 
             const oFrag = this._oRoomDetailFragment;
@@ -348,7 +348,7 @@ sap.ui.define([
                 this._carouselInterval = null;
             }
         },
-         onSelectPricePlan: function (oEvent) {
+        onSelectPricePlan: function (oEvent) {
             const oTile = oEvent.getSource();
             const sType = oTile.data("type"); // "daily", "monthly", or "yearly"
             const oView = this.getView();
@@ -401,7 +401,7 @@ sap.ui.define([
             oTile.removeStyleClass("defaultTile");
             oTile.addStyleClass("selectedTile");
         },
-        
+
         onConfirmBooking: function () {
 
             const oView = this.getView();
@@ -514,7 +514,7 @@ sap.ui.define([
             const oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBookRoom");
         },
-          onRoomDetailOpened: function () {
+        onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
             if (this._oRoomDetailFragment) {
                 const oModel = this._oRoomDetailFragment.getModel("HostelModel");
@@ -524,7 +524,7 @@ sap.ui.define([
                 }
             }
         },
-          _updateBookTileState: function () {
+        _updateBookTileState: function () {
 
             const oTile =
                 sap.ui.core.Fragment.byId("roomDetailsFrag", "bookTile");
@@ -540,7 +540,7 @@ sap.ui.define([
                 oTile.removeStyleClass("occupied");
             }
         },
-         _bindCarousel: function () {
+        _bindCarousel: function () {
 
             const oCarousel =
                 this._oRoomDetailFragment
@@ -616,7 +616,7 @@ sap.ui.define([
             oCarousel.attachBrowserEvent("mousedown", PAUSE_FOR_10_SECONDS);
             oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
         },
-         onImageLoadError: function (oEvent) {
+        onImageLoadError: function (oEvent) {
             const oImage = oEvent.getSource();
             const sFallback = sap.ui.require.toUrl("sap/ui/com/project1/image/no-image.png");
 
@@ -625,7 +625,7 @@ sap.ui.define([
                 setTimeout(() => oImage.setSrc(sFallback), 0); // Agar image load nahi hui, toh fallback set hoga
             }
         },
-          _convertFacilities: function (list) {
+        _convertFacilities: function (list) {
             const defaultImages = {
                 "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
                 "Laundry Service": "../image/Laundry Service.jpg",
@@ -724,7 +724,7 @@ sap.ui.define([
             }
             oFacilityModel.setProperty("/loading", false);
         },
-          _LoadAmenities: async function (sBranchCode) {
+        _LoadAmenities: async function (sBranchCode) {
 
             const oAmenityModel = new JSONModel({
                 loading: true,
@@ -781,7 +781,7 @@ sap.ui.define([
                 };
             });
         },
-          onAddressClick: function () {
+        onAddressClick: function () {
             try {
                 let oHostelModel = this._oRoomDetailFragment ? this._oRoomDetailFragment.getModel("HostelModel") : this.oHostelModel;
                 if (!oHostelModel) return MessageToast.show("Location data not available.");
@@ -799,73 +799,115 @@ sap.ui.define([
                 MessageToast.show("Error opening maps.");
             }
         },
-		   onNavBack: function () {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
 
         onHome: function () {
-			var oRouter = this.getOwnerComponent().getRouter();
+            var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
 
-          _clearEnquiryStates: function () {
+        //   _clearEnquiryStates: function () {
 
-            if (!this._oEnquiry) return;
+        //     if (!this._oEnquiry) return;
 
-            const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
-                return oControl.setValueState;
-            });
+        //     const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
+        //         return oControl.setValueState;
+        //     });
 
-            aControls.forEach(function (oControl) {
-                oControl.setValueState("None");
-                oControl.setValueStateText("");
-            });
-        },
+        //     aControls.forEach(function (oControl) {
+        //         oControl.setValueState("None");
+        //         oControl.setValueStateText("");
+        //     });
+        // },
 
-        onSegmentedButtonChange: function (oEvent) {
-            const sKey = oEvent.getParameter("item").getKey();
-            const oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
-            if (sKey === "details") {
+        // onSegmentedButtonChange: function (oEvent) {
+        //     const sKey = oEvent.getParameter("item").getKey();
+        //     const oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+        //     if (sKey === "details") {
 
-                if (this._oEnquiry && this._oEnquiry.isOpen()) {
-                    this._oEnquiry.close();
-                }
+        //         if (this._oEnquiry && this._oEnquiry.isOpen()) {
+        //             this._oEnquiry.close();
+        //         }
 
-                this.viewDetails(oEvent);
-                return;
-            }
+        //         this.viewDetails(oEvent);
+        //         return;
+        //     }
 
-            if (sKey == "Enquiry") {
-                const oEnquiryModel = new sap.ui.model.json.JSONModel({
-                    RoomType: oData.Name + " (" + oData.ACType + ")",
-                    Salutation: "",
-                    UserName: "",
-                    STDCode: "",
-                    Mobile: "",
-                    Comments: "",
-                    Email: ""
-                });
-                this.getView().setModel(oEnquiryModel, "EnquiryModel");
-                if (!this._oEnquiry) {
-                    this._oEnquiry = sap.ui.xmlfragment(
-                        this.getView().getId(),
-                        "sap.ui.com.project1.fragment.Enquiry", this
-                    );
-                    this.getView().addDependent(this._oEnquiry);
-                    this.getView().addStyleClass("blur-background");
-                }
-                this._clearEnquiryStates();
-                this._oEnquiry.open();
-            }
-        },
+        //     if (sKey == "Enquiry") {
+        //         const oEnquiryModel = new sap.ui.model.json.JSONModel({
+        //             RoomType: oData.Name + " (" + oData.ACType + ")",
+        //             Salutation: "",
+        //             UserName: "",
+        //             STDCode: "",
+        //             Mobile: "",
+        //             Comments: "",
+        //             Email: ""
+        //         });
+        //         this.getView().setModel(oEnquiryModel, "EnquiryModel");
+        //         if (!this._oEnquiry) {
+        //             this._oEnquiry = sap.ui.xmlfragment(
+        //                 this.getView().getId(),
+        //                 "sap.ui.com.project1.fragment.Enquiry", this
+        //             );
+        //             this.getView().addDependent(this._oEnquiry);
+        //             this.getView().addStyleClass("blur-background");
+        //         }
+        //         this._clearEnquiryStates();
+        //         this._oEnquiry.open();
+        //     }
+        // },
 
-        E_onCancelButtonPress: function () {
-            if (this._oEnquiry && this._oEnquiry.isOpen()) {
+        // E_onCancelButtonPress: function () {
+        //     if (this._oEnquiry && this._oEnquiry.isOpen()) {
+        //         this._oEnquiry.close();
+        //     }
+        //     this._clearEnquiryStates();
+        //     this.getView().removeStyleClass("blur-background");
+        // }
+
+        onViewDetailsPress: function (oEvent) {
+            if (this._oEnquiry?.isOpen()) {
                 this._oEnquiry.close();
             }
-            this._clearEnquiryStates();
-            this.getView().removeStyleClass("blur-background");
+            this.viewDetails(oEvent);
+        },
+
+        onEnquiryPress: function (oEvent) {
+            const oData = oEvent.getSource()
+                .getBindingContext("VisibilityModel")
+                .getObject();
+
+            const oEnquiryModel = new sap.ui.model.json.JSONModel({
+                RoomType: oData.Name + " (" + oData.ACType + ")",
+                Salutation: "",
+                UserName: "",
+                STDCode: "",
+                Mobile: "",
+                Comments: "",
+                Email: ""
+            });
+
+            this.getView().setModel(oEnquiryModel, "EnquiryModel");
+
+            if (!this._oEnquiry) {
+                this._oEnquiry = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "sap.ui.com.project1.fragment.Enquiry",
+                    this
+                );
+                this.getView().addDependent(this._oEnquiry);
+            }
+            this._oEnquiry.open();
+        },
+        E_onCancelButtonPress: function () {
+            this._oEnquiry.close();
+        },
+
+        E_onsavebuttonpress: function () {
+
         }
-	});
+    });
 });
