@@ -72,20 +72,20 @@ sap.ui.define([
             const sRating = oRatingCB.getSelectedKey();
             const sSortKey = oSortCB.getSelectedKey();
 
-            var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
+            // var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
 
             var filters = {
-                BedType: BedTypeName,
+                // BedType: BedTypeName,
                 StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
                 EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
                 OverallRating: sRating || "",
                 SortKey: sSortKey || ""
             };
-            if (oExistingModel.Role === "Admin" && aBranchCodes && BedTypeName === "") {
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
-                filters.BranchCode = data.BranchCode || "";
+                filters.BranchCode = data.BranchID || "";
             }
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");

@@ -274,8 +274,8 @@
                                                                         busyIndicatorDelay="0"
                                                                     >
                                                                         <core:ListItem
-                                                                            key="{AreaModel>BranchID}"
-                                                                            text="{AreaModel>Address}"
+                                                                            key="{AreaModel>LandMark}"
+                                                                            text="{AreaModel>LandMark}"
                                                                         />
                                                                     </ComboBox>
                                                                 </fb:control>

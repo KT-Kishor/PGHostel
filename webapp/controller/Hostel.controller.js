@@ -320,7 +320,7 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        _populateUniqueFilterValues: function (data) {
+              _populateUniqueFilterValues: function (data) {
             let uniqueValues = { id_Branch: new Set(), };
 
             data.forEach(item => {
@@ -339,6 +339,7 @@ sap.ui.define([
                 });
             });
         },
+
 
         onSelectPricePlan: function (oEvent) {
             const oTile = oEvent.getSource();
@@ -2341,6 +2342,8 @@ sap.ui.define([
             });
         },
         onSearchRooms: async function () {
+               this.iTop = 8
+               this.iSkip = 0
             this.flag = true
             const oContainer = this.byId("idBedTypeFlex");
             oContainer.setBusy(true);
@@ -2363,7 +2366,7 @@ sap.ui.define([
             var sSelectedBranch = oAreaCB.getSelectedKey() || oAreaCB.getValue();
             var areaList = this.getView().getModel("AreaModel").getData() || [];
             // Check if selected or typed locality is valid
-            var validArea = areaList.find(item => item.Address === sSelectedBranch || item.BranchID === sSelectedBranch);
+            var validArea = areaList.find(item => item.LandMark === sSelectedBranch || item.BranchID === sSelectedBranch);
 
             if (sSelectedBranch && !validArea) {
                 // User typed something, but it does not match the list
@@ -2400,6 +2403,7 @@ sap.ui.define([
 
         Branch: async function (filter) {
             const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            this.RoomCount=response?.HM_RoomCount || 0,
             this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
             const aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
@@ -2420,13 +2424,22 @@ sap.ui.define([
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                var oModelData = await this.Branch("");
+                var data=this.getOwnerComponent().getModel("sBRModel").getData()
+                var city=data[0].City
+                var fCity=this.City ? this.City :city;
+             var filter = {
+                            flag: "true",
+                            top: this.iTop,
+                            skip: this.iSkip,
+                            City: fCity
+                             }
+                var oModelData = await this.Branch(filter);
                 this.isInitialLoad = true;
-                this._populateUniqueFilterValues(oModelData)
+                this._populateUniqueFilterValues(data)
 
-                const sCity = this.City ? this.City : oModelData[0].City;
+                const sCity = this.City ? this.City : data[0].City;
 
-                const aFiltered = oModelData.filter(item => item.City === sCity);
+                const aFiltered = data.filter(item => item.City === sCity);
 
                 if (aFiltered.length === 0 || sCity) {
                     await this._loadFilteredData(sCity, "", "");
@@ -2468,21 +2481,24 @@ sap.ui.define([
                         "HM_Branch",
                         {
                             City: Scity,
-                            BranchCode: sBranchCode,
+                            LandMark: sBranchCode,
                             Name: BranchName,
                             top: this.iTop,
-                            skip: this.iSkip
+                            skip: this.iSkip,
+                            flag:"true"
                         }
                     );
                     aBranchesData = response?.data || [];
+                    this.RoomCount=response?.HM_RoomCount || 0;
 
                 } else {
                     const oBRModel = oView.getModel("sBRModel");
                     aBranchesData = oBRModel?.getData() || [];
+                    
 
                 }
 
-
+                
 
                 let aFilteredBranches = [];
 
@@ -2537,7 +2553,12 @@ sap.ui.define([
                         CheckInTime: branch.CheckinTime,
                         CheckOutTime: branch.CheckoutTime,
                         GeoLocation: branch.GeoLocation,
-                        Image: sImage
+                        Image: sImage,
+                        TotalFeedbacks:branch.TotalFeedbacks,
+                        AverageRating:branch.AverageRating,
+                        
+                        
+
                     };
                 });
                 this.Scity = Scity
@@ -2550,12 +2571,12 @@ sap.ui.define([
                     oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
                 }
 
-                oVisibilityModel.setProperty("/ShowViewMore", true);
+                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length!== this.RoomCount);
                 if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
-                }
+          }
 
             } catch (err) {
                 MessageToast.show("Failed to load branch data");
