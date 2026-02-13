@@ -568,13 +568,33 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  align-items: center;
 }
 
 .bedCardTitle {
   font-size: 1.2rem;
   font-weight: bold;
   color: #000000;
+
+  line-height: 1.5rem;        /* adjust based on font */
+  min-height: 3rem;           /* 1.5rem × 2 lines */
+  max-height: 3rem;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;      /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  margin: auto;
 }
+.roomHeaderTitle {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1f2937;   /* Dark modern color */
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+}
+
+
 
 /* 
 .bedCardDesc {
@@ -596,6 +616,7 @@
   font-size: 0.95rem;
   color: #080808;
   margin-top: 0.4rem;
+  margin-left: 10px;
 
   line-height: 1.4rem;
   min-height: 5.6rem;
@@ -604,7 +625,7 @@
   overflow: hidden;
 
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
   /* 🔑 Justification */

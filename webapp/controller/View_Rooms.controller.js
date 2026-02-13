@@ -29,9 +29,10 @@ sap.ui.define([
             this.getView().setModel(model, "VisibilityModel")
 
               var sPath = oEvent.getParameter("arguments").sPath;
-			  sap.ui.core.BusyIndicator.show(0);
+			  this.getView().setBusy(true);
 			  await this._loadFilteredData(sPath) 
-			  sap.ui.core.BusyIndicator.hide();
+			  this.getView().setBusy(false);
+
 
 			   
 
@@ -197,8 +198,18 @@ sap.ui.define([
 
 
                 aFinal = aFinal.filter(b => b.PriceVisible !== false);
+                  const aACRooms = aFinal.filter(r =>
+            r.ACType?.toLowerCase() === "ac"
+        );
+
+           const NonACRooms = aFinal.filter(r =>
+            r.ACType?.toLowerCase() === "non-ac"
+        );
+
 
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
+                    oVisibilityModel.setProperty("/ACRooms", aACRooms);
+                    oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
                 if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
