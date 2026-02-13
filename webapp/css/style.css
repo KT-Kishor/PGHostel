@@ -554,7 +554,7 @@
   color: #000000;
 
   line-height: 1.5rem;        /* adjust based on font */
-  min-height: 3rem;           /* 1.5rem × 2 lines */
+  min-height: 2rem;           /* 1.5rem × 2 lines */
   max-height: 3rem;
 
   overflow: hidden;

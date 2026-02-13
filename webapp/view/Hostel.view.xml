@@ -228,8 +228,8 @@
                                                                         selectionChange=".onBranchSelectionChange"
                                                                     >
                                                                         <core:ListItem
-                                                                            key="{sBRModel>cityName}"
-                                                                            text="{sBRModel>cityName}"
+                                                                            key="{sBRModel>city}"
+                                                                            text="{sBRModel>city}"
                                                                         />
                                                                     </ComboBox>
                                                                 </fb:control>

@@ -2403,9 +2403,11 @@ sap.ui.define([
 
         Branch: async function (filter) {
             const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
-            this.RoomCount=response?.HM_RoomCount || 0,
-            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
-            const aData = response?.data || [];
+            this.RoomCount=response?.HM_RoomCount || 0;
+                this.getView().setModel(new JSONModel(response?.data ), "BranchModel");
+
+            // this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+            let aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
 
@@ -2425,6 +2427,7 @@ sap.ui.define([
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
                 var data=this.getOwnerComponent().getModel("sBRModel").getData()
+
                 var city=data[0].City
                 var fCity=this.City ? this.City :city;
              var filter = {
@@ -2492,7 +2495,7 @@ sap.ui.define([
                     this.RoomCount=response?.HM_RoomCount || 0;
 
                 } else {
-                    const oBRModel = oView.getModel("sBRModel");
+                    const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
                     
 
