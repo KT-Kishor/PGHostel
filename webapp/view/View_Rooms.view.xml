@@ -270,12 +270,26 @@
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                <Link
-                                    text="View Details"
-                                    tooltip="View Details"
-                                    press="viewDetails"
-                                    class="btnViewDetails"
-                                />
+                                <Toolbar
+                                    class="pillActionBar sapUiTinyMarginTop"
+                                    design="Transparent"
+                                >
+                                    <Button
+                                        text="View Details"
+                                        type="Transparent"
+                                        press="onViewDetailsPress"
+                                        class="pillActionBtn pillLeft"
+                                    />
+
+                                    <ToolbarSpacer width="1px" />
+
+                                    <Button
+                                        text="Enquiry"
+                                        type="Transparent"
+                                        press="onEnquiryPress"
+                                        class="pillActionBtn pillRight"
+                                    />
+                                </Toolbar>
                             </HBox>
                         </VBox>
                     </VBox>
