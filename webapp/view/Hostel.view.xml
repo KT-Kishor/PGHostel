@@ -137,13 +137,14 @@
                             <Page
                                 id="idRooms"
                                 showHeader="false"
-                                enableScrolling="false"
+                                enableScrolling="true"
                             >
                                 <VBox
                                     height="100%"
                                     renderType="Bare"
                                 >
                                     <ScrollContainer
+                                        id="idRoomsScroll"
                                         height="100%"
                                         vertical="true"
                                         horizontal="false"
@@ -234,8 +235,8 @@
                                                                 </fb:control>
                                                             </fb:FilterGroupItem>
                                                             <fb:FilterGroupItem
-                                                                name="Branch Name"
-                                                                label="Branch Name"
+                                                                name="Hostel Name"
+                                                                label="Hostel Name"
                                                                 groupName="Group1"
                                                                 visibleInFilterBar="true"
                                                             >
@@ -248,7 +249,7 @@
                                                                         items="{AreaModel>/}"
                                                                     >
                                                                         <core:ListItem
-                                                                            key="{AreaModel>BranchID}"
+                                                                            key="{AreaModel>Name}"
                                                                             text="{AreaModel>Name}"
                                                                         />
                                                                     </ComboBox>
@@ -271,12 +272,10 @@
                                                                         items="{AreaModel>/}"
                                                                         selectionChange=".onAreaSelectionChange"
                                                                         busyIndicatorDelay="0"
-                                                                        showSecondaryValues="true"
                                                                     >
                                                                         <core:ListItem
                                                                             key="{AreaModel>BranchID}"
                                                                             text="{AreaModel>Address}"
-                                                                            additionalText="{AreaModel>Name}"
                                                                         />
                                                                     </ComboBox>
                                                                 </fb:control>

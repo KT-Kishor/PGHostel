@@ -159,7 +159,7 @@ sap.ui.define([
             if (oTabHeader) oTabHeader.setSelectedKey("idHome");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.iTop = 4; // records per load
+            this.iTop = 8; // records per load
             this.iSkip = 0;   // starting index
 
             this.flag = false
@@ -167,7 +167,6 @@ sap.ui.define([
 
             if (!this.getView().getModel("VisibilityModel")) {
                 this.getView().setModel(new JSONModel({
-                    BedTypes: [],
                     NoData: false,
                     ShowViewMore: false
                 }), "VisibilityModel");
@@ -940,7 +939,7 @@ sap.ui.define([
 
             /* 4️⃣ State flags (unchanged) */
             this.flag = true;
-            this.iTop = 4;
+            this.iTop = 8;
             this.iSkip = 0;
             this.roomtype = true;
 
@@ -981,71 +980,6 @@ sap.ui.define([
             setTimeout(() => {
                 oWrapper.removeStyleClass("explore-enter");
             }, 1900);
-        },
-        onViewMoreRooms: async function () {
-            // Load next page
-            this.flag = false
-            this.roomtype = false
-            this.iSkip;
-            this.iTop
-            const oContainer = this.byId("idViewMoreBusy")
-            oContainer.setBusy(true)
-            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
-            oContainer.setBusy(false);
-        },
-
-
-        Branch: async function () {
-            const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
-            const aData = response?.data || [];
-            return Array.isArray(aData) ? aData : [];
-        },
-
-        _loadRoomsPageData: async function () {
-            this.iTop = 4;
-            this.iSkip = 0;
-
-            this.roomtype = false
-
-            this.byId("idBedTypeFlex").setBusy(true);
-            this.byId("id_Branch").setBusy(true).setValueState("None");;
-            this.byId("id_Area").setBusy(true);
-            this.byId("id_Roomtype").setBusy(true);
-
-            const oFooterModel = this.getView().getModel("FooterModel");
-
-            oFooterModel.setProperty("/showRoomsFooter", false);
-            try {
-                var oModelData = await this.Branch();
-                this._populateUniqueFilterValues(oModelData)
-
-                const sCity = this.City ? this.City : oModelData[0].City;
-
-                const aFiltered = oModelData.filter(item => item.City === sCity);
-
-                if (aFiltered.length === 0 || sCity) {
-                    await this._loadFilteredData(sCity, "", "All");
-                } else {
-                    await this._loadFilteredData(this.City, "", "");
-                }
-
-                this.getView().setModel(new JSONModel(aFiltered), "AreaModel");
-
-                // Default selections
-                this.byId("id_Branch").setSelectedKey(sCity);
-                this.byId("id_Area").setEnabled(true).setSelectedKey("");
-                if (this.roomtype !== true) this.byId("id_Roomtype").setEnabled(true).setSelectedKey("All");
-            } catch (error) {
-                console.log("Error loading Rooms:", error);
-            } finally {
-                this.byId("idBedTypeFlex").setBusy(false);
-                this.byId("id_Branch").setBusy(false);
-                this.byId("id_Area").setBusy(false);
-                this.byId("id_Roomtype").setBusy(false);
-                // ✅ show ROOMS footer after success OR failure
-                oFooterModel.setProperty("/showRoomsFooter", true);
-            }
         },
 
         onpressFilter: function () {
@@ -2334,7 +2268,7 @@ sap.ui.define([
             const oRoomType = oView.byId("id_Roomtype");
             // Reset previous selections
             oAreaCombo.setSelectedKey("").setEnabled(false);
-            oRoomType.setSelectedKey("");
+            oRoomType.setSelectedKey("").setEnabled(false);
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
             // 🔹 Selected Branch Name
@@ -2350,6 +2284,8 @@ sap.ui.define([
             oView.setModel(oAreaModel, "AreaModel");
             // 🔹 Enable the Area dropdown now that data is ready
             oAreaCombo.setEnabled(true);
+            oRoomType.setEnabled(true);
+
         },
 
         // 🔹 When Area is selected, enable Room Type combo
@@ -2359,60 +2295,7 @@ sap.ui.define([
             (oSelectedItem) ? oRoomType.setEnabled(true) : oRoomType.setEnabled(true);
         },
 
-        onSearchRooms: async function () {
-            this.flag = true
-            const oContainer = this.byId("idBedTypeFlex");
-            oContainer.setBusy(true);
 
-            // City
-            var oBranchcity = this.byId("id_Branch").getSelectedKey() || this.byId("id_Branch").getValue();
-
-            if (!oBranchcity) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectCity"));
-                oContainer.setBusy(false);
-                this.byId("id_Branch").setValueState("Error");
-                return;
-            }
-            // AC Type
-            const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey();
-            if (sSelectedACType === "") this.byId("id_Roomtype").setSelectedKey("All")
-            if (sSelectedACType === "All" || oBranchcity) {
-                this.iTop = 4
-                this.iSkip = 0
-            }
-            if (sSelectedACType === "AC" || oBranchcity) {
-                this.iTop = 4
-                this.iSkip = 0
-            }
-            if (sSelectedACType === "Non-Ac" || oBranchcity) {
-                this.iTop = 4
-                this.iSkip = 0
-            }
-
-            // Locality ComboBox
-            var oAreaCB = this.byId("id_Area");
-            var sSelectedBranch = oAreaCB.getSelectedKey() || oAreaCB.getValue();
-            var areaList = this.getView().getModel("AreaModel").getData() || [];
-            // Check if selected or typed locality is valid
-            var validArea = areaList.find(item => item.Address === sSelectedBranch || item.BranchID === sSelectedBranch);
-
-            if (sSelectedBranch && !validArea) {
-                // User typed something, but it does not match the list
-                MessageToast.show(this.i18nModel.getText("pleaseselectlocality"));
-                oContainer.setBusy(false);
-                return;
-            }
-            // If locality is empty, keep it empty (search by city only)
-            var finalBranch = validArea ? validArea.BranchID : "";
-            if (finalBranch === "") this.byId("id_Area").setValueState("None");
-            try {
-                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
-            } catch (e) {
-                console.log(e);
-            } finally {
-                oContainer.setBusy(false);
-            }
-        },
 
         model: function (response) {
             const aRooms = response.data.HM_Rooms || [];
@@ -2440,8 +2323,8 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
 
         },
-         viewRooms: function (oEvent) {
-              var oSource = oEvent.getSource();
+        viewRooms: function (oEvent) {
+            var oSource = oEvent.getSource();
 
             // Get binding context of the clicked bed type
             var oCtx = oSource.getBindingContext("VisibilityModel");
@@ -2452,87 +2335,233 @@ sap.ui.define([
 
             var oBranchData = oCtx.getObject();
 
-       
-               this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
+
+            this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
                 sPath: oBranchData.BranchID
             });
         },
+        onSearchRooms: async function () {
+            this.flag = true
+            const oContainer = this.byId("idBedTypeFlex");
+            oContainer.setBusy(true);
 
-     _loadFilteredData: function (Scity, sBranchCode) {
+            // City
+            var oBranchcity = this.byId("id_Branch").getSelectedKey() || this.byId("id_Branch").getValue();
 
-    const oView = this.getView();
-    const oVisibilityModel = oView.getModel("VisibilityModel");
-
-    try {
-
-        const oBRModel = oView.getModel("sBRModel");
-        const aBranchesData = oBRModel?.getData() || [];
-
-        let aFilteredBranches = [];
-
-        if (Scity && !sBranchCode) {
-            aFilteredBranches = aBranchesData.filter(branch =>
-                branch.City === Scity
-            );
-        } 
-        else if (sBranchCode) {
-            aFilteredBranches = aBranchesData.filter(branch =>
-                branch.BranchID === sBranchCode
-            );
-        } 
-        else {
-            aFilteredBranches = aBranchesData;
-        }
-
-        if (aFilteredBranches.length === 0) {
-            oVisibilityModel.setProperty("/Branches", []);
-            oVisibilityModel.setProperty("/NoData", true);
-            return;
-        }
-
-        // 🔥 Convert Base64 to Image
-        const convertBase64ToImage = (base64String, fileType) => {
-            if (!base64String) return "./image/Fallback.png";
-
-            let sBase64 = base64String.replace(/\s/g, "");
-
-            if (sBase64.startsWith("data:image")) {
-                return sBase64;
+            if (!oBranchcity) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectCity"));
+                oContainer.setBusy(false);
+                this.byId("id_Branch").setValueState("Error");
+                return;
             }
+            // AC Type
+            const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey();
 
-            const mimeType = fileType || "image/jpeg";
-            return `data:${mimeType};base64,${sBase64}`;
-        };
 
-        const aBranches = aFilteredBranches.map(branch => {
+            // Locality ComboBox
+            var oAreaCB = this.byId("id_Area");
+            var sSelectedBranch = oAreaCB.getSelectedKey() || oAreaCB.getValue();
+            var areaList = this.getView().getModel("AreaModel").getData() || [];
+            // Check if selected or typed locality is valid
+            var validArea = areaList.find(item => item.Address === sSelectedBranch || item.BranchID === sSelectedBranch);
 
-            const sImage = convertBase64ToImage(
-                branch.Attachment,
-                branch.AttachmentType
-            );
+            if (sSelectedBranch && !validArea) {
+                // User typed something, but it does not match the list
+                MessageToast.show(this.i18nModel.getText("pleaseselectlocality"));
+                oContainer.setBusy(false);
+                return;
+            }
+            // If locality is empty, keep it empty (search by city only)
+            var finalBranch = validArea ? validArea.BranchID : "";
+            if (finalBranch === "") this.byId("id_Area").setValueState("None");
+            this.isInitialLoad = false;
 
-            return {
-                BranchID: branch.BranchID,
-                Name: branch.Name,
-                City: branch.City,
-                Address: branch.Address,
-                Country: branch.Country,
-                GSTIN: branch.GSTIN,
-                CheckInTime: branch.CheckinTime,
-                CheckOutTime: branch.CheckoutTime,
-                GeoLocation: branch.GeoLocation,
-                Image: sImage 
-            };
-        });
+            try {
+                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
+            } catch (e) {
+                console.log(e);
+            } finally {
+                oContainer.setBusy(false);
+            }
+        },
+        onViewMoreRooms: async function () {
+            // Load next page
+            this.flag = false
+            this.roomtype = false
+            this.iSkip += this.iTop;
+            const oContainer = this.byId("idViewMoreBusy")
+            oContainer.setBusy(true)
+            this.isInitialLoad = false;
 
-        oVisibilityModel.setProperty("/Branches", aBranches);
-        oVisibilityModel.setProperty("/NoData", false);
+            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
+            oContainer.setBusy(false);
+        },
 
-    } catch (err) {
-        MessageToast.show("Failed to load branch data");
-    }
-}
-,
+
+        Branch: async function (filter) {
+            const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
+            const aData = response?.data || [];
+            return Array.isArray(aData) ? aData : [];
+        },
+
+        _loadRoomsPageData: async function () {
+            this.iTop = 8;
+            this.iSkip = 0;
+
+            this.roomtype = false
+
+            this.byId("idBedTypeFlex").setBusy(true);
+            this.byId("id_Branch").setBusy(true).setValueState("None");;
+            this.byId("id_Area").setBusy(true);
+            this.byId("id_Roomtype").setBusy(true);
+
+            const oFooterModel = this.getView().getModel("FooterModel");
+
+            oFooterModel.setProperty("/showRoomsFooter", false);
+            try {
+                var oModelData = await this.Branch("");
+                this.isInitialLoad = true;
+                this._populateUniqueFilterValues(oModelData)
+
+                const sCity = this.City ? this.City : oModelData[0].City;
+
+                const aFiltered = oModelData.filter(item => item.City === sCity);
+
+                if (aFiltered.length === 0 || sCity) {
+                    await this._loadFilteredData(sCity, "", "");
+                } else {
+                    await this._loadFilteredData(this.City, "", "");
+                }
+
+                this.getView().setModel(new JSONModel(aFiltered), "AreaModel");
+
+                // Default selections
+                this.byId("id_Branch").setSelectedKey(sCity);
+                this.byId("id_Area").setEnabled(true).setSelectedKey("");
+                if (this.roomtype !== true) this.byId("id_Roomtype").setEnabled(true).setSelectedKey("");
+            } catch (error) {
+                console.log("Error loading Rooms:", error);
+            } finally {
+                this.byId("idBedTypeFlex").setBusy(false);
+                this.byId("id_Branch").setBusy(false);
+                this.byId("id_Area").setBusy(false);
+                this.byId("id_Roomtype").setBusy(false);
+                // ✅ show ROOMS footer after success OR failure
+                oFooterModel.setProperty("/showRoomsFooter", true);
+            }
+        },
+        _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
+
+
+
+
+            const oView = this.getView();
+            const oVisibilityModel = oView.getModel("VisibilityModel");
+
+            try {
+                let aBranchesData;
+                if (!this.isInitialLoad) {
+
+
+                    let response = await this.ajaxReadWithJQuery(
+                        "HM_Branch",
+                        {
+                            City: Scity,
+                            BranchCode: sBranchCode,
+                            Name: BranchName,
+                            top: this.iTop,
+                            skip: this.iSkip
+                        }
+                    );
+                    aBranchesData = response?.data || [];
+
+                } else {
+                    const oBRModel = oView.getModel("sBRModel");
+                    aBranchesData = oBRModel?.getData() || [];
+
+                }
+
+
+
+                let aFilteredBranches = [];
+
+                if (Scity && !sBranchCode) {
+                    aFilteredBranches = aBranchesData.filter(branch =>
+                        branch.City === Scity
+                    );
+                }
+                else if (sBranchCode) {
+                    aFilteredBranches = aBranchesData.filter(branch =>
+                        branch.BranchID === sBranchCode
+                    );
+                }
+                else {
+                    aFilteredBranches = aBranchesData;
+                }
+
+                if (aFilteredBranches.length === 0) {
+                    oVisibilityModel.setProperty("/Branches", []);
+                    oVisibilityModel.setProperty("/NoData", true);
+                    return;
+                }
+
+                // 🔥 Convert Base64 to Image
+                const convertBase64ToImage = (base64String, fileType) => {
+                    if (!base64String) return "./image/Fallback.png";
+
+                    let sBase64 = base64String.replace(/\s/g, "");
+
+                    if (sBase64.startsWith("data:image")) {
+                        return sBase64;
+                    }
+
+                    const mimeType = fileType || "image/jpeg";
+                    return `data:${mimeType};base64,${sBase64}`;
+                };
+
+                const aBranches = aFilteredBranches.map(branch => {
+
+                    const sImage = convertBase64ToImage(
+                        branch.Attachment,
+                        branch.AttachmentType
+                    );
+
+                    return {
+                        BranchID: branch.BranchID,
+                        Name: branch.Name,
+                        City: branch.City,
+                        Address: branch.Address,
+                        Country: branch.Country,
+                        GSTIN: branch.GSTIN,
+                        CheckInTime: branch.CheckinTime,
+                        CheckOutTime: branch.CheckoutTime,
+                        GeoLocation: branch.GeoLocation,
+                        Image: sImage
+                    };
+                });
+                this.Scity = Scity
+                this.sBranchCode = sBranchCode
+                this.sACType = BranchName
+                if (this.iSkip === 0) {
+                    oVisibilityModel.setProperty("/Branches", aBranches);
+                } else {
+                    let existing = oVisibilityModel.getProperty("/Branches") || [];
+                    oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
+                }
+
+                oVisibilityModel.setProperty("/ShowViewMore", true);
+                if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
+                    oView.getModel("VisibilityModel").setProperty("/NoData", true);
+                } else {
+                    oView.getModel("VisibilityModel").setProperty("/NoData", false);
+                }
+
+            } catch (err) {
+                MessageToast.show("Failed to load branch data");
+            }
+        },
+
         onBookNow: function (oEvent) {
             const oItem = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 

@@ -2031,8 +2031,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
     0 4px 10px rgba(0, 0, 0, 0.2);
   text-decoration: none !important;
   display: inline-block;
-  width:90px !important;
 }
+
 
 /* Hover state */
 .btnViewDetails.sapMLnk:hover {
