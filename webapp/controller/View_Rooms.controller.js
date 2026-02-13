@@ -19,7 +19,10 @@ sap.ui.define([
 
 			},
 			_onRouteMatched:async function (oEvent) {
-
+           if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
 				    var model = new JSONModel({
                    BedTypes: [],
                     NoData: false,
@@ -33,11 +36,6 @@ sap.ui.define([
 			  await this._loadFilteredData(sPath) 
 			  this.getView().setBusy(false);
 
-
-			   
-
-				
-				
 			},
 			  model: function (response) {
             const aRooms = response.data.HM_Rooms || [];
