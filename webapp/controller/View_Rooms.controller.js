@@ -18,6 +18,7 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
+             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
                 BedTypes: [],
                 NoData: false,
@@ -909,8 +910,9 @@ sap.ui.define([
                 utils._LCvalidateName(sap.ui.getCore().byId(oView.createId("id_enq_Name")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_enq_STD")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_MobileNo")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_Comments")), "ID") &&
-                utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("id_enq_Email")), "ID")
+                 utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("id_enq_Email")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_Comments")), "ID") 
+               
             );
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -1067,7 +1069,6 @@ sap.ui.define([
 
             aControls.forEach(function (oControl) {
                 oControl.setValueState("None");
-                oControl.setValueStateText("");
             });
         }
     });

@@ -128,6 +128,19 @@
                         />
                     </VBox>
                 </HBox>
+                 <Label
+                    text="{i18n>email}"
+                    required="true"
+                />
+                <Input
+                    maxLength="50"
+                    placeholder="{i18n>enteryourEmail}"
+                    value="{EnquiryModel>/Email}"
+                    id="id_enq_Email"
+                    type="Email"
+                    liveChange="onmailvalidate"
+                    valueStateText="{i18n>MSenterValidEmail}"
+                />
                 <Label
                     text="Comments"
                     required="true"
@@ -142,19 +155,7 @@
                     maxLength="120"
                     liveChange="onEnqCommentsChange"
                 />
-                <Label
-                    text="{i18n>email}"
-                    required="true"
-                />
-                <Input
-                    maxLength="50"
-                    placeholder="{i18n>enteryourEmail}"
-                    value="{EnquiryModel>/Email}"
-                    id="id_enq_Email"
-                    type="Email"
-                    liveChange="onmailvalidate"
-                    valueStateText="{i18n>MSenterValidEmail}"
-                />
+               
             </f:content>
         </f:SimpleForm>
         <beginButton>

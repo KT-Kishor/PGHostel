@@ -839,11 +839,12 @@ sap.ui.define([
         oLoginModel.setProperty("/UserID", "");
         oLoginModel.setProperty("/UserName", "");
         oLoginModel.setProperty("/EmployeeName", "");
+        oLoginModel.setProperty("/EmailID", "");
       }
            
             sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
 
-            // this._oLoggedInUser = null;
+            this._oLoggedInUser = null;
             this._isProfileRequested = false;
 
             // Reset Login State
