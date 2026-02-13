@@ -2375,7 +2375,7 @@ sap.ui.define([
                 return;
             }
             // If locality is empty, keep it empty (search by city only)
-            var finalBranch = validArea ? validArea.BranchID : "";
+            var finalBranch = validArea ? validArea.LandMark : "";
             if (finalBranch === "") this.byId("id_Area").setValueState("None");
             this.isInitialLoad = false;
 
@@ -2509,7 +2509,7 @@ sap.ui.define([
                 }
                 else if (sBranchCode) {
                     aFilteredBranches = aBranchesData.filter(branch =>
-                        branch.BranchID === sBranchCode
+                        branch.LandMark === sBranchCode
                     );
                 }
                 else {
