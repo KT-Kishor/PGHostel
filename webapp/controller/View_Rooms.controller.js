@@ -3,13 +3,8 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-], function (
-    BaseController,
-    Formatter,
-    JSONModel,
-    MessageToast
-
-) {
+    "../utils/validation",
+], function (BaseController, Formatter, JSONModel, MessageToast, utils) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
@@ -903,11 +898,177 @@ sap.ui.define([
             this._oEnquiry.open();
         },
         E_onCancelButtonPress: function () {
+            this._clearEnquiryStates();
             this._oEnquiry.close();
         },
 
-        E_onsavebuttonpress: function () {
+        E_onsavebuttonpress: async function () {
+            var oView = this.getView();
+            var isMandatoryValid = (
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_Salutation")), "ID") &&
+                utils._LCvalidateName(sap.ui.getCore().byId(oView.createId("id_enq_Name")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_enq_STD")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_MobileNo")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("id_enq_Comments")), "ID") &&
+                utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("id_enq_Email")), "ID")
+            );
+            if (!isMandatoryValid) {
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            var oData = {
+                Name: Payload.Name,
+                UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
+                LandMark: Payload.LandMark,
+                Address: Payload.Address,
+                GeoLocation: Payload.GeoLocation,
+                Pincode: Payload.Pincode,
+                Contact: Payload.Contact,
+                STD: Payload.stdCode,
+                Country: Payload.country,
+                State: Payload.state,
+                City: Payload.baseLocation,
+                Penalty: Payload.Penalty,
+                Currency: Payload.Currency,
+                Photo1: oUpload.Photo1,
+                Attachment: oImage.Attachment,
+                GSTIN: Payload.GSTIN,
+                Type: Payload.Type,
+                Value: Payload.Value,
+                Photo1Type: oUpload.Photo1Type,
+                Photo1Name: oUpload.Photo1Name,
+                AttachmentType: oImage.AttachmentType,
+                AttachmentName: oImage.AttachmentName,
+                CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
+                CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
+            };
 
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const aMainData = oView.getModel("mainModel").getData() || [];
+                if (this.isEdit && Payload.BranchID) {
+                    delete oData.UserID;
+                    await this.ajaxUpdateWithJQuery("HM_Branch", {
+                        data: oData,
+                        filters: {
+                            BranchID: Payload.BranchID
+                        }
+                    });
+                } else {
+                    await this.ajaxCreateWithJQuery("HM_Branch", {
+                        data: oData,
+                        filters: {
+                            UserID: oData.UserID
+                        }
+                    });
+                }
+                await this.Onsearch();
+                this.oDialog.close();
+                sap.m.MessageToast.show(
+                    this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        onAdminLiveValidate: function (oEvent) {
+            utils._LCvalidateName(oEvent);
+        },
+
+        onmailvalidate: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateEmail(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+
+        ADMIN_onMobileLiveChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(sValue);
+
+            const sSTD = this.byId("id_enq_STD").getSelectedKey();
+            if (!sValue) {
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
+                return;
+            }
+
+            if (!sSTD) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Please select ISD code first");
+                return;
+            }
+            if (sSTD === "+91") {
+                if (sValue.length !== 10) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
+                    return;
+                }
+            }
+            else {
+                if (sValue.length < 4) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText("Mobile number must be at least 4 digits");
+                    return;
+                }
+
+                if (sValue.length > 14) {
+                    sValue = sValue.substring(0, 14);
+                    oInput.setValue(sValue);
+                }
+            }
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+        },
+
+        ADMIN_onChangeSTD: function (oEvent) {
+            const oSTD = oEvent.getSource();
+            const sValue = (oSTD.getValue() || "").trim();
+            // const oMobile = $C("adminMobileNo");
+            const oModel = this.getView().getModel("EnquiryModel");
+
+            // Mandatory check
+            if (!utils._LCvalidateMandatoryField(oEvent)) return;
+
+            // ✅ + followed by digits, but NOT +0 / +09 / +01
+            const STD_REGEX = /^\+[1-9][0-9]*$/;
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
+                oModel.setProperty("/STDCode", "");
+                return;
+            }
+            // Clean state
+            oSTD.setValueState("None")
+            // Update model
+            oModel.setProperty("/STDCode", sValue);
+        },
+
+        onAdminChangeSalutation: function (oEvent) {
+            const oSalutation = oEvent.getSource();
+            oSalutation.setValueState("None");
+            oSalutation.setValueStateText("");
+            utils._LCstrictValidationSelect(oSalutation);
+        },
+
+        onEnqCommentsChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        _clearEnquiryStates: function () {
+
+            if (!this._oEnquiry) return;
+
+            const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
+                return oControl.setValueState;
+            });
+
+            aControls.forEach(function (oControl) {
+                oControl.setValueState("None");
+                oControl.setValueStateText("");
+            });
         }
     });
 });

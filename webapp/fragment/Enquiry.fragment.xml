@@ -85,7 +85,7 @@
                             placeholder="{i18n>enteryourname}"
                             liveChange="onAdminLiveValidate"
                             valueStateText="{i18n>MSenterValidName}"
-                            maxLength="50"
+                            maxLength="25"
                         />
                     </VBox>
                 </HBox>
@@ -152,7 +152,7 @@
                     value="{EnquiryModel>/Email}"
                     id="id_enq_Email"
                     type="Email"
-                    liveChange="onAdminLiveValidate"
+                    liveChange="onmailvalidate"
                     valueStateText="{i18n>MSenterValidEmail}"
                 />
             </f:content>
