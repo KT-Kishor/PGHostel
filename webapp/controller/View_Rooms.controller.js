@@ -810,5 +810,64 @@ sap.ui.define([
 			var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
+
+          _clearEnquiryStates: function () {
+
+            if (!this._oEnquiry) return;
+
+            const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
+                return oControl.setValueState;
+            });
+
+            aControls.forEach(function (oControl) {
+                oControl.setValueState("None");
+                oControl.setValueStateText("");
+            });
+        },
+
+        onSegmentedButtonChange: function (oEvent) {
+            const sKey = oEvent.getParameter("item").getKey();
+            const oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+            if (sKey === "details") {
+
+                if (this._oEnquiry && this._oEnquiry.isOpen()) {
+                    this._oEnquiry.close();
+                }
+
+                this.viewDetails(oEvent);
+                return;
+            }
+
+            if (sKey == "Enquiry") {
+                const oEnquiryModel = new sap.ui.model.json.JSONModel({
+                    RoomType: oData.Name + " (" + oData.ACType + ")",
+                    Salutation: "",
+                    UserName: "",
+                    STDCode: "",
+                    Mobile: "",
+                    Comments: "",
+                    Email: ""
+                });
+                this.getView().setModel(oEnquiryModel, "EnquiryModel");
+                if (!this._oEnquiry) {
+                    this._oEnquiry = sap.ui.xmlfragment(
+                        this.getView().getId(),
+                        "sap.ui.com.project1.fragment.Enquiry", this
+                    );
+                    this.getView().addDependent(this._oEnquiry);
+                    this.getView().addStyleClass("blur-background");
+                }
+                this._clearEnquiryStates();
+                this._oEnquiry.open();
+            }
+        },
+
+        E_onCancelButtonPress: function () {
+            if (this._oEnquiry && this._oEnquiry.isOpen()) {
+                this._oEnquiry.close();
+            }
+            this._clearEnquiryStates();
+            this.getView().removeStyleClass("blur-background");
+        }
 	});
 });

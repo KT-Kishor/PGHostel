@@ -136,21 +136,26 @@
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                <Link
-                                    text="View Details"
+                                <SegmentedButton
+                                id="idSegmentedBtn"
                                     tooltip="View Details"
-                                    press="viewDetails"
                                     class="btnViewDetails sapUiLargeMarginEnd"
-                                />
-
-                                <Link
-                                    text="Inquiry"
-                                    tooltip="Inquiry"
-                                    press="viewDetails"
-                                    class="btnViewDetails"
-                                />
+                                    selectionChange="onSegmentedButtonChange"
+                                >
+                                    <items>
+                                        <SegmentedButtonItem
+                                            key="details"
+                                            text="View Details"
+                                        />
+                                        <SegmentedButtonItem
+                                            key="Enquiry"
+                                            text="Enquiry"
+                                            tooltip="Enquiry"
+                                            class="btnViewDetails"
+                                        />
+                                    </items>
+                                </SegmentedButton>
                             </HBox>
-
                         </VBox>
 
                     </VBox>

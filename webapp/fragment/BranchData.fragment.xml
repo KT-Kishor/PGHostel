@@ -58,6 +58,18 @@
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
                 />
+                <Label
+                    text="Landmark"
+                    required="true"
+                />
+                <Input
+                    id="BD_idLandmark"
+                    value="{MDmodel>/LandMark}"
+                    placeholder="Enter LandMark"
+                    maxLength="60"
+                    liveChange="onLandmarkInputLiveChange"
+                    valueStateText="Enter Landmark"
+                />
 
                 <Label
                     text="{i18n>MapLink}"

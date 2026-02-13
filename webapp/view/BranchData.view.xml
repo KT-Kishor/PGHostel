@@ -134,6 +134,15 @@
                             tooltip="{i18n>address}"
                         />
                     </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="Landmark"
+                            tooltip="Landmark"
+                        />
+                    </Column>
 
                     <Column
                         demandPopin="true"
@@ -211,6 +220,7 @@
                                 text="{mainModel>Address}"
                                 maxCharacters="20"
                             />
+                            <Text text="{mainModel>LandMark}"/>
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <Text text="{mainModel>Country}" />

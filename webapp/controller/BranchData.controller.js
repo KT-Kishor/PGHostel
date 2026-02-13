@@ -15,8 +15,7 @@ sap.ui.define([
                 BranchID: "",
                 Name: "",
                 Address: "",
-                // Latitude: "", 
-                // Longitude: "",  
+                LandMark: "",
                 GeoLocation: "",
                 Pincode: "",
                 Contact: "",
@@ -226,6 +225,11 @@ sap.ui.define([
                 type: "string"
             },
             {
+                label: "LandMark",
+                property: "LandMark",
+                type: "string"
+            },
+            {
                 label: "Address",
                 property: "Address",
                 type: "string"
@@ -372,6 +376,7 @@ sap.ui.define([
             oView.getModel("MDmodel").setData({
                 Name: "",
                 Address: "",
+                LandMark: "",
                 GeoLocation: "",
                 Pincode: "",
                 Contact: "",
@@ -381,7 +386,7 @@ sap.ui.define([
                 baseLocation: "",
                 GSTIN: "",
                 Type: "",
-                Value: "",  // Start with empty value
+                Value: "",
                 Penalty: "",
                 CheckinTime: "",
                 CheckoutTime: ""
@@ -406,6 +411,7 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idLandmark")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idGeoLocation")), "ID") &&
                 utils._LCvalidatePinCode(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
@@ -494,6 +500,7 @@ sap.ui.define([
             var oData = {
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
+                LandMark: Payload.LandMark,
                 Address: Payload.Address,
                 GeoLocation: Payload.GeoLocation,
                 Pincode: Payload.Pincode,
@@ -564,17 +571,18 @@ sap.ui.define([
                     BranchID: "",
                     Name: "",
                     Address: "",
+                    LandMark: "",
                     Pincode: "",
                     Contact: "",
                     Penalty: "",
                 });
             }
-
             this._resetFacilityValueStates();
             var oTable = this.byId("id_MD_Table");
             oTable.removeSelections();
             this.oDialog.close();
         },
+
         onGeoLocationLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
@@ -641,6 +649,12 @@ sap.ui.define([
         },
 
         onNameInputLiveChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+
+        onLandmarkInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
@@ -860,6 +874,7 @@ sap.ui.define([
                 BranchID: oData.BranchID,
                 Name: oData.Name,
                 Address: oData.Address,
+                LandMark: oData.LandMark,
                 GeoLocation: oData.GeoLocation,
                 Pincode: oData.Pincode,
                 Contact: oData.Contact,
@@ -914,6 +929,7 @@ sap.ui.define([
             const mControls = {
                 BD_idBName: "enterBranchName",
                 BD_idAddress: "enterAddress",
+                BD_idLandmark: "enterLandmark",
                 BD_idGeoLocation: "enterLocation",
                 BD_idPin: "enterPincode",
                 MC_id_Country: "selectCountry",
