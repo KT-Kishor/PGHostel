@@ -82,7 +82,7 @@
                                         decorative="false"
                                     />
 
-                                    <CustomListItem
+                                    <!-- <CustomListItem
                                         type="Active"
                                         press=".onRatingPress"
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
@@ -103,7 +103,7 @@
                                                 class="ratingCountText"
                                             />
                                         </HBox>
-                                    </CustomListItem>
+                                    </CustomListItem> -->
                                 </VBox>
                             </pages>
                         </Carousel>
@@ -218,7 +218,7 @@
                                         decorative="false"
                                     />
 
-                                    <CustomListItem
+                                    <!-- <CustomListItem
                                         type="Active"
                                         press=".onRatingPress"
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
@@ -239,7 +239,7 @@
                                                 class="ratingCountText"
                                             />
                                         </HBox>
-                                    </CustomListItem>
+                                    </CustomListItem> -->
                                 </VBox>
                             </pages>
                         </Carousel>
