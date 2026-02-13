@@ -259,7 +259,7 @@ sap.ui.define([
             if( this._fromRoute==="Dashboard"){
                 this.getOwnerComponent().getRouter().navTo("RouteDashboard");
             }else{
-             
+                
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
             const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
@@ -268,8 +268,11 @@ sap.ui.define([
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
                 oUIModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-            } else {
+            } else if(sRole === "Admin"){
+
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+            }else{
+                this.getOwnerComponent().getRouter().navTo("RouteHostel");
             }
         
             this.getView().getModel("CustomerData").setData({});

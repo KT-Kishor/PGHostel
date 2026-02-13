@@ -795,6 +795,24 @@ sap.ui.define([
                 };
             });
         },
+          onAddressClick: function () {
+            try {
+                let oHostelModel = this._oRoomDetailFragment ? this._oRoomDetailFragment.getModel("HostelModel") : this.oHostelModel;
+                if (!oHostelModel) return MessageToast.show("Location data not available.");
+                const sGeoUrl = (oHostelModel.getProperty("/GeoLocation") || "").trim();
+                if (!sGeoUrl || sGeoUrl === "null" || sGeoUrl === "undefined") {
+                    return MessageToast.show("Geo Location is not available");
+                }
+                const urlPattern = /^https:\/\/[^ "]+(\.[a-z]{2,})/i;
+                if (!urlPattern.test(sGeoUrl)) {
+                    return MessageToast.show("Invalid Geo Location link");
+                }
+
+                window.open(sGeoUrl, "_blank");
+            } catch (err) {
+                MessageToast.show("Error opening maps.");
+            }
+        },
 		   onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");

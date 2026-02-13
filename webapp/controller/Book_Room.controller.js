@@ -49,6 +49,7 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1", "ID_DOB_"], this.getView());
             var oView = this.getView()
+            
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
                 this._oLoggedInUser = oUserModel.getData();
@@ -720,7 +721,6 @@ sap.ui.define([
                     DocumentType: ""
                 });
 
-
                 /** ---- PERSON FORM ---- **/
                 const oForm = new sap.ui.layout.form.SimpleForm({
                     editable: true,
@@ -886,7 +886,7 @@ sap.ui.define([
                             maxLength: 40
                         }),
                         new sap.m.Select({
-                            width: "8rem",
+                            width:"100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Salutation}",
                             items: [
                                 new sap.ui.core.ListItem({
@@ -2826,16 +2826,14 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 oUIModel.setProperty("/isLoggedIn", false);
             }
 
-            const oLoginModel = this.getView().getModel("LoginModel");
-            const sRole = oLoginModel?.getProperty("/Role") || "";
-            const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+            const oBookingID = this.getView().getModel("HostelModel").getProperty("/BranchCode");
+           
 
-            if (sRole === "Customer") {
-                this._sLoggedUserID = sEmpID;
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            } else {
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            }
+                this.getOwnerComponent().getRouter().navTo("RouteViewRooms",{
+                sPath: oBookingID
+                }
+            )
+           
         },
 
         onRoomDurationChange: function (oEvent) {
@@ -5019,6 +5017,7 @@ oHostelModel.setProperty(
 
                 // Extract BookingDetails array
                 const aBookingDetails = oResponse.BookingDetails || [];
+                this._oPaymentDialog.close()
                 BusyIndicator.hide()
                 
 
@@ -5037,14 +5036,21 @@ oHostelModel.setProperty(
                         const oLoginModel = sap.ui.getCore().getModel("LoginModel");
                         const isLoggedIn = oLoginModel && oLoginModel.getProperty("/UserID");
 
-                        if (!isLoggedIn) {
-                            MessageBox.warning(
-                                "You are Booking as a guest and you will not be able to see the Booking History.",
-                                {
-                                    title: "Guest Booking",
-                                    actions: [MessageBox.Action.OK],
-                                    onClose: function () {
-                                        oModel.setProperty("/CouponCode", "")
+                        // if (!isLoggedIn) {
+                        //     MessageBox.warning(
+                        //         "You are Booking as a guest and you will not be able to see the Booking History.",
+                        //         {
+                        //             title: "Guest Booking",
+                        //             actions: [MessageBox.Action.OK],
+                        //             onClose: function () {
+                                     
+                                       
+                        //             }.bind(this)
+                        //         }
+                        //     );
+                        //     return; // STOP further navigation until user clicks OK
+                        // }
+                           oModel.setProperty("/CouponCode", "")
                                         // Continue navigation after warning
                                         if(isLoggedIn){
                                            this._navigateAfterBooking();
@@ -5059,14 +5065,8 @@ oHostelModel.setProperty(
                 this._oSelectedStep = null;
                  var oRoute = this.getOwnerComponent().getRouter();
             oRoute.navTo("RouteHostel");
-                                       
-                                    }.bind(this)
-                                }
-                            );
-                            return; // STOP further navigation until user clicks OK
-                        }
                         // Logged-in user → direct navigation
-                        this._navigateAfterBooking();
+                        // this._navigateAfterBooking();
                     }.bind(this)
                 });
 
@@ -5098,16 +5098,13 @@ oHostelModel.setProperty(
         },
 
         _navigateAfterBooking: function () {
-            var oRoute = this.getOwnerComponent().getRouter();
-            oRoute.navTo("RouteHostel");
-
             setTimeout(function () {
 
                   var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
     oRouter.navTo("RouteManageProfile");
                 this.resetAllBookingData();
 
-                // 🔑 RESET DYNAMIC UI FLAGS
+                //  RESET DYNAMIC UI FLAGS
                 this._isPersonUIInitialized = false;
                 this._mustRecreatePersonUI = true;
                 this._lastPersonCount = null;
