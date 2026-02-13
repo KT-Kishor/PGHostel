@@ -2268,7 +2268,7 @@ sap.ui.define([
                     // Move Y below wrapped text
                     currentY += amountLines.length * 5 + 8;
 
-                    // ===== CUSTOMER TRANSACTION HISTORY =====
+                    // ===== Transaction History =====
                     if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
 
                         // Page break check
@@ -2278,7 +2278,7 @@ sap.ui.define([
                         }
 
                         doc.setFont("times", "bold").setFontSize(11);
-                        doc.text("Customer Transaction History", margin, currentY);
+                        doc.text("Transaction History", margin, currentY);
 
                         currentY += 5;
 
@@ -3057,11 +3057,11 @@ sap.ui.define([
                         doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY);
                     }
 
-                    // ================= CUSTOMER TRANSACTION HISTORY (ONCE) =================
+                    // ================= Transaction History (ONCE) =================
                     if (paymentRes?.commentData?.length) {
                         doc.addPage();
                         doc.setFont("times", "bold").setFontSize(11);
-                        doc.text("Customer Transaction History", margin, 20);
+                        doc.text("Transaction History", margin, 20);
 
                         doc.autoTable({
                             startY: 25,
