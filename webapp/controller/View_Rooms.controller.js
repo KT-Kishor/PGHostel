@@ -53,12 +53,7 @@ sap.ui.define([
        _loadFilteredData: async function (sBranchCode) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
-
-         
-
             try {
-
-              
 
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
@@ -193,7 +188,6 @@ sap.ui.define([
                 } else { // View More
                     aFinal = aExisting.concat(aBedTypes);
                     this.iSkip += this.iTop;
-                    //  this.iTop= this.iSkip * this.iSkip
                 }
 
 
@@ -205,22 +199,16 @@ sap.ui.define([
            const NonACRooms = aFinal.filter(r =>
             r.ACType?.toLowerCase() === "non-ac"
         );
-
-
+                  const bHasAC = aACRooms.length > 0;
+                  const bHasNonAC = NonACRooms.length > 0;
                 oVisibilityModel.setProperty("/BedTypes", aFinal);
-                    oVisibilityModel.setProperty("/ACRooms", aACRooms);
-                    oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
+                oVisibilityModel.setProperty("/ACRooms", aACRooms);
+                   oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
+                  oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
-                if (oView.getModel("VisibilityModel").getData().BedTypes.length === 0) {
-                    oView.getModel("VisibilityModel").setProperty("/NoData", true);
-                } else {
-                    oView.getModel("VisibilityModel").setProperty("/NoData", false);
-                }
+              
                } catch (err) {
                          console.log(err);
-                         
-
-                // MessageToast.show(this.i18nModel.getText("failedloadbedtypedata"));
             }
         },
           viewDetails: function (oEvent) {

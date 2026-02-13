@@ -14,17 +14,29 @@
 
         <headerContent>
             <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
+                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
             />
         </headerContent>
 
         <content>
+        <VBox
+    height="600px"
+    justifyContent="Center"
+    alignItems="Center"
+    visible="{VisibilityModel>/ShowGlobalNoData}">
+    <Text
+        text="{i18n>noRoomsFound}"
+        class="cssNoDataMessage"/>
+    <Text
+        text="{i18n>pleaseselectanotherCity}"
+        class="cssNoDataSubMessage"/>
+   </VBox>
 
       <Title 
     text="AC Rooms"
     level="H2"
-    class="roomHeaderTitle"
+    class="roomHeaderTitle sapUiMediumMarginBeginEnd"
     visible="{= ${VisibilityModel>/ACRooms}.length > 0}"
 />
 
@@ -32,7 +44,7 @@
             <VBox class="sapUiTinyMarginTop">
 
                 <l:Grid 
-                    id="idBedTypeFlex"
+                    id="idBedTypeFlex2"
                     defaultSpan="XL3 L4 M6 S12"
                     containerQuery="true"
                     hSpacing="2"
@@ -144,30 +156,13 @@
                     </VBox>
 
                 </l:Grid>
-
-                <VBox
-                    height="400px"
-                    justifyContent="Center"
-                    alignItems="Center"
-                    visible="{VisibilityModel>/NoData}"
-                >
-                    <Text
-                        text="{i18n>noRoomsFound}"
-                        class="cssNoDataMessage"
-                    />
-                    <Text
-                        text="{i18n>pleaseselectanotherCity}"
-                        class="cssNoDataSubMessage"
-                    />
-                </VBox>
-
                 <VBox
                     alignItems="Center"
                     class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                     visible="{VisibilityModel>/ShowViewMore}"
                 >
                     <Link
-                        id="idViewMoreBusy"
+                        id="idViewMoreBusy2"
                         text="{i18n>viewmorerooms}"
                         press="onViewMoreRooms"
                         class="btnViewDetails"
@@ -180,7 +175,7 @@
             <Title 
     text="Non-AC Rooms"
     level="H2"
-    class="roomHeaderTitle"
+    class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
     visible="{= ${VisibilityModel>/NonACRooms}.length > 0}"
 />
 
@@ -293,22 +288,6 @@
                     </VBox>
 
                 </l:Grid>
-
-                <VBox
-                    height="400px"
-                    justifyContent="Center"
-                    alignItems="Center"
-                    visible="{VisibilityModel>/NoData}"
-                >
-                    <Text
-                        text="{i18n>noRoomsFound}"
-                        class="cssNoDataMessage"
-                    />
-                    <Text
-                        text="{i18n>pleaseselectanotherCity}"
-                        class="cssNoDataSubMessage"
-                    />
-                </VBox>
 
                 <VBox
                     alignItems="Center"
