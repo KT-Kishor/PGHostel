@@ -536,12 +536,6 @@
                                                     tooltip="{i18n>grossPrice}"
                                                 />
 											</m:Column>
-                                            <m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="6rem">
-                                                <m:Text text="Duration" />
-                                            </m:Column>
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -552,6 +546,12 @@
                                                     tooltip="{i18n>Unit}"
                                                 />
 											</m:Column>
+                                             <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="6rem">
+                                                <m:Text text="Duration" />
+                                            </m:Column>
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -640,9 +640,6 @@
                                                         editable="false"
                                                     />
 												</m:cells>
-                                                <m:cells>
-                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="false"/>
-                                                </m:cells>
 												<m:cells>
 													<m:ComboBox
                                                         items="{Rate>/}"
@@ -658,6 +655,9 @@
                                                         />
 													</m:ComboBox>
 												</m:cells>
+                                                <m:cells>
+                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="false"/>
+                                                </m:cells>
 												<m:cells>
 													<m:Input
                                                         value="{path:'ManageInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}"
@@ -863,7 +863,7 @@
                                                     }"
                                             >
 												<m:Label
-                                                    text="{i18n>invoiceReceivedAmount} ({FilteredSOWModel>/Currency}) :"
+                                                    text="{i18n>invoiceReceivedRefundAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
 												<m:Text
@@ -905,6 +905,7 @@
 		<m:footer>
 			<m:Bar>
             <m:contentLeft>
+             <m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
              <m:Link
                 text="{i18n>devlopby}"
                 href="https://kvrikshatechnologies.com/"
