@@ -426,7 +426,6 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            // Rest of your existing validations...
             const oMobile = sap.ui.getCore().byId(oView.createId("BD_idPhone"));
             if (!oMobile.getValue()) {
                 oMobile.setValueState("Error");

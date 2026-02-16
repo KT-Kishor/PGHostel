@@ -887,7 +887,8 @@ sap.ui.define([
             }
 
             var oData = {
-                BranchName: oBranch,
+                BranchName: oEmail.Name,
+                RoomType: oModel.RoomType,
                 BranchCreatedEmailID: oEmail.EmailID,
                 CustomerName: (oModel.Salutation || "") + " " + (oModel.UserName || ""),
                 CustomerEmail: oModel.Email || "",
@@ -903,8 +904,7 @@ sap.ui.define([
                 });
                 const oResult = oresponse?.data || {};
                 this._oEnquiry.close();
-                sap.m.MessageToast.show(
-                    this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
+                sap.m.MessageToast.show(this.i18nModel.getText("Mail sent successfully"));
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
@@ -954,7 +954,6 @@ sap.ui.define([
         },
 
         _validateMobileStrict: function () {
-
             const oMobile = this.byId("id_enq_MobileNo");
             const oSTD = this.byId("id_enq_STD");
 
@@ -1015,13 +1014,10 @@ sap.ui.define([
         },
 
         _clearEnquiryStates: function () {
-
             if (!this._oEnquiry) return;
-
             const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
                 return oControl.setValueState;
             });
-
             aControls.forEach(function (oControl) {
                 oControl.setValueState("None");
             });
