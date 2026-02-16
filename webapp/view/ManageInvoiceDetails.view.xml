@@ -536,6 +536,12 @@
                                                     tooltip="{i18n>grossPrice}"
                                                 />
 											</m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="6rem">
+                                                <m:Text text="Duration" />
+                                            </m:Column>
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -634,6 +640,9 @@
                                                         editable="false"
                                                     />
 												</m:cells>
+                                                <m:cells>
+                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="false"/>
+                                                </m:cells>
 												<m:cells>
 													<m:ComboBox
                                                         items="{Rate>/}"

@@ -502,12 +502,18 @@ sap.ui.define([
                     this.byId("CID_id_Payby").setDateValue(payByDate);
 
                     let finalInvoiceItems = [];
+                    const bookingDuration = this._getDurationText(
+                        bookingDetails.PaymentType,
+                        bookingDetails.StartDate,
+                        bookingDetails.EndDate
+                    );
 
                     finalInvoiceItems.push({
                         IndexNo: 1,
                         InvNo: this.newID,
                         Particulars: `${bookingDetails.BedType} - Room Rent`,
                         UnitText: bookingDetails.PaymentType,
+                        DurationText: bookingDuration,
                         SAC: "996322",
                         GSTCalculation: "YES",
                         Discount: "0.00",
@@ -520,8 +526,11 @@ sap.ui.define([
                     });
 
                     facilityArray.forEach((item, index) => {
-                        const totalHours =
-                            item.TotalHour && item.TotalHour !== "" ? item.TotalHour : 1; // Default TotalHour → 1 if empty
+                        const durationText = this._getDurationText(
+                            item.UnitText,
+                            item.StartDate,
+                            item.EndDate
+                        );
 
                         let particulars = ""; // Build Particulars
                         if (item.FacilityName === "Penalty Charges") {
@@ -537,6 +546,7 @@ sap.ui.define([
                             InvNo: this.newID,
                             Particulars: particulars,
                             UnitText: item.UnitText,
+                            DurationText: durationText,
                             SAC: "996322",
                             GSTCalculation: "YES",
                             Discount: "0.00",
@@ -558,8 +568,9 @@ sap.ui.define([
                             InvNo: this.newID,
                             Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
                             UnitText: "Fix",
+                            DurationText: "-",
                             SAC: "996322",
-                            GSTCalculation: "NO", 
+                            GSTCalculation: "NO",
                             Discount: "0.00",
                             GrossPrice: -refundAmount,
                             Total: -refundAmount,
@@ -577,6 +588,49 @@ sap.ui.define([
                 } finally {
                     sap.ui.core.BusyIndicator.hide();
                 }
+            },
+
+            _getDurationText: function (sUnit, sStartDate, sEndDate) {
+                if (!sStartDate || !sEndDate) return "";
+
+                const start = new Date(sStartDate);
+                const end = new Date(sEndDate);
+
+                const diffTime = end - start;
+
+                if (sUnit === "Per Day") {
+                    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    return days + (days === 1 ? " Day" : " Days");
+                }
+
+                if (sUnit === "Per Month") {
+                    let months =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() >= start.getDate()) {
+                        months += 1;
+                    }
+
+                    return months + (months === 1 ? " Month" : " Months");
+                }
+
+
+                if (sUnit === "Per Year") {
+                    const years = end.getFullYear() - start.getFullYear() + 1;
+                    return years + (years === 1 ? " Year" : " Years");
+                }
+
+                if (sUnit === "Per Hour") {
+                    const hours = Math.ceil(diffTime / (1000 * 60 * 60));
+                    return hours + (hours === 1 ? " Hour" : " Hours");
+                }
+
+                if (sUnit === "Fix") {
+                    return "-";
+                }
+
+                return "";
             },
 
             onChangeInvoiceDate: function(oEvent) {
@@ -1043,6 +1097,7 @@ sap.ui.define([
                         Currency: item.Currency,
                         GSTCalculation: item.GSTCalculation,
                         Discount: item.Discount,
+                        DurationText:item.DurationText,
                         StartDate: item.StartDate.split('/').reverse().join('-'),
                         EndDate: item.EndDate.split('/').reverse().join('-'),
                     };
