@@ -88,7 +88,7 @@
 						<Text text="{i18n>totalAmount}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>invoiceReceivedAmount}" />
+						<Text text="{i18n>invoiceReceivedRefundAmount}" />
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceDueAmount}" />
