@@ -57,6 +57,11 @@ sap.ui.define([
                 this._fetchCommonData("Country", "CountryModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
+                
+                const oAppStateModel = new sap.ui.model.json.JSONModel({
+                    previousTab: "idHome", // default value
+                    });
+                this.setModel(oAppStateModel, "AppStateModel");
 
             },
             _fetchCommonData: async function (entityName, modelName, filter = "") {

@@ -797,10 +797,11 @@ sap.ui.define([
             }
         },
 
-        onNavBack: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
-        },
+          onNavBack: function() {
+            const sTabKey = "idRooms"
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+          },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();

@@ -151,12 +151,20 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            var oNavContainer = this.byId("pageContainer");
-            var oTabHeader = this.byId("mainTabHeader");
+            const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
+            const oTabHeader = this.byId("mainTabHeader");
+                if (oTabHeader) {
+                    oTabHeader.setSelectedKey(sStoredTab);
+                }
 
-            if (oNavContainer) oNavContainer.to(this.byId("idHome"));
-
-            if (oTabHeader) oTabHeader.setSelectedKey("idHome");
+            const oNavContainer = this.byId("pageContainer");
+                if (oNavContainer) {
+                    const oPage = this.byId(sStoredTab);
+                    if (oPage) {
+                            oNavContainer.to(oPage);
+                       }
+                    }
+            sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.iTop = 8; // records per load
