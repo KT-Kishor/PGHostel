@@ -506,6 +506,7 @@ sap.ui.define([
                         bookingDetails.PaymentType,
                         bookingDetails.StartDate,
                         bookingDetails.EndDate
+                        
                     );
 
                     finalInvoiceItems.push({
@@ -529,13 +530,15 @@ sap.ui.define([
                         const durationText = this._getDurationText(
                             item.UnitText,
                             item.StartDate,
-                            item.EndDate
+                            item.EndDate,
+                            item.TotalHour 
                         );
 
                         let particulars = ""; // Build Particulars
                         if (item.FacilityName === "Penalty Charges") {
                             particulars = "Penalty Charges";
                         } else if (item.UnitText === "Per Hour") {
+                           const totalHours = Number(item.TotalHour) || 1;
                             particulars = `${item.FacilityName} - Facility (${totalHours} Hours)`;
                         } else {
                             particulars = `${item.FacilityName} - Facility`;
@@ -590,12 +593,11 @@ sap.ui.define([
                 }
             },
 
-            _getDurationText: function (sUnit, sStartDate, sEndDate) {
+            _getDurationText: function(sUnit, sStartDate, sEndDate, totalHour) {
                 if (!sStartDate || !sEndDate) return "";
 
                 const start = new Date(sStartDate);
                 const end = new Date(sEndDate);
-
                 const diffTime = end - start;
 
                 if (sUnit === "Per Day") {
@@ -615,14 +617,13 @@ sap.ui.define([
                     return months + (months === 1 ? " Month" : " Months");
                 }
 
-
                 if (sUnit === "Per Year") {
                     const years = end.getFullYear() - start.getFullYear();
                     return years + (years === 1 ? " Year" : " Years");
                 }
 
                 if (sUnit === "Per Hour") {
-                    const hours = Math.ceil(diffTime / (1000 * 60 * 60));
+                    const hours = Number(totalHour) || 1;
                     return hours + (hours === 1 ? " Hour" : " Hours");
                 }
 
@@ -677,53 +678,45 @@ sap.ui.define([
                 const oView = this.getView();
                 const oItemModel = oView.getModel("ManageInvoiceItemModel");
                 let oData = oItemModel.getProperty("/ManageInvoiceItem") || [];
-                // Generate new invoice item
+
                 const currency = this.byId("CID_id_CurrencySelect").getValue();
                 this.IndexNo = oData.length ? oData[oData.length - 1].IndexNo + 1 : 1;
+
+                const startDate = new Date();
+                const endDate = new Date();
+                const unitText = "Fix"; // default unit
+
                 const newItem = {
                     IndexNo: this.IndexNo,
                     Particulars: "",
                     SAC: "996322",
                     GSTCalculation: (currency === "INR") ? "YES" : "",
-                    StartDate: this.Formatter.formatDate(new Date()),
-                    EndDate: this.Formatter.formatDate(new Date()),
-                    UnitText: "Fix",
+                    StartDate: this.Formatter.formatDate(startDate),
+                    EndDate: this.Formatter.formatDate(endDate),
+                    UnitText: unitText,
+                    DurationText: this._getDurationText(unitText, startDate, endDate, 1), 
                     Currency: currency,
                     Discount: "0.00",
                     GrossPrice: "0.00",
-                    Total: "",
-                    // editable: true
+                    Total: ""
                 };
+
                 if (this.Update) {
                     newItem.flag = "create";
                 }
-                // Add and update model
+
                 oData.push(newItem);
                 oItemModel.setProperty("/ManageInvoiceItem", oData);
+                oItemModel.refresh(true);
             },
 
-            CI_On_ChangeRateType: function(oEvent) {
-                var data = oEvent.getSource().getSelectedItem().getBindingContext("ManageInvoiceItemModel").getObject();
+            onChangeUnitText: function(oEvent) {
+                const oItem = oEvent.getSource().getBindingContext("ManageInvoiceItemModel").getObject();
+                const unit = oItem.UnitText;
 
-                switch (data.UnitText) {
-                    case 'Per Day':
-                        data.Unit = 20;
-                        break;
-                    case 'Per Month':
-                        data.Unit = 1;
-                        break;
-                    case 'Per Hour':
-                        data.Unit = 168;
-                        break;
-                    case 'Fix':
-                        data.Unit = 1;
-                        break;
-                    default:
-                        data.Unit = 1;
-                }
-                // Optionally update the model (if using two-way binding or need manual update)
+                oItem.DurationText = this._getDurationText(unit, oItem.StartDate, oItem.EndDate, oItem.TotalHour || 1);
+
                 this.getView().getModel("ManageInvoiceItemModel").refresh(true);
-                this.totalAmountCalculation();
             },
 
             onChangeTotal: function(oEvent) {
@@ -1737,7 +1730,7 @@ sap.ui.define([
 
                 //  More than one selected
                 if (aSelectedItems.length > 1) {
-                    MessageToast.show(this.i18nModel.getText("onlyOneRecordDelete"));
+                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
                     return;
                 }
 

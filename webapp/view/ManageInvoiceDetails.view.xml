@@ -648,7 +648,7 @@
                                                         items="{Rate>/}"
                                                         selectedKey="Per Day"
                                                         value="{ManageInvoiceItemModel>UnitText}"
-                                                        change="CI_On_ChangeRateType"
+                                                        change="onChangeUnitText"
                                                         editable="{visiablityPlay>/editable}"
                                                         width="100%"
                                                     >
