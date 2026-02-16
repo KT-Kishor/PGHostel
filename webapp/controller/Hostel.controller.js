@@ -960,6 +960,13 @@ sap.ui.define([
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
 
+            //     this.byId("idBedTypeFlex").setBusy(true);
+            // this.byId("id_Branch").setBusy(true).setValueState("None");;
+            // this.byId("id_Area").setBusy(true);
+            // this.byId("id_Roomtype").setBusy(true);
+            //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+            //     this.getOwnerComponent().getModel("sBRModel").setData(response.data);
+
                 await this._loadRoomsPageData();
             } else {
                 // Home / Contact

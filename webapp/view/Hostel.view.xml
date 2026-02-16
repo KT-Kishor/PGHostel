@@ -243,7 +243,7 @@
                                                                 <fb:control>
                                                                     <ComboBox
                                                                         id="id_Roomtype"
-                                                                        placeholder="Select Branch Name"
+                                                                        placeholder="Select branch name"
                                                                         showClearIcon="true"
                                                                         busyIndicatorDelay="0"
                                                                         items="{AreaModel>/}"

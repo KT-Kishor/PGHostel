@@ -2751,11 +2751,11 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
     "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",     
         {
             title: "Upgrade Required",
-            actions: [sap.m.MessageBox.Action.OK,"Skip"],
+            actions: ["Extend Now","Maybe Later"],
             emphasizedAction: sap.m.MessageBox.Action.OK,
 
             onClose: function (sAction) {
-                if (sAction === "Skip") {
+                if (sAction === "Maybe Later") {
                     that.oneditsavebooking(Payload);
                 }
               
