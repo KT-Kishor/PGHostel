@@ -62,20 +62,41 @@
 }
 
 /* Login Button */
-.loginButton {
+/* .loginButton {
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
   border-radius: 10px !important;
   color: white !important;
   font-size: 1rem !important;
+} */
+ /* Base Style */
+.loginButton .sapMBtnInner {
+  background: linear-gradient(135deg, #02e0fd, #008b96) !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5),0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
 }
 
+/* Hover */
+/* .loginButton:hover .sapMBtnInner {
+  transform: scale(1.05);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.6);
+} */
 
+/* Active */
+.loginButton:active .sapMBtnInner {
+  background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+}
+
+/* Focus */
+/* .loginButton:focus .sapMBtnInner {
+  outline: none;
+} */
 
 .custom-text {
   font-size: 20px !important;
 }
-
-
 
 .HostelRooms {
   background-image: url("../image/HostelRoom.png");
@@ -1892,6 +1913,93 @@ span.sapMBtnInner.sapMBtnEmphasized {
   outline: none;
   text-decoration: none !important;
 }
+
+/* Outer pill */
+.pillActionBar {
+background: linear-gradient(135deg, #00b7c2, #008b96);
+    border-radius: 22px;
+    width: fit-content;
+    margin: auto;
+}
+
+/* Buttons inside */
+/* ===== Base Pill Button Style ===== */
+.pillActionBtn .sapMBtnInner {
+  color: #ffffff !important;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 2px 5px;
+  border-radius: 18px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover */
+/* .pillActionBtn:hover .sapMBtnInner {
+  transform: scale(1.05);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+/* Active */
+.pillActionBtn:active .sapMBtnInner {
+  background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+}
+
+/* Focus */
+/* .pillActionBtn:focus .sapMBtnInner {
+  outline: none;
+} */
+
+/* Hover */
+/* .pillActionBtn:hover {
+    background: rgba(255, 255, 255, 0.18);
+} */
+
+/* Left / Right shaping */
+/* .pillLeft {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.pillRight {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+} */
+
+/* Remove button outline */
+/* .pillActionBtn:focus {
+    outline: none;
+}
+.pillActionBtn .sapMBtnContent,
+.pillActionBtn .sapMBtnText {
+    color: #ffffff !important;
+} */
+
+/* Remove focus blue line */
+/* .pillActionBtn .sapMBtnInner:focus,
+.pillActionBtn .sapMBtnInner.sapMBtnActive,
+.pillActionBtn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+} */
+
+/* Remove default active bottom border */
+/* .pillActionBtn .sapMBtnInner::after {
+    display: none !important;
+}
+.pillActionBtn .sapMBtnInner {
+    border: none !important;
+}
+
+.pillActionBtn .sapMBtnInner::after {
+    border: none !important;
+    box-shadow: none !important;
+    display: none !important;
+}
+
+.pillActionBtn .sapMBtnInner {
+    border: 0 !important;
+    outline: none !important;
+} */
 
 .tileContainer {
   justify-content: flex-start;
@@ -4277,48 +4385,4 @@ height:140px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Outer pill */
-.pillActionBar {
-    background: linear-gradient(135deg, #00b7c2, #008b96);
-    border-radius: 22px;
-    padding: 4px;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    width: fit-content;
-    margin: auto;
-}
-
-/* Buttons inside */
-.pillActionBtn {
-    color: #ffffff !important;
-    font-weight: 600;
-    padding: 6px 18px;
-    border-radius: 18px;
-    transition: background 0.2s ease;
-}
-
-/* Hover */
-.pillActionBtn:hover {
-    background: rgba(255, 255, 255, 0.18);
-}
-
-/* Left / Right shaping */
-.pillLeft {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.pillRight {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-/* Remove button outline */
-.pillActionBtn:focus {
-    outline: none;
-}
-.pillActionBtn .sapMBtnContent,
-.pillActionBtn .sapMBtnText {
-    color: #ffffff !important;
 }

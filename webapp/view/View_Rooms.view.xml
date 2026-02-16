@@ -140,16 +140,11 @@
                                 >
                                     <Button
                                         text="View Details"
-                                        type="Transparent"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-
-                                    <ToolbarSpacer width="1px" />
-
                                     <Button
                                         text="Enquiry"
-                                        type="Transparent"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
@@ -276,16 +271,11 @@
                                 >
                                     <Button
                                         text="View Details"
-                                        type="Transparent"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-
-                                    <ToolbarSpacer width="1px" />
-
                                     <Button
                                         text="Enquiry"
-                                        type="Transparent"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
