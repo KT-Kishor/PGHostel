@@ -48,7 +48,6 @@ sap.ui.define([
                 Photo1Name: ""
             }), "UploadModel");
 
-            // Token model
             this.getView().setModel(new sap.ui.model.json.JSONModel({
                 tokens: []
             }), "tokenModel");
@@ -60,6 +59,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ imageTokens: [] }), "tokenImageModel");
+                this.onClearAndSearch("MD_id_Filterbar");
                 await this.Onsearch();
                 this.commonLoginFunction();
                 await this.Customerdata()
@@ -134,6 +134,13 @@ sap.ui.define([
             }
             var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
             var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
+             if (!this._allBranches) {
+        this._allBranches = aBranchData;
+        this.getView().setModel(
+            new sap.ui.model.json.JSONModel(this._allBranches),
+            "branchModel"
+        );
+    }
             var model = new sap.ui.model.json.JSONModel(aBranchData);
 
             this.getOwnerComponent().setModel(model, "mainModel")
@@ -220,13 +227,8 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Branch Name",
+                label: "Hostel Name",
                 property: "Name",
-                type: "string"
-            },
-            {
-                label: "LandMark",
-                property: "LandMark",
                 type: "string"
             },
             {
@@ -234,9 +236,10 @@ sap.ui.define([
                 property: "Address",
                 type: "string"
             },
+            
             {
-                label: "GeoLocation",      // Add this
-                property: "GeoLocation",
+                label: "LandMark",
+                property: "LandMark",
                 type: "string"
             },
             {

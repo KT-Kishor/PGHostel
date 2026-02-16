@@ -35,15 +35,15 @@
                         <fb:control>
                             <ComboBox
                                 id="MD_id_BranchCode"
-                                items="{mainModel>/}"
+                                items="{branchModel>/}"
                                 showSecondaryValues="true"
                                 showClearIcon="true"
                                 width="100%"
                             >
                                 <core:ListItem
-                                    key="{mainModel>BranchID}"
-                                    text="{mainModel>BranchID} - {mainModel>Name}"
-                                    additionalText="{mainModel>City}"
+                                    key="{branchModel>BranchID}"
+                                    text="{branchModel>BranchID} - {branchModel>Name}"
+                                    additionalText="{branchModel>City}"
                                 />
                             </ComboBox>
                         </fb:control>
