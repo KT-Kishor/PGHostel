@@ -25,6 +25,7 @@ sap.ui.define([
             if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
 
             this.BranchID = oLogin.BranchCode;
+            // this.onClearAndSearch("D_id_FilterbarEmployee");
             await this._loadCustomers();
             this.commonLoginFunction();
             this.loadDashboardData();
@@ -532,7 +533,7 @@ sap.ui.define([
                 case "STATUS":
                     return [
                         { Status: "New", Count: 0 },
-                        { Status: "Assigned", Count: 0 },
+                        { Status: "Checked-in", Count: 0 },
                         { Status: "Completed", Count: 0 },
                         { Status: "Cancelled", Count: 0 }
                     ];

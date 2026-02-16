@@ -2,7 +2,7 @@ sap.ui.define([
     "./BaseController",
     "../model/formatter",
     "sap/m/MessageToast"
-], function (BaseController, Formatter,MessageToast) {
+], function (BaseController, Formatter, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.CustomerReview", {
         Formatter: Formatter,
@@ -13,9 +13,9 @@ sap.ui.define([
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+            this._resetFiltersOnEntry();
             this._setDefaultDateRange();
             sap.ui.core.BusyIndicator.show(0);
-            this.onClearAndSearch("CR_id_Filterbar");
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews();
@@ -173,13 +173,13 @@ sap.ui.define([
             oBox.removeAllItems();
             let aFiltered = this._aAllFeedbacks || [];
             if (aFiltered.length === 0) {
-                    this._showIllustration(
-                        sap.m.IllustratedMessageType.NoData,
-                        "No Reviews Found",
-                        "There are no customer reviews available."
+                this._showIllustration(
+                    sap.m.IllustratedMessageType.NoData,
+                    "No Reviews Found",
+                    "There are no customer reviews available."
 
-                    )
-                    return;
+                )
+                return;
             }
             aFiltered.forEach(f => {
                 const oCard = new sap.ui.integration.widgets.Card({
@@ -233,5 +233,14 @@ sap.ui.define([
             this.byId("CR_id_BranchCode").setValue("");
             this.byId("CR_id_Sort").setValue("");
         },
+
+        _resetFiltersOnEntry: function () {
+            const oFilterBar = this.byId("CR_id_Filterbar");
+            this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_Sort").setSelectedKey("");
+
+            oFilterBar.clear();
+                this._setDefaultDateRange();
+        }
     })
 })
