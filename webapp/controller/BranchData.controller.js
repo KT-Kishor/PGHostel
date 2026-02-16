@@ -502,6 +502,7 @@ sap.ui.define([
             var oData = {
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
+                EmailID: this.getOwnerComponent().getModel("LoginModel").getData().EmailID,
                 LandMark: Payload.LandMark,
                 Address: Payload.Address,
                 GeoLocation: Payload.GeoLocation,
@@ -1223,9 +1224,7 @@ sap.ui.define([
             if (!oFile) {
                 return;
             }
-
             const oReader = new FileReader();
-
             oReader.onload = (e) => {
                 const base64 = e.target.result.split(",")[1];
                 this.getView().getModel("UploadModel").setData({
@@ -1245,7 +1244,6 @@ sap.ui.define([
                 }
                 sap.m.MessageToast.show("Logo uploaded successfully");
             };
-
             oReader.readAsDataURL(oFile);
         },
 
@@ -1254,9 +1252,7 @@ sap.ui.define([
             if (!oFiles) {
                 return;
             }
-
             const oReader = new FileReader();
-
             oReader.onload = (e) => {
                 const base64 = e.target.result.split(",")[1];
                 this.getView().getModel("imageModel").setData({
@@ -1277,7 +1273,7 @@ sap.ui.define([
 
         onFileSizeExceeds: function () {
             sap.m.MessageToast.show(
-                "This file is more than 2 MB and cannot be uploaded"
+                "This file is more than 5 MB and cannot be uploaded"
             );
         },
 

@@ -26,6 +26,7 @@ sap.ui.define([
                 const oData = await this.ajaxReadWithJQuery("HM_Branch", "");
                 const aBranchData = Array.isArray(oData?.commentData) ? oData.commentData : [];
                 this.getView().setModel(new JSONModel(aBranchData), "PayBranchModel");
+                this.onClearAndSearch("P_id_Filterbar");
                 await this._loadBranchCode();
                 this.setDefaultCurrentMonth();
                 await this.Onsearch(true);
@@ -68,17 +69,6 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
-        // buildBranchMap: function () {
-        //     const aBranches = this.getView().getModel("PayBranchModel")?.getData() || [];
-        //     const mBranchMap = {};
-        //     aBranches.forEach(b => {
-        //         if (b.BranchCode && b.Name) {
-        //             mBranchMap[b.BranchCode] = b.Name;
-        //         }
-        //     });
-        //     return mBranchMap;
-        // },
 
         prepareMasterFilterData: function (aData) {
             const mBranch = new Map();
@@ -243,6 +233,11 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [{
+                label: "Hostel Name",
+                property: "BranchName",
+                type: "string"
+            },
+                {
                 label: "Booking ID",
                 property: "BookingID",
                 type: "string"
@@ -260,6 +255,11 @@ sap.ui.define([
             {
                 label: "Amount",
                 property: "Amount",
+                type: "string"
+            },
+            {
+                label: "Currency",
+                property: "Currency",
                 type: "string"
             },
             {

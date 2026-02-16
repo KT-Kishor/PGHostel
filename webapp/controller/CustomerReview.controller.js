@@ -15,6 +15,7 @@ sap.ui.define([
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             this._setDefaultDateRange();
             sap.ui.core.BusyIndicator.show(0);
+            this.onClearAndSearch("CR_id_Filterbar");
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews();

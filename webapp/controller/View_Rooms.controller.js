@@ -797,11 +797,11 @@ sap.ui.define([
             }
         },
 
-          onNavBack: function() {
+        onNavBack: function () {
             const sTabKey = "idRooms"
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
             sessionStorage.setItem("homePageReturnTab", sTabKey);
-          },
+        },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
@@ -903,9 +903,22 @@ sap.ui.define([
                     data: oData,
 
                 });
+                sap.m.MessageBox.success(
+                    "Your enquiry has been submitted successfully.\n\nOur team will contact you soon.",
+                    {
+                        title: "Request Submitted",
+                        actions: [sap.m.MessageBox.Action.OK],
+                        emphasizedAction: sap.m.MessageBox.Action.OK,
+                        onClose: function () {
+                            if (this._oEnquiry && this._oEnquiry.isOpen()) {
+                    this._oEnquiry.close();
+                }
+                            this._clearEnquiryStates(); // optional if you have it
+                        }.bind(this)
+                    }
+                );
                 const oResult = oresponse?.data || {};
                 this._oEnquiry.close();
-                sap.m.MessageToast.show(this.i18nModel.getText("Mail sent successfully"));
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {

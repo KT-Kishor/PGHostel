@@ -3802,7 +3802,7 @@ justify-content: flex-end;
 }
 
 .todaySection {
-  background: linear-gradient(135deg, #f7fbff, #eef5ff);
+  /* background: linear-gradient(135deg, #f7fbff, #eef5ff); */
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -3838,7 +3838,7 @@ justify-content: flex-end;
   max-width: calc(20% - 16px);
   min-width: 260px;
   border-radius: 14px;
-  background: #fff;
+  /* background: #fff; */
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
