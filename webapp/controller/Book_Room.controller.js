@@ -5023,8 +5023,6 @@ oHostelModel.setProperty(
                 else if (e.message) {
                     errorMsg = e.message;
                 }
-
-                MessageToast.show(errorMsg);
                 MessageBox.error(errorMsg);
             }
         },
