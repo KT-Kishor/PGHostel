@@ -617,7 +617,7 @@ sap.ui.define([
 
 
                 if (sUnit === "Per Year") {
-                    const years = end.getFullYear() - start.getFullYear() + 1;
+                    const years = end.getFullYear() - start.getFullYear();
                     return years + (years === 1 ? " Year" : " Years");
                 }
 
