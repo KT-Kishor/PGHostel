@@ -35,6 +35,13 @@ sap.ui.define([
                 dateRangeControl.setSecondDateValue(fyEnd);
             }
             // this._loadHostelMasterData();
+            this.getView().byId("PO_id_CompanyName").setSelectedKey("")
+            this.getView().byId("PO_id_Status").setSelectedKey("")
+            this.getView().byId("PO_id_BookingId").setSelectedKey("")
+            this.getView().byId("PO_id_CustomerName").setSelectedKey("")
+
+
+
             await this._loadBranchCode()
             await this.Cust_read(true)
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
