@@ -236,12 +236,16 @@ sap.ui.define([
 
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
+                PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
                 PO_id_Status: new Set(),
                 PO_id_CustomerName: new Set()
             };
 
             data.forEach(item => {
+                  if (item.BookingID && item.BookingID.trim()) {
+                    uniqueValues.PO_id_BookingId.add(item.BookingID.trim());
+                }
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
                 }
@@ -255,7 +259,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["PO_id_CompanyName", "PO_id_Status","PO_id_CustomerName"].forEach(field => {
+            ["PO_id_BookingId","PO_id_CompanyName", "PO_id_Status","PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 

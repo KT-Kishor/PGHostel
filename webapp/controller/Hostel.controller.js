@@ -2373,7 +2373,7 @@ sap.ui.define([
                 return;
             }
             // AC Type
-            const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey();
+            const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey() || this.byId("id_Roomtype")?.getValue();
 
 
             // Locality ComboBox
@@ -2485,10 +2485,6 @@ sap.ui.define([
             }
         },
         _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
-
-
-
-
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
@@ -2539,6 +2535,7 @@ sap.ui.define([
                 if (aFilteredBranches.length === 0) {
                     oVisibilityModel.setProperty("/Branches", []);
                     oVisibilityModel.setProperty("/NoData", true);
+                    oVisibilityModel.setProperty("/ShowViewMore",false);
                     return;
                 }
 

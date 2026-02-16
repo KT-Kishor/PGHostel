@@ -483,7 +483,7 @@ sap.ui.define([
 
                     if (paymentType === "per day") {
                         Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
-                        DurationUnit = "days";
+                          DurationUnit = Duration === 1 ? "Day" : "Days";
 
 
                     } else if (paymentType === "per month") {
@@ -497,7 +497,7 @@ sap.ui.define([
                         }
 
                         Duration = totalMonths;
-                        DurationUnit = "months";
+                      DurationUnit = Duration === 1 ? "Month" : "Months";
 
 
                     }
@@ -513,7 +513,7 @@ sap.ui.define([
                         }
 
                         Duration = years;
-                        DurationUnit = "years";
+                     DurationUnit = Duration === 1 ? "Year" : "Years";  
 
                     }
                 }
