@@ -164,23 +164,19 @@ sap.ui.define([
 RECALCULATE ONLY THIS PERSON
 ================================== */
 const oPerson = aPersons[iPersonIndex];
-const hasPerMonthFacility =
-    oPerson.Facilities.SelectedFacilities.some(
-        f => f.UnitText === "Per Month"
-    );
 
 // 🔥 Sync SelectedMonths from summary rows back to real facility objects
-const realFacilities = oPerson.Facilities.SelectedFacilities || [];
+// const realFacilities = oPerson.Facilities.SelectedFacilities || [];
 
-realFacilities.forEach(rf => {
-    const row = oPerson.AllSelectedFacilities.find(
-        f => f.FacilityName === rf.FacilityName
-    );
+// realFacilities.forEach(rf => {
+//     const row = oPerson.AllSelectedFacilities.find(
+//         f => f.FacilityName === rf.FacilityName
+//     );
 
-    if (row && row.SelectedMonths) {
-        rf.SelectedMonths = row.SelectedMonths;
-    }
-});
+//     if (row && row.SelectedMonths) {
+//         rf.SelectedMonths = row.SelectedMonths;
+//     }
+// });
 const parseDate = v => {
     if (typeof v === "string" && v.includes("/")) {
         const [d, m, y] = v.split("/");
@@ -194,10 +190,16 @@ const oEnd = parseDate(oModel.getProperty("/EndDate"));
 
 
 
+const bookingMonths =
+    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+    (oEnd.getMonth() - oStart.getMonth()) || 1;
+
 const bookingYears =
     Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
+
 const bookingDays =
     Math.floor((oEnd - oStart) / 86400000) + 1;
+
 
     const selectedMonths =
         Number(
@@ -222,27 +224,26 @@ const bookingDays =
 /* ---- Facility totals (per facility units) ---- */
 oPerson.Facilities.SelectedFacilities.forEach(f => {
 
-//     //  Ensure unit exists
-//   f.UnitText = f.UnitText || f.SelectedPriceType;
+    f.UnitText = f.SelectedPriceType; // normalize
 
-    const fDays =
-        Number(f.TotalDays || bookingDays || 1);
+    if (f.UnitText === "Per Month") {
+        f.SelectedMonths = bookingMonths;
+        f.TotalMonths = bookingMonths;
+    }
 
-   const fMonths =
-     f.SelectedPriceType === "Per Month"
-                ? selectedMonths
-                : 0;
+    if (f.UnitText === "Per Year") {
+        f.TotalYears = bookingYears;
+    }
 
-    const fYears =
-         f.SelectedPriceType === "Per Year"
-                ? Number(f.TotalYears || bookingYears || 1)
-                : 0;
+    if (f.UnitText === "Per Day") {
+        f.TotalDays = bookingDays;
+    }
 
     f.TotalAmount = this._calculateFacilityTotal(
         f,
-        fDays,
-        fMonths,
-        fYears
+        bookingDays,
+        bookingMonths,
+        bookingYears
     );
 });
 
@@ -449,24 +450,24 @@ if (paymentType === "Per Month") {
     // =================================================
     // PER HOUR DEFAULTS
     // =================================================
-    if (oSafeCopy.UnitText === "Per Hour") {
+    // if (oSafeCopy.UnitText === "Per Hour") {
 
-        const sStart = oSafeCopy.StartTime || "09";
-        const sEnd = oSafeCopy.EndTime || "10";
+    //     const sStart = oSafeCopy.StartTime || "09";
+    //     const sEnd = oSafeCopy.EndTime || "10";
 
-        oSafeCopy.StartTime = sStart;
-        oSafeCopy.EndTime = sEnd;
+    //     oSafeCopy.StartTime = sStart;
+    //     oSafeCopy.EndTime = sEnd;
 
-        const iStart = parseInt(sStart, 10);
-        const iEnd = parseInt(sEnd, 10);
+    //     const iStart = parseInt(sStart, 10);
+    //     const iEnd = parseInt(sEnd, 10);
 
-        let iTotal = iEnd - iStart;
-        if (iTotal < 0) {
-            iTotal += 24; // safety
-        }
+    //     let iTotal = iEnd - iStart;
+    //     if (iTotal < 0) {
+    //         iTotal += 24; // safety
+    //     }
 
-        oSafeCopy.TotalTime = iTotal.toFixed(2); // "1.00"
-    }
+    //     oSafeCopy.TotalTime = iTotal.toFixed(2); // "1.00"
+    // }
 
     // =================================================
     // DERIVE TOTAL MONTHS / YEARS FOR DROPDOWN
@@ -501,27 +502,24 @@ iYears = iYears > 0 ? iYears : 1;
 
 // 🔥 USE USER-SELECTED VALUE FIRST
 if (oSafeCopy.UnitText === "Per Month") {
+    oSafeCopy.SelectedMonths =
+        String(oSafeCopy.SelectedMonths || oSafeCopy.TotalMonths || iMonths);
 
-    oSafeCopy.TotalMonths =
-        Number(oSafeCopy.SelectedMonths || iMonths);
-
+    oSafeCopy.TotalMonths = Number(oSafeCopy.SelectedMonths);
     oSafeCopy.TotalYears = 0;
 }
 
 if (oSafeCopy.UnitText === "Per Year") {
+    oSafeCopy.SelectedMonths =
+        String(oSafeCopy.SelectedMonths || oSafeCopy.TotalYears || iYears);
 
-    oSafeCopy.TotalYears =
-        Number(oSafeCopy.SelectedMonths || iYears);
-
+    oSafeCopy.TotalYears = Number(oSafeCopy.SelectedMonths);
     oSafeCopy.TotalMonths = 0;
 }
 
     }
 
-    // =================================================
-    // CREATE EDIT MODEL
-    // =================================================
-    this._oEditModel = new sap.ui.model.json.JSONModel(oSafeCopy);
+    this._oEditModel = new JSONModel(oSafeCopy);
     this.getView().setModel(this._oEditModel, "edit");
 
 
@@ -731,7 +729,7 @@ if (oSafeCopy.TotalYears) {
          oFacility.IsDurationEdited = true;
           const aPersons = oHostelModel.getProperty("/Persons");
     aPersons[iPersonIndex].SelectedMonths = iCount;
-        // oHostelModel.setProperty("/SelectedMonths", iCount);
+        // oHostelModel.setProperty("/TotalMonths", iCount);
        
     }
 
@@ -743,8 +741,8 @@ if (oSafeCopy.TotalYears) {
         oFacility.TotalMonths = 0;
         oFacility.IsDurationEdited = true;
          const aPersons = oHostelModel.getProperty("/Persons");
-    aPersons[iPersonIndex].SelectedMonths = iCount;
-        // oHostelModel.setProperty("/SelectedYears", iCount);
+    aPersons[iPersonIndex].SelectedYears = iCount;
+        // oHostelModel.setProperty("/TotalYears", iCount);
 
     }
 
@@ -1215,183 +1213,6 @@ oHostelModel.setProperty("/Persons", aPersons);
     );
 },
 
-
-//    onUnitTextChange: function (oEvent) {
-
-//     const oCombo = oEvent.getSource();
-//     if (!oCombo.getSelectedItem()) {
-//         MessageToast.show(this.i18nModel.getText("pleaseselectUnitTypefromlist"));
-//         return;
-//     }
-
-//     const oEditModel = this.getView().getModel("edit");
-//     const oFacilityModel = this.getView().getModel("FacilityModel");
-//     const oHostelModel = this.getView().getModel("HostelModel");
-
-//     const sUnit = oCombo.getSelectedItem().getText();
-//     const sFacilityName = oEditModel.getProperty("/FacilityName");
-//     const sBranch = oHostelModel.getProperty("/BranchCode");
-
-//     oEditModel.setProperty("/UnitText", sUnit);
-
-//     // 🔑 Reset ONLY what is unit-specific
-//     oEditModel.setProperty("/StartTime", "");
-//     oEditModel.setProperty("/EndTime", "");
-//     oEditModel.setProperty("/TotalTime", "");
-
-//     oEditModel.setProperty("/TotalMonths", 0);
-//     oEditModel.setProperty("/TotalYears", 0);
-//      oEditModel.setProperty("/StartDate", "");
-//             oEditModel.setProperty("/EndDate", "");
-//             oEditModel.setProperty("/TotalDays", "");
-//             oEditModel.refresh(true);
-
-//     //  Do NOT touch TotalDays here
-
-//     // Resolve price
-//     const aFacilities = oFacilityModel.getProperty("/Facilities") || [];
-//     const oMatched = aFacilities.find(f =>
-//         f.FacilityName === sFacilityName &&
-//         f.BranchCode === sBranch
-//     );
-
-//     if (!oMatched) {
-//         MessageToast.show(this.i18nModel.getText("pricenotFoundSelectedUnitType"));
-//         return;
-//     }
-
-//     let price = 0;
-//     switch (sUnit) {
-//         case "Per Day":   price = oMatched.PricePerDay; break;
-//         case "Per Month": price = oMatched.PricePerMonth; break;
-//         case "Per Year":  price = oMatched.PricePerYear; break;
-//         case "Per Hour":  price = oMatched.PricePerHour; break;
-//     }
-
-//     oEditModel.setProperty("/Price", price);
-
-//     if (sUnit === "Per Month") oEditModel.setProperty("/TotalMonths", 1);
-//     if (sUnit === "Per Year")  oEditModel.setProperty("/TotalYears", 1);
-// }
-
-// ,
-
-        // onOpenDocumentPreview: function (oEvent) {
-        //     const oCtx = oEvent.getSource().getBindingContext("HostelModel");
-        //     const oDoc = oCtx && oCtx.getObject();
- 
-        //     if (!oDoc || !oDoc.Document) {
-        //         MessageToast.show(this.i18nModel.getText("noDocumentPreview"));
-        //         return;
-        //     }
- 
-        //     let sData = oDoc.Document;
- 
-        //     if (!sData.startsWith("data:")) {
-        //         const sType = oDoc.FileType || "application/octet-stream";
-        //         sData = `data:${sType};base64,${sData}`;
-        //     }
- 
-        //     const sTitle = oDoc.FileName || "Document Preview";
- 
-        //     /** DESTROY OLD DIALOG IF EXISTS */
-        //     if (this._oImageDialog) {
-        //         this._oImageDialog.destroy();
-        //         this._oImageDialog = null;
-        //     }
- 
-        //     let oContent;
- 
-        //     if (oDoc.FileType.includes("image")) {
- 
-        //         const oFlex = new sap.m.FlexBox({
-        //             width: "100%",
-        //             height: "100%",
-        //             renderType: "Div",
-        //             justifyContent: "Center",
-        //             alignItems: "Center",
-        //             items: [
-        //                 new sap.m.Image({
-        //                     id: this.createId("previewImage"),
-        //                     src: sData,
-        //                     densityAware: false,
-        //                     width: "100%",
-        //                     height: "100%",
-        //                     style: "object-fit:cover;display:block;margin:0;padding:0;"
-        //                 })
-        //             ]
-        //         });
- 
-        //         oContent = oFlex;
-        //     }
- 
-        //     /** ============================
-        //      *  PDF PREVIEW
-        //      * ============================ */
-        //     // else if (oDoc.FileType.includes("pdf")) {
- 
-        //     //     const oHtml = new sap.ui.core.HTML({
-        //     //         content: `<iframe src="${sData}" style="width:100%;height:500%;border:none;display:block;"></iframe>`,
-        //     //         sanitizeContent: false,
-        //     //         horizontalScrolling: false,
-        //     //     });
- 
-        //     //     oContent = oHtml;
-        //     // }
- 
-        //     /** ============================
-        //      *  UNSUPPORTED FILE
-        //      * ============================ */
-        //     else {
-        //         oContent = new sap.m.VBox({
-        //             items: [
-        //                 new sap.m.Text({
-        //                     text: "Preview not supported."
-        //                 }),
-        //                 new sap.m.Link({
-        //                     text: "Download File",
-        //                     href: sData,
-        //                     download: oDoc.FileName
-        //                 })
-        //             ],
-        //             width: "100%",
-        //             height: "100%",
-        //             justifyContent: "Center",
-        //             alignItems: "Center"
-        //         });
-        //     }
- 
-        //     /** ============================
-        //      *  CREATE DIALOG
-        //      * ============================ */
-        //     this._oImageDialog = new sap.m.Dialog({
-        //         title: sTitle,
-        //         contentWidth: "50%",
-        //         contentHeight: "80%",
-        //         draggable: true,
-        //         resizable: true,
-        //         horizontalScrolling: false,
-        //         verticalScrolling: false,
-        //         contentPadding: "0px",
-        //         content: [oContent],
- 
-        //         beginButton: new sap.m.Button({
-        //             text: "Close",
-        //             press: function () {
-        //                 this._oImageDialog.close();
-        //             }.bind(this)
-        //         }),
- 
-        //         afterClose: function () {
-        //             this._oImageDialog.destroy();
-        //             this._oImageDialog = null;
-        //         }.bind(this)
-        //     });
- 
-        //     this.getView().addDependent(this._oImageDialog);
- 
-        //     this._oImageDialog.open();
-        // },
         onOpenDocumentPreview: function (oEvent) {
             const oCtx = oEvent.getSource().getBindingContext("HostelModel");
             const oDoc = oCtx && oCtx.getObject();
@@ -1563,56 +1384,56 @@ oHostelModel.setProperty("/Persons", aPersons);
             }
         },
 
-       onTimeChange: function (oEvent) {
+//        onTimeChange: function (oEvent) {
 
-    utils._LCvalidateMandatoryField(oEvent);
+//     utils._LCvalidateMandatoryField(oEvent);
 
-    const oEditModel = this.getView().getModel("edit");
+//     const oEditModel = this.getView().getModel("edit");
 
-    const sStart = oEditModel.getProperty("/StartTime");
-    const sEnd = oEditModel.getProperty("/EndTime");
+//     const sStart = oEditModel.getProperty("/StartTime");
+//     const sEnd = oEditModel.getProperty("/EndTime");
 
-    if (!sStart || !sEnd) {
-        oEditModel.setProperty("/TotalTime", "");
-        return;
-    }
+//     if (!sStart || !sEnd) {
+//         oEditModel.setProperty("/TotalTime", "");
+//         return;
+//     }
 
-    const startHour = parseInt(sStart, 10);
-    const endHour = parseInt(sEnd, 10);
+//     const startHour = parseInt(sStart, 10);
+//     const endHour = parseInt(sEnd, 10);
 
-    if (
-        isNaN(startHour) || isNaN(endHour) ||
-        startHour < 0 || startHour > 23 ||
-        endHour < 0 || endHour > 23
-    ) {
-        MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
-        oEditModel.setProperty("/TotalTime", "");
-        return;
-    }
+//     if (
+//         isNaN(startHour) || isNaN(endHour) ||
+//         startHour < 0 || startHour > 23 ||
+//         endHour < 0 || endHour > 23
+//     ) {
+//         MessageToast.show(this.i18nModel.getText("invalidHourFormat"));
+//         oEditModel.setProperty("/TotalTime", "");
+//         return;
+//     }
 
-    /* =========================
-       HANDLE OVERNIGHT HOURS
-    ========================= */
-    let totalHours = endHour - startHour;
-    if (totalHours <= 0) {
-        totalHours += 24; // 🔑 overnight support
-    }
+//     /* =========================
+//        HANDLE OVERNIGHT HOURS
+//     ========================= */
+//     let totalHours = endHour - startHour;
+//     if (totalHours <= 0) {
+//         totalHours += 24; // 🔑 overnight support
+//     }
 
-    oEditModel.setProperty("/TotalTime", totalHours.toFixed(2));
+//     oEditModel.setProperty("/TotalTime", totalHours.toFixed(2));
 
-    /* =========================
-       🔑 CRITICAL FIX
-       Per Hour = always 1 day
-    ========================= */
-    // oEditModel.setProperty("/TotalDays", 1);
-}
-,
+//     /* =========================
+//        🔑 CRITICAL FIX
+//        Per Hour = always 1 day
+//     ========================= */
+//     // oEditModel.setProperty("/TotalDays", 1);
+// }
+// ,
 
-        _getTimePeriod: function (sTime) {
-            if (!sTime) return "";
-            const [hour] = sTime.split(":").map(Number);
-            return hour < 12 ? "Morning" : "Evening";
-        },
+        // _getTimePeriod: function (sTime) {
+        //     if (!sTime) return "";
+        //     const [hour] = sTime.split(":").map(Number);
+        //     return hour < 12 ? "Morning" : "Evening";
+        // },
 
         _sumGrandTotalOfPersons: function () {
             const oHostelModel = this.getView().getModel("HostelModel");

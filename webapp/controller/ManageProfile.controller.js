@@ -58,11 +58,6 @@ sap.ui.define([
                         ?.getData();
                 }
                 const sUserID = oUser.UserID;
-                // const sUserID = oUser.UserID || "";
-                // if (!sUserID) {
-                //     sap.m.MessageToast.show(ths.i18nModel.getText("usernotLoggedin"));
-                //     return;
-                // }
                 fullUserData = oUser;
                 const oTempModel = new JSONModel({
                     bookings: [],
@@ -615,7 +610,7 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("okay");
+                MessageToast.show(this.i18nModel.getText("mandatoryFieldsAreMandatory"));
                 return;
             }
             const payload = {
@@ -640,11 +635,11 @@ sap.ui.define([
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
-                sap.m.MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
+                MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
 
             } catch (err) {
                 console.error(err);
-                sap.m.MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
+               MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
@@ -664,13 +659,13 @@ sap.ui.define([
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-                sap.m.MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
+               MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
+               MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
 
@@ -736,7 +731,7 @@ sap.ui.define([
             const oEndDate = this._parseDate(sEndDate);
 
             if (!oStartDate || !oEndDate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidStartEndDate"));
+                MessageToast.show(this.i18nModel.getText("invalidStartEndDate"));
                 return null;
             }
 
@@ -744,7 +739,7 @@ sap.ui.define([
             const iDays = Math.ceil(diffTime / (1000 * 3600 * 24));
 
             if (iDays <= 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
 
@@ -831,9 +826,9 @@ sap.ui.define([
 
            this.getView().getModel("profileData").setData({});
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            if (oLoginModel) {
-                oLoginModel.setData({});
-            }
+            // if (oLoginModel) {
+            //     oLoginModel.setData({});
+            // }
              if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/UserID", "");
@@ -842,14 +837,10 @@ sap.ui.define([
         oLoginModel.setProperty("/EmailID", "");
       }
            
-            sap.m.MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
-
-            this._oLoggedInUser = null;
-            this._isProfileRequested = false;
-
             // Reset Login State
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },
         onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";

@@ -145,11 +145,9 @@
                             type="Number"
                             value="{HostelModel>/PerMonthNoPerson}"
                             placeholder="{i18n>enterAmount}"
-                            liveChange=".onAmountChange"
                             maxLength="15"
                             editable="false"
                         />
-
 
                         <Label
                             text="{i18n>paymentType}"
@@ -158,9 +156,7 @@
                         <Input
                             id="idPaymentTypeField"
                             placeholder="{i18n>enterPaymentType}"
-                            liveChange=".onPaymentTypeChange"
                             value="{PaymentModel>/PaymentType}"
-                            valueStateText="{i18n>enterPaymentType}"
                             maxLength="20"
                             editable="false"
                           
@@ -173,7 +169,7 @@
                         <Input
                             id="idTransactionID"
                             placeholder="{i18n>enterTransactionID}"
-                            liveChange=".onTransactionIDChange"
+                            liveChange="onTransactionIDChange"
                             valueStateText="{i18n>enterTransactionID}"
                             maxLength="25"
                         />
@@ -193,22 +189,7 @@
                     </VBox>
                 </l:Grid>
             </VBox>
-           <!-- <HBox class="paymentMonthlyBox"
-             visible="{= ${HostelModel>/SelectedPriceType} !== 'Per Day' }">
-          <Label
-    class="sapUiTinyMargin"
-    text="{
-        parts: [
-            { path: 'HostelModel>/SelectedPerson' },
-            { path: 'HostelModel>/SelectedPriceType' }
-        ],
-        formatter: '.Formatter.formatMonthlyPaymentText'
-    }"
-           />
-                    <Text
-                        text="{parts: ['HostelModel>/PerMonthNoPerson','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
-                    />
-                </HBox> -->
+          
         </f:SimpleForm>
        
         <footer>
@@ -218,12 +199,12 @@
                     text="{i18n>submitPayment}"
                     tooltip="{i18n>submitPayment}"
                     class="myUnifiedBtn"
-                    press=".onSubmitPress"
+                    press="onSubmitPress"
                 />
                 <Button
                     text="{i18n>CancelButton}"
                     tooltip="{i18n>CancelButton}"
-                    press=".onPaymentClose"
+                    press="onPaymentClose"
                     class="myUnifiedBtn"
                 />
             </Toolbar>

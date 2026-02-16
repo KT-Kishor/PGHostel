@@ -197,7 +197,6 @@ sap.ui.define([
                 fileName: "Manage_Vendor.xlsx",
                 worker: false
             };
-            MessageToast.show(this.i18nModel.getText("MSdownloading"));
             const oSheet = new sap.ui.export.Spreadsheet(oSettings);
 
             oSheet.build().then(() => {

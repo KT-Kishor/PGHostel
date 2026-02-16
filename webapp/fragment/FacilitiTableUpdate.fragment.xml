@@ -132,11 +132,7 @@
                 <Select
                     width="100%"
                     visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
-                    selectedKey="{
-        = ${edit>/UnitText} === 'Per Month'
-            ? '' + ${edit>/TotalMonths}
-            : '' + ${edit>/TotalYears}
-    }"
+                     selectedKey="{edit>/SelectedMonths}"
                     change="onMonthSelectionChange"
                 >
                     <core:Item

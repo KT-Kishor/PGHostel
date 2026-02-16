@@ -4794,12 +4794,6 @@ oHostelModel.setProperty(
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onPaymentTypeChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
-        },
-
         onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
@@ -4831,7 +4825,6 @@ oHostelModel.setProperty(
 
             if (!isPayOnCheckIn) {
                 const isMandatoryValid = (
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idPaymentTypeField"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("idPaymentDate"), "ID")
                 );
@@ -4925,7 +4918,6 @@ oHostelModel.setProperty(
                             BranchCode: oData.BranchCode || "",
                             CustomerName: p.FullName || "",
                             Currency: oData.Currency || "INR",
-
                             BranchName: oData.Area || "",
                             BankName: sap.ui.getCore().byId("idPaymentTypeField").getValue()
                         };
