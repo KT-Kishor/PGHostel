@@ -1166,55 +1166,132 @@ sap.ui.define([
                 ?.setText("Hostel Access Portal");
         },
 
+        // onSwitchToSignUp: function () {
+        //     const oSignInPanel = $C("signInPanel");
+        //     const oSignUpPanel = $C("signUpPanel");
+
+        //     // 🔒 MAKE DOB READ-ONLY (calendar-only)
+        //     this._FragmentDatePickersReadOnly(["signUpDOB"]);
+
+        //     oSignInPanel?.setVisible(false);
+        //     oSignUpPanel?.setVisible(true);
+
+        //     this.oViewModel.setProperty("/authFlow", "signup");
+        //     this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+
+        //     // DOB Limits Logic
+        //     const oDOBpicker = $C("signUpDOB");
+        //     if (oDOBpicker) {
+        //         const oToday = new Date();
+        //         const oMaxDate = new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate());
+        //         oDOBpicker.setMaxDate(oMaxDate);
+        //         const oMinDate = new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate());
+        //         oDOBpicker.setMinDate(oMinDate);
+        //     }
+
+        //     // 🔥 AUTO-POPULATE LOCATION DATA
+        //     const oLoginModel = this.getView().getModel("LoginMode");
+        //     if (this.Country) {
+        //         oLoginModel.setProperty("/Country", this.Country);
+        //         this.onChangeCountry(null); // Manual trigger (Safe call)
+
+        //         if (this.State) {
+        //             // Delay is important for binding filters to react
+        //             setTimeout(() => {
+        //                 oLoginModel.setProperty("/State", this.State);
+        //                 this.onChangeState(null);
+
+        //                 if (this.City) {
+        //                     setTimeout(() => {
+        //                         oLoginModel.setProperty("/City", this.City);
+        //                         this.onChangeCity(null);
+        //                     }, 200);
+        //                 }
+        //             }, 200);
+        //         }
+        //     }
+
+        //     this._resetOtpState();
+        //     this._addPasswordGenerateIcon();
+        // },
         onSwitchToSignUp: function () {
             const oSignInPanel = $C("signInPanel");
             const oSignUpPanel = $C("signUpPanel");
 
-            // 🔒 MAKE DOB READ-ONLY (calendar-only)
+            // 🔒 DOB Read-only and Titles
             this._FragmentDatePickersReadOnly(["signUpDOB"]);
+            this.oViewModel.setProperty("/authFlow", "signup");
+            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal"); // Added back
 
             oSignInPanel?.setVisible(false);
             oSignUpPanel?.setVisible(true);
-
-            this.oViewModel.setProperty("/authFlow", "signup");
-            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
 
             // DOB Limits Logic
             const oDOBpicker = $C("signUpDOB");
             if (oDOBpicker) {
                 const oToday = new Date();
-                const oMaxDate = new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate());
-                oDOBpicker.setMaxDate(oMaxDate);
-                const oMinDate = new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate());
-                oDOBpicker.setMinDate(oMinDate);
+                oDOBpicker.setMaxDate(new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate()));
+                oDOBpicker.setMinDate(new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate()));
             }
 
-            // 🔥 AUTO-POPULATE LOCATION DATA
-            const oLoginModel = this.getView().getModel("LoginMode");
-            if (this.Country) {
-                oLoginModel.setProperty("/Country", this.Country);
-                this.onChangeCountry(null); // Manual trigger (Safe call)
+            // --- AUTO-POPULATE WITH BUSY INDICATOR ---
+            const oCountryCB = $C("signUpCountry");
+            const oCountryModel = this.getOwnerComponent().getModel("CountryModel");
 
-                if (this.State) {
-                    // Delay is important for binding filters to react
-                    setTimeout(() => {
-                        oLoginModel.setProperty("/State", this.State);
-                        this.onChangeState(null);
+            const fnRunAutoPopulate = () => {
+                const oLoginModel = this.getView().getModel("LoginMode");
+                if (this.Country) {
+                    oLoginModel.setProperty("/Country", this.Country);
+                    this.onChangeCountry(null); // Trigger Country Fuzzy Match & STD Logic
 
-                        if (this.City) {
-                            setTimeout(() => {
-                                oLoginModel.setProperty("/City", this.City);
-                                this.onChangeCity(null);
-                            }, 200);
-                        }
-                    }, 200);
+                    if (this.State) {
+                        setTimeout(() => {
+                            oLoginModel.setProperty("/State", this.State);
+                            this.onChangeState(null); // Trigger State Fuzzy Match & City Filter
+
+                            if (this.City) {
+                                setTimeout(() => {
+                                    oLoginModel.setProperty("/City", this.City);
+                                    this.onChangeCity(null); // Trigger City Fuzzy Match
+                                }, 300);
+                            }
+                        }, 300);
+                    }
                 }
+            };
+
+            // Data Availability Check
+            if (!oCountryModel || !oCountryModel.getData() || oCountryModel.getData().length === 0) {
+                oCountryCB.setBusy(true);
+                $C("signUpState").setEnabled(false);
+                $C("signUpCity").setEnabled(false);
+                $C("signUpSTD").setEnabled(false);
+                $C("signUpPhone").setEnabled(false);
+
+                const nInterval = setInterval(() => {
+                    const oLatest = this.getOwnerComponent().getModel("CountryModel");
+                    if (oLatest && oLatest.getData() && oLatest.getData().length > 0) {
+                        clearInterval(nInterval);
+                        $C("signUpState").setEnabled(true);
+                        $C("signUpCity").setEnabled(true);
+                        $C("signUpSTD").setEnabled(true);
+                        $C("signUpPhone").setEnabled(true);
+
+                        oCountryCB.setBusy(false);
+                        fnRunAutoPopulate();
+                    }
+                }, 300);
+            } else {
+                fnRunAutoPopulate();
             }
 
+            // OTP and Password Icons
             this._resetOtpState();
             this._addPasswordGenerateIcon();
         },
 
+
+       
         SM_onGeneratePassword: function () {
             var oPwdInput = $C("signUpPassword");
             var oStrength = $C("passwordStrengthText");
@@ -1329,7 +1406,10 @@ sap.ui.define([
             const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
 
-            const std = (C("signUpSTD").getValue() || "").trim();
+            const sCountry = C("signUpCountry").getValue() || data.Country;
+            const sState = C("signUpState").getValue() || data.State;
+            const sCity = C("signUpCity").getValue() || data.City;
+            const sSTD = C("signUpSTD").getValue() || data.STDCode;
 
             // ---- VALIDATION GATE ----
             const isValid = (
@@ -1342,7 +1422,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(C("signUpState"), "ID") &&
                 utils._LCvalidateMandatoryField(C("signUpCity"), "ID") &&
                 utils._LCvalidateMandatoryField(C("signUpSTD"), "ID") &&
-                utils._LCvalidateISDmobile(C("signUpPhone"), std) &&
+                utils._LCvalidateISDmobile(C("signUpPhone"), sSTD) &&
                 utils._LCvalidateAddress(C("signUpAddress")) &&
                 utils._LCvalidatePassword(
                     C("signUpPassword"),
@@ -1357,22 +1437,22 @@ sap.ui.define([
 
             const payload = {
                 data: {
-                    Salutation: C("signUpSalutation").getSelectedKey(),
-                    UserName: data.fullname.trim(),
+                    Salutation: C("signUpSalutation").getSelectedKey() || C("signUpSalutation").getValue(),
+                    UserName: (data.fullname || "").trim(),
                     Role: "Customer",
                     Type: "Customer",
-                    EmailID: data.Email.trim(),
+                    EmailID: (data.Email || "").trim(),
                     Password: btoa(sFinalPassword),
-                    STDCode: data.STDCode || std,
+                    STDCode: sSTD, // Synced value
                     MobileNo: data.Mobileno,
                     Status: "Active",
                     TimeDate,
                     DateOfBirth: data.DateOfBirth || "",
-                    Gender: C("signUpGender").getSelectedKey(),
-                    Country: data.Country,
-                    State: data.State,
-                    City: data.City,
-                    Address: data.Address.trim()
+                    Gender: C("signUpGender").getSelectedKey() || C("signUpGender").getValue(),
+                    Country: sCountry, // Synced value
+                    State: sState,     // Synced value
+                    City: sCity,       // Synced value
+                    Address: (data.Address || "").trim()
                 }
             };
             sap.ui.core.BusyIndicator.show(0);
@@ -1481,55 +1561,87 @@ sap.ui.define([
         // --- Refactored State Change ---
         onChangeState: function (oEvent) {
             const oState = oEvent ? oEvent.getSource() : $C("signUpState");
-            oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
-            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
-
             const oModel = this.getView().getModel("LoginMode");
             const oCity = $C("signUpCity");
+            const oStateModel = this.getOwnerComponent().getModel("StateModel"); // to get all states for fuzzy search
 
             if (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
                 oModel.setProperty("/City", "");
-                oCity.setValue("").setSelectedKey("");
-                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
-            }
+                // oCity.setValue("").setSelectedKey("");
+                }
+            oModel.setProperty("/City", "");
+            oCity.setValue("").setSelectedKey("");
 
-            // Auto-select for location fetch
-            let oSelectedItem = oState.getSelectedItem();
-            if (!oSelectedItem && oModel.getProperty("/State")) {
-                oState.setSelectedKey(oModel.getProperty("/State"));
-                oSelectedItem = oState.getSelectedItem();
-            }
+            oCity.getBinding("items")?.filter([
+                new Filter("cityName", "EQ", "__NONE__")
+            ]);
 
-            const sStateText = oSelectedItem?.getText() || oState.getValue() || "";
-            oModel.setProperty("/State", sStateText);
-
+            const sStateSearch = oEvent ? oState.getValue() : oModel.getProperty("/State");
+            oModel.setProperty("/State", sStateSearch);
+            
             const oCountry = $C("signUpCountry");
             const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
 
-            if (sCountryCode && sStateText) {
-                oCity.getBinding("items")?.filter([
-                    new Filter("stateName", "EQ", sStateText),
+            if (!sCountryCode) {
+                oCity.getBinding("items").filter([new Filter("cityName", "EQ", "__NONE__")]);
+                return;
+            }
+
+            // Get all states for the current country to perform fuzzy search
+            const allStates = oStateModel.getData() || [];
+            const countryStates = allStates.filter(s => s.countryCode === sCountryCode);
+
+            const oMatch = this._findBestMatch(sStateSearch, countryStates, "stateName");
+
+            if (oMatch) {
+                oState.setSelectedKey(oMatch.stateName);
+                const sStateName = oMatch.stateName;
+
+                // Filter Cities
+                oCity.getBinding("items").filter([
+                    new Filter("stateName", "EQ", sStateName),
                     new Filter("countryCode", "EQ", sCountryCode)
                 ]);
+            } else {
+                oCity.getBinding("items").filter([new Filter("cityName", "EQ", "__NONE__")]);
             }
         },
 
         // --- Refactored City Change ---
         onChangeCity: function (oEvent) {
-            const oCity = oEvent ? oEvent.getSource() : $C("signUpCity");
-            oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            const oCityCtrl = oEvent ? oEvent.getSource() : $C("signUpCity");
+            const oModel = this.getView().getModel("LoginMode");
+            const oCityModel = this.getOwnerComponent().getModel("CityModel");
 
             if (oEvent) utils._LCvalidateMandatoryField(oEvent);
 
-            const oModel = this.getView().getModel("LoginMode");
+            const sCitySearch = oEvent ? oCityCtrl.getValue() : oModel.getProperty("/City");
+            oModel.setProperty("/City", sCitySearch);
+            
+            const oState = $C("signUpState");
+            const sStateName = oState.getSelectedItem()?.getText() || oState.getValue();
+            const oCountry = $C("signUpCountry");
+            const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
 
-            // Auto-select logic
-            if (!oCity.getSelectedItem() && oModel.getProperty("/City")) {
-                oCity.setSelectedKey(oModel.getProperty("/City"));
+            if (!sStateName || !sCountryCode) {
+                return;
             }
 
-            const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
-            oModel.setProperty("/City", sCityText);
+            const allCities = oCityModel.getData() || [];
+            const stateCities = allCities.filter(c => c.stateName === sStateName && c.countryCode === sCountryCode);
+
+            // --- FUZZY LOGIC INTEGRATION ---
+            const oMatch = this._findBestMatch(sCitySearch, stateCities, "cityName");
+
+            if (oMatch) {
+                oCityCtrl.setSelectedKey(oMatch.cityName);
+                oModel.setProperty("/City", oMatch.cityName);
+                oCityCtrl.setValueState("None");
+            } else {
+                // If no match, keep what user typed
+                oModel.setProperty("/City", sCitySearch);
+            }
         },
         // onChangeState: function (oEvent) {
         //     const oState = oEvent.getSource();
@@ -1752,52 +1864,55 @@ sap.ui.define([
         // --- Refactored Country Change ---
         onChangeCountry: function (oEvent) {
             const oCountry = oEvent ? oEvent.getSource() : $C("signUpCountry");
-            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
-
-            // Sanitize
-            oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
+            if (!oCountry) return;
 
             const oModel = this.getView().getModel("LoginMode");
             const oState = $C("signUpState");
             const oCity = $C("signUpCity");
             const oSTD = $C("signUpSTD");
+            const oCountryModel = this.getOwnerComponent().getModel("CountryModel");
 
-            // Reset dependents ONLY if it's a manual change
+            if (!oCountryModel) return;
+
             if (oEvent) {
-                ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
-                oState.setSelectedKey("").setValue("");
-                oCity.setSelectedKey("").setValue("");
-                oSTD.setSelectedKey("");
+                utils._LCvalidateMandatoryField(oEvent);
+                oModel.setProperty("/State", "");
+                oModel.setProperty("/City", "");
                 oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
                 oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
+                // oState.setValue("").setSelectedKey("");
+                // oCity.setValue("").setSelectedKey("");
             }
+            
+            const aCountries = oCountryModel.getData() || [];
+            const sSearch = oEvent ? oCountry.getValue() : oModel.getProperty("/Country");
+            oModel.setProperty("/Country", sSearch);
 
-            // Auto-select item in list if not selected (for location fetch)
-            let oItem = oCountry.getSelectedItem();
-            if (!oItem && oModel.getProperty("/Country")) {
-                oCountry.setSelectedKey(oModel.getProperty("/Country"));
-                oItem = oCountry.getSelectedItem();
-            }
+            const oMatch = this._findBestMatch(sSearch, aCountries, "countryName");
 
-            if (!oItem) return;
+            if (oMatch) {
+                oCountry.setSelectedKey(oMatch.countryName);
+                const sCountryCode = oMatch.code;
 
-            const sCountryName = oItem.getText();
-            const sCountryCode = oItem.getAdditionalText()?.trim();
+                // Filter States
+                oState.getBinding("items").filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
 
-            oModel.setProperty("/Country", sCountryName);
-
-            // Set STD Code
-            const aCountries = this.getOwnerComponent().getModel("CountryModel").getProperty("/");
-            const oMatch = aCountries?.find(c => c.countryName === sCountryName);
-            if (oMatch?.stdCode) {
-                oModel.setProperty("/STDCode", oMatch.stdCode);
-                oSTD.setSelectedKey(oMatch.stdCode);
-                this.onSTDChange(); // Trigger mobile length logic
-            }
-
-            // Filter States
-            if (sCountryCode) {
-                oState.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
+                // Mobile & STD
+                const oMobile = $C("signUpPhone");
+                if (oMobile) oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
+                
+                const oSTDItem = oSTD.getItems().find(i => i.getAdditionalText() === sCountryCode);
+                if (oSTDItem) {
+                    oSTD.setSelectedKey(oSTDItem.getKey());
+                    oModel.setProperty("/STDCode", oSTDItem.getKey());
+                    // we need to call onSTDChange to apply mobile validations
+                    const stdControl = $C("signUpSTD");
+                    if (stdControl) {
+                        this.onSTDChange({ getSource: () => stdControl });
+                    }
+                }
+            } else {
+                 oState.getBinding("items").filter([new Filter("countryCode", "EQ", "__NONE__")]);
             }
         },
 
@@ -3758,30 +3873,6 @@ sap.ui.define([
                 });
             }
 
-            const oModel = this.getView().getModel("AdminSignupModel");
-
-            // --- AUTO-POPULATION LOGIC ---
-            if (this.Country) {
-                oModel.setProperty("/Country", this.Country);
-                // Bina event ke trigger karein
-                this.ADMIN_onChangeCountry(null);
-
-                if (this.State) {
-                    // Thoda delay zaroori hai taaki State list filter ho chuki ho
-                    setTimeout(() => {
-                        oModel.setProperty("/State", this.State);
-                        this.ADMIN_onChangeState(null);
-
-                        if (this.City) {
-                            setTimeout(() => {
-                                oModel.setProperty("/City", this.City);
-                                this.ADMIN_onChangeCity(null);
-                            }, 100);
-                        }
-                    }, 100);
-                }
-            }
-
             // DOB Limits
             const oDate = $C("adminDOB");
             if (oDate) {
@@ -3792,6 +3883,68 @@ sap.ui.define([
 
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
+
+
+            // 2. Control level Busy Indicator logic
+            const oCountryCB = $C("adminsignUpCountry"); // Ya "signUpCountry" customer ke liye
+            const oCountryModel = this.getOwnerComponent().getModel("CountryModel");
+
+            // Agar model/data abhi tak nahi aaya
+            if (!oCountryModel || !oCountryModel.getData() || oCountryModel.getData().length === 0) {
+                oCountryCB.setBusy(true); // Sirf is field par spinner dikhega
+                $C("adminsignUpState").setEnabled(false);
+                $C("adminsignUpCity").setEnabled(false);
+                $C("adminsignUpSTD").setEnabled(false);
+                $C("adminMobileNo").setEnabled(false);
+
+
+                // Background check (Fuzzy logic aur auto-populate ke liye)
+                const nInterval = setInterval(() => {
+                    const oLatestModel = this.getOwnerComponent().getModel("CountryModel");
+                    if (oLatestModel && oLatestModel.getData() && oLatestModel.getData().length > 0) {
+                        clearInterval(nInterval);
+                        $C("adminsignUpState").setEnabled(true);
+                        $C("adminsignUpCity").setEnabled(true);
+                        $C("adminsignUpSTD").setEnabled(true);
+                        $C("adminMobileNo").setEnabled(true);
+                        oCountryCB.setBusy(false); // Spinner hatao
+
+                        // Ab auto-populate start karo
+                        this._triggerAutoPopulation();
+                    }
+                }, 300);
+            } else {
+                // Data pehle se hai, toh seedha trigger karo
+                this._triggerAutoPopulation();
+            }
+
+
+
+        },
+        _triggerAutoPopulation: function () {
+            const oModel = this.getView().getModel("AdminSignupModel"); // Ya "LoginMode"
+
+            if (this.Country) {
+                // Country set karo aur fuzzy match trigger karo
+                oModel.setProperty("/Country", this.Country);
+                this.ADMIN_onChangeCountry(null);
+
+                // State ke liye thoda wait (taaki filtering complete ho jaye)
+                setTimeout(() => {
+                    if (this.State) {
+                        oModel.setProperty("/State", this.State);
+                        this.ADMIN_onChangeState(null);
+
+                        // City ke liye thoda aur wait
+                        setTimeout(() => {
+                            if (this.City) {
+                                oModel.setProperty("/City", this.City);
+                                this.ADMIN_onChangeCity(null);
+                            }
+                        }, 400);
+                    }
+                }, 400);
+            }
         },
 
         onCloseAdminSignup: function () {
@@ -3802,129 +3955,133 @@ sap.ui.define([
         },
 
         ADMIN_onChangeCountry: function (oEvent) {
-            // 1. Get Control reference safely
             const oCountry = oEvent ? oEvent.getSource() : $C("adminsignUpCountry");
-            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
+            if (!oCountry) return;
 
             const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
-            const oCityModel = this.getView().getModel("CityModel");
+            const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
 
-            const oState = $C("adminsignUpState");
-            const oCity = $C("adminsignUpCity");
-            const oSTD = $C("adminsignUpSTD");
-            const oMobile = $C("adminMobileNo");
+            if (!oCountryModel) return;
 
-            // 2. Sanitize typing only if user is interacting
             if (oEvent) {
-                const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
-                oCountry.setValue(val);
-            }
-
-            // 3. Reset dependent fields logic (Reset tabhi karein jab user manual change kare)
-            if (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
                 oModel.setProperty("/State", "");
                 oModel.setProperty("/City", "");
-                oStateModel.setProperty("/filtered", []);
-                oCityModel.setProperty("/filtered", []);
+                // $C("adminsignUpState").setValue("");
+                // $C("adminsignUpCity").setValue("");
             }
 
-            // 4. Get Selected Item or Find from Model (for Auto-populate)
-            let selected = oCountry.getSelectedItem();
-            let sCountryName = oModel.getProperty("/Country");
+            const aCountries = oCountryModel.getData() || [];
+            const sSearch = oModel.getProperty("/Country");
 
-            // Agar item select nahi hua (auto-populate case), toh model se search karein
-            if (!selected && sCountryName) {
-                const aCountries = this.getView().getModel("CountryModel").getData();
-                const oMatch = aCountries.find(c => c.countryName === sCountryName);
-                if (oMatch) {
-                    // Select the item in ComboBox so getAdditionalText works
-                    oCountry.setSelectedKey(oMatch.countryName);
-                    selected = oCountry.getSelectedItem();
-                }
-            }
+            // --- FUZZY LOGIC INTEGRATION ---
+            const oMatch = this._findBestMatch(sSearch, aCountries, "countryName");
 
-            if (!selected) return;
+            if (oMatch) {
+                oCountry.setSelectedKey(oMatch.countryName);
+                const sCountryCode = oMatch.code;
 
-            // 5. Filtering States
-            const sCountryCode = selected.getAdditionalText().trim();
-            oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
+                // Filter States
+                const allStates = oStateModel.getData() || [];
+                const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
+                oStateModel.setProperty("/filtered", filteredStates);
 
-            const allStates = oStateModel.getData();
-            const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
-            oStateModel.setProperty("/filtered", filteredStates);
-
-            // 6. Auto-select STD
-            let matchedKey = null;
-            oSTD.getItems().some(item => {
-                if (item.getAdditionalText().trim() === sCountryCode) {
-                    matchedKey = item.getKey();
-                    return true;
-                }
-                return false;
-            });
-
-            if (matchedKey) {
-                oSTD.setSelectedKey(matchedKey);
-                oModel.setProperty("/STDCode", matchedKey);
+                // Mobile & STD
+                const oMobile = $C("adminMobileNo");
+                if (oMobile) oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
+                this._autoSelectSTD(sCountryCode);
             }
         },
 
         ADMIN_onChangeState: function (oEvent) {
             const oState = oEvent ? oEvent.getSource() : $C("adminsignUpState");
-            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
-
             const oModel = this.getView().getModel("AdminSignupModel");
+            const oStateModel = this.getView().getModel("StateModel");
             const oCityModel = this.getView().getModel("CityModel");
-            const oCountry = $C("adminsignUpCountry");
 
             if (oEvent) {
-                oModel.setProperty("/City", "");
-                oCityModel.setProperty("/filtered", []);
+                utils._LCvalidateMandatoryField(oEvent);
+                    oModel.setProperty("/City", "");
+                    oCityModel.setProperty("/filtered", []);
+
+
             }
 
-            let selectedState = oState.getSelectedItem();
-            let sStateText = oModel.getProperty("/State");
+            const aFilteredStates = oStateModel.getProperty("/filtered") || [];
+            const sStateSearch = oModel.getProperty("/State");
 
-            // Auto-populate case: find and select in list
-            if (!selectedState && sStateText) {
-                const aFilteredStates = oStateModel.getProperty("/filtered");
-                const oMatch = aFilteredStates.find(s => s.stateName === sStateText);
-                if (oMatch) {
-                    oState.setSelectedKey(oMatch.stateName);
-                    selectedState = oState.getSelectedItem();
-                }
+            // --- FUZZY LOGIC INTEGRATION ---
+            const oMatch = this._findBestMatch(sStateSearch, aFilteredStates, "stateName");
+
+            if (oMatch) {
+                oState.setSelectedKey(oMatch.stateName);
+                const sStateName = oMatch.stateName;
+
+                // Country Code nikalne ke liye Country control se check karein
+                const oCountry = $C("adminsignUpCountry");
+                const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim() || "IN";
+
+                // Filter Cities
+                const allCities = oCityModel.getData() || [];
+                const filteredCities = allCities.filter(c =>
+                    c.countryCode === sCountryCode && c.stateName === sStateName
+                );
+                oCityModel.setProperty("/filtered", filteredCities);
             }
-
-            const selectedCountry = oCountry.getSelectedItem();
-            if (!selectedState || !selectedCountry) return;
-
-            const sCountryCode = selectedCountry.getAdditionalText().trim();
-            const sActualStateText = selectedState.getText();
-
-            // Filter cities
-            const allCities = this.getView().getModel("CityModel").getData();
-            const filteredCities = allCities.filter(c =>
-                c.countryCode === sCountryCode && c.stateName === sActualStateText
-            );
-            oCityModel.setProperty("/filtered", filteredCities);
         },
 
         ADMIN_onChangeCity: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
-            const oCityCtrl = oEvent.getSource();
+            const oCityCtrl = oEvent ? oEvent.getSource() : $C("adminsignUpCity");
             const oModel = this.getView().getModel("AdminSignupModel");
-            // --- SANITIZE INPUT ---
-            const val = oCityCtrl.getValue().replace(/[^a-zA-Z\s]/g, "");
-            oCityCtrl.setValue(val);
-            // City clears its own error ALWAYS (typed or selected)
-            oCityCtrl.setValueState("None");
-            const selected = oCityCtrl.getSelectedItem();
-            if (selected) return oModel.setProperty("/City", selected.getText());
-            oModel.setProperty("/City", val);
-        },
+            const oCityModel = this.getView().getModel("CityModel");
 
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
+
+            const aFilteredCities = oCityModel.getProperty("/filtered") || [];
+            const sCitySearch = oModel.getProperty("/City");
+
+            // --- FUZZY LOGIC INTEGRATION ---
+            const oMatch = this._findBestMatch(sCitySearch, aFilteredCities, "cityName");
+
+            if (oMatch) {
+                oCityCtrl.setSelectedKey(oMatch.cityName);
+                oModel.setProperty("/City", oMatch.cityName);
+                oCityCtrl.setValueState("None");
+            } else {
+                // Agar match nahi mila toh jo type kiya wahi rehne dein
+                oModel.setProperty("/City", sCitySearch);
+            }
+        },
+        _findBestMatch: function (sInput, aItems, sPropertyName) {
+            if (!sInput || !aItems || aItems.length === 0) return null;
+            const sNormInput = sInput.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+
+            // 1. Exact Match try karein
+            let oMatch = aItems.find(item => item[sPropertyName].toLowerCase().trim() === sInput.toLowerCase().trim());
+
+            // 2. Agar nahi mila, toh normalized fuzzy match try karein
+            if (!oMatch) {
+                oMatch = aItems.find(item => {
+                    const sNormItem = item[sPropertyName].toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+                    return sNormItem.includes(sNormInput) || sNormInput.includes(sNormItem);
+                });
+                // console.log("oMatched item :", oMatch);
+            }
+            return oMatch;
+        },
+        
+
+
+        _autoSelectSTD: function (sCode) {
+            const oSTD = $C("adminsignUpSTD");
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const oItem = oSTD.getItems().find(i => i.getAdditionalText() === sCode);
+            if (oItem) {
+                oSTD.setSelectedKey(oItem.getKey());
+                oModel.setProperty("/STDCode", oItem.getKey());
+            }
+        },
         ADMIN_onChangeSTD: function (oEvent) {
             const oSTD = oEvent.getSource();
             const sValue = (oSTD.getValue() || "").trim();

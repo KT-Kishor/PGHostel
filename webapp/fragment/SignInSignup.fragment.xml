@@ -477,6 +477,7 @@
                         />
                         <ComboBox
                             id="signUpCountry"
+                            value="{LoginMode>/Country}"
                             change="onChangeCountry"
                             selectionChange="onChangeCountry"
                             placeholder="{i18n>selectCountry}"
@@ -496,6 +497,7 @@
                         />
                         <ComboBox
                             id="signUpState"
+                            value="{LoginMode>/State}"
                             change="onChangeState"
                             selectionChange="onChangeState"
                             placeholder="{i18n>selectState}"
@@ -515,6 +517,7 @@
                         <ComboBox
                             selectionChange="onCitySelect"
                             id="signUpCity"
+                            value="{LoginMode>/City}"
                             change="onChangeCity"
                             placeholder="{i18n>cityValueText}"
                             valueStateText="{i18n>MSselectCity}"
@@ -541,6 +544,7 @@
                                 <ComboBox
                                     change="onSTDChange"
                                     id="signUpSTD"
+                                    value="{LoginMode>/STDCode}"
                                     placeholder="+91"
                                     valueStateText="{i18n>MSselectCode}"
                                     showSecondaryValues="true"

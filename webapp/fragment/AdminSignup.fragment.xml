@@ -178,6 +178,7 @@
                     valueStateText="{i18n>MVDselectcountry}"
                     items="{path:'CountryModel>/', length:1000}"
                     showSecondaryValues="true"
+                    value="{AdminSignupModel>/Country}"
                 >
                     <core:ListItem
                         key="{CountryModel>countryName}"
@@ -199,6 +200,7 @@
                     valueStateText="{i18n>MSselectState}"
                     items="{path: 'StateModel>/filtered', length: 1000}"
                     showSecondaryValues="true"
+                    value="{AdminSignupModel>/State}"
                 >
                     <core:ListItem
                         key="{StateModel>stateName}"
@@ -219,6 +221,7 @@
                     valueStateText="{i18n>MSselectCity}"
                     items="{path:'CityModel>/filtered', length:1000}"
                     showSecondaryValues="true"
+                    value="{AdminSignupModel>/City}"
                 >
                     <core:ListItem
                         key="{CityModel>cityName}"
@@ -243,6 +246,7 @@
                             items="{path:'CountryModel>/', length:1000}"
                             filterSecondaryValues="true"
                             valueStateText="Select ISD Code"
+                            value="{AdminSignupModel>/STDCode}"
                         >
                             <core:ListItem
                                 key="{CountryModel>stdCode}"
