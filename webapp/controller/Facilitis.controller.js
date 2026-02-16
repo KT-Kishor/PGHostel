@@ -134,7 +134,7 @@ sap.ui.define([
                         BranchName: branch ? branch.Name : bed.BranchID
                     };
                 });
-                this.getOwnerComponent().setModel(new JSONModel(responseData),"Facilities");
+                this.getOwnerComponent().setModel(new JSONModel(responseData), "Facilities");
 
                 if (filter.filter === "Initial") {
                     const facilitiesData = [
@@ -222,8 +222,8 @@ sap.ui.define([
             }
 
             // Clear tokens and upload data for new record
-            oView.getModel("tokenModel").setData({tokens: []});
-            oView.getModel("UploaderData").setData({attachments: [],isFileUploaded: false});
+            oView.getModel("tokenModel").setData({ tokens: [] });
+            oView.getModel("UploaderData").setData({ attachments: [], isFileUploaded: false });
             // Reset input value states
             this._resetFacilityValueStates();
             this.ARD_Dialog.open();
@@ -293,9 +293,9 @@ sap.ui.define([
             });
 
             if (bDuplicate) return MessageToast.show(this.i18nModel.getText("facilitywiththesameratetypealreadyexistsforthisbranch"));
-        
+
             if (attachments.length > 3) return MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
-             
+
             const oData = {
                 data: {
                     BranchCode: Payload.BranchCode,
@@ -332,8 +332,8 @@ sap.ui.define([
                     data: oData
                 });
                 MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
-                oView.getModel("UploaderData").setData({attachments: []});
-                oView.getModel("tokenModel").setData({tokens: []});
+                oView.getModel("UploaderData").setData({ attachments: [] });
+                oView.getModel("tokenModel").setData({ tokens: [] });
                 this.ARD_Dialog.close();
                 if (this.ARD_Dialog) {
                     this.ARD_Dialog.destroy();
@@ -506,7 +506,7 @@ sap.ui.define([
             this.getView().getModel("Facilities").setData({});
         },
 
-        onHome: function () {this.CommonLogoutFunction()},
+        onHome: function () { this.CommonLogoutFunction() },
 
         FD_onFacilityRowPress: function (oEvent) {
             var ofacilityID = oEvent.getSource().getBindingContext("Facilities").getObject().ID;
@@ -566,6 +566,11 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [{
+                label: "Hostel Name",
+                property: "BranchName",
+                type: "string"
+            },
+            {
                 label: "Facility Name",
                 property: "FacilityName",
                 type: "string"

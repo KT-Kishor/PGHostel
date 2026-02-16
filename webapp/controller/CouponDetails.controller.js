@@ -78,8 +78,7 @@ sap.ui.define([
                 this._oLoggedInUser = {};
             }
             console.log("this._oLoggedInUser", this._oLoggedInUser);
-
-
+            this.onClearAndSearch("couponFilterBar");
             await this._loadBranchCode();
             this._buildBranchMap();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -470,10 +469,10 @@ sap.ui.define([
                 .finally(() => oSheet.destroy());
         },
 
-
         _createColumnConfig: function () {
             return [
-                { label: "Branch", property: "BranchCode", type: "String" },
+                {label: "Hostel Name", property: "BranchName", type: "String" },
+                { label: "Branch Code", property: "BranchCode", type: "String" },
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },
                 { label: "Discount Value", property: "DiscountValue", type: "String" },

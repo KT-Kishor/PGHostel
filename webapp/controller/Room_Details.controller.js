@@ -139,8 +139,8 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [{
-                label: "Branch Code",
-                property: "BranchCode",
+                label: "Hostel Name",
+                property: "BranchName",
                 type: "string"
             },
             {
