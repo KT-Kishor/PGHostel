@@ -96,7 +96,6 @@
 
                 <Label
                     text="{i18n>currency}"
-                    required="true"
                 />
                 <ComboBox
                     enabled="false"

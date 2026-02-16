@@ -170,7 +170,7 @@
                             id="idTransactionID"
                             placeholder="{i18n>enterTransactionID}"
                             liveChange="onTransactionIDChange"
-                            valueStateText="{i18n>enterTransactionID}"
+                            valueStateText="Enter Transaction ID"
                             maxLength="25"
                         />
 

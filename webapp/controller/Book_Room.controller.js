@@ -4834,20 +4834,6 @@ oHostelModel.setProperty(
                     return;
                 }
             }
-            const oAmountInput = sap.ui.getCore().byId("idAmount");
-            const rawEntered = (oAmountInput.getValue() || "").replace(/,/g, "").trim();
-            const rawGrand = (this.getView().getModel("HostelModel").getProperty("/FinalTotalCost") || "").toString().replace(/,/g, "").trim();
-
-            /*  Decimal Completion Guard  */
-            if (!rawEntered || rawEntered === "." || rawEntered.endsWith(".")) {
-                oAmountInput.setValueState("Error");
-                oAmountInput.setValueStateText(this.i18nModel.getText("pleaseenterValidAmount"));
-                MessageToast.show(this.i18nModel.getText("pleaseenterValidAmount"));
-                return;
-            }
-
-
-            oAmountInput.setValueState("None");
 
             try {
                 // Format payload according to your new structure
@@ -4857,11 +4843,9 @@ oHostelModel.setProperty(
 
                     //  FIX: Use oData for booking fields, not individual person object
                     if (oData.StartDate) {
-
                         var rentPrice = Number(p.FinalTotalCost || 0);
                         var Discountvalue = Number(p.AppliedDiscount || 0);
                         var oCouponCode = oData.CouponCode || "";
-                        // var  perMonthTotalRent = rentPrice / (Number(oData.SelectedMonths) || 1);
                         var today = new Date();
                         var todayDate = today.toISOString().split("T")[0];
                         var iSelected = Number(oData.SelectedPerson || 0);
@@ -4886,7 +4870,6 @@ oHostelModel.setProperty(
                             GSTType: oData.GSTType || "",
                             GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0",
                             GSTIN:oData.GSTIN || ""
-                            // PerMonthTotalRent: perMonthTotalRent.toFixed(2).toString()
                         });
                     }
                     let paymentDetails;
@@ -4904,7 +4887,6 @@ oHostelModel.setProperty(
                         };
 
                     } else {
-
 
                         // ✔ Normal payment → take user input
                         paymentDetails = {
@@ -4933,25 +4915,6 @@ oHostelModel.setProperty(
                     aSelectedFacilities.forEach(fac => {
 
                         let facilityPrice = fac.TotalAmount || 0;
-
-                        // let startTime = "";
-                        // let endTime = "";
-                        // let facilityHour = "";
-
-                        // if (fac.UnitText === "Per Hour") {
-
-                        //     // ✔ Preserve edited values, fallback to defaults
-                        //     startTime = fac.StartTime ? fac.StartTime : "09";
-                        //     endTime = fac.EndTime ? fac.EndTime : "10";
-                        //     facilityHour = fac.TotalTime ? String(fac.TotalTime) : "1";
-
-                        // } else {
-
-                        //     startTime = "";
-                        //     endTime = "";
-                        //     facilityHour = "";
-                        // }
-
                         facilityData.push({
                             PaymentID: "",
                             FacilityName: fac.FacilityName,
@@ -4960,15 +4923,10 @@ oHostelModel.setProperty(
                             EndDate: fac.EndDate ? fac.EndDate.split("/").reverse().join("-") : "",
                             PaidStatus: "Pending",
                             UnitText: fac.UnitText,
-                            // StartTime: startTime,
-                            // EndTime: endTime,
-                            // TotalHour: facilityHour,
                             Currency: fac.Currency,
                             BasicFacilityPrice: fac.Price
                         });
                     });
-
-
 
                     // Return formatted entry
                     return {
@@ -5012,7 +4970,6 @@ oHostelModel.setProperty(
                 this._oPaymentDialog.close()
                 BusyIndicator.hide()
                 
-
                 let sMessage = "Booking Successful!\n\n";
 
                 aBookingDetails.forEach((item, index) => {
@@ -5027,21 +4984,6 @@ oHostelModel.setProperty(
                         // Check login status
                         const oLoginModel = sap.ui.getCore().getModel("LoginModel");
                         const isLoggedIn = oLoginModel && oLoginModel.getProperty("/UserID");
-
-                        // if (!isLoggedIn) {
-                        //     MessageBox.warning(
-                        //         "You are Booking as a guest and you will not be able to see the Booking History.",
-                        //         {
-                        //             title: "Guest Booking",
-                        //             actions: [MessageBox.Action.OK],
-                        //             onClose: function () {
-                                     
-                                       
-                        //             }.bind(this)
-                        //         }
-                        //     );
-                        //     return; // STOP further navigation until user clicks OK
-                        // }
                            oModel.setProperty("/CouponCode", "")
                                         // Continue navigation after warning
                                         if(isLoggedIn){
@@ -5057,8 +4999,6 @@ oHostelModel.setProperty(
                 this._oSelectedStep = null;
                  var oRoute = this.getOwnerComponent().getRouter();
             oRoute.navTo("RouteHostel");
-                        // Logged-in user → direct navigation
-                        // this._navigateAfterBooking();
                     }.bind(this)
                 });
 
@@ -5190,7 +5130,6 @@ oHostelModel.setProperty(
             // ---- RESET MODEL COMPLETELY ----
             oHostelModel.setData({
                 Persons: [],
-
                 SelectedMonths: "",
                 SelectedPriceType: "",
                 StartDate: "",
