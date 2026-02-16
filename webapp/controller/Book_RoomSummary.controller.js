@@ -921,6 +921,17 @@ if (oSafeCopy.TotalYears) {
             return;
         }
     }
+       if (sUnitText !== "Per Day" && sUnitText !== "Per Hour") {
+        const iFacilityMonths = Number(oEditModel.getProperty("/SelectedMonths")) || 0;
+        const iBookingMonths  = Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+
+        if (iFacilityMonths > iBookingMonths) {
+            MessageBox.error(
+                this.i18nModel.getText("facilityMonthsCannotExceedBookingMonths")
+            );
+            return;
+        }
+    }
 
     /* =========================
        LOCATE PERSON & FACILITY
@@ -984,10 +995,6 @@ const iYears = Number(
     /* =========================
        RECALCULATE ONLY FACILITY
     ========================= */
-   // Recalculate ONLY edited facility
-if (oFacility.UnitText !== "Per Hour") {
-    oFacility.TotalTime = 0;
-}
 oFacility.TotalMonths = iMonths;
 
 oFacility.TotalAmount = this._calculateFacilityTotal(
@@ -1086,13 +1093,6 @@ if (paymentType === "Per Day") {
 
 
     oPerson.TotalDays = iDays;
-
-    /* =========================
-       GRAND TOTAL (ONCE)
-    ========================= */
-// const paymentType =
-//     oHostelModel.getProperty("/SelectedPriceType");
-
 let grandTotal = 0;
 
 if (paymentType === "Per Day") {

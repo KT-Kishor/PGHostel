@@ -2056,7 +2056,6 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             this._iSelectedStepIndex--;
             this._oSelectedStep = oPreviousStep;
 
-            this.handleButtonsVisibility();
         },
 
         handleNavigationChange: function (oEvent) {
