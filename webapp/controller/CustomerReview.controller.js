@@ -119,7 +119,9 @@ sap.ui.define([
             if (sRole === "Admin") {
                 this.getOwnerComponent().getRouter().navTo("TilePage");
             } else {
+                const sTabKey = "idRooms"
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                sessionStorage.setItem("homePageReturnTab", sTabKey);
                 this.getOwnerComponent().getModel("SelectedBedType").setData("")
             }
             oBox.removeAllItems();
