@@ -1925,7 +1925,6 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
     margin: auto;
 }
 
-/* Buttons inside */
 /* ===== Base Pill Button Style ===== */
 .pillActionBtn .sapMBtnInner {
   color: #ffffff !important;
@@ -1936,73 +1935,9 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
   transition: all 0.2s ease-in-out;
 }
 
-/* Hover */
-/* .pillActionBtn:hover .sapMBtnInner {
-  transform: scale(1.05);
-  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.6);
-}
-
-/* Active */
 .pillActionBtn:active .sapMBtnInner {
   background: linear-gradient(135deg, #02d0ed, #007f89) !important;
 }
-
-/* Focus */
-/* .pillActionBtn:focus .sapMBtnInner {
-  outline: none;
-} */
-
-/* Hover */
-/* .pillActionBtn:hover {
-    background: rgba(255, 255, 255, 0.18);
-} */
-
-/* Left / Right shaping */
-/* .pillLeft {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.pillRight {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-} */
-
-/* Remove button outline */
-/* .pillActionBtn:focus {
-    outline: none;
-}
-.pillActionBtn .sapMBtnContent,
-.pillActionBtn .sapMBtnText {
-    color: #ffffff !important;
-} */
-
-/* Remove focus blue line */
-/* .pillActionBtn .sapMBtnInner:focus,
-.pillActionBtn .sapMBtnInner.sapMBtnActive,
-.pillActionBtn:focus {
-    outline: none !important;
-    box-shadow: none !important;
-} */
-
-/* Remove default active bottom border */
-/* .pillActionBtn .sapMBtnInner::after {
-    display: none !important;
-}
-.pillActionBtn .sapMBtnInner {
-    border: none !important;
-}
-
-.pillActionBtn .sapMBtnInner::after {
-    border: none !important;
-    box-shadow: none !important;
-    display: none !important;
-}
-
-.pillActionBtn .sapMBtnInner {
-    border: 0 !important;
-    outline: none !important;
-} */
 
 .tileContainer {
   justify-content: flex-start;
@@ -3548,14 +3483,11 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
   transform: none !important;
 }
 
-
-
 .customErrorPopover .sapMPopoverTitle {
   color: #ffffff !important;
   font-weight: bold !important;
   font-size: 1.1rem !important;
 }
-
 
 .customCloseBtn {
   color: #ffffff !important;
@@ -3570,14 +3502,11 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
   margin-right: 260px !important;
 }
 
-
-
 .customErrorPopover .sapMPopoverTitle {
   color: #ffffff !important;
   font-weight: bold !important;
   font-size: 1.1rem !important;
 }
-
 
 .customCloseBtn {
   color: #ffffff !important;
@@ -3592,9 +3521,6 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
   color: #ffffff !important;
 }
 
-
-
-
 @media screen and (max-width: 850px) {
 
   #idHome .sapMScrollContScroll {
@@ -3606,13 +3532,11 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
     overflow-y: auto !important;
   }
 
-
   .fullHeightGrid {
     display: block !important;
     height: auto !important;
     width: 100% !important;
   }
-
 
   .heroTextBox {
     margin-top: 2vh !important;
@@ -3920,56 +3844,6 @@ justify-content: flex-end;
   }
 }
 
-/* .todayCardsRow {
-    width: 100%;
-    display: flex;
-     gap: 16px;
-    padding: 8px 12px;
-}
-
-.todayCard {
-    flex: 0 0 auto;
-    border-radius: 14px;
-    background: #fff;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-} */
-
-/* Hover polish */
-/* .todayCard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.18);
-} */
-
-/* @media (max-width: 900px) {
-    .todayCardsRow {
-        gap: 12px;
-    }
-}
-
-@media (max-width: 600px) {
-  .todayCardsRow {
-    width: 100%;
-    overflow: hidden;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .todayCard {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-  }
-} */
-
-/* Remove outer gaps */
-/* .todayCardsRow > .todayCard:first-child {
-    margin-left: 0;
-}
-.todayCardsRow > .todayCard:last-child {
-    margin-right: 0;
-} */
-
 .todayCardsRow {
   width: 100%;
   display: flex;
@@ -4076,7 +3950,6 @@ justify-content: flex-end;
     }
 }
 
-
 .feedbackPageWrapper .sapMPageChildCanvas {
   padding: 0 !important;
   /* overflow: hidden !important; */
@@ -4134,7 +4007,6 @@ justify-content: flex-end;
     letter-spacing: 1px; 
   }
 }
-
 
 .heroFeedBox {
   width: 100%;
@@ -4388,4 +4260,21 @@ height:140px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.noExtraSpace {
+    margin: 0;
+    padding: 0;
+}
+
+.noExtraSpace .sapMScrollCont {
+    padding: 0;
+}
+
+.noExtraSpace .sapMTokenizer {
+    margin-top: 0.25rem;
+}
+
+.sapMDialogSection {
+    padding-bottom: 0.5rem;
 }

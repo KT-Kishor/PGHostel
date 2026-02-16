@@ -730,8 +730,8 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [{
-                label: "Branch Code",
-                property: "BranchCode",
+                label: "Hostel Name",
+                property: "BranchName",
                 type: "string"
             },
             {
@@ -745,13 +745,23 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Max No of Rooms",
+                label: "No of Rooms",
                 property: "MaxBeds",
                 type: "string"
             },
             {
                 label: "No of Persons",
                 property: "NoOfPerson",
+                type: "string"
+            },
+                {
+                label: "Deposit Amount",
+                property: "Deposit",
+                type: "string"
+            },
+            {
+                label: "Deposit Currency",
+                property: "DepositCurrency",
                 type: "string"
             },
             {

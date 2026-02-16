@@ -304,45 +304,40 @@
                     alignItems="Start"
                     width="100%"
                     renderType="Bare"
+                    class="noExtraSpace"
                 >
-                    <HBox>
-                        <u:FileUploader
-                            id="BD_id_FileUploader"
-                            fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="5MB"
-                            typeMissmatch="onFileTypeMissmatch"
-                            fileType="jpg,jpeg,png"
-                            change="onFacilityFileChange"
-                            buttonOnly="true"
-                            sameFilenameAllowed="true"
-                            iconFirst="true"
-                            buttonText="Upload Logo"
-                            multiple="false"
-                            uploadOnChange="false"
-                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
-                        />
-                    </HBox>
-                    <!-- Tokenizer -->
-                    <HBox>
-                        <ScrollContainer
-                            height="60px"
+                    <u:FileUploader
+                        id="BD_id_FileUploader"
+                        fileSizeExceed="onFileSizeExceeds"
+                        maximumFileSize="5MB"
+                        typeMissmatch="onFileTypeMissmatch"
+                        fileType="jpg,jpeg,png"
+                        change="onFacilityFileChange"
+                        buttonOnly="true"
+                        sameFilenameAllowed="true"
+                        iconFirst="true"
+                        buttonText="Upload Logo"
+                        multiple="false"
+                        uploadOnChange="false"
+                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                    />
+                    <ScrollContainer
+                        width="100%"
+                        horizontal="false"
+                        vertical="true"
+                    >
+                        <Tokenizer
+                            id="BD_id_TokenList"
                             width="100%"
-                            horizontal="false"
-                            vertical="true"
+                            tokenDelete="onTokenDelete"
+                            tokens="{tokenModel>/tokens}"
                         >
-                            <Tokenizer
-                                id="BD_id_TokenList"
-                                width="100%"
-                                tokenDelete="onTokenDelete"
-                                tokens="{tokenModel>/tokens}"
-                            >
-                                <Token
-                                    key="{tokenModel>key}"
-                                    text="{tokenModel>text}"
-                                />
-                            </Tokenizer>
-                        </ScrollContainer>
-                    </HBox>
+                            <Token
+                                key="{tokenModel>key}"
+                                text="{tokenModel>text}"
+                            />
+                        </Tokenizer>
+                    </ScrollContainer>
                 </VBox>
                 <Label
                     text="{i18n>addImage}"
@@ -352,45 +347,40 @@
                     alignItems="Start"
                     width="100%"
                     renderType="Bare"
+                    class="noExtraSpace"
                 >
-                    <HBox>
-                        <u:FileUploader
-                            id="BD_id_FileUploader1"
-                            fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="5MB"
-                            typeMissmatch="onFileTypeMissmatch"
-                            fileType="jpg,jpeg,png"
-                            change="onImageChange"
-                            buttonOnly="true"
-                            sameFilenameAllowed="true"
-                            iconFirst="true"
-                            buttonText="Upload Image"
-                            multiple="false"
-                            uploadOnChange="false"
-                            tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
-                        />
-                    </HBox>
-                    <!-- Tokenizer -->
-                    <HBox>
-                        <ScrollContainer
-                            height="60px"
+                    <u:FileUploader
+                        id="BD_id_FileUploader1"
+                        fileSizeExceed="onFileSizeExceeds"
+                        maximumFileSize="5MB"
+                        typeMissmatch="onFileTypeMissmatch"
+                        fileType="jpg,jpeg,png"
+                        change="onImageChange"
+                        buttonOnly="true"
+                        sameFilenameAllowed="true"
+                        iconFirst="true"
+                        buttonText="Upload Image"
+                        multiple="false"
+                        uploadOnChange="false"
+                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                    />
+                    <ScrollContainer
+                        width="100%"
+                        horizontal="false"
+                        vertical="true"
+                    >
+                        <Tokenizer
+                            id="BD_id_TokenList1"
                             width="100%"
-                            horizontal="false"
-                            vertical="true"
+                            tokenDelete="onTokenImageDelete"
+                            tokens="{tokenImageModel>/imageTokens}"
                         >
-                            <Tokenizer
-                                id="BD_id_TokenList1"
-                                width="100%"
-                                tokenDelete="onTokenImageDelete"
-                                tokens="{tokenImageModel>/imageTokens}"
-                            >
-                                <Token
-                                    key="{tokenImageModel>key}"
-                                    text="{tokenImageModel>text}"
-                                />
-                            </Tokenizer>
-                        </ScrollContainer>
-                    </HBox>
+                            <Token
+                                key="{tokenImageModel>key}"
+                                text="{tokenImageModel>text}"
+                            />
+                        </Tokenizer>
+                    </ScrollContainer>
                 </VBox>
             </f:content>
         </f:SimpleForm>
