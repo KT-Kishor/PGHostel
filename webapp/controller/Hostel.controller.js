@@ -153,17 +153,17 @@ sap.ui.define([
         _onRouteMatched: async function () {
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");
-                if (oTabHeader) {
-                    oTabHeader.setSelectedKey(sStoredTab);
-                }
+            if (oTabHeader) {
+                oTabHeader.setSelectedKey(sStoredTab);
+            }
 
             const oNavContainer = this.byId("pageContainer");
-                if (oNavContainer) {
-                    const oPage = this.byId(sStoredTab);
-                    if (oPage) {
-                            oNavContainer.to(oPage);
-                       }
-                    }
+            if (oNavContainer) {
+                const oPage = this.byId(sStoredTab);
+                if (oPage) {
+                    oNavContainer.to(oPage);
+                }
+            }
             sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -328,7 +328,7 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-              _populateUniqueFilterValues: function (data) {
+       _populateUniqueFilterValues: function (data) {
             let uniqueValues = { id_Branch: new Set(), };
 
             data.forEach(item => {
@@ -960,12 +960,12 @@ sap.ui.define([
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
 
-            //     this.byId("idBedTypeFlex").setBusy(true);
-            // this.byId("id_Branch").setBusy(true).setValueState("None");;
-            // this.byId("id_Area").setBusy(true);
-            // this.byId("id_Roomtype").setBusy(true);
-            //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-            //     this.getOwnerComponent().getModel("sBRModel").setData(response.data);
+                //     this.byId("idBedTypeFlex").setBusy(true);
+                // this.byId("id_Branch").setBusy(true).setValueState("None");;
+                // this.byId("id_Area").setBusy(true);
+                // this.byId("id_Roomtype").setBusy(true);
+                //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+                //     this.getOwnerComponent().getModel("sBRModel").setData(response.data);
 
                 await this._loadRoomsPageData();
             } else {
@@ -2357,8 +2357,8 @@ sap.ui.define([
             });
         },
         onSearchRooms: async function () {
-               this.iTop = 8
-               this.iSkip = 0
+            this.iTop = 8
+            this.iSkip = 0
             this.flag = true
             const oContainer = this.byId("idBedTypeFlex");
             oContainer.setBusy(true);
@@ -2418,8 +2418,8 @@ sap.ui.define([
 
         Branch: async function (filter) {
             const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
-            this.RoomCount=response?.HM_RoomCount || 0;
-                this.getView().setModel(new JSONModel(response?.data ), "BranchModel");
+            this.RoomCount = response?.HM_RoomCount || 0;
+            this.getView().setModel(new JSONModel(response?.data), "BranchModel");
 
             // this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
             let aData = response?.data || [];
@@ -2441,16 +2441,16 @@ sap.ui.define([
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                var data=this.getOwnerComponent().getModel("sBRModel").getData()
+                var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
-                var city=data[0].City
-                var fCity=this.City ? this.City :city;
-             var filter = {
-                            flag: "true",
-                            top: this.iTop,
-                            skip: this.iSkip,
-                            City: fCity
-                             }
+                var city = data[0].City
+                var fCity = this.City ? this.City : city;
+                var filter = {
+                    flag: "true",
+                    top: this.iTop,
+                    skip: this.iSkip,
+                    City: fCity
+                }
                 var oModelData = await this.Branch(filter);
                 this.isInitialLoad = true;
                 this._populateUniqueFilterValues(data)
@@ -2464,8 +2464,10 @@ sap.ui.define([
                 } else {
                     await this._loadFilteredData(this.City, "", "");
                 }
-
-                this.getView().setModel(new JSONModel(aFiltered), "AreaModel");
+                const aUnique = aFiltered.filter((item, index, self) =>
+                    index === self.findIndex(t => t.Name === item.Name)
+                );
+                this.getView().setModel(new JSONModel(aUnique), "AreaModel");
 
                 // Default selections
                 this.byId("id_Branch").setSelectedKey(sCity);
@@ -2503,20 +2505,20 @@ sap.ui.define([
                             Name: BranchName,
                             top: this.iTop,
                             skip: this.iSkip,
-                            flag:"true"
+                            flag: "true"
                         }
                     );
                     aBranchesData = response?.data || [];
-                    this.RoomCount=response?.HM_RoomCount || 0;
+                    this.RoomCount = response?.HM_RoomCount || 0;
 
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
-                    
+
 
                 }
 
-                
+
 
                 let aFilteredBranches = [];
 
@@ -2572,10 +2574,10 @@ sap.ui.define([
                         CheckOutTime: branch.CheckoutTime,
                         GeoLocation: branch.GeoLocation,
                         Image: sImage,
-                        TotalFeedbacks:branch.TotalFeedbacks,
-                        AverageRating:branch.AverageRating,
-                        
-                        
+                        TotalFeedbacks: branch.TotalFeedbacks,
+                        AverageRating: branch.AverageRating,
+
+
 
                     };
                 });
@@ -2589,12 +2591,12 @@ sap.ui.define([
                     oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
                 }
 
-                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length!== this.RoomCount);
+                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !== this.RoomCount);
                 if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
                     oView.getModel("VisibilityModel").setProperty("/NoData", false);
-          }
+                }
 
             } catch (err) {
                 MessageToast.show("Failed to load branch data");

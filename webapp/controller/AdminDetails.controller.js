@@ -185,6 +185,7 @@ sap.ui.define([
             };
 
             // Send payload
+            sap.ui.core.BusyIndicator.show(0);
             await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
