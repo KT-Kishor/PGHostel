@@ -796,6 +796,7 @@ sap.ui.define([
                 MessageToast.show("Error opening maps.");
             }
         },
+
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
@@ -806,65 +807,6 @@ sap.ui.define([
             oRouter.navTo("RouteHostel");
         },
 
-        //   _clearEnquiryStates: function () {
-
-        //     if (!this._oEnquiry) return;
-
-        //     const aControls = this._oEnquiry.findAggregatedObjects(true, function (oControl) {
-        //         return oControl.setValueState;
-        //     });
-
-        //     aControls.forEach(function (oControl) {
-        //         oControl.setValueState("None");
-        //         oControl.setValueStateText("");
-        //     });
-        // },
-
-        // onSegmentedButtonChange: function (oEvent) {
-        //     const sKey = oEvent.getParameter("item").getKey();
-        //     const oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
-        //     if (sKey === "details") {
-
-        //         if (this._oEnquiry && this._oEnquiry.isOpen()) {
-        //             this._oEnquiry.close();
-        //         }
-
-        //         this.viewDetails(oEvent);
-        //         return;
-        //     }
-
-        //     if (sKey == "Enquiry") {
-        //         const oEnquiryModel = new sap.ui.model.json.JSONModel({
-        //             RoomType: oData.Name + " (" + oData.ACType + ")",
-        //             Salutation: "",
-        //             UserName: "",
-        //             STDCode: "",
-        //             Mobile: "",
-        //             Comments: "",
-        //             Email: ""
-        //         });
-        //         this.getView().setModel(oEnquiryModel, "EnquiryModel");
-        //         if (!this._oEnquiry) {
-        //             this._oEnquiry = sap.ui.xmlfragment(
-        //                 this.getView().getId(),
-        //                 "sap.ui.com.project1.fragment.Enquiry", this
-        //             );
-        //             this.getView().addDependent(this._oEnquiry);
-        //             this.getView().addStyleClass("blur-background");
-        //         }
-        //         this._clearEnquiryStates();
-        //         this._oEnquiry.open();
-        //     }
-        // },
-
-        // E_onCancelButtonPress: function () {
-        //     if (this._oEnquiry && this._oEnquiry.isOpen()) {
-        //         this._oEnquiry.close();
-        //     }
-        //     this._clearEnquiryStates();
-        //     this.getView().removeStyleClass("blur-background");
-        // }
-
         onViewDetailsPress: function (oEvent) {
             if (this._oEnquiry?.isOpen()) {
                 this._oEnquiry.close();
@@ -873,12 +815,8 @@ sap.ui.define([
         },
 
         onEnquiryPress: function (oEvent) {
-            var  oData= oEvent.getSource()
-                .getBindingContext("VisibilityModel")
-                .getObject();
-                 this.oData = oEvent.getSource()
-                .getBindingContext("VisibilityModel")
-                .getObject();
+            var oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+            this.oData = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 
             const oEnquiryModel = new sap.ui.model.json.JSONModel({
                 RoomType: oData.Name + " (" + oData.ACType + ")",
@@ -902,19 +840,19 @@ sap.ui.define([
             }
             this._oEnquiry.open();
         },
+
         E_onCancelButtonPress: function () {
             this._clearEnquiryStates();
             this._oEnquiry.close();
         },
 
         E_onsavebuttonpress: async function (oEvent) {
-            var Data=this.oData
+            var Data = this.oData
             var oView = this.getView();
             const oModel = oView.getModel("EnquiryModel").getData();
-            const oEmail=oView.getModel("sBRModel").getData().find((item)=>{
-                return item.BranchID===Data.BranchCode;
+            const oEmail = oView.getModel("sBRModel").getData().find((item) => {
+                return item.BranchID === Data.BranchCode;
             });
-            // const oLogin = this.getOwnerComponent().getModel("EnquiryModel").getData();
             const oBranch = oModel.RoomType;
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_Salutation")), "ID") &&
@@ -934,15 +872,10 @@ sap.ui.define([
             const sSTD = oSTD.getSelectedKey();
             const sMobile = oMobile.getValue();
 
-            let isMobileValid = false;
-            //             if (!isMobileValid) {
-            //     sap.m.MessageToast.show("Please correct mobile number");
-            //     return;
-            // }
-            if (sSTD === "+91") {
-                isMobileValid = /^[6-9]\d{9}$/.test(sMobile);
-            } else {
-                isMobileValid = /^\d{4,14}$/.test(sMobile);
+            let isMobileValid = this._validateMobileStrict();
+            if (!isMobileValid) {
+                sap.m.MessageToast.show("Please enter valid mobile number");
+                return;
             }
 
             if (!isMobileValid) {
@@ -964,11 +897,11 @@ sap.ui.define([
             console.log("Enquiry Payload:", oData);
             sap.ui.core.BusyIndicator.show(0);
             try {
-                 const oresponse=   await this.ajaxCreateWithJQuery("HM_EnquiryEmail", {
-                        data: oData,
-                       
-                    });
-                    const oResult = oresponse?.data || {};
+                const oresponse = await this.ajaxCreateWithJQuery("HM_EnquiryEmail", {
+                    data: oData,
+
+                });
+                const oResult = oresponse?.data || {};
                 this._oEnquiry.close();
                 sap.m.MessageToast.show(
                     this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
@@ -993,93 +926,31 @@ sap.ui.define([
             this._validateMobileStrict();
         },
 
-        // ADMIN_onMobileLiveChange: function (oEvent) {
-        //     const oInput = oEvent.getSource();
-        //     let sValue = oInput.getValue().replace(/\D/g, "");
-        //     oInput.setValue(sValue);
-
-        //     const sSTD = this.byId("id_enq_STD").getSelectedKey();
-        //     if (!sValue) {
-        //         oInput.setValueState("None");
-        //         oInput.setValueStateText("");
-        //         return;
-        //     }
-
-        //     if (!sSTD) {
-        //         oInput.setValueState("Error");
-        //         oInput.setValueStateText("Please select ISD code first");
-        //         return;
-        //     }
-        //     if (sSTD === "+91") {
-        //         if (sValue.length !== 10) {
-        //             oInput.setValueState("Error");
-        //             oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
-        //             return;
-        //         }
-        //     }
-        //     else {
-        //         if (sValue.length < 4) {
-        //             oInput.setValueState("Error");
-        //             oInput.setValueStateText("Mobile number must be at least 4 digits");
-        //             return;
-        //         }
-
-        //         if (sValue.length > 14) {
-        //             sValue = sValue.substring(0, 14);
-        //             oInput.setValue(sValue);
-        //         }
-        //     }
-        //     oInput.setValueState("None");
-        //     oInput.setValueStateText("");
-        // },
-
-        // ADMIN_onChangeSTD: function (oEvent) {
-        //     const oSTD = oEvent.getSource();
-        //     const sValue = (oSTD.getValue() || "").trim();
-        //     // const oMobile = $C("adminMobileNo");
-        //     const oModel = this.getView().getModel("EnquiryModel");
-
-        //     // Mandatory check
-        //     if (!utils._LCvalidateMandatoryField(oEvent)) return;
-
-        //     // ✅ + followed by digits, but NOT +0 / +09 / +01
-        //     const STD_REGEX = /^\+[1-9][0-9]*$/;
-        //     if (!STD_REGEX.test(sValue)) {
-        //         oSTD.setValueState("Error");
-        //         oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
-        //         oModel.setProperty("/STDCode", "");
-        //         return;
-        //     }
-        //     // Clean state
-        //     oSTD.setValueState("None")
-        //     // Update model
-        //     oModel.setProperty("/STDCode", sValue);
-        // },
-
         ADMIN_onChangeSTD: function (oEvent) {
-
             const oSTD = oEvent.getSource();
             const oMobile = this.byId("id_enq_MobileNo");
             const sKey = oSTD.getSelectedKey();
+            const sMobileValue = (oMobile.getValue() || "").trim();
 
             if (!sKey) {
                 oSTD.setValueState("Error");
                 oSTD.setValueStateText("Please select ISD code");
                 return;
             }
-
             oSTD.setValueState("None");
             oSTD.setValueStateText("");
 
-            // 🔥 Set maxLength strictly
             if (sKey === "+91") {
                 oMobile.setMaxLength(10);
             } else {
                 oMobile.setMaxLength(14);
             }
-
-            // Do NOT clear mobile value automatically
-            this._validateMobileStrict();
+            if (sMobileValue) {
+                this._validateMobileStrict();
+            } else {
+                oMobile.setValueState("None");
+                oMobile.setValueStateText("");
+            }
         },
 
         _validateMobileStrict: function () {
@@ -1092,14 +963,12 @@ sap.ui.define([
 
             oMobile.setValue(sValue);
 
-            // If empty
             if (!sValue) {
                 oMobile.setValueState("Error");
                 oMobile.setValueStateText("Mobile number is required");
                 return false;
             }
 
-            // If no STD
             if (!sSTD) {
                 oMobile.setValueState("Error");
                 oMobile.setValueStateText("Select ISD code first");
@@ -1107,15 +976,9 @@ sap.ui.define([
             }
             if (sSTD === "+91") {
 
-                if (sValue.length < 10) {
+                if (sValue.length !== 10) {
                     oMobile.setValueState("Error");
                     oMobile.setValueStateText("Indian mobile number must be exactly 10 digits");
-                    return false;
-                }
-
-                if (sValue.length > 10) {
-                    oMobile.setValueState("Error");
-                    oMobile.setValueStateText("Indian mobile number cannot exceed 10 digits");
                     return false;
                 }
 
@@ -1125,27 +988,13 @@ sap.ui.define([
                     return false;
                 }
 
-                // if (!/^[6-9]\d{9}$/.test(sValue)) {
-                //     oMobile.setValueState("Error");
-                //     oMobile.setValueStateText("Indian mobile number must start with 6, 7, 8 or 9");
-                //     return false;
-                // }
-
-                // oMobile.setValueState(""); // 🔥 KEEP RED UNTIL FULLY VALID
                 oMobile.setValueState("None");
                 oMobile.setValueStateText("");
                 return true;
             }
-
-            if (sValue.length < 4) {
+            if (sValue.length < 4 || sValue.length > 14) {
                 oMobile.setValueState("Error");
-                oMobile.setValueStateText("Mobile number must be at least 4 digits");
-                return false;
-            }
-
-            if (sValue.length > 14) {
-                oMobile.setValueState("Error");
-                oMobile.setValueStateText("Mobile number cannot exceed 14 digits");
+                oMobile.setValueStateText("Mobile number must be between 4 and 14 digits");
                 return false;
             }
 
