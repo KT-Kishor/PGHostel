@@ -18,6 +18,8 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
+            this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
+
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
                 BedTypes: [],
@@ -27,10 +29,22 @@ sap.ui.define([
             });
             this.getView().setModel(model, "VisibilityModel")
 
-            var sPath = oEvent.getParameter("arguments").sPath;
-            this.getView().setBusy(true);
-            await this._loadFilteredData(sPath)
-            this.getView().setBusy(false);
+              if (!this._oBookingDateDialog) {
+        this._oBookingDateDialog = await sap.ui.core.Fragment.load({
+            name: "sap.ui.com.project1.fragment.BookingDate",
+            controller: this
+        });
+        this.getView().addDependent(this._oBookingDateDialog);
+    } 
+              sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date())
+              this.getView().byId("VR_id_JoiningDate").setValue("")
+
+           this.getView().addStyleClass("blurView")
+           this._oBookingDateDialog.open();
+
+            this.sPath = oEvent.getParameter("arguments").sPath;
+      
+            await this._loadFilteredData()
 
         },
         model: function (response) {
@@ -44,18 +58,46 @@ sap.ui.define([
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
 
-        _loadFilteredData: async function (sBranchCode) {
+        Bookingdatepress:async function(){
+              
+            if(utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idBookingDate"), "ID")){
+              await this._loadFilteredData()
+              this.getView().removeStyleClass("blurView")
+              this._oBookingDateDialog.close();
+              this.getView().byId("VR_id_JoiningDate").setValue(sap.ui.getCore().byId("idBookingDate").getValue())
+            }else{
+                sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"))
+
+            }
+        },
+        onBookingDateCancel:function(){
+            this._oBookingDateDialog.close();
+            this.getView().removeStyleClass("blurView")
+
+
+        },
+        onDatePickerChange:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+
+        },
+
+        _loadFilteredData: async function () {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
-            try {
 
+                var sBranchCode= this.sPath
+          
+            var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
+            try {
+                this.getView().setBusy(true);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
+                    JoiningDate:Date,
                     BranchCode: sBranchCode,
-                    top: this.iTop,
-                    skip: this.iSkip
                 });
                 await this.model(response)
+                this.getView().setBusy(false);
+
 
                 let matchedRooms = response.data.HM_BedType || [];
                 let HM_RoomCount = response.data.HM_RoomCount
@@ -177,13 +219,8 @@ sap.ui.define([
                 const aExisting = oVisibilityModel.getProperty("/BedTypes") || [];
                 let aFinal;
 
-                if (this.flag) { // Search / filter
                     aFinal = aBedTypes;
-                    this.iSkip = aBedTypes.length;
-                } else { // View More
-                    aFinal = aExisting.concat(aBedTypes);
-                    this.iSkip += this.iTop;
-                }
+              
 
 
                 aFinal = aFinal.filter(b => b.PriceVisible !== false);
@@ -201,6 +238,10 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
                 oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
+
+               
+
+
 
             } catch (err) {
                 console.log(err);

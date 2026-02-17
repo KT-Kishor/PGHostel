@@ -8,6 +8,7 @@
     displayBlock="true"
     height="100%"
     busyIndicatorDelay="0"
+    xmlns:fb="sap.ui.comp.filterbar"
 >
     <Page
         showHeader="true"
@@ -21,6 +22,36 @@
         </headerContent>
 
         <content>
+         <fb:FilterBar
+                id="PO_id_FilterbarEmployee"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="Viewroom_onPressClear"
+                showClearOnFB="true" 
+                search="_loadFilteredData"
+                filterChange="IA_.onFilterChange"
+                afterVariantLoad="IA_.onAfterVariantLoad"
+                showFilterConfiguration="false"
+                filterContainerWidth="auto"
+            >
+                <fb:filterGroupItems>   
+                    <fb:FilterGroupItem
+                        name="Booking Date"
+                        label="Booking Date"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DatePicker
+                                id="VR_id_JoiningDate"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+
+            </fb:FilterBar>
             <VBox
                 height="600px"
                 justifyContent="Center"

@@ -120,8 +120,8 @@
                 <Input
                     id="BD_id_DepositAmount"
                     value="{BedModel>/Deposit}"
-                    placeholder="Enter Deposit Amount"
-                    valueStateText="Enter Deposit Amount"
+                    placeholder="Enter deposit amount"
+                    valueStateText="Enter deposit amount"
                     maxLength="7"
                     liveChange="onNoOfPersonInputLiveChange"
                 />

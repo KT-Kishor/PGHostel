@@ -577,6 +577,11 @@
     margin: 1rem 0;
     text-transform: uppercase;
 }
+.blurView {
+    filter: blur(5px);
+    pointer-events: none;   /* Prevent interaction */
+}
+
 
 .bedCardDesc {
   font-size: 0.95rem;

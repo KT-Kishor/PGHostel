@@ -328,7 +328,7 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-       _populateUniqueFilterValues: function (data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = { id_Branch: new Set(), };
 
             data.forEach(item => {
@@ -933,52 +933,68 @@ sap.ui.define([
         },
 
         onTabSelect: async function (oEvent) {
+
             const sKey = oEvent.getParameter("item").getKey();
             const oNav = this.byId("pageContainer");
 
-            /* 1️⃣ Set transition BEFORE navigation */
             oNav.setDefaultTransitionName("Slide");
-
-            /* 2️⃣ Navigate ONCE */
             oNav.to(this.byId(sKey));
 
-            /* 3️⃣ Reset scroll (safe) */
             const page = this.byId(sKey);
-            if (page && page.scrollTo) page.scrollTo(0, 0);
+            if (page && page.scrollTo) {
+                page.scrollTo(0, 0);
+            }
 
-            /* 4️⃣ State flags (unchanged) */
             this.flag = true;
             this.iTop = 8;
             this.iSkip = 0;
             this.roomtype = true;
 
-            /* 5️⃣ Footer control */
             const oFooterModel = this.getView().getModel("FooterModel");
 
             if (sKey === "idRooms") {
-                // Entering Rooms
+
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
 
-                //     this.byId("idBedTypeFlex").setBusy(true);
-                // this.byId("id_Branch").setBusy(true).setValueState("None");;
-                // this.byId("id_Area").setBusy(true);
-                // this.byId("id_Roomtype").setBusy(true);
-                //     const response = await this.ajaxReadWithJQuery("HM_Branch", "");
-                //     this.getOwnerComponent().getModel("sBRModel").setData(response.data);
+                let oModel = this.getOwnerComponent().getModel("sBRModel");
+
+                if (!oModel) {
+                    oModel = new sap.ui.model.json.JSONModel([]);
+                    this.getOwnerComponent().setModel(oModel, "sBRModel");
+                }
+
+                let aData = oModel.getData();
+
+                if (!aData || aData.length === 0) {
+            this.byId("idBedTypeFlex").setBusy(true);
+            this.byId("id_Branch").setBusy(true).setValueState("None");;
+            this.byId("id_Area").setBusy(true);
+            this.byId("id_Roomtype").setBusy(true)
+
+                    try {
+                        const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+                        aData = response?.data || [];
+                        oModel.setData(aData);
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                    }
+                }
+
 
                 await this._loadRoomsPageData();
+
             } else {
-                // Home / Contact
+
                 oFooterModel.setProperty("/showGlobalFooter", true);
                 oFooterModel.setProperty("/showRoomsFooter", false);
             }
 
-            /* 6️⃣ Animate Explore button ONLY on Home */
             if (sKey === "idHome") {
                 this._animateExploreButton();
             }
         },
+
 
         _animateExploreButton: function () {
             const oWrapper = this.byId("exploreWrapper");
@@ -1291,7 +1307,7 @@ sap.ui.define([
         },
 
 
-       
+
         SM_onGeneratePassword: function () {
             var oPwdInput = $C("signUpPassword");
             var oStrength = $C("passwordStrengthText");
@@ -1569,7 +1585,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
                 oModel.setProperty("/City", "");
                 // oCity.setValue("").setSelectedKey("");
-                }
+            }
             oModel.setProperty("/City", "");
             oCity.setValue("").setSelectedKey("");
 
@@ -1579,7 +1595,7 @@ sap.ui.define([
 
             const sStateSearch = oEvent ? oState.getValue() : oModel.getProperty("/State");
             oModel.setProperty("/State", sStateSearch);
-            
+
             const oCountry = $C("signUpCountry");
             const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim();
 
@@ -1618,7 +1634,7 @@ sap.ui.define([
 
             const sCitySearch = oEvent ? oCityCtrl.getValue() : oModel.getProperty("/City");
             oModel.setProperty("/City", sCitySearch);
-            
+
             const oState = $C("signUpState");
             const sStateName = oState.getSelectedItem()?.getText() || oState.getValue();
             const oCountry = $C("signUpCountry");
@@ -1883,7 +1899,7 @@ sap.ui.define([
                 // oState.setValue("").setSelectedKey("");
                 // oCity.setValue("").setSelectedKey("");
             }
-            
+
             const aCountries = oCountryModel.getData() || [];
             const sSearch = oEvent ? oCountry.getValue() : oModel.getProperty("/Country");
             oModel.setProperty("/Country", sSearch);
@@ -1900,7 +1916,7 @@ sap.ui.define([
                 // Mobile & STD
                 const oMobile = $C("signUpPhone");
                 if (oMobile) oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
-                
+
                 const oSTDItem = oSTD.getItems().find(i => i.getAdditionalText() === sCountryCode);
                 if (oSTDItem) {
                     oSTD.setSelectedKey(oSTDItem.getKey());
@@ -1912,7 +1928,7 @@ sap.ui.define([
                     }
                 }
             } else {
-                 oState.getBinding("items").filter([new Filter("countryCode", "EQ", "__NONE__")]);
+                oState.getBinding("items").filter([new Filter("countryCode", "EQ", "__NONE__")]);
             }
         },
 
@@ -2650,7 +2666,7 @@ sap.ui.define([
                 if (aFilteredBranches.length === 0) {
                     oVisibilityModel.setProperty("/Branches", []);
                     oVisibilityModel.setProperty("/NoData", true);
-                    oVisibilityModel.setProperty("/ShowViewMore",false);
+                    oVisibilityModel.setProperty("/ShowViewMore", false);
                     return;
                 }
 
@@ -4002,8 +4018,8 @@ sap.ui.define([
 
             if (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-                    oModel.setProperty("/City", "");
-                    oCityModel.setProperty("/filtered", []);
+                oModel.setProperty("/City", "");
+                oCityModel.setProperty("/filtered", []);
 
 
             }
@@ -4070,7 +4086,7 @@ sap.ui.define([
             }
             return oMatch;
         },
-        
+
 
 
         _autoSelectSTD: function (sCode) {
