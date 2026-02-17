@@ -21,6 +21,7 @@
                 displayFormat="dd/MM/yyyy"
                 valueFormat="yyyy-MM-dd"
                 change="onDatePickerChange"
+                valueStateText="Please select date"
             />
         </VBox>
 

@@ -36,7 +36,7 @@ sap.ui.define([
         });
         this.getView().addDependent(this._oBookingDateDialog);
     } 
-              sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date())
+              sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date()).setValueState("None")
               this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
 
            this.getView().addStyleClass("blurView")
