@@ -163,7 +163,8 @@ sap.ui.define([
                 NXTVis: true,
                 PERVIOUSVIS: false,
                 Month: false,
-                Year: false
+                Year: false,
+              
             })
             this.getView().setModel(oBTn, "OBTNModel")
             var oEndDatePicker = this.getView().byId("idEndDate1")
@@ -217,7 +218,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             this._perDayInfoShown = false;
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
-
+this._bBlockMessagePopover = false;
         },
 
         Roomdetails: async function () {
@@ -2018,6 +2019,10 @@ sap.ui.define([
             this._openMessagePopover(oEvent.getSource());
         },
         _openMessagePopover: function (oSource) {
+
+             if (this._iSelectedStepIndex === 0) {
+        return;
+    }
             if (!this._oMessagePopover) {
                 this._oMessagePopover = sap.ui.xmlfragment(
                     this.getView().getId(),
@@ -2029,9 +2034,6 @@ sap.ui.define([
 
             this._oMessagePopover.openBy(oSource);
         },
-
-
-
 
         _resetCouponAndDiscount: function () {
             const oModel = this.getView().getModel("HostelModel");
@@ -2064,9 +2066,7 @@ sap.ui.define([
         },
 
         onDialogBackButton: function () {
-            if (this._oMessagePopover) {
-        this._oMessagePopover.close();
-    }
+       
             this._iSelectedStepIndex = this._oWizard.getSteps().indexOf(this._oSelectedStep);
             var oPreviousStep = this._oWizard.getSteps()[this._iSelectedStepIndex - 1];
                
@@ -2079,6 +2079,17 @@ sap.ui.define([
             this._iSelectedStepIndex--;
             this._oSelectedStep = oPreviousStep;
 
+ if (this._iSelectedStepIndex === 0) {
+
+        this._bBlockMessagePopover = true;
+
+        if (this._oMessagePopover) {
+            this._oMessagePopover.close();
+        }
+    } else {
+        this._bBlockMessagePopover = false;
+    }
+             this.handleButtonsVisibility();
         },
 
         handleNavigationChange: function (oEvent) {
@@ -2184,6 +2195,7 @@ sap.ui.define([
                 case 0:
                     oModel.setProperty("/NXTVis", true);
                     oModel.setProperty("/PERVIOUSVIS", false);
+                  
                     break;
                 case 1:
                     oModel.setProperty("/PERVIOUSVIS", true);
@@ -2198,8 +2210,6 @@ sap.ui.define([
                             }
 
                         } else {
-                            // fallback: call handler without event so it uses model value
-
                             this.onNoOfPersonSelect();
                         }
                     } catch (e) {
@@ -4502,9 +4512,7 @@ sap.ui.define([
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-        // SM_onChnageSetAndConfirm: function (oEvent) {
-        //     utils._LCvalidatePassword(oEvent);
-        // },
+       
         // Robust helper to find control inside your Login fragment
         _getLoginFragmentControl: function (localId) {
             // 1) If you stored the fragment instance (best practice), use it
