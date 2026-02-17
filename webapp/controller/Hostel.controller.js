@@ -967,10 +967,10 @@ sap.ui.define([
                 let aData = oModel.getData();
 
                 if (!aData || aData.length === 0) {
-            this.byId("idBedTypeFlex").setBusy(true);
-            this.byId("id_Branch").setBusy(true).setValueState("None");;
-            this.byId("id_Area").setBusy(true);
-            this.byId("id_Roomtype").setBusy(true)
+                    this.byId("idBedTypeFlex").setBusy(true);
+                    this.byId("id_Branch").setBusy(true).setValueState("None");;
+                    this.byId("id_Area").setBusy(true);
+                    this.byId("id_Roomtype").setBusy(true)
 
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
@@ -1584,14 +1584,9 @@ sap.ui.define([
             if (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 oModel.setProperty("/City", "");
-                // oCity.setValue("").setSelectedKey("");
+                oCity.setValue("").setSelectedKey("");
+                oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
             }
-            oModel.setProperty("/City", "");
-            oCity.setValue("").setSelectedKey("");
-
-            oCity.getBinding("items")?.filter([
-                new Filter("cityName", "EQ", "__NONE__")
-            ]);
 
             const sStateSearch = oEvent ? oState.getValue() : oModel.getProperty("/State");
             oModel.setProperty("/State", sStateSearch);
@@ -1896,8 +1891,11 @@ sap.ui.define([
                 oModel.setProperty("/City", "");
                 oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
                 oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
-                // oState.setValue("").setSelectedKey("");
-                // oCity.setValue("").setSelectedKey("");
+            }
+            // 2. Sanitize typing only if user is interacting
+            if (oEvent) {
+                const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
+                oCountry.setValue(val);
             }
 
             const aCountries = oCountryModel.getData() || [];
@@ -3977,15 +3975,22 @@ sap.ui.define([
             const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
             const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
+            const oCityModel = this.getView().getModel("CityModel");
 
             if (!oCountryModel) return;
+
+            // 2. Sanitize typing only if user is interacting
+            // if (oEvent) {
+            //     const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
+            //     oCountry.setValue(val);
+            // }
 
             if (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
                 oModel.setProperty("/State", "");
                 oModel.setProperty("/City", "");
-                // $C("adminsignUpState").setValue("");
-                // $C("adminsignUpCity").setValue("");
+                oStateModel.setProperty("/filtered", []);
+                oCityModel.setProperty("/filtered", []);
             }
 
             const aCountries = oCountryModel.getData() || [];
