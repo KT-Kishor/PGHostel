@@ -3020,39 +3020,40 @@ sap.ui.define([
 
                         // ================= SUMMARY =================
                         const summaryBody = [];
+                        const subTotalGST = parseFloat(oModel.SubTotalInGST || 0);
+                        const subTotalNoGST = parseFloat(oModel.SubTotalNotGST || 0);
+                        const igst = parseFloat(oModel.IGST || 0);
+                        const refundDue = parseFloat(oModel.RefundAmount || 0);
+                        const refundProcessed = parseFloat(oModel.RefundProcessed || 0);
+                        const totalAmount = parseFloat(oModel.TotalAmount || 0);
 
-                        if (+oModel.SubTotalInGST > 0) {
-                            summaryBody.push([
-                                `Sub-Total (${oModel.Currency}) :`,
-                                Formatter.fromatNumber(oModel.SubTotalInGST)
-                            ]);
+                        // Sub Total (GST or NON-GST)
+                        if (subTotalGST > 0) {
+                            summaryBody.push([`Sub-Total (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
+                        } else if (subTotalNoGST > 0) {
+                            summaryBody.push([`Sub-Total (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
                         }
 
-                        if (oModel.Type === "IGST" && +oModel.IGST > 0) {
-                            summaryBody.push([
-                                `IGST (${oModel.Value}%) :`,
-                                Formatter.fromatNumber(oModel.IGST)
-                            ]);
+                        // IGST
+                        if (oModel.Type === "IGST" && igst > 0) {
+                            summaryBody.push([`IGST (${oModel.Value}%) :`, Formatter.fromatNumber(igst)]);
                         }
 
-                        if (parseFloat(oModel.RefundAmount) > 0) {
-                            summaryBody.push([
-                                `Refund Due (${oModel.Currency}) :`,
-                                Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
-                            ]);
+                        // Refund Due
+                        if (refundDue > 0) {
+                            summaryBody.push([`Refund Due (${oModel.Currency}) :`, Formatter.fromatNumber(refundDue)]);
                         }
 
-                        if (parseFloat(oModel.RefundProcessed) > 0) {
-                            summaryBody.push([
-                                `Refund Processed (${oModel.Currency}) :`,
-                                Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
-                            ]);
+                        // Refund Processed
+                        if (refundProcessed > 0) {
+                            summaryBody.push([`Refund Processed (${oModel.Currency}) :`, Formatter.fromatNumber(refundProcessed)]);
                         }
 
+                        // Total
                         const totalRowIndex = summaryBody.length;
                         summaryBody.push([
                             `Total (${oModel.Currency}) :`,
-                            Formatter.fromatNumber(oModel.TotalAmount)
+                            Formatter.fromatNumber(totalAmount)
                         ]);
 
                         doc.autoTable({

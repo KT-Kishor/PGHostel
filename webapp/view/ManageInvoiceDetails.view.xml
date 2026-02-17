@@ -863,7 +863,7 @@
                                                     }"
                                             >
 												<m:Label
-                                                    text="{i18n>invoiceReceivedRefundAmount} ({FilteredSOWModel>/Currency}) :"
+                                                    text="{i18n>invoiceReceivedAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
 												<m:Text
