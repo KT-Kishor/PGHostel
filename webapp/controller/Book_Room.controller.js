@@ -27,7 +27,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
-        this._bPricingDirty = true; // For calculation 
+            this._bPricingDirty = true; // For calculation 
             var oMessageManager = sap.ui.getCore().getMessageManager();
 
             // Register view
@@ -49,7 +49,7 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["idStartDate1", "idEndDate1", "ID_DOB_"], this.getView());
             var oView = this.getView()
-            
+
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             if (oUserModel) {
                 this._oLoggedInUser = oUserModel.getData();
@@ -221,7 +221,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             this._perDayInfoShown = false;
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
-            
+
         },
 
         Roomdetails: async function () {
@@ -310,43 +310,43 @@ sap.ui.define([
                     Currency: f.Currency,
                     BranchCode: f.BranchCode
                 }));
-                
+
                 this._aAllFacilities = aFinalFacilities;
-               
+
                 oView.setModel(new JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
-  this._applyFacilityPriceFilter();
+                this._applyFacilityPriceFilter();
             } catch (err) {
                 console.error("Facility Load Error", err);
                 sap.m.MessageBox.error("Unable to load facilities.");
             }
         },
         _applyFacilityPriceFilter: function () {
-    const oView = this.getView();
-    const oHostelModel = oView.getModel("HostelModel");
-    const oFacilityModel = oView.getModel("FacilityModel");
+            const oView = this.getView();
+            const oHostelModel = oView.getModel("HostelModel");
+            const oFacilityModel = oView.getModel("FacilityModel");
 
-    if (!oFacilityModel || !this._aAllFacilities) return;
+            if (!oFacilityModel || !this._aAllFacilities) return;
 
-    const sPriceType = oHostelModel.getProperty("/SelectedPriceType");
+            const sPriceType = oHostelModel.getProperty("/SelectedPriceType");
 
-    const aFiltered = this._aAllFacilities.filter(fac => {
-        switch (sPriceType) {
-            case "Per Day":
-                return fac.PricePerDay && fac.PricePerDay > 0;
+            const aFiltered = this._aAllFacilities.filter(fac => {
+                switch (sPriceType) {
+                    case "Per Day":
+                        return fac.PricePerDay && fac.PricePerDay > 0;
 
-            case "Per Month":
-                return fac.PricePerMonth && fac.PricePerMonth > 0;
+                    case "Per Month":
+                        return fac.PricePerMonth && fac.PricePerMonth > 0;
 
-            case "Per Year":
-                return fac.PricePerYear && fac.PricePerYear > 0;
+                    case "Per Year":
+                        return fac.PricePerYear && fac.PricePerYear > 0;
 
-            default:
-                return true;
-        }
-    });
+                    default:
+                        return true;
+                }
+            });
 
-    oFacilityModel.setProperty("/Facilities", aFiltered);
-},
+            oFacilityModel.setProperty("/Facilities", aFiltered);
+        },
 
 
         onDialogClose: function () {
@@ -803,7 +803,7 @@ sap.ui.define([
                                                 that._oLoginAlertDialog.open();
                                                 sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signInEmail").setValue("").setValueState("None");
                                                 sap.ui.core.Fragment.byId(that.createId("LoginAlertDialog"), "signinPassword").setValue("").setValueState("None");
-                                               
+
                                                 oEvent.getSource().setSelected(false);
                                                 return;
                                             }
@@ -839,7 +839,7 @@ sap.ui.define([
                                                 p.Address = oUser.Address || "";
                                                 p.STDCode = oUser.STDCode || "";
                                                 p.DateOfBirth = that.Formatter.DateFormat(oUser.DateOfBirth)
- || "";
+                                                    || "";
 
                                                 // ---------- FIRST PERSON ONLY ----------
                                                 if (index === 0) {
@@ -886,7 +886,7 @@ sap.ui.define([
                             maxLength: 40
                         }),
                         new sap.m.Select({
-                            width:"100%",
+                            width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Salutation}",
                             items: [
                                 new sap.ui.core.ListItem({
@@ -938,9 +938,9 @@ sap.ui.define([
                             formatter: that.DateFormat,
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
-                             maxDate: new Date(new Date().getFullYear() - 10, 11, 31),
-                             placeholder: "Select Date of Birth",
-                           change: function (oEvent) {
+                            maxDate: new Date(new Date().getFullYear() - 10, 11, 31),
+                            placeholder: "Select Date of Birth",
+                            change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
                                     MessageToast.show(that.i18nModel.getText("dateofBirthcannotbeFuture"));
@@ -1328,8 +1328,8 @@ sap.ui.define([
                         new sap.ui.unified.FileUploader({
                             placeholder: "Choose File",
                             width: "100%",
-                            fileType: ["jpg", "jpeg", "png","pdf"],
-                            mimeType: ["image/jpeg", "image/png","application/pdf"],
+                            fileType: ["jpg", "jpeg", "png", "pdf"],
+                            mimeType: ["image/jpeg", "image/png", "application/pdf"],
                             multiple: false,
                             layoutData: new sap.ui.layout.form.ColumnElementData({
                                 cellsLarge: 7, ///8
@@ -1616,15 +1616,15 @@ sap.ui.define([
                                                         const aSelected = aPersons[iPersonIndex].Facilities.SelectedFacilities;
 
                                                         // Check if facility already selected
-                                                         const existsIndex = aSelected.findIndex(
-            f => f.FacilityID === facility.FacilityID
-        );
+                                                        const existsIndex = aSelected.findIndex(
+                                                            f => f.FacilityID === facility.FacilityID
+                                                        );
 
                                                         // If selected → REMOVE it
                                                         if (existsIndex > -1) {
 
                                                             aSelected.splice(existsIndex, 1);
-                                                        
+
                                                             //  Force summary recalculation
                                                             aPersons[iPersonIndex].PersonFacilitiesSummary = [];
                                                             aPersons[iPersonIndex].AllSelectedFacilities = [];
@@ -1730,63 +1730,63 @@ sap.ui.define([
         },
 
         _createFacilityPopover: function (facility, iPersonIndex, oCard) {
- 
-    const SelectedPriceType =
-        this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
- 
-    const that = this;
- 
-    if (this._oFacilityPopover) {
-        this._oFacilityPopover.destroy();
-    }
- 
-    const aButtons = [];
- 
-    function addButton(price, label) {
- 
-        const num = Number(price);
- 
-        if (price !== "" && price !== null && Number.isFinite(num) && num > 0) {
- 
-            aButtons.push(
-                new sap.m.Button({
-                    width: "100%",
-                    text: `${label} – ${num} ${facility.Currency}`,
-                    type: "Transparent",
-                    press: function () {
-                        that._setFacilitySelectedPrice(
-                            facility,
-                            label,
-                            num,
-                            iPersonIndex,
-                            oCard
-                        );
-                        that._oFacilityPopover.close();
-                    }
-                })
-            );
-        }
-    }
- 
-    if (SelectedPriceType === "Per Day") {
-        addButton(facility.PricePerDay, "Per Day");
-    } else if (SelectedPriceType === "Per Month") {
-        addButton(facility.PricePerMonth, "Per Month");
-    } else if (SelectedPriceType === "Per Year") {
-        addButton(facility.PricePerYear, "Per Year");
-    }
- 
-    this._oFacilityPopover = new sap.m.Popover({
-        placement: sap.m.PlacementType.Top,
-        showHeader: false,
-        contentWidth: "220px",
-        content: aButtons
-    });
- 
-    this.getView().addDependent(this._oFacilityPopover);
- 
-    return this._oFacilityPopover;
-},
+
+            const SelectedPriceType =
+                this.getView().getModel("HostelModel").getProperty("/SelectedPriceType");
+
+            const that = this;
+
+            if (this._oFacilityPopover) {
+                this._oFacilityPopover.destroy();
+            }
+
+            const aButtons = [];
+
+            function addButton(price, label) {
+
+                const num = Number(price);
+
+                if (price !== "" && price !== null && Number.isFinite(num) && num > 0) {
+
+                    aButtons.push(
+                        new sap.m.Button({
+                            width: "100%",
+                            text: `${label} – ${num} ${facility.Currency}`,
+                            type: "Transparent",
+                            press: function () {
+                                that._setFacilitySelectedPrice(
+                                    facility,
+                                    label,
+                                    num,
+                                    iPersonIndex,
+                                    oCard
+                                );
+                                that._oFacilityPopover.close();
+                            }
+                        })
+                    );
+                }
+            }
+
+            if (SelectedPriceType === "Per Day") {
+                addButton(facility.PricePerDay, "Per Day");
+            } else if (SelectedPriceType === "Per Month") {
+                addButton(facility.PricePerMonth, "Per Month");
+            } else if (SelectedPriceType === "Per Year") {
+                addButton(facility.PricePerYear, "Per Year");
+            }
+
+            this._oFacilityPopover = new sap.m.Popover({
+                placement: sap.m.PlacementType.Top,
+                showHeader: false,
+                contentWidth: "220px",
+                content: aButtons
+            });
+
+            this.getView().addDependent(this._oFacilityPopover);
+
+            return this._oFacilityPopover;
+        },
 
         _setFacilitySelectedPrice: function (facility, selectedType, selectedPrice, iPersonIndex, oCard) {
 
@@ -1852,46 +1852,46 @@ sap.ui.define([
                 }
             }, 0);
 
-          
+
             // 🔁 Rebuild AllSelectedFacilities from all persons
             // Ensure duration values exist
-aPersons[iPersonIndex].TotalDays = 30;
-aPersons[iPersonIndex].SelectedMonths = selectedMonths;
+            aPersons[iPersonIndex].TotalDays = 30;
+            aPersons[iPersonIndex].SelectedMonths = selectedMonths;
 
-            
-let aAll = [];
 
-const defaultMonths =
-    Number(oModel.getProperty("/SelectedMonths")) || 1;
+            let aAll = [];
 
-aPersons.forEach((person, personIdx) => {
-    if (person.Facilities?.SelectedFacilities) {
-        person.Facilities.SelectedFacilities.forEach(facility => {
+            const defaultMonths =
+                Number(oModel.getProperty("/SelectedMonths")) || 1;
 
-            // 🔥 Ensure months exist
-            if (!facility.SelectedMonths) {
-                facility.SelectedMonths = defaultMonths;
-            }
+            aPersons.forEach((person, personIdx) => {
+                if (person.Facilities?.SelectedFacilities) {
+                    person.Facilities.SelectedFacilities.forEach(facility => {
 
-            aAll.push({
-                FacilityName: facility.FacilityName,
-                UnitText: facility.SelectedPriceType,
-                SelectedPriceType: facility.SelectedPriceType,
-                PersonIndex: personIdx,
-                Currency: facility.Currency,
-                SelectedPrice: facility.SelectedPrice,
+                        // 🔥 Ensure months exist
+                        if (!facility.SelectedMonths) {
+                            facility.SelectedMonths = defaultMonths;
+                        }
 
-                TotalDays: person.TotalDays || 1,
-                SelectedMonths: facility.SelectedMonths,
-                 IsDurationEdited: facility.IsDurationEdited 
+                        aAll.push({
+                            FacilityName: facility.FacilityName,
+                            UnitText: facility.SelectedPriceType,
+                            SelectedPriceType: facility.SelectedPriceType,
+                            PersonIndex: personIdx,
+                            Currency: facility.Currency,
+                            SelectedPrice: facility.SelectedPrice,
+
+                            TotalDays: person.TotalDays || 1,
+                            SelectedMonths: facility.SelectedMonths,
+                            IsDurationEdited: facility.IsDurationEdited
+                        });
+                    });
+                }
             });
-        });
-    }
-});
 
 
-oModel.setProperty("/AllSelectedFacilities", aAll);
-  oModel.refresh(true);
+            oModel.setProperty("/AllSelectedFacilities", aAll);
+            oModel.refresh(true);
 
         }
         ,
@@ -1932,7 +1932,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     c.getValueState && c.getValueState() === sap.ui.core.ValueState.Error
                 );
             }
- 
+
             const oModel = this.getView().getModel("HostelModel");
             const sCurrentBranch = oModel.getProperty("/BranchCode");
 
@@ -1950,24 +1950,24 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
 
             // STEP 1: validations
-           if (this._iSelectedStepIndex === 1) {
-    const aMissing = this._checkMandatoryFields();
-    const aMessages = this.getView().getModel("message")?.getProperty("/") || [];
+            if (this._iSelectedStepIndex === 1) {
+                const aMissing = this._checkMandatoryFields();
+                const aMessages = this.getView().getModel("message")?.getProperty("/") || [];
 
-    if (aMissing.length > 0 || aMessages.length > 0) {
-        MessageToast.show("Please review the errors and fix them");
+                if (aMissing.length > 0 || aMessages.length > 0) {
+                    MessageToast.show("Please review the errors and fix them");
 
-        const oMessageButton = this.byId("messagePopoverBtn"); 
-        if (oMessageButton) {
-            oMessageButton.addEventDelegate({
-                onAfterRendering: () => {
-                    this._openMessagePopover(oMessageButton);
+                    const oMessageButton = this.byId("messagePopoverBtn");
+                    if (oMessageButton) {
+                        oMessageButton.addEventDelegate({
+                            onAfterRendering: () => {
+                                this._openMessagePopover(oMessageButton);
+                            }
+                        });
+                    }
+                    return;
                 }
-            });
-        }
-        return;
-    }
-}
+            }
 
 
 
@@ -1995,20 +1995,20 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             this.handleButtonsVisibility();
         },
         onMessagePopoverPress: function (oEvent) {
-    this._openMessagePopover(oEvent.getSource());
+            this._openMessagePopover(oEvent.getSource());
         },
         _openMessagePopover: function (oSource) {
-    if (!this._oMessagePopover) {
-        this._oMessagePopover = sap.ui.xmlfragment(
-            this.getView().getId(),
-            "sap.ui.com.project1.fragment.MessagePopOver",
-            this
-        );
-        this.getView().addDependent(this._oMessagePopover);
-    }
+            if (!this._oMessagePopover) {
+                this._oMessagePopover = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "sap.ui.com.project1.fragment.MessagePopOver",
+                    this
+                );
+                this.getView().addDependent(this._oMessagePopover);
+            }
 
-    this._oMessagePopover.openBy(oSource);
-},
+            this._oMessagePopover.openBy(oSource);
+        },
 
 
 
@@ -2094,12 +2094,12 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             this._oSelectedStep = oTargetStep;
             this._iSelectedStepIndex = iTargetIndex;
 
-      setTimeout(function () {
-        var oWizardDom = this._oWizard.getDomRef();
-        if (oWizardDom) {
-            oWizardDom.scrollTop = 0;
-        }
-    }.bind(this), 0);
+            setTimeout(function () {
+                var oWizardDom = this._oWizard.getDomRef();
+                if (oWizardDom) {
+                    oWizardDom.scrollTop = 0;
+                }
+            }.bind(this), 0);
             this.handleButtonsVisibility();
         },
 
@@ -2255,19 +2255,19 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             const oView = this.getView();
             const oModel = oView.getModel("HostelModel");
-             oModel.setProperty("/CouponCode", "");
-    //  const inputID = sap.ui.core.Fragment.byId(
-    //     this.getView().getId(),
-    //     "BookingcouponInput"
-    // );
-    // if (inputID) {
-    //     inputID.setShowValueHelp(false);
-    // }
+            oModel.setProperty("/CouponCode", "");
+            //  const inputID = sap.ui.core.Fragment.byId(
+            //     this.getView().getId(),
+            //     "BookingcouponInput"
+            // );
+            // if (inputID) {
+            //     inputID.setShowValueHelp(false);
+            // }
 
-    const oBtn = this.byId("couponApplyBtn");
-    if (oBtn) {
-        oBtn.setVisible(true);
-    }
+            const oBtn = this.byId("couponApplyBtn");
+            if (oBtn) {
+                oBtn.setVisible(true);
+            }
 
             const aPersons = oModel.getProperty("/Persons") || [];
 
@@ -2293,7 +2293,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 return;
             }
 
-           oModel.setProperty("/Persons", [...result.Persons]);
+            oModel.setProperty("/Persons", [...result.Persons]);
             oModel.setProperty("/GrandTotal", result.GrandTotal);
 
             oModel.refresh(true);
@@ -2470,12 +2470,12 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             aPersons.forEach(p => {
                 p.GrandTotal = grandTotal;
             });
-   
+
 
             return {
-    Persons: aPersons.map(p => ({ ...p })),   // NEW ARRAY
-    GrandTotal: grandTotal
-};
+                Persons: aPersons.map(p => ({ ...p })),   // NEW ARRAY
+                GrandTotal: grandTotal
+            };
         },
 
         // Helper function to parse date
@@ -2718,7 +2718,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onMonthSelectionChange: function (oEvent) {
-  this._bPricingDirty = true;
+            this._bPricingDirty = true;
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
 
@@ -2799,7 +2799,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             oHostelModel.setProperty("/IsGeneralInfoValid", false);
 
             if (result) {
-              oHostelModel.setProperty("/Persons", [...result.Persons]);
+                oHostelModel.setProperty("/Persons", [...result.Persons]);
 
                 oHostelModel.setProperty("/GrandTotal", result.GrandTotal);
                 oHostelModel.refresh(true);
@@ -2826,17 +2826,17 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             }
 
             const oBookingID = this.getView().getModel("HostelModel").getProperty("/BranchCode");
-           
 
-                this.getOwnerComponent().getRouter().navTo("RouteViewRooms",{
+
+            this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
                 sPath: oBookingID
-                }
+            }
             )
-           
+
         },
 
         onRoomDurationChange: function (oEvent) {
-    this._bPricingDirty = true;
+            this._bPricingDirty = true;
             this._resetWizardFromStep1();
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -2940,7 +2940,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             }
             // Update selected type
             oHostelModel.setProperty("/SelectedPriceType", sValue);
-    this._applyFacilityPriceFilter();
+            this._applyFacilityPriceFilter();
             const oEndDatePicker = oView.byId("idEndDate1");
             const sBranchCode = oHostelModel.getProperty("/BranchCode") || "";
 
@@ -3026,7 +3026,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             oBTN.refresh(true);
             oHostelModel.refresh(true);
             this._validateGeneralInfo()
-        
+
         },
 
         //login
@@ -3091,7 +3091,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onOtpLive: function (e) {
-           const sInput = oEvent.getSource();
+            const sInput = oEvent.getSource();
             const sVal = oEvent.getParameter("value").replace(/\D/g, ""); // allow digits only
 
             sInput.setValue(sVal);
@@ -3145,7 +3145,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
 
             var sUserid = ctrlEmailId && ctrlEmailId.getValue ? ctrlEmailId.getValue().trim() : "";
-           
+
             var sPassword = ctrlPassword && ctrlPassword.getValue ? ctrlPassword.getValue() : "";
             const sOTP = ctrlOTP && ctrlOTP.getValue ? ctrlOTP.getValue().trim() : "";
 
@@ -3271,7 +3271,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     return;
                 }
 
-               this._oLoggedInUser = oMatchedUser;
+                this._oLoggedInUser = oMatchedUser;
                 // ---------- rest of your existing success logic (unchanged) ----------
                 oLoginModel.setProperty("/EmployeeID", oMatchedUser.UserID);
                 oLoginModel.setProperty("/UserID", oMatchedUser.UserID);
@@ -3289,7 +3289,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 oLoginModel.setProperty("/STDCode", oMatchedUser.STDCode);
                 oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
 
-               
+
                 this.getOwnerComponent()
                     .getModel("UserModel")
                     ?.setData(oMatchedUser);
@@ -3399,7 +3399,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             // oConf.setValueStateText("Passwords matched");
             BusyIndicator.show(0);
             try {
-                 const oFilters = this._oResetUser?.UserID
+                const oFilters = this._oResetUser?.UserID
                     ? { UserID: this._oResetUser.UserID }
                     : { EmailID: this._oResetUser?.EmailID };
                 await this.ajaxUpdateWithJQuery("HM_Login", {
@@ -3504,17 +3504,17 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
         },
 
         onValidateUser: async function () {
-             const oEmailCtrl =sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId");
+            const oEmailCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId");
             const isValid =
                 utils._LCvalidateEmail(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId"), "ID")
-               
+
 
             if (!isValid) {
                 MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
 
-              const sEmail = oEmailCtrl.getValue().trim();
+            const sEmail = oEmailCtrl.getValue().trim();
 
             BusyIndicator.show(0);
 
@@ -3555,7 +3555,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
             try {
                 const oPayload = {
-                     ...(this._oResetUser?.EmailID
+                    ...(this._oResetUser?.EmailID
                         ? { EmailID: this._oResetUser.EmailID }
                         : {
                             UserID: this._oResetUser?.UserID,
@@ -3580,12 +3580,12 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
 
         onPressOTP: async function () {
             const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
-            
+
             const sUserId = oEmailIDCtrl.getValue().trim();
             // const sUserName = oUserNameCtrl.getValue().trim();
 
             // Validate inputs
-            if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID") ) {
+            if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID")) {
                 MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
                 return;
             }
@@ -3778,7 +3778,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             // Reset only values (not visibility/enabled state)
 
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId").setValue("");
-          
+
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpOTP").setValue("");
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass").setValue("");
             sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass").setValue("");
@@ -3863,7 +3863,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     Salutation: C("signUpSalutation").getSelectedKey(),
                     UserName: data.fullname.trim(),
                     Role: "Customer",
-                    Type:"Customer",
+                    Type: "Customer",
                     EmailID: data.Email.trim(),
                     Password: btoa(data.password),
                     STDCode: data.STDCode || std,
@@ -3894,7 +3894,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                     });
                     return;
                 }
-                 const sUsername = data.fullname.trim();
+                const sUsername = data.fullname.trim();
                 const Salutation = C("signUpSalutation").getSelectedItem().getText();
                 const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
                     "Your account has been created successfully. You will receive an email shortly with your login credentials.";
@@ -4570,7 +4570,7 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
                 return;
             }
 
-            // ✅ Only generate + validate (NO copying here)
+            //  Only generate + validate (NO copying here)
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
@@ -4601,19 +4601,19 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             );
             oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
 
-    // Default radio = PayOnCheckIn
-    const oRadio = sap.ui.getCore().byId("idPaymentTypeGroup");
-    if (oRadio) {
-        oRadio.setSelectedIndex(0);
-    }
+            // Default radio = PayOnCheckIn
+            const oRadio = sap.ui.getCore().byId("idPaymentTypeGroup");
+            if (oRadio) {
+                oRadio.setSelectedIndex(0);
+            }
 
-    this.onPaymentTypeSelect({
-        getSource: () => ({
-            getSelectedIndex: () => 0
-        })
-    });
+            this.onPaymentTypeSelect({
+                getSource: () => ({
+                    getSelectedIndex: () => 0
+                })
+            });
 
-    this._oPaymentDialog.open();
+            this._oPaymentDialog.open();
         }
         ,
 
@@ -4630,86 +4630,86 @@ oModel.setProperty("/AllSelectedFacilities", aAll);
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const oHostelModel = this.getView().getModel("HostelModel");
 
-const paymentType =
-    oHostelModel.getProperty("/SelectedPriceType");
+            const paymentType =
+                oHostelModel.getProperty("/SelectedPriceType");
 
-const aPersons =
-    oHostelModel.getProperty("/Persons") || [];
+            const aPersons =
+                oHostelModel.getProperty("/Persons") || [];
 
-let totalPersonsMonthly = 0;
+            let totalPersonsMonthly = 0;
 
-if (paymentType === "Per Day") {
+            if (paymentType === "Per Day") {
 
-    totalPersonsMonthly = aPersons.reduce(
-        (s, p) => s + (Number(p.FinalTotalCost) || 0),
-        0
-    );
+                totalPersonsMonthly = aPersons.reduce(
+                    (s, p) => s + (Number(p.FinalTotalCost) || 0),
+                    0
+                );
 
-} else {
+            } else {
 
-    totalPersonsMonthly = aPersons.reduce(
-        (s, p) => s + (Number(p.MonthlyCostPerPerson) || 0),
-        0
-    );
-}
+                totalPersonsMonthly = aPersons.reduce(
+                    (s, p) => s + (Number(p.MonthlyCostPerPerson) || 0),
+                    0
+                );
+            }
 
-// store again every time
-oHostelModel.setProperty(
-    "/PerMonthNoPerson",
-    Number(totalPersonsMonthly.toFixed(2))
-);
+            // store again every time
+            oHostelModel.setProperty(
+                "/PerMonthNoPerson",
+                Number(totalPersonsMonthly.toFixed(2))
+            );
 
 
             // -----------------------------
             // PAY ON CHECKIN
             // -----------------------------
-           if (isPayOnCheckIn) {
+            if (isPayOnCheckIn) {
 
-        oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
-        oPaymentModel.setProperty("/Amount", "0");
-        oPaymentModel.setProperty("/PaymentDate", "");
+                oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
+                oPaymentModel.setProperty("/Amount", "0");
+                oPaymentModel.setProperty("/PaymentDate", "");
 
-        oHostelModel.setProperty(
-            "/PayableAmountPerMonth",
-            totalPersonsMonthly
-        );
+                oHostelModel.setProperty(
+                    "/PayableAmountPerMonth",
+                    totalPersonsMonthly
+                );
 
-        oHostelModel.setProperty(
-            "/PerMonthNoPerson",
-            totalPersonsMonthly
-        );
+                oHostelModel.setProperty(
+                    "/PerMonthNoPerson",
+                    totalPersonsMonthly
+                );
 
-        return;
-    }
+                return;
+            }
 
-    /* =====================
-       UPI / CARD
-    ===================== */
+            /* =====================
+               UPI / CARD
+            ===================== */
 
-    oPaymentModel.setProperty(
-        "/PaymentType",
-        isUPI ? "UPI" : "CARD"
-    );
+            oPaymentModel.setProperty(
+                "/PaymentType",
+                isUPI ? "UPI" : "CARD"
+            );
 
-    oPaymentModel.setProperty(
-        "/PaymentDate",
-        this.Formatter.formatDate(new Date())
-    );
+            oPaymentModel.setProperty(
+                "/PaymentDate",
+                this.Formatter.formatDate(new Date())
+            );
 
-    oPaymentModel.setProperty(
-        "/Amount",
-        totalPersonsMonthly
-    );
+            oPaymentModel.setProperty(
+                "/Amount",
+                totalPersonsMonthly
+            );
 
-    oHostelModel.setProperty(
-        "/PayableAmountPerMonth",
-        totalPersonsMonthly
-    );
+            oHostelModel.setProperty(
+                "/PayableAmountPerMonth",
+                totalPersonsMonthly
+            );
 
-    oHostelModel.setProperty(
-        "/PerMonthNoPerson",
-        totalPersonsMonthly
-    );
+            oHostelModel.setProperty(
+                "/PerMonthNoPerson",
+                totalPersonsMonthly
+            );
         },
 
         _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
@@ -4868,7 +4868,7 @@ oHostelModel.setProperty(
                             UserID: p.UserID,
                             GSTType: oData.GSTType || "",
                             GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0",
-                            GSTIN:oData.GSTIN || ""
+                            GSTIN: oData.GSTIN || ""
                         });
                     }
                     let paymentDetails;
@@ -4968,7 +4968,7 @@ oHostelModel.setProperty(
                 const aBookingDetails = oResponse.BookingDetails || [];
                 this._oPaymentDialog.close()
                 BusyIndicator.hide()
-                
+
                 let sMessage = "Booking Successful!\n\n";
 
                 aBookingDetails.forEach((item, index) => {
@@ -4983,21 +4983,21 @@ oHostelModel.setProperty(
                         // Check login status
                         const oLoginModel = sap.ui.getCore().getModel("LoginModel");
                         const isLoggedIn = oLoginModel && oLoginModel.getProperty("/UserID");
-                           oModel.setProperty("/CouponCode", "")
-                                        // Continue navigation after warning
-                                        if(isLoggedIn){
-                                           this._navigateAfterBooking();
-                                        }
-                                         this.resetAllBookingData();
+                        oModel.setProperty("/CouponCode", "")
+                        // Continue navigation after warning
+                        if (isLoggedIn) {
+                            this._navigateAfterBooking();
+                        }
+                        this.resetAllBookingData();
 
-                //  RESET DYNAMIC UI FLAGS
-                this._isPersonUIInitialized = false;
-                this._mustRecreatePersonUI = true;
-                this._lastPersonCount = null;
-                this._iSelectedStepIndex = 0;
-                this._oSelectedStep = null;
-                 var oRoute = this.getOwnerComponent().getRouter();
-            oRoute.navTo("RouteHostel");
+                        //  RESET DYNAMIC UI FLAGS
+                        this._isPersonUIInitialized = false;
+                        this._mustRecreatePersonUI = true;
+                        this._lastPersonCount = null;
+                        this._iSelectedStepIndex = 0;
+                        this._oSelectedStep = null;
+                        var oRoute = this.getOwnerComponent().getRouter();
+                        oRoute.navTo("RouteHostel");
                     }.bind(this)
                 });
 
@@ -5029,8 +5029,8 @@ oHostelModel.setProperty(
         _navigateAfterBooking: function () {
             setTimeout(function () {
 
-                  var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-    oRouter.navTo("RouteManageProfile");
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteManageProfile");
                 this.resetAllBookingData();
 
                 //  RESET DYNAMIC UI FLAGS
@@ -5039,7 +5039,7 @@ oHostelModel.setProperty(
                 this._lastPersonCount = null;
                 this._iSelectedStepIndex = 0;
                 this._oSelectedStep = null;
-              
+
             }.bind(this), 500);
 
             const oAvatar = this.byId("ProfileAvatar");
@@ -5096,13 +5096,13 @@ oHostelModel.setProperty(
             oSourceCB.setValue(sSource);
         },
 
-        
+
         onCancelPress: function () {
             this.resetAllBookingData()
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteHostel")
         },
-         onCancelPress: function () {
+        onCancelPress: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
@@ -5287,7 +5287,7 @@ oHostelModel.setProperty(
                 MessageToast.show("Room Type changed to " + oSelectedBedType.BedTypeName);
             }
         },
-         onHome: function () {
+        onHome: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
