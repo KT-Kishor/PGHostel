@@ -216,6 +216,7 @@ sap.ui.define([
                         TotalFeedbacks: TotalFeedbacks,
                         GeoLocation: oBranchInfo?.GeoLocation || "",
                         EmailID: oBranchInfo?.EmailID || "",
+                        AvailableDate:Date
                     };
                 });
 
@@ -281,7 +282,8 @@ sap.ui.define([
                     GSTType: oSelected.GSTType,
                     GSTValue: oSelected.GSTValue,
                     GSTIN: oSelected.GSTIN || "",
-                    GeoLocation: oSelected.GeoLocation
+                    GeoLocation: oSelected.GeoLocation,
+                    AvailableDate:oSelected.AvailableDate
 
                 };
 
@@ -500,7 +502,8 @@ sap.ui.define([
                 DepositCurrency: oData.DepositCurrency,
                 GSTValue: oData.GSTValue,
                 GSTType: oData.GSTType,
-                GSTIN: oData.GSTIN || ""
+                GSTIN: oData.GSTIN || "",
+                AvailableDate:oData.AvailableDate
 
             };
 

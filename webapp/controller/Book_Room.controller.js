@@ -188,10 +188,17 @@ sap.ui.define([
             setTimeout(() => {
                 this.Roomdetails();
             }, 100);
-            const oToday = new Date();
-            // Strip time (set hours to 0) to avoid timezone offset issues
-            oToday.setHours(0, 0, 0, 0);
-            oHostelModel.setProperty("/TodayDate", oToday);
+          const aDate = this.getView().getModel("HostelModel");
+const sAvailableDate = aDate.getProperty("/AvailableDate"); // "20-02-2026"
+
+if (sAvailableDate) {
+    const oToday = this._parseDate(sAvailableDate);
+    if (oToday) {
+        oToday.setHours(0, 0, 0, 0);
+        oHostelModel.setProperty("/TodayDate", oToday);
+    }
+}
+
             this.oWizard = this.byId("TC_id_wizard");
             this.oWizard.discardProgress(this.byId("TC_id_stepGeneralInfo"));
             this.oWizard.goToStep(this.byId("TC_id_stepGeneralInfo"));
@@ -2549,6 +2556,46 @@ this._bBlockMessagePopover = false;
             const oEndDatePicker = oView.byId("idEndDate1");
 
             const sStartDate = oStartDatePicker?.getValue() || "";
+    // =========================================================
+// HARD ENFORCEMENT: StartDate >= TodayDate
+// =========================================================
+const oTodayDate = oHostelModel.getProperty("/TodayDate");
+
+if (
+    oEvent.getSource().getId().includes("idStartDate1") &&
+    sStartDate &&
+    oTodayDate instanceof Date
+) {
+    const oSelectedStart = this._parseDate(sStartDate);
+
+    if (oSelectedStart instanceof Date) {
+
+        oSelectedStart.setHours(0, 0, 0, 0);
+        oTodayDate.setHours(0, 0, 0, 0);
+
+        if (oSelectedStart < oTodayDate) {
+
+            // force reset
+            const d = String(oTodayDate.getDate()).padStart(2, "0");
+            const m = String(oTodayDate.getMonth() + 1).padStart(2, "0");
+            const y = oTodayDate.getFullYear();
+
+            const sCorrectedDate = `${d}/${m}/${y}`;
+
+            oHostelModel.setProperty("/StartDate", sCorrectedDate);
+            oStartDatePicker.setValue(sCorrectedDate);
+
+            oStartDatePicker.setValueState("Error");
+            oStartDatePicker.setValueStateText(
+                this.i18nModel.getText("enterStartDate")
+            );
+
+            oBtnModel.setProperty("/Next", false);
+            return; // ⛔ STOP ALL FURTHER LOGIC
+        }
+    }
+}
+
             const sEndDate = oEndDatePicker?.getValue() || "";
             const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
             const sPerson = oData.Person || oView.byId("id_Noofperson1")?.getSelectedKey() || "";
@@ -2588,9 +2635,7 @@ this._bBlockMessagePopover = false;
                 }
             }
 
-            // =========================================================
             // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
-            // =========================================================
             if (
                 oEvent.getSource().getId().includes("idStartDate1") &&
                 sStartDate &&
@@ -2858,12 +2903,17 @@ this._bBlockMessagePopover = false;
             }
 
             const oBookingID = this.getView().getModel("HostelModel").getProperty("/BranchCode");
+            const aDate = this.getView().getModel("HostelModel").getProperty("/AvailableDate");
 
 
             this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
                 sPath: oBookingID
             }
             )
+             this.getView().setModel(new JSONModel({
+                Date: aDate
+            }), "ViewDateModel");
+
 
         },
 

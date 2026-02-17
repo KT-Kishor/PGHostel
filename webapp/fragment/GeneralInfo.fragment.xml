@@ -76,7 +76,7 @@
                     displayFormat="dd/MM/yyyy"
                     change="onFieldValidation"
                     width="100%"
-                    minDate="{path: 'HostelModel>/TodayDate'}"
+                    minDate="{HostelModel>/TodayDate}"
                     valueStateText="{i18n>enterStartDate}"
                 />
                 <Label text="{i18n>howmanymonthyears}" />
