@@ -37,7 +37,7 @@ sap.ui.define([
         this.getView().addDependent(this._oBookingDateDialog);
     } 
               sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date())
-              this.getView().byId("VR_id_JoiningDate").setValue("")
+              this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
 
            this.getView().addStyleClass("blurView")
            this._oBookingDateDialog.open();
@@ -69,6 +69,9 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"))
 
             }
+        },
+        Viewroom_onPressClear:function(){
+         this.getView().byId("VR_id_JoiningDate").setValue("")
         },
         onBookingDateCancel:function(){
             this._oBookingDateDialog.close();
@@ -212,7 +215,7 @@ sap.ui.define([
                         AverageRating: AverageRating,
                         TotalFeedbacks: TotalFeedbacks,
                         GeoLocation: oBranchInfo?.GeoLocation || "",
-                        EmailID: oBranchInfo?.EmailID || ""
+                        EmailID: oBranchInfo?.EmailID || "",
                     };
                 });
 

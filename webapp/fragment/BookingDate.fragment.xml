@@ -8,7 +8,13 @@
         stretchOnPhone="true">
 
         <VBox class="sapUiSmallMargin">
-            <Label text="Booking Date" />
+          <MessageStrip
+                text="Kindly select a date to view availability."
+                showIcon="true"
+                type="Information"
+                class="sapUiTinyMarginBottom"
+            />
+            <Label text="Booking Date" required="true" />
             <DatePicker
                 id="idBookingDate"
                 width="100%"
