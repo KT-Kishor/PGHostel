@@ -46,7 +46,7 @@
                     <HBox >
                     
                     <MessageStrip
-                                    text="CheckIn Time : {HostelModel>/CheckInTime}     ; CkeckOut Time : {HostelModel>/CheckOutTime}"
+                                    text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
                                     showIcon="true"
                                     showCloseButton="false"
                                 />

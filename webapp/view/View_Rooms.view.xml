@@ -158,12 +158,12 @@
                     class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                     visible="{VisibilityModel>/ShowViewMore}"
                 >
-                    <Link
+                    <!-- <Link
                         id="idViewMoreBusy2"
                         text="{i18n>viewmorerooms}"
                         press="onViewMoreRooms"
                         class="btnViewDetails"
-                    />
+                    /> -->
                     <VBox height="2rem" />
                 </VBox>
             </VBox>
@@ -290,12 +290,12 @@
                     class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                     visible="{VisibilityModel>/ShowViewMore}"
                 >
-                    <Link
+                    <!-- <Link
                         id="idViewMoreBusy1"
                         text="{i18n>viewmorerooms}"
                         press="onViewMoreRooms"
                         class="btnViewDetails"
-                    />
+                    /> -->
                     <VBox height="2rem" />
                 </VBox>
             </VBox>

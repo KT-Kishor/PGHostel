@@ -178,9 +178,8 @@ sap.ui.define([
 
 
 
-            const bookingMonths =
-                (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-                (oEnd.getMonth() - oStart.getMonth()) || 1;
+          const bookingMonths =
+    Number(oModel.getProperty("/SelectedMonths")) || 1;
 
             const bookingYears =
                 Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
@@ -279,39 +278,52 @@ sap.ui.define([
                 ).toFixed(2));
 
             /* ---- Monthly cost ---- */
-            const months =
-                Number(bookingMonths && bookingMonths > 0 ? bookingMonths : 1);
-            if (paymentType === "Per Month") {
+            // const months =
+            //     Number(bookingMonths && bookingMonths > 0 ? bookingMonths : 1);
+            // if (paymentType === "Per Month") {
 
-                const monthly =
-                    oPerson.FinalTotalCost / months;
+            //     const monthly =
+            //         oPerson.FinalTotalCost / months;
 
-                oPerson.MonthlyCostPerPerson =
-                    Number(monthly.toFixed(2));
+            //     oPerson.MonthlyCostPerPerson =
+            //         Number(monthly.toFixed(2));
 
-                oPerson.MonthlyCostPerson =
-                    Number(monthly.toFixed(2));
+            //     oPerson.MonthlyCostPerson =
+            //         Number(monthly.toFixed(2));
 
-            } else if (paymentType === "Per Year") {
+            // } else if (paymentType === "Per Year") {
 
-                const monthly =
-                    oPerson.FinalTotalCost / bookingMonths;
+            //     const monthly =
+            //         oPerson.FinalTotalCost / bookingMonths;
 
-                oPerson.MonthlyCostPerPerson =
-                    Number(monthly.toFixed(2));
+            //     oPerson.MonthlyCostPerPerson =
+            //         Number(monthly.toFixed(2));
 
-                oPerson.MonthlyCostPerson =
-                    Number(monthly.toFixed(2));
+            //     oPerson.MonthlyCostPerson =
+            //         Number(monthly.toFixed(2));
 
-            } else {
+            // } else {
 
-                // Per Day / Per Hour
-                oPerson.MonthlyCostPerPerson =
-                    Number(oPerson.FinalTotalCost.toFixed(2));
+            //     // Per Day / Per Hour
+            //     oPerson.MonthlyCostPerPerson =
+            //         Number(oPerson.FinalTotalCost.toFixed(2));
 
-                oPerson.MonthlyCostPerson =
-                    Number(oPerson.FinalTotalCost.toFixed(2));
-            }
+            //     oPerson.MonthlyCostPerson =
+            //         Number(oPerson.FinalTotalCost.toFixed(2));
+            // }
+            /* ---- Monthly cost (correct & consistent) ---- */
+let divisor = 1;
+
+
+if (paymentType === "Per Month" || paymentType === "Per Year") {
+    divisor = bookingMonths > 0 ? bookingMonths : 1;
+}
+
+const monthlyCost = oPerson.FinalTotalCost / divisor;
+
+oPerson.MonthlyCostPerPerson = Number(monthlyCost.toFixed(2));
+oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
+
             /* ==================================
             GRAND TOTAL (ONCE)
             ================================== */
@@ -397,76 +409,67 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("pleaseSelectRowEdit"));
                 return;
             }
-
+            
             // -----------------------------
             // SAFE COPY OF SELECTED FACILITY
             // -----------------------------
             const oSafeCopy = JSON.parse(
                 JSON.stringify(this._oSelectedFacility)
             );
-
+            delete oSafeCopy.SelectedMonths;
 
             // =================================================
             // DERIVE TOTAL MONTHS / YEARS FOR DROPDOWN
             // =================================================
-            if (oSafeCopy.StartDate && oSafeCopy.EndDate) {
+           if (oSafeCopy.StartDate && oSafeCopy.EndDate) {
 
-                const parseDate = (s) => {
-                    if (typeof s === "string" && s.includes("/")) {
-                        const [d, m, y] = s.split("/");
-                        return new Date(+y, +m - 1, +d);
-                    }
-                    return new Date(s);
-                };
+    const parseDate = (s) => {
+        if (typeof s === "string" && s.includes("/")) {
+            const [d, m, y] = s.split("/");
+            return new Date(+y, +m - 1, +d);
+        }
+        return new Date(s);
+    };
 
-                const oStart = parseDate(oSafeCopy.StartDate);
-                const oEnd = parseDate(oSafeCopy.EndDate);
+    const oStart = parseDate(oSafeCopy.StartDate);
+    const oEnd = parseDate(oSafeCopy.EndDate);
 
-                // Calendar month diff
-                // Calendar month diff (fallback only)
-                let iMonths =
-                    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-                    (oEnd.getMonth() - oStart.getMonth());
+    const iMonths =
+        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+        (oEnd.getMonth() - oStart.getMonth()) || 1;
 
-                iMonths = iMonths > 0 ? iMonths : 1;
+    const iYears =
+        Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
 
-                // Calendar year diff (fallback only)
-                let iYears =
-                    oEnd.getFullYear() - oStart.getFullYear();
+    if (oSafeCopy.UnitText === "Per Month") {
+        oSafeCopy.SelectedMonths = String(
+            oSafeCopy.TotalMonths || iMonths
+        );
+        oSafeCopy.TotalMonths = Number(oSafeCopy.SelectedMonths);
+        oSafeCopy.TotalYears = 0;
+    }
 
-                iYears = iYears > 0 ? iYears : 1;
+    if (oSafeCopy.UnitText === "Per Year") {
+        oSafeCopy.SelectedMonths = String(
+            oSafeCopy.TotalYears || iYears
+        );
+        oSafeCopy.TotalYears = Number(oSafeCopy.SelectedMonths);
+        oSafeCopy.TotalMonths = 0;
+    }
+}
 
-
-                // 🔥 USE USER-SELECTED VALUE FIRST
-                if (oSafeCopy.UnitText === "Per Month") {
-                    oSafeCopy.SelectedMonths =
-                        String(oSafeCopy.SelectedMonths || oSafeCopy.TotalMonths || iMonths);
-
-                    oSafeCopy.TotalMonths = Number(oSafeCopy.SelectedMonths);
-                    oSafeCopy.TotalYears = 0;
-                }
-
-                if (oSafeCopy.UnitText === "Per Year") {
-                    oSafeCopy.SelectedMonths =
-                        String(oSafeCopy.SelectedMonths || oSafeCopy.TotalYears || iYears);
-
-                    oSafeCopy.TotalYears = Number(oSafeCopy.SelectedMonths);
-                    oSafeCopy.TotalMonths = 0;
-                }
-
-            }
 
             this._oEditModel = new JSONModel(oSafeCopy);
             this.getView().setModel(this._oEditModel, "edit");
 
 
-            if (oSafeCopy.TotalMonths) {
-                this._oEditModel.setProperty("/TotalMonths", String(oSafeCopy.TotalMonths));
-            }
+            // if (oSafeCopy.TotalMonths) {
+            //     this._oEditModel.setProperty("/TotalMonths", String(oSafeCopy.TotalMonths));
+            // }
 
-            if (oSafeCopy.TotalYears) {
-                this._oEditModel.setProperty("/TotalYears", String(oSafeCopy.TotalYears));
-            }
+            // if (oSafeCopy.TotalYears) {
+            //     this._oEditModel.setProperty("/TotalYears", String(oSafeCopy.TotalYears));
+            // }
             // =================================================
             // LOAD DIALOG IF NEEDED
             // =================================================
@@ -477,10 +480,13 @@ sap.ui.define([
                     this
                 );
                 this.getView().addDependent(this._oEditDialog);
+               
             }
 
             // Assign model
             this._oEditDialog.setModel(this._oEditModel, "edit");
+             this._sPrevEditStartDate =
+                         this._oEditModel.getProperty("/StartDate");
 
             // Filter rate types
             this._filterRateTypesForEdit(this._oSelectedFacility);
@@ -769,6 +775,30 @@ sap.ui.define([
 
                 if (iDays < 1) iDays = 1;
             }
+            /* ===============================
+   VALIDATE AGAINST BOOKING END DATE
+=============================== */
+const oHostelModel = this.getView().getModel("HostelModel");
+const sBookingEnd = oHostelModel.getProperty("/EndDate");
+
+if (sBookingEnd && oEnd) {
+    const oBookingEnd = this._parseDate(sBookingEnd);
+
+    if (oBookingEnd && oEnd > oBookingEnd) {
+        MessageBox.error(
+            this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
+        );
+  //  ROLLBACK START DATE
+        oModel.setProperty("/StartDate", this._sPrevEditStartDate);
+
+        //  Reset DatePicker UI
+        oEvent.getSource().setDateValue(
+            this._parseDate(this._sPrevEditStartDate)
+        );
+        return;
+    }
+}
+
 
 
 
@@ -856,18 +886,39 @@ sap.ui.define([
                     return;
                 }
             }
-            const iFacilityMonths =
-                Number(oEditModel.getProperty("/SelectedMonths")) || 0;
+           if (sUnitText === "Per Month") {
 
-            const iBookingMonths =
-                Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+    const iFacilityMonths =
+        Number(oEditModel.getProperty("/SelectedMonths")) || 0;
 
-            if (iFacilityMonths > iBookingMonths) {
-                MessageBox.error(
-                    this.i18nModel.getText("facilityMonthsCannotExceedBookingMonths"),
-                );
-                return;
-            }
+    const iBookingMonths =
+        Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+       
+
+    if (iFacilityMonths > iBookingMonths) {
+        MessageBox.error(
+            this.i18nModel.getText("facilityMonthsCannotExceedBookingMonths")
+        );
+        return;
+    }
+}
+
+if (sUnitText === "Per Year") {
+
+    const iFacilityYears =
+        Number(oEditModel.getProperty("/SelectedMonths")) || 0;
+
+    const iBookingYears =
+       Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+
+    if (iFacilityYears > iBookingYears) {
+        MessageBox.error(
+            this.i18nModel.getText("facilityYearsCannotExceedBookingYears")
+        );
+        return;
+    }
+}
+
             /* =========================
                LOCATE PERSON & FACILITY
             ========================= */
@@ -907,24 +958,32 @@ sap.ui.define([
                 return new Date(v);
             };
 
-            const oStart = parseDate(oHostelModel.getProperty("/StartDate"));
-            const oEnd = parseDate(oHostelModel.getProperty("/EndDate"));
+            // const oStart = parseDate(oHostelModel.getProperty("/StartDate"));
+            // const oEnd = parseDate(oHostelModel.getProperty("/EndDate"));
 
             //  USE FACILITY-LEVEL DAYS (ALREADY CORRECT)
             const iDays = Number(oEditModel.getProperty("/TotalDays") || 1);
             //  TAKE FROM EDIT MODEL IF PRESENT
-            const iMonths = Number(
-                oFacility.SelectedMonths ||
-                oEditModel.getProperty("/TotalMonths")
-            ) || (
-                    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-                    (oEnd.getMonth() - oStart.getMonth())
-                ) || 1;
+           let iMonths = 0;
+let iYears = 0;
 
-            const iYears = Number(
-                oFacility.TotalYears ||
-                oEditModel.getProperty("/TotalYears")
-            ) || Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
+if (sUnitText === "Per Month") {
+    iMonths =
+        Number(oEditModel.getProperty("/SelectedMonths")) ||
+        Number(oEditModel.getProperty("/TotalMonths")) || 1;
+
+    oFacility.TotalMonths = iMonths;
+    oFacility.TotalYears = 0;
+}
+
+if (sUnitText === "Per Year") {
+    iYears =
+        Number(oEditModel.getProperty("/SelectedMonths")) ||
+        Number(oEditModel.getProperty("/TotalYears")) || 1;
+
+    oFacility.TotalYears = iYears;
+    oFacility.TotalMonths = 0;
+}
 
 
             /* =========================
@@ -956,22 +1015,29 @@ sap.ui.define([
                 Number(oHostelModel.getProperty("/TotalDays")) ||
                 Number(oHostelModel.getProperty("/NoOfDays")) ||
                 iDays;
+                const bookingMonths =
+    Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+                 const bookingYears =
+    Math.max(1, Math.ceil(bookingMonths / 12));
 
-            let roomRent = 0;
-            switch (paymentType) {
-                case "Per Day":
-                    roomRent = baseRoomRent * bookingDays;
-                    break;
-                case "Per Month":
-                    roomRent = baseRoomRent * selectedMonths;
-                    break;
-                case "Per Year":
-                    roomRent = baseRoomRent * iYears;
-                    break;
-            }
+            // let roomRent = 0;
+            // switch (paymentType) {
+            //     case "Per Day":
+            //         roomRent = baseRoomRent * bookingDays;
+            //         break;
+            //     case "Per Month":
+            //         roomRent = baseRoomRent * bookingMonths;
+            //         break;
+            //     case "Per Year":
+            //         roomRent = baseRoomRent * bookingYears;
+            //         break;
+            // }
+const roomRentSafe = Number(oPerson.RoomRentPerPerson) || 0;
+const facilityTotalSafe = Number(oPerson.TotalFacilityPrice) || 0;
 
-            oPerson.RoomRentPerPerson = roomRent;
-            oPerson.SubTotal = roomRent + oPerson.TotalFacilityPrice;
+// ✅ Correct subtotal
+oPerson.SubTotal = roomRentSafe + facilityTotalSafe;
+           
 
 
             // ------------------
@@ -1008,23 +1074,38 @@ sap.ui.define([
                 oPerson.SGST +
                 oPerson.IGST
             ).toFixed(2));
+let divisor = 1;
+
+if (paymentType === "Per Month") {
+    divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+}
+
+if (paymentType === "Per Year") {
+    divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+}
+
+const monthly = oPerson.FinalTotalCost / divisor;
+
+oPerson.MonthlyCostPerPerson = Number(monthly.toFixed(2));
+oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
 
 
-            if (paymentType === "Per Day") {
-                oPerson.MonthlyCostPerPerson =
-                    Number(oPerson.FinalTotalCost.toFixed(2));
-                oPerson.MonthlyCostPerson =
-                    Number(oPerson.FinalTotalCost.toFixed(2));
-            } else {
-                const monthly =
-                    oPerson.FinalTotalCost / selectedMonths;
 
-                oPerson.MonthlyCostPerPerson =
-                    Number(monthly.toFixed(2));
+            // if (paymentType === "Per Day") {
+            //     oPerson.MonthlyCostPerPerson =
+            //         Number(oPerson.FinalTotalCost.toFixed(2));
+            //     oPerson.MonthlyCostPerson =
+            //         Number(oPerson.FinalTotalCost.toFixed(2));
+            // } else {
+            //     const monthly =
+            //         oPerson.FinalTotalCost / selectedMonths;
 
-                oPerson.MonthlyCostPerson =
-                    Number(monthly.toFixed(2));
-            }
+            //     oPerson.MonthlyCostPerPerson =
+            //         Number(monthly.toFixed(2));
+
+            //     oPerson.MonthlyCostPerson =
+            //         Number(monthly.toFixed(2));
+            // }
 
 
             oPerson.TotalDays = iDays;
@@ -1908,8 +1989,6 @@ sap.ui.define([
             } finally {
                 BusyIndicator.hide();
             }
-        }
-
-        ,
+        },
     });
 });

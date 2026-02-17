@@ -56,7 +56,7 @@
                     value="{edit>/StartTime}"
                     displayFormat="HH"
                     valueFormat="HH"
-                    change=".onTimeChange"
+                    change="onTimeChange"
                     visible="{= ${edit>/UnitText} === 'Per Hour' }"
                     valueStateText="{i18n>selectStartTime}"
                 />
@@ -70,7 +70,7 @@
                     value="{edit>/EndTime}"
                     displayFormat="HH"
                     valueFormat="HH"
-                    change=".onTimeChange"
+                    change="onTimeChange"
                     visible="{= ${edit>/UnitText} === 'Per Hour' }"
                     valueStateText="{i18n>selectEndTime}"
                 />

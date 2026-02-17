@@ -128,8 +128,6 @@ sap.ui.define([
             oHostelModel.setProperty("/FullName", "");
             oHostelModel.setProperty("/SelectedMonths", "1");
             oHostelModel.setProperty("/SelectedPerson", "1");
-
-
             // If older fields exist, normalize them to new ones
             if (oData.RoomType && !oData.BedType && oData.RoomType.includes("-")) {
                 const parts = oData.RoomType.split("-");
@@ -183,7 +181,6 @@ sap.ui.define([
 
                 oEndDatePicker.setEditable(false)
             }
-
             //  Refresh visibility
             oBTn.refresh(true);
 
@@ -200,7 +197,6 @@ sap.ui.define([
             this.oWizard.getSteps()[0].setValidated(true);
             this.oWizard.getSteps()[1].setValidated(false);
             this.oWizard.getSteps()[2].setValidated(false);
-            // this.resetAllBookingData()
             this.getView().setModel(new JSONModel({
                 isOtpSelected: false,
                 isPasswordSelected: true,
@@ -915,7 +911,31 @@ sap.ui.define([
                             placeholder: "Enter Full Name",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/FullName}",
-                            maxLength: 40
+                            maxLength: 40,
+                         liveChange: function (oEvent) {
+    const oInput = oEvent.getSource();
+    let sValue = oEvent.getParameter("value");
+
+    // Allow only alphabets and spaces
+    const sFilteredValue = sValue.replace(/[^a-zA-Z\s]/g, "");
+
+    // Replace invalid characters immediately
+    if (sValue !== sFilteredValue) {
+        oInput.setValue(sFilteredValue);
+    }
+
+    // Empty is allowed (no error while typing)
+    if (!sFilteredValue) {
+        oInput.setValueState(sap.ui.core.ValueState.None);
+        return;
+    }
+
+    //  Valid input → clear error
+    oInput.setValueState(sap.ui.core.ValueState.None);
+}
+
+
+
                         }),
                         new sap.m.Label({
                             text: "UserID",
@@ -994,7 +1014,7 @@ sap.ui.define([
                                 const oEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                 if (sValue && !oEmailRegex.test(sValue)) {
                                     oInput.setValueState("Error");
-                                    oInput.setValueStateText("Please enter a valid email address.");
+                                    oInput.setValueStateText("Please enter a valid email address");
                                 } else {
                                     oInput.setValueState("None");
                                 }
@@ -2044,15 +2064,18 @@ sap.ui.define([
         },
 
         onDialogBackButton: function () {
+            if (this._oMessagePopover) {
+        this._oMessagePopover.close();
+    }
             this._iSelectedStepIndex = this._oWizard.getSteps().indexOf(this._oSelectedStep);
             var oPreviousStep = this._oWizard.getSteps()[this._iSelectedStepIndex - 1];
-
+               
             if (this._oSelectedStep) {
                 this._oWizard.goToStep(oPreviousStep, true);
             } else {
                 this._oWizard.previousStep();
             }
-
+         
             this._iSelectedStepIndex--;
             this._oSelectedStep = oPreviousStep;
 
@@ -2142,7 +2165,7 @@ sap.ui.define([
             // ===============================
             oStepGeneral.setValidated(bValid);
 
-            // 🔒 THIS CONTROLS HEADER CLICKABILITY
+            //  THIS CONTROLS HEADER CLICKABILITY
             oStepPersonal.setEnabled(bValid);
 
             // If invalid → force user back to Step 1
@@ -2256,14 +2279,6 @@ sap.ui.define([
             const oView = this.getView();
             const oModel = oView.getModel("HostelModel");
             oModel.setProperty("/CouponCode", "");
-            //  const inputID = sap.ui.core.Fragment.byId(
-            //     this.getView().getId(),
-            //     "BookingcouponInput"
-            // );
-            // if (inputID) {
-            //     inputID.setShowValueHelp(false);
-            // }
-
             const oBtn = this.byId("couponApplyBtn");
             if (oBtn) {
                 oBtn.setVisible(true);
@@ -2323,13 +2338,6 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
                 return null;
             }
-
-            // ---------- MONTHS ----------
-            // let iMonths =
-            //     (oEndDate.getFullYear() - oStartDate.getFullYear()) * 12 +
-            //     (oEndDate.getMonth() - oStartDate.getMonth());
-
-            // iMonths = iMonths > 0 ? iMonths : 1;
 
             // ---------- YEARS ----------
             let iYears = oEndDate.getFullYear() - oStartDate.getFullYear();
@@ -2452,13 +2460,27 @@ sap.ui.define([
                         oPerson.SubTotal + oPerson.CGST + oPerson.SGST + oPerson.IGST).toFixed(2));
 
 
-                if (paymentType !== "Per Day") {
-                    oPerson.MonthlyCostPerPerson =
-                        Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));
-                } else {
-                    oPerson.MonthlyCostPerPerson =
-                        Number((oPerson.FinalTotalCost / selectedMonths).toFixed(2));   // or null
-                }
+               if (paymentType === "Per Day") {
+
+    // Per Day → full amount (already includes total days)
+    oPerson.MonthlyCostPerPerson =
+        Number(oPerson.FinalTotalCost.toFixed(2));
+
+    oPerson.MonthlyCostPerson =
+        Number(oPerson.FinalTotalCost.toFixed(2));
+
+} else {
+
+    // Per Month / Per Year → divide by booking months
+    const divisor = selectedMonths > 0 ? selectedMonths : 1;
+
+    oPerson.MonthlyCostPerPerson =
+        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
+
+    oPerson.MonthlyCostPerson =
+        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
+}
+
                 oPerson.MonthlyCostPerson =
                     oPerson.FinalTotalCost / selectedMonths;
 
