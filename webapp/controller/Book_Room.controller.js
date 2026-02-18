@@ -188,16 +188,21 @@ sap.ui.define([
             setTimeout(() => {
                 this.Roomdetails();
             }, 100);
-          const aDate = this.getView().getModel("HostelModel");
-const sAvailableDate = aDate.getProperty("/AvailableDate"); // "20-02-2026"
+//           const aDate = this.getView().getModel("HostelModel");
+// const sAvailableDate = aDate.getProperty("/AvailableDate"); // "20-02-2026"
 
-if (sAvailableDate) {
-    const oToday = this._parseDate(sAvailableDate);
-    if (oToday) {
-        oToday.setHours(0, 0, 0, 0);
-        oHostelModel.setProperty("/TodayDate", oToday);
-    }
-}
+// if (sAvailableDate) {
+//     const oToday = this._parseDate(sAvailableDate);
+//     if (oToday) {
+//         oToday.setHours(0, 0, 0, 0);
+//         oHostelModel.setProperty("/TodayDate", oToday);
+//     }
+// }else{
+    const oToday = new Date();
+            // Strip time (set hours to 0) to avoid timezone offset issues
+            oToday.setHours(0, 0, 0, 0);
+            oHostelModel.setProperty("/TodayDate", oToday);
+
 
             this.oWizard = this.byId("TC_id_wizard");
             this.oWizard.discardProgress(this.byId("TC_id_stepGeneralInfo"));
@@ -2903,16 +2908,16 @@ if (
             }
 
             const oBookingID = this.getView().getModel("HostelModel").getProperty("/BranchCode");
-            const aDate = this.getView().getModel("HostelModel").getProperty("/AvailableDate");
+            // const aDate = this.getView().getModel("HostelModel").getProperty("/AvailableDate");
 
 
             this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
                 sPath: oBookingID
             }
             )
-             this.getView().setModel(new JSONModel({
-                Date: aDate
-            }), "ViewDateModel");
+            //  this.getView().setModel(new JSONModel({
+            //     Date: aDate
+            // }), "ViewDateModel");
 
 
         },
@@ -4861,17 +4866,17 @@ if (
             });
         },
 
-        onBankNameChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
-        },
+        // onBankNameChange: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     utils._LCvalidateMandatoryField(oEvent);
+        //     if (oInput.getValue() === "") oInput.setValueState("None");
+        // },
 
-        onCurrencyChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            utils._LCstrictValidationComboBox(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
-        },
+        // onCurrencyChange: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     utils._LCstrictValidationComboBox(oEvent);
+        //     if (oInput.getValue() === "") oInput.setValueState("None");
+        // },
 
         onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
@@ -4879,11 +4884,11 @@ if (
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onChangeUPIID: function (oEvent) {
-            const oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
-        },
+        // onChangeUPIID: function (oEvent) {
+        //     const oInput = oEvent.getSource();
+        //     utils._LCvalidateMandatoryField(oEvent);
+        //     if (oInput.getValue() === "") oInput.setValueState("None");
+        // },
 
         onPaymentDateChange: function (oEvent) {
             const oInput = oEvent.getSource();
@@ -5175,13 +5180,11 @@ if (
             oStateCB.setValue(sState);
             oSourceCB.setValue(sSource);
         },
-
-
-        onCancelPress: function () {
-            this.resetAllBookingData()
-            var oRouter = this.getOwnerComponent().getRouter()
-            oRouter.navTo("RouteHostel")
-        },
+        // onCancelPress: function () {
+        //     this.resetAllBookingData()
+        //     var oRouter = this.getOwnerComponent().getRouter()
+        //     oRouter.navTo("RouteHostel")
+        // },
         onCancelPress: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
@@ -5259,90 +5262,90 @@ if (
             }
         },
 
-        onPressEditSave: async function (oEvent) {
-            var oButton = oEvent.getSource();
-            var oViewModel = this.getView().getModel("viewModel");
-            var bEditMode = oViewModel.getProperty("/editMode");
-            var oHostelModel = this.getView().getModel("HostelModel");
-            var oData = oHostelModel.getData();
+        // onPressEditSave: async function (oEvent) {
+        //     var oButton = oEvent.getSource();
+        //     var oViewModel = this.getView().getModel("viewModel");
+        //     var bEditMode = oViewModel.getProperty("/editMode");
+        //     var oHostelModel = this.getView().getModel("HostelModel");
+        //     var oData = oHostelModel.getData();
 
-            if (!bEditMode) {
-                // Before entering edit mode, ensure bed types are loaded
-                await this.BedTypedetails();
+        //     if (!bEditMode) {
+        //         // Before entering edit mode, ensure bed types are loaded
+        //         await this.BedTypedetails();
 
-                // Switch to edit mode
-                oViewModel.setProperty("/editMode", true);
-                oButton.setText("Save");
-            } else {
+        //         // Switch to edit mode
+        //         oViewModel.setProperty("/editMode", true);
+        //         oButton.setText("Save");
+        //     } else {
 
-                oViewModel.setProperty("/editMode", false);
-                oButton.setText("Edit");
+        //         oViewModel.setProperty("/editMode", false);
+        //         oButton.setText("Edit");
 
-                try {
-                    //  Build Booking data
-                    const bookingData = [{
-                        BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                        RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
-                        RoomPrice: oData.RoomPrice || "0",
-                        NoOfPersons: oData.noofperson || 1,
-                        Customerid: oData.CustomerId,
-                        StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                        EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                        Status: "Updated",
-                        PaymentType: oData.PaymentType || "",
-                        BedType: oData.BedType || ""
-                    }];
+        //         try {
+        //             //  Build Booking data
+        //             const bookingData = [{
+        //                 BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+        //                 RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
+        //                 RoomPrice: oData.RoomPrice || "0",
+        //                 NoOfPersons: oData.noofperson || 1,
+        //                 Customerid: oData.CustomerId,
+        //                 StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+        //                 EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+        //                 Status: "Updated",
+        //                 PaymentType: oData.PaymentType || "",
+        //                 BedType: oData.BedType || ""
+        //             }];
 
-                    //  Build Facility data
-                    const facilityData = [];
-                    if (oData.AllSelectedFacilities && oData.AllSelectedFacilities.length > 0) {
-                        oData.AllSelectedFacilities.forEach(fac => {
-                            facilityData.push({
-                                PaymentID: "",
-                                FacilityName: fac.FacilityName,
-                                FacilitiPrice: fac.Price,
-                                StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                PaidStatus: "Pending"
-                            });
-                        });
-                    }
-                    //  Build Personal Information
-                    const personData = [{
-                        Salutation: oData.Salutation || "",
-                        CustomerName: oData.FullName || "",
-                        UserID: oData.UserID || "",
-                        CustomerID: oData.CustomerID || "",
-                        STDCode: oData.STDCode || "",
-                        MobileNo: oData.MobileNo || "",
-                        Gender: oData.Gender || "",
-                        DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
-                        CustomerEmail: oData.CustomerEmail || "",
-                        Country: oData.Country || "",
-                        State: oData.State || "",
-                        City: oData.City || "",
-                        PermanentAddress: oData.Address || "",
-                        Booking: bookingData,
-                        FacilityItems: facilityData,
-                    }];
+        //             //  Build Facility data
+        //             const facilityData = [];
+        //             if (oData.AllSelectedFacilities && oData.AllSelectedFacilities.length > 0) {
+        //                 oData.AllSelectedFacilities.forEach(fac => {
+        //                     facilityData.push({
+        //                         PaymentID: "",
+        //                         FacilityName: fac.FacilityName,
+        //                         FacilitiPrice: fac.Price,
+        //                         StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+        //                         EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+        //                         PaidStatus: "Pending"
+        //                     });
+        //                 });
+        //             }
+        //             //  Build Personal Information
+        //             const personData = [{
+        //                 Salutation: oData.Salutation || "",
+        //                 CustomerName: oData.FullName || "",
+        //                 UserID: oData.UserID || "",
+        //                 CustomerID: oData.CustomerID || "",
+        //                 STDCode: oData.STDCode || "",
+        //                 MobileNo: oData.MobileNo || "",
+        //                 Gender: oData.Gender || "",
+        //                 DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+        //                 CustomerEmail: oData.CustomerEmail || "",
+        //                 Country: oData.Country || "",
+        //                 State: oData.State || "",
+        //                 City: oData.City || "",
+        //                 PermanentAddress: oData.Address || "",
+        //                 Booking: bookingData,
+        //                 FacilityItems: facilityData,
+        //             }];
 
-                    //  Final payload structure
-                    const oPayload = personData;
-                    var custid = bookingData[0].Customerid
-                    await this.ajaxUpdateWithJQuery("HM_Customer", {
-                        data: oPayload,
-                        filters: {
-                            CustomerID: custid
-                        }
-                    });
-                    MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
+        //             //  Final payload structure
+        //             const oPayload = personData;
+        //             var custid = bookingData[0].Customerid
+        //             await this.ajaxUpdateWithJQuery("HM_Customer", {
+        //                 data: oPayload,
+        //                 filters: {
+        //                     CustomerID: custid
+        //                 }
+        //             });
+        //             MessageToast.show(this.i18nModel.getText("bookingDetailsUpdatedSuccessfully"));
 
-                } catch (err) {
-                    console.error("Error during update:", err);
-                    MessageBox.error("Failed to Update Booking Details: " + err.message);
-                }
-            }
-        },
+        //         } catch (err) {
+        //             console.error("Error during update:", err);
+        //             MessageBox.error("Failed to Update Booking Details: " + err.message);
+        //         }
+        //     }
+        // },
 
         onSelectionChange: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("selectedItem");
