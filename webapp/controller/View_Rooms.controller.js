@@ -18,7 +18,7 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
-            this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
+            // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
@@ -29,18 +29,18 @@ sap.ui.define([
             });
             this.getView().setModel(model, "VisibilityModel")
 
-              if (!this._oBookingDateDialog) {
-        this._oBookingDateDialog = await sap.ui.core.Fragment.load({
-            name: "sap.ui.com.project1.fragment.BookingDate",
-            controller: this
-        });
-        this.getView().addDependent(this._oBookingDateDialog);
-    } 
-              sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date()).setValueState("None")
-              this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
+    //           if (!this._oBookingDateDialog) {
+    //     this._oBookingDateDialog = await sap.ui.core.Fragment.load({
+    //         name: "sap.ui.com.project1.fragment.BookingDate",
+    //         controller: this
+    //     });
+    //     this.getView().addDependent(this._oBookingDateDialog);
+    // } 
+    //           sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date()).setValueState("None")
+    //           this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
 
-           this.getView().addStyleClass("blurView")
-           this._oBookingDateDialog.open();
+    //        this.getView().addStyleClass("blurView")
+    //        this._oBookingDateDialog.open();
 
             this.sPath = oEvent.getParameter("arguments").sPath;
       
@@ -90,12 +90,12 @@ sap.ui.define([
 
                 var sBranchCode= this.sPath
           
-            var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
+            // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
                 this.getView().setBusy(true);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
-                    JoiningDate:Date,
+                    // JoiningDate:Date,
                     BranchCode: sBranchCode,
                 });
                 await this.model(response)

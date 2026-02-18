@@ -1,20 +1,32 @@
 <core:FragmentDefinition 
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
 
     <Dialog
         id="idBookingDateDialog"
         title="Select Booking Date"
-        stretchOnPhone="true">
+         contentWidth="28rem"
+        contentHeight="auto">
 
-        <VBox class="sapUiSmallMargin">
-          <MessageStrip
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                  <!-- <MessageStrip
                 text="Kindly select a date to view availability."
                 showIcon="true"
                 type="Information"
-                class="sapUiTinyMarginBottom"
-            />
-            <Label text="Booking Date" required="true" />
+            /> -->
+            <Label text="Check-in Date" required="true" />
             <DatePicker
                 id="idBookingDate"
                 width="100%"
@@ -23,7 +35,19 @@
                 change="onDatePickerChange"
                 valueStateText="Please select date"
             />
-        </VBox>
+              <Label text="Check-out Date" required="true" />
+            <DatePicker
+                id="idBookingEndDate"
+                width="100%"
+                displayFormat="dd/MM/yyyy"
+                valueFormat="yyyy-MM-dd"
+                change="onDatePickerChange"
+                valueStateText="Please select date"
+            />
+             
+
+            </f:content>
+        </f:SimpleForm>
 
         <beginButton>
             <Button

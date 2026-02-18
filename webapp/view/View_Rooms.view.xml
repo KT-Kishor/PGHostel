@@ -22,7 +22,7 @@
         </headerContent>
 
         <content>
-         <fb:FilterBar
+         <!-- <fb:FilterBar
                 id="PO_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -36,8 +36,8 @@
             >
                 <fb:filterGroupItems>   
                     <fb:FilterGroupItem
-                        name="Booking Date"
-                        label="Booking Date"
+                        name="Check-in Date"
+                        label="Check-in Date"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -51,7 +51,24 @@
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
 
-            </fb:FilterBar>
+                  <fb:filterGroupItems>   
+                    <fb:FilterGroupItem
+                        name="Check-out Date"
+                        label="Check-out Date"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DatePicker
+                                id="VR_id_CheckoutDate"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+
+            </fb:FilterBar> -->
             <VBox
                 height="600px"
                 justifyContent="Center"
