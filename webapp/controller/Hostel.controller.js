@@ -2264,7 +2264,7 @@ sap.ui.define([
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
             // 🔹 Make Area and Room Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
-            if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(true);
+            if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
         },
 
         onPressBookingRow: function (oEvent) {

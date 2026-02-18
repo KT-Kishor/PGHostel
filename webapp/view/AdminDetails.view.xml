@@ -958,14 +958,15 @@
                                     <Text
                                         text="{CustomerData>UnitText}"
                                     />
-                      <Text
+                    <Text
     text="{= (${CustomerData>UnitText} === 'Per Month') 
-        ? ${CustomerData>TotalMonths} + ' ' + (${CustomerData>TotalMonths} === 1 ? 'Month' : 'Months')
+        ? Number(${CustomerData>TotalMonths}) + ' ' + (Number(${CustomerData>TotalMonths}) === 1 ? 'Month' : 'Months')
         : (${CustomerData>UnitText} === 'Per Year') 
-            ? ${CustomerData>TotalYears} + ' ' + (${CustomerData>TotalYears} === 1 ? 'Year' : 'Years')
-            : ${CustomerData>UnitText}==='Per Day' ?
-             ${CustomerData>TotalDays} + ' ' + (${CustomerData>TotalDays} === 1 ? 'Day' : 'Days') : 
-              ${CustomerData>TotalHour} + ' ' + (${CustomerData>TotalHour} === 1 ? 'Hour' : 'Hours') }" />
+            ? Number(${CustomerData>TotalYears}) + ' ' + (Number(${CustomerData>TotalYears}) === 1 ? 'Year' : 'Years')
+            : (${CustomerData>UnitText} === 'Per Day') 
+                ? Number(${CustomerData>TotalDays}) + ' ' + (Number(${CustomerData>TotalDays}) === 1 ? 'Day' : 'Days') 
+                : Number(${CustomerData>TotalHour}) + ' ' + (Number(${CustomerData>TotalHour}) === 1 ? 'Hour' : 'Hours') }" />
+
 
 
 
