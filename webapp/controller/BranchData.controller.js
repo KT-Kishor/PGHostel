@@ -932,7 +932,7 @@ sap.ui.define([
             const mControls = {
                 BD_idBName: "enterBranchName",
                 BD_idAddress: "enterAddress",
-                BD_idLandmark: "enterLandmark",
+                BD_idLandmark: "Enter Landmark",
                 BD_idGeoLocation: "enterLocation",
                 BD_idPin: "enterPincode",
                 MC_id_Country: "selectCountry",

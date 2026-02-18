@@ -916,20 +916,9 @@ sap.ui.define([
                 return;
             }
             const oMobile = sap.ui.getCore().byId(oView.createId("id_enq_MobileNo"));
-            const oSTD = sap.ui.getCore().byId(oView.createId("id_enq_STD"));
-            const sSTD = oSTD.getSelectedKey();
-            const sMobile = oMobile.getValue();
-
-            let isMobileValid = this._validateMobileStrict();
-            if (!isMobileValid) {
-                sap.m.MessageToast.show("Please enter valid mobile number");
-                return;
-            }
-
-            if (!isMobileValid) {
+            if (!oMobile.getValue()) {
                 oMobile.setValueState("Error");
                 oMobile.setValueStateText("Enter valid mobile number");
-                sap.m.MessageToast.show("Please enter valid mobile number");
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -943,7 +932,6 @@ sap.ui.define([
                 CustomerPhone: (oModel.STDCode || "") + oModel.Mobile,
                 CustomerComment: oModel.Comments || ""
             };
-            console.log("Enquiry Payload:", oData);
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oresponse = await this.ajaxCreateWithJQuery("HM_EnquiryEmail", {
@@ -958,8 +946,8 @@ sap.ui.define([
                         emphasizedAction: sap.m.MessageBox.Action.OK,
                         onClose: function () {
                             if (this._oEnquiry && this._oEnquiry.isOpen()) {
-                    this._oEnquiry.close();
-                }
+                                this._oEnquiry.close();
+                            }
                             this._clearEnquiryStates(); // optional if you have it
                         }.bind(this)
                     }
@@ -984,37 +972,6 @@ sap.ui.define([
         },
 
         ADMIN_onMobileLiveChange: function (oEvent) {
-            this._validateMobileStrict();
-        },
-
-        ADMIN_onChangeSTD: function (oEvent) {
-            const oSTD = oEvent.getSource();
-            const oMobile = this.byId("id_enq_MobileNo");
-            const sKey = oSTD.getSelectedKey();
-            const sMobileValue = (oMobile.getValue() || "").trim();
-
-            if (!sKey) {
-                oSTD.setValueState("Error");
-                oSTD.setValueStateText("Please select ISD code");
-                return;
-            }
-            oSTD.setValueState("None");
-            oSTD.setValueStateText("");
-
-            if (sKey === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(14);
-            }
-            if (sMobileValue) {
-                this._validateMobileStrict();
-            } else {
-                oMobile.setValueState("None");
-                oMobile.setValueStateText("");
-            }
-        },
-
-        _validateMobileStrict: function () {
             const oMobile = this.byId("id_enq_MobileNo");
             const oSTD = this.byId("id_enq_STD");
 
@@ -1061,6 +1018,27 @@ sap.ui.define([
             oMobile.setValueState("None");
             oMobile.setValueStateText("");
             return true;
+        },
+
+        ADMIN_onChangeSTD: function (oEvent) {
+            const oSTD = oEvent.getSource();
+            const oMobile = this.byId("id_enq_MobileNo");
+            const sKey = oSTD.getSelectedKey();
+            const sMobileValue = (oMobile.getValue() || "").trim();
+
+            if (!sKey) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("Please select ISD code");
+                return;
+            }
+            oSTD.setValueState("None");
+            oSTD.setValueStateText("");
+
+            if (sKey === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
         },
 
         onAdminChangeSalutation: function (oEvent) {

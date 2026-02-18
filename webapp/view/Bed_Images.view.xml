@@ -147,7 +147,7 @@
                                         <m:Input
                                             id="id_DepositAmount"
                                             value="{BedImageModel>/Deposit}"
-                                            placeholder="Enter Deposit Amount"
+                                            placeholder="Enter deposit amount"
                                             liveChange="onNumber"
                                             maxLength="7"
                                             valueStateText="Enter Deposit Amount"

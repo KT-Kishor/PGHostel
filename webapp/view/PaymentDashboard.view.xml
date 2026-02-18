@@ -46,7 +46,7 @@
                                 <MultiComboBox
                                     id="customerFilter"
                                     width="400px"
-                                    placeholder="Select Customer"
+                                    placeholder="Select customer"
                                     items="{path: 'customers>/'}"
                                 >
                                     <items>
@@ -84,7 +84,7 @@
                                     id="yearFilter"
                                     displayFormat="yyyy"
                                     valueFormat="yyyy"
-                                    placeholder="Select Year"
+                                    placeholder="Select year"
                                     change="onchangeFY"
                                 />
                             </fb:control>

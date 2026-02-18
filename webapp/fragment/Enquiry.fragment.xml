@@ -99,7 +99,7 @@
                             id="id_enq_STD"
                             selectedKey="{EnquiryModel>/STDCode}"
                             change="ADMIN_onChangeSTD"
-                            placeholder="ISD"
+                            placeholder="isd"
                             showSecondaryValues="true"
                             width="100%"
                             items="{path:'CountryModel>/', length:1000}"
@@ -122,13 +122,13 @@
                             value="{EnquiryModel>/Mobile}"
                             liveChange="ADMIN_onMobileLiveChange"
                             maxLength="18"
-                            placeholder="Enter Mobile Number"
+                            placeholder="Enter mobile number"
                             width="100%"
                             valueStateText="Enter valid mobile number"
                         />
                     </VBox>
                 </HBox>
-                 <Label
+                <Label
                     text="{i18n>email}"
                     required="true"
                 />
@@ -151,12 +151,11 @@
                     value="{EnquiryModel>/Comments}"
                     rows="3"
                     width="100%"
-                    placeholder="Enter Comments"
+                    placeholder="Enter comments"
                     maxLength="120"
                     valueStateText="Enter comments"
                     liveChange="onEnqCommentsChange"
                 />
-               
             </f:content>
         </f:SimpleForm>
         <beginButton>

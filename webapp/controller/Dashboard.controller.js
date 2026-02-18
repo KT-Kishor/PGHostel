@@ -1,33 +1,31 @@
 sap.ui.define([
     "./BaseController",
-    "sap/m/MessageBox",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
-    "../model/formatter"
-], function (BaseController, MessageBox, MessageToast, JSONModel, Formatter) {
+    "../model/formatter",
+    "sap/viz/ui5/controls/common/feeds/FeedItem",
+    "sap/viz/ui5/data/FlattenedDataset"
+], function (BaseController, MessageToast, JSONModel, Formatter, FeedItem, FlattenedDataset) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Dashboard", {
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDashboard").attachMatched(this._onRouteMatched, this);
             this.getView().setModel(new JSONModel({ monthly: "column", daily: "column", status: "column", payment: "column" }), "chartTypeModel");
+        },
+
+        _onRouteMatched: async function () {
+            this.commonLoginFunction();
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             const oNow = new Date();
             const iMonth = oNow.getMonth() + 1;
             const iYear = oNow.getFullYear();
             this.byId("D_id_month").setSelectedKey(String(iMonth));
             this.byId("D_id_year").setValue(String(iYear));
-        },
-
-        _onRouteMatched: async function () {
-            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
-
             if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
-
             this.BranchID = oLogin.BranchCode;
-            // this.onClearAndSearch("D_id_FilterbarEmployee");
             await this._loadCustomers();
-            this.commonLoginFunction();
             this.loadDashboardData();
             this.onFilterGo();
         },
@@ -72,7 +70,6 @@ sap.ui.define([
                 }
                 const dBooking = new Date(oBooking.BookingDate);
                 const sMonthKey = dBooking.getFullYear() + "-" + (dBooking.getMonth() + 1);
-
                 oMonthlyDate[sMonthKey] = (oMonthlyDate[sMonthKey] || 0) + 1;
             });
             this.dashboardModels(aTodayCards, oMonthlyDate);
@@ -88,12 +85,11 @@ sap.ui.define([
 
         _getCardsPerPage: function () {
             const w = window.innerWidth;
-
-            if (w < 600) return 1;      // Mobile
-            if (w < 900) return 2;      // Large phones / small tablets
-            if (w < 1200) return 3;     // Tablets
-            if (w < 1600) return 4;     // Small laptops
-            return 5;                  // Large screens
+            if (w < 600) return 1;
+            if (w < 900) return 2;
+            if (w < 1200) return 3;
+            if (w < 1600) return 4;
+            return 5;
         },
 
         dashboardModels: function (aCards, oMonthMap) {
@@ -115,20 +111,16 @@ sap.ui.define([
         },
 
         getBranch: async function () {
-            const oComponent = this.getOwnerComponent();
-            let oBRModel = oComponent.getModel("sBRModel");
-
-            if (!oBRModel) {
+            const oComponent = this.getOwnerComponent().getModel("sBRModel");
+            if (!oComponent) {
                 await oComponent._fetchCommonData("HM_Branch", "sBRModel");
-                oBRModel = oComponent.getModel("sBRModel");
             }
-            const aData = oBRModel?.getData();
+            const aData = oComponent?.getData();
             return Array.isArray(aData) ? aData : [];
         },
 
         onBookingCardPress: function (oEvent) {
             var sCustomerID = oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID;
-
             var sEncodedID = btoa(sCustomerID.toString());
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
@@ -146,7 +138,7 @@ sap.ui.define([
             if (!oVizFrame) return;
 
             const sChartType = this.getView().getModel("chartTypeModel").getProperty("/monthlyType");
-            const oDataset = new sap.viz.ui5.data.FlattenedDataset({
+            const oDataset = new FlattenedDataset({
                 dimensions: [{
                     name: "Month",
                     value: "{month}"
@@ -159,29 +151,28 @@ sap.ui.define([
                     path: "/data"
                 }
             });
-
             oVizFrame.setModel(this.getView().getModel("monthlyChartModel"));
             oVizFrame.setDataset(oDataset);
             oVizFrame.removeAllFeeds();
 
             if (sChartType === "pie") {
-                oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+                oVizFrame.addFeed(new FeedItem({
                     uid: "size",
                     type: "Measure",
                     values: ["Count"]
                 }));
-                oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+                oVizFrame.addFeed(new FeedItem({
                     uid: "color",
                     type: "Dimension",
                     values: ["Month"]
                 }));
             } else {
-                oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+                oVizFrame.addFeed(new FeedItem({
                     uid: "valueAxis",
                     type: "Measure",
                     values: ["Count"]
                 }));
-                oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+                oVizFrame.addFeed(new FeedItem({
                     uid: "categoryAxis",
                     type: "Dimension",
                     values: ["Month"]
@@ -191,13 +182,12 @@ sap.ui.define([
 
         _loadMonthChart: function (oPayload) {
             sap.ui.core.BusyIndicator.show(0);
-
             this.ajaxReadWithJQuery("HM_GetCurrentYearBarChart", oPayload).then((oData) => {
-                const aData = Array.isArray(oData) ? oData : oData.data;
+                console.log("month wise response:", oData);
+                let aData = Array.isArray(oData) ? oData : oData.data;
                 if (aData.length === 0) aData = this.switchForAllGraph("MONTH");
-                
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "monthlyChartModel");
-                console.table(aData);
+
+                this.getView().setModel(new JSONModel({ data: aData }), "monthlyChartModel");
                 this._bindMonthlyChart();
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -205,16 +195,16 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show("Failed to load monthly chart");
                 });
-        },
+        }, 
 
         _loadDayChart: function (oPayload) {
             sap.ui.core.BusyIndicator.show(0);
-
             this.ajaxReadWithJQuery("HM_GetCurrentMonthBarChart", oPayload).then((oData) => {
+                console.log("daily wise response:", oData);
                 let aData = oData.results || [];
                 if (aData.length === 0) aData = this.switchForAllGraph("DAY");
-                
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "dailyChartModel");
+
+                this.getView().setModel(new JSONModel({ data: aData }), "dailyChartModel");
                 this._bindDailyChart();
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -228,7 +218,7 @@ sap.ui.define([
             const oVizFrame = this.byId("dailyBookingChart");
             if (!oVizFrame) return;
 
-            const oDataset = new sap.viz.ui5.data.FlattenedDataset({
+            const oDataset = new FlattenedDataset({
                 dimensions: [{
                     name: "Day",
                     value: "{Date}"
@@ -241,18 +231,17 @@ sap.ui.define([
                     path: "/data"
                 }
             });
-
             oVizFrame.setModel(this.getView().getModel("dailyChartModel"));
             oVizFrame.setDataset(oDataset);
             oVizFrame.removeAllFeeds();
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "valueAxis",
                 type: "Measure",
                 values: ["Count"]
             }));
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "categoryAxis",
                 type: "Dimension",
                 values: ["Day"]
@@ -261,14 +250,13 @@ sap.ui.define([
 
         _loadStatusChart: function (oPayload) {
             sap.ui.core.BusyIndicator.show(0);
-
             this.ajaxReadWithJQuery("HM_GetCurrentYearStatusBarChart", oPayload).then((oData) => {
                 console.log("status wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : (oData.results || oData.data || []);
                 if (aData.length === 0) {
                     aData = this.switchForAllGraph("STATUS");
                 }
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "statusChartModel");
+                this.getView().setModel(new JSONModel({ data: aData }), "statusChartModel");
                 this._bindStatusChart();
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -283,7 +271,7 @@ sap.ui.define([
             if (!oVizFrame) return;
             const sChartType =
                 this.getView().getModel("chartTypeModel").getProperty("/monthlyType");
-            const oDataset = new sap.viz.ui5.data.FlattenedDataset({
+            const oDataset = new FlattenedDataset({
                 dimensions: [{
                     name: "Status",
                     value: "{Status}"
@@ -301,13 +289,13 @@ sap.ui.define([
             oVizFrame.setDataset(oDataset);
             oVizFrame.removeAllFeeds();
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "valueAxis",
                 type: "Measure",
                 values: ["Count"]
             }));
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "categoryAxis",
                 type: "Dimension",
                 values: ["Status"]
@@ -316,13 +304,13 @@ sap.ui.define([
 
         _loadPaymentTypeChart: function (oPayload) {
             sap.ui.core.BusyIndicator.show(0);
-
             this.ajaxReadWithJQuery("HM_GetCurrentYearPaymentTypeBarChart", oPayload).then((oData) => {
+                console.log("payment wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.results || [];
-                if (aData.length === 0) {
-                    aData = this.switchForAllGraph("PAYMENT");
-                }
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ data: aData }), "paymentTypeChartModel");
+                // if (aData.length === 0) {
+                //     aData = this.switchForAllGraph("PAYMENT");
+                // }
+                this.getView().setModel(new JSONModel({ data: aData }), "paymentTypeChartModel");
                 this._bindPaymentTypeChart();
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -335,8 +323,7 @@ sap.ui.define([
         _bindPaymentTypeChart: function () {
             const oVizFrame = this.byId("paymentTypeChart");
             if (!oVizFrame) return;
-
-            const oDataset = new sap.viz.ui5.data.FlattenedDataset({
+            const oDataset = new FlattenedDataset({
                 dimensions: [{
                     name: "Payment Type",
                     value: "{Status}"
@@ -349,18 +336,17 @@ sap.ui.define([
                     path: "/data"
                 }
             });
-
             oVizFrame.setModel(this.getView().getModel("paymentTypeChartModel"));
             oVizFrame.setDataset(oDataset);
             oVizFrame.removeAllFeeds();
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "valueAxis",
                 type: "Measure",
                 values: ["Count"]
             }));
 
-            oVizFrame.addFeed(new sap.viz.ui5.controls.common.feeds.FeedItem({
+            oVizFrame.addFeed(new FeedItem({
                 uid: "categoryAxis",
                 type: "Dimension",
                 values: ["Payment Type"]
@@ -434,11 +420,8 @@ sap.ui.define([
         _loadCustomers: function () {
             return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
                 const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
-
                 const mCustomerMap = {};
-                aCustomers.forEach(c => {
-                    mCustomerMap[c.CustomerID] = c.CustomerName || c.Name;
-                });
+                aCustomers.forEach(c => { mCustomerMap[c.CustomerID] = c.CustomerName || c.Name });
                 this._mCustomerMap = mCustomerMap;
             })
                 .catch(() => {
@@ -477,31 +460,32 @@ sap.ui.define([
 
         onFilterGo: function () {
             if (!this.BranchID) return MessageToast.show("Branch not ready");
-
             const oRange = this._getStartEndDate();
+             const bMonthSelected = this.byId("D_id_month").getSelectedKey();
             const oMonthPayload = {
                 StartDate: oRange.yearStart,
                 EndDate: oRange.yearEnd,
                 BranchCode: this.BranchID
             };
-
             const oDailyPayload = {
                 StartDate: oRange.monthStart,
                 EndDate: oRange.monthEnd,
                 BranchCode: this.BranchID
             };
-
             const oStatusPayload = {
                 StartDate: oRange.yearStart,
                 EndDate: oRange.yearEnd,
                 BranchCode: this.BranchID
             };
-
             const oPaymentPayload = {
-                StartDate: oRange.yearStart,
-                EndDate: oRange.yearEnd,
-                BranchCode: this.BranchID
-            };
+        StartDate: bMonthSelected ? oRange.monthStart : oRange.yearStart,
+        EndDate: bMonthSelected ? oRange.monthEnd : oRange.yearEnd,
+        BranchCode: this.BranchID
+    };
+            console.log("Month Chart Filters:", oMonthPayload);
+            console.log("Daily Chart Filters:", oDailyPayload);
+            console.log("Status Chart Filters:", oStatusPayload);
+            console.log("Payment Chart Filters:", oPaymentPayload);
             this._loadMonthChart(oMonthPayload);
             this._loadDayChart(oDailyPayload);
             this._loadStatusChart(oStatusPayload);
@@ -523,17 +507,13 @@ sap.ui.define([
                         { Month: "Sep", Count: 0 },
                         { Month: "Oct", Count: 0 },
                         { Month: "Nov", Count: 0 },
-                        { Month: "Dec", Count: 0 }
-                    ];
+                        { Month: "Dec", Count: 0 }];
                 case "DAY":
-                    return Array.from({ length: 31 }, (_, i) => ({
-                        Day: i + 1,
-                        Count: 0
-                    }));
+                    return Array.from({ length: 31 }, (_, i) => ({ Day: i + 1, Count: 0 }));
                 case "STATUS":
                     return [
                         { Status: "New", Count: 0 },
-                        { Status: "Checked-in", Count: 0 },
+                        { Status: "Assigned", Count: 0 },
                         { Status: "Completed", Count: 0 },
                         { Status: "Cancelled", Count: 0 }
                     ];

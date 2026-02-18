@@ -264,7 +264,7 @@
                             value="{AdminSignupModel>/Mobile}"
                             liveChange="ADMIN_onMobileLiveChange"
                             maxLength="18"
-                            placeholder="Enter Mobile Number"
+                            placeholder="Enter mobile number"
                             width="100%"
                             valueStateText="Enter valid mobile number"
                         />

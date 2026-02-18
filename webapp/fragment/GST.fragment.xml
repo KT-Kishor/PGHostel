@@ -48,7 +48,7 @@
                 <Input
                     id="idGSTNumber"
                     value="{GSTModel>/GSTNumber}"
-                    placeholder="Enter GST Number"
+                    placeholder="Enter GST number"
                     maxLength="15"
                     liveChange="onGSTInputLiveChange"
                     valueStateText="Please enter a valid GST Number"
@@ -75,13 +75,12 @@
                 <Input
                     id="idGSTPercentage"
                     value="{GSTModel>/GSTPercentage}"
-                    placeholder="Enter GST Percentage"
+                    placeholder="Enter GST percentage"
                     maxLength="5"
                     liveChange="onPercentagetLiveChange"
                     valueStateText="Please enter a valid GST Percentage"
                 />
             </f:content>
-        
         </f:SimpleForm>
 
         <beginButton>

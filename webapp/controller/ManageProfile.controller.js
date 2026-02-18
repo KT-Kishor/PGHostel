@@ -45,7 +45,6 @@ sap.ui.define([
 
         },
 
-
         ManageData: async function () {
             let oUser = this._oLoggedInUser;
             // const fullUserData = this._oLoggedInUser || {};
@@ -639,7 +638,7 @@ sap.ui.define([
 
             } catch (err) {
                 console.error(err);
-               MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
+                MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 sap.ui.core.BusyIndicator.hide();
                 oModel.setProperty("/isEditMode", false);
@@ -659,13 +658,13 @@ sap.ui.define([
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
 
             if (!sCustomerID) {
-               MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
 
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
-               MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
+                MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
 
@@ -824,19 +823,19 @@ sap.ui.define([
         },
         onlogout: function () {
 
-           this.getView().getModel("profileData").setData({});
+            this.getView().getModel("profileData").setData({});
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             // if (oLoginModel) {
             //     oLoginModel.setData({});
             // }
-             if (oLoginModel) {
-        oLoginModel.setProperty("/EmployeeID", "");
-        oLoginModel.setProperty("/UserID", "");
-        oLoginModel.setProperty("/UserName", "");
-        oLoginModel.setProperty("/EmployeeName", "");
-        oLoginModel.setProperty("/EmailID", "");
-      }
-           
+            if (oLoginModel) {
+                oLoginModel.setProperty("/EmployeeID", "");
+                oLoginModel.setProperty("/UserID", "");
+                oLoginModel.setProperty("/UserName", "");
+                oLoginModel.setProperty("/EmployeeName", "");
+                oLoginModel.setProperty("/EmailID", "");
+            }
+
             // Reset Login State
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
@@ -954,7 +953,7 @@ sap.ui.define([
                 ]);
             }
         },
-         CC_onChangeState: function (oEvent) {
+        CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("profileData");
@@ -1014,7 +1013,7 @@ sap.ui.define([
             // Save in model
             oModel.setProperty("/City", sCityName);
         },
-         _onProfileSTDChange: function () {
+        _onProfileSTDChange: function () {
             const oSTD = this.byId("id_std1");
             const oMobile = this.byId("id_phone1");
 

@@ -28,7 +28,7 @@
 			<f:content>
 				<Label text="Refund Amount"/>
 				<Input id="HM_id_RefundAmount"
-                    placeholder="Enter Refund Amount"
+                    placeholder="Enter refund amount"
                     value="{RefundModel>/RefundAmount}"
                     maxLength="6"
                     valueStateText="Enter refund amount"
@@ -36,7 +36,7 @@
                 />
 
 				<Label text="Payment Mode" required="true"/>
-				<ComboBox id="HM_id_PaymentMode" placeholder="Select Payment Mode"
+				<ComboBox id="HM_id_PaymentMode" placeholder="Select payment mode"
                     selectedKey="{RefundModel>/PaymentMode}" valueStateText="Select payment mode" change="onPaymentModeChange">
 					<core:ListItem key="UPI" text="UPI"/>
 					<core:ListItem key="Cash" text="Cash"/>
@@ -44,7 +44,7 @@
 				</ComboBox>
 
 				<Label text="Transaction / Person Name"/>
-				<Input id="HM_id_TransactionID" placeholder="Enter Transaction / Person Name"
+				<Input id="HM_id_TransactionID" placeholder="Enter transaction / person name"
                     value="{RefundModel>/TransactionId}" liveChange="onLiveTransactionID"
                     valueStateText="Enter Transaction / Person Name" maxLength="20"/>
 

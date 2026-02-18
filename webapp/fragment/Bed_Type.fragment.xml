@@ -121,7 +121,7 @@
                     id="BD_id_DepositAmount"
                     value="{BedModel>/Deposit}"
                     placeholder="Enter deposit amount"
-                    valueStateText="Enter deposit amount"
+                    valueStateText="Enter Deposit Amount"
                     maxLength="7"
                     liveChange="onNoOfPersonInputLiveChange"
                 />

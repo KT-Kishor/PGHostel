@@ -65,7 +65,7 @@
                 <Input
                     id="BD_idLandmark"
                     value="{MDmodel>/LandMark}"
-                    placeholder="Enter LandMark"
+                    placeholder="Enter landmark"
                     maxLength="60"
                     liveChange="onLandmarkInputLiveChange"
                     valueStateText="Enter Landmark"

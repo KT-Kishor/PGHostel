@@ -439,7 +439,7 @@
                                 valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
                                 width="50%"
-                                 placeholder="Enter Full Name"
+                                 placeholder="Enter full name"
                             />
 
                             <Label
@@ -486,7 +486,7 @@
                                 id="Ad_id_gender"
                                 valueStateText="{i18n>selectGender}"
                                 change="onChange"
-                                placeholder="Select Gender"
+                                placeholder="Select gender"
                             >
                                 <core:Item
                                     key="Male"
@@ -524,7 +524,7 @@
                                 id="Ad_id_CustomerEmail"
                                 valueStateText="{i18n>enterEmailId}"
                                 change="onChangemail"
-                                placeholder="Enter Email ID"
+                                placeholder="Enter email ID"
                             />
 
                             <Label
@@ -640,7 +640,7 @@
                                 id="Ad_id_Address"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
-                                 placeholder="Enter Address"
+                                 placeholder="Enter address"
                             />
 
                             <Label
@@ -672,7 +672,7 @@
                             <ComboBox
                                 change="onSTDChange"
                                 id="CC_id_STDCode"
-                                placeholder="STD Code"
+                                placeholder="STD code"
                                 valueStateText="{i18n>MSselectCode}"
                                 showSecondaryValues="true"
                                 items="{path:'CountryModel>/', length:1000}"

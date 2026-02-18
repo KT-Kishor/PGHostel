@@ -36,7 +36,7 @@
                         width="100%"
                     >
                         <FlexBox
-                            items="{path: 'todayModel>'}"
+                            items="{path: 'todayModel>' , templateShareable: false}"
                             direction="Row"
                             wrap="Wrap"
                             justifyContent="Start"

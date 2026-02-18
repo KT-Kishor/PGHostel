@@ -117,7 +117,7 @@
                 <Input
                     id="inReturnTransactionID"
                     value="{DepositView>/CurrentDeposit/ReturnDepositTransactionID}"
-                    placeholder="Enter transaction ID"
+                    placeholder="Enter transaction id"
                     change="_validateTransactionID"
                     liveChange="_validateTransactionID"
                     valueStateText="Transaction ID is required for non-cash transactions"

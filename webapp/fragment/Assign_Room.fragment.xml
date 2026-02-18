@@ -45,7 +45,7 @@
                 />
                 <Input
                     id="id_DepositAmount"
-                    placeholder="Enter Deposit Amount"
+                    placeholder="Enter deposit amount"
                     value="{HostelModel>/DepositAmount}"
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
@@ -60,7 +60,7 @@
                 />
                 <Input
                     id="id_ActualAmount"
-                    placeholder="Enter Actual Amount"
+                    placeholder="Enter actual amount"
                     value="{HostelModel>/ActualAmount}"
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
@@ -74,7 +74,7 @@
                 />
                 <ComboBox
                     id="idPaymentMode"
-                    placeholder="Select Payment Mode"
+                    placeholder="Select payment mode"
                     selectedKey="{HostelModel>/PaymentMode}"
                     valueStateText="Select payment mode"
                     change="onPaymentModeChange"
@@ -100,7 +100,7 @@
                 />
                 <Input
                     id="id_TransactionID"
-                    placeholder="Enter Transaction / Person Name"
+                    placeholder="Enter transaction / person name"
                     value="{HostelModel>/TransactionID}"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
@@ -127,10 +127,6 @@
                         text="{AvailableRoomsModel>RoomNo}"
                     />
                 </ComboBox>
-
-               
-
-              
             </f:content>
         </f:SimpleForm>
 

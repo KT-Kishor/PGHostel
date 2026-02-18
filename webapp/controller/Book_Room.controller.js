@@ -916,7 +916,7 @@ this._bBlockMessagePopover = false;
                             ]
                         }),
                         new sap.m.Input({
-                            placeholder: "Enter Full Name",
+                            placeholder: "Enter full name",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/FullName}",
                             maxLength: 40,
@@ -967,7 +967,7 @@ this._bBlockMessagePopover = false;
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
                             maxDate: new Date(new Date().getFullYear() - 10, 11, 31),
-                            placeholder: "Select Date of Birth",
+                            placeholder: "Select date of birth",
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
                                 if (oDate > new Date()) {
@@ -1013,7 +1013,7 @@ this._bBlockMessagePopover = false;
 
                         }),
                         new sap.m.Input({
-                            placeholder: "Enter Email",
+                            placeholder: "Enter email",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/CustomerEmail}",
                             liveChange: function (oEvent) {
@@ -1035,7 +1035,7 @@ this._bBlockMessagePopover = false;
                         }),
 
                         new sap.m.ComboBox({
-                            placeholder: "Select Country",
+                            placeholder: "Select country",
                             width: "100%",
                             selectedKey: "{HostelModel>/Persons/" + i + "/Country}",
                             showSecondaryValues: true,
@@ -1105,7 +1105,7 @@ this._bBlockMessagePopover = false;
                             required: true,
                         }),
                         new sap.m.ComboBox({
-                            placeholder: "Select State",
+                            placeholder: "Select state",
                             width: "100%",
                             id: that.createId("ID_State_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/State}",
@@ -1150,7 +1150,7 @@ this._bBlockMessagePopover = false;
                         }),
 
                         new sap.m.ComboBox({
-                            placeholder: "Select City",
+                            placeholder: "Select city",
                             width: "100%",
                             id: that.createId("ID_City_" + i),
                             selectedKey: "{HostelModel>/Persons/" + i + "/City}",
@@ -1190,7 +1190,7 @@ this._bBlockMessagePopover = false;
                         }),
 
                         new sap.m.ComboBox({
-                            placeholder: "STD Code",
+                            placeholder: "STD code",
                             id: that.createId("ID_STDCode_" + i),
 
                             selectedKey: "{HostelModel>/Persons/" + i + "/STDCode}",
@@ -1251,7 +1251,7 @@ this._bBlockMessagePopover = false;
                         }),
 
                         new sap.m.Input({
-                            placeholder: "Enter Mobile No",
+                            placeholder: "Enter mobile number",
                             width: "100%",
                             id: that.createId("ID_Mobile_" + i),
                             value: "{HostelModel>/Persons/" + i + "/MobileNo}",
@@ -1300,10 +1300,10 @@ this._bBlockMessagePopover = false;
                             required: true
                         }),
                         new sap.m.TextArea({
-                            placeholder: "Enter Address",
+                            placeholder: "Enter address",
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/Address}",
-                            placeholder: "Enter Permanent Address",
+                            placeholder: "Enter permanent address",
                             rows: 3,
                             maxLength: 100
                         })
@@ -1327,7 +1327,7 @@ this._bBlockMessagePopover = false;
                             text: "Document Type"
                         }),
                         new sap.m.ComboBox({
-                            placeholder: "Select Document Type",
+                            placeholder: "Select document type",
                             width: "100%",
                             maxLength: 30,
                             selectedKey: "{HostelModel>/Persons/" + i + "/DocumentType}",
@@ -1354,7 +1354,7 @@ this._bBlockMessagePopover = false;
                             text: "Upload ID Proof"
                         }),
                         new sap.ui.unified.FileUploader({
-                            placeholder: "Choose File",
+                            placeholder: "Choose file",
                             width: "100%",
                             fileType: ["jpg", "jpeg", "png", "pdf"],
                             mimeType: ["image/jpeg", "image/png", "application/pdf"],
