@@ -1070,7 +1070,8 @@ sap.ui.define([
                     BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
                     CustomerGSTNO:oSelectedCustomerModel.CustomerGSTNO || "",
-                    RefundAmount : oSelectedCustomerModel.RefundAmount || ""
+                    RefundAmount : oSelectedCustomerModel.RefundAmount || "",
+                    DueAmount : oSelectedCustomerModel.BalanceAmount || ""
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1402,18 +1403,7 @@ sap.ui.define([
                 }
 
                 if (status === "Payment Received" || status === "Payment Partially" || status === "Open") {
-                    // ADD THIS CHECK (no existing logic changed)
-                    var oNavData = this.getView().getModel("SelectedCustomerModel").getData();
-                    var fTotalAmount = parseFloat(oNavData.TotalAmount) || 0;
-                    var fReceivedAmount = parseFloat(oNavData.PaidAmount) || 0;
-
-                    if (fTotalAmount === fReceivedAmount) {
-                        MessageToast.show("Advance payment has already done for this month");
-                        return; // stop fragment open
-                    }
-
                     var oView = that.getView();
-
                     if (!that.oDialog) {
                         sap.ui.core.Fragment.load({
                             name: "sap.ui.com.project1.fragment.ManageInvoice",
