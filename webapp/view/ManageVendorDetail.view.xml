@@ -297,56 +297,18 @@
                                         <m:headerToolbar>
                                             <m:OverflowToolbar>
                                                 <m:Title text="{i18n>MVDdocument}"/>
-                                                <m:ToolbarSpacer />
-                                                <m:ComboBox
-                                                    id="MV_id_adminDocType"
-                                                    selectedKey="{AdminSignupModel>/CurrentDocType}"
-                                                    placeholder="{i18n>selectDocument}"
-                                                    width="auto"
-                                                    change="onDocumentTypeChange"
-                                                    valueStateText="{i18n>MVDdoc}"
-                                                    editable="{editable>/Edit}"
-                                                >
-                                                    <core:ListItem
-                                                        key="Aadhar Card"
-                                                        text="Aadhar Card"
-                                                    />
-                                                    <core:ListItem
-                                                        key="PAN Card"
-                                                        text="PAN Card"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Driving License"
-                                                        text="Driving License"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Bank Account Proof"
-                                                        text="Bank Account Proof"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Other"
-                                                        text="Other"
-                                                    />
-                                                </m:ComboBox>
                                                 <m:ToolbarSeparator />
+                                                <m:ToolbarSpacer />
                                                 <!-- Upload button -->
-                                                <m:VBox id="MV_id_adminUploaderWrapper">
-                                                    <u:FileUploader
-                                                        id="MV_id_adminFileUploader"
-                                                        buttonOnly="true"
-                                                        buttonText="{i18n>MVDupload}"
-                                                        tooltip="{i18n>MVDupload}"
-                                                        uploadOnChange="false"
-                                                        change="onAdminFileSelect"
-                                                        fileType="jpg,jpeg,png,pdf,doc,docx"
-                                                        fileSizeExceed="onFileSizeExceeds"
-                                                        maximumFileSize="2MB"
-                                                        typeMissmatch="onFileTypeMissmatch"
-                                                        sameFilenameAllowed="true"
-                                                        iconFirst="true"
-                                                        enabled="{= ${editable>/Edit} &amp;&amp; ${AdminSignupModel>/CurrentDocType} !== '' }"
-                                                    />
-                                                </m:VBox>
+                                             
+                                                    <m:Button
+                                            text="{i18n>uploadDocuments}"
+                                            tooltip="{i18n>uploadDocuments}"
+                                            press="onUploadDocumentFile"
+                                            class="myUnifiedBtn"
+                                             enabled="{editable>/Edit}"
+                                          />
+                                            
                                                 <m:Button
                                                     id="AdminDeleteButton"
                                                     text="{i18n>MSdelete}"

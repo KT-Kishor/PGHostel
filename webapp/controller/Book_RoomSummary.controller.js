@@ -627,6 +627,12 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUnit = oEditModel.getProperty("/UnitText");
             const sStartDate = oEditModel.getProperty("/StartDate");
+// Store previous values for rollback
+this._iPrevSelectedMonths =
+    oEditModel.getProperty("/SelectedMonths");
+
+this._sPrevEditEndDate =
+    oEditModel.getProperty("/EndDate");
 
             if (!sStartDate) {
                 MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
@@ -695,6 +701,47 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
             //  UPDATE BOTH MODELS (UI + DATA)
             // ------------------------------------------------
             oFacility.TotalDays = iTotalDays;
+            /* ===============================
+   VALIDATE AGAINST BOOKING END DATE
+=============================== */
+const sBookingEnd = oHostelModel.getProperty("/EndDate");
+
+if (sBookingEnd && oEnd) {
+    const oBookingEnd = this._parseDate(sBookingEnd);
+
+    if (oBookingEnd && oEnd > oBookingEnd) {
+        MessageBox.error(
+            this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
+        );
+
+        // -------------------------------
+        // ROLLBACK SELECTED MONTHS
+        // -------------------------------
+        oEditModel.setProperty(
+            "/SelectedMonths",
+            this._iPrevSelectedMonths || 1
+        );
+
+        // -------------------------------
+        // ROLLBACK END DATE
+        // -------------------------------
+        oEditModel.setProperty(
+            "/EndDate",
+            this._sPrevEditEndDate
+        );
+
+        // Reset DatePicker UI
+        const oDatePicker = this.byId("endDatePicker"); // ensure correct ID
+        if (oDatePicker && this._sPrevEditEndDate) {
+            oDatePicker.setDateValue(
+                this._parseDate(this._sPrevEditEndDate)
+            );
+        }
+
+        return;
+    }
+}
+
 
             oEditModel.setProperty("/EndDate", this._formatDateToDDMMYYYY(oEnd));
             oEditModel.setProperty("/TotalDays", iTotalDays);
@@ -798,9 +845,6 @@ if (sBookingEnd && oEnd) {
         return;
     }
 }
-
-
-
 
             /* ===============================
                UPDATE MODEL
