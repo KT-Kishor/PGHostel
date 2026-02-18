@@ -805,7 +805,12 @@
 											<!-- Pending Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
-                                                visible="{= ${SelectedCustomerModel>/BalanceAmount} > 0 }"
+                                                visible="{=
+                                                        (
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Received'
+                                                        ) &amp;&amp;
+                                                        Number(${InvoicePayment>/BalanceAmount}) > 0
+                                                    }"
                                             >
 												<m:Label
                                                     text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
