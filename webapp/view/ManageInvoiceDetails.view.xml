@@ -807,7 +807,8 @@
                                                 justifyContent="SpaceBetween"
                                                 visible="{=
                                                         (
-                                                            ${SelectedCustomerModel>/Status} === 'Payment Received'
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Received' ||
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Partially'
                                                         ) &amp;&amp;
                                                         Number(${InvoicePayment>/BalanceAmount}) > 0
                                                     }"
