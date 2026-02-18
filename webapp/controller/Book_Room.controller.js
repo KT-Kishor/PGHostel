@@ -270,7 +270,7 @@ this._bBlockMessagePopover = false;
                     "meals / food subscription": "./image/Meals.jpg",
                     "gym membership": "./image/gym.jpg",
                     "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
-                    "four-wheeler parking": "./image/Four-Wheeler Parking.jpg",
+                    "four-wheeler parking": "./image/Four Wheeler Parking.jpg",
                     "locker / storage facility": "./image/locker.jpg",
                     "power backup": "./image/Power Backup.jpeg",
                     "air conditioner": "./image/Air Conditioner.jpeg",
