@@ -298,13 +298,28 @@
                                             <m:OverflowToolbar>
                                                 <m:Title text="{i18n>MVDdocument}"/>
                                                 <m:ToolbarSpacer />
+                                                <m:VBox
+    id="MV_id_adminUploaderWrapper"
+    class="{= ${device>/system/phone} ? 'mobileUploadMargin' : '' }">
+
+    <u:FileUploader
+        id="MV_id_adminFileUploader"
+        buttonOnly="true"
+        buttonText="{i18n>MVDupload}"
+        uploadOnChange="false"
+        change="onAdminFileSelect"
+        enabled="{= ${editable>/Edit} &amp;&amp; ${AdminSignupModel>/CurrentDocType} !== '' }"/>
+</m:VBox>
+
                                                 <m:ComboBox
                                                     id="MV_id_adminDocType"
                                                     selectedKey="{AdminSignupModel>/CurrentDocType}"
                                                     placeholder="{i18n>selectDocument}"
-                                                    width="auto"
+                                                    width="{= ${device>/system/phone} ? '100%' : 'auto' }"
                                                     change="onDocumentTypeChange"
                                                     valueStateText="{i18n>MVDdoc}"
+                                                    editable="{editable>/Edit}"
+                                                    
                                                 >
                                                     <core:ListItem
                                                         key="Aadhar Card"
@@ -329,23 +344,7 @@
                                                 </m:ComboBox>
                                                 <m:ToolbarSeparator />
                                                 <!-- Upload button -->
-                                                <m:VBox id="MV_id_adminUploaderWrapper">
-                                                    <u:FileUploader
-                                                        id="MV_id_adminFileUploader"
-                                                        buttonOnly="true"
-                                                        buttonText="{i18n>MVDupload}"
-                                                        tooltip="{i18n>MVDupload}"
-                                                        uploadOnChange="false"
-                                                        change="onAdminFileSelect"
-                                                        fileType="jpg,jpeg,png,pdf,doc,docx"
-                                                        fileSizeExceed="onFileSizeExceeds"
-                                                        maximumFileSize="2MB"
-                                                        typeMissmatch="onFileTypeMissmatch"
-                                                        sameFilenameAllowed="true"
-                                                        iconFirst="true"
-                                                        enabled="{= ${editable>/Edit} &amp;&amp; ${AdminSignupModel>/CurrentDocType} !== '' }"
-                                                    />
-                                                </m:VBox>
+                                                
                                                 <m:Button
                                                     id="AdminDeleteButton"
                                                     text="{i18n>MSdelete}"
