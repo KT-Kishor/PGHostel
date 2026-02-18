@@ -18,31 +18,9 @@ sap.ui.define([
             });
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendorDetail").attachMatched(this._onRouteMatched, this);
-              sap.ui.Device.resize.attachHandler(this._onDeviceResize, this);
+             
         },
-        _onDeviceResize: function () {
-    var oWrapper = this.byId("MV_id_adminUploaderWrapper");
-    if (!oWrapper) {
-        return;
-    }
-
-    if (sap.ui.Device.system.phone) {
-        oWrapper.addStyleClass("mobileUploadMargin");
-    } else {
-        oWrapper.removeStyleClass("mobileUploadMargin");
-    }
-},
-        onAfterRendering: function () {
-    if (sap.ui.Device.system.phone) {
-        this.byId("MV_id_adminUploaderWrapper")
-            .addStyleClass("mobileUploadMargin");
-    } else {
-        this.byId("MV_id_adminUploaderWrapper")
-            .removeStyleClass("mobileUploadMargin");
-    }
-        },
-
-
+      
         _onRouteMatched: async function(oEvent) {
             try {
                 // this.commonLoginFunction();
