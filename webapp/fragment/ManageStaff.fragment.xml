@@ -285,7 +285,7 @@
                     maxLength="120"
                     value="{MDmodel>/Address}"
                     liveChange="onAddressChange"
-                    placeholder="{i18n>address}"
+                    placeholder="{i18n>placeHolderAddress}"
                 />
 				<!-- <HBox width="100%"><Label
                         text="{i18n>MSaccountSecurity}"

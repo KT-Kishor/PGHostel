@@ -134,15 +134,8 @@ sap.ui.define([
             }
             var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
             var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
-             if (!this._allBranches) {
-        this._allBranches = aBranchData;
-        this.getView().setModel(
-            new sap.ui.model.json.JSONModel(this._allBranches),
-            "branchModel"
-        );
-    }
+            this.getView().setModel(new sap.ui.model.json.JSONModel(aBranchData),"branchModel");
             var model = new sap.ui.model.json.JSONModel(aBranchData);
-
             this.getOwnerComponent().setModel(model, "mainModel")
         },
 
@@ -212,7 +205,7 @@ sap.ui.define([
         _updateRowCount: function () {
             const oTable = this.byId("id_MD_Table");
             const oBinding = oTable.getBinding("items");
-            const iLength = oBinding.getLength(); // filtered result count
+            const iLength = oBinding.getLength();
             this.getView().getModel("mainModel").setProperty("/count", iLength);
         },
 
@@ -236,7 +229,7 @@ sap.ui.define([
                 property: "Address",
                 type: "string"
             },
-            
+
             {
                 label: "LandMark",
                 property: "LandMark",
@@ -367,8 +360,6 @@ sap.ui.define([
                 oCityCB.setValueState("None");
                 oCityCB.setValueStateText("");
             }
-
-            // oCountry.getBinding("items").filter([]);
             const stateBinding = oState.getBinding("items");
             if (stateBinding) stateBinding.filter([]);
 
@@ -696,22 +687,18 @@ sap.ui.define([
                 oCheckIn.setValueStateText(this.i18nModel.getText("enterCheckInTime"));
                 return false;
             }
-
             if (!dCheckOut) {
                 oCheckOut.setValueState("Error");
                 oCheckOut.setValueStateText(this.i18nModel.getText("enterCheckOutTime"));
                 return false;
             }
-
             if (dCheckOut.getTime() <= dCheckIn.getTime()) {
                 oCheckOut.setValueState("Error");
                 oCheckOut.setValueStateText(this.i18nModel.getText("checkoutAfterCheckin"));
                 return false;
             }
             oCheckIn.setValueState("None");
-            // oCheckIn.setValueStateText("");
             oCheckOut.setValueState("None");
-            // oCheckOut.setValueStateText("");
             return true;
         },
 
@@ -719,19 +706,14 @@ sap.ui.define([
             var oTable = this.byId("id_MD_Table");
             var aSelectedItems = oTable.getSelectedItems();
             var CustData = this.getView().getModel("HostelModel").getData();
-
-            // No selection
             if (aSelectedItems.length === 0) {
                 sap.m.MessageToast.show(
                     this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
                 );
                 return;
             }
-
             var aAssignedBranches = [];
             var aDeletableBranches = [];
-
-            // Split assigned & non-assigned branches
             aSelectedItems.forEach(oItem => {
                 var oData = oItem.getBindingContext("mainModel").getObject();
 
@@ -739,7 +721,6 @@ sap.ui.define([
                     cust.BranchCode === oData.BranchID &&
                     cust.Status === "Assigned"
                 );
-
                 if (bAssigned) {
                     aAssignedBranches.push(oData.BranchID);
                 } else {
@@ -749,28 +730,19 @@ sap.ui.define([
                     });
                 }
             });
-
-            // Single selection & assigned → stop
             if (aSelectedItems.length === 1 && aAssignedBranches.length === 1) {
                 sap.m.MessageBox.warning(
                     "Cannot delete! Selected branch is already assigned."
                 );
                 return;
             }
-
-            // All selected branches are assigned
             if (aDeletableBranches.length === 0) {
                 sap.m.MessageBox.warning(
                     "All selected branches are already assigned and cannot be deleted."
                 );
                 return;
             }
-
-            // Show only non-assigned branch IDs
-            var sBranchIds = aDeletableBranches
-                .map(b => b.branchId)
-                .join(", ");
-
+            var sBranchIds = aDeletableBranches.map(b => b.branchId).join(", ");
             sap.m.MessageBox.confirm(
                 `Are you sure you want to delete the following branches: ${sBranchIds}?`,
                 {
@@ -788,8 +760,6 @@ sap.ui.define([
 
                             try {
                                 var sUserID = this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID;
-
-                                // Delete only non-assigned branches
                                 for (let oBranch of aDeletableBranches) {
                                     await this.ajaxDeleteWithJQuery("HM_Branch", {
                                         filters: {
@@ -855,8 +825,6 @@ sap.ui.define([
                 key: oData.AttachmentName,
                 text: oData.AttachmentName
             }] : [];
-
-            // Add existing file to tokens
             const aTokens = oData.Photo1Name ? [{
                 key: oData.Photo1Name,
                 text: oData.Photo1Name
@@ -1224,6 +1192,12 @@ sap.ui.define([
             if (!oFile) {
                 return;
             }
+            const MaxSize = 2 * 1024 * 1024;
+            if (oFile.size > MaxSize) {
+                sap.m.MessageToast.show("Image must be under 2 MB");
+                oEvent.getSource().clear();
+                return;
+            }
             const oReader = new FileReader();
             oReader.onload = (e) => {
                 const base64 = e.target.result.split(",")[1];
@@ -1252,6 +1226,12 @@ sap.ui.define([
             if (!oFiles) {
                 return;
             }
+            const MaxSize = 2 * 1024 * 1024;
+            if (oFiles.size > MaxSize) {
+                sap.m.MessageToast.show("Image must be under 2 MB");
+                oEvent.getSource().clear();
+                return;
+            }
             const oReader = new FileReader();
             oReader.onload = (e) => {
                 const base64 = e.target.result.split(",")[1];
@@ -1273,7 +1253,7 @@ sap.ui.define([
 
         onFileSizeExceeds: function () {
             sap.m.MessageToast.show(
-                "This file is more than 5 MB and cannot be uploaded"
+                "This file is more than 2 MB and cannot be uploaded"
             );
         },
 
@@ -1492,7 +1472,6 @@ sap.ui.define([
             const visiModel = this.getView().getModel("visiblePlay");
 
             visiModel.setProperty("/selectedIndex", selectedIndex);
-            // Update the Type in model based on selection
             if (selectedIndex === 0) {
                 dataModel.setProperty("/Type", "CGST/SGST");
             } else if (selectedIndex === 1) {

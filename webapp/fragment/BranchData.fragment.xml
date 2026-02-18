@@ -290,6 +290,13 @@
                     valueStateText="{i18n>enterPenalty}"
                     class="sapUiSmallMarginBottom"
                 />
+                <MessageStrip
+                    text="For Logo and Image, files larger than 2 MB are not allowed."
+                    type="Warning"
+                    showIcon="true"
+                    enableFormattedText="true"
+                    class="sapUiSmallMarginBottom"
+                />
 
                 <MessageStrip
                     text="{i18n>Branchdatalogomsg}"
@@ -309,7 +316,7 @@
                     <u:FileUploader
                         id="BD_id_FileUploader"
                         fileSizeExceed="onFileSizeExceeds"
-                        maximumFileSize="5MB"
+                        maximumFileSize="2"
                         typeMissmatch="onFileTypeMissmatch"
                         fileType="jpg,jpeg,png"
                         change="onFacilityFileChange"
@@ -352,7 +359,7 @@
                     <u:FileUploader
                         id="BD_id_FileUploader1"
                         fileSizeExceed="onFileSizeExceeds"
-                        maximumFileSize="5MB"
+                        maximumFileSize="2"
                         typeMissmatch="onFileTypeMissmatch"
                         fileType="jpg,jpeg,png"
                         change="onImageChange"

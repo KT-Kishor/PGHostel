@@ -598,7 +598,7 @@
                             rows="3"
                             value="{LoginMode>/Address}"
                             liveChange="onAddressChange"
-                            placeholder="{i18n>address}"
+                            placeholder="{i18n>placeHolderAddress}"
                             maxLength="120"
                         />
                         <HBox width="100%">
