@@ -2140,6 +2140,8 @@ sap.ui.define([
                         head: head,
                         body: body,
                         theme: 'grid',
+                        pageBreak: 'auto',   
+                        rowPageBreak: 'auto', 
                         headStyles: {
                             fillColor: [20, 170, 183]
                         },
@@ -2244,19 +2246,19 @@ sap.ui.define([
                         }
                     }
 
-                    if (parseFloat(oModel.RefundAmount) > 0) {
-                        summaryBody.push([
-                            `Refund Due (${data.Currency}) :`,
-                            Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
-                        ]);
-                    }
+                    // if (parseFloat(oModel.RefundAmount) > 0) {
+                    //     summaryBody.push([
+                    //         `Refund Due (${data.Currency}) :`,
+                    //         Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
+                    //     ]);
+                    // }
 
-                    if (parseFloat(oModel.RefundProcessed) > 0) {
-                        summaryBody.push([
-                            `Refund Processed (${data.Currency}) :`,
-                            Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
-                        ]);
-                    }
+                    // if (parseFloat(oModel.RefundProcessed) > 0) {
+                    //     summaryBody.push([
+                    //         `Refund Processed (${data.Currency}) :`,
+                    //         Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
+                    //     ]);
+                    // }
                     
                     // if (data.RoundOf && data.RoundOf !== "0") {
                     //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
@@ -2270,6 +2272,8 @@ sap.ui.define([
                         head: [],
                         body: summaryBody,
                         theme: 'plain',
+                        pageBreak: 'auto',   
+                        rowPageBreak: 'auto', 
                         styles: {
                             font: "times",
                             fontSize: 10,
@@ -2327,10 +2331,10 @@ sap.ui.define([
                     if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
 
                         // Page break check
-                        if (currentY + 50 > pageHeight) {
-                            doc.addPage();
-                            currentY = 20;
-                        }
+                                if (currentY + 60 > pageHeight) {
+                                doc.addPage();
+                                currentY = 20;
+                            }
 
                         doc.setFont("times", "bold").setFontSize(11);
                         doc.text("Transaction History", margin, currentY);
@@ -2354,6 +2358,8 @@ sap.ui.define([
                             ],
                             body: paymentBody,
                             theme: 'grid',
+                            pageBreak: 'auto',   
+                            rowPageBreak: 'auto', 
                             headStyles: {
                                 fillColor: [20, 170, 183]
                             },
@@ -3030,15 +3036,15 @@ sap.ui.define([
                         const subTotalGST = parseFloat(oModel.SubTotalInGST || 0);
                         const subTotalNoGST = parseFloat(oModel.SubTotalNotGST || 0);
                         const igst = parseFloat(oModel.IGST || 0);
-                        const refundDue = parseFloat(oModel.RefundAmount || 0);
-                        const refundProcessed = parseFloat(oModel.RefundProcessed || 0);
+                        const cgst = parseFloat(oModel.CGST || 0);
+                        const sgst = parseFloat(oModel.SGST || 0);
                         const totalAmount = parseFloat(oModel.TotalAmount || 0);
 
                         // Sub Total (GST or NON-GST)
                         if (subTotalGST > 0) {
-                            summaryBody.push([`Sub-Total (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
+                            summaryBody.push([`Sub-Total ( Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
                         } else if (subTotalNoGST > 0) {
-                            summaryBody.push([`Sub-Total (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
+                            summaryBody.push([`Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
                         }
 
                         // IGST
@@ -3046,14 +3052,14 @@ sap.ui.define([
                             summaryBody.push([`IGST (${oModel.Value}%) :`, Formatter.fromatNumber(igst)]);
                         }
 
-                        // Refund Due
-                        if (refundDue > 0) {
-                            summaryBody.push([`Refund Due (${oModel.Currency}) :`, Formatter.fromatNumber(refundDue)]);
-                        }
-
-                        // Refund Processed
-                        if (refundProcessed > 0) {
-                            summaryBody.push([`Refund Processed (${oModel.Currency}) :`, Formatter.fromatNumber(refundProcessed)]);
+                        // CGST/SGST
+                        if (oModel.Type === "CGST/SGST") {
+                            if (cgst > 0) {
+                                summaryBody.push([`CGST (${oModel.Value}%) :`, Formatter.fromatNumber(cgst)]);
+                            }
+                            if (sgst > 0) {
+                                summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
+                            }
                         }
 
                         // Total
