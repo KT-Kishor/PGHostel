@@ -599,10 +599,10 @@ sap.ui.define([
                 const start = new Date(sStartDate);
                 const end = new Date(sEndDate);
                 const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
                 if (sUnit === "Per Day") {
-                    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    return days + (days === 1 ? " Day" : " Days");
+                    return diffDays + (diffDays === 1 ? " Day" : " Days");
                 }
 
                 if (sUnit === "Per Month") {
@@ -610,15 +610,21 @@ sap.ui.define([
                         (end.getFullYear() - start.getFullYear()) * 12 +
                         (end.getMonth() - start.getMonth());
 
-                    if (end.getDate() >= start.getDate()) {
-                        months += 1;
-                    }
+                    if (end.getDate() >= start.getDate()) months += 1;
 
                     return months + (months === 1 ? " Month" : " Months");
                 }
 
                 if (sUnit === "Per Year") {
-                    const years = end.getFullYear() - start.getFullYear();
+                    const diffYears = diffDays / 365;
+
+                    // If less than 1 full year → show days
+                    if (diffYears < 1) {
+                        return diffDays + " Days";
+                    }
+
+                    // Otherwise normal year logic
+                    const years = Math.floor(diffYears);
                     return years + (years === 1 ? " Year" : " Years");
                 }
 
@@ -782,6 +788,7 @@ sap.ui.define([
                         isGSTEnabled && item.GSTCalculation === "YES";
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
+                    item.GSTCalculation = isGSTApplicable ? "YES" : "NO";
 
                     if (isGSTApplicable) {
                         totalWithGST += finalAmount;

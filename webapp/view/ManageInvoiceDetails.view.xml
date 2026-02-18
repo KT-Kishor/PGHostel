@@ -588,11 +588,7 @@
                                                         value="{ManageInvoiceItemModel>SAC}"
                                                         selectedKey="{ManageInvoiceItemModel>SAC}"
                                                     >
-														<core:ListItem
-                                                            key="{InvoiceSAC>ID}"
-                                                            additionalText="{InvoiceSAC>Description}"
-                                                            text="{InvoiceSAC>SAC}"
-                                                        />
+                                                        <core:ListItem key="{InvoiceSAC>SAC}" text="{InvoiceSAC>SAC}" additionalText="{InvoiceSAC>Description}"/>
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
@@ -646,7 +642,7 @@
                                                         selectedKey="Per Day"
                                                         value="{ManageInvoiceItemModel>UnitText}"
                                                         change="onChangeUnitText"
-                                                        editable="{visiablityPlay>/editable}"
+                                                        editable="false"
                                                         width="100%"
                                                     >
 														<core:Item
