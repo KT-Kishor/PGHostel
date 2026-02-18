@@ -236,24 +236,22 @@
                 />
                 <HBox width="100%">
                     <VBox width="35%">
-                        <ComboBox
-                            id="adminsignUpSTD"
-                            selectedKey="{AdminSignupModel>/STDCode}"
-                            change="ADMIN_onChangeSTD"
-                            placeholder="ISD"
-                            showSecondaryValues="true"
-                            width="100%"
-                            items="{path:'CountryModel>/', length:1000}"
-                            filterSecondaryValues="true"
-                            valueStateText="Select ISD Code"
-                            value="{AdminSignupModel>/STDCode}"
-                        >
-                            <core:ListItem
-                                key="{CountryModel>stdCode}"
-                                text="{CountryModel>stdCode}"
-                                additionalText="{CountryModel>code}"
-                            />
-                        </ComboBox>
+<ComboBox 
+id="adminsignUpSTD" 
+value="{AdminSignupModel>/STDCode}" 
+change="ADMIN_onChangeSTD" 
+placeholder="ISD" 
+showSecondaryValues="true" 
+width="100%" 
+items="{path:'CountryModel>/', length:1000}" 
+filterSecondaryValues="true"
+>
+	<core:ListItem 
+        key="{CountryModel>stdCode}" 
+        text="{CountryModel>stdCode}" 
+        additionalText="{CountryModel>code}" 
+        />
+</ComboBox>
                     </VBox>
                     <VBox
                         width="65%"

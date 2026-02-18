@@ -18,7 +18,6 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getView().setModel(new JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
-            this.getView().setModel(new JSONModel({ showGlobalFooter: false, showRoomsFooter: false, }), "FooterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostel").attachMatched(this._onRouteMatched, this);
             this._getBrowserLocation();
             this._initAdminSignupModel();
@@ -1447,7 +1446,6 @@ sap.ui.define([
                 this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") }));
 
             if (!isValid) return MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-            // Server timestamp in required format
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
             const sFinalPassword = $C("signUpPassword").getValue();
 
@@ -1512,11 +1510,13 @@ sap.ui.define([
                         $C("signInOTP")?.setEnabled(false).setValue("");
                         $C("btnSignInSendOTP")?.setVisible(false);
                         $C("signInEmail")?.setValue("");
-
-                        oCtrl._oSignDialog?.close();
+                        oCtrl.onpressLogin();
                         setTimeout(() => {
-                            oCtrl._oSignDialog?.open();
-                        }, 200);
+                            const sEmail = (data.Email || "").trim();
+                            if (sEmail) {
+                                $C("signInEmail")?.setValue(sEmail);
+                            }
+                        }, 100);
                     }
                 });
             } catch (err) {
@@ -4105,26 +4105,28 @@ sap.ui.define([
         },
         ADMIN_onChangeSTD: function (oEvent) {
             const oSTD = oEvent.getSource();
-            const sValue = (oSTD.getValue() || "").trim();
-            const oMobile = $C("adminMobileNo");
+            let sValue = oSTD.getValue() || "";
+            sValue = sValue.trim();
+            const oMobile = $C("adminMobileNo"); 
             const oModel = this.getView().getModel("AdminSignupModel");
-
-            // Mandatory check
-            if (!utils._LCvalidateMandatoryField(oEvent)) return;
-
-            // ✅ + followed by digits, but NOT +0 / +09 / +01
-            const STD_REGEX = /^\+[1-9][0-9]*$/;
-            if (!STD_REGEX.test(sValue)) {
+            if (!sValue) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
+                oSTD.setValueStateText("STD Code is required");
                 oModel.setProperty("/STDCode", "");
                 return;
             }
-            // Clean state
-            oSTD.setValueState("None")
-            oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
-            // Update model
-            oModel.setProperty("/STDCode", sValue);
+            const STD_REGEX = /^\+[1-9][0-9]*$/;
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("Must start with + and have no leading zero (e.g., +91)");
+                oModel.setProperty("/STDCode", "");
+            } else {
+                oSTD.setValueState("None");
+                if (oMobile) {
+                    oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
+                }
+                oModel.setProperty("/STDCode", sValue);
+            }
         },
 
 

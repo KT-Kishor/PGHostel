@@ -315,7 +315,7 @@
                             <Text
                                 text="{ 
                                     path: 'DepositModel>DepositDate',
-                                    formatter: '.Formatter.formatDate' 
+                                    formatter: '.Formatter.displayFormatDate' 
                                 }"
                             />
 
@@ -335,7 +335,7 @@
                             <Text
                                 text="{ 
                                     path: 'DepositModel>ReturnDepositDate',
-                                    formatter: '.Formatter.formatDate' 
+                                    formatter: '.Formatter.displayFormatDate' 
                                 }"
                             />
 
