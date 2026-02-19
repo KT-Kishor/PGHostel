@@ -275,7 +275,7 @@ this._bBlockMessagePopover = false;
                     "power backup": "./image/Power Backup.jpeg",
                     "air conditioner": "./image/Air Conditioner.jpeg",
                     "room heater": "./image/Room Heater.jpeg",
-                    "study room access": "./image/StudyRoom.png"
+                    "study room access": "./image/Study Room.png"
                 };
 
                 //Base64 Convert Logic
