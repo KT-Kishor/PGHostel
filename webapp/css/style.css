@@ -1546,19 +1546,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 
 
-/* Hide UI5 FileUploader completely but KEEP input clickable */
-.hiddenUploader .sapMBtn {
-  display: none !important;
-}
-
-/* DO NOT use display:none on the input — this breaks camera */
-.hiddenUploader input[type="file"] {
-  opacity: 0 !important;
-  width: 1px !important;
-  height: 1px !important;
-  position: absolute !important;
-  z-index: -1 !important;
-}
 
 /* Avatar center on small devices */
 @media (max-width: 768px) {
@@ -4254,4 +4241,142 @@ height:140px;
 }
 .mobileUploadMargin {
     margin-left: -10px;
+  } 
+  .defaultBGBlur {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%; 
+  }
+  .defaultBGBlur::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    transform: scale(1.08);
+    z-index: 0;
+  }
+  .defaultBGBlur::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 0;
+  }
+  .defaultBGBlur > footer {
+    margin-top: auto; 
+    position: relative;
+    z-index: 2;
+  }
+  .defaultBGBlur > * {
+    position: relative;
+    z-index: 1;
+  }
+  .defaultBGBlur {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+  } 
+  .customRoundedFlex {
+      border-radius: 12px;
+      background-color: white;
+      padding: 5px 15px;
+      border: 1px solid #ddd;
+  }
+  .customRoundedTable {
+      border-radius: 12px !important;
+      overflow: hidden !important; 
+      border: 1px solid #ddd;
+      background-color: white;
+  }
+.avatarContainer {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    display: inline-block;
+}
+.customLargeAvatar {
+    width: 170px !important;
+    height: 170px !important;
+    border-radius: 15px !important; 
+    border: 3px solid white !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+    overflow: hidden;
+}
+.avatarEditBtnOverlay {
+    position: absolute !important;
+    bottom: 7px !important;
+    right: -10px !important;
+    z-index: 10;
+}
+.avatarEditBtnOverlay .sapMBtnInner {
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border: 2px solid white !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25) !important;
+}
+.avatarEditBtnOverlay .sapMBtnInner:hover {
+    background: linear-gradient(135deg, #00d4e6, #009aa6) !important;
+}
+.avatarEditBtnOverlay .sapMBtnIcon {
+    color: white !important;
+    font-size: 1.1rem !important;
+    line-height: 40px !important;
+}
+.hiddenUploader .sapMBtn {
+    display: none !important;
+    visibility: hidden !important;
+}
+.hiddenUploader input[type="file"] {
+    opacity: 0 !important;
+    width: 0.1px !important;
+    height: 0.1px !important;
+    position: absolute !important;
+    overflow: hidden;
+    z-index: -1 !important;
+}
+.profileFlex {
+    display: flex;
+    flex-direction: row;
+}
+@media (max-width: 600px) {
+    .profileFlex {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+}
+@media (max-width: 600px) {
+    .avatarContainer {
+        margin-bottom: 1rem;
+    }
+}
+.btnGradientHoverOnly .sapMBtnInner {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.4) !important;
+  transition: background 0.2s ease, transform 0.1s ease, border 0.2s ease;
+}
+.btnGradientHoverOnly:hover .sapMBtnInner,
+.btnGradientHoverOnly.sapMBtnHover .sapMBtnInner {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  border: 1px solid transparent !important;
+  transform: scale(1.05);
+}
+.btnGradientHoverOnly.sapMBtnActive .sapMBtnInner {
+  background: linear-gradient(135deg, #1fb7c5, #0f99a6) !important;
+  transform: scale(1.05);
+}
+.btnGradientHoverOnly .sapMBtnIcon,
+.btnGradientHoverOnly .sapUiIcon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }

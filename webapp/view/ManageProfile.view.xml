@@ -12,14 +12,16 @@
         id="id_profilePage"
         title="{i18n>myAccount}"
         showNavButton="true"
-        navButtonPress="onNavBack">
+        navButtonPress="onNavBack"
+        class="defaultBGBlur"
+        >
 
           <customHeader>
             <Bar class="barheader">
             <contentLeft>
                     <Button
                       icon="sap-icon://nav-back"
-                        class="myUnifiedBtn"
+                        class="btnGradientHoverOnly"
                         tooltip="{i18n>MSedit}"
                         press="onNavBack"
                     />
@@ -49,38 +51,12 @@
         </customHeader>
 
         <!-- ================= PROFILE HEADER ================= -->
-
-        <FlexBox
-            direction="Row"
-            justifyContent="Center"
-            alignItems="Center"
-            class="myclass">
-
-            <!-- Avatar -->
-            <VBox>
-                <Avatar
-                    src="{profileData>/photo}"
-                    initials="{profileData>/initials}"
-                    displayShape="Circle"
-                    displaySize="XL"
-                    press="onPreviewProfilePhoto"
-                    class="sapUiMediumMargin myavatar"/>
-
-                <Button
-                    icon="sap-icon://edit"
-                    tooltip="{i18n>setProfilePhoto}"
-                    press="onPressAvatarEdit"
-                    class="avatarEditIcon"/>
-
-                <u:FileUploader
-                    id="id_fileUploaderAvatar1"
-                    uploadOnChange="false"
-                    change="onAvatarFileSelected"
-                    fileType="png,jpg,jpeg"
-                    class="hiddenUploader"
-                    buttonOnly="true"
-                    iconOnly="true"/>
-            </VBox>
+<FlexBox direction="Row" justifyContent="Center" alignItems="Center" class="sapUiSmallMargin profileFlex">
+	<VBox class="avatarContainer sapUiSmallMarginEnd">
+		<Avatar src="{profileData>/photo}" initials="{profileData>/initials}" displayShape="Square" displaySize="XL" press="onPreviewProfilePhoto" class="customLargeAvatar "/>
+		<Button icon="sap-icon://camera" press="onPressAvatarEdit" class="avatarEditBtnOverlay"/>
+		<u:FileUploader id="id_fileUploaderAvatar1" uploadOnChange="false" change="onAvatarFileSelected" fileType="png,jpg,jpeg" class="hiddenUploader" buttonOnly="true" visible="false"/>
+	</VBox>
 
             <!-- Profile Forms -->
             <VBox>
@@ -274,7 +250,7 @@
             justifyContent="SpaceBetween"
             alignItems="Center"
             wrap="Wrap"
-            class="responsiveFlex">
+           class="responsiveFlex sapUiSmallMargin customRoundedFlex">
 
             <IconTabHeader
                 id="id_tabBar1"
@@ -316,7 +292,9 @@
                     { path: 'bookingGroup', descending: false, group: true },
                     { path: 'BookingDate', descending: true }
                 ]
-            }">
+            }"
+            width="auto" 
+           class="sapUiSmallMargin customRoundedTable">
 
             <columns>
                 <Column demandPopin="true">
@@ -357,9 +335,8 @@
                 path:'profileData>/Payments',
                 sorter:[{ path:'PaymentGroup', group:true }]
             }"
-            width="auto"
-            
-            >
+            width="auto" 
+          class="sapUiSmallMargin customRoundedTable">
             <columns>
                 <Column><Text text="{i18n>bookingID}"/></Column>
                 <Column><Text text="{i18n>customerName}"/></Column>

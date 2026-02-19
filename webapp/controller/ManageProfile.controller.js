@@ -293,12 +293,12 @@ sap.ui.define([
                 buttons: [
                     new sap.m.Button({
                         text: "Take Photo",
-                        icon: "sap-icon://camera",
+                        icon: "sap-icon://add-photo",
                         press: this.onTakePhoto.bind(this)
                     }),
                     new sap.m.Button({
                         text: "Upload from Gallery",
-                        icon: "sap-icon://add-photo",
+                        icon: "sap-icon://image-viewer",
                         press: this.onUploadPhoto.bind(this)
                     }),
                     new sap.m.Button({
