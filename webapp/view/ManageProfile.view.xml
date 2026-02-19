@@ -360,7 +360,6 @@
             width="auto"
             
             >
-
             <columns>
                 <Column><Text text="{i18n>bookingID}"/></Column>
                 <Column><Text text="{i18n>customerName}"/></Column>
@@ -378,7 +377,7 @@
                         <Text text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"/>
                         <Text text="{profileData>InvNo}"/>
                         <Text text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
-                        <Text text="{profileData>DueAmount}"/>
+                        <Text text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>curremcy}"/>
                     </cells>
                 </ColumnListItem>
             </items>
@@ -390,5 +389,4 @@
             />
         </footer>
     </Page>
-
 </mvc:View>
