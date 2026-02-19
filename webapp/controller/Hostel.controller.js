@@ -931,13 +931,26 @@ sap.ui.define([
             this._clearRoomDetailDialog();
         },
 
-        onTabSelect: async function (oEvent) {
-
-            const sKey = oEvent.getParameter("item").getKey();
+        _navigateTo: function (sKey) {
             const oNav = this.byId("pageContainer");
+            const oPage = this.byId(sKey);
 
-            oNav.setDefaultTransitionName("Slide");
-            oNav.to(this.byId(sKey));
+            if (!oNav || !oPage) {
+                console.error("Navigation failed: pageContainer or Target Page not found.");
+                return;
+            }
+
+            try {
+                oNav.to(oPage, "show");
+            } catch (oError) {
+                console.warn("Navigation with 'show' transition failed, falling back to default.");
+                oNav.to(oPage);
+            }
+        },
+        onTabSelect: async function (oEvent) {
+            const sKey = oEvent.getParameter("item").getKey();
+
+            this._navigateTo(sKey);
 
             const page = this.byId(sKey);
             if (page && page.scrollTo) {
@@ -952,7 +965,6 @@ sap.ui.define([
             const oFooterModel = this.getView().getModel("FooterModel");
 
             if (sKey === "idRooms") {
-
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
 
@@ -964,10 +976,9 @@ sap.ui.define([
                 }
 
                 let aData = oModel.getData();
-
                 if (!aData || aData.length === 0) {
                     this.byId("idBedTypeFlex").setBusy(true);
-                    this.byId("id_Branch").setBusy(true).setValueState("None");;
+                    this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
 
@@ -990,27 +1001,27 @@ sap.ui.define([
             }
 
             if (sKey === "idHome") {
-                this._animateExploreButton();
+                this._exploreBtnAnimationTimeout = setTimeout(() => {
+                    this._animateExploreButton();
+                    this._exploreBtnAnimationTimeout = null;
+                }, 50);
             }
         },
-
 
         _animateExploreButton: function () {
             const oWrapper = this.byId("exploreWrapper");
             if (!oWrapper) return;
-
-            // restart animation cleanly
             oWrapper.removeStyleClass("explore-enter");
 
-            // force reflow so animation restarts
-            oWrapper.getDomRef()?.offsetHeight;
-
+            const oDomRef = oWrapper.getDomRef();
+            if (oDomRef) { void oDomRef.offsetHeight; }
             oWrapper.addStyleClass("explore-enter");
+        },
 
-            // cleanup after animation ends
-            setTimeout(() => {
-                oWrapper.removeStyleClass("explore-enter");
-            }, 1900);
+        onExit: function () {
+            if (this._exploreBtnAnimationTimeout) {
+                clearTimeout(this._exploreBtnAnimationTimeout);
+            }
         },
 
         onpressFilter: function () {

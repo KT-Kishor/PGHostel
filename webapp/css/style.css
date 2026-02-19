@@ -3129,65 +3129,65 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
 
 .exploreBtnWrapper {
   position: fixed;
-  top: calc(50% - 25px);
+  top: 50%;
   left: 0;
   right: 0;
-
   transform: translateY(-50%);
   display: flex;
-
   justify-content: flex-end;
   padding-right: 164px;
-
   z-index: 100;
   pointer-events: auto;
 }
 
 
 .exploreBtnWrapper {
-  transition: margin 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.25s ease;
 }
-
-
 
 @keyframes mobileSlideIn {
   0% {
     opacity: 0;
-    transform: translate3d(110vw, 0, 0) scale(0.98);
+    transform: translateY(-50%) translateX(110vw) scale(0.98);
   }
-
   60% {
     opacity: 1;
-    transform: translate3d(-4px, 0, 0) scale(1);
+    transform: translateY(-50%) translateX(-4px) scale(1);
   }
-
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translateY(-50%) translateX(0) scale(1);
   }
 }
 
-.explore-enter {
-  animation: screenEdgeSlide 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* Butter-smooth, premium motion */
+/* Default state for screenEdgeSlide (Desktop/Tablet) */
 @keyframes screenEdgeSlide {
   0% {
     opacity: 0;
-    transform: translate3d(120vw, -50%, 0) scale(0.98);
+    transform: translateY(-50%) translateX(120vw) scale(0.98);
   }
-
   60% {
     opacity: 1;
-    transform: translate3d(-6px, -50%, 0) scale(1);
+    transform: translateY(-50%) translateX(-6px) scale(1);
   }
-
   100% {
     opacity: 1;
-    transform: translate3d(0, -50%, 0) scale(1);
+    transform: translateY(-50%) translateX(0) scale(1);
   }
 }
+
+/* Base declaration (Desktop/Default) */
+.explore-enter {
+  animation: screenEdgeSlide 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Media Query for Mobile Optimization */
+@media screen and (max-width: 768px) {
+  .explore-enter {
+    animation: mobileSlideIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+
 
 
 
@@ -3410,20 +3410,9 @@ background: linear-gradient(135deg, #00b7c2, #008b96);
     z-index: 10;
   }
 
-  .exploreBtn {
-    height: 58px !important;
-    width: 260px !important;
-    border-radius: 7px !important;
-  }
 
-  .exploreBtn .sapMBtnContent {
-    font-size: 20px !important;
-    letter-spacing: 2px;
-  }
+  
 
-  .explore-enter {
-    animation: mobileSlideIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
 }
 
 @media screen and (max-width: 380px) {
