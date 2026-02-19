@@ -18,9 +18,9 @@ sap.ui.define([
             });
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendorDetail").attachMatched(this._onRouteMatched, this);
-             
+
         },
-      
+
         _onRouteMatched: async function(oEvent) {
             try {
                 // this.commonLoginFunction();
@@ -164,7 +164,7 @@ sap.ui.define([
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
-        }, 
+        },
 
         onAdminFileSelect: function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
@@ -253,15 +253,19 @@ sap.ui.define([
             this._updateUploaderState();
         },
 
-        _updateUploaderState: function () {
+        _updateUploaderState: function() {
             const oView = this.getView();
             const bEdit = oView.getModel("editable").getProperty("/Edit");
             const sDocType = oView.getModel("AdminSignupModel").getProperty("/CurrentDocType");
 
-            this.byId("MV_id_adminFileUploader").setEnabled(bEdit && !!sDocType);
+            const oUploader = oView.byId("VN_id_FileUploader") || sap.ui.getCore().byId("VN_id_FileUploader");
+
+            if (oUploader) {
+                oUploader.setEnabled(bEdit && !!sDocType);
+            }
         },
 
-        onDocumentTypeChange: function (oEvent) {
+        onDocumentTypeChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             this._updateUploaderState();
         },
@@ -314,7 +318,7 @@ sap.ui.define([
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
                 sap.ui.core.BusyIndicator.hide();
-                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
+                MessageToast.show(this.i18nModel.getText("vendorSuccess"));
                 return true;
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
@@ -907,9 +911,9 @@ sap.ui.define([
 
         onChangeDOB: function(oEvent) {
             utils._LCvalidateDate(oEvent);
-        }
-        ,
-       onUploadDocumentFile: function () {
+        },
+
+        onUploadDocumentFile: function() {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
                 this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.VenderUpload", this);
@@ -929,102 +933,95 @@ sap.ui.define([
 
             this.UD_Dialog.open();
         },
-        onCloseDialog: function () {
+
+        onCloseDialog: function() {
             this.UD_Dialog.close();
         },
-        onFacilityFileChange: function (oEvent) {
-    const oFileUploader = oEvent.getSource();
-    const oFile = oEvent.getParameter("files")[0];
 
-    const oAdminModel = this.getView().getModel("AdminSignupModel");
-    const sDocType = oAdminModel.getProperty("/CurrentDocType");
+         onFacilityFileChange: function(oEvent) {
+            const oFileUploader = oEvent.getSource();
+            const oFile = oEvent.getParameter("files")[0];
 
-    // --------------------------------
-    // VALIDATE DOCUMENT TYPE
-    // --------------------------------
-    if (!sDocType) {
-        MessageToast.show(
-            this.i18nModel.getText("pleaseSelectDocumentTypeFirst")
-        );
-        oFileUploader.clear();
-        return;
-    }
+            const oAdminModel = this.getView().getModel("AdminSignupModel");
+            const sDocType = oAdminModel.getProperty("/CurrentDocType");
 
-    if (!oFile) {
-        return;
-    }
+            // VALIDATE DOCUMENT TYPE
+            if (!sDocType) {
+                MessageToast.show(
+                    this.i18nModel.getText("pleaseSelectDocumentTypeFirst")
+                );
+                oFileUploader.clear();
+                return;
+            }
 
-    // --------------------------------
-    // DUPLICATE CHECK
-    // --------------------------------
-    const aDocs = oAdminModel.getProperty("/Documents") || [];
-    const bDuplicate = aDocs.some(
-        oDoc => oDoc.DocumentType === sDocType
-    );
+            if (!oFile) {
+                return;
+            }
 
-    if (bDuplicate) {
-        MessageToast.show(
-            this.i18nModel.getText("reuploadDocType")
-        );
-        oFileUploader.clear();
-        return;
-    }
+            // DUPLICATE CHECK
+            const aDocs = oAdminModel.getProperty("/Documents") || [];
+            const bDuplicate = aDocs.some(
+                oDoc => oDoc.DocumentType === sDocType
+            );
 
-    // --------------------------------
-    // FILE READ
-    // --------------------------------
-    const reader = new FileReader();
-    const that = this;
+            if (bDuplicate) {
+                MessageToast.show(
+                    this.i18nModel.getText("reuploadDocType")
+                );
+                oFileUploader.clear();
+                return;
+            }
 
-    reader.onload = async function (e) {
-        try {
-            const sBase64 = e.target.result.split(",")[1];
+            // FILE READ
+            const reader = new FileReader();
+            const that = this;
 
-            const oPayload = {
-                data: {
-                    CustomerID: oAdminModel.getProperty("/UserID"),
-                    DocumentType: sDocType,
-                    File: sBase64,
-                    FileName: oFile.name,
-                    FileType: oFile.type,
+            reader.onload = async function(e) {
+                try {
+                    const sBase64 = e.target.result.split(",")[1];
+
+                    const oPayload = {
+                        data: {
+                            CustomerID: oAdminModel.getProperty("/UserID"),
+                            DocumentType: sDocType,
+                            File: sBase64,
+                            FileName: oFile.name,
+                            FileType: oFile.type,
+                        }
+                    };
+
+                    sap.ui.core.BusyIndicator.show(0);
+
+                    await that.ajaxCreateWithJQuery(
+                        "HM_CustomerDocument",
+                        oPayload
+                    );
+
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadSuccess")
+                    );
+
+                    // RELOAD DOCUMENTS → TABLE UPDATES
+                    await that._loadVendorDetails(
+                        oAdminModel.getProperty("/UserID")
+                    );
+
+                    // Reset
+                    oAdminModel.setProperty("/CurrentDocType", "");
+                    oFileUploader.clear();
+
+                } catch (err) {
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadError")
+                    );
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
                 }
             };
 
-            sap.ui.core.BusyIndicator.show(0);
+            reader.readAsDataURL(oFile);
 
-            await that.ajaxCreateWithJQuery(
-                "HM_CustomerDocument",
-                oPayload
-            );
-
-            MessageToast.show(
-                that.i18nModel.getText("docUploadSuccess")
-            );
-
-            // --------------------------------
-            // RELOAD DOCUMENTS → TABLE UPDATES
-            // --------------------------------
-            await that._loadVendorDetails(
-                oAdminModel.getProperty("/UserID")
-            );
-
-            // Reset
-            oAdminModel.setProperty("/CurrentDocType", "");
-            oFileUploader.clear();
-
-        } catch (err) {
-            MessageToast.show(
-                that.i18nModel.getText("docUploadError")
-            );
-        } finally {
-            sap.ui.core.BusyIndicator.hide();
+            this.UD_Dialog.close();
         }
-    };
-
-    reader.readAsDataURL(oFile);
-
-    this.UD_Dialog.close();
-}
-
     });
 });

@@ -11,7 +11,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteVendorDetail").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             sap.ui.core.BusyIndicator.show(0);
 
             try {
@@ -76,7 +76,7 @@ sap.ui.define([
             }
         },
 
-        _ensureCountryDataLoaded: async function () {
+        _ensureCountryDataLoaded: async function() {
             let aCountryData = this.getView().getModel("CountryModel")?.getData();
 
             if (!Array.isArray(aCountryData) || aCountryData.length === 0) {
@@ -88,7 +88,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
         },
 
-        _validateVendorUserID: async function (sUserID) {
+        _validateVendorUserID: async function(sUserID) {
             try {
                 const oResp = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
                     UserID: sUserID
@@ -126,7 +126,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        _applyCountryStateCityFilters: function () {
+        _applyCountryStateCityFilters: function() {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCountryCB = this.byId("V_id_Country");
             const oStateCB = this.byId("V_id_State");
@@ -301,24 +301,27 @@ sap.ui.define([
             this._updateUploaderState();
         },
 
-        _updateUploaderState: function () {
+        _updateUploaderState: function() {
             const oView = this.getView();
             const bEdit = oView.getModel("editable").getProperty("/Edit");
             const sDocType = oView.getModel("AdminSignupModel").getProperty("/CurrentDocType");
 
-            this.byId("V_id_adminFileUploader").setEnabled(bEdit && !!sDocType);
+            const oUploader = oView.byId("VN_id_FileUploader") || sap.ui.getCore().byId("VN_id_FileUploader");
+
+            if (oUploader) {
+                oUploader.setEnabled(bEdit && !!sDocType);
+            }
         },
 
-        onDocumentTypeChange: function (oEvent) {
+        onDocumentTypeChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             this._updateUploaderState();
         },
 
-        BT_onsavebuttonpress: async function () {
+        BT_onsavebuttonpress: async function() {
             const bConfirm = await new Promise((resolve) => {
                 sap.m.MessageBox.confirm(
-                     "Are you sure you want to Submit?",
-                    {
+                    "Are you sure you want to Submit?", {
                         icon: sap.m.MessageBox.Icon.WARNING,
                         title: "Confirm Submission",
                         actions: [
@@ -326,7 +329,7 @@ sap.ui.define([
                             sap.m.MessageBox.Action.NO
                         ],
                         // emphasizedAction: sap.m.MessageBox.Action.NO,
-                        onClose: function (sAction) {
+                        onClose: function(sAction) {
                             resolve(sAction === sap.m.MessageBox.Action.YES);
                         }
                     }
@@ -854,7 +857,118 @@ sap.ui.define([
         },
 
         BI_onButtonPress: function() {
-           this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+        },
+
+        onUploadDocumentFile: function() {
+            if (!this.UD_Dialog) {
+                var oView = this.getView();
+                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.VenderUpload", this);
+                oView.addDependent(this.UD_Dialog);
+            }
+
+            var oCombo = this.getView().byId("VN_idProofType") || sap.ui.getCore().byId("VN_idProofType");
+            if (oCombo) {
+                oCombo.setSelectedKey("");
+                oCombo.setValue("");
+            }
+
+            var oFileUploader = this.getView().byId("VN_id_FileUploader") || sap.ui.getCore().byId("VN_id_FileUploader");
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
+
+            this.UD_Dialog.open();
+        },
+
+        onCloseDialog: function() {
+            this.UD_Dialog.close();
+        },
+
+        onFacilityFileChange: function(oEvent) {
+            const oFileUploader = oEvent.getSource();
+            const oFile = oEvent.getParameter("files")[0];
+
+            const oAdminModel = this.getView().getModel("AdminSignupModel");
+            const sDocType = oAdminModel.getProperty("/CurrentDocType");
+
+            // VALIDATE DOCUMENT TYPE
+            if (!sDocType) {
+                MessageToast.show(
+                    this.i18nModel.getText("pleaseSelectDocumentTypeFirst")
+                );
+                oFileUploader.clear();
+                return;
+            }
+
+            if (!oFile) {
+                return;
+            }
+
+            // DUPLICATE CHECK
+            const aDocs = oAdminModel.getProperty("/Documents") || [];
+            const bDuplicate = aDocs.some(
+                oDoc => oDoc.DocumentType === sDocType
+            );
+
+            if (bDuplicate) {
+                MessageToast.show(
+                    this.i18nModel.getText("reuploadDocType")
+                );
+                oFileUploader.clear();
+                return;
+            }
+
+            // FILE READ
+            const reader = new FileReader();
+            const that = this;
+
+            reader.onload = async function(e) {
+                try {
+                    const sBase64 = e.target.result.split(",")[1];
+
+                    const oPayload = {
+                        data: {
+                            CustomerID: oAdminModel.getProperty("/UserID"),
+                            DocumentType: sDocType,
+                            File: sBase64,
+                            FileName: oFile.name,
+                            FileType: oFile.type,
+                        }
+                    };
+
+                    sap.ui.core.BusyIndicator.show(0);
+
+                    await that.ajaxCreateWithJQuery(
+                        "HM_CustomerDocument",
+                        oPayload
+                    );
+
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadSuccess")
+                    );
+
+                    // RELOAD DOCUMENTS → TABLE UPDATES
+                    await that._loadVendorDetails(
+                        oAdminModel.getProperty("/UserID")
+                    );
+
+                    // Reset
+                    oAdminModel.setProperty("/CurrentDocType", "");
+                    oFileUploader.clear();
+
+                } catch (err) {
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadError")
+                    );
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                }
+            };
+
+            reader.readAsDataURL(oFile);
+
+            this.UD_Dialog.close();
         }
     });
 });
