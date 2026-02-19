@@ -14,7 +14,7 @@
                 justifyContent="SpaceBetween"
             >
 <core:HTML
-    content="&lt;img src='image/HPFooter.png' style='height:20px; vertical-align: middle; margin-right: 5px;'&gt; &lt;a href='https://www.kalpavrikshatechnologies.com/' class='footer-text' target='_blank'&gt;Developed by Kalpavriksha Technologies&lt;/a&gt;"
+    content="&lt;img src='' style='height:20px; vertical-align: middle; margin-right: 5px;'&gt; &lt;a href='https://www.kalpavrikshatechnologies.com/' class='footer-text' target='_blank'&gt;Developed by Kalpavriksha Technologies&lt;/a&gt;"
 />
 
                 <HBox
