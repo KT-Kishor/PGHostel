@@ -99,7 +99,7 @@
                             id="id_enq_STD"
                             selectedKey="{EnquiryModel>/STDCode}"
                             change="ADMIN_onChangeSTD"
-                            placeholder="isd"
+                            placeholder="ISD"
                             showSecondaryValues="true"
                             width="100%"
                             items="{path:'CountryModel>/', length:1000}"
