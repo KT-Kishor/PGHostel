@@ -62,7 +62,7 @@ sap.ui.define([
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
-                filters.BranchCode = "";
+                filters.BranchCode = oExistingModel.BranchCode;
             }
             this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
 
@@ -90,7 +90,7 @@ sap.ui.define([
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
             } else {
-                filters.BranchID = "";
+                filters.BranchID = oExistingModel.BranchCode;
             }
             try {
                 const oView = this.getView();
@@ -839,7 +839,7 @@ sap.ui.define([
                 filters.Role = "Admin";
 
             } else {
-                filters.BranchCode = "";
+                filters.BranchCode = oExistingModel.BranchCode;
             }
 
             if (sRoomNo) {

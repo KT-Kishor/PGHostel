@@ -79,7 +79,7 @@ sap.ui.define([
                 filters.Role ="Admin";
 
             }else{
-                filters.BranchID = "";
+                filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
             try {

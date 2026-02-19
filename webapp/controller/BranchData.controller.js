@@ -88,7 +88,7 @@ sap.ui.define([
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
             } else {
-                filters.BranchCode = "";
+                filters.BranchCode = oExistingModel.BranchCode;
             }
             this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
                 const oModel = new sap.ui.model.json.JSONModel(response.Customers);
@@ -112,13 +112,16 @@ sap.ui.define([
             const oView = this.getView();
 
             let filters = {};
-            if (oLoginmodel.Role === "Admin") {
-                filters.BranchID = Branch === "" ? oExistingModel.BranchCode : Branch;
-                filters.Role = "Admin";
 
-            } else {
-                filters.BranchID = Branch
+            // ✅ Admin → All branches
+            if (oLoginmodel.Role === "Admin") {
+                filters.BranchID = Branch ? Branch : oExistingModel.BranchCode;
+            } 
+            // ✅ Non Admin → Only his branch
+            else {
+                filters.BranchID = oLoginmodel.BranchCode;
             }
+
             let sCustomerName = oView.byId("MD_id_BranchCode").getValue()?.trim();
             let sPincode = oView.byId("MD_id_SearchField").getValue()?.trim();
 

@@ -100,7 +100,7 @@ sap.ui.define([
                 filters.BranchID = aBranchCodes;
                 filters.Role ="Admin";
             }else{
-                filters.BranchID = "";
+                filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -427,8 +427,6 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-
-
           if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             }else   if (oExistingModel.BranchCode) {
@@ -444,7 +442,7 @@ sap.ui.define([
                 filters.Role ="Admin";
 
             }else{
-                filters = { BranchCode: "" };
+                filters = { BranchCode: oExistingModel.BranchCode };
 
             }
 

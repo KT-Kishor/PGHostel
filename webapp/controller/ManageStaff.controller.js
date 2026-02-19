@@ -320,13 +320,8 @@ sap.ui.define([
             // Always apply Vendor type
             filters.Type = oExistingModel.EmployeeID;
 
-            // BranchCode applied based on role
-            if (oExistingModel.Role === "Admin") {
-                filters.BranchCode = aBranchCodes;
-                filters.Role = "Admin";
-            } else {
-                filters.BranchCode = aBranchCodes;
-            }
+            // Always apply BranchCode (for all roles)
+            filters.BranchCode = aBranchCodes;
 
             // Apply UserID filter
             if (sUserID) {

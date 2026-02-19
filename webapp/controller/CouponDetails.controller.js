@@ -118,6 +118,8 @@ sap.ui.define([
 
                 if (oExistingModel.Role === "Admin") {
                     params.Role = "Admin";
+                }else{
+                    params.BranchCode = oExistingModel.BranchCode;
                 }
 
                 // ================= Date Format =================
@@ -271,7 +273,7 @@ sap.ui.define([
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
             } else {
-                filters.BranchID = "";
+                filters.BranchID = oExistingModel.BranchCode;
 
             }
             try {

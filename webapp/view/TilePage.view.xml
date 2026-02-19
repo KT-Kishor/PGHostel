@@ -132,7 +132,7 @@
 
                 <GenericTile
                     id="id5roomTile"
-                    visible="{= ${TileVisibility>/ManageBedType}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/ManageStaff}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>manageStaff}"
                     press="TileV_onpressManageStaff"

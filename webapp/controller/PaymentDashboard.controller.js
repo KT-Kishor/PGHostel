@@ -62,7 +62,7 @@ sap.ui.define([
                     filters.BranchID = aBranchCodes;
                     filters.Role = "Admin";
                 } else {
-                    filters.BranchID = "";
+                    filters.BranchID = aBranchCodes;
                 }
 
                 const oView = this.getView();

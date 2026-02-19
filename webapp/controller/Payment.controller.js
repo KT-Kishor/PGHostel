@@ -128,6 +128,8 @@ sap.ui.define([
             if (oLogin.Role === "Admin") {
                 filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
                 filters.Role = "Admin";
+            }else {
+                    filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
             }
 
             if (oLogin.Role === "Super Admin" && !filters.StartDate) filters.GetAll = true;

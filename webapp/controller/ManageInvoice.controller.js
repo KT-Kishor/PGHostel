@@ -65,7 +65,7 @@ sap.ui.define(
                         filters.BranchID = aBranchCodes;
                         filters.Role = "Admin";
                     } else {
-                        filters.BranchID = "";
+                        filters.BranchID = aBranchCodes 
                     }
                     try {
                         const oView = this.getView();
@@ -104,6 +104,8 @@ sap.ui.define(
                         if (oExistingModel.Role === "Admin") {
                             params.BranchCode = aBranchCodes;
                             params.Role = "Admin";
+                        }else {
+                            params.BranchCode = aBranchCodes;
                         }
 
                         /* ---------------- Filter Bar Values ---------------- */
@@ -188,6 +190,8 @@ sap.ui.define(
                         if (oExistingModel.Role === "Admin") {
                             filterModelParams.BranchCode = aBranchCodes;
                             filterModelParams.Role = "Admin";
+                        }else {
+                                filterModelParams.BranchCode = aBranchCodes;
                         }
 
                         await this._fetchCommonData(

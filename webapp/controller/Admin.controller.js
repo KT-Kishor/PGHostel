@@ -82,7 +82,7 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
             }else{
-                filters.BranchID = "";
+                filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
@@ -173,7 +173,8 @@ sap.ui.define([
                      if (oExistingModel.Role === "Admin"){
                           filters.Role ="Admin";
                         filters.BranchCode = aBranchCodes;
-
+                     }else{
+                        filters.BranchCode = oExistingModel.BranchCode;
                      }
 
                 if (sbookID) filters.BookingID = sbookID;
