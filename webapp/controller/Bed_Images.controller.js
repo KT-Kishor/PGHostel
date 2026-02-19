@@ -498,7 +498,7 @@ sap.ui.define([
                         press: function() {
                             this._oImageDialog.close();
                         }.bind(this)
-                    }),
+                    }).addStyleClass("myUnifiedBtn"),
 
                     afterClose: function() {
                         this._oImageDialog.destroy();
