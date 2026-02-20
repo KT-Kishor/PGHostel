@@ -948,7 +948,7 @@ sap.ui.define([
                             if (this._oEnquiry && this._oEnquiry.isOpen()) {
                                 this._oEnquiry.close();
                             }
-                            this._clearEnquiryStates(); // optional if you have it
+                            this._clearEnquiryStates();
                         }.bind(this)
                     }
                 );

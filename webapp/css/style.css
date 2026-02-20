@@ -1889,26 +1889,38 @@ span.sapMBtnInner.sapMBtnEmphasized {
   text-decoration: none !important;
 }
 
-/* Outer pill */
-.pillActionBar {
-background: linear-gradient(135deg, #00b7c2, #008b96);
-    border-radius: 22px;
-    width: fit-content;
-    margin: auto;
-}
+/* EXACT SAME STYLE AS View Rooms */
 
-/* ===== Base Pill Button Style ===== */
-.pillActionBtn .sapMBtnInner {
+.pillActionBtn.sapMLnk {
+  background: linear-gradient(135deg, #02e0fd, #008b96) !important;
   color: #ffffff !important;
-  font-weight: bold;
-  font-size: 14px;
-  padding: 2px 5px;
-  border-radius: 18px !important;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5), 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none !important;
+  display: inline-block;
   transition: all 0.2s ease-in-out;
 }
 
-.pillActionBtn:active .sapMBtnInner {
+.pillActionBtn.sapMLnk:hover {
+  text-decoration: none !important;
+  transform: scale(1.05);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.pillActionBtn.sapMLnk:active {
   background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+}
+
+.pillActionBtn.sapMLnk:focus {
+  outline: none !important;
+  text-decoration: none !important;
+}
+
+.pillLeft {
+  margin-right: 10px;
 }
 
 .tileContainer {

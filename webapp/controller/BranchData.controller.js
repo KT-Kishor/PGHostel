@@ -87,8 +87,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchCode = "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
@@ -117,9 +117,9 @@ sap.ui.define([
 
             if (oLoginmodel.Role === "Admin") {
                 filters.BranchID = Branch ? Branch : oExistingModel.BranchCode;
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            } 
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            }
             else {
                 filters.BranchID = oLoginmodel.BranchCode;
             }
@@ -139,7 +139,7 @@ sap.ui.define([
             }
             var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
             var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
-            this.getView().setModel(new sap.ui.model.json.JSONModel(aBranchData),"branchModel");
+            this.getView().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel");
             var model = new sap.ui.model.json.JSONModel(aBranchData);
             this.getOwnerComponent().setModel(model, "mainModel")
         },
@@ -418,7 +418,8 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("MC_id_City")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID")
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("Bd_id_DepositCurrency")), "ID")
             );
 
             if (!isMandatoryValid) {
@@ -484,6 +485,15 @@ sap.ui.define([
                 c.stateName === Payload.state &&
                 c.countryCode === aCountries.find(c => c.countryName === Payload.country)?.code
             );
+
+            if (!validCity) {
+                const oCityCombo = sap.ui.getCore().byId(oView.createId("MC_id_City"));
+                oCityCombo.setValueState("Error");
+                oCityCombo.setValueStateText("Please select a valid city from dropdown");
+                oCityCombo.focus();
+                sap.m.MessageToast.show("Please select a valid city from dropdown");
+                return;
+            }
 
             if (!this.MC_ValidateGstNumber()) {
                 sap.ui.getCore().byId(oView.createId("MC_id_CustomGst")).focus();
@@ -1333,7 +1343,12 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisbranch"));
+                sap.m.MessageBox.information(
+                    "No logo is uploaded.",
+                    {
+                        title: "Information"
+                    }
+                );
                 return;
             }
 

@@ -182,21 +182,16 @@
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                <Toolbar
-                                    class="pillActionBar sapUiTinyMarginTop"
-                                    design="Transparent"
-                                >
-                                    <Button
+                                    <Link
                                         text="View Details"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-                                    <Button
+                                    <Link
                                         text="Enquiry"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
-                                </Toolbar>
                             </HBox>
                         </VBox>
                     </VBox>
@@ -313,21 +308,16 @@
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                <Toolbar
-                                    class="pillActionBar sapUiTinyMarginTop"
-                                    design="Transparent"
-                                >
-                                    <Button
+                                    <Link
                                         text="View Details"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-                                    <Button
+                                    <Link
                                         text="Enquiry"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
-                                </Toolbar>
                             </HBox>
                         </VBox>
                     </VBox>
