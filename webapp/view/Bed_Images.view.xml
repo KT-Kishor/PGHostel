@@ -287,11 +287,12 @@
                 <m:contentRight>
                     <m:Button
                         id="BI_ideditButton"
-                        visible="{= !${editable>/Edit} }"
+                        visible="{= !${editable>/Edit} &amp;&amp; ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         text="{i18n>MSedit}"
                         tooltip="{i18n>editBedDetails}"
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
+                        
                     />
                     <m:Button
                         id="POO_idSaveButton"

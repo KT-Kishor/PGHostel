@@ -157,6 +157,9 @@
                     placeholder="{i18n>enterDescription}"
                     valueStateText="{i18n>enterDescription}"
                     liveChange="onLivehange"
+                    rows="4"
+                    growing="false"
+                    
                 />
             </f:content>
         </f:SimpleForm>
@@ -166,13 +169,13 @@
         >
             <!-- Informational Message Strip -->
             <MessageStrip
-                text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB."
+                text="Please add at least one image. Only JPG, JPEG, or PNG files up to 2 MB are allowed."
                 showIcon="true"
                 type="Warning"
                 class="sapUiTinyMarginBottom"
             />
         </VBox>
-        <Label text="" />
+        <Label text=""/>
         <VBox width="100%">
             <HBox
                 justifyContent="End"
@@ -188,10 +191,10 @@
                     change="onFacilityFileChange"
                     class="myUnifiedBtn"
                 />
-                <Text
+                <!-- <Text
                     text="*"
                     class="upload-star"
-                />
+                /> -->
             </HBox>
             <Table
                 id="id_Bed_AttachmentTable"

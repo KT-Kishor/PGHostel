@@ -93,24 +93,28 @@
                             press="HM_AddRoom"
                             tooltip="{i18n>createRoom}"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="HM_EditRoom"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="HM_DeleteRoom"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

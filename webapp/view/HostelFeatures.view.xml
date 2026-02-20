@@ -72,18 +72,21 @@
                             tooltip="{i18n>addHostelFeatures}"
                             press="HM_AddHostelFeature"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="HM_EditHostelFeature"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="HM_DeleteHostelFeature"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

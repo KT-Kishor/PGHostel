@@ -96,18 +96,23 @@
                             tooltip="{i18n>addBed}"
                             press="HM_RoomDetails"
                             class="myUnifiedBtn"
+                              visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>deleteSelectedBeds}"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
+                           visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>downloadBedDetails}"
                             press="BD_onDownload"
                             class="myUnifiedBtn"
+                             visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+
                         />
                     </OverflowToolbar>
                 </headerToolbar>

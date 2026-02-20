@@ -91,24 +91,28 @@
                             tooltip="{i18n>MSadd}"
                             press="MD_AddButtonPress"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="MD_UpdateTableRow"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>deleteSelectedBranch}"
                             press="MD_DeleteRow"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>downloadBranchData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

@@ -212,6 +212,7 @@
                             press="onReturnDeposit"
                             class="myUnifiedBtn"
                             type="Emphasized"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
 
                         <!-- Download Button -->
@@ -220,6 +221,7 @@
                             tooltip="{i18n>download}"
                             press="onDownloadDeposits"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
