@@ -25,72 +25,41 @@
                     text="{i18n>dashTodayBookings}"
                     level="H3"
                 />
-
-                <Carousel
-                    height="auto"
-                    showPageIndicator="true"
-                    pages="{todayModel>/pages}"
-                >
-                    <VBox
-                        class="todayPage"
-                        width="100%"
-                    >
-                        <FlexBox
-                            items="{path: 'todayModel>' , templateShareable: false}"
-                            direction="Row"
-                            wrap="Wrap"
-                            justifyContent="Start"
-                            class="todayCardsRow"
-                        >
-                            <Panel
-                                class="todayCard"
-                                expandable="false"
-                            >
-                                <VBox>
-                                    <Title
-                                        text="{i18n>bookingID}: {todayModel>BookingID}"
-                                        level="H4"
-                                        wrapping="true"
-                                    />
-                                    <Text
-                                        text="{i18n>bookingDate}: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
-                                    />
-                                    <Text
-                                        text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
-                                        wrapping="true"
-                                    />
-                                    <Text
-                                        text="{i18n>dashStay}: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
-                        to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
-                                    />
-
-                                    <HBox
-                                        justifyContent="End"
-                                        class="sapUiSmallMarginTop"
-                                    >
-                                        <Button
-                                            text="{i18n>dashViewBooking}"
-                                            type="Emphasized"
-                                            press="onBookingCardPress"
-                                        />
-                                    </HBox>
-                                </VBox>
-                            </Panel>
-                        </FlexBox>
-                    </VBox>
-                </Carousel>
-
-                <VBox class="sapUiMediumMarginTop" />
+                <VBox class="sapUiSmallMarginTop" />
 
                 <fb:FilterBar
                     id="D_id_FilterbarEmployee"
                     useToolbar="false"
                     clear="D_onPressClear"
                     showClearOnFB="true"
-                    search="onFilterGo"
+                    search="D_search"
                     filterChange="onFilterChange"
                     showFilterConfiguration="false"
                 >
+                 <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="Name"
+                        label="Branch Name"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="D_id_BranchCode"
+                                items="{branchModel>/}"
+                                showSecondaryValues="true"
+                                showClearIcon="true"
+                                width="100%"
+                            >
+                                <core:ListItem
+                                    key="{branchModel>BranchID}"
+                                    text="{branchModel>Name} - {branchModel>BranchID}"
+                                    additionalText="{branchModel>City}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="year"
@@ -177,6 +146,61 @@
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
                 </fb:FilterBar>
+
+                <Carousel
+                    height="auto"
+                    showPageIndicator="true"
+                    class="sapUiSmallMarginTop"
+                    pages="{todayModel>/pages}"
+                >
+                    <VBox
+                        class="todayPage"
+                        width="100%"
+                    >
+                        <FlexBox
+                            items="{path: 'todayModel>' , templateShareable: false}"
+                            direction="Row"
+                            wrap="Wrap"
+                            justifyContent="Start"
+                            class="todayCardsRow"
+                        >
+                            <Panel
+                                class="todayCard"
+                                expandable="false"
+                            >
+                                <VBox>
+                                    <Title
+                                        text="{i18n>bookingID}: {todayModel>BookingID}"
+                                        level="H4"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{i18n>bookingDate}: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <Text
+                                        text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{i18n>dashStay}: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
+                        to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                                    />
+
+                                    <HBox
+                                        justifyContent="End"
+                                        class="sapUiSmallMarginTop"
+                                    >
+                                        <Button
+                                            text="{i18n>dashViewBooking}"
+                                            type="Emphasized"
+                                            press="onBookingCardPress"
+                                        />
+                                    </HBox>
+                                </VBox>
+                            </Panel>
+                        </FlexBox>
+                    </VBox>
+                </Carousel>
 
                 <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"

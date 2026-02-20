@@ -26,10 +26,12 @@ sap.ui.define([
                 this.byId("D_id_year").setValue(String(iYear));
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
-                this.BranchID = oLogin.BranchCode;
+                this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
+                this._selectedBranch = "ALL";
                 await this._loadCustomers();
+                await this._loadUserBranches();
                 await this.loadDashboardData();
-                await this.onFilterGo();
+                await this.D_search();
             } catch (err) {
                 MessageToast.show("Something went wrong");
             } finally {
@@ -40,11 +42,17 @@ sap.ui.define([
         loadDashboardData: async function () {
             // sap.ui.core.BusyIndicator.show(0);
             try {
-                var oFilter = { BranchID: this.BranchID };
+                if (!this._aUserBranches || this._aUserBranches.length === 0) {
+                    return;
+                }
+                var oFilter = {
+                    BranchID: this._aUserBranches.join(",")
+                };
+
                 const oData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
                 var aData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 this._aAllBookings = aData;
-                this.dashboardSetDate(aData);
+                this.dashboardSetDate(aData, this._aUserBranches);
                 // sap.ui.core.BusyIndicator.hide();
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("Failed to load dashboard data"));
@@ -52,10 +60,10 @@ sap.ui.define([
             }
         },
 
-        dashboardSetDate: function (aData) {
+        dashboardSetDate: function (aData, aBranchesToUse) {
             const oToday = new Date();
             oToday.setHours(0, 0, 0, 0);
-            const aAllowedBranches = this.BranchID
+            const aAllowedBranches = aBranchesToUse;
             const aTodayCards = [];
             const oMonthlyDate = {};
             aData.forEach((oBooking) => {
@@ -468,40 +476,66 @@ sap.ui.define([
             };
         },
 
-        onFilterGo: async function () {
-            if (!this.BranchID) return MessageToast.show("Branch not ready");
-            const oRange = this._getStartEndDate();
-            const bMonthSelected = this.byId("D_id_month").getSelectedKey();
-            const oMonthPayload = {
-                StartDate: oRange.yearStart,
-                EndDate: oRange.yearEnd,
-                BranchCode: this.BranchID
-            };
-            const oDailyPayload = {
-                StartDate: oRange.monthStart,
-                EndDate: oRange.monthEnd,
-                BranchCode: this.BranchID
-            };
-            const oStatusPayload = {
-                StartDate: oRange.yearStart,
-                EndDate: oRange.yearEnd,
-                BranchCode: this.BranchID
-            };
-            const oPaymentPayload = {
-                StartDate: bMonthSelected ? oRange.monthStart : oRange.yearStart,
-                EndDate: bMonthSelected ? oRange.monthEnd : oRange.yearEnd,
-                BranchCode: this.BranchID
-            };
-            // console.log("Month Chart Filters:", oMonthPayload);
-            // console.log("Daily Chart Filters:", oDailyPayload);
-            // console.log("Status Chart Filters:", oStatusPayload);
-            // console.log("Payment Chart Filters:", oPaymentPayload);
-            await Promise.all([
-                this._loadMonthChart(oMonthPayload),
-                this._loadDayChart(oDailyPayload),
-                this._loadStatusChart(oStatusPayload),
-                this._loadPaymentTypeChart(oPaymentPayload)
-            ]);
+        D_search: async function () {
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const sSelected = this.byId("D_id_BranchCode").getSelectedKey();
+                let aBranchesToUse = [];
+                if (sSelected === "ALL") {
+                    aBranchesToUse = this._aUserBranches;
+                } else {
+                    aBranchesToUse = [sSelected];
+                }
+                if (!aBranchesToUse) return MessageToast.show("Branch not ready");
+                const oRange = this._getStartEndDate();
+                const bMonthSelected = this.byId("D_id_month").getSelectedKey();
+                const oUserBranch = aBranchesToUse.join(",");
+                const oMonthPayload = {
+                    StartDate: oRange.yearStart,
+                    EndDate: oRange.yearEnd,
+                    BranchCode: oUserBranch
+                };
+                const oDailyPayload = {
+                    StartDate: oRange.monthStart,
+                    EndDate: oRange.monthEnd,
+                    BranchCode: oUserBranch
+                };
+                const oStatusPayload = {
+                    StartDate: oRange.yearStart,
+                    EndDate: oRange.yearEnd,
+                    BranchCode: oUserBranch
+                };
+                const oPaymentPayload = {
+                    StartDate: bMonthSelected ? oRange.monthStart : oRange.yearStart,
+                    EndDate: bMonthSelected ? oRange.monthEnd : oRange.yearEnd,
+                    BranchCode: oUserBranch
+                };
+                await Promise.all([
+                    this._loadMonthChart(oMonthPayload),
+                    this._loadDayChart(oDailyPayload),
+                    this._loadStatusChart(oStatusPayload),
+                    this._loadPaymentTypeChart(oPaymentPayload)
+                ]);
+            } catch (err) {
+                MessageToast.show("Failed to load charts");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        _loadUserBranches: async function () {
+            const oData = await this.ajaxReadWithJQuery("HM_Branch", {});
+            let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
+            let aFiltered = aAllBranches.filter(b =>
+                this._aUserBranches.includes(b.BranchID));
+
+            aFiltered.unshift({
+                Name: "All",
+                BranchID: "ALL",
+                City: ""
+            });
+            this.getView().setModel(new JSONModel(aFiltered), "branchModel");
+            this.byId("D_id_BranchCode").setSelectedKey("ALL");
         },
 
         switchForAllGraph: function (sType) {
@@ -548,6 +582,7 @@ sap.ui.define([
         D_onPressClear: function () {
             this.byId("D_id_year").setValue("");
             this.byId("D_id_month").setValue("");
+            this.byId("D_id_BranchCode").setValue("");
         }
     })
 })
