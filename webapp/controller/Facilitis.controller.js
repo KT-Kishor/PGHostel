@@ -108,12 +108,12 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filter.BranchCode = aBranchCodes;
                 filter.Role = "Admin";
-
-            } else if (oExistingModel.Role === "Super Admin") {
-                filter.BranchCode = filter.BranchCode || "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filter.BranchCode = "";
             } else {
                 filter.BranchCode = oExistingModel.BranchCode;
             }
+
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", filter);
@@ -180,6 +180,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }

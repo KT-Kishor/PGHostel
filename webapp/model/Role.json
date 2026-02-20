@@ -1,10 +1,4 @@
 [
-    { "RoleID": "HM001", "RoleName": "Admin" },
-    { "RoleID": "HM002", "RoleName": "Warden" },
-    { "RoleID": "HM003", "RoleName": "Receptionist" },
-    { "RoleID": "HM004", "RoleName": "Front Office Manager" },
-    { "RoleID": "HM005", "RoleName": "Security Guard" },
-    { "RoleID": "HM006", "RoleName": "Noraml Staff" },
-    { "RoleID": "HM007", "RoleName": "Ground Staff" },
-    { "RoleID": "HM008", "RoleName": "HR Team" }
+    { "RoleID": "HM001", "RoleName": "BranchManager" },
+    { "RoleID": "HM002", "RoleName": "FrontOfficeEmployee" }
 ]

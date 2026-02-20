@@ -40,8 +40,6 @@ sap.ui.define([
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
 
-
-
             await this._loadBranchCode()
             await this.Cust_read(true)
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
@@ -81,7 +79,9 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-            }else{
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
+            } else{
                 filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -170,12 +170,14 @@ sap.ui.define([
                 if (oExistingModel.Role === "Admin" && aBranchCodes) {
                     filters.BranchCode = aBranchCodes;
                   }
-                     if (oExistingModel.Role === "Admin"){
+                    if (oExistingModel.Role === "Admin"){
                           filters.Role ="Admin";
                         filters.BranchCode = aBranchCodes;
-                     }else{
+                    } else if (oExistingModel.Role === "SuperAdmin" ) {
+                        filters.BranchCode = "";
+                    } else{
                         filters.BranchCode = oExistingModel.BranchCode;
-                     }
+                    }
 
                 if (sbookID) filters.BookingID = sbookID;
                 if (sRoomNo) filters.RoomNo = sRoomNo;

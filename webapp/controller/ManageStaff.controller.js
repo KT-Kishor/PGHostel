@@ -79,7 +79,9 @@ sap.ui.define([
                     BranchID: aBranchCodes,
                     Role: "Admin"
                 };
-            } else {
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
+            }  else {
                 filters.BranchID = aBranchCodes;
             }
 
@@ -320,8 +322,15 @@ sap.ui.define([
             // Always apply Vendor type
             filters.Type = oExistingModel.EmployeeID;
 
-            // Always apply BranchCode (for all roles)
-            filters.BranchCode = aBranchCodes;
+            // BranchCode applied based on role
+            if (oExistingModel.Role === "Admin") {
+                filters.BranchCode = aBranchCodes;
+                filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchCode = "";
+            } else {
+                filters.BranchCode = aBranchCodes;
+            }
 
             // Apply UserID filter
             if (sUserID) {

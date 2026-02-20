@@ -87,6 +87,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchCode = "";
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
@@ -113,11 +115,11 @@ sap.ui.define([
 
             let filters = {};
 
-            // ✅ Admin → All branches
             if (oLoginmodel.Role === "Admin") {
                 filters.BranchID = Branch ? Branch : oExistingModel.BranchCode;
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
             } 
-            // ✅ Non Admin → Only his branch
             else {
                 filters.BranchID = oLoginmodel.BranchCode;
             }

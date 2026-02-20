@@ -99,7 +99,9 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
                 filters.Role ="Admin";
-            }else{
+            }else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
+            } else{
                 filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -440,10 +442,10 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
                 filters.Role ="Admin";
-
-            }else{
+            }else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchCode = "";
+            } else{
                 filters = { BranchCode: oExistingModel.BranchCode };
-
             }
 
             if (sCustomerName) filters.Name = sCustomerName;

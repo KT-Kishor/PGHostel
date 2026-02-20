@@ -64,7 +64,9 @@ sap.ui.define(
                     if (oExistingModel.Role === "Admin" && aBranchCodes) {
                         filters.BranchID = aBranchCodes;
                         filters.Role = "Admin";
-                    } else {
+                    } else if (oExistingModel.Role === "SuperAdmin" ) {
+                        filters.BranchID = "";
+                    }  else {
                         filters.BranchID = oExistingModel.BranchCode; 
                     }
                     try {
@@ -104,7 +106,9 @@ sap.ui.define(
                         if (oExistingModel.Role === "Admin") {
                             params.BranchCode = aBranchCodes;
                             params.Role = "Admin";
-                        }else {
+                        } else if (oExistingModel.Role === "SuperAdmin" ) {
+                            params.BranchCode = "";
+                        } else {
                             params.BranchCode = oExistingModel.BranchCode;
                         }
 
@@ -190,7 +194,9 @@ sap.ui.define(
                         if (oExistingModel.Role === "Admin") {
                             filterModelParams.BranchCode = aBranchCodes;
                             filterModelParams.Role = "Admin";
-                        }else {
+                        }else if (oExistingModel.Role === "SuperAdmin" ) {
+                            filterModelParams.BranchCode = "";
+                        } else {
                                 filterModelParams.BranchCode = oExistingModel.BranchCode;
                         }
 

@@ -85,8 +85,10 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchCode = "";
             } else {
-                filters.BranchCode = data.BranchID || "";
+                filters.BranchCode =  oExistingModel.BranchCode;
             }
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");

@@ -118,7 +118,9 @@ sap.ui.define([
 
                 if (oExistingModel.Role === "Admin") {
                     params.Role = "Admin";
-                }else{
+                } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    params.BranchCode = "";
+                } else{
                     params.BranchCode = oExistingModel.BranchCode;
                 }
 
@@ -272,9 +274,10 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
-            } else {
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
+            }  else {
                 filters.BranchID = oExistingModel.BranchCode;
-
             }
             try {
                 const oView = this.getView();
