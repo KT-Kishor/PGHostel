@@ -36,6 +36,7 @@ sap.ui.define([
             };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel([]), "customers");
+            this.getView().setModel(new JSONModel({ filterSuffix: "" }), "headerModel");
             // Initialize the chart type model with the default values.
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "invoiceChartTypeModel");
             this.getOwnerComponent().getRouter().getRoute("RouteHostelDashboard").attachPatternMatched(this._onObjectMatched, this);
@@ -243,20 +244,19 @@ sap.ui.define([
 
         onFilterChange: function () {
             if (!this.rawInvoiceData) return;
-            // this.getBusyDialog();
             sap.ui.core.BusyIndicator.show(0);
 
             setTimeout(() => {
                 try {
-                    // Make deep copy so rawInvoiceData never changes
                     const invoiceDataCopy = JSON.parse(JSON.stringify(this.rawInvoiceData));
                     const creditNotesCopy = JSON.parse(JSON.stringify(this.creditNotesData));
 
                     const oCustomerFilter = this.byId("customerFilter");
                     const oYearFilter = this.byId("yearFilter");
                     const oDateRange = this.byId("DashI_id_Date");
-
+                    const aSelectedBranches = this.byId("branchFilter").getSelectedKeys();
                     const aSelectedCustomers = oCustomerFilter.getSelectedKeys();
+
                     let sSelectedYear = oYearFilter.getValue();
                     let dFrom = oDateRange.getDateValue();
                     let dTo = oDateRange.getSecondDateValue();
@@ -270,10 +270,10 @@ sap.ui.define([
                     // Use the copy (NEVER rawInvoiceData)
                     let aFilteredData = invoiceDataCopy.filter(item => {
                         const invoiceDate = new Date(item.InvoiceDate);
-
                         let bCustomerMatch = aSelectedCustomers.length === 0 || aSelectedCustomers.includes(item.CustomerName);
-                        let bDateMatch = true;
+                        let bBranchMatch = aSelectedBranches.length === 0 || aSelectedBranches.includes(item.BranchCode);
 
+                        let bDateMatch = true;
                         if (dFrom && dTo) {
                             const dEndDate = new Date(dTo);
                             dEndDate.setDate(dEndDate.getDate() + 1);
@@ -283,8 +283,13 @@ sap.ui.define([
                             const fyEnd = new Date(parseInt(sSelectedYear) + 1, 2, 31, 23, 59, 59);
                             bDateMatch = invoiceDate >= fyStart && invoiceDate <= fyEnd;
                         }
+                        return bCustomerMatch && bBranchMatch && bDateMatch;
+                    });
+                    
 
-                        return bCustomerMatch && bDateMatch;
+                    // 2. Map Branch Names (for Tooltips/Labels)
+                    aFilteredData.forEach(item => {
+                        item.BranchName = (this._branchMap && this._branchMap[item.BranchCode]) || item.BranchCode || "Unknown";
                     });
 
                     this._aCurrentFilteredData = aFilteredData;
@@ -296,16 +301,57 @@ sap.ui.define([
 
                     this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
 
-                    let aYearlyTrendData = (aSelectedCustomers.length > 0)
-                        ? invoiceDataCopy.filter(invoice => aSelectedCustomers.includes(invoice.CustomerName))
-                        : invoiceDataCopy;
+                    // 3. Updated Yearly Trend Logic (Adding Branch Filter here too)
+                    let aYearlyTrendData = invoiceDataCopy.filter(invoice => {
+                        let bCust = aSelectedCustomers.length === 0 || aSelectedCustomers.includes(invoice.CustomerName);
+                        let bBran = aSelectedBranches.length === 0 || aSelectedBranches.includes(invoice.BranchCode);
+                        return bCust && bBran;
+                    });
+                    aYearlyTrendData.forEach(item => {
+                        item.BranchName = (this._branchMap && this._branchMap[item.BranchCode]) || item.BranchCode || "Unknown";
+                    });
+
+
+                    //title header logic start here
+                    let sBranchName = "";
+                    let sCustomerName = "";
+
+                    if (aSelectedBranches.length === 1) {
+                        sBranchName = (this._branchMap && this._branchMap[aSelectedBranches[0]]) || aSelectedBranches[0];
+                    }
+
+                    if (aSelectedCustomers.length === 1) {
+                        sCustomerName = aSelectedCustomers[0];
+                        if (!sBranchName && aFilteredData.length > 0) {
+                            const sBranchCode = aFilteredData[0].BranchCode;
+                            sBranchName = (this._branchMap && this._branchMap[sBranchCode]) || sBranchCode;
+                        }
+                    }
+
+                    // 🔥 Step 1: Ek simple suffix banayein
+                    let sSuffix = "";
+                    if (sBranchName && sCustomerName) sSuffix = ` - ${sBranchName} - ${sCustomerName}`;
+                    else if (sBranchName) sSuffix = ` - ${sBranchName}`;
+                    else if (sCustomerName) sSuffix = ` - ${sCustomerName}`;
+
+                    // 🔥 Step 2: Saare titles JS mein hi ready kar lein (Performance Boost)
+                    const oHeaderData = {
+                        statusTitle: "Invoice Status Distribution" + sSuffix,
+                        monthlyTitle: "Monthly Revenue Trend" + sSuffix,
+                        customerTitle: "Customer Totals" + sSuffix,
+                        yearlyTitle: "Yearly Revenue Trend" + sSuffix,
+                        pendingTitle: "Top 5 Pending Payments" + sSuffix,
+                        filterSuffix: sSuffix // Popovers/Dialogs ke liye
+                    };
+
+                    // 🔥 Step 3: Direct pure object ko model mein set karein
+                    this.getView().getModel("headerModel").setData(oHeaderData);
 
                     this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, aFilterDataCreditNote);
 
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    // this.closeBusyDialog();
                     sap.ui.core.BusyIndicator.hide();
                 }
             }, 100);
@@ -971,7 +1017,10 @@ sap.ui.define([
         onClearFilters: function () {
             this.byId("customerFilter").setSelectedKeys(null);
             this.byId("DashI_id_Date").setValue("");
+            this.byId("branchFilter").setSelectedKeys([]); 
 
+            // Suffix reset karein
+            this.getView().getModel("headerModel").setProperty("/filterSuffix", "");
             const today = new Date();
             let year = today.getFullYear();
             let month = today.getMonth() + 1;
@@ -1265,7 +1314,7 @@ sap.ui.define([
             if (!this.pYearlyInvoicesDialog) {
                 this.pYearlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
-                    name: "sap.ui.com.project1.fragment.YearlyInvoice",
+                    name: "sap.ui.com.project1.fragment.  ",
                     controller: this
                 });
             }

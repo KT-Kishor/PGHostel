@@ -13,9 +13,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title
-                        text="{i18n>totalInvoiceValue} {dialogData>/customerName}"
-                    />
+                 <Title text="{i18n>totalInvoiceValue} {dialogData>/customerName}"/>
                 </contentMiddle>
                 <contentRight>
                     <Button

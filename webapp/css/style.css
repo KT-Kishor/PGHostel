@@ -4392,3 +4392,10 @@ height:140px;
   color: #ffffff !important;
   fill: #ffffff !important;
 }
+.automatedEllipsis {
+    display: block !important; 
+    width: 100%;               
+    overflow: hidden;          
+    text-overflow: ellipsis;   
+    white-space: nowrap;       
+}

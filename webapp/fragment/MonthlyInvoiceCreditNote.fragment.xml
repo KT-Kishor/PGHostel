@@ -13,9 +13,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title
-                        text="{i18n>monthlycreditnotefor} {dialogData>/month}"
-                    />
+  <Title text="{i18n>monthlycreditnotefor} {dialogData>/month} {headerModel>/filterSuffix}"/>
                 </contentMiddle>
                 <contentRight>
                     <Button
