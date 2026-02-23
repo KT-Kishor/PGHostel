@@ -82,7 +82,8 @@ sap.ui.define([
                 Email: "",
                 Mobileno: "",
                 password: "",
-                comfirmpass: ""
+                comfirmpass: "",
+                minDate: new Date(2000, 0, 1)
             }), "LoginMode");
             oView.setModel(new JSONModel({
                 selectedSection: "profile"
@@ -251,84 +252,85 @@ this._bBlockMessagePopover = false;
             }
         },
 
-        _LoadFacilities: async function () {
-            const oView = this.getView();
+     _LoadFacilities: async function () {
+    const oView = this.getView();
 
-            try {
-                const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
-                const oBranch = oHostelModel.BranchCode;
+    try {
+        const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
+        const oBranch = oHostelModel.BranchCode;
+        const oExtraBed = oHostelModel.ExtraBed;
 
-                const Response = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: oBranch });
-                const aFacilities = Response?.data || [];
+        const Response = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: oBranch });
+        const aFacilities = Response?.data || [];
 
-                //  Default images ONLY by Type
-                const defaultTypeImages = {
-                    "high-speed wi-fi": "./image/High-Speed Wi-Fi.jpg",
-                    "laundry service": "./image/Laundry Service.jpg",
-                    "ironing service": "./image/Ironing Service.jpg",
-                    "housekeeping": "./image/Housekeeping.jpg",
-                    "meals / food subscription": "./image/Meals.jpg",
-                    "gym membership": "./image/gym.jpg",
-                    "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
-                    "four-wheeler parking": "./image/Four Wheeler Parking.jpg",
-                    "locker / storage facility": "./image/locker.jpg",
-                    "power backup": "./image/Power Backup.jpeg",
-                    "air conditioner": "./image/Air Conditioner.jpeg",
-                    "room heater": "./image/Room Heater.jpeg",
-                    "study room access": "./image/Study Room.png"
-                };
-
-                //Base64 Convert Logic
-                const convertBase64ToImage = (base64String, fileType, type) => {
-
-                    const typeKey = (type || "").toLowerCase().trim();
-                    const fallback = defaultTypeImages[typeKey] || "./image/Fallback.png";
-
-                    // Case 1️⃣ DB Image exists
-                    if (base64String && base64String.trim()) {
-                        let sBase64 = base64String.replace(/\s/g, "");
-
-                        try {
-                            if (!sBase64.startsWith("data:image")) {
-                                atob(sBase64.substring(0, 40)); // Validate base64
-                            }
-                        } catch (e) {
-                            console.warn("Invalid base64 image:", type);
-                            return fallback;
-                        }
-
-                        const mimeType = fileType || "image/jpeg";
-                        return `data:${mimeType};base64,${sBase64}`;
-                    }
-
-                    // Case 2️⃣ No image → Type default
-                    return fallback;
-                };
-
-                // Map Facilities
-                const aFinalFacilities = aFacilities.map(f => ({
-                    FacilityID: f.ID,
-                    FacilityName: f.FacilityName,
-                    Type: f.Type,
-                    Image: convertBase64ToImage(f.Photo1, f.Photo1Type, f.Type),
-                    PricePerHour: f.PerHourPrice,
-                    PricePerDay: f.PerDayPrice,
-                    PricePerMonth: f.PerMonthPrice,
-                    PricePerYear: f.PerYearPrice,
-                    UnitText: f.UnitText,
-                    Currency: f.Currency,
-                    BranchCode: f.BranchCode
-                }));
-
-                this._aAllFacilities = aFinalFacilities;
-
-                oView.setModel(new JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
-                this._applyFacilityPriceFilter();
-            } catch (err) {
-                console.error("Facility Load Error", err);
-                sap.m.MessageBox.error("Unable to load facilities.");
+        //  FILTER LOGIC ADDED HERE
+        const aFilteredFacilities = aFacilities.filter(f => {
+            if ((f.Type || "").toLowerCase().trim() === "extra bed") {
+                return oExtraBed > 0; // include only if ExtraBed > 1
             }
-        },
+            return true; // include all other facilities
+        });
+
+        // Default images ONLY by Type
+        const defaultTypeImages = {
+            "high-speed wi-fi": "./image/High-Speed Wi-Fi.jpg",
+            "laundry service": "./image/Laundry Service.jpg",
+            "ironing service": "./image/Ironing Service.jpg",
+            "housekeeping": "./image/Housekeeping.jpg",
+            "meals / food subscription": "./image/Meals.jpg",
+            "gym membership": "./image/gym.jpg",
+            "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
+            "four-wheeler parking": "./image/Four Wheeler Parking.jpg",
+            "locker / storage facility": "./image/locker.jpg",
+            "power backup": "./image/Power Backup.jpeg",
+            "air conditioner": "./image/Air Conditioner.jpeg",
+            "room heater": "./image/Room Heater.jpeg",
+            "study room access": "./image/Study Room.png",
+            "extra bed": "./image/ExtraBed.jpg"
+        };
+
+        const convertBase64ToImage = (base64String, fileType, type) => {
+            const typeKey = (type || "").toLowerCase().trim();
+            const fallback = defaultTypeImages[typeKey] || "./image/Fallback.png";
+
+            if (base64String && base64String.trim()) {
+                let sBase64 = base64String.replace(/\s/g, "");
+                try {
+                    if (!sBase64.startsWith("data:image")) {
+                        atob(sBase64.substring(0, 40));
+                    }
+                } catch (e) {
+                    return fallback;
+                }
+                return `data:${fileType || "image/jpeg"};base64,${sBase64}`;
+            }
+            return fallback;
+        };
+
+        // Map Facilities
+        const aFinalFacilities = aFilteredFacilities.map(f => ({
+            FacilityID: f.ID,
+            FacilityName: f.FacilityName,
+            Type: f.Type,
+            Image: convertBase64ToImage(f.Photo1, f.Photo1Type, f.Type),
+            PricePerHour: f.PerHourPrice,
+            PricePerDay: f.PerDayPrice,
+            PricePerMonth: f.PerMonthPrice,
+            PricePerYear: f.PerYearPrice,
+            UnitText: f.UnitText,
+            Currency: f.Currency,
+            BranchCode: f.BranchCode
+        }));
+
+        this._aAllFacilities = aFinalFacilities;
+        oView.setModel(new sap.ui.model.json.JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
+        this._applyFacilityPriceFilter();
+
+    } catch (err) {
+        console.error("Facility Load Error", err);
+        sap.m.MessageBox.error("Unable to load facilities.");
+    }
+},
         _applyFacilityPriceFilter: function () {
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -762,7 +764,7 @@ this._bBlockMessagePopover = false;
                                         const oUser = oLoginModel ? oLoginModel.getData() : null;
                                         if (bSelected) {
                                             // No login yet → open dialog
-                                            if (!oUser || !oUser.EmployeeID) {
+                                            if (!oUser || !oUser.EmployeeID || !oUser.UserID) {
                                                 if (!that._oLoginAlertDialog) {
                                                     that._oLoginAlertDialog = sap.ui.xmlfragment(
                                                         that.createId("LoginAlertDialog"),
@@ -971,7 +973,9 @@ this._bBlockMessagePopover = false;
                             formatter: that.DateFormat,
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
-                            maxDate: new Date(new Date().getFullYear() - 10, 11, 31),
+                            //   minDate: new Date(2000, 0, 1),
+                              maxDate: new Date(),
+                              initialFocusedDateValue: new Date(2000, 0, 1),
                             placeholder: "Select date of birth",
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
@@ -1638,7 +1642,7 @@ this._bBlockMessagePopover = false;
                                                     // class: "serviceImage",
                                                     densityAware: false,
                                                     wrap: true,
-                                                    press: function (oEvent) {
+                                                  press: function (oEvent) {
                                                         const oCtx = oEvent.getSource().getBindingContext("FacilityModel");
                                                         const facility = oCtx.getObject();
                                                         const oCard = oEvent.getSource().getParent().getParent();
@@ -1690,6 +1694,7 @@ this._bBlockMessagePopover = false;
                                                         const oActionSheet = that._createFacilityPopover(facility, iPersonIndex, oCard);
                                                         oActionSheet.openBy(oEvent.getSource());
                                                     }
+
                                                 }).addStyleClass("serviceImage"),
 
 
@@ -1832,10 +1837,11 @@ this._bBlockMessagePopover = false;
                 aPersons[iPersonIndex].Facilities.SelectedFacilities;
 
             const idx = aSelected.findIndex(
-                f => f.FacilityName === facility.FacilityName
-            );
+    f => f.FacilityID === facility.FacilityID
+);
 
             const oNew = {
+                 FacilityID: facility.FacilityID, 
                 FacilityName: facility.FacilityName,
                 BranchCode: facility.BranchCode,
                 Currency: facility.Currency,
@@ -4252,8 +4258,6 @@ if (
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
             }
-            // Dr. → user must choose gender manually
-            // ✅ STRICT validation -- pass CONTROL, not event
             utils._LCstrictValidationSelect(oSalutation);
         },
 
@@ -4545,11 +4549,11 @@ if (
                 const oToday = new Date();
 
                 // Max date: 10 years ago from today
-                const oMaxDate = new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate());
+                const oMaxDate = new Date(oToday);
                 oDOBpicker.setMaxDate(oMaxDate);
 
                 // Min date: 100 years ago from today
-                const oMinDate = new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate());
+                const oMinDate = new Date(2000, 0, 1); 
                 oDOBpicker.setMinDate(oMinDate);
             }
             this._resetOtpState();

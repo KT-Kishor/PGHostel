@@ -118,7 +118,7 @@
     valueFormat="yyyy-MM-dd"
     value="{AdminSignupModel>/DOB}"
     initialFocusedDateValue="{controller>/focusedDate}"
-    minDate="{controller>/minDate}"
+   
     maxDate="{controller>/maxDate}"
     change="ADMIN_onChangeDOB"
                     valueStateText="{i18n>agediff}"
@@ -265,7 +265,15 @@ filterSecondaryValues="true"
                             placeholder="Enter mobile number"
                             width="100%"
                             valueStateText="Enter valid mobile number"
-                        />
+                             autocomplete="false"
+                             
+                        >
+                        <!-- <customData>
+        <core:CustomData 
+            key="autocomplete" 
+            writeToDom="true" />
+    </customData> -->
+</Input>
                     </VBox>
                 </HBox>
 

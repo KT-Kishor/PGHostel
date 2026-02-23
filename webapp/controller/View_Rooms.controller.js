@@ -216,7 +216,8 @@ sap.ui.define([
                         TotalFeedbacks: TotalFeedbacks,
                         GeoLocation: oBranchInfo?.GeoLocation || "",
                         EmailID: oBranchInfo?.EmailID || "",
-                        AvailableDate:Date
+                        AvailableDate:Date,
+                        ExtraBed: 1
                     };
                 });
 
@@ -283,7 +284,8 @@ sap.ui.define([
                     GSTValue: oSelected.GSTValue,
                     GSTIN: oSelected.GSTIN || "",
                     GeoLocation: oSelected.GeoLocation,
-                    AvailableDate:oSelected.AvailableDate
+                    AvailableDate:oSelected.AvailableDate,
+                    ExtraBed: oSelected.ExtraBed || 0
 
                 };
 
@@ -503,7 +505,8 @@ sap.ui.define([
                 GSTValue: oData.GSTValue,
                 GSTType: oData.GSTType,
                 GSTIN: oData.GSTIN || "",
-                AvailableDate:oData.AvailableDate
+                AvailableDate:oData.AvailableDate,
+                ExtraBed: oData.ExtraBed || 0
 
             };
 
@@ -516,7 +519,7 @@ sap.ui.define([
             };
 
             // -------------------------
-            // ✅ FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
+            //  FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
             // -------------------------
             const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
 
@@ -538,23 +541,14 @@ sap.ui.define([
             // Optional: auto-select max available persons
             oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
 
-            // -------------------------
-            // UPDATE GLOBAL MODEL
-            // -------------------------
             oGlobalModel.setData(oMergedData, true);
 
-            // -------------------------
-            // CLOSE ROOM DETAIL DIALOG
-            // -------------------------
             if (this._oRoomDetailFragment) {
                 this._oRoomDetailFragment.close();
             }
 
             this._clearRoomDetailDialog();
 
-            // -------------------------
-            // NAVIGATE TO BOOKING PAGE
-            // -------------------------
             const oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBookRoom");
         },
@@ -728,7 +722,9 @@ sap.ui.define([
                 .filter(Boolean); // remove null
         },
         _LoadFacilities: async function (sBranchCode) {
-
+              
+               const oModel = this.getView().getModel("HostelModel").getData();
+               const oExtraBed = oModel.ExtraBed || 0;
             if (!this._oRoomDetailFragment || !sBranchCode) return;
 
             const oFacilityModel = new JSONModel({
@@ -740,7 +736,7 @@ sap.ui.define([
 
             try {
                 let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
-                let allFacilities = resp?.data || [];
+                let allFacilities = resp?.data || [];   
 
                 // Get static types
                 const oStaticModel = this.getView().getModel("FacilityType");
@@ -748,15 +744,21 @@ sap.ui.define([
                 const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
 
                 // Case-insensitive filter
-                const branchFacilities = allFacilities.filter(f => {
-                    const fBranch = (f.BranchCode || "").trim();
-                    const fNameLower = (f.Type || "").trim();
+               const branchFacilities = allFacilities.filter(f => {
+    const fBranch = (f.BranchCode || "").trim();
+    const fType = (f.Type || "").trim().toLowerCase();
 
-                    const branchMatch = fBranch === sBranchCode.trim();
-                    const typeMatch = validTypesLower.includes(fNameLower);
+    const branchMatch = fBranch === sBranchCode.trim();
+    const typeMatch = validTypesLower.includes(f.Type || "");
 
-                    return branchMatch && typeMatch;
-                });
+    // ✅ Extra Bed condition
+    if (fType === "extra bed") {
+        return branchMatch && typeMatch && oExtraBed > 0;
+    }
+
+    // ✅ All other facilities
+    return branchMatch && typeMatch;
+});
 
                 if (branchFacilities.length > 0) {
                     oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));

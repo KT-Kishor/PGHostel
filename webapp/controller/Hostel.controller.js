@@ -24,15 +24,11 @@ sap.ui.define([
             const today = new Date();
 
             const focusedDate = new Date(
-                today.getFullYear() - 18,
-                today.getMonth(),
-                today.getDate()
+              2000, 0, 1
             );
 
             const minDate = new Date(
-                today.getFullYear() - 100,
-                today.getMonth(),
-                today.getDate()
+            2000, 0, 1
             );
 
             const oDateModel = new JSONModel({
@@ -43,50 +39,11 @@ sap.ui.define([
 
             this.getView().setModel(oDateModel, "controller");
         },
-        // _getBrowserLocation: function () {
-        //     if (!navigator.geolocation) {
-        //         MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
-        //         return;
-        //     }
-        //     navigator.geolocation.getCurrentPosition(
-        //         (pos) => {
-        //             let lat = pos.coords.latitude;
-        //             let lng = pos.coords.longitude;
-        //             this._getLocationName(lat, lng);
-        //         },
-        //         (err) => {
-        //             console.error("Location error:", err);
-        //         }
-        //     );
-        // },
-        // _getLocationName: function (lat, lng) {
-        //     let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
-
-        //     $.ajax({
-        //         url: url,
-        //         method: "GET",
-        //         success: (data) => {
-        //             if (!data || !data.address) {
-        //                 return;
-        //             }
-
-        //             let city = data.address.city ||
-        //                 data.address.town ||
-        //                 data.address.village ||
-        //                 data.address.municipality;
-        //             this.City = city
-        //         },
-        //         error: (err) => {
-        //             console.log("Reverse geocoding failed", err);
-        //         }
-        //     });
-        // },
         _getBrowserLocation: function () {
             if (!navigator.geolocation) {
                 MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
                 return;
             }
-
             // Options for better reliability
             const options = {
                 enableHighAccuracy: true, // trying to use GPS
@@ -204,7 +161,8 @@ sap.ui.define([
                 authFlow: "signin",
                 isOtpBoxVisible: false,
                 otpExpiryTs: null,
-                otpValidityText: ""
+                otpValidityText: "",
+              
             }), "LoginViewModel");
 
             this.oViewModel = oView.getModel("LoginViewModel");
@@ -219,7 +177,8 @@ sap.ui.define([
                 Email: "",
                 Mobileno: "",
                 password: "",
-                comfirmpass: ""
+                comfirmpass: "",
+                minDate:new Date(2000,0,1)
             }), "LoginMode");
             oView.setModel(new JSONModel({
                 selectedSection: "profile"
@@ -429,7 +388,7 @@ sap.ui.define([
                 oGlobalModel = new JSONModel({});
                 sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
             }
-
+          
             // -------------------------
             // BUILD BOOKING DATA
             // -------------------------
@@ -459,7 +418,8 @@ sap.ui.define([
                 DepositCurrency: oData.DepositCurrency,
                 GSTValue: oData.GSTValue,
                 GSTType: oData.GSTType,
-                GSTIN: oData.GSTIN || ""
+                GSTIN: oData.GSTIN || "",
+               
 
             };
 
@@ -761,7 +721,8 @@ sap.ui.define([
                     GSTType: oSelected.GSTType,
                     GSTValue: oSelected.GSTValue,
                     GSTIN: oSelected.GSTIN || "",
-                    GeoLocation: oSelected.GeoLocation
+                    GeoLocation: oSelected.GeoLocation,
+                 
 
                 };
 
@@ -1256,8 +1217,8 @@ sap.ui.define([
             const oDOBpicker = $C("signUpDOB");
             if (oDOBpicker) {
                 const oToday = new Date();
-                oDOBpicker.setMaxDate(new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate()));
-                oDOBpicker.setMinDate(new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate()));
+                oDOBpicker.setMaxDate(oToday);
+                // oDOBpicker.setMinDate(new Date(2000, 0, 1)); // Jan 1, 2000 as minimum age limit
             }
 
             // --- AUTO-POPULATE WITH BUSY INDICATOR ---
@@ -1745,7 +1706,7 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onChangeDOB: function (oEventOrControl) {
+      onChangeDOB: function (oEventOrControl) {
             const oDP =
                 (typeof oEventOrControl.getSource === "function")
                     ? oEventOrControl.getSource() : oEventOrControl;
@@ -1758,18 +1719,18 @@ sap.ui.define([
                 return false;
             }
 
-            // Age validation (10–100)
-            const today = new Date();
-            let age = today.getFullYear() - v.getFullYear();
-            const m = today.getMonth() - v.getMonth();
+            // // Age validation (10–100)
+            // const today = new Date();
+            // let age = today.getFullYear() - v.getFullYear();
+            // const m = today.getMonth() - v.getMonth();
 
-            if (m < 0 || (m === 0 && today.getDate() < v.getDate())) age--;
+            // if (m < 0 || (m === 0 && today.getDate() < v.getDate())) age--;
 
-            if (age < 10 || age > 100) {
-                oDP.setValueState("Error");
-                oDP.setValueStateText(this.i18nModel.getText("agemustbebetween10and100years"));
-                return false;
-            }
+            // if (age < 10 || age > 100) {
+            //     oDP.setValueState("Error");
+            //     oDP.setValueStateText(this.i18nModel.getText("agemustbebetween10and100years"));
+            //     return false;
+            // }
             oDP.setValueState("None");
 
             const sDob =
@@ -2712,10 +2673,7 @@ sap.ui.define([
                         GeoLocation: branch.GeoLocation,
                         Image: sImage,
                         TotalFeedbacks: branch.TotalFeedbacks,
-                        AverageRating: branch.AverageRating,
-
-
-
+                        AverageRating: branch.AverageRating
                     };
                 });
                 this.Scity = Scity
@@ -3903,7 +3861,7 @@ sap.ui.define([
             if (oDate) {
                 const now = new Date();
                 oDate.setMaxDate(now);
-                oDate.setMinDate(new Date(now.getFullYear() - 100, now.getMonth(), now.getDate()));
+                // oDate.setMinDate(new Date(2000, 0, 1));
             }
 
             this.getView().addStyleClass("blur-background");
@@ -4139,8 +4097,6 @@ sap.ui.define([
                 oModel.setProperty("/STDCode", sValue);
             }
         },
-
-
 
         ADMIN_onMobileLiveChange: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
@@ -4738,6 +4694,31 @@ sap.ui.define([
                 MessageToast.show("Error opening maps.");
             }
         },
+//      onAfterRendering: function() {
+//     // 1. Get the reference to your input control
+//     var oInput = sap.ui.getCore().byId("adminMobileNo");     
+//     if (oInput) {
+//         // 3. Add a delegate to wait until the HTML is actually rendered
+//         oInput.addEventDelegate({h,
+//             onAfterRendering: function() {
+//                 var $input = oInput.$().find("input");
+
+//                 // 4. Listen for the 'change' event (which Autofill triggers)
+//                 $input.on("change", function(oEvent) {
+//                     var sNewValue = oEvent.target.value;
+
+//                     // Manually sync the value to the UI5 Control and Model
+//                     oInput.setValue(sNewValue);
+
+//                     // Clear the error state
+//                     oInput.setValueState("None");
+//                     oInput.setValueStateText("");
+//                 });
+//             }
+//         }, this);
+//     }
+// },
+
     });
 });
 

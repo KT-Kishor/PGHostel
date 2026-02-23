@@ -424,10 +424,11 @@
                         />
                         <DatePicker
                             id="signUpDOB"
-                            value="{LoginMode>/DateOfBirth}"
+                            value ="{LoginMode>/DateOfBirth}"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="yyyy-MM-dd"
                             change="onChangeDOB"
+                             initialFocusedDateValue="{LoginMode>/minDate}"
                         />
                         <Label
                             text="{i18n>MVgender}"

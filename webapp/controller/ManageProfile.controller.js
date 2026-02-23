@@ -15,7 +15,7 @@ sap.ui.define([
             const oView = this.getView();
 
             // Login form model
-            oView.setModel(new sap.ui.model.json.JSONModel({
+            oView.setModel(new JSONModel({
                 fullname: "",
                 Email: "",
                 Mobileno: "",
@@ -24,7 +24,7 @@ sap.ui.define([
             }), "LoginMode");
 
             // Edit / Save state model
-            oView.setModel(new sap.ui.model.json.JSONModel({
+            oView.setModel(new JSONModel({
                 isEditMode: false
             }), "saveModel");
 
@@ -67,12 +67,7 @@ sap.ui.define([
                 });
 
                 this.getView().setModel(oTempModel, "profileData");
-                // oProfileModel.refresh(true); 
-                // this._oProfileDialog.open();
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
-                // setTimeout(() => {
-                //     this.byId("id_dialog")?.addStyleClass("dialogBlur");
-                // }, 200);
 
                 const filter = { UserID: sUserID }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
@@ -112,8 +107,9 @@ sap.ui.define([
                     } else {
                         GSTValue = (Number(booking.GSTValue) + Number(booking.GSTValue)) / 100 || 0;
                     }
-                    // const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
+                   
                     return {
+                          bookingGroup: bookingGroup,
                         customerName: booking.Salutation + " " + booking.CustomerName,
                         room: booking.BedType || "",
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
@@ -200,7 +196,6 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
 
         _applyCountryStateCityFilters: function () {
 
@@ -331,16 +326,14 @@ sap.ui.define([
                 this.oCameraDialog.open();
             }
         },
-        onUploadPhoto: function () {
+         onUploadPhoto: function () {
             const uploader = this.byId("id_fileUploaderAvatar1");
             if (!uploader) return;
 
             setTimeout(() => {
                 const oInput = uploader.getFocusDomRef();
-                if (!oInput) {
-                    console.error("Uploader input not ready");
-                    return;
-                }
+                if (!oInput) return;
+
                 uploader.clear();
                 uploader.setValue("");
                 oInput.value = "";
@@ -824,13 +817,11 @@ sap.ui.define([
         onlogout: function () {
 
             this.getView().getModel("profileData").setData({});
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            // if (oLoginModel) {
-            //     oLoginModel.setData({});
-            // }
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            
             if (oLoginModel) {
                 oLoginModel.setProperty("/EmployeeID", "");
-                oLoginModel.setProperty("/UserID", "");
+                // oLoginModel.setProperty("/UserID", "");
                 oLoginModel.setProperty("/UserName", "");
                 oLoginModel.setProperty("/EmployeeName", "");
                 oLoginModel.setProperty("/EmailID", "");

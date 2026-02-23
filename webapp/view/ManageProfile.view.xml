@@ -55,7 +55,7 @@
 	<VBox class="avatarContainer sapUiSmallMarginEnd">
 		<Avatar src="{profileData>/photo}" initials="{profileData>/initials}" displayShape="Square" displaySize="XL" press="onPreviewProfilePhoto" class="customLargeAvatar "/>
 		<Button icon="sap-icon://camera" press="onPressAvatarEdit" class="avatarEditBtnOverlay"/>
-		<u:FileUploader id="id_fileUploaderAvatar1" uploadOnChange="false" change="onAvatarFileSelected" fileType="png,jpg,jpeg" class="hiddenUploader" buttonOnly="true" visible="false"/>
+		<u:FileUploader id="id_fileUploaderAvatar1" uploadOnChange="false" change="onAvatarFileSelected" fileType="png,jpg,jpeg" class="hiddenUploader" buttonOnly="true" />
 	</VBox>
 
             <!-- Profile Forms -->
@@ -287,14 +287,16 @@
             busyIndicatorDelay="0"
             noDataText="No booking history found"
             items="{
-                path: 'profileData>/bookings',
-                sorter: [
-                    { path: 'bookingGroup', descending: false, group: true },
-                    { path: 'BookingDate', descending: true }
-                ]
-            }"
-            width="auto" 
-           class="sapUiSmallMargin customRoundedTable">
+                    path: 'profileData>/bookings',
+                    sorter: [
+                        { path: 'bookingGroup', descending: false, group: true },
+                        { path: 'BookingDate', descending: true }
+                    ]
+                }"
+                 width="auto" 
+           class="sapUiSmallMargin customRoundedTable"
+           
+        >
 
             <columns>
                 <Column demandPopin="true">
