@@ -144,6 +144,12 @@
                             tooltip="{i18n>noofPerson}"
                         />
                     </Column>
+                        <Column demandPopin="true">
+                        <Text
+                            text="{i18n>extraBed}"
+                            tooltip="{i18n>extraBed}"
+                        />
+                    </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
@@ -173,6 +179,8 @@
                             <Text text="{BedDetails>ACType}" />
                             <Text text="{BedDetails>MaxBeds}" />
                             <Text text="{BedDetails>NoOfPerson}" />
+                            <Text text="{BedDetails>ExtraBed}" />
+
                              <Text
                                 text="{parts: ['BedDetails>Deposit','BedDetails>DepositCurrency'],
 									formatter: '.Formatter.formatPrice'}"

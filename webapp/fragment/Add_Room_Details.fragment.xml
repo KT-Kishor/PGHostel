@@ -104,14 +104,14 @@
                 <!-- <Label text="No Of person" required="true" />
                 <Input id="idRoomNumber13" value="{RoomModel>/NoofPerson}" placeholder="Enter No of person" type="Number" liveChange="onRoomNoInputLiveChange" valueStateText="No of person cannot be empty" /> -->
 
-                <Label text="{i18n>extraBed}" />
+                <!-- <Label text="{i18n>extraBed}" />
                 <Input
                     id="idExtrabed"
                     value="{RoomModel>/ExtraBed}"
                     placeholder="{i18n>enterNoofExtraBed}"
                     liveChange="onPriceInputLiveChange"
                     maxLength="2"
-                />
+                /> -->
 
                 <Label text="{i18n>dailyPrice}" />
                 <Input

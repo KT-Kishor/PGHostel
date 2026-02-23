@@ -217,7 +217,7 @@ sap.ui.define([
                         GeoLocation: oBranchInfo?.GeoLocation || "",
                         EmailID: oBranchInfo?.EmailID || "",
                         AvailableDate:Date,
-                        ExtraBed: 1
+                        ExtraBed:room.ExtraBed
                     };
                 });
 

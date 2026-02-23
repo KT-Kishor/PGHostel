@@ -303,6 +303,7 @@ sap.ui.define([
                         Name: Payload.Name.trim(),
                         ACType: Payload.ACType,
                         NoOfPerson: Payload.NoOfPerson.trim(),
+                        ExtraBed:Payload.ExtraBed,
                         MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
                         DepositCurrency: Payload.DepositCurrency,
@@ -454,6 +455,28 @@ sap.ui.define([
             };
 
             oReader.readAsDataURL(oFile);
+        },
+          onPriceInputLiveChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue();
+
+            // Allow digits and one decimal point
+            sValue = sValue.replace(/[^0-9.]/g, "");
+
+            // Allow only one decimal point
+            const aParts = sValue.split(".");
+            if (aParts.length > 2) {
+                sValue = aParts[0] + "." + aParts[1];
+            }
+
+            // Limit to 2 decimal places
+            if (aParts[1]) {
+                aParts[1] = aParts[1].substring(0, 2);
+                sValue = aParts[0] + "." + aParts[1];
+            }
+
+            oInput.setValue(sValue);
+
         },
 
         onImagePress: function(oEvent) {

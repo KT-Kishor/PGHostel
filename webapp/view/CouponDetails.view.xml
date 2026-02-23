@@ -142,54 +142,57 @@
                             text="{i18n>CDtitle} ({= ${CouponModel>/}.length })"
                         />
                         <ToolbarSpacer />
-<Button
-    id="btnShareCoupon" class="myUnifiedBtn" text="Share Coupon"
-    icon="sap-icon://action"
-    tooltip="Share Coupon"
-    press="onShareCouponPress"
-/>
-
+                        <Button
+                            id="btnShareCoupon"
+                            class="myUnifiedBtn"
+                            text="Share Coupon"
+                            icon="sap-icon://action"
+                            tooltip="Share Coupon"
+                            press="onShareCouponPress"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                        />
 
                         <Button
                             text="{i18n>MSadd}"
                             tooltip="{i18n>MSadd}"
                             press="onAddCoupon"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="onEditCoupon"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="onDeleteCoupon"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="onDownloadCoupons"
                             class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
                 <!-- Columns -->
                 <columns>
-                <Column minScreenWidth="Tablet" demandPopin="true">
-    <Text text="{i18n>CDBranch}" />
-</Column>
-
-                    <!-- <Column
+                    <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text
-                            text="{i18n>CDBranch}"
-                            tooltip="{i18n>CDBranch}"
-                        />
+                        <Text text="{i18n>CDBranch}" />
+                    </Column>
+
+                    <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>CDBranch}" tooltip="{i18n>CDBranch}" />
                     </Column> -->
                     <Column demandPopin="true">
                         <Text
@@ -215,7 +218,7 @@
                             tooltip="{i18n>CDDiscountValue}"
                         />
                     </Column>
-                                        <Column
+                    <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
@@ -285,15 +288,14 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                        <Text text="{CouponModel>BranchName}" />
+                            <Text text="{CouponModel>BranchName}" />
                             <!-- <Text text="{CouponModel>BranchCode}" /> -->
                             <Text text="{CouponModel>CouponCode}" />
                             <Text text="{CouponModel>DiscountType}" />
                             <Text
                                 text="{   parts: [      { path: 'CouponModel>DiscountValue' },      { path: 'CouponModel>DiscountType' }   ],   formatter: '.Formatter.formatDiscountValue'		}"
                             />
-                            <Text
-                                text="{CouponModel>UptoValue}"/>
+                            <Text text="{CouponModel>UptoValue}" />
                             <Text text="{CouponModel>MaxUses}" />
                             <!-- <Text text="{CouponModel>UsedCount}" /> -->
                             <!-- <Text text="{CouponModel>PerUserLimit}" /> -->
@@ -315,7 +317,7 @@
             </Table>
         </content>
         <footer>
-         <core:Fragment
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />

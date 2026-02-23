@@ -55,7 +55,7 @@
                                     columnsM="2"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:content>                              
+                                    <f:content>
                                         <m:Label
                                             text="Branch Name"
                                             required="true"
@@ -127,6 +127,17 @@
                                             editable="{editable>/Edit}"
                                         />
 
+                                        <m:Label text="{i18n>extraBed}" />
+                                        <m:Input
+                                            id="idBedExtrabed"
+                                            value="{BedImageModel>/ExtraBed}"
+                                            placeholder="{i18n>enterNoofExtraBed}"
+                                            liveChange="onPriceInputLiveChange"
+                                            maxLength="2"
+                                            editable="{editable>/Edit}"
+
+                                        />
+
                                         <m:Label
                                             text="{i18n>maxNoofRooms}"
                                             required="true"
@@ -140,7 +151,7 @@
                                             valueStateText="{i18n>enterMaxNoofRooms}"
                                             editable="{editable>/Edit}"
                                         />
-                                         <m:Label
+                                        <m:Label
                                             text="Deposit Amount"
                                             required="true"
                                         />
@@ -153,27 +164,27 @@
                                             valueStateText="Enter Deposit Amount"
                                             editable="{editable>/Edit}"
                                         />
- <m:Label
-                    text="{i18n>currency}"
-                    required="true"
-                />
-                <m:ComboBox
-                    id="id_DepositCurrency"
-                    selectedKey="{BedImageModel>/DepositCurrency}"
-                    items="{path:'CountryModel>/',length:1000}"
-                    valueStateText="{i18n>selectCurrency}"
-                    width="100%"
-                    change="onDepositCurrency"
-                    placeholder="{i18n>selectCurrency}"
-                    editable="{editable>/Edit}"
-                    showSecondaryValues="true"
-                >
-                    <core:ListItem
-                        key="{CountryModel>currency}"
-                        text="{CountryModel>currency}"
-                        additionalText="{CountryModel>countryName}"
-                    />
-                </m:ComboBox>
+                                        <m:Label
+                                            text="{i18n>currency}"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            id="id_DepositCurrency"
+                                            selectedKey="{BedImageModel>/DepositCurrency}"
+                                            items="{path:'CountryModel>/',length:1000}"
+                                            valueStateText="{i18n>selectCurrency}"
+                                            width="100%"
+                                            change="onDepositCurrency"
+                                            placeholder="{i18n>selectCurrency}"
+                                            editable="{editable>/Edit}"
+                                            showSecondaryValues="true"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>currency}"
+                                                text="{CountryModel>currency}"
+                                                additionalText="{CountryModel>countryName}"
+                                            />
+                                        </m:ComboBox>
                                         <m:Label
                                             text="{i18n>description}"
                                             required="true"
@@ -202,7 +213,10 @@
                         <ObjectPageSubSection id="POO_Purchaseordersection">
                             <blocks>
                                 <m:VBox>
-                                    <m:HBox width="100%" visible="{=${editable>/Edit}}">
+                                    <m:HBox
+                                        width="100%"
+                                        visible="{=${editable>/Edit}}"
+                                    >
                                         <m:MessageStrip
                                             text="Only JPG, JPEG and PNG image formats are allowed."
                                             type="Warning"
@@ -276,14 +290,14 @@
         </ObjectPageLayout>
         <m:footer>
             <m:Bar id="IA_id_FooterBar">
-            <m:contentLeft>
-             <m:Link
-                text="{i18n>devlopby}"
-                href="https://kvrikshatechnologies.com/"
-                target="_blank"
-                class="customLinkWhiteBg"
-            />
-            </m:contentLeft>
+                <m:contentLeft>
+                    <m:Link
+                        text="{i18n>devlopby}"
+                        href="https://kvrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </m:contentLeft>
                 <m:contentRight>
                     <m:Button
                         id="BI_ideditButton"
@@ -292,7 +306,6 @@
                         tooltip="{i18n>editBedDetails}"
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
-                        
                     />
                     <m:Button
                         id="POO_idSaveButton"

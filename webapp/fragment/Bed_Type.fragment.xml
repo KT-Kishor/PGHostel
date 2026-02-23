@@ -101,6 +101,15 @@
                     maxLength="2"
                 />
 
+                    <Label text="{i18n>extraBed}" />
+                <Input
+                    id="idExtrabed"
+                    value="{BedModel>/ExtraBed}"
+                    placeholder="{i18n>enterNoofExtraBed}"
+                    liveChange="onPriceInputLiveChange"
+                    maxLength="2"
+                />
+
                 <Label
                     text="{i18n>noofRooms}"
                     required="true"
