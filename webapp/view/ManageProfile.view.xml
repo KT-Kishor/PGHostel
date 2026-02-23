@@ -264,10 +264,10 @@
 
                     <IconTabFilter
                         key="Payment"
-                        text="Payment ({= ${profileData>/paymentCount} })"/>
+                        text="Payment ({profileData>/paymentCount})"/>
                     <IconTabFilter
-                        key="Complaint"
-                        text="Complaints ({= ${profileData>/complaintCount} })"/>
+                        key="Complaints"
+                        text="Complaints ({profileData>/complainCount})"/>
                 </items>
             </IconTabHeader>
 
@@ -372,30 +372,34 @@
         </Table>
         <Table
             id="Id_CompmaintTable"
-            visible="{= ${profileData>/selectedTab} === 'Complaint' }"
+            visible="{= ${profileData>/selectedTab} === 'Complaints' }"
             updateFinished="onTableUpdateFinished"
             items="{
-                path:'profileData>/Complaint',
-                sorter:[{ path:'ComplaintGroup', group:true }]
+                path:'profileData>/complain'
+              
             }"
             width="auto" 
           class="sapUiSmallMargin customRoundedTable">
             <columns>
-                <Column><Text text="{i18n>complainid}"/></Column>
-                <Column><Text text="{i18n>complainDate}"/></Column>
                 <Column><Text text="{i18n>complainType}"/></Column>
+                <Column><Text text="{i18n>description}"/></Column>
+                <Column><Text text="{i18n>complainDate}"/></Column>
                 <Column><Text text="{i18n>status}"/></Column>
                 <!-- <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
                 <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column> -->
             </columns>
 
             <items>
-                <ColumnListItem type="Navigation" press="onPressManageComplaint">
+                <ColumnListItem>
                     <cells>
-                        <Text text="{profileData>BookingID}"/>
-                        <Text text="{path:'profileData>ComplaintDate', formatter:'.Formatter.formatDate'}"/>
                         <Text text="{profileData>ComplaintType}"/>
-                        <Text text="{profileData>ComplaintStatus}"/>
+                        <Text text="{profileData>ComplaintDescription}"/>
+                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
+                        <!-- <Text text="{profileData>ComplaintStatus}"/> -->
+                          <ObjectStatus
+                            text="{profileData>ComplaintStatus}"
+                            state="{ path:'profileData>ComplaintStatus',
+                                     formatter:'.Formatter.formatObjectStatus'}"/>
                     </cells>
                 </ColumnListItem>
             </items>

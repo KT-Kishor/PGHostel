@@ -173,6 +173,12 @@ sap.ui.define([
                     return "Error";
                 case "Rejected":
                     return "Error";
+                case "Pending":
+                    return "Indication02";
+                case "In Progress":
+                    return "Indication03";
+                case "Resolved":
+                    return "Indication04";
                 case "Submitted":
                     return "Indication03";
                 case "Company":

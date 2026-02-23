@@ -73,6 +73,7 @@ sap.ui.define([
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
                 const aPayments = response?.PaymentData || [];
+                const aComplain = response?.ComplaintData || [];
 
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -138,6 +139,12 @@ sap.ui.define([
                     currency: payment.Currency,
                     PaymentGroup: payment.Status || "Others"
                 }));
+                const aComplainData = aComplain.map(complain => ({
+                    ComplaintType: complain.ComplaintType,
+                    ComplaintDescription: complain.Description,
+                    ComplaintRaisedDate: complain.ComplaintRaisedDate,
+                    ComplaintStatus: complain.Status,
+                }));
 
                 const oProfileModel = new JSONModel({
                     ...fullUserData,
@@ -161,8 +168,10 @@ sap.ui.define([
 
                     bookings: aBookingData,
                     Payments: aPaymentData,
+                    complain: aComplainData,
                     bookingCount: aBookingData.length,
                     paymentCount: aPaymentData.length,
+                    complainCount: aComplainData.length,
                     selectedTab: "Booking History",
                     aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
                     facility: [],
@@ -798,7 +807,17 @@ sap.ui.define([
         _updateRowCount: function () {
             const oProfileModel = this.getView().getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
-            const oTable = sSelectedTab === "Payment" ? this.byId("Id_PaymentTable1") : this.byId("Id_ProfileaTable1");
+            let oTable;
+
+if (sSelectedTab === "Payment") {
+    oTable = this.byId("Id_PaymentTable1");
+} else if (sSelectedTab === "Booking History") {
+    oTable = this.byId("Id_ProfileaTable1");
+} else if (sSelectedTab === "Complaints") {
+    oTable = this.byId("Id_CompmaintTable");
+}
+
+           
             const oBinding = oTable.getBinding("items");
             const length = oBinding ? oBinding.getLength() : 0;
 
@@ -806,8 +825,8 @@ sap.ui.define([
                 oProfileModel.setProperty("/paymentCount", length);
             } else if(sSelectedTab === "Booking History"){
                 oProfileModel.setProperty("/bookingCount", length);
-            }else{
-                oProfileModel.setProperty("/complaintCount", length);
+            } else if(sSelectedTab === "Complaints"){
+                oProfileModel.setProperty("/complainCount", length);
             }
         },
 
@@ -877,7 +896,7 @@ sap.ui.define([
                         })
                     ];
                 }
-                else{
+                else if(sSelectedTab === "Complaints"){
 
                 }
             }
