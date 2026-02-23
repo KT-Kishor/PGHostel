@@ -1314,7 +1314,7 @@ sap.ui.define([
             if (!this.pYearlyInvoicesDialog) {
                 this.pYearlyInvoicesDialog = Fragment.load({
                     id: this.getView().getId(),
-                    name: "sap.ui.com.project1.fragment.  ",
+                    name: "sap.ui.com.project1.fragment.YearlyInvoice",
                     controller: this
                 });
             }

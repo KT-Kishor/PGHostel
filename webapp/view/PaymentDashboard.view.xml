@@ -171,7 +171,7 @@ wrapping="false" class="Dashboardtitle automatedEllipsis" />
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Yearly Invoice Trend' {headerModel>/filterSuffix}" 
+									<Title text="Yearly Invoice Trend {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart" />
