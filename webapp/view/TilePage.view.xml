@@ -214,6 +214,18 @@
                         />
                     </TileContent>
                 </GenericTile>
+                <GenericTile
+                    id="TP_ComplaintDashBoardTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>complainDashboard}"
+                    press="TileV_onpresscomplaintdashboard"
+                >
+                    <TileContent unit="{i18n>complaingraph}">
+                        <ImageContent
+                            src="sap-icon://bbyd-dashboard"
+                        />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <Button

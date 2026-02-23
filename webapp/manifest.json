@@ -343,6 +343,13 @@
       "target": [
         "targetViewRooms"
       ]
+    },
+    {
+      "name": "RouteComplainDashboard",
+      "pattern": "ComplainDashboard",
+      "target": [
+        "targetComplainDashboard"
+      ]
     }
         
       ],
@@ -563,6 +570,13 @@
           "clearControlAggregation": false,
           "viewName": "View_Rooms",
           "viewId": "View_Rooms"
+        },
+         "targetComplainDashboard": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "ComplainDashboard",
+          "viewId": "ComplainDashboard"
         }
        
       }

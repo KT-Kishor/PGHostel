@@ -1,0 +1,270 @@
+<mvc:View controllerName="sap.ui.com.project1.controller.ComplainDashboard" 
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:core="sap.ui.core" 
+	xmlns:fb="sap.ui.comp.filterbar" 
+	xmlns:layout="sap.ui.layout" 
+	xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds" 
+	xmlns:vizData="sap.viz.ui5.data" 
+	xmlns:f="sap.f" 
+	xmlns:com="sap.suite.ui.commons" displayBlock="true" height="100%" busyIndicatorDelay="0">
+	<Page id="hostelDashboardPage" showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML" />
+		</headerContent>
+		<content>
+			<!-- <VBox class="sapUiSmallMargin"> -->
+			<VBox class="sapUiSmallMargin paymentDashboardTheme">
+				<!-- Filter Bar -->
+				<fb:FilterBar id="dashboardFilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange">
+					<fb:filterGroupItems>
+						<fb:FilterGroupItem name="Branch" label="Branch" groupName="Group1" visibleInFilterBar="true">
+							<fb:control>
+								<MultiComboBox id="branchFilter" width="400px" placeholder="Select Branch" items="{path: 'Branchmodel>/'}" selectionChange="onFilterChange">
+									<items>
+										<core:Item key="{Branchmodel>BranchID}" text="{Branchmodel>Name}" />
+									</items>
+								</MultiComboBox>
+							</fb:control>
+						</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="Customer" label="Customer" groupName="Group1" visibleInFilterBar="true">
+							<fb:control>
+								<MultiComboBox id="customerFilter" width="400px" placeholder="Select customer" items="{path: 'customers>/'}" selectionChange="onFilterChange">
+									<items>
+										<core:Item key="{customers>key}" text="{customers>text}" />
+									</items>
+								</MultiComboBox>
+							</fb:control>
+						</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="InvoiceDate" label="Invoice Date" groupName="Group1" visibleInFilterBar="true">
+							<fb:control>
+								<DateRangeSelection id="DashI_id_Date" valueFormat="MM/dd/yyyy" displayFormat="MM/dd/yyyy" change="onDateRangeselection" />
+							</fb:control>
+						</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="Year" label="Financial Year" groupName="Group1" visibleInFilterBar="true">
+							<fb:control>
+								<DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="Select year" change="onchangeFY" />
+							</fb:control>
+						</fb:FilterGroupItem>
+					</fb:filterGroupItems>
+				</fb:FilterBar>
+				<!-- Grid for Charts -->
+				<layout:Grid defaultSpan="XL6 L6 M12 S12" class="sapUiResponsiveMargin">
+					<layout:content>
+						<!-- 1. Status Distribution Chart -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+                                <Title text="Invoice Status Distribution {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
+									<ToolbarSpacer />
+									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="Donut Chart" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" width="100%" vizProperties="{                                                          title: { visible: false },                                                          legend: { label: { color: '#ffffff' } },                                                          plotArea: {                                                            dataLabel: { visible: false },                                                            colorPalette: ['#4CAF50', '#007984']                                                          }                                                            }" selectData="onStatusChartSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/statusDistribution}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Status" value="{chartData>status}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																<vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" />
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
+														<vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+						</f:Card>
+						<!-- 2. Monthly Trend Chart -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+									<Title text="Monthly Invoice Trend {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<ToolbarSpacer />
+									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="Vertical Chart" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="Line Chart" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false" class="monthly-trend-chart">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                   colorPalette: ['#007984'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onMonthlyInvoiceSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/monthlyValue}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Month" value="{chartData>month}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																<vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Month" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+						</f:Card>
+						<!-- 3. Value by Customer Chart -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+									<Title text="Invoice Value by Customer {headerModel>/filterSuffix}" level="H5"
+									
+wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<ToolbarSpacer />
+									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="Vertical Chart" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressCustomerBar" tooltip="Bar Chart" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="barChartCustomer" vizType="{invoiceChartTypeModel>/customerType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984'],                                                                dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" selectData="onTotalInvoiceValueSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/customerTotals}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Customer" value="{chartData>customerName}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																<vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Customer" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+						</f:Card>
+						<!-- 4. Yearly Trend Chart -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+									<Title text="Yearly Invoice Trend' {headerModel>/filterSuffix}" 
+									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<ToolbarSpacer />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressYearlyLine" tooltip="Line Chart" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="lineChartYearly" vizType="{invoiceChartTypeModel>/yearlyType}" width="100%" vizProperties="{                                                                title: { visible: false },                                                                plotArea: {                                                                    colorPalette: ['#007984'],                                                                    dataLabel: {                                                                        visible: false,                                                                        formatString: '#'                                                                    }                                                                },                                                                interaction: {                                                                   selectability: { mode: 'SINGLE' }                                                                }                                                                                                                    }" selectData="onYearlyInvoiceSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/yearlyTrend}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Year" value="{chartData>year}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																<vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
+																<vizData:MeasureDefinition name="Invoice Count" value="{chartData>count}" />
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+														<vizFeeds:FeedItem uid="valueAxis2" type="Measure" values="Invoice Count" />
+														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Year" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+						</f:Card>
+					</layout:content>
+				</layout:Grid>
+				<!-- Grid for Full Width Charts -->
+				<layout:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiResponsiveMargin">
+					<layout:content>
+						<!-- 5. Payment Breakdown (Stacked Bar Chart) -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+
+									<Title 
+									text="Payment Breakdown {headerModel>/filterSuffix}" 
+									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									
+									<ToolbarSpacer />
+									<Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="Stacked Horizontal" />
+									<Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="Grouped Horizontal" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="stackedChartPayment" vizType="{invoiceChartTypeModel>/paymentBreakdownType}" width="100%" vizProperties="{                                                                title: { visible: false },                                                                plotArea: {                                                                     dataLabel: { visible: false, formatString: '#' },                                                                        colorPalette: [ '#007984','#4CAF50']                                                                },                                                                interaction: { selectability: { mode: 'SINGLE' } }                                                            }" selectData="onPaymentBreakdownSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/paymentBreakdown}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Customer" value="{chartData>customerName}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																<vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
+																<vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
+																<!-- Credit Notes Amount has been removed -->
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Taxable Amount,GST Amount" />
+														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Customer" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+							
+						</f:Card>
+						
+					</layout:content>
+				</layout:Grid>
+				
+			</VBox>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML" />
+		</footer>
+	</Page>
+</mvc:View>

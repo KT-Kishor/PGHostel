@@ -804,8 +804,10 @@ sap.ui.define([
 
             if (sSelectedTab === "Payment") {
                 oProfileModel.setProperty("/paymentCount", length);
-            } else {
+            } else if(sSelectedTab === "Booking History"){
                 oProfileModel.setProperty("/bookingCount", length);
+            }else{
+                oProfileModel.setProperty("/complaintCount", length);
             }
         },
 
@@ -859,7 +861,7 @@ sap.ui.define([
                             and: false
                         })
                     ];
-                } else {
+                } else if(sSelectedTab === "Booking History") {
                     aFilters = [
                         new sap.ui.model.Filter({
                             filters: [
@@ -874,6 +876,9 @@ sap.ui.define([
                             and: false
                         })
                     ];
+                }
+                else{
+
                 }
             }
             oBinding.filter(aFilters);

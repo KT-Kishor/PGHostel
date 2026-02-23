@@ -265,23 +265,32 @@
                     <IconTabFilter
                         key="Payment"
                         text="Payment ({= ${profileData>/paymentCount} })"/>
+                    <IconTabFilter
+                        key="Complaint"
+                        text="Complaints ({= ${profileData>/complaintCount} })"/>
                 </items>
             </IconTabHeader>
 
             <ToolbarSpacer/>
+         
+            <Button 
+            text="Raise Complaint"
+            press="onPressRaiseComplaint"
+           
+            />
 
             <SearchField
                 width="auto"
-                class="sapUiSmallMargin searchField"
                 liveChange="onGlobalSearch"
                 placeholder="{i18n>search}"/>
+           
         </FlexBox>
 
         <!-- ================= BOOKING HISTORY TABLE ================= -->
 
         <Table
             id="Id_ProfileaTable1"
-            visible="{= ${profileData>/selectedTab} !== 'Payment' }"
+            visible="{= ${profileData>/selectedTab} === 'Booking History' }"
             busy="{profileData>/isTableBusy}"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
@@ -357,6 +366,36 @@
                         <Text text="{profileData>InvNo}"/>
                         <Text text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
                         <Text text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>curremcy}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <Table
+            id="Id_CompmaintTable"
+            visible="{= ${profileData>/selectedTab} === 'Complaint' }"
+            updateFinished="onTableUpdateFinished"
+            items="{
+                path:'profileData>/Complaint',
+                sorter:[{ path:'ComplaintGroup', group:true }]
+            }"
+            width="auto" 
+          class="sapUiSmallMargin customRoundedTable">
+            <columns>
+                <Column><Text text="{i18n>complainid}"/></Column>
+                <Column><Text text="{i18n>complainDate}"/></Column>
+                <Column><Text text="{i18n>complainType}"/></Column>
+                <Column><Text text="{i18n>status}"/></Column>
+                <!-- <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
+                <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column> -->
+            </columns>
+
+            <items>
+                <ColumnListItem type="Navigation" press="onPressManageComplaint">
+                    <cells>
+                        <Text text="{profileData>BookingID}"/>
+                        <Text text="{path:'profileData>ComplaintDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text text="{profileData>ComplaintType}"/>
+                        <Text text="{profileData>ComplaintStatus}"/>
                     </cells>
                 </ColumnListItem>
             </items>

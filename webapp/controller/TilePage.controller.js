@@ -123,6 +123,10 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteCustomerReview");
         },
+        TileV_onpresscomplaintdashboard: function() {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteComplainDashboard");
+        },
 
         onStartGuide: function () {
             if (!this._oGuideDialog) {
