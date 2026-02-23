@@ -10,6 +10,7 @@
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:svm="sap.ui.comp.smartvariants"
     height="100%"
+    busyIndicatorDelay="0"
 >
     <tnt:ToolPage>
         <tnt:header>

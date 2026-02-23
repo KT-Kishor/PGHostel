@@ -31,7 +31,7 @@ sap.ui.define([
                 // set the device model
                 this.setModel(models.createDeviceModel(), "device");
 
-                var oUIModel = new sap.ui.model.json.JSONModel({
+                var oUIModel = new JSONModel({
                     isLoggedIn: false
                 });
                 this.setModel(oUIModel, "UIModel");
@@ -50,15 +50,16 @@ sap.ui.define([
                     isRadioVisible: false
                 });
                 this.setModel(omodel, "LoginModel");
-                await this._fetchCommonData("HM_Branch", "sBRModel");
-
+                this.getRootControl().setBusy(true);
                 this._fetchCommonData("City", "CityModel");
                 this._fetchCommonData("State", "StateModel");
                 this._fetchCommonData("Country", "CountryModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
-                
-                const oAppStateModel = new sap.ui.model.json.JSONModel({
+                await this._fetchCommonData("HM_Branch", "sBRModel");
+               this.getRootControl().setBusy(false);
+
+                const oAppStateModel = new JSONModel({
                     previousTab: "idHome", // default value
                     });
                 this.setModel(oAppStateModel, "AppStateModel");
