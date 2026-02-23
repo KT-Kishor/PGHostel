@@ -959,18 +959,18 @@ sap.ui.define([
             }
 
             // DUPLICATE CHECK
-            const aDocs = oAdminModel.getProperty("/Documents") || [];
-            const bDuplicate = aDocs.some(
-                oDoc => oDoc.DocumentType === sDocType
-            );
+            // const aDocs = oAdminModel.getProperty("/Documents") || [];
+            // const bDuplicate = aDocs.some(
+            //     oDoc => oDoc.DocumentType === sDocType
+            // );
 
-            if (bDuplicate) {
-                MessageToast.show(
-                    this.i18nModel.getText("reuploadDocType")
-                );
-                oFileUploader.clear();
-                return;
-            }
+            // if (bDuplicate) {
+            //     MessageToast.show(
+            //         this.i18nModel.getText("reuploadDocType")
+            //     );
+            //     oFileUploader.clear();
+            //     return;
+            // }
 
             // FILE READ
             const reader = new FileReader();
