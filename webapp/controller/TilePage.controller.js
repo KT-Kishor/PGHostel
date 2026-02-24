@@ -128,6 +128,10 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteComplainDashboard");
         },
+        TileV_onpressComplaintdetails:function(){
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteComplaintDetails");
+        },
 
         TileV_onpressdamage: function() {
             var oRouter = this.getOwnerComponent().getRouter();

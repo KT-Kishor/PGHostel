@@ -1,0 +1,90 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        id="ComplaintID"
+        type="Message"
+        class="sapUiContentPadding"
+        contentWidth="28rem"
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>managecomplaint}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="{i18n>AssignedBy}"
+                    required="true"
+                />
+                <Input
+                    id="CD_id_Assignedto"
+                    value=""
+                    placeholder="Enter Assigned To"
+                    valueStateText="Enter Assigned To"
+                    liveChange="onNoOfPersonInputLiveChange"
+                />
+
+                 <Label
+                    text="{i18n>estimatedate}"
+                    required="true"
+                />
+               <DatePicker
+    id="CD_id_EstimatedDate"
+    value="{CDModel>/EstimatedDate}" 
+    displayFormat="dd/MM/yyyy"       
+    valueFormat="yyyy-MM-dd"         
+    placeholder="Select Estimated Date"
+/>
+
+                 <Label
+                    text="{i18n>ResolutionDate}"
+                    required="true"
+                />
+                 <DatePicker
+                    id="CD_id_ResolutionDate"
+                    value=""
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onEditDateChange"
+                    valueStateText="{i18n>plaeseSelectDate}"
+                />
+               
+            </f:content>
+        </f:SimpleForm>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press=".onAddComplainSave"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press=".onAddComplainCancel"
+                class="myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

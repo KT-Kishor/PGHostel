@@ -214,6 +214,20 @@
                         />
                     </TileContent>
                 </GenericTile>
+                   <GenericTile
+                    id="id12roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
+                    header="{i18n>Complaintdetails}"
+                    press="TileV_onpressComplaintdetails"
+                >
+                    <TileContent unit="{i18n>Complaintdetails}">
+                        <ImageContent
+                            src="sap-icon://discussion"
+                        />
+                    </TileContent>
+                </GenericTile>
+
                 <GenericTile
                     id="TP_ComplaintDashBoardTile"
                     class="sapUiMediumMargin glassTile"

@@ -324,38 +324,45 @@
           "target": "NotFound"
         },
         {
-          "name": "RouteFeedback",
-          "pattern": "feedback/{bookingId}",
-          "target": [
-            "targetFeedback"
-          ]
-        },
-        {
-          "name": "RouteCustomerReview",
-          "pattern": "CustomerReview",
-          "target": [
-            "targetCustomerReview"
-          ]
-        },
-        {
-          "name": "RouteViewRooms",
-          "pattern": "ViewRooms/{sPath}",
-          "target": [
-            "targetViewRooms"
-          ]
-        },
-        {
-          "name": "RouteComplainDashboard",
-          "pattern": "ComplainDashboard",
-          "target": [
-            "targetComplainDashboard"
-          ]
-        },
-        {
+      "name": "RouteFeedback",
+      "pattern": "feedback/{bookingId}",
+      "target": [
+        "targetFeedback"
+      ]
+    },
+      {
+      "name": "RouteCustomerReview",
+      "pattern": "CustomerReview",
+      "target": [
+        "targetCustomerReview"
+      ]
+    },
+     {
+      "name": "RouteViewRooms",
+      "pattern": "ViewRooms/{sPath}",
+      "target": [
+        "targetViewRooms"
+      ]
+    },
+    {
+      "name": "RouteComplainDashboard",
+      "pattern": "ComplainDashboard",
+      "target": [
+        "targetComplainDashboard"
+      ]
+    },
+       {
           "name": "RouteDamage",
           "pattern": "Damage",
           "target": [
             "targetDamage"
+          ]
+        },
+         {
+          "name": "RouteComplaintDetails",
+          "pattern": "ComplaintDetails",
+          "target": [
+            "targetComplaintDetails"
           ]
         }
         
@@ -368,12 +375,26 @@
           "viewId": "Hostel",
           "viewName": "Hostel"
         },
+          "targetDamage": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "Damage",
+          "viewId": "Damage"
+        },
         "TargetTilepage": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewId": "TilePage",
           "viewName": "TilePage"
+        },
+        "targetComplaintDetails":{
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Complaint_Details",
+          "viewName": "Complaint_Details"
         },
         "TargetAdmin": {
           "viewType": "XML",

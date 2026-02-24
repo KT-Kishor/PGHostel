@@ -225,6 +225,12 @@ sap.ui.define([
                     return "Indication03";
                 case "Payment Partially":
                     return "Indication01";
+                case "Pending":
+                    return "Indication01"
+                    case "In Progress":
+                    return "Warning"
+                    case "Resolved":
+                    return "Success"
                 default:
                     return "Indication01";
 
