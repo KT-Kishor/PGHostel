@@ -32,6 +32,17 @@ sap.ui.define([
             const oUserModel = sap.ui.getCore().getModel("LoginModel");
             this._oLoggedInUser = oUserModel ? oUserModel.getData() : {};
 
+            this.getView().setModel(new JSONModel({
+                ComplaintID: "",
+                ComplaintType: "",
+                RoomNo: "",
+                Description: "",
+                FileName: "",
+                FileType: "",
+                FileContent: "",
+                Documents: []
+            }), "complaintTemp");
+
             // Router matched
             this.getOwnerComponent()
                 .getRouter()
@@ -140,10 +151,16 @@ sap.ui.define([
                     PaymentGroup: payment.Status || "Others"
                 }));
                 const aComplainData = aComplain.map(complain => ({
+                    ComplaintID: complain.ComplaintID,
                     ComplaintType: complain.ComplaintType,
+                    Description: complain.Description,
                     ComplaintDescription: complain.Description,
                     ComplaintRaisedDate: complain.ComplaintRaisedDate,
                     ComplaintStatus: complain.Status,
+                    RoomNo: complain.RoomNo || "",
+                    FileName: complain.FileName || "",
+                    FileType: complain.FileType || "",
+                    File: complain.File || ""
                 }));
 
                 const oProfileModel = new JSONModel({
@@ -1076,7 +1093,451 @@ if (sSelectedTab === "Payment") {
                 oInput.setValueState("None");
             }
         },
+        onPressRaiseComplaint: function () {
+            this._openComplaintDialog(); // no data → create mode
+        },
+
+        _openComplaintDialog: function (oComplaintData) {
+            const oView = this.getView();
+            const oTempModel = oView.getModel("complaintTemp");
+
+            if (oComplaintData) {
+                const sExistingFileName = oComplaintData.FileName || "";
+                const sExistingFileType = oComplaintData.FileType || "";
+                const sExistingFile = oComplaintData.FileContent || oComplaintData.File || "";
+                const aDocuments = sExistingFileName ? [{
+                    FileName: sExistingFileName,
+                    DocumentType: sExistingFileType,
+                    FileType: sExistingFileType,
+                    File: sExistingFile,
+                    Base64: sExistingFile,
+                    size: oComplaintData.size || 0,
+                    DocType: "Attachment"
+                }] : [];
+
+                oTempModel.setData({
+                    ComplaintID: oComplaintData.ComplaintID,
+                    ComplaintType: oComplaintData.ComplaintType,
+                    RoomNo: oComplaintData.RoomNo || "",
+                    Description: oComplaintData.Description || oComplaintData.ComplaintDescription || "",
+                    FileName: sExistingFileName,
+                    FileType: sExistingFileType,
+                    FileContent: sExistingFile,
+                    Documents: aDocuments
+                });
+            } else {
+                oTempModel.setData({
+                    ComplaintID: "",
+                    ComplaintType: "",
+                    RoomNo: "",
+                    Description: "",
+                    FileName: "",
+                    FileType: "",
+                    FileContent: "",
+                    Documents: []
+                });
+            }
+
+            if (!this._oComplaintDialog) {
+                Fragment.load({
+                    name: "sap.ui.com.project1.fragment.Complaint",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._oComplaintDialog = oDialog;
+                    oView.addDependent(oDialog);
+                    oDialog.open();
+                    this._resetComplaintValidationStates();
+                }.bind(this));
+            } else {
+                this._oComplaintDialog.open();
+                this._resetComplaintValidationStates();
+            }
+        },
+
+        onCloseComplaintDialog: function () {
+            if (this._oComplaintDialog) {
+                this._oComplaintDialog.close();
+            }
+            if (this._oComplaintPreviewDialog) {
+                this._oComplaintPreviewDialog.close();
+            }
+            if (this._oComplaintPreviewUrl) {
+                URL.revokeObjectURL(this._oComplaintPreviewUrl);
+                this._oComplaintPreviewUrl = null;
+            }
+            this._oComplaintDialog.destroy();
+            this._oComplaintDialog = null;
+        },
+        _getComplaintControl: function (sId) {
+            return sap.ui.getCore().byId(sId) || this.byId(sId);
+        },
+        _resetComplaintValidationStates: function () {
+            const aControls = [
+                this._getComplaintControl("idComplaintType"),
+                this._getComplaintControl("idComplaintRoom"),
+                this._getComplaintControl("idComplaintDesc")
+            ];
+            aControls.forEach(function (oControl) {
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState("None");
+                }
+            });
+        },
+        onComplaintTypeChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+        onComplaintRoomLiveChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            const sSanitized = (oInput.getValue() || "")
+                .toUpperCase()
+                .replace(/[^A-Z0-9-]/g, "");
+            if (oInput.getValue() !== sSanitized) {
+                oInput.setValue(sSanitized);
+            }
+            utils._LCvalidateMandatoryField(oInput, "ID");
+        },
+        onComplaintRoomChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            oInput.setValue((oInput.getValue() || "").trim().toUpperCase());
+            utils._LCvalidateMandatoryField(oInput, "ID");
+        },
+        onComplaintDescLiveChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onComplaintFileChange: function (oEvent) {
+            const oUploader = oEvent.getSource();
+            const file = oEvent.getParameter("files")[0];
+            if (!file) {
+                return;
+            }
+
+            const aAllowedMimeTypes = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "application/pdf"
+            ];
+            if (file.type && !aAllowedMimeTypes.includes(file.type)) {
+                MessageToast.show("Only JPG & PNG files are allowed.");
+                oUploader.clear();
+                return;
+            }
+
+            const MAX_SIZE = 2 * 1024 * 1024;
+            if (file.size > MAX_SIZE) {
+                MessageToast.show("File size must be less than 2 MB.");
+                oUploader.clear();
+                return;
+            }
+
+            const oTempModel = this.getView().getModel("complaintTemp");
+            const aDocuments = oTempModel.getProperty("/Documents") || [];
+            const oExistingDoc = aDocuments[0];
+            if (
+                oExistingDoc &&
+                oExistingDoc.FileName === file.name &&
+                Number(oExistingDoc.size || 0) === Number(file.size || 0)
+            ) {
+                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded"));
+                oUploader.clear();
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const sResult = e.target.result || "";
+                const base64 = sResult.includes(",") ? sResult.split(",")[1] : sResult;
+
+                const oDoc = {
+                    FileName: file.name,
+                    DocumentType: file.type,
+                    FileType: file.type,
+                    File: base64,
+                    Base64: base64,
+                    size: file.size,
+                    DocType: "Attachment"
+                };
+
+                oTempModel.setProperty("/Documents", [oDoc]);
+                oTempModel.setProperty("/FileName", file.name);
+                oTempModel.setProperty("/FileType", file.type);
+                oTempModel.setProperty("/FileContent", base64);
+                oUploader.clear();
+            };
+            reader.readAsDataURL(file);
+        },
+        onComplaintDeleteDoc: function () {
+            const oTempModel = this.getView().getModel("complaintTemp");
+            oTempModel.setProperty("/Documents", []);
+            oTempModel.setProperty("/FileName", "");
+            oTempModel.setProperty("/FileType", "");
+            oTempModel.setProperty("/FileContent", "");
+
+            const oUploader = sap.ui.getCore().byId("idComplaintFileUploader");
+            if (oUploader) {
+                oUploader.clear();
+            }
+        },
+        onComplaintPreviewDoc: function (oEvent) {
+            const autoDecodeBase64 = function (sBase64) {
+                if (!sBase64 || typeof sBase64 !== "string") {
+                    return "";
+                }
+                let sDecoded = sBase64.replace(/\s/g, "");
+                let sLast = sDecoded;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            sLast.startsWith("iVB") ||
+                            sLast.startsWith("/9j") ||
+                            sLast.startsWith("JVBER")
+                        ) {
+                            return sLast;
+                        }
+                        sLast = atob(sLast);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return sLast;
+            };
+
+            const oDoc = oEvent.getSource().getBindingContext("complaintTemp")?.getObject();
+            if (!oDoc || !(oDoc.File || oDoc.Base64)) {
+                MessageToast.show("No document to preview.");
+                return;
+            }
+
+            const sBase64 = autoDecodeBase64(oDoc.File || oDoc.Base64);
+            let sMimeType = oDoc.DocumentType || oDoc.FileType || "application/octet-stream";
+            if (!oDoc.DocumentType && !oDoc.FileType) {
+                if (sBase64.startsWith("iVB")) sMimeType = "image/png";
+                else if (sBase64.startsWith("/9j")) sMimeType = "image/jpeg";
+                else if (sBase64.startsWith("JVBER")) sMimeType = "application/pdf";
+            }
+
+            if (sMimeType.startsWith("image/")) {
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                this._oComplaintPreviewDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || "Document Preview",
+                    contentWidth: "50%",
+                    contentHeight: "60%",
+                    draggable: true,
+                    resizable: true,
+                    horizontalScrolling: false,
+                    verticalScrolling: true,
+                    content: [
+                        new sap.m.Image({
+                            src: sImageSrc,
+                            width: "100%",
+                            height: "100%",
+                            densityAware: false
+                        })
+                    ],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: () => this._oComplaintPreviewDialog.close()
+                    }),
+                    afterClose: () => {
+                        this._oComplaintPreviewDialog.destroy();
+                        this._oComplaintPreviewDialog = null;
+                    }
+                });
+                this.getView().addDependent(this._oComplaintPreviewDialog);
+                this._oComplaintPreviewDialog.open();
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                const byteChars = atob(sBase64);
+                const byteArrays = [];
+                for (let offset = 0; offset < byteChars.length; offset += 512) {
+                    const slice = byteChars.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: sMimeType });
+                this._oComplaintPreviewUrl = URL.createObjectURL(blob);
+                this._oComplaintPreviewDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || "Document Preview",
+                    stretch: true,
+                    draggable: true,
+                    resizable: true,
+                    horizontalScrolling: true,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [
+                        new sap.ui.core.HTML({
+                            sanitizeContent: false,
+                            content: `
+                                <div style="width:100%;height:100%;overflow:hidden;">
+                                    <iframe src="${this._oComplaintPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+                                </div>
+                            `
+                        })
+                    ],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: () => this._oComplaintPreviewDialog.close()
+                    }),
+                    afterClose: () => {
+                        if (this._oComplaintPreviewUrl) {
+                            URL.revokeObjectURL(this._oComplaintPreviewUrl);
+                            this._oComplaintPreviewUrl = null;
+                        }
+                        this._oComplaintPreviewDialog.destroy();
+                        this._oComplaintPreviewDialog = null;
+                    }
+                });
+                this.getView().addDependent(this._oComplaintPreviewDialog);
+                this._oComplaintPreviewDialog.open();
+                return;
+            }
+
+            MessageToast.show("Preview not supported for this file type.");
+        },
+        onSaveComplaint: async function () {
+            const oView = this.getView();
+            const oTempModel = oView.getModel("complaintTemp");
+            const oData = oTempModel.getData();
+
+            const oComplaintType = this._getComplaintControl("idComplaintType");
+            const oRoomNo = this._getComplaintControl("idComplaintRoom");
+            const oDescription = this._getComplaintControl("idComplaintDesc");
+
+            if (!utils._LCvalidateMandatoryField(oComplaintType, "ID")) {
+                MessageToast.show("Please fill all required fields.");
+                return;
+            }
+            if (!utils._LCvalidateMandatoryField(oRoomNo, "ID")) {
+                MessageToast.show("Please fill all required fields.");
+                return;
+            }
+            if (!utils._LCvalidateMandatoryField(oDescription, "ID")) {
+                MessageToast.show("Please fill all required fields.");
+                return;
+            }
+
+            const sUserID = this._oLoggedInUser.UserID;
+            const sUserName = this._oLoggedInUser.UserName; // RaisedBy
+            const sBranchCode = this._oLoggedInUser.BranchCode; // direct from user
+
+            console.log("BranchCode from _oLoggedInUser:", sBranchCode);
+
+            const sToday = new Date().toISOString().split("T")[0];
+
+            const payloadData = {
+                UserID: sUserID,
+                RaisedBy: sUserName,
+                ComplaintType: oData.ComplaintType,
+                Description: oData.Description,
+                Status: "Pending",
+                ComplaintRaisedDate: sToday,
+                RoomNo: oData.RoomNo,
+                FileName: oData.FileName || "",
+                FileType: oData.FileType || "",
+                File: oData.FileContent || ""   // field name expected by backend
+            };
+
+            // Only add BranchCode if it exists (not empty/undefined)
+            if (sBranchCode) {
+                payloadData.BranchCode = sBranchCode;
+            }
+
+            let payload;
+            if (oData.ComplaintID) {
+                // UPDATE (PUT)
+                payload = {
+                    data: {
+                        ComplaintType: oData.ComplaintType,
+                        Description: oData.Description,
+                        RoomNo: oData.RoomNo,
+                        Status: "In Progress",
+                        FileName: oData.FileName || "",
+                        FileType: oData.FileType || "",
+                        File: oData.FileContent || ""
+                    },
+                    filters: { ComplaintID: oData.ComplaintID }
+                };
+                if (sBranchCode) {
+                    payload.data.BranchCode = sBranchCode;
+                }
+            } else {
+                // CREATE (POST)
+                payload = { data: payloadData };
+            }
+
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                let response;
+                if (oData.ComplaintID) {
+                    response = await this.ajaxUpdateWithJQuery("HM_Complaint", payload);
+                } else {
+                    response = await this.ajaxCreateWithJQuery("HM_Complaint", payload);
+                }
+
+                MessageToast.show(this.i18nModel.getText("complaintSavedSuccessfully") || "Complaint saved successfully.");
+
+                await this._refreshComplaints();
+                this._oComplaintDialog.close();
+                sap.ui.core.BusyIndicator.hide();
+
+
+            } catch (err) {
+                console.error("AJAX error:", err);
+                if (err.responseJSON) {
+                    console.error("Server message:", err.responseJSON.message);
+                }
+                MessageToast.show(this.i18nModel.getText("errorSavingComplaint") || "Error saving complaint.");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+        // Helper to refresh complaints table after save
+        _refreshComplaints: async function () {
+            const oProfileModel = this.getView().getModel("profileData");
+            const sUserID = oProfileModel.getProperty("/UserID");
+            const filter = { UserID: sUserID };
+            try {
+                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
+                const aComplain = response?.ComplaintData || [];
+
+                // Apply same mapping as in ManageData to match table bindings
+                const aComplainData = aComplain.map(complain => ({
+                    ComplaintID: complain.ComplaintID,
+                    ComplaintType: complain.ComplaintType,
+                    Description: complain.Description,
+                    ComplaintDescription: complain.Description,
+                    ComplaintRaisedDate: complain.ComplaintRaisedDate,
+                    ComplaintStatus: complain.Status,
+                    RoomNo: complain.RoomNo || "",
+                    FileName: complain.FileName || "",
+                    FileType: complain.FileType || "",
+                    File: complain.File || ""
+                }));
+
+                // oProfileModel.setProperty("/complain", aComplainData);
+                // oProfileModel.setProperty("/complainCount", aComplainData.length);
+                oProfileModel.setProperty("/Complaint", aComplainData);
+                oProfileModel.setProperty("/ComplaintCount", aComplainData.length);
+                console.log(typeof oDoc.File, oDoc.File);
+            } catch (err) {
+                console.error("Failed to refresh complaints", err);
+            }
+        },
+
+        onPressComplaintRow: function (oEvent) {
+            console.log("onPressComplaintRow called");
+            const oContext = oEvent.getSource().getBindingContext("profileData");
+            const oComplaint = oContext.getObject();
+            this._openComplaintDialog(oComplaint);
+        },
 
     });
 });
-

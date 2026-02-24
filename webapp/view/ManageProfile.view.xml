@@ -385,17 +385,14 @@
                 <Column><Text text="{i18n>description}"/></Column>
                 <Column><Text text="{i18n>complainDate}"/></Column>
                 <Column><Text text="{i18n>status}"/></Column>
-                <!-- <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
-                <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column> -->
-            </columns>
+                   </columns>
 
             <items>
-                <ColumnListItem>
+                <ColumnListItem type="Navigation" press="onPressComplaintRow">
                     <cells>
                         <Text text="{profileData>ComplaintType}"/>
                         <Text text="{profileData>ComplaintDescription}"/>
                         <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
-                        <!-- <Text text="{profileData>ComplaintStatus}"/> -->
                           <ObjectStatus
                             text="{profileData>ComplaintStatus}"
                             state="{ path:'profileData>ComplaintStatus',
