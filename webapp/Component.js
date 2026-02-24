@@ -56,8 +56,8 @@ sap.ui.define([
                 this._fetchCommonData("Country", "CountryModel");
                 this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
-                await this._fetchCommonData("HM_Branch", "sBRModel");
-               this.getRootControl().setBusy(false);
+                await this._fetchCommonData("HM_BranchData", "sBRModel");
+                this.getRootControl().setBusy(false);
 
                 const oAppStateModel = new JSONModel({
                     previousTab: "idHome", // default value
