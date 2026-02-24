@@ -304,53 +304,60 @@
             "TargetDashboard"
           ]
         },
-                {
-                  "name": "RouteHostelDashboard",
-                  "pattern": "PaymentDashboard",
-                  "target": [
-                    "TargetHostelDashboard"
-                  ]
-                },
-                {
-                  "name": "RouteManageProfile",
-                  "pattern": "ManageProfile",
-                  "target": [
-                    "TargetManageProfile"
-                  ]
-                },
-                {
+        {
+          "name": "RouteHostelDashboard",
+          "pattern": "PaymentDashboard",
+          "target": [
+            "TargetHostelDashboard"       
+          ]
+        },
+        {
+          "name": "RouteManageProfile",
+          "pattern": "ManageProfile",
+          "target": [
+            "TargetManageProfile"
+          ]
+        },
+        {
           "name": "NotFound",
           "pattern": "NotFound",
           "target": "NotFound"
         },
         {
-      "name": "RouteFeedback",
-      "pattern": "feedback/{bookingId}",
-      "target": [
-        "targetFeedback"
-      ]
-    },
-      {
-      "name": "RouteCustomerReview",
-      "pattern": "CustomerReview",
-      "target": [
-        "targetCustomerReview"
-      ]
-    },
-     {
-      "name": "RouteViewRooms",
-      "pattern": "ViewRooms/{sPath}",
-      "target": [
-        "targetViewRooms"
-      ]
-    },
-    {
-      "name": "RouteComplainDashboard",
-      "pattern": "ComplainDashboard",
-      "target": [
-        "targetComplainDashboard"
-      ]
-    }
+          "name": "RouteFeedback",
+          "pattern": "feedback/{bookingId}",
+          "target": [
+            "targetFeedback"
+          ]
+        },
+        {
+          "name": "RouteCustomerReview",
+          "pattern": "CustomerReview",
+          "target": [
+            "targetCustomerReview"
+          ]
+        },
+        {
+          "name": "RouteViewRooms",
+          "pattern": "ViewRooms/{sPath}",
+          "target": [
+            "targetViewRooms"
+          ]
+        },
+        {
+          "name": "RouteComplainDashboard",
+          "pattern": "ComplainDashboard",
+          "target": [
+            "targetComplainDashboard"
+          ]
+        },
+        {
+          "name": "RouteDamage",
+          "pattern": "Damage",
+          "target": [
+            "targetDamage"
+          ]
+        }
         
       ],
       "targets": {
@@ -571,12 +578,19 @@
           "viewName": "View_Rooms",
           "viewId": "View_Rooms"
         },
-         "targetComplainDashboard": {
+        "targetComplainDashboard": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewName": "ComplainDashboard",
           "viewId": "ComplainDashboard"
+        },
+        "targetDamage": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "Damage",
+          "viewId": "Damage"
         }
        
       }

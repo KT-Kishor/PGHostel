@@ -219,8 +219,23 @@
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>complainDashboard}"
                     press="TileV_onpresscomplaintdashboard"
+                     visible="{= ${TileVisibility>/ManageComplaintDashboard}!== 0?true:false }"
                 >
                     <TileContent unit="{i18n>complaingraph}">
+                        <ImageContent
+                            src="sap-icon://bbyd-dashboard"
+                        />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
+                    id="TP_DamageTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>damageTracking}"
+                     visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
+                    press="TileV_onpressdamage"
+                >
+                    <TileContent unit="{i18n>damageDetails}">
                         <ImageContent
                             src="sap-icon://bbyd-dashboard"
                         />

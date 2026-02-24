@@ -1,0 +1,121 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<Dialog type="Message" class="sapUiContentPadding" contentWidth="28rem" contentHeight="auto">
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="{i18n>manageDamageDetails}" />
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+		<f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1">
+			<f:content>
+				<!-- Customer ID -->
+				<Label text="Customer ID" required="true"/>
+				<ComboBox id="HD_id_CustomerID" width="100%" change="onChangeAddCustomer"
+                    items="{CustomerModel>/}" showSecondaryValues="true" editable="{DamageModel>/CustomerIDEditable}" selectedKey="{DamageModel>/CustomerID}" valueStateText="{i18n>customerIDValueState}">
+					<core:ListItem key="{CustomerModel>CustomerID}" text="{CustomerModel>CustomerID}"
+                additionalText="{CustomerModel>CustomerName}"/>
+				</ComboBox>
+				<!-- Customer Name -->
+				<Label text="Customer Name" />
+				<Input id="HR_id_CustomerName"
+                    value="{DamageModel>/CustomerName}"
+                    placeholder="Enter customer name" editable="false"
+                />
+				<!-- Room Number -->
+				<Label text="Room No" />
+				<Input id="HD_id_RoomNo"
+                    value="{DamageModel>/RoomNo}"
+                    placeholder="Enter room number" editable="false"
+                />
+				<!-- Bed Type Name -->
+				<Label text="Bed Type Name" />
+				<Input id="HD_id_BedTypeName"
+                    value="{DamageModel>/BedTypeName}"
+                    placeholder="Enter bed type" editable="false"
+                />
+				<!-- Branch Code -->
+				<Label text="Branch Code" />
+				<Input id="HD_id_BranchCode"
+                    value="{DamageModel>/BranchCode}"
+                    placeholder="Enter branch code" editable="false"
+                />
+				<!-- Item Name -->
+				<Label text="Item Name" required="true"/>
+				<Input id="HD_id_ItemName"
+                    value="{DamageModel>/ItemName}"
+                    placeholder="Enter damaged item name" maxLength="50"
+                    valueStateText="{i18n>itemValueState}"
+                    liveChange="onLiveChangeItemName"
+                />
+				<!-- Description -->
+				<Label text="Description" required="true"/>
+				<TextArea id="HD_id_Description"
+                    value="{DamageModel>/Description}"
+                    rows="2"
+                    maxLength="200"
+                    width="100%"
+                    placeholder="Enter damage description"
+                    valueStateText="{i18n>descriptionValueState}" liveChange="onLiveChangeDescription"
+                />
+				<!-- Cost -->
+				<Label text="Cost" required="true"/>
+				<Input id="HD_id_Cost"
+                    value="{DamageModel>/Cost}" maxLength="10"
+                    placeholder="Enter estimated cost"
+                    valueStateText="{i18n>costValueState}"
+                    width="100%" liveChange="onLiveChangeCost"
+                />
+				<!-- Date -->
+				<Label text="Date" required="true"/>
+				<DatePicker id="HD_id_DamageDate"
+                    value="{DamageModel>/Date}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy" 
+                    valueStateText="{i18n>dateValueState}"
+                    width="100%" change="onChangeDamageDate"
+                />
+				<!-- Status -->
+				<Label text="Status" required="true"/>
+				<ComboBox id="HD_id_Status"
+                    selectedKey="{DamageModel>/Status}"
+                    width="100%" change="onChangeStatus" valueStateText="{i18n>statusValueState}">
+					<core:Item key="Pending" text="Pending" />
+					<core:Item key="Recovered" text="Recovered" />
+				</ComboBox>
+			</f:content>
+		</f:SimpleForm>
+		<beginButton>
+			<Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="HD_onsavebuttonpress"
+                id="HD_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+		</beginButton>
+		<endButton>
+			<Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="HD_onCancelButtonPress"
+                id="HD_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+		</endButton>
+	</Dialog>
+</c:FragmentDefinition>

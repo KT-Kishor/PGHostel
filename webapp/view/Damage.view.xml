@@ -1,0 +1,146 @@
+<mvc:View controllerName="sap.ui.com.project1.controller.Damage"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
+    displayBlock="true"
+    height="100%"
+    busyIndicatorDelay="0">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
+                id="HD_id_FilterbarEmployee"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="HD_onPressClear"
+                showClearOnFB="true"
+                search="Onsearch"
+                filterChange="IA_.onFilterChange"
+                afterVariantLoad="IA_.onAfterVariantLoad"
+                showFilterConfiguration="false"
+                filterContainerWidth="auto">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Room Number"
+                        label="{i18n>roomNumber}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="HD_id_CustomerName"
+                                items="{RoomDetailsModel>/}"
+                                showClearIcon="true">
+								<core:Item key="{RoomDetailsModel>RoomNo}" 
+                                text="{RoomDetailsModel>RoomNo}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Bed Type"
+                        label="{i18n>bedType}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="HD_id_BedType"
+                                items="{RoomDetailsModel>/}"
+                                showClearIcon="true">
+								<core:ListItem
+                                    key="{RoomDetailsModel>BedTypeName}"
+                                    text="{RoomDetailsModel>BedTypeName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="HD_id_ARD_Table"
+                sticky="ColumnHeaders,HeaderToolbar"
+                mode="MultiSelect"
+                width="auto"
+                busyIndicatorDelay="0"
+                class="sapUiResponsiveMargin"
+				items="{Damage>/}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>
+						<ToolbarSpacer />
+						<Button
+                            text="{i18n>createDamage}"
+                            press="HM_AddRoom"
+                            tooltip="{i18n>createDamage}"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+						<Button
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>MSedit}"
+                            press="HM_EditRoom"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+						<Button
+                            text="{i18n>MSdelete}"
+                            tooltip="{i18n>MSdelete}"
+                            press="HM_DeleteRoom"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+						<Button
+                            text="{i18n>download}"
+                            tooltip="{i18n>download}"
+                            press="RD_onDownload"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>customerID}" tooltip="{i18n>customer}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>customerName}" tooltip="{i18n>customerName}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>roomNo}" tooltip="{i18n>roomNo}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>ItemName}" tooltip="{i18n>ItemName}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>Description}" tooltip="{i18n>Description}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>Cost}" tooltip="{i18n>Cost}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>date}" tooltip="{i18n>Cost}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{Damage>CustomerID}" />
+							<Text text="{Damage>CustomerName}" />
+							<Text text="{Damage>RoomNo}" />
+							<Text text="{Damage>ItemName}" />
+							<Text text="{Damage>Description}" />
+							<Text text="{parts: ['Damage>Cost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{path: 'Damage>Date', formatter: '.Formatter.formatDate'}"/>
+							<Text text="{Damage>Status}" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
+</mvc:View>
