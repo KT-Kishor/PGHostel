@@ -1422,49 +1422,60 @@ sap.ui.define([
             if (sMimeType.startsWith("image/")) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
 
-                // Create FlexBox container for proper image centering
-                const oFlex = new sap.m.FlexBox({
-                    width: "100%",
-                    height: "100%",
-                    renderType: "Div",
-                    justifyContent: "Center",
-                    alignItems: "Center",
-                    items: [
-                        new sap.m.Image({
-                            id: this.createId("complaintPreviewImage"),
-                            densityAware: false,
-                            width: "100%",
-                            height: "100%",
-                            style: "object-fit: contain; display:block;"
-                        })
-                    ]
-                });
 
-                this._oComplaintPreviewDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || "Document Preview",
-                    contentWidth: "50%",
-                    contentHeight: "60%",
-                    draggable: true,
-                    resizable: true,
-                    contentPadding: "0rem",
-                    horizontalScrolling: false,
-                    verticalScrolling: false, // Changed to false to remove scrollbar
-                    content: [oFlex],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: () => this._oComplaintPreviewDialog.close()
-                    }),
-                    afterClose: () => {
-                        this._oComplaintPreviewDialog.destroy();
-                        this._oComplaintPreviewDialog = null;
+                // Create a temporary image to detect orientation and dimensions
+                const oImg = new Image();
+
+                oImg.onload = function () {
+
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+
+                    const imgRatio = oImg.width / oImg.height;
+
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
                     }
-                });
 
-                this.getView().addDependent(this._oComplaintPreviewDialog);
+                    const oHtml = new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+            <div class="preview-image-container">
+                <img src="${sImageSrc}" />
+            </div>
+        `
+                    });
 
-                // Set the image source
-                this.byId("complaintPreviewImage").setSrc(sImageSrc);
-                this._oComplaintPreviewDialog.open();
+                    this._oComplaintPreviewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Preview",
+                        contentWidth: finalWidth + "px",
+                        contentHeight: finalHeight + "px",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        horizontalScrolling: false,
+                        verticalScrolling: false,
+                        content: [oHtml],
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => this._oComplaintPreviewDialog.close()
+                        }),
+                        afterClose: () => {
+                            this._oComplaintPreviewDialog.destroy();
+                            this._oComplaintPreviewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._oComplaintPreviewDialog);
+                    this._oComplaintPreviewDialog.open();
+
+                }.bind(this);
+
+                oImg.src = sImageSrc;
                 return;
             }
 

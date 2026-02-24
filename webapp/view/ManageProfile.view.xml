@@ -382,11 +382,11 @@
             width="auto" 
           class="sapUiSmallMargin customRoundedTable">
             <columns>
-                <Column><Text text="{i18n>complainType}"/></Column>
-                <Column><Text text="{i18n>roomNo}"/></Column>
-                <Column><Text text="{i18n>description}"/></Column>
-                <Column><Text text="{i18n>complainDate}"/></Column>
-                <Column><Text text="{i18n>status}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>complainType}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>roomNo}"/></Column>
+                <Column demandPopin="true" ><Text text="{i18n>description}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>complainDate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
                    </columns>
 
             <items>
