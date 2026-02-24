@@ -58,7 +58,6 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
                 items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true}}"
             >
                 <headerToolbar>

@@ -35,20 +35,50 @@ sap.ui.define([
             this.onClearAndSearch("HD_id_FilterbarEmployee");
             var loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.BranchCode = loginModel.getProperty("/BranchCode");
+            await this._loadBranchCode()
             await this.Onsearch()
             this.readCustomerData();
         },
 
+        _loadBranchCode: async function() {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+            let filters = {};
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchID = aBranchCodes;
+            } else if (oExistingModel.Role === "SuperAdmin" ) {
+                    filters.BranchID = "";
+            } else{
+                filters.BranchID = oExistingModel.BranchCode;
+            }
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
+                const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+                const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
+                this.getView().setModel(oBranchModel, "BranchModel");
+            } catch (err) {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageToast.show(err.message || err.responseText);
+            }
+        },
+        
         readCustomerData: function() {
             return new Promise((resolve, reject) => {
                 sap.ui.core.BusyIndicator.show(0);
 
-                var filter = {
-                    BranchCode: this.BranchCode
-                };
+                var filter = {BranchCode: this.BranchCode};
 
-                this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter)
-                    .then((oData) => {
+                this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter).then((oData) => {
                         var aData = Array.isArray(oData.commentData) ?
                             oData.commentData : [oData.commentData];
 

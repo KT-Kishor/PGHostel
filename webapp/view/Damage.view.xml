@@ -65,8 +65,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
-				items="{Damage>/}">
+				items="{path:'Damage>/', sorter: {path:'BranchName',descending: false,group: true}}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>

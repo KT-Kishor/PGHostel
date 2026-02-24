@@ -76,7 +76,6 @@
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
                 items="{path: 'mainModel>/', sorter: {path: 'Status',descending: false,group: true}}"
             >
                 <headerToolbar>
