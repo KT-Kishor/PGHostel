@@ -39,34 +39,34 @@
                     value=""
                     placeholder="Enter Assigned To"
                     valueStateText="Enter Assigned To"
-                    liveChange="onNoOfPersonInputLiveChange"
+                    change="onNoOfPersonInputLiveChange"
                 />
 
-                 <Label
+                <Label
                     text="{i18n>estimatedate}"
                     required="true"
                 />
-               <DatePicker
-    id="CD_id_EstimatedDate"
-    value="{CDModel>/EstimatedDate}" 
-    displayFormat="dd/MM/yyyy"       
-    valueFormat="yyyy-MM-dd"         
-    placeholder="Select Estimated Date"
-/>
+                <DatePicker
+                    id="CD_id_EstimatedDate"
+                    value="{CDModel>/EstimatedDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    placeholder="Select Estimated Date"
+                    change="onNoOfPersonInputLiveChange"
+                />
 
-                 <Label
+                <Label
                     text="{i18n>ResolutionDate}"
                     required="true"
                 />
-                 <DatePicker
+                <DatePicker
                     id="CD_id_ResolutionDate"
                     value=""
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
-                    change="onEditDateChange"
+                    change="onNoOfPersonInputLiveChange"
                     valueStateText="{i18n>plaeseSelectDate}"
                 />
-               
             </f:content>
         </f:SimpleForm>
 

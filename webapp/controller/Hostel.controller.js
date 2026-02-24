@@ -119,7 +119,7 @@ sap.ui.define([
             sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.iTop = 8; // records per load
+            this.iTop = 5; // records per load
             this.iSkip = 0; // starting index
 
             this.flag = false
@@ -896,7 +896,7 @@ sap.ui.define([
             if (page && page.scrollTo) page.scrollTo(0, 0);
 
             this.flag = true;
-            this.iTop = 8;
+            this.iTop = 5;
             this.iSkip = 0;
             this.roomtype = true;
 
@@ -2481,7 +2481,7 @@ sap.ui.define([
             });
         },
         onSearchRooms: async function() {
-            this.iTop = 8
+            this.iTop = 5
             this.iSkip = 0
             this.flag = true
             const oContainer = this.byId("idBedTypeFlex");
@@ -2551,7 +2551,7 @@ sap.ui.define([
         },
 
         _loadRoomsPageData: async function() {
-            this.iTop = 8;
+            this.iTop = 5;
             this.iSkip = 0;
 
             this.roomtype = false

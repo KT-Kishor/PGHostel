@@ -23,7 +23,7 @@
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="CD_onPressClear"
-                showClearOnFB="true" 
+                showClearOnFB="true"
                 search="CD_read"
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
@@ -48,13 +48,13 @@
                                 <core:ListItem
                                     key="{ComplaintModel>BranchCode}"
                                     text="{ComplaintModel>BranchCode}"
-                                    additionalText="{HostelModel>BranchName}"
+                                    additionalText="{ComplaintModel>BranchName}"
                                 />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
-				  <fb:filterGroupItems>
+                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room No"
                         label="{i18n>roomNo}"
@@ -77,7 +77,7 @@
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
 
-                  <fb:filterGroupItems>
+                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Status"
                         label="{i18n>status}"
@@ -115,7 +115,9 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title text="{i18n>Complaints}({= ${ComplaintModel>/}.length})" />
+                        <Title
+                            text="{i18n>Complaints}({= ${ComplaintModel>/}.length})"
+                        />
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>assignComplain}"
@@ -123,7 +125,7 @@
                             press="CD_Assign"
                             class="myUnifiedBtn"
                         />
-                          <Button
+                        <Button
                             text="{i18n>resolve}"
                             tooltip="{i18n>resolve}"
                             press="CD_resolve"
@@ -180,7 +182,7 @@
                             tooltip="{i18n>RoomNo}"
                         />
                     </Column>
-                     <Column
+                    <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -199,7 +201,7 @@
                         />
                     </Column>
 
-					   <Column
+                    <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -214,7 +216,7 @@
                             tooltip="{i18n>ResolutionDate}"
                         />
                     </Column>
-					   <Column demandPopin="true">
+                    <Column demandPopin="true">
                         <Text
                             text="{i18n>Image}"
                             tooltip="{i18n>Image}"
@@ -224,43 +226,45 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                                <Text
-                                    text="{ComplaintModel>RaisedBy}"
-                                />
+                            <Text text="{ComplaintModel>RaisedBy}" />
                             <Text text="{ComplaintModel>ComplaintType}" />
-                            <ExpandableText 
-                             maxCharacters="20"
-                             text="{ComplaintModel>Description}" />
+                            <ExpandableText
+                                maxCharacters="20"
+                                text="{ComplaintModel>Description}"
+                            />
                             <Text
                                 text="{path:'ComplaintModel>ComplaintRaisedDate',formatter: '.Formatter.formatDate'}"
                             />
                             <Text text="{ComplaintModel>RoomNo}" />
-                            <Text text="{path:'ComplaintModel>EstimatDate',formatter: '.Formatter.formatDate'}" />
-                          
 
-	
-							   <ObjectStatus
+                            <Text
+                                text="{= ${ComplaintModel>EstimatDate} === '1899-11-30T00:00:00.000Z' || ${ComplaintModel>EstimatDate} === null ? '' : ${
+                                path: 'ComplaintModel>EstimatDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"
+                            />
+
+                            <ObjectStatus
                                 inverted="false"
                                 text="{ComplaintModel>Status}"
                                 state="{ path: 'ComplaintModel>Status', formatter: '.Formatter.formatObjectStatus'}"
                             />
                             <Text text="{ComplaintModel>AssignedBy}" />
 
-
-                         
-                            <Text text="{path:'ComplaintModel>ResolutionDate',formatter: '.Formatter.formatDate'}" />
-							  <Link
+                            <Text
+                                text="{path:'ComplaintModel>ResolutionDate',formatter: '.Formatter.formatDate'}"
+                            />
+                            <Link
                                 text="{i18n>view}"
                                 press="CD_viewimage"
                             />
-                         
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <footer>
-         <core:Fragment
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />

@@ -92,6 +92,8 @@ sap.ui.define([
             let uniqueValues = {
                 CD_id_BranchName: new Set(),
                 PCD_id_RoomNo: new Set(),
+                CD_id_Status: new Set(),
+
             
             };
 
@@ -102,11 +104,14 @@ sap.ui.define([
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PCD_id_RoomNo.add(item.RoomNo.trim());
                 }
+                  if (item.Status && item.Status.trim()) {
+                    uniqueValues.CD_id_Status.add(item.Status.trim());
+                }
             });
 
             let oView = this.getView();
 
-            ["CD_id_BranchName","PCD_id_RoomNo"].forEach(field => {
+            ["CD_id_BranchName","PCD_id_RoomNo","CD_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -147,8 +152,13 @@ sap.ui.define([
             }
             this.CD_Dialog.open();
             this.byId("CD_id_ResolutionDate").setVisible(false);
-              this.byId("CD_id_Assignedto").setVisible(true);
-            this.byId("CD_id_EstimatedDate").setVisible(true);
+            this.byId("CD_id_Assignedto").setVisible(true).setValue("");
+            this.byId("CD_id_EstimatedDate").setVisible(true).setValue("");
+        },
+        CD_onPressClear:function(){
+             this.getView().byId("CD_id_BranchName").setSelectedKey("")
+             this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
+             this.getView().byId("CD_id_Status").setSelectedKey("")
         },
         CD_viewimage: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("ComplaintModel");
@@ -280,12 +290,15 @@ sap.ui.define([
             this.CD_Dialog.close();
 
         },
+        onNoOfPersonInputLiveChange:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+        },
         CD_resolve: function () {
             var table = this.byId("idPOTable1");
             var selected = table.getSelectedItem();
 
             if (!selected) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssign"));
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoresolve"));
                 return;
             }
 
@@ -307,7 +320,7 @@ sap.ui.define([
             this.CD_Dialog.open();
             this.byId("CD_id_Assignedto").setVisible(false);
             this.byId("CD_id_EstimatedDate").setVisible(false);
-            this.byId("CD_id_ResolutionDate").setVisible(true);
+            this.byId("CD_id_ResolutionDate").setVisible(true).setValue("");
 
 
         },
