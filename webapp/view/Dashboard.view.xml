@@ -20,13 +20,6 @@
             />
         </headerContent>
         <content>
-            <VBox class=" todaySection sapUiSmallMargin">
-                <Title
-                    text="{i18n>dashTodayBookings}"
-                    level="H3"
-                />
-                <VBox class="sapUiSmallMarginTop" />
-
                 <fb:FilterBar
                     id="D_id_FilterbarEmployee"
                     useToolbar="false"
@@ -146,7 +139,12 @@
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
                 </fb:FilterBar>
-
+                 <VBox class=" todaySection sapUiSmallMargin">
+                <Title
+                    text="{i18n>dashTodayBookings}"
+                    level="H3"
+                />
+                <VBox class="sapUiSmallMarginTop" />
                 <Carousel
                     height="auto"
                     showPageIndicator="true"

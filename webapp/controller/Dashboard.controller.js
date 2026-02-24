@@ -61,33 +61,32 @@ sap.ui.define([
         },
 
         dashboardSetDate: function (aData, aBranchesToUse) {
-            const oToday = new Date();
-            oToday.setHours(0, 0, 0, 0);
+            // const oToday = new Date();
+            // oToday.setHours(0, 0, 0, 0);
             const aAllowedBranches = aBranchesToUse;
-            const aTodayCards = [];
-            const oMonthlyDate = {};
+            // const aTodayCards = [];
+            const aCards = [];
             aData.forEach((oBooking) => {
                 if (!["New"].includes(oBooking.Status)) return;
                 if (!aAllowedBranches.includes(oBooking.BranchCode)) return;
 
-                const dBookingDate = new Date(oBooking.BookingDate);
-                dBookingDate.setHours(0, 0, 0, 0);
-                if (dBookingDate.getTime() === oToday.getTime()) {
-                    aTodayCards.push({
-                        BookingID: oBooking.BookingID,
-                        BookingDate: oBooking.BookingDate,
-                        CustomerName: this._mCustomerMap[oBooking.CustomerID],
-                        CustomerID: oBooking.CustomerID,
-                        RoomNo: oBooking.RoomNo,
-                        StartDate: oBooking.StartDate,
-                        EndDate: oBooking.EndDate
-                    });
-                }
-                const dBooking = new Date(oBooking.BookingDate);
-                const sMonthKey = dBooking.getFullYear() + "-" + (dBooking.getMonth() + 1);
-                oMonthlyDate[sMonthKey] = (oMonthlyDate[sMonthKey] || 0) + 1;
+                // const dBookingDate = new Date(oBooking.BookingDate);
+                // dBookingDate.setHours(0, 0, 0, 0);
+                // if (dBookingDate.getTime() === oToday.getTime()) {
+                aCards.push({
+                    BookingID: oBooking.BookingID,
+                    BookingDate: oBooking.BookingDate,
+                    CustomerName: this._mCustomerMap[oBooking.CustomerID],
+                    CustomerID: oBooking.CustomerID,
+                    RoomNo: oBooking.RoomNo,
+                    StartDate: oBooking.StartDate,
+                    EndDate: oBooking.EndDate
+                });
+                // const dBooking = new Date(oBooking.BookingDate);
+                // const sMonthKey = dBooking.getFullYear() + "-" + (dBooking.getMonth() + 1);
+                // oMonthlyDate[sMonthKey] = (oMonthlyDate[sMonthKey] || 0) + 1;
             });
-            this.dashboardModels(aTodayCards, oMonthlyDate);
+            this.dashboardModels(aCards);
         },
 
         _groupCardsForCarousel: function (aCards, iPerPage) {
@@ -107,21 +106,21 @@ sap.ui.define([
             return 5;
         },
 
-        dashboardModels: function (aCards, oMonthMap) {
+        dashboardModels: function (aCards) {
             this._aTodayCards = aCards;
             const iPerPage = this._getCardsPerPage();
             const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
             this.getView().setModel(new JSONModel({ pages: aPages }), "todayModel");
 
-            const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const oChartData = Object.keys(oMonthMap).map((sKey) => {
-                const [year, month] = sKey.split("-");
-                return {
-                    Month: aMonthNames[parseInt(month, 10) - 1],
-                    Count: oMonthMap[sKey]
-                };
-            });
-            this.getView().setModel(new JSONModel({ data: oChartData }), "chartModel");
+            // const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            // const oChartData = Object.keys(oMonthMap).map((sKey) => {
+            //     const [year, month] = sKey.split("-");
+            //     return {
+            //         Month: aMonthNames[parseInt(month, 10) - 1],
+            //         Count: oMonthMap[sKey]
+            //     };
+            // });
+            // this.getView().setModel(new JSONModel({ data: oChartData }), "chartModel");
             this._bindMonthlyChart();
         },
 
@@ -479,36 +478,134 @@ sap.ui.define([
         D_search: async function () {
             sap.ui.core.BusyIndicator.show(0);
             try {
+
                 const sSelected = this.byId("D_id_BranchCode").getSelectedKey();
                 let aBranchesToUse = [];
-                if (sSelected === "ALL") {
-                    aBranchesToUse = this._aUserBranches;
-                } else {
-                    aBranchesToUse = [sSelected];
+
+                if (!sSelected || sSelected === "" || sSelected === "ALL") {
+                    aBranchesToUse = this._aUserBranches || [];
+                    this.byId("D_id_BranchCode").setSelectedKey("ALL");
                 }
-                if (!aBranchesToUse) return MessageToast.show("Branch not ready");
-                const oRange = this._getStartEndDate();
-                const bMonthSelected = this.byId("D_id_month").getSelectedKey();
+                else {
+                    if (this._aUserBranches.includes(sSelected)) {
+                        aBranchesToUse = [sSelected];
+                    } else {
+                        MessageToast.show("Unauthorized branch selected");
+                        return;
+                    }
+                }
+                if (!aBranchesToUse || aBranchesToUse.length === 0) {
+                    MessageToast.show("No authorized branches found");
+                    return;
+                }
+
+                const sYear = this.byId("D_id_year").getValue();
+                const sMonth = this.byId("D_id_month").getSelectedKey();
                 const oUserBranch = aBranchesToUse.join(",");
-                const oMonthPayload = {
-                    StartDate: oRange.yearStart,
-                    EndDate: oRange.yearEnd,
-                    BranchCode: oUserBranch
+                // let finalYear = sYear;
+                // let finalMonth = sMonth;
+
+                // // 🔥 If year not selected → default to current year
+                // if (!finalYear) {
+                //     finalYear = new Date().getFullYear().toString();
+                // }
+
+                // const iYear = parseInt(finalYear, 10);
+
+                // let yearStart = iYear + "-01-01";
+                // let yearEnd = iYear + "-12-31";
+
+                // let monthStart, monthEnd;
+
+                // if (finalMonth) {
+                //     const iMonth = parseInt(finalMonth, 10);
+                //     const mStart = new Date(iYear, iMonth - 1, 1);
+                //     const mEnd = new Date(iYear, iMonth, 0);
+
+                //     const format = d =>
+                //         d.getFullYear() + "-" +
+                //         String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                //         String(d.getDate()).padStart(2, "0");
+
+                //     monthStart = format(mStart);
+                //     monthEnd = format(mEnd);
+                // }
+                let StartDate;
+                let EndDate;
+
+                // 🔹 CASE 1 → Year selected
+                if (sYear) {
+
+                    const iYear = parseInt(sYear, 10);
+
+                    // Year selected but no month
+                    if (!sMonth) {
+                        StartDate = iYear + "-01-01";
+                        EndDate = iYear + "-12-31";
+                    }
+
+                    // Year + Month selected
+                    else {
+                        const iMonth = parseInt(sMonth, 10);
+
+                        const mStart = new Date(iYear, iMonth - 1, 1);
+                        const mEnd = new Date(iYear, iMonth, 0);
+
+                        const format = d =>
+                            d.getFullYear() + "-" +
+                            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                            String(d.getDate()).padStart(2, "0");
+
+                        StartDate = format(mStart);
+                        EndDate = format(mEnd);
+                    }
+                }
+
+                // 🔹 CASE 3 → Nothing selected (CLEAR case)
+                else {
+                    // Full safe range
+                    StartDate = "2000-01-01";
+                    EndDate = "2099-12-31";
+                }
+                // 🔹 Filter by branch first
+                let aFilteredBookings = (this._aAllBookings || []).filter(b =>
+                    aBranchesToUse.includes(b.BranchCode)
+                );
+                aFilteredBookings = aFilteredBookings.filter(b => {
+
+                    const d = new Date(b.BookingDate);
+
+                    const formatted =
+                        d.getFullYear() + "-" +
+                        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                        String(d.getDate()).padStart(2, "0");
+
+                    return formatted >= StartDate && formatted <= EndDate;
+                });
+
+                this.dashboardSetDate(aFilteredBookings, aBranchesToUse);
+                let oMonthPayload = {
+                    BranchCode: oUserBranch,
+                    StartDate: StartDate,
+                    EndDate: EndDate
                 };
-                const oDailyPayload = {
-                    StartDate: oRange.monthStart,
-                    EndDate: oRange.monthEnd,
-                    BranchCode: oUserBranch
+
+                let oStatusPayload = {
+                    BranchCode: oUserBranch,
+                    StartDate: StartDate,
+                    EndDate: EndDate
                 };
-                const oStatusPayload = {
-                    StartDate: oRange.yearStart,
-                    EndDate: oRange.yearEnd,
-                    BranchCode: oUserBranch
+
+                let oDailyPayload = {
+                    BranchCode: oUserBranch,
+                    StartDate: StartDate,
+                    EndDate: EndDate
                 };
-                const oPaymentPayload = {
-                    StartDate: bMonthSelected ? oRange.monthStart : oRange.yearStart,
-                    EndDate: bMonthSelected ? oRange.monthEnd : oRange.yearEnd,
-                    BranchCode: oUserBranch
+
+                let oPaymentPayload = {
+                    BranchCode: oUserBranch,
+                    StartDate: StartDate,
+                    EndDate: EndDate
                 };
                 await Promise.all([
                     this._loadMonthChart(oMonthPayload),
@@ -581,8 +678,8 @@ sap.ui.define([
 
         D_onPressClear: function () {
             this.byId("D_id_year").setValue("");
-            this.byId("D_id_month").setValue("");
-            this.byId("D_id_BranchCode").setValue("");
+            this.byId("D_id_month").setSelectedKey("");
+            this.byId("D_id_BranchCode").setSelectedKey("ALL");
         }
     })
 })
