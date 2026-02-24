@@ -11,7 +11,7 @@
                     <ComboBox
                         id="idComplaintType"
                         required="true"
-                        selectedKey="{complaintTemp>/ComplaintType}"
+                        value="{complaintTemp>/ComplaintType}"
                         change="onComplaintTypeChange"
                         valueStateText="Please select complaint type"
                     >
@@ -44,9 +44,10 @@
                         value="{complaintTemp>/Description}"
                         liveChange="onComplaintDescLiveChange"
                         valueStateText="Please enter complaint description"
+                        maxLength="200"
                     />
 
-                    <Label text="Documents" />
+                    <Label text="Upload Image" />
                     <VBox width="100%">
                         <MessageStrip
                             text="{i18n>messageComplaintAttachment}"
@@ -61,14 +62,14 @@
                         >
                             <headerToolbar>
                                 <OverflowToolbar>
-                                    <Title text="Documents" />
+                                    <Title text="Image" />
                                     <ToolbarSpacer />
                                     <u:FileUploader
                                         id="idComplaintFileUploader"
                                         buttonOnly="true"
                                         buttonText="Upload"
                                         uploadOnChange="false"
-                                        fileType="jpg,jpeg,png,pdf"
+                                        fileType="jpg,jpeg,png"
                                         change="onComplaintFileChange"
                                     />
                                 </OverflowToolbar>
@@ -77,9 +78,9 @@
                                 <Column>
                                     <Text text="{i18n>filename}" />
                                 </Column>
-                                <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
-                                    <Text text="{i18n>document}" />
-                                </Column>
+                                <!-- <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+                                    <Text text="{i18n>image}" />
+                                </Column> -->
                                 <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
                                     <Text text="{i18n>size}" />
                                 </Column>
@@ -96,7 +97,7 @@
                                             tooltip="{path:'complaintTemp>', formatter:'.Formatter.fileTooltip'}"
                                             wrapping="true"
                                         />
-                                        <Text text="{complaintTemp>DocType}" />
+                                        <!-- <Text text="{complaintTemp>DocType}" /> -->
                                         <Text text="{path:'complaintTemp>size', formatter:'.Formatter.formatFileSize'}" />
                                         <Button
                                             icon="sap-icon://decline"

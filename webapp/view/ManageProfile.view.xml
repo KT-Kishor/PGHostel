@@ -272,10 +272,11 @@
             </IconTabHeader>
 
             <ToolbarSpacer/>
-         
+        <HBox alignItems="Center" justifyContent="Start" class="customActionBox">
             <Button 
             text="Raise Complaint"
             press="onPressRaiseComplaint"
+            class="myUnifiedBtn sapUiSmallMarginEnd"
            
             />
 
@@ -283,7 +284,7 @@
                 width="auto"
                 liveChange="onGlobalSearch"
                 placeholder="{i18n>search}"/>
-           
+          </HBox> 
         </FlexBox>
 
         <!-- ================= BOOKING HISTORY TABLE ================= -->
@@ -382,6 +383,7 @@
           class="sapUiSmallMargin customRoundedTable">
             <columns>
                 <Column><Text text="{i18n>complainType}"/></Column>
+                <Column><Text text="{i18n>roomNo}"/></Column>
                 <Column><Text text="{i18n>description}"/></Column>
                 <Column><Text text="{i18n>complainDate}"/></Column>
                 <Column><Text text="{i18n>status}"/></Column>
@@ -391,7 +393,8 @@
                 <ColumnListItem type="Navigation" press="onPressComplaintRow">
                     <cells>
                         <Text text="{profileData>ComplaintType}"/>
-                        <Text text="{profileData>ComplaintDescription}"/>
+                        <Text text="{profileData>RoomNo}"/>
+                        <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
                         <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
                           <ObjectStatus
                             text="{profileData>ComplaintStatus}"
