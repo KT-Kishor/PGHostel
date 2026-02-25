@@ -138,7 +138,12 @@
 							<ExpandableText text="{Damage>Description}" maxCharacters="20"/>
 							<Text text="{parts: ['Damage>Cost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{path: 'Damage>Date', formatter: '.Formatter.formatDate'}"/>
-							<Text text="{Damage>Status}" />
+							<ObjectStatus
+							inverted="false"
+							text="{Damage>Status}"
+							state="{ path: 'Damage>Status', formatter: '.Formatter.formatObjectStatus'}"
+							class="sapUiTinyMarginBottom"
+							/>
 						</cells>
 					</ColumnListItem>
 				</items>

@@ -174,7 +174,7 @@ sap.ui.define([
                 case "Rejected":
                     return "Error";
                 case "Pending":
-                    return "Indication02";
+                    return "Error";
                 case "In Progress":
                     return "Indication03";
                 case "Resolved":
@@ -225,6 +225,8 @@ sap.ui.define([
                     return "Indication03";
                 case "Payment Partially":
                     return "Indication01";
+                    case "Recovered":
+                        return "Success"
                 case "Pending":
                     return "Indication01"
                     case "In Progress":
