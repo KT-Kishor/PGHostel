@@ -1,5 +1,5 @@
 <mvc:View
-    controllerName="sap.ui.com.project1.controller.Dashboard"
+    controllerName="sap.ui.com.project1.controller.DamageDashboard"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:fb="sap.ui.comp.filterbar"
@@ -20,15 +20,15 @@
             />
         </headerContent>
         <content>
-                <fb:FilterBar
-                    useToolbar="false"
-                    clear="D_onPressClear"
-                    showClearOnFB="true"
-                    search="D_search"
-                    filterChange="onFilterChange"
-                    showFilterConfiguration="false"
-                >
-                 <fb:filterGroupItems>
+            <fb:FilterBar
+                useToolbar="false"
+                clear="DD_onPressClear"
+                showClearOnFB="true"
+                search="DD_search"
+                filterChange="onFilterChange"
+                showFilterConfiguration="false"
+            >
+                <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Name"
                         label="Branch Name"
@@ -37,6 +37,7 @@
                     >
                         <fb:control>
                             <ComboBox
+                            id="id_DD_branch"
                                 items="{branchModel>/}"
                                 showSecondaryValues="true"
                                 showClearIcon="true"
@@ -51,324 +52,257 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
-                    <fb:filterGroupItems>
-                        <fb:FilterGroupItem
-                            name="year"
-                            label="{i18n>dashYear}"
-                            groupName="Group"
-                            visibleInFilterBar="true"
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="year"
+                        label="{i18n>dashYear}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DateRangeSelection
+                                id="id_DD_year"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+
+            <layout:Grid
+                defaultSpan="XL6 L6 M12 S12"
+                class="sapUiResponsiveMargin sapUiMediumMarginTop"
+            >
+                <!-- 1. Monthly Booking Trend -->
+                <f:Card class="sapUiTinyMargin">
+                    <f:header>
+                        <Toolbar class="customdashboard">
+                            <Title
+                                text="{i18n>dashMonthlyBooking}"
+                                level="H5"
+                                wrapping="true"
+                                class="Dashboardtitle"
+                            />
+                            <ToolbarSpacer />
+                            <Button
+                                icon="sap-icon://vertical-bar-chart"
+                                press="onColumnChart"
+                            />
+                            <Button
+                                icon="sap-icon://bar-chart"
+                                press="onBarChart"
+                            />
+                            <Button
+                                icon="sap-icon://line-chart"
+                                press="onLineChart"
+                            />
+                            <Button
+                                icon="sap-icon://pie-chart"
+                                press="onPieChart"
+                            />
+                        </Toolbar>
+                    </f:header>
+
+                    <f:content>
+                        <com:ChartContainer
+                            showFullScreen="true"
+                            showPersonalization="false"
                         >
-                            <fb:control>
-                                <DatePicker
-                                    valueFormat="yyyy"
-                                    displayFormat="yyyy"
-                                    change="onFilterChange"
-                                />
-                            </fb:control>
-                        </fb:FilterGroupItem>
-                    </fb:filterGroupItems>
-
-                    <fb:filterGroupItems>
-                        <fb:FilterGroupItem
-                            name="month"
-                            label="{i18n>dashMonth}"
-                            groupName="Group"
-                            visibleInFilterBar="true"
-                        >
-                            <fb:control>
-                                <Select
-                                    selectedKey="{filterModel>/month}"
-                                    change="onFilterChange"
-                                >
-                                    <items>
-                                        <core:Item
-                                            key="1"
-                                            text="Jan"
-                                        />
-                                        <core:Item
-                                            key="2"
-                                            text="Feb"
-                                        />
-                                        <core:Item
-                                            key="3"
-                                            text="Mar"
-                                        />
-                                        <core:Item
-                                            key="4"
-                                            text="Apr"
-                                        />
-                                        <core:Item
-                                            key="5"
-                                            text="May"
-                                        />
-                                        <core:Item
-                                            key="6"
-                                            text="Jun"
-                                        />
-                                        <core:Item
-                                            key="7"
-                                            text="Jul"
-                                        />
-                                        <core:Item
-                                            key="8"
-                                            text="Aug"
-                                        />
-                                        <core:Item
-                                            key="9"
-                                            text="Sep"
-                                        />
-                                        <core:Item
-                                            key="10"
-                                            text="Oct"
-                                        />
-                                        <core:Item
-                                            key="11"
-                                            text="Nov"
-                                        />
-                                        <core:Item
-                                            key="12"
-                                            text="Dec"
-                                        />
-                                    </items>
-                                </Select>
-                            </fb:control>
-                        </fb:FilterGroupItem>
-                    </fb:filterGroupItems>
-                </fb:FilterBar>
-
-                <layout:Grid
-                    defaultSpan="XL6 L6 M12 S12"
-                    class="sapUiResponsiveMargin sapUiMediumMarginTop"
-                >
-                    <!-- 1. Monthly Booking Trend -->
-                    <f:Card class="sapUiTinyMargin">
-                        <f:header>
-                            <Toolbar class="customdashboard">
-                                <Title
-                                    text="{i18n>dashMonthlyBooking}"
-                                    level="H5"
-                                    wrapping="true"
-                                    class="Dashboardtitle"
-                                />
-                                <ToolbarSpacer />
-                                <Button
-                                    icon="sap-icon://vertical-bar-chart"
-                                    press="onColumnChart"
-                                />
-                                <Button
-                                    icon="sap-icon://bar-chart"
-                                    press="onBarChart"
-                                />
-                                <Button
-                                    icon="sap-icon://line-chart"
-                                    press="onLineChart"
-                                />
-                                <Button
-                                    icon="sap-icon://pie-chart"
-                                    press="onPieChart"
-                                />
-                            </Toolbar>
-                        </f:header>
-
-                        <f:content>
-                            <com:ChartContainer
-                                showFullScreen="true"
-                                showPersonalization="false"
-                            >
-                                <com:content>
-                                    <com:ChartContainerContent>
-                                        <com:content>
-                                            <viz:VizFrame
-                                                height="400px"
-                                                width="100%"
-                                                vizType="{chartTypeModel>/monthly}"
-                                                uiConfig="{applicationSet:'fiori'}"
-                                                vizProperties="{
+                            <com:content>
+                                <com:ChartContainerContent>
+                                    <com:content>
+                                        <viz:VizFrame
+                                            height="400px"
+                                            width="100%"
+                                            vizType="{chartTypeModel>/monthly}"
+                                            uiConfig="{applicationSet:'fiori'}"
+                                            vizProperties="{
                                                 title: {visible: false},
                                 plotArea: { dataLabel: { visible: true } },
                                 valueAxis: { title: { text: 'Number of Bookings' } },
                                 categoryAxis: { title: { text: 'Month' } },
                                 legend: { visible: true }
                             }"
-                                            />
-                                        </com:content>
-                                    </com:ChartContainerContent>
-                                </com:content>
-                            </com:ChartContainer>
-                        </f:content>
-                    </f:Card>
+                                        />
+                                    </com:content>
+                                </com:ChartContainerContent>
+                            </com:content>
+                        </com:ChartContainer>
+                    </f:content>
+                </f:Card>
 
-                    <!-- 2. Daily Booking Trend -->
-                    <f:Card class="sapUiTinyMargin">
-                        <f:header>
-                            <Toolbar class="customdashboard">
-                                <Title
-                                    text="{i18n>dashDailyBooking}"
-                                    level="H5"
-                                    wrapping="true"
-                                    class="Dashboardtitle"
-                                />
-                                <ToolbarSpacer />
-                                <Button
-                                    icon="sap-icon://vertical-bar-chart"
-                                    press="ondayColumnChart"
-                                />
-                                <Button
-                                    icon="sap-icon://bar-chart"
-                                    press="ondayBarChart"
-                                />
-                                <Button
-                                    icon="sap-icon://line-chart"
-                                    press="ondayLineChart"
-                                />
-                                <Button
-                                    icon="sap-icon://pie-chart"
-                                    press="ondayPieChart"
-                                />
-                            </Toolbar>
-                        </f:header>
+                <!-- 2. Daily Booking Trend -->
+                <f:Card class="sapUiTinyMargin">
+                    <f:header>
+                        <Toolbar class="customdashboard">
+                            <Title
+                                text="{i18n>dashDailyBooking}"
+                                level="H5"
+                                wrapping="true"
+                                class="Dashboardtitle"
+                            />
+                            <ToolbarSpacer />
+                            <Button
+                                icon="sap-icon://vertical-bar-chart"
+                                press="ondayColumnChart"
+                            />
+                            <Button
+                                icon="sap-icon://bar-chart"
+                                press="ondayBarChart"
+                            />
+                            <Button
+                                icon="sap-icon://line-chart"
+                                press="ondayLineChart"
+                            />
+                            <Button
+                                icon="sap-icon://pie-chart"
+                                press="ondayPieChart"
+                            />
+                        </Toolbar>
+                    </f:header>
 
-                        <f:content>
-                            <com:ChartContainer
-                                showFullScreen="true"
-                                showPersonalization="false"
-                            >
-                                <com:content>
-                                    <com:ChartContainerContent>
-                                        <com:content>
-                                            <viz:VizFrame
-                                                height="400px"
-                                                vizType="{chartTypeModel>/daily}"
-                                                uiConfig="{applicationSet:'fiori'}"
-                                                vizProperties="{
+                    <f:content>
+                        <com:ChartContainer
+                            showFullScreen="true"
+                            showPersonalization="false"
+                        >
+                            <com:content>
+                                <com:ChartContainerContent>
+                                    <com:content>
+                                        <viz:VizFrame
+                                            height="400px"
+                                            vizType="{chartTypeModel>/daily}"
+                                            uiConfig="{applicationSet:'fiori'}"
+                                            vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Day' } }
                                                 }"
-                                            />
-                                        </com:content>
-                                    </com:ChartContainerContent>
-                                </com:content>
-                            </com:ChartContainer>
-                        </f:content>
-                    </f:Card>
+                                        />
+                                    </com:content>
+                                </com:ChartContainerContent>
+                            </com:content>
+                        </com:ChartContainer>
+                    </f:content>
+                </f:Card>
 
-                    <!-- 3. Status Wise Booking Trend -->
-                    <f:Card class="sapUiTinyMargin">
-                        <f:header>
-                            <Toolbar class="customdashboard">
-                                <Title
-                                    text="{i18n>dashStatusWiseBooking}"
-                                    level="H5"
-                                    wrapping="true"
-                                    class="Dashboardtitle"
-                                />
-                                <ToolbarSpacer />
-                                <Button
-                                    icon="sap-icon://vertical-bar-chart"
-                                    press="onStatusColumnChart"
-                                />
-                                <Button
-                                    icon="sap-icon://bar-chart"
-                                    press="onStatusBarChart"
-                                />
-                                <Button
-                                    icon="sap-icon://line-chart"
-                                    press="onStatusLineChart"
-                                />
-                                <Button
-                                    icon="sap-icon://pie-chart"
-                                    press="onStatusPieChart"
-                                />
-                            </Toolbar>
-                        </f:header>
+                <!-- 3. Status Wise Booking Trend -->
+                <f:Card class="sapUiTinyMargin">
+                    <f:header>
+                        <Toolbar class="customdashboard">
+                            <Title
+                                text="{i18n>dashStatusWiseBooking}"
+                                level="H5"
+                                wrapping="true"
+                                class="Dashboardtitle"
+                            />
+                            <ToolbarSpacer />
+                            <Button
+                                icon="sap-icon://vertical-bar-chart"
+                                press="onStatusColumnChart"
+                            />
+                            <Button
+                                icon="sap-icon://bar-chart"
+                                press="onStatusBarChart"
+                            />
+                            <Button
+                                icon="sap-icon://line-chart"
+                                press="onStatusLineChart"
+                            />
+                            <Button
+                                icon="sap-icon://pie-chart"
+                                press="onStatusPieChart"
+                            />
+                        </Toolbar>
+                    </f:header>
 
-                        <f:content>
-                            <com:ChartContainer
-                                showFullScreen="true"
-                                showPersonalization="false"
-                            >
-                                <com:content>
-                                    <com:ChartContainerContent>
-                                        <com:content>
-                                            <viz:VizFrame
-                                                height="400px"
-                                                vizType="{chartTypeModel>/status}"
-                                                uiConfig="{applicationSet:'fiori'}"
-                                                vizProperties="{
+                    <f:content>
+                        <com:ChartContainer
+                            showFullScreen="true"
+                            showPersonalization="false"
+                        >
+                            <com:content>
+                                <com:ChartContainerContent>
+                                    <com:content>
+                                        <viz:VizFrame
+                                            height="400px"
+                                            vizType="{chartTypeModel>/status}"
+                                            uiConfig="{applicationSet:'fiori'}"
+                                            vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Status' } }
                                                 }"
-                                            />
-                                        </com:content>
-                                    </com:ChartContainerContent>
-                                </com:content>
-                            </com:ChartContainer>
-                        </f:content>
-                    </f:Card>
+                                        />
+                                    </com:content>
+                                </com:ChartContainerContent>
+                            </com:content>
+                        </com:ChartContainer>
+                    </f:content>
+                </f:Card>
 
-                    <!-- 4. Payment Type Booking Trend -->
-                    <f:Card class="sapUiTinyMargin">
-                        <f:header>
-                            <Toolbar class="customdashboard">
-                                <Title
-                                    text="{i18n>dashPaymentTypeBooking}"
-                                    level="H5"
-                                    wrapping="true"
-                                    class="Dashboardtitle"
-                                />
-                                <ToolbarSpacer />
-                                <Button
-                                    icon="sap-icon://vertical-bar-chart"
-                                    press="onPayColumnChart"
-                                />
-                                <Button
-                                    icon="sap-icon://bar-chart"
-                                    press="onPayBarChart"
-                                />
-                                <Button
-                                    icon="sap-icon://line-chart"
-                                    press="onPayLineChart"
-                                />
-                                <Button
-                                    icon="sap-icon://pie-chart"
-                                    press="onPayPieChart"
-                                />
-                            </Toolbar>
-                        </f:header>
+                <!-- 4. Payment Type Booking Trend -->
+                <f:Card class="sapUiTinyMargin">
+                    <f:header>
+                        <Toolbar class="customdashboard">
+                            <Title
+                                text="{i18n>dashPaymentTypeBooking}"
+                                level="H5"
+                                wrapping="true"
+                                class="Dashboardtitle"
+                            />
+                            <ToolbarSpacer />
+                            <Button
+                                icon="sap-icon://vertical-bar-chart"
+                                press="onPayColumnChart"
+                            />
+                            <Button
+                                icon="sap-icon://bar-chart"
+                                press="onPayBarChart"
+                            />
+                            <Button
+                                icon="sap-icon://line-chart"
+                                press="onPayLineChart"
+                            />
+                            <Button
+                                icon="sap-icon://pie-chart"
+                                press="onPayPieChart"
+                            />
+                        </Toolbar>
+                    </f:header>
 
-                        <f:content>
-                            <com:ChartContainer
-                                showFullScreen="true"
-                                showPersonalization="false"
-                            >
-                                <com:content>
-                                    <com:ChartContainerContent>
-                                        <com:content>
-                                            <viz:VizFrame
-                                                height="400px"
-                                                vizType="{chartTypeModel>/payment}"
-                                                uiConfig="{applicationSet:'fiori'}"
-                                                vizProperties="{
+                    <f:content>
+                        <com:ChartContainer
+                            showFullScreen="true"
+                            showPersonalization="false"
+                        >
+                            <com:content>
+                                <com:ChartContainerContent>
+                                    <com:content>
+                                        <viz:VizFrame
+                                            height="400px"
+                                            vizType="{chartTypeModel>/payment}"
+                                            uiConfig="{applicationSet:'fiori'}"
+                                            vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Number of Bookings' } },
                                                     categoryAxis: { title: { text: 'Payment Type' } }
                                                 }"
-                                            />
-                                        </com:content>
-                                    </com:ChartContainerContent>
-                                </com:content>
-                            </com:ChartContainer>
-                        </f:content>
-                    </f:Card>
-                </layout:Grid>
+                                        />
+                                    </com:content>
+                                </com:ChartContainerContent>
+                            </com:content>
+                        </com:ChartContainer>
+                    </f:content>
+                </f:Card>
+            </layout:Grid>
         </content>
         <footer>
-         <core:Fragment
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />

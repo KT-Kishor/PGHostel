@@ -262,7 +262,7 @@
                      visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
                     press="TileV_onpressdamagedashboard"
                 >
-                    <TileContent unit="{i18n>damageDashboard}">
+                    <TileContent unit="{i18n>damageGraph}">
                         <ImageContent
                             src="sap-icon://bbyd-dashboard"
                         />
