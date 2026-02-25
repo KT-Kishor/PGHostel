@@ -5,13 +5,15 @@ sap.ui.define([
     "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
        "../utils/validation",
+        "sap/ui/export/Spreadsheet",
 ], function (
     BaseController,
     Formatter,
     JSONModel,
     BusyIndicator,
     MessageToast,
-    utils
+    utils,
+    Spreadsheet
 
 ) {
     "use strict";
@@ -22,20 +24,55 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteComplaintDetails").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched: function () {
-            this.CD_read()
+        _onRouteMatched:async function () {
+           this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
+           this.getView().byId("CD_id_Status").setSelectedKey("")
+           await this.CD_read()
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["CD_id_EstimatedDate", "CD_id_ResolutionDate"], sap.ui.getCore());
 
+             this.CD_Staff()
+
+        },
+        CD_Staff:function(){
+               const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
 
+            let aBranchCodes = "";
+
+            if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+            } else if (oExistingModel.BranchCode) {
+                aBranchCodes = oExistingModel.BranchCode;
+            }
+
+            let filters = {};
+
+            if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchCode = aBranchCodes;
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
+            } else {
+                filters.BranchCode = oExistingModel.BranchCode;
+            }
+                     this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
+                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+
+                // Map BranchCode to BranchName directly in response
+              var Staffmodel =  new JSONModel(oFCIAerData);
+                this.getView().setModel(Staffmodel, "StaffModel");
+                   
+
+            })
+            sap.ui.core.BusyIndicator.hide();
         },
         CD_read: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
-                 const sBranchName = this.byId("CD_id_BranchName").getSelectedKey()
-                    || this.byId("CD_id_BranchName").getValue();
+         
 
                 const sRoomNo = this.byId("PCD_id_RoomNo").getSelectedKey()
                     || this.byId("PCD_id_RoomNo").getValue();
@@ -61,7 +98,6 @@ sap.ui.define([
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
-                if (sBranchName) filters.BranchCode = sBranchName;
                 if (sRoomNo) filters.RoomNo = sRoomNo;
                 if (sStatus) filters.Status = sStatus;
 
@@ -79,10 +115,13 @@ sap.ui.define([
                         BranchName: branch ? branch.Name : complain.BranchID
                     };
                 });
+                  if (!this._originalRoomdata) {
+                            this._originalRoomdata = response;
+                        }
                 var model = new JSONModel(response);
                 this.getView().setModel(model, "ComplaintModel");
                    
-                this._populateUniqueFilterValues(response);
+                this._populateUniqueFilterValues(this._originalRoomdata);
 
             })
             sap.ui.core.BusyIndicator.hide();
@@ -90,7 +129,6 @@ sap.ui.define([
         },
           _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
-                CD_id_BranchName: new Set(),
                 PCD_id_RoomNo: new Set(),
                 CD_id_Status: new Set(),
 
@@ -98,9 +136,7 @@ sap.ui.define([
             };
 
             data.forEach(item => {
-                  if (item.BranchCode && item.BranchCode.trim()) {
-                    uniqueValues.CD_id_BranchName.add(item.BranchCode.trim());
-                }
+                
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PCD_id_RoomNo.add(item.RoomNo.trim());
                 }
@@ -111,7 +147,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["CD_id_BranchName","PCD_id_RoomNo","CD_id_Status"].forEach(field => {
+            ["PCD_id_RoomNo","CD_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -126,8 +162,90 @@ sap.ui.define([
                 });
             });
         },
-        CD_Assign: function () {
+          createTableSheet: function () {
+            return [{
+                label: "Name",
+                property: "RaisedBy",
+                type: "string"
+            },
+            {
+                label: "Complaint Type",
+                property: "ComplaintType",
+                type: "string"
+            },
+            {
+                label: "Description",
+                property: "Description",
+                type: "string"
+            },
+            {
+                label: "Complaint Raised Date",
+                property: "ComplaintRaisedDate",
+                type: "string"
+            },
+            {
+                label: "Room No",
+                property: "RoomNo",
+                type: "string"
+            },
+            {
+                label: "Estimat Date",
+                property: "EstimatDate",
+                type: "string"
+            },
+            {
+                label: "Status",
+                property: "Status",
+                type: "string"
+            },
+            {
+                label: "Assigned To",
+                property: "AssignedBy",
+                type: "string"
+            },
+            {
+                label: "Resolution Date",
+                property: "ResolutionDate",
+                type: "string"
+            }
+            ]
+        },
+             CD_onDownload: function () {
+            const oModel = this.byId("idPOTable1").getModel("ComplaintModel").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item,
+                ComplaintRaisedDate: Formatter.formatDate(item.ComplaintRaisedDate),
+                EstimatDate: Formatter.formatDate(item.EstimatDate),
+                ResolutionDate: Formatter.formatDate(item.ResolutionDate)
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Complain_Details.xlsx",
+                worker: false
+            };
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        },
+        CD_Assign:async function () {
+
+                var StaffModel=this.getView().getModel("StaffModel").getData();
+
             var table = this.byId("idPOTable1");
+            
             var selected = table.getSelectedItem();
 
             if (!selected) {
@@ -137,7 +255,14 @@ sap.ui.define([
 
             var Model = selected.getBindingContext("ComplaintModel");
             var data = Model.getObject();
-            if (data.Status === "In Progress" || data.Status === "Resolved") {
+         var Staffs = StaffModel.filter(function(element) {
+    return element.BranchCode === data.BranchCode;
+});
+   var oFilteredModel = new sap.ui.model.json.JSONModel(Staffs);
+    this.getView().setModel(oFilteredModel, "FilteredStaffModel");
+
+            this.flag=false
+            if (data.Status === "Resolved") {
                 MessageToast.show(this.i18nModel.getText("wecannotAssign"));
                 return;
             }
@@ -152,11 +277,15 @@ sap.ui.define([
             }
             this.CD_Dialog.open();
             this.byId("CD_id_ResolutionDate").setVisible(false);
-            this.byId("CD_id_Assignedto").setVisible(true).setValue("");
-            this.byId("CD_id_EstimatedDate").setVisible(true).setValue("");
+            if(data.Status === "Pending"){
+            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("");
+            this.byId("CD_id_EstimatedDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate));
+            }else{
+            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey(data.AssignedBy);
+            this.byId("CD_id_EstimatedDate").setVisible(true).setValue(Formatter.formatDate(data.EstimatDate)).setMinDate(new Date(data.ComplaintRaisedDate));
+            }
         },
         CD_onPressClear:function(){
-             this.getView().byId("CD_id_BranchName").setSelectedKey("")
              this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
              this.getView().byId("CD_id_Status").setSelectedKey("")
         },
@@ -235,7 +364,7 @@ sap.ui.define([
             var oContext = selected.getBindingContext("ComplaintModel");
             var Complaint = oContext.getObject();
 
-              if (Complaint.Status === "Pending") {
+              if (Complaint.Status === "Pending" || Complaint.Status==="In Progress" && this.flag===false) {
         if (
             !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_Assignedto"), "ID") ||
             !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_EstimatedDate"), "ID")
@@ -250,7 +379,7 @@ sap.ui.define([
         }
     }
 
-    if (Complaint.Status === "In Progress") {
+    if (Complaint.Status === "In Progress" && this.flag===true) {
         if (
             !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_ResolutionDate"), "ID")
         ) {
@@ -262,20 +391,21 @@ sap.ui.define([
             return;
         }
     }
-            if(Complaint.Status==="Pending"){
+            if((Complaint.Status==="Pending" || Complaint.Status==="In Progress") && this.flag===false){
             var payload = {
                 AssignedBy: Assignedto,
-                EstimatDate: EstimatDate,
-              
-
+                EstimatDate: EstimatDate.includes("-")?EstimatDate : EstimatDate.split("/").reverse().join("-"),
                 Status: "In Progress"
             };
-        }else{
+        }
+         if((Complaint.Status==="In Progress" || Complaint.Status==="Resolved") && this.flag===true){
               var payload = {
                 ResolutionDate: ResolutionDate.split("/").reverse().join("-") || "",
                 Status:"Resolved"
             };
         }
+            sap.ui.core.BusyIndicator.show(0);
+
             await this.ajaxUpdateWithJQuery("HM_Complaint", {
                 data: payload,
                 filters: {
@@ -304,7 +434,8 @@ sap.ui.define([
 
             var Model = selected.getBindingContext("ComplaintModel");
             var data = Model.getObject();
-            if (data.Status === "Pending" || data.Status === "Resolved") {
+            this.flag=true
+            if (data.Status === "Pending") {
                 MessageToast.show(this.i18nModel.getText("wecannotresolve"));
                 return;
             }
@@ -320,9 +451,17 @@ sap.ui.define([
             this.CD_Dialog.open();
             this.byId("CD_id_Assignedto").setVisible(false);
             this.byId("CD_id_EstimatedDate").setVisible(false);
-            this.byId("CD_id_ResolutionDate").setVisible(true).setValue("");
+            if(data.Status === "In Progress"){
+            this.byId("CD_id_ResolutionDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate));
+            }else{
+            this.byId("CD_id_ResolutionDate").setVisible(true).setValue(Formatter.formatDate(data.ResolutionDate)).setMinDate(new Date(data.ComplaintRaisedDate));
+            }
 
 
+        },
+          onHome: function () {
+            this.CommonLogoutFunction();
+            this.getView().getModel("ComplaintModel").setData({});
         },
     });
 });

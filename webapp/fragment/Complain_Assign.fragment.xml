@@ -34,13 +34,21 @@
                     text="{i18n>AssignedBy}"
                     required="true"
                 />
-                <Input
+                    <ComboBox
                     id="CD_id_Assignedto"
-                    value=""
-                    placeholder="Enter Assigned To"
+                    selectedKey="{edit>/Currency}"
+                    items="{FilteredStaffModel>/}"
                     valueStateText="Enter Assigned To"
-                    change="onNoOfPersonInputLiveChange"
-                />
+                    width="100%"
+                    change=".onNoOfPersonInputLiveChange"
+                    placeholder="Enter Assigned To"
+
+                >
+                    <core:Item
+                        key="{FilteredStaffModel>UserName}"
+                        text="{FilteredStaffModel>UserName}"
+                    />
+                </ComboBox>
 
                 <Label
                     text="{i18n>estimatedate}"
@@ -52,6 +60,7 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
                     placeholder="Select Estimated Date"
+
                     change="onNoOfPersonInputLiveChange"
                 />
 

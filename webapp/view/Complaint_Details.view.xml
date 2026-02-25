@@ -30,30 +30,7 @@
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
             >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="Branch Name"
-                        label="{i18n>branchName}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="CD_id_BranchName"
-                                items="{ComplaintModel>/}"
-                                showClearIcon="true"
-                                showSecondaryValues="true"
-                                filterSecondaryValues="true"
-                            >
-                                <core:ListItem
-                                    key="{ComplaintModel>BranchCode}"
-                                    text="{ComplaintModel>BranchCode}"
-                                    additionalText="{ComplaintModel>BranchName}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
+            
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room No"
@@ -250,9 +227,11 @@
                                 state="{ path: 'ComplaintModel>Status', formatter: '.Formatter.formatObjectStatus'}"
                             />
                             <Text text="{ComplaintModel>AssignedBy}" />
-
-                            <Text
-                                text="{path:'ComplaintModel>ResolutionDate',formatter: '.Formatter.formatDate'}"
+                             <Text
+                                text="{= ${ComplaintModel>ResolutionDate} === '1899-11-30T00:00:00.000Z' || ${ComplaintModel>ResolutionDate} === null ? '' : ${
+                                path: 'ComplaintModel>ResolutionDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"
                             />
                             <Link
                                 text="{i18n>view}"
