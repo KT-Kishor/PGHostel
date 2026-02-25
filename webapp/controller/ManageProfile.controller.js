@@ -1625,11 +1625,14 @@ sap.ui.define([
                 } else {
                     response = await this.ajaxCreateWithJQuery("HM_Complaint", payload);
                 }
-
-                MessageToast.show(this.i18nModel.getText("complaintSavedSuccessfully") || "Complaint saved successfully.");
-
-                await this._refreshComplaints();
                 this._oComplaintDialog.close();
+
+                const sSuccessMsg = oData.ComplaintID
+                    ? (this.i18nModel.getText("complaintUpdatedSuccessfully"))
+                    : (this.i18nModel.getText("complaintSavedSuccessfully"));
+
+                MessageToast.show(sSuccessMsg);
+                await this._refreshComplaints();
                 sap.ui.core.BusyIndicator.hide();
 
             } catch (err) {

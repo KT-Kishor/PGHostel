@@ -1,0 +1,14 @@
+[
+    { "key": "Internet not working", "text": "Internet not working" },
+    { "key": "Slow WiFi speed", "text": "Slow WiFi speed" },
+    { "key": "Electricity issue", "text": "Electricity issue" },
+    { "key": "Power socket not working", "text": "Power socket not working" },
+    { "key": "Geyser not working", "text": "Geyser not working" },
+    { "key": "Water leakage", "text": "Water leakage" },
+    { "key": "Bathroom cleaning required", "text": "Bathroom cleaning required" },
+    { "key": "Room cleaning required", "text": "Room cleaning required" },
+    { "key": "Fan not working", "text": "Fan not working" },
+    { "key": "AC not cooling", "text": "AC not cooling" },
+    { "key": "Drinking water issue", "text": "Drinking water issue" },
+    { "key": "Other", "text": "Other" }
+ ]

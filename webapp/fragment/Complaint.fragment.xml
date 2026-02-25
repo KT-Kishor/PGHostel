@@ -37,12 +37,10 @@
                         change="onComplaintRoomChange"
                         valueStateText="{i18n>enterRoomNo}"
                     />
-                    <Label text="Complaint Type" required="true" />
+                    <!-- <Label text="Complaint Type" required="true" />
                     <ComboBox
                         id="idComplaintType"
                         required="true"
-                        value="{complaintTemp>/ComplaintType}"
-                        change="onComplaintTypeChange"
                         valueStateText="Please select complaint type"
                     >
                         <items>
@@ -50,7 +48,23 @@
                             <core:Item key="Electrical Issue" text="Electrical Issue"/>
                             <core:Item key="Room Cleaning" text="Room Cleaning"/>
                         </items>
-                    </ComboBox>
+                    </ComboBox> -->
+                    <Label text="Complaint Type" required="true" />
+
+<ComboBox
+    id="idComplaintType"
+    required="true"
+    selectedKey="{complaintTemp>/ComplaintType}"
+    value="{complaintTemp>/ComplaintType}"
+    valueStateText="Please select complaint type"
+    change="onComplaintTypeChange"
+    items="{
+        path: 'ComplaintTypeModel>/'
+    }">
+    <core:Item
+        key="{ComplaintTypeModel>key}"
+        text="{ComplaintTypeModel>text}" />
+</ComboBox>
 
                    
 

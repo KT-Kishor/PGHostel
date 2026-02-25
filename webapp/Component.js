@@ -64,6 +64,9 @@ sap.ui.define([
                     });
                 this.setModel(oAppStateModel, "AppStateModel");
 
+                const oComplaintTypeModel = new sap.ui.model.json.JSONModel();
+                oComplaintTypeModel.loadData("model/ComplaintTypes.json");
+                this.setModel(oComplaintTypeModel, "ComplaintTypeModel");
             },
             _fetchCommonData: async function (entityName, modelName, filter = "") {
                 // If already loaded, skip
