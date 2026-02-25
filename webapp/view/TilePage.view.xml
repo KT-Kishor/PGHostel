@@ -255,6 +255,19 @@
                         />
                     </TileContent>
                 </GenericTile>
+                 <GenericTile
+                    id="TP_DamageDashboard"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>damageDashboard}"
+                     visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
+                    press="TileV_onpressdamagedashboard"
+                >
+                    <TileContent unit="{i18n>damageDashboard}">
+                        <ImageContent
+                            src="sap-icon://bbyd-dashboard"
+                        />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </layout:VerticalLayout>
         <Button

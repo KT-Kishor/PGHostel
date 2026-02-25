@@ -308,7 +308,7 @@
           "name": "RouteHostelDashboard",
           "pattern": "PaymentDashboard",
           "target": [
-            "TargetHostelDashboard"       
+            "TargetHostelDashboard"
           ]
         },
         {
@@ -324,48 +324,54 @@
           "target": "NotFound"
         },
         {
-      "name": "RouteFeedback",
-      "pattern": "feedback/{bookingId}",
-      "target": [
-        "targetFeedback"
-      ]
-    },
-      {
-      "name": "RouteCustomerReview",
-      "pattern": "CustomerReview",
-      "target": [
-        "targetCustomerReview"
-      ]
-    },
-     {
-      "name": "RouteViewRooms",
-      "pattern": "ViewRooms/{sPath}",
-      "target": [
-        "targetViewRooms"
-      ]
-    },
-    {
-      "name": "RouteComplainDashboard",
-      "pattern": "ComplainDashboard",
-      "target": [
-        "targetComplainDashboard"
-      ]
-    },
-       {
+          "name": "RouteFeedback",
+          "pattern": "feedback/{bookingId}",
+          "target": [
+            "targetFeedback"
+          ]
+        },
+        {
+          "name": "RouteCustomerReview",
+          "pattern": "CustomerReview",
+          "target": [
+            "targetCustomerReview"
+          ]
+        },
+        {
+          "name": "RouteViewRooms",
+          "pattern": "ViewRooms/{sPath}",
+          "target": [
+            "targetViewRooms"
+          ]
+        },
+        {
+          "name": "RouteComplainDashboard",
+          "pattern": "ComplainDashboard",
+          "target": [
+            "targetComplainDashboard"
+          ]
+        },
+        {
           "name": "RouteDamage",
           "pattern": "Damage",
           "target": [
             "targetDamage"
           ]
         },
-         {
+        {
           "name": "RouteComplaintDetails",
           "pattern": "ComplaintDetails",
           "target": [
             "targetComplaintDetails"
           ]
+        },
+        {
+          "name": "RouteDamageDashboard",
+          "pattern": "DamageDashboard",
+          "target": [
+            "targetDamageDashboard"
+          ]
         }
-        
       ],
       "targets": {
         "TargetHostel": {
@@ -375,7 +381,7 @@
           "viewId": "Hostel",
           "viewName": "Hostel"
         },
-          "targetDamage": {
+        "targetDamage": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -389,7 +395,7 @@
           "viewId": "TilePage",
           "viewName": "TilePage"
         },
-        "targetComplaintDetails":{
+        "targetComplaintDetails": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -564,7 +570,7 @@
           "viewId": "PaymentDashboard",
           "viewName": "PaymentDashboard"
         },
-         "TargetManageProfile": {
+        "TargetManageProfile": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -578,7 +584,7 @@
           "viewId": "NotFound",
           "viewName": "NotFound"
         },
-         "targetFeedback": {
+        "targetFeedback": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -592,7 +598,7 @@
           "viewName": "CustomerReview",
           "viewId": "CustomerReview"
         },
-         "targetViewRooms": {
+        "targetViewRooms": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -612,8 +618,14 @@
           "clearControlAggregation": false,
           "viewName": "Damage",
           "viewId": "Damage"
+        },
+        "targetDamageDashboard": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "DamageDashboard",
+          "viewId": "DamageDashboard"
         }
-       
       }
     },
     "rootView": {
