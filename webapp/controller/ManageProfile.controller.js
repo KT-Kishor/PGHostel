@@ -153,19 +153,7 @@ sap.ui.define([
                     currency: payment.Currency,
                     PaymentGroup: payment.Status || "Others"
                 }));
-                // const aComplainData = aComplain.map(complain => ({
-                //     ComplaintID: complain.ComplaintID,
-                //     ComplaintType: complain.ComplaintType,
-                //     Description: complain.Description,
-                //     ComplaintDescription: complain.Description,
-                //     ComplaintRaisedDate: complain.ComplaintRaisedDate,
-                //     ComplaintStatus: complain.Status,
-                //     RoomNo: complain.RoomNo || "",
-                //     BranchCode: complain.BranchCode || "", 
-                //     FileName: complain.FileName || "",
-                //     FileType: complain.FileType || "",
-                //     File: complain.File || ""
-                // }));
+              
                 const oBRModel = this.getOwnerComponent().getModel("sBRModel");
                 const aBranchMaster = oBRModel?.getProperty("/") || [];
 
@@ -189,7 +177,9 @@ sap.ui.define([
                         RoomNo: complain.RoomNo || "",
                         FileName: complain.FileName || "",
                         FileType: complain.FileType || "",
-                        File: complain.File || ""
+                        File: complain.File || "",
+                        ExpectedResolvedDate: complain.EstimatDate,
+                        AssignedTo: complain.AssignedBy || "",
                     };
                 });
                 console.log("aComplainData:", aComplainData);
@@ -1630,9 +1620,9 @@ sap.ui.define([
                 const sSuccessMsg = oData.ComplaintID
                     ? (this.i18nModel.getText("complaintUpdatedSuccessfully"))
                     : (this.i18nModel.getText("complaintSavedSuccessfully"));
-
-                MessageToast.show(sSuccessMsg);
-                await this._refreshComplaints();
+               MessageToast.show(sSuccessMsg);
+               await this._refreshComplaints();
+               
                 sap.ui.core.BusyIndicator.hide();
 
             } catch (err) {
@@ -1675,7 +1665,9 @@ sap.ui.define([
                         RoomNo: complain.RoomNo || "",
                         FileName: complain.FileName || "",
                         FileType: complain.FileType || "",
-                        File: complain.File || ""
+                        File: complain.File || "",
+                        ExpectedResolvedDate: complain.EstimatDate,
+                        AssignedTo: complain.AssignedBy || "",
                     };
                 });
 

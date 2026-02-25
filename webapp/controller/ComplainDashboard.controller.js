@@ -10,7 +10,7 @@ sap.ui.define([
         statusType: "donut",
         DailyType: "line",
         monthlyType: "bar",
-        yearlyType: "line"
+        yearlyType: "bar"
       
     };
     return BaseController.extend("sap.ui.com.project1.controller.ComplainDashboard", {
@@ -41,25 +41,14 @@ sap.ui.define([
             oRouter.navTo("TilePage");
             }
         },
-        _setCurrentMonthDateRange: function () {
-    var oDateRange = this.byId("CD_complain_Date");
-
-    var oToday = new Date();
-
-    // First day of current month
-    var oStartDate = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
-
-    // Last day of current month
-    var oEndDate = new Date(oToday.getFullYear(), oToday.getMonth() + 1, 0);
-
-    oDateRange.setDateValue(oStartDate);
-    oDateRange.setSecondDateValue(oEndDate);
-},
+       
         _onRouteMatched: async function(oEvent) {
             this.sPath = oEvent.getParameter("arguments").sPath;
 
-            // var LoginFunction = await this.commonLoginFunction("ComplainDashboard");
-            //  if (!LoginFunction) return;
+            var LoginFunction = await this.commonLoginFunction("ComplainDashboard");
+             if (!LoginFunction) return;
+             this._ViewDatePickersReadOnly(["CD_branchFilter", "CD_complain_Date", "CD_assignedStaffFilter","CD_statusFilter"], this.getView());
+            this.Loginmodel = this.getOwnerComponent().getModel("LoginModel").getData()
                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
                 this._oLoggedInUser = oLoginModel.getData();
@@ -67,10 +56,10 @@ sap.ui.define([
                 this._oLoggedInUser = {};
             }
            await this._loadBranchCode();
-         this._buildBranchMap();
-         this._setCurrentMonthDateRange();
-              this.readComplainData();
-    
+           this._buildBranchMap();
+           this._setCurrentMonthDateRange();
+           this.readComplainData();
+        //    this.ReadEmpData()
           var oVizFrame = this.getView().byId("CD_donutChartStatus");
 
             this.getView().getModel("ComplaintChartModel").setData(JSON.parse(JSON.stringify(INITIAL_CHART_TYPES)));
@@ -85,10 +74,24 @@ sap.ui.define([
                 }
             });
         },
+         _setCurrentMonthDateRange: function () {
+    var oDateRange = this.byId("CD_complain_Date");
+
+    var oToday = new Date();
+
+    // First day of current month
+    var oStartDate = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
+
+    // Last day of current month
+    var oEndDate = new Date(oToday.getFullYear(), oToday.getMonth() + 1, 0);
+
+    oDateRange.setDateValue(oStartDate);
+    oDateRange.setSecondDateValue(oEndDate);
+},
 
           _loadBranchCode: async function () {
             try {
-                const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+                const oExistingModel = this.Loginmodel;
                 const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
                 let aBranchCodes = "";
@@ -157,74 +160,135 @@ sap.ui.define([
                     }
                 }
 
-                const oData = await this.ajaxReadWithJQuery("HM_Complaint", ComplaintFilters);
-                this.rawComplainData = Array.isArray(oData?.commentData) ? oData.commentData : [oData?.commentData || {}];
+               const oData = await this.ajaxReadWithJQuery("HM_Complaint", ComplaintFilters);
 
-                const today = new Date();
-                let year = today.getFullYear();
-                let month = today.getMonth() + 1;
+this.rawComplainData = Array.isArray(oData?.commentData)
+    ? oData.commentData
+    : [];
 
-                // Determine financial year
-                let financialYear;
-                if (month < 4) {
-                    financialYear = (year - 1) + "-" + year;
-                } else {
-                    financialYear = year + "-" + (year + 1);
-                }
-                this.byId("CD_yearFilter").setValue(financialYear);
+// Build AssignedBy list (NO blanks, NO duplicates)
+const aAssignedBy = Array.from(
+    new Set(
+        this.rawComplainData
+            .map(item => item.AssignedBy)
+            .filter(v => v && v.trim() !== "")
+    )
+).map(name => ({
+    AssignedBy: name
+}));
+
+// Create model ONLY for Assigned Staff filter
+const oAssignedStaffModel = new JSONModel(aAssignedBy);
+
+// Set model to view
+this.getView().setModel(oAssignedStaffModel, "AssignedStaffModel");
+
+// Keep complaint model if needed elsewhere
+this.getView().setModel(
+    new JSONModel(this.rawComplainData),
+    "ComplaintModel"
+);
+
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
-        onDateRangeselection: function () {
-            const oYearFilter = this.byId("CD_yearFilter");
-            oYearFilter.setValue("");
-        },
         onHome: function () {
             this.CommonLogoutFunction();
         },
-        onchangeFY: function (oEvent) {
-            // get selected year from DatePicker
-            const sYear = oEvent.getSource().getValue();
-            if (!sYear) return;
+        _updateAssignedStaffByBranch: function (aFilteredByBranchData) {
 
-            const year = parseInt(sYear, 10);
+    // Extract AssignedBy only from branch-filtered data
+    const aAssignedBy = Array.from(
+        new Set(
+            aFilteredByBranchData
+                .map(item => item.AssignedBy)
+                .filter(v => v && v.trim() !== "")
+        )
+    ).map(name => ({
+        AssignedBy: name
+    }));
 
-            // Financial Year = selectedYear - (selectedYear+1)
-            const financialYear = year + "-" + (year + 1);
+    // Update model
+    const oAssignedStaffModel = new JSONModel(aAssignedBy);
+    this.getView().setModel(oAssignedStaffModel, "AssignedStaffModel");
 
-            // set back to DatePicker as string
-            this.byId("CD_yearFilter").setValue(financialYear);
-        },
+    // Reset selection if current value is no longer valid
+    const oCombo = this.byId("CD_assignedStaffFilter");
+    const sSelectedKey = oCombo.getSelectedKey();
 
-      onFilterChange: function () {
-    if (!this.rawComplainData) {
-        return;
+    if (sSelectedKey && !aAssignedBy.some(e => e.AssignedBy === sSelectedKey)) {
+        oCombo.setSelectedKey("");
     }
+},
+onFilterChange: function () {
+    const currentYear = new Date().getFullYear();
+    if (!this.rawComplainData) return;
 
     sap.ui.core.BusyIndicator.show(0);
 
     setTimeout(() => {
         try {
-            const aRawData = [...this.rawComplainData]; // safe copy
+            const aRawData = [...this.rawComplainData];
+
+            // Branch
             const aSelectedBranches = this.byId("CD_branchFilter").getSelectedKeys();
 
-            // 🔹 SINGLE POINT OF FILTERING
-            const aFilteredData = aRawData.filter(item => {
-                if (!item.BranchCode) {
-                    return false;
-                }
-
+            // 🔹 STEP 1: Filter ONLY by branch (for AssignedBy list)
+            const aBranchFilteredData = aRawData.filter(item => {
                 return (
                     aSelectedBranches.length === 0 ||
                     aSelectedBranches.includes(item.BranchCode)
                 );
             });
 
-            // 🔹 Map Branch Names (used in tooltips / labels)
+            //  STEP 2: Update Assigned Staff dropdown
+            // this._updateAssignedStaffByBranch(aBranchFilteredData);
+
+            // Status
+            const sSelectedStatus = this.byId("CD_statusFilter").getSelectedKey();
+
+            // Assigned Staff
+            const sAssignedBy = this.byId("CD_assignedStaffFilter").getSelectedKey();
+
+            // Date Range
+            const oDateRange = this.byId("CD_complain_Date");
+            const dFrom = oDateRange.getDateValue();
+            const dTo = oDateRange.getSecondDateValue();
+
+            // 🔹 STEP 3: Apply ALL filters
+            const aFilteredData = aBranchFilteredData.filter(item => {
+
+                if (sSelectedStatus && item.Status !== sSelectedStatus) {
+                    return false;
+                }
+
+                if (sAssignedBy && item.AssignedBy !== sAssignedBy) {
+                    return false;
+                }
+
+                const dItemDate = new Date(item.ComplaintRaisedDate || item.InvoiceDate);
+                if (isNaN(dItemDate)) return false;
+
+                dItemDate.setHours(0, 0, 0, 0);
+
+                if (dFrom && dTo) {
+                    dFrom.setHours(0, 0, 0, 0);
+                    dTo.setHours(23, 59, 59, 999);
+
+                    if (dItemDate < dFrom || dItemDate > dTo) {
+                        return false;
+                    }
+                } else if (dItemDate.getFullYear() !== currentYear) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Map Branch Names
             aFilteredData.forEach(item => {
                 item.BranchName =
                     (this._branchMap && this._branchMap[item.BranchCode]) ||
@@ -232,10 +296,7 @@ sap.ui.define([
                     "Unknown";
             });
 
-            // 🔹 Store globally (used for drill-down / selection)
             this._aCurrentFilteredData = aFilteredData;
-
-            // 🔹 ONE aggregation entry point
             this._aggregateAndSetAllChartData(aFilteredData);
 
         } catch (e) {
@@ -245,12 +306,52 @@ sap.ui.define([
         }
     }, 0);
 },
+onBranchChange: function () {
+    if (!this.rawComplainData) return;
+
+    const aSelectedBranches = this.byId("CD_branchFilter").getSelectedKeys();
+
+    // Filter ONLY by branch
+    const aBranchFilteredData = this.rawComplainData.filter(item =>
+        aSelectedBranches.length === 0 ||
+        aSelectedBranches.includes(item.BranchCode)
+    );
+
+    // 🔥 Update Assigned Staff ONLY here
+    this._updateAssignedStaffByBranch(aBranchFilteredData);
+
+    // 🔥 Then apply full filtering
+    this.onFilterChange();
+},
+// ReadEmpData: function () {
+//     const oLoginModel = this.Loginmodel;
+//     const sBranch = oLoginModel.BranchCode;
+
+//     const oFilters = {
+//         BranchCode: sBranch
+//     };
+
+//     this.ajaxReadWithJQuery("HM_StaffContact", oFilters)
+//         .then((oData) => {
+
+//             const aStaffData = Array.isArray(oData.data)
+//                 ? oData.data
+//                 : (oData.data ? [oData.data] : []);
+
+//             // 🔹 Create model
+//             const oStaffModel = new JSONModel(aStaffData);
+
+//             //  Set model to view
+//             this.getView().setModel(oStaffModel, "staffModel");
+
+//         })
+//         .catch(() => {
+//             sap.m.MessageToast.show("Failed to load staff data");
+//         });
+// },
 
         _prepareDailyStatusData: function (aFilteredData) {
-
-    // const oYearFilter = this.byId("CD_yearFilter").getValue(); // e.g. 2024-2025
     const oDateRange = this.byId("CD_complain_Date");
-
     let year, month;
 
     // Priority: DateRange → Year Filter → Current Month
@@ -476,25 +577,12 @@ const aStatusDistribution = Object.entries(oStatusCount).map(
         IN_onPressMonthlyBar: function () { this.getView().getModel("ComplaintChartModel").setProperty("/monthlyType", "bar"); },
         IN_onPressYearlyBar: function () { this.getView().getModel("ComplaintChartModel").setProperty("/yearlyType", "bar"); },
         IN_onPressYearlyLine: function () { this.getView().getModel("ComplaintChartModel").setProperty("/yearlyType", "line"); },
+
         onClearFilters: function () {
+
             this.byId("CD_complain_Date").setValue("");
+            this.byId("CD_statusFilter").setValue("");
             this.byId("CD_branchFilter").setSelectedKeys([]); 
-
-            // Suffix reset karein
-            // this.getView().getModel("headerModel").setProperty("/filterSuffix", "");
-            const today = new Date();
-            let year = today.getFullYear();
-            let month = today.getMonth() + 1;
-
-            // Determine financial year
-            let financialYear;
-            if (month < 4) {
-                financialYear = (year - 1) + "-" + year;
-            } else {
-                financialYear = year + "-" + (year + 1);
-            }
-
-            this.byId("CD_yearFilter").setValue(financialYear);
         },
 
         onPressback: function () {

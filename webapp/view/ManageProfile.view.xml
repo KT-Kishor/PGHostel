@@ -277,7 +277,6 @@
             text="Raise Complaint"
             press="onPressRaiseComplaint"
             class="myUnifiedBtn sapUiSmallMarginEnd"
-             visible="{= ${profileData>/selectedTab} === 'Complaints' }"
               enabled="{profileData>/hasAssignedBooking}"
            
             />
@@ -352,12 +351,12 @@
             width="auto" 
           class="sapUiSmallMargin customRoundedTable">
             <columns>
-                <Column><Text text="{i18n>bookingID}"/></Column>
-                <Column><Text text="{i18n>customerName}"/></Column>
-                <Column><Text text="{i18n>invoiceDate}"/></Column>
-                <Column><Text text="{i18n>invoiceNo}"/></Column>
-                <Column minScreenWidth="Tablet"><Text text="{i18n>totalAmount}"/></Column>
-                <Column minScreenWidth="Tablet"><Text text="{i18n>invoiceDueAmount}"/></Column>
+                <Column demandPopin="true" ><Text text="{i18n>bookingID}"/></Column>
+                <Column demandPopin="true"><Text text="{i18n>customerName}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>invoiceDate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>invoiceNo}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>totalAmount}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>invoiceDueAmount}"/></Column>
             </columns>
 
             <items>
@@ -389,6 +388,8 @@
                 <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>roomNo}"/></Column>
                 <Column demandPopin="true" ><Text text="{i18n>description}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>complainDate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
                    </columns>
 
@@ -400,6 +401,11 @@
                         <Text text="{profileData>RoomNo}"/>
                         <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
                         <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text  text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
+                                path: 'profileData>ExpectedResolvedDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"/>
+                         <Text text="{profileData>AssignedTo}"/>
                           <ObjectStatus
                             text="{profileData>ComplaintStatus}"
                             state="{ path:'profileData>ComplaintStatus',

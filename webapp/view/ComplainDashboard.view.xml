@@ -21,30 +21,34 @@
 					<fb:filterGroupItems>
 						<fb:FilterGroupItem name="Branch" label="Branch" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<MultiComboBox id="CD_branchFilter" width="400px" placeholder="Select Branch" items="{path: 'Branchmodel>/'}" selectionChange="onFilterChange">
+								<MultiComboBox id="CD_branchFilter" width="400px" placeholder="Select Branch" items="{path: 'Branchmodel>/'}" selectionChange="onBranchChange">
 									<items>
 										<core:Item key="{Branchmodel>BranchID}" text="{Branchmodel>Name}" />
 									</items>
 								</MultiComboBox>
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="ComplainDate" label="Complain Date" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="ComplainDate" label="Date Range" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<DateRangeSelection id="CD_complain_Date" valueFormat="MM/dd/yyyy" displayFormat="MM/dd/yyyy" change="onDateRangeselection" />
+								<DateRangeSelection id="CD_complain_Date" valueFormat="MM/dd/yyyy" displayFormat="MM/dd/yyyy" change="onFilterChange" />
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Year" label="Financial Year" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Year" label="Assigned Staff" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<DatePicker id="CD_yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="Select year" change="onchangeFY" />
+							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="Select Assigned Staff" selectionChange="onFilterChange" items="{path: 'AssignedStaffModel>/'}">
+									<items>
+										<core:Item key="{AssignedStaffModel>AssignedBy}" text="{AssignedStaffModel>AssignedBy}" />
+									</items>
+								</ComboBox>
 							</fb:control>
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
 								<ComboBox id="CD_statusFilter" width="400px" placeholder="Select Status" selectionChange="onFilterChange">
 									<items>
-										<core:Item key="pending" text="Pending" />
-										<core:Item key="inProgress" text="In Progress" />
-										<core:Item key="resolved" text="Resolved" />
+										<core:Item key="Pending" text="Pending" />
+										<core:Item key="In Progress" text="In Progress" />
+										<core:Item key="Resolved" text="Resolved" />
 									</items>
 								</ComboBox>
 							</fb:control>
@@ -70,48 +74,19 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame
-    id="CD_donutChartStatus"
-   vizType="{ComplaintChartModel>/statusType}"
-    width="100%"
-    vizProperties="{
-        title: { visible: false },
-        plotArea: {
-            semanticColors: false,
-            dataLabel: { visible: true, type: 'percentage' },
-            dataPointStyle: {
-                rules: [
-                    {
-                        dataContext: { Status: 'Pending' },
-                        properties: { color: '#e71111' }
-                    },
-                    {
-                        dataContext: { Status: 'In Progress' },
-                        properties: { color: '#d8ca2f' }
-                    },
-                    {
-                        dataContext: { Status: 'Resolved' },
-                        properties: { color: '#3cc31e' }
-                    }
-                ]
-            }
-        },
-        legend: {
-            visible: true
-        }
-    }" selectData="onStatusChartSelect">
+												<viz:VizFrame id="CD_donutChartStatus" vizType="{ComplaintChartModel>/statusType}" width="100%" vizProperties="{                                                          title: { visible: false },                                                          legend: { label: { color: '#ffffff' } },                                                          plotArea: {                                                            dataLabel: { visible: false },                                                            colorPalette: ['#ec3b14', '#0b8400','#e2f026']                                                          }                                                            }" selectData="onStatusChartSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/statusDistribution}">
 															<vizData:dimensions>
 																<vizData:DimensionDefinition name="Status" value="{chartData>Status}" />
 															</vizData:dimensions>
 															<vizData:measures>
-																<vizData:MeasureDefinition name="Total Amount" value="{chartData>Count}" />
+																<vizData:MeasureDefinition name="Count" value="{chartData>Count}" />
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
 													<viz:feeds>
-														<vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
+														<vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
 														<vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
 													</viz:feeds>
 												</viz:VizFrame>
@@ -137,7 +112,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="DailyChartMonthly" vizType="{ComplaintChartModel>/DailyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                   colorPalette: ['#007984','#0b8400','#ec3b14'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onDailyComplainSelect">
+												<viz:VizFrame id="DailyChartMonthly" vizType="{ComplaintChartModel>/DailyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                   colorPalette: ['#ec3b14','#0b8400','#e2f026'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onDailyComplainSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/dailyValue}">
 															<vizData:dimensions>
@@ -179,7 +154,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="CD_Monthlyid" vizType="{ComplaintChartModel>/monthlyType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984','#0b8400','#ec3b14'],                                                               dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" selectData="onTotalInvoiceValueSelect">
+												<viz:VizFrame id="CD_Monthlyid" vizType="{ComplaintChartModel>/monthlyType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#e2f026','#0b8400','#ec3b14'],                                                               dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" selectData="onTotalInvoiceValueSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/monthlyValue}">
 															<vizData:dimensions>
@@ -219,7 +194,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Yearly Complain Trend" 
+									<Title text="Total Complain Trend" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart" />
@@ -231,7 +206,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="CD_lineChartYearly" vizType="{ComplaintChartModel>/yearlyType}" width="100%" vizProperties="{                                                                title: { visible: false },                                                                plotArea: {                                                                    colorPalette: ['#007984','#0b8400','#ec3b14'],                                                                  dataLabel: {                                                                        visible: false,                                                                        formatString: '#'                                                                    }                                                                },                                                                interaction: {                                                                   selectability: { mode: 'SINGLE' }                                                                }                                                                                                                    }" selectData="onYearlyInvoiceSelect">
+												<viz:VizFrame id="CD_lineChartYearly" vizType="{ComplaintChartModel>/yearlyType}" width="100%" vizProperties="{                                                                title: { visible: false },                                                                plotArea: {                                                                    colorPalette: ['#e2f026','#0b8400','#ec3b14'],                                                                  dataLabel: {                                                                        visible: false,                                                                        formatString: '#'                                                                    }                                                                },                                                                interaction: {                                                                   selectability: { mode: 'SINGLE' }                                                                }                                                                                                                    }" selectData="onYearlyInvoiceSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/yearlyValue}">
 															<vizData:dimensions>

@@ -126,7 +126,9 @@ sap.ui.define([
 
         TileV_onpresscomplaintdashboard: function() {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteComplainDashboard");
+            oRouter.navTo("RouteComplainDashboard",{
+                sPath:"Dashboard"
+            });
         },
         TileV_onpressComplaintdetails:function(){
             var oRouter = this.getOwnerComponent().getRouter();
