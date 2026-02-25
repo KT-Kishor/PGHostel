@@ -13,8 +13,8 @@
 			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
 		</headerContent>
 		<content>
-			<fb:FilterBar
-                id="HD_id_FilterbarEmployee"
+			<fb:FilterBar 
+			    id="HD_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="HD_onPressClear"
@@ -89,6 +89,12 @@
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
 						<Button
+                            text="{i18n>ReturnDamage}"
+                            tooltip="{i18n>ReturnDamage}"
+                            press="HM_ReturnDamage"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+						<Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="RD_onDownload"
@@ -129,7 +135,7 @@
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
 							<Text text="{Damage>ItemName}" />
-							<Text text="{Damage>Description}" />
+							<ExpandableText text="{Damage>Description}" maxCharacters="20"/>
 							<Text text="{parts: ['Damage>Cost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{path: 'Damage>Date', formatter: '.Formatter.formatDate'}"/>
 							<Text text="{Damage>Status}" />
@@ -139,7 +145,16 @@
 			</Table>
 		</content>
 		<footer>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+			<Bar>
+				<contentLeft>
+					<Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
+					<Link text="{i18n>devlopby}" href="https://kvrikshatechnologies.com/"  target="_blank"
+                class="customLinkWhiteBg"/>
+				</contentLeft>
+				<contentRight>
+					<Button text="Generate PDF" press="HM_onPressGenerateDamageReceipt" class="myUnifiedBtn"/>
+				</contentRight>
+			</Bar>
 		</footer>
 	</Page>
 </mvc:View>

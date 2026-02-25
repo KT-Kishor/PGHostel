@@ -36,6 +36,12 @@
                     value="{DamageModel>/CustomerName}"
                     placeholder="Enter customer name" editable="false"
                 />
+                <!-- Customer Email -->
+                <Label text="Customer Email" />
+                <Input id="HD_id_CustomerEmail"
+                    value="{DamageModel>/CustomerEmail}"
+                    placeholder="Enter customer email" editable="false"
+                />
 				<!-- Room Number -->
 				<Label text="Room No" />
 				<Input id="HD_id_RoomNo"
@@ -80,6 +86,9 @@
                     valueStateText="{i18n>costValueState}"
                     width="100%" liveChange="onLiveChangeCost"
                 />
+                <!-- Currency -->
+                <Label text="{i18n>currency}"/>
+                <Input id="HD_id_Currency" value="{DamageModel>/Currency}" editable="false"></Input>
 				<!-- Date -->
 				<Label text="Date" required="true"/>
 				<DatePicker id="HD_id_DamageDate"
@@ -90,13 +99,8 @@
                     width="100%" change="onChangeDamageDate"
                 />
 				<!-- Status -->
-				<Label text="Status" required="true"/>
-				<ComboBox id="HD_id_Status"
-                    selectedKey="{DamageModel>/Status}"
-                    width="100%" change="onChangeStatus" valueStateText="{i18n>statusValueState}">
-					<core:Item key="Pending" text="Pending" />
-					<core:Item key="Recovered" text="Recovered" />
-				</ComboBox>
+				<Label text="Status"/>
+                <Input value="{DamageModel>/Status}" editable="false" id="HD_id_Status"></Input>
 			</f:content>
 		</f:SimpleForm>
 		<beginButton>

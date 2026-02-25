@@ -1,0 +1,81 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form">
+    <Dialog
+        id="DT_id_DamageRecoverDialog"
+        title="Recover Damage"
+        contentWidth="500px"
+        stretch="false"
+        afterClose="onDialogAfterClose">
+        <content>
+            <form:SimpleForm
+                id="DT_id_DamageRecoveryForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="0"
+                emptySpanL="0"
+                emptySpanM="0"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false">
+
+                <!-- Customer ID -->
+                <Label text="Customer ID"/>
+                <Text text="{DamageModel>/CustomerID}"/>
+
+                <!-- Customer Name -->
+                <Label text="Customer Name"/>
+                <Text text="{DamageModel>/CustomerName}"/>
+
+                <!-- Damage Amount -->
+                <Label text="Damage Amount"/>
+                <Text text="{parts:[{path:'DamageModel>/Cost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
+
+                <!-- Return Amount -->
+                <Label text="Return Amount" required="true"/>
+                <Input
+                    id="DT_id_ReturnAmount"
+                    type="Number"
+                    value="{DamageModel>/ReturnDamageAmount}"
+                    placeholder="Enter return amount"
+                    liveChange="_validateReturnAmount"/>
+
+                <!-- Return Mode -->
+                <Label text="Return Mode" required="true"/>
+                <ComboBox
+                    id="DT_id_ReturnMode"
+                    selectedKey="{DamageModel>/ReturnDamageMode}"
+                    change="_onReturnModeChange">
+                    <core:Item key="CASH" text="Cash"/>
+                    <core:Item key="UPI" text="UPI"/>
+                    <core:Item key="CARD" text="Card"/>
+                </ComboBox>
+
+                <!-- Transaction ID -->
+                <Label text="Transaction ID"/>
+                <Input
+                    id="DT_id_ReturnTransactionID"
+                    value="{DamageModel>/ReturnDamageTransactionID}"
+                    placeholder="Enter transaction ID"
+                    liveChange="_validateTransactionID"/>
+
+                <!-- Returning Employee -->
+                <Label text="Returning To"/>
+                <Text text="{LoginModel>/EmployeeName}"/>
+            </form:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="Return Damage" press="onSaveReturn" type="Emphasized"/>
+            <Button text="Cancel" press="onDialogClose"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

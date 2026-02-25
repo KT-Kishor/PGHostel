@@ -27,8 +27,10 @@ sap.ui.define([
                 Description: "",
                 Cost: "",
                 Date: "",
-                Status: "",
-                DamageID: ""
+                Status: "Pending",
+                DamageID: "",
+                Currency: "",
+                CustomerEmail: "",
             });
             this.getView().setModel(model, "DamageModel");
             this._makeDatePickersReadOnly(["HD_id_DamageDate"]);
@@ -55,9 +57,9 @@ sap.ui.define([
             let filters = {};
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            } else{
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
             sap.ui.core.BusyIndicator.show(0);
@@ -71,31 +73,33 @@ sap.ui.define([
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
-        
+
         readCustomerData: function() {
             return new Promise((resolve, reject) => {
                 sap.ui.core.BusyIndicator.show(0);
 
-                var filter = {BranchCode: this.BranchCode};
+                var filter = {
+                    BranchCode: this.BranchCode
+                };
 
                 this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter).then((oData) => {
-                        var aData = Array.isArray(oData.commentData) ?
-                            oData.commentData : [oData.commentData];
+                    var aData = Array.isArray(oData.commentData) ?
+                        oData.commentData : [oData.commentData];
 
-                        const aFilteredData = aData.filter(item =>
-                            item.Status === "Assigned" || item.Status === "Completed"
-                        );
+                    const aFilteredData = aData.filter(item =>
+                        item.Status === "Assigned" || item.Status === "Completed"
+                    );
 
-                        this.getView().setModel(
-                            new sap.ui.model.json.JSONModel(aFilteredData),
-                            "CustomerModel"
-                        );
+                    this.getView().setModel(
+                        new sap.ui.model.json.JSONModel(aFilteredData),
+                        "CustomerModel"
+                    );
 
-                        resolve();
-                    }).catch((err) => {
-                        MessageToast.show(err.responseText || "Failed to Load Customer Data.");
-                        sap.ui.core.BusyIndicator.hide();
-                    })
+                    resolve();
+                }).catch((err) => {
+                    MessageToast.show(err.responseText || "Failed to Load Customer Data.");
+                    sap.ui.core.BusyIndicator.hide();
+                })
             });
         },
 
@@ -113,6 +117,8 @@ sap.ui.define([
             oDamageModel.setProperty("/RoomNo", SelectedData.RoomNo);
             oDamageModel.setProperty("/BedTypeName", SelectedData.BedType);
             oDamageModel.setProperty("/BranchCode", SelectedData.BranchCode);
+            oDamageModel.setProperty("/CustomerEmail", SelectedData.CustomerEmail);
+            oDamageModel.setProperty("/Currency", SelectedData.Currency);
         },
 
         HM_AddRoom: function(oEvent) {
@@ -141,9 +147,11 @@ sap.ui.define([
                     ItemName: "",
                     Description: "",
                     Cost: "",
-                    Date: "",
-                    Status: "",
+                    Date: this.Formatter.formatDate(new Date()), // Set current date
+                    Status: "Pending",
                     DamageID: "",
+                    Currency: "",
+                    CustomerEmail: "",
                     CustomerIDEditable: true
                 });
             }
@@ -153,8 +161,7 @@ sap.ui.define([
                 "HD_id_ItemName",
                 "HD_id_Description",
                 "HD_id_Cost",
-                "HD_id_DamageDate",
-                "HD_id_Status"
+                "HD_id_DamageDate"
             ];
 
             aInputIds.forEach(function(sId) {
@@ -184,6 +191,12 @@ sap.ui.define([
 
             var oContext = oSelected[0].getBindingContext("Damage");
             var oData = oContext.getObject();
+
+            if (oData.Status === "Recovered") {
+                MessageToast.show("Damage has already been recovered");
+                return;
+            }
+
             oData.Date = this.Formatter.formatDate(oData.Date); // Format date for input field
             oData.CustomerIDEditable = false;
 
@@ -208,8 +221,7 @@ sap.ui.define([
                 "HD_id_ItemName",
                 "HD_id_Description",
                 "HD_id_Cost",
-                "HD_id_DamageDate",
-                "HD_id_Status"
+                "HD_id_DamageDate"
             ];
             aInputIds.forEach(function(sId) {
                 var oInput = oView.byId(sId);
@@ -239,8 +251,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_ItemName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_Description")), "ID") &&
                 utils._LCvalidateAmount(sap.ui.getCore().byId(oView.createId("HD_id_Cost")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_DamageDate")), "ID") &&
-                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HD_id_Status")), "ID")
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_DamageDate")), "ID")
             );
 
             if (!isMandatoryValid) {
@@ -252,6 +263,7 @@ sap.ui.define([
             var oData = {
                 CustomerID: Payload.CustomerID,
                 CustomerName: Payload.CustomerName,
+                CustomerEmail: Payload.CustomerEmail,
                 RoomNo: Payload.RoomNo,
                 BedTypeName: Payload.BedTypeName,
                 BranchCode: Payload.BranchCode,
@@ -259,10 +271,11 @@ sap.ui.define([
                 Description: Payload.Description,
                 Cost: Payload.Cost,
                 Date: Payload.Date ? Payload.Date.split("/").reverse().join("-") : "",
-                Status: Payload.Status
+                Status: Payload.Status,
+                Currency: Payload.Currency,
             };
 
-            delete Payload.CustomerIDEditable; 
+            delete Payload.CustomerIDEditable;
             try {
                 sap.ui.core.BusyIndicator.show(0);
 
@@ -525,6 +538,463 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("Damage").setData({});
+        },
+
+        HM_ReturnDamage: function() {
+            const oView = this.getView();
+            var oTable = this.byId("HD_id_ARD_Table");
+            var oSelected = oTable.getSelectedItems();
+
+            if (!oSelected || oSelected.length === 0) {
+                MessageToast.show("Please select a record");
+                return;
+            }
+            if (oSelected.length > 1) {
+                MessageToast.show("Select only one row");
+                return;
+            }
+
+            // Get selected row data
+            var oContext = oSelected[0].getBindingContext("Damage");
+            var oData = oContext.getObject();
+
+            if (oData.Status === "Recovered") {
+                MessageToast.show("Damage has already been recovered");
+                return;
+            }
+
+            if (!this._oReturnDialog) {
+                this._oReturnDialog = sap.ui.xmlfragment(
+                    oView.getId(),
+                    "sap.ui.com.project1.fragment.DamageRecovery",
+                    this
+                );
+                oView.addDependent(this._oReturnDialog);
+            }
+
+            // Prepare DamageModel with selected data
+            var oDamageModel = oView.getModel("DamageModel");
+            oDamageModel.setData({
+                ...oData,
+            });
+
+            // Reset input ValueState
+            var aInputIds = [
+                "DT_id_ReturnAmount",
+                "DT_id_ReturnMode",
+                "DT_id_ReturnTransactionID"
+            ];
+            aInputIds.forEach(function(sId) {
+                var oInput = oView.byId(sId);
+                if (oInput && oInput.setValueState) {
+                    oInput.setValueState("None");
+                }
+            });
+
+
+            this._oReturnDialog.open();
+            this._initializeTransactionIDState();
+        },
+
+        _initializeTransactionIDState: function() {
+            const oView = this.getView();
+            const oMode = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
+            const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+
+            if (!oMode || !oTxn) return;
+
+            const mode = oMode.getSelectedKey();
+
+            if (mode === "CASH") {
+                oTxn.setEnabled(false);
+                oTxn.setValue("");
+                oTxn.setValueState("None");
+            } else {
+                oTxn.setEnabled(true);
+            }
+        },
+
+        onSaveReturn: async function() {
+            const oView = this.getView();
+            const oDamage = oView.getModel("DamageModel").getData();
+
+            const oAmountInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount"));
+            const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
+            const oTxnInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+
+            const returnAmount = parseFloat(oAmountInput.getValue());
+            const mode = oModeInput.getSelectedKey();
+            const txnID = oTxnInput.getValue();
+            const damageAmount = parseFloat(oDamage.Cost);
+
+            // === VALIDATIONS ===
+            if (!returnAmount || returnAmount <= 0) {
+                MessageToast.show("Enter valid return amount");
+                return;
+            }
+
+            if (returnAmount > damageAmount) {
+                MessageToast.show("Return amount cannot exceed damage amount");
+                return;
+            }
+
+            if (!mode) {
+                MessageToast.show("Select return mode");
+                return;
+            }
+
+            if (mode !== "CASH" && (!txnID || txnID.trim() === "")) {
+                MessageToast.show("Transaction ID required");
+                oTxnInput.setValueState("Error");
+                return;
+            }
+
+            sap.ui.core.BusyIndicator.show();
+
+            try {
+                const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
+
+                const updateData = {
+                    ReturnDamageAmount: returnAmount,
+                    ReturnDamageDate: new Date().toISOString().split("T")[0],
+                    ReturnDamageMode: mode,
+                    ReturnDamageTransactionID: txnID || "",
+                    Status: "Recovered",
+                    ReturningEmployeeName: currentUser
+                };
+
+                const payload = {
+                    filters: {
+                        DamageID: oDamage.DamageID
+                    },
+                    data: updateData
+                };
+
+                const res = await this.ajaxUpdateWithJQuery("HM_Damage", payload);
+
+                if (!res.success) throw new Error(res.message);
+
+                MessageToast.show("Damage recovered successfully");
+                this._oReturnDialog.close();
+                await this.Onsearch("true");
+            } catch (e) {
+                MessageToast.show(e.message);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        onDialogClose: function() {
+            this._clearTableSelection(); // Clear table selection
+            if (this._oReturnDialog) {
+                this._oReturnDialog.close();
+            }
+        },
+
+        _clearTableSelection: function() {
+            var oTable = this.byId("HD_id_ARD_Table");
+            if (oTable) {
+                oTable.removeSelections(true);
+            }
+        },
+
+        _validateReturnAmount: function(oEvent) {
+            const oInput = oEvent.getSource();
+            const oDamage = this.getView().getModel("DamageModel").getData();
+            const amount = parseFloat(oInput.getValue());
+            const max = parseFloat(oDamage.Cost);
+
+            if (!amount || amount < 0 || amount > max) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("0 to " + max);
+                return false;
+            }
+
+            oInput.setValueState("None");
+            return true;
+        },
+
+        _onReturnModeChange: function(oEvent) {
+            const oView = this.getView();
+            const mode = oEvent.getSource().getSelectedKey();
+            const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+
+            if (mode === "CASH") {
+                oTxn.setEnabled(false);
+                oTxn.setValue("");
+                oTxn.setValueState("None");
+            } else {
+                oTxn.setEnabled(true);
+            }
+        },
+
+        _validateTransactionID: function(oEvent) {
+            const oInput = oEvent.getSource();
+            const oView = this.getView();
+            const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
+            const returnMode = oModeInput ? (oModeInput.getSelectedKey() || oModeInput.getValue()) : "";
+
+            // If CASH mode, no validation needed
+            if (returnMode === "CASH") {
+                oInput.setValueState("None");
+                return true;
+            }
+
+            // For non-cash transactions, validate
+            const value = oInput.getValue();
+            if (!value || value.trim() === "") {
+                oInput.setValueState("Error");
+                return false;
+            }
+
+            oInput.setValueState("None");
+            return true;
+        },
+
+        HM_onPressGenerateDamageReceipt: async function() {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+                const {jsPDF} = window.jspdf;
+
+                // ===== Get Selected Row Data =====
+                var oTable = this.byId("HD_id_ARD_Table");
+                var oSelected = oTable.getSelectedItems();
+
+                if (!oSelected || oSelected.length === 0) {
+                    MessageToast.show("Please select a damage record");
+                    return;
+                }
+
+                if (oSelected.length > 1) {
+                    MessageToast.show("Select only one row");
+                    return;
+                }
+
+                var oContext = oSelected[0].getBindingContext("Damage");
+                var oData = oContext.getObject();
+
+                // ===== Status Check =====
+                if (oData.Status !== "Recovered") {
+                    MessageToast.show("Receipt can be generated only for Recovered status");
+                    return;
+                }
+
+                let filter = {BranchID: [oData.BranchCode]};
+                const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+                const company = oCompanyDetailsModel.data[0] || {};
+
+                // ===== Create PDF =====
+                const margin = 15;
+                const doc = new jsPDF("p", "mm", "a4");
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                let currentY = 20;
+
+                const NA = (v) => (v === null || v === undefined || v === "" ? "N/A" : v);
+
+                // ================= HEADER =================
+                doc.setFont("times", "bold");
+                doc.setFontSize(16);
+
+                const branchName = NA(company.Name);
+                const headerText = `DAMAGE RECOVERY RECEIPT - ${branchName}`;
+
+                // Split text properly based on max width
+                const maxTextWidth = pageWidth - (margin * 2);
+                const textLines = doc.splitTextToSize(headerText, maxTextWidth);
+
+                // Starting Y position
+                let lineY = currentY;
+
+                doc.setLineWidth(0.5);
+
+                textLines.forEach((line) => {
+                    // Center each line
+                    doc.text(line, pageWidth / 2, lineY, {
+                        align: "center"
+                    });
+
+                    // Calculate width of current line
+                    const textWidth = doc.getTextWidth(line);
+                    const centerX = pageWidth / 2;
+
+                    // Draw underline for that line
+                    doc.line(
+                        centerX - textWidth / 2,
+                        lineY + 2,
+                        centerX + textWidth / 2,
+                        lineY + 2
+                    );
+
+                    lineY += 7; // Adjust line spacing
+                });
+
+                currentY = lineY + 3;
+
+                doc.setFontSize(11);
+                doc.setFont("times", "normal");
+
+                // ================= RECEIPT META (RIGHT SIDE TABLE STYLE) =================
+                const detailsStartY = currentY;
+                const rowHeight = 6.5;
+                const columnWidths = [40, 35]; // label + value column width
+                const rightAlignX = pageWidth - 22 - columnWidths[0] - columnWidths[1];
+
+                doc.setFontSize(11).setFont("times", "bold");
+
+                const receiptDetails = [{
+                        label: "Receipt Date :",
+                        value: this.Formatter.formatDate(oData.ReturnDamageDate) || "N/A"
+                    },
+                    {
+                        label: "Room No :",
+                        value: NA(oData.RoomNo)
+                    },
+                    {
+                        label: "Customer ID :",
+                        value: NA(oData.CustomerID)
+                    }
+                ];
+
+                // Print right-aligned meta block
+                currentY = detailsStartY;
+                receiptDetails.forEach(row => {
+                    // Label (right aligned in first column)
+                    doc.text(
+                        row.label,
+                        rightAlignX + columnWidths[0] - doc.getTextWidth(row.label),
+                        currentY + 5
+                    );
+
+                    // Value (normal left aligned)
+                    doc.setFont("times", "normal");
+                    doc.text(
+                        String(row.value),
+                        rightAlignX + columnWidths[0] + 5,
+                        currentY + 5
+                    );
+
+                    // Reset bold for next label
+                    doc.setFont("times", "bold");
+                    currentY += rowHeight;
+                });
+
+                // ================= TO SECTION =================
+                currentY += 12;
+                doc.setFont("times", "bold");
+                doc.text("To,", margin, currentY);
+
+                currentY += 6;
+                doc.setFont("times", "normal");
+                doc.text(`Customer Name : ${NA(oData.CustomerName)}`, margin, currentY);
+
+                currentY += 6;
+                doc.text(`Email : ${NA(oData.CustomerEmail)}`, margin, currentY);
+
+                currentY += 10;
+
+                // ================= DAMAGE DETAILS TABLE =================
+                const damageBody = [
+                    ["Item Name", NA(oData.ItemName)],
+                    ["Description", NA(oData.Description)],
+                    ["Bed Type", NA(oData.BedTypeName)],
+                    ["Damage Cost", `${NA(oData.Cost)} ${NA(oData.Currency)}`],
+                    ["Recovered Amount", `${NA(oData.ReturnDamageAmount)} ${NA(oData.Currency)}`],
+                    ["Payment Mode", NA(oData.ReturnDamageMode)],
+                    ["Transaction ID", NA(oData.ReturnDamageTransactionID)],
+                    ["Recovered By", NA(oData.ReturningEmployeeName)],
+                    ["Status", NA(oData.Status)]
+                ];
+
+                doc.autoTable({
+                    startY: currentY,
+                    head: [
+                        ["Particulars", "Information"]
+                    ],
+                    body: damageBody,
+                    theme: "grid",
+                    styles: {
+                        font: "times",
+                        fontSize: 10,
+                        cellPadding: 3,
+                        lineColor: [30, 30, 30],
+                        lineWidth: 0.5,
+                    },
+                    headStyles: {
+                        fillColor: [20, 170, 183]
+                    },
+                    columnStyles: {
+                        0: {
+                            fontStyle: "bold",
+                            cellWidth: 50
+                        },
+                        1: {
+                            cellWidth: 120
+                        }
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 10;
+
+                doc.setFont("times", "bold");
+                doc.text("Thank you for your cooperation.", margin, currentY);
+
+                // ================= FOOTER =================
+                const totalPages = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                }
+
+                doc.save(`${NA(oData.CustomerName)}-Damage-Receipt-${NA(oData.RoomNo)}.pdf`);
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        addFooter: function(doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
+            const footerHeight = 18;
+            const footerYPosition = pageHeight - footerHeight;
+            const footerWidth = pageWidth;
+            const company = oCompanyDetailsModel.data[0];
+
+            doc.setFillColor(128, 128, 128);
+            doc.rect(0, footerYPosition, footerWidth, footerHeight, 'F');
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(255, 255, 255);
+
+            const textYPosition = footerYPosition + 5;
+            const lineHeight = 5;
+
+            if (company && company.City) {
+                doc.setFontSize(8);
+                doc.text(`SUBJECT TO ${company.City.toUpperCase()} JURISDICTION`, footerWidth / 2, textYPosition, {
+                    align: 'center'
+                });
+            }
+
+            if (company && company.GSTIN) {
+                doc.setFontSize(10);
+                doc.text(`GSTIN : ${company.GSTIN}`, footerWidth - 5, textYPosition + 5, {
+                    align: 'right'
+                });
+            }
+
+            if (company && company.Address) {
+                let fullAddress = company.Address;
+                if (company.Contact) {
+                    fullAddress += `, Mobile No : ${company.STD}-${company.Contact}`;
+                }
+                const addressLines = doc.splitTextToSize(fullAddress, footerWidth - 100);
+                let y = textYPosition + 5;
+                addressLines.forEach(line => {
+                    doc.text(line, 5, y);
+                    y += lineHeight;
+                });
+            }
         },
     });
 });
