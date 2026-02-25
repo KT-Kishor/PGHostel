@@ -36,6 +36,10 @@
                 <Label text="Customer Name"/>
                 <Text text="{DamageModel>/CustomerName}"/>
 
+                <!-- Type -->
+                <Label text="Type"/>
+                <Text text="{DamageModel>/Type}"/>
+
                 <!-- Damage Amount -->
                 <Label text="Damage Amount"/>
                 <Text text="{parts:[{path:'DamageModel>/Cost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
@@ -74,8 +78,8 @@
             </form:SimpleForm>
         </content>
         <buttons>
-            <Button text="Return Damage" press="onSaveReturn" type="Emphasized"/>
-            <Button text="Cancel" press="onDialogClose"/>
+            <Button text="Return Damage" press="onSaveReturn" class="marginRight myUnifiedBtn"/>
+            <Button text="Cancel" press="onDialogClose" class="marginRight myUnifiedBtn"/>
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

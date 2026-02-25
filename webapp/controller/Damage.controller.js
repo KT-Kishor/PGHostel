@@ -31,6 +31,8 @@ sap.ui.define([
                 DamageID: "",
                 Currency: "",
                 CustomerEmail: "",
+                Type: "",
+                UserID: ""
             });
             this.getView().setModel(model, "DamageModel");
             this._makeDatePickersReadOnly(["HD_id_DamageDate"]);
@@ -119,6 +121,7 @@ sap.ui.define([
             oDamageModel.setProperty("/BranchCode", SelectedData.BranchCode);
             oDamageModel.setProperty("/CustomerEmail", SelectedData.CustomerEmail);
             oDamageModel.setProperty("/Currency", SelectedData.Currency);
+            oDamageModel.setProperty("/UserID", SelectedData.UserID)
         },
 
         HM_AddRoom: function(oEvent) {
@@ -152,6 +155,8 @@ sap.ui.define([
                     DamageID: "",
                     Currency: "",
                     CustomerEmail: "",
+                    Type: "",
+                    UserID: "",
                     CustomerIDEditable: true
                 });
             }
@@ -161,7 +166,8 @@ sap.ui.define([
                 "HD_id_ItemName",
                 "HD_id_Description",
                 "HD_id_Cost",
-                "HD_id_DamageDate"
+                "HD_id_DamageDate",
+                "HD_id_Type"
             ];
 
             aInputIds.forEach(function(sId) {
@@ -221,7 +227,8 @@ sap.ui.define([
                 "HD_id_ItemName",
                 "HD_id_Description",
                 "HD_id_Cost",
-                "HD_id_DamageDate"
+                "HD_id_DamageDate",
+                "HD_id_Type"
             ];
             aInputIds.forEach(function(sId) {
                 var oInput = oView.byId(sId);
@@ -247,6 +254,7 @@ sap.ui.define([
 
             // Mandatory Validation
             var isMandatoryValid = (
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HD_id_Type")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_CustomerID")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_ItemName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_Description")), "ID") &&
@@ -273,6 +281,8 @@ sap.ui.define([
                 Date: Payload.Date ? Payload.Date.split("/").reverse().join("-") : "",
                 Status: Payload.Status,
                 Currency: Payload.Currency,
+                Type : Payload.Type,
+                UserID : Payload.UserID
             };
 
             delete Payload.CustomerIDEditable;
@@ -333,7 +343,7 @@ sap.ui.define([
             utils._LCvalidateDate(oEvent);
         },
 
-        onChangeStatus: function(oEvent) {
+        onchangeType: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
 

@@ -113,6 +113,9 @@
 						<Text text="{i18n>roomNo}" tooltip="{i18n>roomNo}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>type}" tooltip="{i18n>ItemName}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>ItemName}" tooltip="{i18n>ItemName}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
@@ -134,6 +137,7 @@
 							<Text text="{Damage>CustomerID}" />
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
+							<Text text="{Damage>Type}" />
 							<Text text="{Damage>ItemName}" />
 							<ExpandableText text="{Damage>Description}" maxCharacters="20"/>
 							<Text text="{parts: ['Damage>Cost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>

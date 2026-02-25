@@ -15,13 +15,19 @@
 		<f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
-            labelSpanXL="4"
+            labelSpanXL="3"
             labelSpanL="3"
-            labelSpanM="4"
+            labelSpanM="3"
             labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="0"
+            emptySpanL="0"
+            emptySpanM="0"
+            emptySpanS="0"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
+            columnsM="2"
+            singleContainerFullSize="false">
 			<f:content>
 				<!-- Customer ID -->
 				<Label text="Customer ID" required="true"/>
@@ -60,6 +66,13 @@
                     value="{DamageModel>/BranchCode}"
                     placeholder="Enter branch code" editable="false"
                 />
+                <!-- Type  -->
+                <Label text="Type" />
+                <ComboBox  id="HD_id_Type" value="{DamageModel>/Type}" change="onchangeType"
+                valueStateText="{i18n>selectType}" placeholder="Select Type">
+                    <core:Item key="Damage" text="Damage"/>
+                    <core:Item key="Missing" text="Missing"/>
+                 </ComboBox>
 				<!-- Item Name -->
 				<Label text="Item Name" required="true"/>
 				<Input id="HD_id_ItemName"
