@@ -245,8 +245,6 @@ onFilterChange: function () {
             });
 
             //  STEP 2: Update Assigned Staff dropdown
-            // this._updateAssignedStaffByBranch(aBranchFilteredData);
-
             // Status
             const sSelectedStatus = this.byId("CD_statusFilter").getSelectedKey();
 
@@ -317,38 +315,13 @@ onBranchChange: function () {
         aSelectedBranches.includes(item.BranchCode)
     );
 
-    // 🔥 Update Assigned Staff ONLY here
+    //  Update Assigned Staff ONLY here
     this._updateAssignedStaffByBranch(aBranchFilteredData);
 
-    // 🔥 Then apply full filtering
+    //  Then apply full filtering
     this.onFilterChange();
 },
-// ReadEmpData: function () {
-//     const oLoginModel = this.Loginmodel;
-//     const sBranch = oLoginModel.BranchCode;
 
-//     const oFilters = {
-//         BranchCode: sBranch
-//     };
-
-//     this.ajaxReadWithJQuery("HM_StaffContact", oFilters)
-//         .then((oData) => {
-
-//             const aStaffData = Array.isArray(oData.data)
-//                 ? oData.data
-//                 : (oData.data ? [oData.data] : []);
-
-//             // 🔹 Create model
-//             const oStaffModel = new JSONModel(aStaffData);
-
-//             //  Set model to view
-//             this.getView().setModel(oStaffModel, "staffModel");
-
-//         })
-//         .catch(() => {
-//             sap.m.MessageToast.show("Failed to load staff data");
-//         });
-// },
 
         _prepareDailyStatusData: function (aFilteredData) {
     const oDateRange = this.byId("CD_complain_Date");
@@ -514,54 +487,7 @@ const aStatusDistribution = Object.entries(oStatusCount).map(
             });
         },
 
-        // --- EVENT HANDLERS FOR CHART SELECTIONS ---
-        // onStatusChartSelect: function (oEvent) {
-        //     const oSelectedData = oEvent.getParameter("data")[0].data;
-        //     if (!oSelectedData || !oSelectedData.Status) return;
-
-        //     const sStatus = oSelectedData.Status;
-        //     let aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
-        //     aInvoicesForStatus = aInvoicesForStatus.slice().sort((a, b) => {
-        //         const dA = new Date(a.InvoiceDate);
-        //         const dB = new Date(b.InvoiceDate);
-        //         return dB - dA; // latest first
-        //     });
-
-        //     const oView = this.getView();
-        //     if (!this._pPopover) {
-        //         this._pPopover = Fragment.load({
-        //             id: oView.getId(),
-        //             name: "sap.ui.com.project1.fragment.InvoiceListPopover",
-        //             controller: this
-        //         }).then(oPopover => {
-        //             oView.addDependent(oPopover);
-        //             return oPopover;
-        //         });
-        //     }
-
-        //     this._pPopover.then(oPopover => {
-        //         oPopover.setModel(new JSONModel({
-        //             status: sStatus,
-        //             invoices: aInvoicesForStatus,
-        //             AllTotalAmount: aInvoicesForStatus.reduce((sum, inv) => {
-        //                 let amount = 0;
-        //                 if (inv.Currency === "INR") {
-        //                     amount = parseFloat(inv.TotalAmount || 0);
-        //                 } else {
-        //                     amount = parseFloat(inv.AmountInINR || 0);
-        //                 }
-        //                 return sum + amount;
-        //             }, 0)
-        //         }), "popoverData");
-
-        //         // Set dynamic title combining i18n text and status
-        //         const sTitlePrefix = this.i18nModel.getText("invoiceFor");
-        //         oPopover.setTitle(`${sTitlePrefix} ${sStatus}`);
-
-        //         // Open popover near the clicked element
-        //         oPopover.open(oEvent.getParameter("data")[0].target);
-        //     });
-        // },
+      
 
         onCloseDialog: function (oEvent) {
             oEvent.getSource().getParent().getParent().close();
@@ -593,156 +519,5 @@ const aStatusDistribution = Object.entries(oStatusCount).map(
             this.getRouter().navTo("RouteLoginPage");
         },
 
-        // onMonthlyInvoiceSelect: function (oEvent) {
-        //     var aData = oEvent.getParameter("data");
-        //     if (!aData || !aData[0] || !aData[0].data) return;
-
-        //     const oSelectedData = aData[0].data;
-        //     const sMonthLabel = oSelectedData.Month;  // e.g. "Apr-2024"
-        //     if (!sMonthLabel) return;
-
-        //     const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        //         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        //     // Extract month and year
-        //     const [sMonth, sYear] = sMonthLabel.split("-");
-        //     const monthIndex = monthNamesShort.indexOf(sMonth); // JS month index (0–11)
-        //     const iYear = parseInt(sYear, 10);
-
-        //     if (monthIndex === -1 || isNaN(iYear)) {
-        //         MessageToast.show(this.i18nModel.getText("noDataForSelectedMonth"));
-        //         return;
-        //     }
-
-        //     // Filter invoices by month + year
-        //     const aInvoices = (this._aCurrentFilteredData || []).filter(inv => {
-        //         if (!inv || !inv.InvoiceDate) return false;
-        //         const invDate = new Date(inv.InvoiceDate);
-        //         return !isNaN(invDate.getTime()) &&
-        //             invDate.getMonth() === monthIndex &&
-        //             invDate.getFullYear() === iYear;
-        //     });
-
-        //     // Convert each invoice to INR
-        //     aInvoices.forEach(inv => {
-        //         const rawValue = this._getInrValue(inv);
-        //         const numValue = Number(String(rawValue).replace(/[^0-9.-]+/g, ""));
-        //         inv.totalAmountInINR = isNaN(numValue) ? 0 : numValue;
-        //     });
-
-        //     // Total value in INR
-        //     const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
-
-        //     // Total considering currency
-        //     const AllTotalAmount = aInvoices.reduce((sum, inv) => {
-        //         const amount = (inv.Currency === "INR") ?
-        //             parseFloat(inv.TotalAmount || 0) :
-        //             parseFloat(inv.AmountInINR || 0);
-        //         return sum + (isNaN(amount) ? 0 : amount);
-        //     }, 0);
-
-        //     // Update selected data with total
-        //     aData[0].data["Total Value (INR)"] = AllTotalAmount;
-
-        //     // Lazy load fragment
-        //     if (!this.pMonthlyInvoicesDialog) {
-        //         this.pMonthlyInvoicesDialog = Fragment.load({
-        //             id: this.getView().getId(),
-        //             name: "sap.ui.com.project1.fragment.MonthlyInvoice",
-        //             controller: this
-        //         });
-        //     }
-
-        //     this.pMonthlyInvoicesDialog.then(oDialog => {
-        //         const sTitle = `${this.i18nModel.getText("monthlyinvoicefor")} ${sMonth}-${iYear}`;
-
-        //         oDialog.setModel(new JSONModel({
-        //             month: `${sMonth}-${iYear}`,
-        //             invoices: aInvoices,
-        //             totalValue: totalValue,
-        //             AllTotalAmount: AllTotalAmount
-        //         }), "dialogData");
-
-        //         oDialog.setTitle(sTitle);
-        //         this.getView().addDependent(oDialog);
-        //         oDialog.open();
-        //     });
-        // },
-
-        // onYearlyInvoiceSelect: function (oEvent) {
-        //     const aData = oEvent.getParameter("data");
-        //     if (!aData || !aData[0] || !aData[0].data) return;
-
-        //     const oSelectedData = aData[0].data;
-        //     const sYearRaw = oSelectedData.Year || oSelectedData.year;
-        //     const iYear = parseInt(String(sYearRaw), 10);
-
-        //     if (isNaN(iYear)) {
-        //         MessageToast.show(this.i18nModel.getText("noDataForSelectedYear"));
-        //         return;
-        //     }
-
-        //     // Determine FY from clicked year
-        //     const fyStartYear = iYear;
-        //     const fyEndYear = fyStartYear + 1;
-        //     const fyLabel = `${fyStartYear}-${fyEndYear}`;
-
-        //     const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || this.rawComplainData || [];
-
-        //     // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
-        //     const aInvoices = aAllInvoices.filter(inv => {
-        //         if (!inv || !inv.InvoiceDate) return false;
-        //         const dInv = new Date(inv.InvoiceDate);
-        //         if (isNaN(dInv.getTime())) return false;
-
-        //         const fyStartDate = new Date(fyStartYear, 3, 1);  // Apr 1 of selected year
-        //         const fyEndDate = new Date(fyEndYear, 2, 31, 23, 59, 59); // Mar 31 of next year with time
-
-        //         return dInv >= fyStartDate && dInv <= fyEndDate;
-        //     });
-
-        //     // Attach numeric INR value
-        //     aInvoices.forEach(inv => {
-        //         const raw = this._getInrValue(inv);
-        //         const num = Number(String(raw).replace(/[^0-9.-]+/g, ""));
-        //         inv.totalAmountInINR = isNaN(num) ? 0 : num;
-        //     });
-
-        //     // Sort latest first
-        //     aInvoices.sort((a, b) => new Date(b.InvoiceDate) - new Date(a.InvoiceDate));
-
-        //     // Compute FY total
-        //     const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
-        //     var AllTotalAmount = aInvoices.reduce((sum, inv) => {
-        //         let amount = 0;
-        //         (inv.Currency === "INR") ?
-        //             amount = parseFloat(inv.TotalAmount || 0) :
-        //             amount = parseFloat(inv.AmountInINR || 0);
-        //         return sum + amount;
-        //     }, 0);
-
-        //     // Lazy load dialog
-        //     aData[0].data['Total Value (INR)'] = AllTotalAmount;
-
-        //     if (!this.pYearlyInvoicesDialog) {
-        //         this.pYearlyInvoicesDialog = Fragment.load({
-        //             id: this.getView().getId(),
-        //             name: "sap.ui.com.project1.fragment.YearlyInvoice",
-        //             controller: this
-        //         });
-        //     }
-
-        //     this.pYearlyInvoicesDialog.then(oDialog => {
-        //         oDialog.setModel(new JSONModel({
-        //             year: fyLabel,
-        //             invoices: aInvoices,
-        //             totalValue: totalValue,
-        //             AllTotalAmount: AllTotalAmount
-        //         }), "dialogData");
-
-        //         this.getView().addDependent(oDialog);
-        //         oDialog.open();
-        //     });
-        // }
     });
 })

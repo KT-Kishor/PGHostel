@@ -22,7 +22,7 @@
                     <Button
                       icon="sap-icon://nav-back"
                         class="btnGradientHoverOnly"
-                        tooltip="{i18n>MSedit}"
+                        tooltip="{i18n>back}"
                         press="onNavBack"
                     />
                 </contentLeft>
@@ -267,7 +267,12 @@
                         text="Payment ({profileData>/paymentCount})"/>
                     <IconTabFilter
                         key="Complaints"
-                        text="Complaints ({profileData>/complainCount})"/>
+                        text="Complaints ({profileData>/complainCount})"
+                        visible="{= ${profileData>/complainCount} > 0 }"/>
+                    <IconTabFilter
+                        key="Damage"
+                        text="Damage ({profileData>/damageCount})"
+                      />
                 </items>
             </IconTabHeader>
 
@@ -410,6 +415,44 @@
                             text="{profileData>ComplaintStatus}"
                             state="{ path:'profileData>ComplaintStatus',
                                      formatter:'.Formatter.formatObjectStatus'}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+         <Table
+            id="Id_DamageTable"
+            visible="{= ${profileData>/selectedTab} === 'Damage' }"
+            updateFinished="onTableUpdateFinished"
+            width="auto" 
+          class="sapUiSmallMargin customRoundedTable">
+            <columns>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>ItemName}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Phone"><Text text="{i18n>type}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>description}"/></Column>
+                <Column demandPopin="true" ><Text text="{i18n>quantity}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>cost}"/></Column>
+                <!-- <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
+                   </columns>
+
+            <items>
+                <ColumnListItem type="Navigation" press="onPressComplaintRow">
+                    <cells>
+                        <!-- <Text text="{profileData>ComplaintType}"/>
+                        <Text text="{profileData>BranchName}" />
+                        <Text text="{profileData>RoomNo}"/>
+                        <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
+                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text  text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
+                                path: 'profileData>ExpectedResolvedDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"/>
+                         <Text text="{profileData>AssignedTo}"/>
+                          <ObjectStatus
+                            text="{profileData>ComplaintStatus}"
+                            state="{ path:'profileData>ComplaintStatus',
+                                     formatter:'.Formatter.formatObjectStatus'}"/> -->
                     </cells>
                 </ColumnListItem>
             </items>
