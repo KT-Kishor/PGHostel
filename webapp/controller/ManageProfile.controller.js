@@ -37,6 +37,7 @@ sap.ui.define([
                 ComplaintType: "",
                 RoomNo: "",
                 Description: "",
+                BranchCode: "",
                 FileName: "",
                 FileType: "",
                 FileContent: "",
@@ -83,6 +84,8 @@ sap.ui.define([
                 const filter = { UserID: sUserID }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
+            
+                const aBranchComboData = this._prepareBranchComboData(aBookings);
                 const aPayments = response?.PaymentData || [];
                 const aComplain = response?.ComplaintData || [];
 
@@ -150,19 +153,49 @@ sap.ui.define([
                     currency: payment.Currency,
                     PaymentGroup: payment.Status || "Others"
                 }));
-                const aComplainData = aComplain.map(complain => ({
-                    ComplaintID: complain.ComplaintID,
-                    ComplaintType: complain.ComplaintType,
-                    Description: complain.Description,
-                    ComplaintDescription: complain.Description,
-                    ComplaintRaisedDate: complain.ComplaintRaisedDate,
-                    ComplaintStatus: complain.Status,
-                    RoomNo: complain.RoomNo || "",
-                    FileName: complain.FileName || "",
-                    FileType: complain.FileType || "",
-                    File: complain.File || ""
-                }));
+                // const aComplainData = aComplain.map(complain => ({
+                //     ComplaintID: complain.ComplaintID,
+                //     ComplaintType: complain.ComplaintType,
+                //     Description: complain.Description,
+                //     ComplaintDescription: complain.Description,
+                //     ComplaintRaisedDate: complain.ComplaintRaisedDate,
+                //     ComplaintStatus: complain.Status,
+                //     RoomNo: complain.RoomNo || "",
+                //     BranchCode: complain.BranchCode || "", 
+                //     FileName: complain.FileName || "",
+                //     FileType: complain.FileType || "",
+                //     File: complain.File || ""
+                // }));
+                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+                const aBranchMaster = oBRModel?.getProperty("/") || [];
 
+                const aComplainData = aComplain.map(complain => {
+
+                    const sBranchCode = complain.BranchCode || "";
+
+                    const oBranch = aBranchMaster.find(
+                        b => b.BranchID === sBranchCode
+                    );
+
+                    return {
+                        ComplaintID: complain.ComplaintID,
+                        ComplaintType: complain.ComplaintType,
+                        Description: complain.Description,
+                        ComplaintDescription: complain.Description,
+                        ComplaintRaisedDate: complain.ComplaintRaisedDate,
+                        ComplaintStatus: complain.Status,
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch?.Name || sBranchCode,   // ← Added
+                        RoomNo: complain.RoomNo || "",
+                        FileName: complain.FileName || "",
+                        FileType: complain.FileType || "",
+                        File: complain.File || ""
+                    };
+                });
+                console.log("aComplainData:", aComplainData);
+                const hasAssignedBooking = aBookings.some(b =>
+                    b.Status && b.Status.toLowerCase() === "assigned"
+                );
                 const oProfileModel = new JSONModel({
                     ...fullUserData,
                     isEditMode: false,
@@ -182,6 +215,9 @@ sap.ui.define([
                     stdCode: oUser.STDCode,
                     branchCode: oUser.BranchCode,
                     role: oUser.Role,
+                    BranchCombo: aBranchComboData,
+                    selectedBranchCode: "",
+                    hasAssignedBooking: hasAssignedBooking,
 
                     bookings: aBookingData,
                     Payments: aPaymentData,
@@ -195,6 +231,7 @@ sap.ui.define([
                     isTableBusy: false
                 });
                 this.getView().setModel(oProfileModel, "profileData");
+                // this._prepareBranchComboData()
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
@@ -211,9 +248,11 @@ sap.ui.define([
                     gender: oUser.Gender || "",
                     address: oUser.Address || "",
                     bookings: [],
-                    aCustomers: []
+                    aCustomers: [],
+                    hasAssignedBooking: false,
                 });
                 this.getView().setModel(oProfileModel, "profileData");
+                // this._prepareBranchComboData()
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
 
@@ -222,7 +261,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-
+      
         _applyCountryStateCityFilters: function () {
 
             const oModel = this.getView().getModel("profileData");
@@ -1093,15 +1132,67 @@ sap.ui.define([
                 oInput.setValueState("None");
             }
         },
+        _prepareBranchComboData: function (aBookingData) {
+
+            if (!Array.isArray(aBookingData)) {
+                return [];
+            }
+            // 1. Filter only Assigned bookings
+            const aAssigned = aBookingData.filter(b => b.Status?.toLowerCase() === "assigned");
+
+            // 2. Extract unique BranchCodes
+            const aUniqueBranchCodes = [
+                ...new Set(
+                    aAssigned
+                        .map(b => b.BranchCode)
+                        .filter(Boolean)
+                )
+            ];
+            // 3. Get Branch Master data from global model
+            const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+            const aBranchMaster = oBRModel?.getProperty("/") || [];
+            // 4. Map BranchCode → BranchName
+            const aFinal = aUniqueBranchCodes.map(code => {
+                const branchObj = aBranchMaster.find(b => b.BranchID === code);
+                return {
+                    BranchCode: code,
+                    BranchName: branchObj?.Name || code
+                };
+            });
+            return aFinal;
+        },
+
         onPressRaiseComplaint: function () {
+            const aBranches = this.getView().getModel("profileData").getProperty("/BranchCombo");
+
+            if (aBranches?.length === 1) {
+                this.getView().getModel("profileData")
+                    .setProperty("/selectedBranchCode", aBranches[0].BranchCode);
+            }
             this._openComplaintDialog(); // no data → create mode
         },
 
         _openComplaintDialog: function (oComplaintData) {
+
+            
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
 
             if (oComplaintData) {
+
+                const oProfileModel = this.getView().getModel("profileData");
+
+                console.log("Selected BranchCode:", oComplaintData.BranchCode);
+
+                console.log(
+                    "Available BranchCombo:",
+                    this.getView().getModel("profileData").getProperty("/BranchCombo")
+                );
+
+                oProfileModel.setProperty(
+                    "/selectedBranchCode",
+                    oComplaintData.BranchCode?.trim() || ""
+                );
                 // Get raw file data – could be byte array, Buffer object, or base64 string
                 let rawFile = oComplaintData.File || oComplaintData.FileContent || "";
                 let base64File = "";
@@ -1153,24 +1244,33 @@ sap.ui.define([
                     ComplaintType: oComplaintData.ComplaintType,
                     RoomNo: oComplaintData.RoomNo || "",
                     Description: oComplaintData.Description || oComplaintData.ComplaintDescription || "",
+                    BranchCode: oComplaintData.BranchCode?.trim() || "",
                     FileName: sExistingFileName,
                     FileType: sExistingFileType,
                     FileContent: base64File, // store for saving
-                    Documents: aDocuments
+                    Documents: aDocuments,
+                    isEditMode: true
                 });
+                console.log("Edit data:", oComplaintData);
             } else {
+                const oProfileModel = this.getView().getModel("profileData");
+                oProfileModel.setProperty("/selectedBranchCode", "");
                 // New complaint: reset model
                 oTempModel.setData({
                     ComplaintID: "",
                     ComplaintType: "",
                     RoomNo: "",
                     Description: "",
+                    BranchCode: "",
                     FileName: "",
                     FileType: "",
                     FileContent: "",
-                    Documents: []
+                    Documents: [],
+                    isEditMode: false
                 });
             }
+
+            const sDialogTitle = oComplaintData ? "Edit Complaint" : "Raise New Complaint";
 
             // Open dialog (your existing logic)
             if (!this._oComplaintDialog) {
@@ -1180,43 +1280,87 @@ sap.ui.define([
                 }).then(function (oDialog) {
                     this._oComplaintDialog = oDialog;
                     oView.addDependent(oDialog);
+                    this._oComplaintDialog.setTitle(sDialogTitle);
                     oDialog.open();
                     this._resetComplaintValidationStates();
                 }.bind(this));
             } else {
+                this._oComplaintDialog.setTitle(sDialogTitle); 
                 this._oComplaintDialog.open();
                 this._resetComplaintValidationStates();
             }
         },
 
         onCloseComplaintDialog: function () {
+
             if (this._oComplaintDialog) {
                 this._oComplaintDialog.close();
             }
+
             if (this._oComplaintPreviewDialog) {
                 this._oComplaintPreviewDialog.close();
             }
+
             if (this._oComplaintPreviewUrl) {
                 URL.revokeObjectURL(this._oComplaintPreviewUrl);
                 this._oComplaintPreviewUrl = null;
             }
-            this._oComplaintDialog.destroy();
-            this._oComplaintDialog = null;
+
+            // Reset complaintTemp model
+            const oTempModel = this.getView().getModel("complaintTemp");
+            if (oTempModel) {
+                oTempModel.setData({
+                    ComplaintID: "",
+                    ComplaintType: "",
+                    RoomNo: "",
+                    Description: "",
+                    BranchCode: "",
+                    FileName: "",
+                    FileType: "",
+                    FileContent: "",
+                    Documents: []
+                });
+            }
+
+            // Force clear ComboBox manual input
+            const oBranchCombo = this._getComplaintControl("idBranchCombo");
+            if (oBranchCombo) {
+                oBranchCombo.setValue("");
+                oBranchCombo.setSelectedKey("");
+            }
+
+            this._resetComplaintValidationStates();
         },
         _getComplaintControl: function (sId) {
             return sap.ui.getCore().byId(sId) || this.byId(sId);
         },
         _resetComplaintValidationStates: function () {
+
             const aControls = [
+                this._getComplaintControl("idBranchCombo"),      // ← Added
                 this._getComplaintControl("idComplaintType"),
                 this._getComplaintControl("idComplaintRoom"),
                 this._getComplaintControl("idComplaintDesc")
             ];
+
             aControls.forEach(function (oControl) {
                 if (oControl && oControl.setValueState) {
                     oControl.setValueState("None");
+                    // oControl.setValueStateText("");
                 }
             });
+        },
+
+        onExit: function () {
+            if (this._oComplaintDialog) {
+                this._oComplaintDialog.destroy();
+                this._oComplaintDialog = null;
+            }
+
+            if (this._oComplaintPreviewDialog) {
+                this._oComplaintPreviewDialog.destroy();
+                this._oComplaintPreviewDialog = null;
+            }
         },
         onComplaintTypeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -1313,77 +1457,7 @@ sap.ui.define([
                 oUploader.clear();
             }
         },
-        // onComplaintPreviewDoc: function (oEvent) {
-        //     const autoDecodeBase64 = function (sBase64) {
-        //         if (!sBase64 || typeof sBase64 !== "string") {
-        //             return "";
-        //         }
-        //         let sDecoded = sBase64.replace(/\s/g, "");
-        //         let sLast = sDecoded;
-        //         for (let i = 0; i < 5; i++) {
-        //             try {
-        //                 if (
-        //                     sLast.startsWith("iVB") ||
-        //                     sLast.startsWith("/9j")
-        //                 ) {
-        //                     return sLast;
-        //                 }
-        //                 sLast = atob(sLast);
-        //             } catch (e) {
-        //                 break;
-        //             }
-        //         }
-        //         return sLast;
-        //     };
-
-        //     const oDoc = oEvent.getSource().getBindingContext("complaintTemp")?.getObject();
-        //     if (!oDoc || !(oDoc.File || oDoc.Base64)) {
-        //         MessageToast.show("No document to preview.");
-        //         return;
-        //     }
-
-        //     const sBase64 = autoDecodeBase64(oDoc.File || oDoc.Base64);
-        //     let sMimeType = oDoc.DocumentType || oDoc.FileType || "application/octet-stream";
-        //     if (!oDoc.DocumentType && !oDoc.FileType) {
-        //         if (sBase64.startsWith("iVB")) sMimeType = "image/png";
-        //         else if (sBase64.startsWith("/9j")) sMimeType = "image/jpeg";
-        //     }
-
-        //     if (sMimeType.startsWith("image/")) {
-        //         const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-        //         this._oComplaintPreviewDialog = new sap.m.Dialog({
-        //             title: oDoc.FileName || "Document Preview",
-        //             contentWidth: "50%",
-        //             contentHeight: "60%",
-        //             draggable: true,
-        //             resizable: true,
-        //             horizontalScrolling: false,
-        //             verticalScrolling: true,
-        //             content: [
-        //                 new sap.m.Image({
-        //                     src: sImageSrc,
-        //                     width: "100%",
-        //                     height: "100%",
-        //                     densityAware: false
-        //                 })
-        //             ],
-        //             beginButton: new sap.m.Button({
-        //                 text: "Close",
-        //                 press: () => this._oComplaintPreviewDialog.close()
-        //             }),
-        //             afterClose: () => {
-        //                 this._oComplaintPreviewDialog.destroy();
-        //                 this._oComplaintPreviewDialog = null;
-        //             }
-        //         });
-        //         this.getView().addDependent(this._oComplaintPreviewDialog);
-        //         this._oComplaintPreviewDialog.open();
-        //         return;
-        //     }
-
-        //     MessageToast.show("Preview not supported for this file type.");
-        // },
-        onComplaintPreviewDoc: function (oEvent) {
+            onComplaintPreviewDoc: function (oEvent) {
             const autoDecodeBase64 = function (sBase64) {
                 if (!sBase64 || typeof sBase64 !== "string") {
                     return "";
@@ -1485,31 +1559,28 @@ sap.ui.define([
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oData = oTempModel.getData();
-
             const oComplaintType = this._getComplaintControl("idComplaintType");
             const oRoomNo = this._getComplaintControl("idComplaintRoom");
             const oDescription = this._getComplaintControl("idComplaintDesc");
+            const oBranchCombo = this._getComplaintControl("idBranchCombo");
 
-            if (!utils._LCvalidateMandatoryField(oComplaintType, "ID")) {
-                MessageToast.show("Please fill all required fields.");
-                return;
-            }
-            if (!utils._LCvalidateMandatoryField(oRoomNo, "ID")) {
-                MessageToast.show("Please fill all required fields.");
-                return;
-            }
-            if (!utils._LCvalidateMandatoryField(oDescription, "ID")) {
-                MessageToast.show("Please fill all required fields.");
-                return;
-            }
 
+
+            if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID") ||
+                !utils._LCvalidateMandatoryField(oRoomNo, "ID") ||
+                !utils._LCvalidateMandatoryField(oComplaintType, "ID") ||
+                !utils._LCvalidateMandatoryField(oDescription, "ID")) {
+                MessageToast.show("Please fill all required fields.");
+                return;
+            }
             const sUserID = this._oLoggedInUser.UserID;
             const sUserName = this._oLoggedInUser.UserName; // RaisedBy
-            const sBranchCode = this._oLoggedInUser.BranchCode; // direct from user
 
             const sToday = new Date().toISOString().split("T")[0];
 
             const sComplaintType = oComplaintType.getValue();
+            const sBranchCode = oBranchCombo.getSelectedKey();
+
 
             const payloadData = {
                 UserID: sUserID,
@@ -1519,35 +1590,29 @@ sap.ui.define([
                 Status: "Pending",
                 ComplaintRaisedDate: sToday,
                 RoomNo: oData.RoomNo,
+                BranchCode: sBranchCode,   // ← from ComboBox ONLY
                 FileName: oData.FileName || "",
                 FileType: oData.FileType || "",
                 File: oData.FileContent || ""
             };
 
-            // Only add BranchCode if it exists (not empty/undefined)
-            if (sBranchCode) {
-                payloadData.BranchCode = sBranchCode;
-            }
+
 
             let payload;
             if (oData.ComplaintID) {
-                // UPDATE (PUT)
                 payload = {
                     data: {
                         ComplaintType: sComplaintType,
                         Description: oData.Description,
                         RoomNo: oData.RoomNo,
+                        BranchCode: sBranchCode,   // ← also here
                         FileName: oData.FileName || "",
                         FileType: oData.FileType || "",
                         File: oData.FileContent || ""
                     },
                     filters: { ComplaintID: oData.ComplaintID }
                 };
-                if (sBranchCode) {
-                    payload.data.BranchCode = sBranchCode;
-                }
             } else {
-                // CREATE (POST)
                 payload = { data: payloadData };
             }
 
@@ -1584,19 +1649,33 @@ sap.ui.define([
             try {
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", { UserID: sUserID });
                 const aComplain = response?.ComplaintData || [];
+                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+                const aBranchMaster = oBRModel?.getProperty("/") || [];
 
-                const aComplainData = aComplain.map(complain => ({
-                    ComplaintID: complain.ComplaintID,
-                    ComplaintType: complain.ComplaintType,
-                    Description: complain.Description,
-                    ComplaintDescription: complain.Description,
-                    ComplaintRaisedDate: complain.ComplaintRaisedDate,
-                    ComplaintStatus: complain.Status,
-                    RoomNo: complain.RoomNo || "",
-                    FileName: complain.FileName || "",
-                    FileType: complain.FileType || "",
-                    File: complain.File || ""
-                }));
+                const aComplainData = aComplain.map(complain => {
+
+                    const sBranchCode = complain.BranchCode || "";
+
+                    const oBranch = aBranchMaster.find(
+                        b => b.BranchID === sBranchCode
+                    );
+
+                    return {
+                        ComplaintID: complain.ComplaintID,
+                        ComplaintType: complain.ComplaintType,
+                        Description: complain.Description,
+                        ComplaintDescription: complain.Description,
+                        ComplaintRaisedDate: complain.ComplaintRaisedDate,
+                        ComplaintStatus: complain.Status,
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch?.Name || sBranchCode,   // ← THIS FIXES YOUR ISSUE
+                        RoomNo: complain.RoomNo || "",
+                        FileName: complain.FileName || "",
+                        FileType: complain.FileType || "",
+                        File: complain.File || ""
+                    };
+                });
+
 
                 oProfileModel.setProperty("/complain", aComplainData);
                 oProfileModel.setProperty("/complainCount", aComplainData.length);
@@ -1611,11 +1690,15 @@ sap.ui.define([
             const oContext = oEvent.getSource().getBindingContext("profileData");
             const oComplaint = oContext.getObject();
             // Do not allow editing if complaint is In Progress or Resolved
-            if (oComplaint.ComplaintStatus === "In Progress" || oComplaint.ComplaintStatus === "Resolved") {
+            const status = (oComplaint.ComplaintStatus || "").toLowerCase();
+            if (status === "in progress" || status === "resolved"){
                 MessageToast.show("Complaints with status 'In Progress' or 'Resolved' cannot be edited.");
                 return;
             }
             this._openComplaintDialog(oComplaint);
+        },
+        onComBranch: function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent);
         },
     });
 });

@@ -7,6 +7,36 @@
         <content>
             <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
                 <f:content>
+                <Label text="Branch" required="true"/>
+
+<ComboBox
+    id="idBranchCombo"
+   selectedKey="{complaintTemp>/BranchCode}"
+    items="{
+        path: 'profileData>/BranchCombo'
+    }"
+    required="true"
+    width="100%"    
+    valueStateText="Please Select  Branch"
+    change="onComBranch"
+>
+
+    <core:Item
+        key="{profileData>BranchCode}"
+        text="{profileData>BranchName}" />
+
+</ComboBox>
+ <Label text="Room No" required="true" />
+                    <Input
+                        id="idComplaintRoom"
+                        value="{complaintTemp>/RoomNo}"
+                        placeholder="e.g. PSK1"
+                        maxLength="10"
+                        required="true"
+                        liveChange="onComplaintRoomLiveChange"
+                        change="onComplaintRoomChange"
+                        valueStateText="{i18n>enterRoomNo}"
+                    />
                     <Label text="Complaint Type" required="true" />
                     <ComboBox
                         id="idComplaintType"
@@ -22,17 +52,7 @@
                         </items>
                     </ComboBox>
 
-                    <Label text="RoomNo" required="true" />
-                    <Input
-                        id="idComplaintRoom"
-                        value="{complaintTemp>/RoomNo}"
-                        placeholder="e.g. PSK1"
-                        maxLength="10"
-                        required="true"
-                        liveChange="onComplaintRoomLiveChange"
-                        change="onComplaintRoomChange"
-                        valueStateText="{i18n>enterRoomNo}"
-                    />
+                   
 
                     <Label text="Description" required="true" />
                     <TextArea
@@ -114,7 +134,11 @@
             </f:SimpleForm>
         </content>
         <beginButton>
-            <Button text="Submit" type="Emphasized" press="onSaveComplaint" />
+           <Button 
+    text="{= ${complaintTemp>/isEditMode} ? 'Update' : 'Submit' }"
+    type="Emphasized" 
+    press="onSaveComplaint" 
+/>
         </beginButton>
         <endButton>
             <Button text="Cancel" press="onCloseComplaintDialog" />

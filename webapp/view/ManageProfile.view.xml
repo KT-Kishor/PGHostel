@@ -277,6 +277,8 @@
             text="Raise Complaint"
             press="onPressRaiseComplaint"
             class="myUnifiedBtn sapUiSmallMarginEnd"
+             visible="{= ${profileData>/selectedTab} === 'Complaints' }"
+              enabled="{profileData>/hasAssignedBooking}"
            
             />
 
@@ -383,6 +385,7 @@
           class="sapUiSmallMargin customRoundedTable">
             <columns>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>complainType}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Phone"><Text text="Branch"/></Column>
                 <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>roomNo}"/></Column>
                 <Column demandPopin="true" ><Text text="{i18n>description}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>complainDate}"/></Column>
@@ -393,6 +396,7 @@
                 <ColumnListItem type="Navigation" press="onPressComplaintRow">
                     <cells>
                         <Text text="{profileData>ComplaintType}"/>
+                        <Text text="{profileData>BranchName}" />
                         <Text text="{profileData>RoomNo}"/>
                         <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
                         <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
