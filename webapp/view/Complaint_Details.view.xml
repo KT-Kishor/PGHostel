@@ -108,6 +108,12 @@
                             press="CD_resolve"
                             class="myUnifiedBtn"
                         />
+                          <Button
+                            text="{i18n>Dashboard}"
+                            tooltip="{i18n>Dashboard}"
+                            press="CD_Dashboard"
+                            class="myUnifiedBtn"
+                        />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>downloadAdminData}"

@@ -24,7 +24,8 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteComplaintDetails").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched:async function () {
+        _onRouteMatched:async function (oEvent) {
+
            this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
            this.getView().byId("CD_id_Status").setSelectedKey("")
            await this.CD_read()
@@ -240,6 +241,12 @@ sap.ui.define([
                 oSheet.destroy();
             });
         },
+        CD_Dashboard:function(){
+             var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteComplainDashboard",{
+                sPath: "Complaindetails",
+            });
+        },
         CD_Assign:async function () {
 
                 var StaffModel=this.getView().getModel("StaffModel").getData();
@@ -278,11 +285,11 @@ sap.ui.define([
             this.CD_Dialog.open();
             this.byId("CD_id_ResolutionDate").setVisible(false);
             if(data.Status === "Pending"){
-            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("");
-            this.byId("CD_id_EstimatedDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate));
+            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("").setValueState("None");
+            this.byId("CD_id_EstimatedDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             }else{
-            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey(data.AssignedBy);
-            this.byId("CD_id_EstimatedDate").setVisible(true).setValue(Formatter.formatDate(data.EstimatDate)).setMinDate(new Date(data.ComplaintRaisedDate));
+            this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey(data.AssignedBy).setValueState("None");
+            this.byId("CD_id_EstimatedDate").setVisible(true).setValue(Formatter.formatDate(data.EstimatDate)).setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             }
         },
         CD_onPressClear:function(){
@@ -452,9 +459,9 @@ sap.ui.define([
             this.byId("CD_id_Assignedto").setVisible(false);
             this.byId("CD_id_EstimatedDate").setVisible(false);
             if(data.Status === "In Progress"){
-            this.byId("CD_id_ResolutionDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate));
+            this.byId("CD_id_ResolutionDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             }else{
-            this.byId("CD_id_ResolutionDate").setVisible(true).setValue(Formatter.formatDate(data.ResolutionDate)).setMinDate(new Date(data.ComplaintRaisedDate));
+            this.byId("CD_id_ResolutionDate").setVisible(true).setValue(Formatter.formatDate(data.ResolutionDate)).setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             }
 
 

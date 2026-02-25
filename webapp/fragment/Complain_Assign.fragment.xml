@@ -60,8 +60,8 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
                     placeholder="Select Estimated Date"
-
                     change="onNoOfPersonInputLiveChange"
+                    valueStateText="Select Estimate Date"
                 />
 
                 <Label

@@ -346,7 +346,7 @@
         },
         {
           "name": "RouteComplainDashboard",
-          "pattern": "ComplainDashboard",
+          "pattern": "ComplainDashboard/{sPath}",
           "target": [
             "targetComplainDashboard"
           ]

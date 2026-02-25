@@ -33,8 +33,13 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteComplainDashboard").attachMatched(this._onRouteMatched, this);
         },
         onNavBack: function() {
+            if(this.sPath==="Complaindetails"){
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteComplaintDetails");
+            }else{
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
+            }
         },
         _setCurrentMonthDateRange: function () {
     var oDateRange = this.byId("CD_complain_Date");
@@ -50,7 +55,9 @@ sap.ui.define([
     oDateRange.setDateValue(oStartDate);
     oDateRange.setSecondDateValue(oEndDate);
 },
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function(oEvent) {
+            this.sPath = oEvent.getParameter("arguments").sPath;
+
             // var LoginFunction = await this.commonLoginFunction("ComplainDashboard");
             //  if (!LoginFunction) return;
                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
