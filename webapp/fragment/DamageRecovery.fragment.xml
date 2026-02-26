@@ -31,18 +31,12 @@
                 <!-- Customer ID -->
                 <Label text="Customer ID"/>
                 <Text text="{DamageModel>/CustomerID}"/>
-
                 <!-- Customer Name -->
                 <Label text="Customer Name"/>
                 <Text text="{DamageModel>/CustomerName}"/>
-
-                <!-- Type -->
-                <Label text="Type"/>
-                <Text text="{DamageModel>/Type}"/>
-
                 <!-- Damage Amount -->
                 <Label text="Damage Amount"/>
-                <Text text="{parts:[{path:'DamageModel>/Cost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
+                <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
 
                 <!-- Return Amount -->
                 <Label text="Return Amount" required="true"/>
@@ -51,26 +45,27 @@
                     type="Number"
                     value="{DamageModel>/ReturnDamageAmount}"
                     placeholder="Enter return amount"
-                    liveChange="_validateReturnAmount"/>
+                    liveChange="_validateReturnAmount"
+                    valueStateText="Enter return amount"/>
 
                 <!-- Return Mode -->
                 <Label text="Return Mode" required="true"/>
                 <ComboBox
                     id="DT_id_ReturnMode"
                     selectedKey="{DamageModel>/ReturnDamageMode}"
-                    change="_onReturnModeChange">
+                    change="_onReturnModeChange" valueStateText="Select return mode">
                     <core:Item key="CASH" text="Cash"/>
                     <core:Item key="UPI" text="UPI"/>
                     <core:Item key="CARD" text="Card"/>
                 </ComboBox>
 
                 <!-- Transaction ID -->
-                <Label text="Transaction ID"/>
+                <Label text="Transaction ID/ Person Name"/>
                 <Input
                     id="DT_id_ReturnTransactionID"
                     value="{DamageModel>/ReturnDamageTransactionID}"
                     placeholder="Enter transaction ID"
-                    liveChange="_validateTransactionID"/>
+                    liveChange="_validateTransactionID" valueStateText="Enter transaction ID"/>
 
                 <!-- Returning Employee -->
                 <Label text="Returning To"/>

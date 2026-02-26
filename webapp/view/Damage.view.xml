@@ -81,7 +81,7 @@
 			</fb:FilterBar>
 			<Table id="HD_id_ARD_Table"
                 sticky="ColumnHeaders,HeaderToolbar"
-                mode="MultiSelect"
+                mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
 				items="{path:'Damage>/', sorter: {path:'BranchName',descending: false,group: true}}">

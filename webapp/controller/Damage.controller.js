@@ -445,7 +445,6 @@ sap.ui.define([
                 filters.Status = sstatus
             }
 
-
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_Damage", filters).then((oData) => {
                 const roomData = Array.isArray(oData.data) ? oData.data : [];
@@ -648,10 +647,21 @@ sap.ui.define([
             const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
             const oTxnInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
 
+             var isMandatoryValid = (
+                utils.onNumber(sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID")), "ID")
+            );
+
+            if (!isMandatoryValid) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
             const returnAmount = parseFloat(oAmountInput.getValue());
             const mode = oModeInput.getSelectedKey();
             const txnID = oTxnInput.getValue();
-            const damageAmount = parseFloat(oDamage.Cost);
+            const damageAmount = parseFloat(oDamage.TotalCost);
 
             // === VALIDATIONS ===
             if (!returnAmount || returnAmount <= 0) {
@@ -669,18 +679,18 @@ sap.ui.define([
                 return;
             }
 
-            if (mode !== "CASH" && (!txnID || txnID.trim() === "")) {
-                MessageToast.show("Transaction ID required");
-                oTxnInput.setValueState("Error");
-                return;
-            }
+            // if (mode !== "CASH" && (!txnID || txnID.trim() === "")) {
+            //     MessageToast.show("Transaction ID required");
+            //     oTxnInput.setValueState("Error");
+            //     return;
+            // }
 
             sap.ui.core.BusyIndicator.show();
 
             try {
                 const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
 
-                const updateData = {
+                const payload = {
                     ReturnDamageAmount: returnAmount,
                     ReturnDamageDate: new Date().toISOString().split("T")[0],
                     ReturnDamageMode: mode,
@@ -689,14 +699,19 @@ sap.ui.define([
                     ReturningEmployeeName: currentUser
                 };
 
-                const payload = {
-                    filters: {
-                        DamageID: oDamage.DamageID
-                    },
-                    data: updateData
-                };
+                // const payload = {
+                //     Filters: {
+                //         DamageID: oDamage.DamageID
+                //     },
+                //     data: updateData
+                // };
 
-                const res = await this.ajaxUpdateWithJQuery("HM_Damage", payload);
+                const res = await this.ajaxUpdateWithJQuery("HM_Damage", {
+                  data: payload,
+                filters: {
+                     DamageID: oDamage.DamageID
+                }
+                });
 
                 if (!res.success) throw new Error(res.message);
 
@@ -725,10 +740,11 @@ sap.ui.define([
         },
 
         _validateReturnAmount: function(oEvent) {
+            utils.onNumber(oEvent)
             const oInput = oEvent.getSource();
             const oDamage = this.getView().getModel("DamageModel").getData();
             const amount = parseFloat(oInput.getValue());
-            const max = parseFloat(oDamage.Cost);
+            const max = parseFloat(oDamage.TotalCost);
 
             if (!amount || amount < 0 || amount > max) {
                 oInput.setValueState("Error");
@@ -741,17 +757,18 @@ sap.ui.define([
         },
 
         _onReturnModeChange: function(oEvent) {
+         utils._LCstrictValidationComboBox(oEvent);
             const oView = this.getView();
-            const mode = oEvent.getSource().getSelectedKey();
-            const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+            // const mode = oEvent.getSource().getSelectedKey();
+            // const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
 
-            if (mode === "CASH") {
-                oTxn.setEnabled(false);
-                oTxn.setValue("");
-                oTxn.setValueState("None");
-            } else {
-                oTxn.setEnabled(true);
-            }
+            // if (mode === "CASH") {
+            //     oTxn.setEnabled(false);
+            //     oTxn.setValue("");
+            //     oTxn.setValueState("None");
+            // } else {
+            //     oTxn.setEnabled(true);
+            // }
         },
 
         _validateTransactionID: function(oEvent) {
