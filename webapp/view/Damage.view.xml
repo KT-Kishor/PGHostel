@@ -24,6 +24,24 @@
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
                 filterContainerWidth="auto">
+					<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Customer Name"
+                        label="{i18n>customerName}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="Dm_id_CustomerName"
+                                items="{CustomerModel>/}"
+                                showClearIcon="true">
+								<core:ListItem
+                                    key="{CustomerModel>CustomerID}"
+                                    text="{CustomerModel>CustomerName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Room Number"
@@ -32,7 +50,7 @@
                         visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
-                                id="HD_id_CustomerName"
+                                id="DM_id_RoomNo"
                                 items="{RoomDetailsModel>/}"
                                 showClearIcon="true">
 								<core:Item key="{RoomDetailsModel>RoomNo}" 
@@ -41,20 +59,21 @@
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
+			
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
-                        name="Bed Type"
-                        label="{i18n>bedType}"
+                        name="Status"
+                        label="{i18n>status}"
                         groupName="Group"
                         visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
-                                id="HD_id_BedType"
+                                id="DM_id_Status"
                                 items="{RoomDetailsModel>/}"
                                 showClearIcon="true">
 								<core:ListItem
-                                    key="{RoomDetailsModel>BedTypeName}"
-                                    text="{RoomDetailsModel>BedTypeName}"/>
+                                    key="{RoomDetailsModel>Status}"
+                                    text="{RoomDetailsModel>Status}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -70,30 +89,19 @@
 					<OverflowToolbar>
 						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>
 						<ToolbarSpacer />
-						<Button
-                            text="{i18n>createDamage}"
-                            press="HM_AddRoom"
-                            tooltip="{i18n>createDamage}"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
-						<Button
-                            text="{i18n>MSedit}"
-                            tooltip="{i18n>MSedit}"
-                            press="HM_EditRoom"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
-						<Button
-                            text="{i18n>MSdelete}"
-                            tooltip="{i18n>MSdelete}"
-                            press="HM_DeleteRoom"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+					
 						<Button
                             text="{i18n>ReturnDamage}"
                             tooltip="{i18n>ReturnDamage}"
                             press="HM_ReturnDamage"
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+							<Button
+                            text="Create Damage"
+                            tooltip="Create Damage"
+                            press="HM_GenearteDamage"
+                            class="myUnifiedBtn"
+                             />
 						<Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
@@ -113,15 +121,6 @@
 						<Text text="{i18n>roomNo}" tooltip="{i18n>roomNo}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>type}" tooltip="{i18n>ItemName}"/>
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>ItemName}" tooltip="{i18n>ItemName}"/>
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>Description}" tooltip="{i18n>Description}"/>
-					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>Cost}" tooltip="{i18n>Cost}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
@@ -132,16 +131,16 @@
 					</Column>
 				</columns>
 				<items>
-					<ColumnListItem>
+					<ColumnListItem
+						type="Navigation"
+						press="DM_onPressEditDetails"
+					>
 						<cells>
 							<Text text="{Damage>CustomerID}" />
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
-							<Text text="{Damage>Type}" />
-							<Text text="{Damage>ItemName}" />
-							<ExpandableText text="{Damage>Description}" maxCharacters="20"/>
-							<Text text="{parts: ['Damage>Cost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
-							<Text text="{path: 'Damage>Date', formatter: '.Formatter.formatDate'}"/>
+							<Text text="{parts: ['Damage>TotalCost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{path: 'Damage>InvoiceDate', formatter: '.Formatter.formatDate'}"/>
 							<ObjectStatus
 							inverted="false"
 							text="{Damage>Status}"
@@ -160,9 +159,6 @@
 					<Link text="{i18n>devlopby}" href="https://kvrikshatechnologies.com/"  target="_blank"
                 class="customLinkWhiteBg"/>
 				</contentLeft>
-				<contentRight>
-					<Button text="Generate PDF" press="HM_onPressGenerateDamageReceipt" class="myUnifiedBtn"/>
-				</contentRight>
 			</Bar>
 		</footer>
 	</Page>

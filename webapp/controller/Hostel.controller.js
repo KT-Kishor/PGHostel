@@ -890,6 +890,11 @@ sap.ui.define([
         },
 
         onTabSelect: async function(oEvent) {
+             const oView = this.getView();
+            const oVisibilityModel = oView.getModel("VisibilityModel");
+            oVisibilityModel.setProperty("/Branches", {})
+            oVisibilityModel.setProperty("/ShowViewMore", false);
+
             const sKey = oEvent.getParameter("item").getKey();
             this._navigateTo(sKey);
             const page = this.byId(sKey);
@@ -902,6 +907,8 @@ sap.ui.define([
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
+                  
+
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
 
@@ -2566,9 +2573,12 @@ sap.ui.define([
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
+      
+
 
                 var city = data[0].City
                 var fCity = this.City ? this.City : city;
+             
                 var filter = {
                     flag: "true",
                     top: this.iTop,
@@ -2581,7 +2591,10 @@ sap.ui.define([
 
                 const sCity = this.City ? this.City : data[0].City;
 
-                const aFiltered = data.filter(item => item.City === sCity);
+                const aFiltered = oModelData.filter(item => item.City === sCity);
+        
+
+             
 
                 if (aFiltered.length === 0 || sCity) {
                     await this._loadFilteredData(sCity, "", "");
@@ -2612,6 +2625,12 @@ sap.ui.define([
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
+            var data = this.getOwnerComponent().getModel("sBRModel").getData()
+
+           var Branchdata=data.filter((item)=>{
+                    return item.City===Scity
+                })
+                this.Branchlength=Branchdata.length
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -2692,7 +2711,7 @@ sap.ui.define([
                     oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
                 }
 
-                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !== this.RoomCount);
+                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !==this.Branchlength);
                 if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {

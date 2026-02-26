@@ -371,6 +371,13 @@
           "target": [
             "targetDamageDashboard"
           ]
+        },
+          {
+          "name": "RouteDamageDetails",
+          "pattern": "DamageDetails/{sPath}",
+          "target": [
+            "targetDamageDetails"
+          ]
         }
       ],
       "targets": {
@@ -380,6 +387,13 @@
           "clearControlAggregation": false,
           "viewId": "Hostel",
           "viewName": "Hostel"
+        },
+          "targetDamageDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Damage_Details",
+          "viewName": "Damage_Details"
         },
         "targetDamage": {
           "viewType": "XML",

@@ -43,6 +43,10 @@ sap.ui.define([
             await this.Onsearch()
             this.readCustomerData();
         },
+        HM_GenearteDamage:function(){
+                   
+             this.getOwnerComponent().getRouter().navTo("RouteDamageDetails",{sPath: "Damage"});
+        },
 
         _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -77,7 +81,6 @@ sap.ui.define([
         },
 
         readCustomerData: function() {
-            return new Promise((resolve, reject) => {
                 sap.ui.core.BusyIndicator.show(0);
 
                 var filter = {
@@ -97,12 +100,7 @@ sap.ui.define([
                         "CustomerModel"
                     );
 
-                    resolve();
-                }).catch((err) => {
-                    MessageToast.show(err.responseText || "Failed to Load Customer Data.");
-                    sap.ui.core.BusyIndicator.hide();
                 })
-            });
         },
 
         onChangeAddCustomer: function(oEvent) {
@@ -411,8 +409,10 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
 
-            var sRoomNo = oView.byId("HD_id_CustomerName").getSelectedKey() || oView.byId("HD_id_CustomerName").getValue();
-            var sbedtype = oView.byId("HD_id_BedType").getSelectedKey() || oView.byId("HD_id_BedType").getValue();
+            var sRoomNo = oView.byId("Dm_id_CustomerName").getSelectedKey() || oView.byId("Dm_id_CustomerName").getValue();
+            var sbedtype = oView.byId("DM_id_RoomNo").getSelectedKey() || oView.byId("DM_id_RoomNo").getValue();
+            var sstatus = oView.byId("DM_id_Status").getSelectedKey() || oView.byId("DM_id_Status").getValue();
+
 
             let aBranchCodes = [];
 
@@ -441,15 +441,19 @@ sap.ui.define([
             if (sbedtype) {
                 filters.BedTypeName = sbedtype
             }
+            if (sstatus) {
+                filters.Status = sstatus
+            }
+
 
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_Damage", filters).then((oData) => {
-                const roomData = Array.isArray(oData.commentData) ? oData.commentData : [];
+                const roomData = Array.isArray(oData.data) ? oData.data : [];
                 const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
                 // Map BranchCode → BranchName
                 const mappedData = roomData.map(bed => {
-                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);   
                     return {
                         ...bed,
                         BranchName: branch ? branch.Name : bed.BranchCode // fallback
@@ -465,20 +469,31 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             })
         },
+        DM_onPressEditDetails: function(oEvent) {
+            var oSelected = oEvent.getSource().getBindingContext("Damage").getObject();
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteDamageDetails",{
+               sPath: encodeURIComponent(oSelected.DamageID)
+            }); 
+        },
 
         _populateUniqueFilterValues: function(data) {
             let uniqueValues = {
-                HD_id_CustomerName: new Set(),
-                HD_id_BedType: new Set(),
+                Dm_id_CustomerName: new Set(),
+                DM_id_RoomNo: new Set(),
+                DM_id_Status: new Set(),
+
             };
 
             data.forEach(item => {
-                uniqueValues.HD_id_CustomerName.add(item.RoomNo);
-                uniqueValues.HD_id_BedType.add(item.BedTypeName);
+                uniqueValues.DM_id_RoomNo.add(item.RoomNo);
+                uniqueValues.Dm_id_CustomerName.add(item.CustomerID);
+                uniqueValues.DM_id_Status.add(item.Status);
+
             });
 
             let oView = this.getView();
-            ["HD_id_CustomerName", "HD_id_BedType"].forEach(field => {
+            ["Dm_id_CustomerName", "DM_id_RoomNo", "DM_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 oComboBox.destroyItems();
                 Array.from(uniqueValues[field]).sort().forEach(value => {
@@ -491,8 +506,9 @@ sap.ui.define([
         },
 
         HD_onPressClear: function() {
-            this.getView().byId("HD_id_CustomerName").setSelectedKey("")
-            this.getView().byId("HD_id_BedType").setSelectedKey("")
+            this.getView().byId("Dm_id_CustomerName").setSelectedKey("")
+            this.getView().byId("DM_id_RoomNo").setSelectedKey("")
+            this.getView().byId("DM_id_Status").setSelectedKey("")
         },
 
         RD_onDownload: function() {

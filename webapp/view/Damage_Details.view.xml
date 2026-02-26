@@ -1,0 +1,360 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Damage_Details"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns="sap.uxap"
+    xmlns:f="sap.ui.layout.form"
+>
+    <m:Page
+        title="Manage Damage Details"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        id="CID_id_MyPageId"
+    >
+        <m:headerContent>
+            <m:Button
+                press="onHome"
+                icon="sap-icon://log"
+                tooltip="{i18n>logoutTooltip}"
+                type="Transparent"
+            />
+        </m:headerContent>
+        <!-- <m:ScrollContainer > -->
+        <ObjectPageLayout
+            id="DM_id_CmpInvObjectPageLayout"
+            useIconTabBar="false"
+            class="sapUiSmallmarginResponsive"
+        >
+            <!-- Sections in the ObjectPage -->
+            <sections>
+                <!-- First section containing Customer details -->
+                <ObjectPageSection
+                    id="DM_id_DamageGoals1"
+                    showTitle="false"
+                >
+                    <subSections>
+                        <ObjectPageSubSection
+                            id="DM_id_Damage"
+                            title="{i18n>invoiceBasicDetails}"
+                        >
+                            <blocks>
+                                <f:SimpleForm
+                                    editable="true"
+                                    layout="ColumnLayout"
+                                    labelSpanXL="4"
+                                    labelSpanL="3"
+                                    labelSpanM="4"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    emptySpanS="0"
+                                    columnsXL="2"
+                                    columnsL="2"
+                                    columnsM="1"
+                                >
+                                    <f:content>
+                                        <m:Label
+                                            text="Customer ID"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            id="HD_id_CustomerID1"
+                                            width="100%"
+                                            change="onChangeAddCustomer"
+                                            items="{CustomerModel>/}"
+                                            showSecondaryValues="true"
+                                            selectedKey="{DamageModel>/CustomerID}"
+                                            valueStateText="{i18n>customerIDValueState}"
+                                        >
+                                            <core:ListItem
+                                                key="{CustomerModel>CustomerID}"
+                                                text="{CustomerModel>CustomerID}"
+                                                additionalText="{CustomerModel>CustomerName}"
+                                            />
+                                        </m:ComboBox>
+                                        <!-- Customer Name -->
+                                        <m:Label text="Customer Name" />
+                                        <m:Input
+                                            id="HR_id_CustomerName1"
+                                            value="{DamageModel>/CustomerName}"
+                                            placeholder="Enter customer name"
+                                            editable="false"
+                                        />
+                                        <!-- Customer Email -->
+                                        <m:Label text="Customer Email" />
+                                        <m:Input
+                                            id="HD_id_CustomerEmail1"
+                                            value="{DamageModel>/CustomerEmail}"
+                                            placeholder="Enter customer email"
+                                            editable="false"
+                                        />
+                                        <!-- Room Number -->
+                                        <m:Label text="Room No" />
+                                        <m:Input
+                                            id="HD_id_RoomNo1"
+                                            value="{DamageModel>/RoomNo}"
+                                            placeholder="Enter room number"
+                                            editable="false"
+                                        />
+                                        <!-- Bed Type Name -->
+                                        <m:Label text="Bed Type Name" />
+                                        <m:Input
+                                            id="HD_id_BedTypeName1"
+                                            value="{DamageModel>/BedTypeName}"
+                                            placeholder="Enter bed type"
+                                            editable="false"
+                                        />
+                                        <!-- Branch Code -->
+                                        <m:Label text="Branch Code" />
+                                        <m:Input
+                                            id="HD_id_BranchCode1"
+                                            value="{DamageModel>/BranchCode}"
+                                            placeholder="Enter branch code"
+                                            editable="false"
+                                        />
+                                        <m:Label text="{i18n>currency}" />
+                                        <m:Input
+                                            id="HD_id_Currency1"
+                                            value="{DamageModel>/Currency}"
+                                            editable="false"
+                                        />
+                                        <!-- Date -->
+                                        <m:Label
+                                            text="Date"
+                                            required="true"
+                                        />
+                                        <m:DatePicker
+                                            id="HD_id_DamageDate1"
+                                            value="{DamageModel>/Date}"
+                                            displayFormat="dd/MM/yyyy"
+                                            valueFormat="dd/MM/yyyy"
+                                            valueStateText="{i18n>dateValueState}"
+                                            width="100%"
+                                            change="onChangeDamageDate"
+                                            editable="{VisibleModel>/visible}"
+
+
+                                        />
+                                        <!-- Status -->
+                                        <m:Label text="Status" />
+                                        <m:Input
+                                            value="{DamageModel>/Status}"
+                                            editable="false"
+                                            id="HD_id_Status1"
+                                        />
+                                    </f:content>
+                                </f:SimpleForm>
+                            </blocks>
+                        </ObjectPageSubSection>
+                        <ObjectPageSubSection>
+                            <blocks>
+                                <m:VBox>
+                                    <m:Table
+                                        id="CID_id_TableInvoiceItem1"
+                                        sticky="ColumnHeaders,HeaderToolbar"
+                                        items="{DamageModel>/Items}"
+                                        mode="MultiSelect"
+                                       
+
+                                    >
+                                        <m:headerToolbar>
+                                            <m:Toolbar>
+                                                <m:Title text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })" />
+                                                <m:ToolbarSpacer />
+                                                <m:Button
+                                                    text="Add"
+                                                    tooltip="Add"
+                                                    class="myUnifiedBtn"
+                                                    press="DM_onPressAddDamageItems"
+                                                    visible="{VisibleModel>/visible}"
+
+                                                />
+                                                <m:Button
+                                                    text="Delete"
+                                                    tooltip="Delete"
+                                                    class="myUnifiedBtn"
+                                                    press="CID_onPressDelete"
+                                                    visible="{VisibleModel>/visible}"
+                                                />
+                                                <!-- <m:ToolbarSeparator /> -->
+                                            </m:Toolbar>
+                                        </m:headerToolbar>
+                                        <m:columns>
+                                            <m:Column
+                                                width="3rem"
+                                                minScreenWidth="Tablet"
+                                            >
+                                                <m:Text
+                                                    text="{i18n>itemID}"
+                                                    tooltip="{i18n>itemID}"
+                                                />
+                                            </m:Column>
+                                            <m:Column minScreenWidth="Tablet">
+                                                <m:Text
+                                                    text="Item Name"
+                                                    tooltip="Item Name"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="Type"
+                                                    tooltip="Type"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                id="idGSTCalculation"
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="Quantity"
+                                                    tooltip="Quantity"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="Description"
+                                                    tooltip="Description"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="{i18n>total}"
+                                                    tooltip="{i18n>total}"
+                                                />
+                                            </m:Column>
+                                        </m:columns>
+                                        <m:items>
+                                            <m:ColumnListItem type="Active" >
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{DamageModel>IndexNo}"
+                                                        editable="false"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{DamageModel>ItemName}"
+                                                        maxLength="50"
+                                                         editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:ComboBox selectedKey="{DamageModel>Type}"  editable="{VisibleModel>/visible}">
+                                                        <core:Item
+                                                            key="Damage"
+                                                            text="Damage"
+                                                        />
+                                                        <core:Item
+                                                            key="Missing"
+                                                            text="Missing"
+                                                        />
+                                                    </m:ComboBox>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input value="{DamageModel>Quantity}"  editable="{VisibleModel>/visible}" />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:TextArea
+                                                        value="{DamageModel>Description}"
+                                                        rows="2"
+                                                        maxLength="120"
+                                                        editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{DamageModel>Cost}"
+                                                        liveChange="onTotalInputLiveChange"
+                                                        editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
+                                            </m:ColumnListItem>
+                                        </m:items>
+                                    </m:Table>
+                                    <m:FlexBox
+                                        class="custom-flexbox sapUiContentPadding"
+                                        direction="Column"
+                                    >
+                                        <m:VBox class="custom-vbox">
+                                            <!-- Sub Total (Non-Taxable) -->
+                                            <m:HBox justifyContent="SpaceBetween">
+                                                <m:Label
+                                                    text="Total Cost :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{
+                                                        parts: [{
+                                                            path: 'DamageModel>/TotalCost'
+                                                        }, {
+                                                            path: 'DamageModel>/Currency'
+                                                        }],
+                                                        formatter: '.Formatter.formatCurrency'
+                                                    }"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
+                                        </m:VBox>
+                                    </m:FlexBox>
+                                </m:VBox>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Bar>
+                <m:contentLeft>
+                    <m:Image
+                        src="../image/TransparentKTlogo.png"
+                        width="30px"
+                        height="30px"
+                    />
+                    <m:Link
+                        text="{i18n>devlopby}"
+                        href="https://kvrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </m:contentLeft>
+                <m:contentRight>
+                    <m:Button
+                        text="{i18n>submit}"
+                        tooltip="{i18n>submit}"
+                        press="DM_onPressSubmit"
+                        class="sendMail myUnifiedBtn"
+                          visible="{VisibleModel>/visible}"
+
+                    />
+                    <m:Button
+                        text="Edit"
+                        press="DM_onPressEdit"
+                        class="sendMail myUnifiedBtn"
+                          visible="{= !${VisibleModel>/visible} }"
+                    />
+                    <m:Button
+                        text="Genearte PDF"
+                        press="CID_onPressEdit"
+                        class="sendMail myUnifiedBtn"
+                    />
+                </m:contentRight>
+            </m:Bar>
+        </m:footer>
+    </m:Page>
+</mvc:View>

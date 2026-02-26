@@ -242,19 +242,30 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-        Facilitysearch: async function (sBranchCode) {
-            const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
-                BranchCode: sBranchCode
-            });
+     Facilitysearch: async function (sBranchCode, Deposit) {
 
-            const aFacilities = Array.isArray(oData.data.data) ? oData.data.data : [oData.data.data];
+    const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
+        BranchCode: sBranchCode
+    });
 
-            const oModel = new sap.ui.model.json.JSONModel(aFacilities);
-            this.getView().setModel(oModel, "Facilities");
+    const aFacilities = Array.isArray(oData.data.data)
+        ? oData.data.data
+        : [oData.data.data];
 
-            // very important: return data so main function waits
-            return aFacilities;
-        },
+    let aFilteredFacilities = aFacilities;
+
+    // 🚀 If extrabed <= 0 → remove Extra Bed
+    if (Deposit && Deposit.ExtraBed <= 0) {
+        aFilteredFacilities = aFacilities.filter(function (oItem) {
+            return oItem.Type !== "Extra Bed";  
+        });
+    }
+
+    const oModel = new sap.ui.model.json.JSONModel(aFilteredFacilities);
+    this.getView().setModel(oModel, "Facilities");
+
+    return aFilteredFacilities;
+},
 
         onNavBack: function () {
             if( this._fromRoute==="Dashboard"){
@@ -399,6 +410,7 @@ sap.ui.define([
                         SelectedFacilities: oCustomer.FaciltyItems || []
                     }
                 }];
+              
                 // Calculate totals
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 var BedType = oCustomer.Bookings?.[0]?.BedType
@@ -524,7 +536,7 @@ sap.ui.define([
                 oCustomerData.Duration = Duration;
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
-                await this.Facilitysearch(sBranchCode)
+                await this.Facilitysearch(sBranchCode,Deposit)
                 const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,oCustomer);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
