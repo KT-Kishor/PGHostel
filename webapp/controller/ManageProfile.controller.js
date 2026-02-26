@@ -82,13 +82,10 @@ sap.ui.define([
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
 
                 const filter = { UserID: sUserID }
-                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
-                const aBookings = response?.BookingData || [];
+                const response = await this.ajaxReadWithJQuery("HM_Booking", filter);
+                const aBookings = response?.commentData || [];
             
                 const aBranchComboData = this._prepareBranchComboData(aBookings);
-                const aPayments = response?.PaymentData || [];
-                const aComplain = response?.ComplaintData || [];
-
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const aBookingData = aBookings.map(booking => {
@@ -142,46 +139,8 @@ sap.ui.define([
                     }
 
                 });
-                // Format PAYMENTS
-                const aPaymentData = aPayments.map(payment => ({
-                    BookingID: payment.BookingID,
-                    InvNo: payment.InvNo?.toString() || "",
-                    InvoiceDate: payment.InvoiceDate,
-                    CustomerName: payment.CustomerName,
-                    TotalAmount: payment.TotalAmount?.toString() || "",
-                    DueAmount: payment.DueAmount ? payment.DueAmount.toString() : "Not Applicable",
-                    currency: payment.Currency,
-                    PaymentGroup: payment.Status || "Others"
-                }));
+            
               
-                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
-                const aBranchMaster = oBRModel?.getProperty("/") || [];
-
-                const aComplainData = aComplain.map(complain => {
-
-                    const sBranchCode = complain.BranchCode || "";
-
-                    const oBranch = aBranchMaster.find(
-                        b => b.BranchID === sBranchCode
-                    );
-
-                    return {
-                        ComplaintID: complain.ComplaintID,
-                        ComplaintType: complain.ComplaintType,
-                        Description: complain.Description,
-                        ComplaintDescription: complain.Description,
-                        ComplaintRaisedDate: complain.ComplaintRaisedDate,
-                        ComplaintStatus: complain.Status,
-                        BranchCode: sBranchCode,
-                        BranchName: oBranch?.Name || sBranchCode,   // ← Added
-                        RoomNo: complain.RoomNo || "",
-                        FileName: complain.FileName || "",
-                        FileType: complain.FileType || "",
-                        File: complain.File || "",
-                        ExpectedResolvedDate: complain.EstimatDate,
-                        AssignedTo: complain.AssignedBy || "",
-                    };
-                });
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
@@ -207,13 +166,8 @@ sap.ui.define([
                     BranchCombo: aBranchComboData,
                     selectedBranchCode: "",
                     hasAssignedBooking: hasAssignedBooking,
-
                     bookings: aBookingData,
-                    Payments: aPaymentData,
-                    complain: aComplainData,
                     bookingCount: aBookingData.length,
-                    paymentCount: aPaymentData.length,
-                    complainCount: aComplainData.length,
                     selectedTab: "Booking History",
                     aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
                     facility: [],
@@ -241,11 +195,8 @@ sap.ui.define([
                     hasAssignedBooking: false,
                 });
                 this.getView().setModel(oProfileModel, "profileData");
-                // this._prepareBranchComboData()
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
-
-
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
@@ -543,10 +494,6 @@ sap.ui.define([
         updateUserPhoto: async function ({ fileName, fileType, fileContent }) {
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
-                // if (!sUserID) {
-                //     sap.m.MessageToast.show(this.i18nModel.getText("usernotLoggedin"));
-                //     return;
-                // }
                 const payload = {
                     data: {
                         FileName: fileName,
@@ -879,6 +826,40 @@ sap.ui.define([
             const sKey = oEvent.getParameter("key");
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
+
+            // When Payment tab selected, fetch invoices and bind to Payments
+            if (sKey === "Payment") {
+                try {
+                    sap.ui.core.BusyIndicator.show(0);
+                    const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+                    if (!sUserID) {
+                        MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
+                        return;
+                    }
+
+                    const resp = await this.ajaxReadWithJQuery("HM_ManageInvoice", { UserID: sUserID });
+                    const aInvoiceData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
+
+                    const aPayments = aInvoiceData.map(inv => ({
+                        BookingID: inv.BookingID || inv.BookingId || "",
+                        CustomerName: inv.CustomerName || "",
+                        InvoiceDate: inv.InvoiceDate || inv.InvoiceDateString || "",
+                        InvNo: inv.InvNo || inv.InvNumber || "",
+                        TotalAmount: inv.TotalAmount || inv.GrandTotal || 0,
+                        DueAmount: inv.DueAmount || inv.DueAmount || 0,
+                        currency: inv.Currency || inv.currency || "",
+                         PaymentGroup: inv.Status || "Others"
+                    }));
+
+                    oModel.setProperty("/Payments", aPayments);
+                } catch (err) {
+                    sap.m.MessageToast.show(err.message || err.responseText || "Error loading payments");
+                } finally {
+                    sap.ui.core.BusyIndicator.hide();
+                    // Update counts for table
+                    this._updateRowCount();
+                }
+            }
         },
         onlogout: function () {
 

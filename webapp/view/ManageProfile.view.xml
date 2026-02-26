@@ -264,18 +264,18 @@
                 <items>
                     <IconTabFilter
                         key="Booking History"
-                        text="Booking History ({profileData>/bookingCount})"/>
+                        text="{= ${profileData>/bookingCount} > 0 ? 'Booking History (' + ${profileData>/bookingCount} + ')' : 'Booking History' }"/>
 
                     <IconTabFilter
                         key="Payment"
-                        text="Payment ({profileData>/paymentCount})"/>
+                        text="{= ${profileData>/paymentCount} > 0 ? 'Payment (' + ${profileData>/paymentCount} + ')' : 'Payment' }"/>
                     <IconTabFilter
                         key="Complaints"
-                        text="Complaints ({profileData>/complainCount})"
-                        visible="{= ${profileData>/complainCount} > 0 }"/>
+                        text="{= ${profileData>/complainCount} > 0 ? 'Complaints (' + ${profileData>/complainCount} + ')' : 'Complaints' }"
+                      />
                     <IconTabFilter
                         key="Damage"
-                        text="Damage ({profileData>/damageCount})"
+                        text="{= ${profileData>/damageCount} > 0 ? 'Damage (' + ${profileData>/damageCount} + ')' : 'Damage' }"
                       />
                 </items>
             </IconTabHeader>
