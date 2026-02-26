@@ -22,6 +22,7 @@ sap.ui.define([
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
                 await this._loadUserBranches();
+                await this.DD_search();
             } catch (err) {
                 MessageToast.show("Something went wrong");
             } finally {
@@ -42,8 +43,42 @@ sap.ui.define([
             this.byId("id_DD_year").setValue("");
         },
 
-        DD_search: function () {
+        DD_search: async function () {
+            sap.ui.core.BusyIndicator.show(0);
+            try {
+                const sBranch = this.byId("id_DD_branch").getSelectedKey();
+                const oRange = this.byId("id_DD_year");
 
+                let startDate = null;
+                let endDate = null;
+                if (oRange.getDateValue() && oRange.getSecondDateValue()) {
+                    startDate = oRange.getDateValue().toISOString().split("T")[0];
+                    endDate = oRange.getSecondDateValue().toISOString().split("T")[0];
+                }
+                let payload = {
+                    BranchCode: sBranch || this._aUserBranches.join(","),
+                    StartDate: startDate,
+                    EndDate: endDate,
+                    StartReturnDamageDate: startDate,
+                    EndReturnDamageDate: endDate
+                };
+                const oChartResponse = await this.ajaxCreateWithJQuery("HM_DamageChart", payload);
+                console.log("damage chart:", payload);
+                this.getView().setModel(new JSONModel(oChartResponse.data || []), "damageChartModel");
+
+                const oDailyResponse = await this.ajaxCreateWithJQuery(
+                    "HM_DamageCurrentMonthBarChart",
+                    {
+                        StartDate: startDate,
+                        EndDate: endDate
+                    }
+                );
+                this.getView().setModel(new JSONModel(oDailyResponse.data || []), "dailyModel");
+            } catch (err) {
+                sap.m.MessageToast.show("Dashboard load failed");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
         },
 
         onHome: function () {

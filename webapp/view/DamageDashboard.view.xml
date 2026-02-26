@@ -4,8 +4,8 @@
     xmlns="sap.m"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:viz="sap.viz.ui5.controls"
-    xmlns:vizData="sap.viz.ui5.data"
-    xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:layout="sap.ui.layout"
     xmlns:core="sap.ui.core"
     xmlns:f="sap.f"
@@ -37,7 +37,7 @@
                     >
                         <fb:control>
                             <ComboBox
-                            id="id_DD_branch"
+                                id="id_DD_branch"
                                 items="{branchModel>/}"
                                 showSecondaryValues="true"
                                 showClearIcon="true"
@@ -74,12 +74,11 @@
                 defaultSpan="XL6 L6 M12 S12"
                 class="sapUiResponsiveMargin sapUiMediumMarginTop"
             >
-                <!-- 1. Monthly Booking Trend -->
                 <f:Card class="sapUiTinyMargin">
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="{i18n>dashMonthlyBooking}"
+                                text="Damaged Items"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -120,11 +119,43 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                 plotArea: { dataLabel: { visible: true } },
-                                valueAxis: { title: { text: 'Number of Bookings' } },
-                                categoryAxis: { title: { text: 'Month' } },
+                                valueAxis: { title: { text: 'Damage Count' } },
+                                categoryAxis: { title: { text: 'Item Name' } },
                                 legend: { visible: true }
                             }"
-                                        />
+                                        >
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset
+                                                    data="{damageChartModel>/}"
+                                                >
+                                                    <viz.data:dimensions>
+                                                        <viz.data:DimensionDefinition
+                                                            name="Item Name"
+                                                            value="{damageChartModel>ItemName}"
+                                                        />
+                                                    </viz.data:dimensions>
+                                                    <viz.data:measures>
+                                                        <viz.data:MeasureDefinition
+                                                            name="Damage Count"
+                                                            value="{damageChartModel>Count}"
+                                                        />
+                                                    </viz.data:measures>
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                    uid="valueAxis"
+                                                    type="Measure"
+                                                    values="Damage Count"
+                                                />
+                                                <viz.feeds:FeedItem
+                                                    uid="categoryAxis"
+                                                    type="Dimension"
+                                                    values="Item Name"
+                                                />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
                                     </com:content>
                                 </com:ChartContainerContent>
                             </com:content>
@@ -132,12 +163,11 @@
                     </f:content>
                 </f:Card>
 
-                <!-- 2. Daily Booking Trend -->
                 <f:Card class="sapUiTinyMargin">
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="{i18n>dashDailyBooking}"
+                                text="Daily Damage"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -177,10 +207,42 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Number of Bookings' } },
-                                                    categoryAxis: { title: { text: 'Day' } }
+                                                    valueAxis: { title: { text: 'Damage Count' } },
+                                                    categoryAxis: { title: { text: 'Day of month' } }
                                                 }"
-                                        />
+                                        >
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset
+                                                    data="{dailyModel>/}"
+                                                >
+                                                    <viz.data:dimensions>
+                                                        <viz.data:DimensionDefinition
+                                                            name="Day"
+                                                            value="{dailyModel>Day}"
+                                                        />
+                                                    </viz.data:dimensions>
+                                                    <viz.data:measures>
+                                                        <viz.data:MeasureDefinition
+                                                            name="Damage Count"
+                                                            value="{dailyModel>Count}"
+                                                        />
+                                                    </viz.data:measures>
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                    uid="valueAxis"
+                                                    type="Measure"
+                                                    values="Damage Count"
+                                                />
+                                                <viz.feeds:FeedItem
+                                                    uid="categoryAxis"
+                                                    type="Dimension"
+                                                    values="Day"
+                                                />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
                                     </com:content>
                                 </com:ChartContainerContent>
                             </com:content>
@@ -188,12 +250,11 @@
                     </f:content>
                 </f:Card>
 
-                <!-- 3. Status Wise Booking Trend -->
                 <f:Card class="sapUiTinyMargin">
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="{i18n>dashStatusWiseBooking}"
+                                text="Damage Status"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -233,10 +294,42 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Number of Bookings' } },
+                                                    valueAxis: { title: { text: 'Total records' } },
                                                     categoryAxis: { title: { text: 'Status' } }
                                                 }"
-                                        />
+                                        >
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset
+                                                    data="{damageChartModel>/}"
+                                                >
+                                                    <viz.data:dimensions>
+                                                        <viz.data:DimensionDefinition
+                                                            name="Status"
+                                                            value="{damageChartModel>Status}"
+                                                        />
+                                                    </viz.data:dimensions>
+                                                    <viz.data:measures>
+                                                        <viz.data:MeasureDefinition
+                                                            name="Total Records"
+                                                            value="{damageChartModel>Count}"
+                                                        />
+                                                    </viz.data:measures>
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                    uid="size"
+                                                    type="Measure"
+                                                    values="Total Records"
+                                                />
+                                                <viz.feeds:FeedItem
+                                                    uid="color"
+                                                    type="Dimension"
+                                                    values="Status"
+                                                />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
                                     </com:content>
                                 </com:ChartContainerContent>
                             </com:content>
@@ -244,12 +337,11 @@
                     </f:content>
                 </f:Card>
 
-                <!-- 4. Payment Type Booking Trend -->
                 <f:Card class="sapUiTinyMargin">
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="{i18n>dashPaymentTypeBooking}"
+                                text="Damage Type"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -289,10 +381,42 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Number of Bookings' } },
-                                                    categoryAxis: { title: { text: 'Payment Type' } }
+                                                    valueAxis: { title: { text: 'Total records' } },
+                                                    categoryAxis: { title: { text: 'Damage type' } }
                                                 }"
-                                        />
+                                        >
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset
+                                                    data="{damageChartModel>/}"
+                                                >
+                                                    <viz.data:dimensions>
+                                                        <viz.data:DimensionDefinition
+                                                            name="Status"
+                                                            value="{damageChartModel>Status}"
+                                                        />
+                                                    </viz.data:dimensions>
+                                                    <viz.data:measures>
+                                                        <viz.data:MeasureDefinition
+                                                            name="Total Records"
+                                                            value="{damageChartModel>Count}"
+                                                        />
+                                                    </viz.data:measures>
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                    uid="size"
+                                                    type="Measure"
+                                                    values="Total Records"
+                                                />
+                                                <viz.feeds:FeedItem
+                                                    uid="color"
+                                                    type="Dimension"
+                                                    values="Status"
+                                                />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
                                     </com:content>
                                 </com:ChartContainerContent>
                             </com:content>

@@ -60,7 +60,8 @@
 .navText:hover {
   color: #00bcd4 !important;
 }
- /* Base Style */
+
+/* Base Style */
 .loginButton .sapMBtnInner {
   background: linear-gradient(135deg, #02e0fd, #008b96) !important;
   color: #ffffff !important;
@@ -554,32 +555,38 @@
   font-weight: bold;
   color: #000000;
 
-  line-height: 1.5rem;        /* adjust based on font */
-  min-height: 2rem;           /* 1.5rem × 2 lines */
+  line-height: 1.5rem;
+  /* adjust based on font */
+  min-height: 2rem;
+  /* 1.5rem × 2 lines */
   max-height: 3rem;
 
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;      /* limit to 2 lines */
+  -webkit-line-clamp: 2;
+  /* limit to 2 lines */
   -webkit-box-orient: vertical;
   margin: auto;
 }
+
 .roomHeaderTitle {
-    font-size: 1.6rem;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: 700;
-    color: #00b7c7 !important;             
-    letter-spacing: 0.5px;
-    padding: 0.6rem 1rem;
-    border-left: 5px solid #00b7c7;
-    background: linear-gradient(to right, #e8f4ff, transparent);
-    border-radius: 6px;
-    margin: 1rem 0;
-    text-transform: uppercase;
+  font-size: 1.6rem;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-weight: 700;
+  color: #00b7c7 !important;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 1rem;
+  border-left: 5px solid #00b7c7;
+  background: linear-gradient(to right, #e8f4ff, transparent);
+  border-radius: 6px;
+  margin: 1rem 0;
+  text-transform: uppercase;
 }
+
 .blurView {
-    filter: blur(5px);
-    pointer-events: none;   /* Prevent interaction */
+  filter: blur(5px);
+  pointer-events: none;
+  /* Prevent interaction */
 }
 
 
@@ -2030,9 +2037,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
   /* Push entire block to the right */
   justify-content: flex-end !important;
 }
+
 .responsiveFlex {
-   background: white;
-  }
+  background: white;
+}
+
 @media only screen and (min-width: 811px) {
   .responsiveFlex {
     justify-content: space-between !important;
@@ -2762,6 +2771,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
   object-fit: cover !important;
 }
+
 .serviceImage1,
 .imageContainer img {
   width: 100% !important;
@@ -2842,12 +2852,13 @@ span.sapMBtnInner.sapMBtnEmphasized {
     width: 100% !important;
     max-width: 320px;
     margin: 0.5rem auto;
-  } 
+  }
 }
-@media screen and (max-width:600px){
-.serviceImage1{
-  width:230px !important;
-}
+
+@media screen and (max-width:600px) {
+  .serviceImage1 {
+    width: 230px !important;
+  }
 }
 
 .profileActionSheet .sapMBtn {
@@ -3149,10 +3160,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
     opacity: 0;
     transform: translateY(-50%) translateX(110vw) scale(0.98);
   }
+
   60% {
     opacity: 1;
     transform: translateY(-50%) translateX(-4px) scale(1);
   }
+
   100% {
     opacity: 1;
     transform: translateY(-50%) translateX(0) scale(1);
@@ -3165,10 +3178,12 @@ span.sapMBtnInner.sapMBtnEmphasized {
     opacity: 0;
     transform: translateY(-50%) translateX(120vw) scale(0.98);
   }
+
   60% {
     opacity: 1;
     transform: translateY(-50%) translateX(-6px) scale(1);
   }
+
   100% {
     opacity: 1;
     transform: translateY(-50%) translateX(0) scale(1);
@@ -3179,6 +3194,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
 .explore-enter {
   animation: screenEdgeSlide 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
 /* Media Query for Mobile Optimization */
 @media screen and (max-width: 768px) {
   .explore-enter {
@@ -3410,7 +3426,7 @@ span.sapMBtnInner.sapMBtnEmphasized {
   }
 
 
-  
+
 
 }
 
@@ -3557,22 +3573,22 @@ span.sapMBtnInner.sapMBtnEmphasized {
   line-height: 1.5;
   word-break: normal;
   white-space: normal;
-  transition: background-color 0.2s; 
+  transition: background-color 0.2s;
 }
 
 .AddressTextLarge.sapMLnk:focus,
 .AddressTextLarge.sapMLnk:active,
 .AddressTextLarge.sapMLnk.sapMLnkFocus {
-    outline: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important; 
-    border: none !important;
-    color: #0064d1 !important;
+  outline: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: #0064d1 !important;
 }
 
 .AddressTextLarge.sapMLnk:hover {
-    background-color: transparent !important;
-    text-decoration: underline !important;
+  background-color: transparent !important;
+  text-decoration: underline !important;
 }
 
 .AddressBox {
@@ -3648,11 +3664,11 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
 /* Mobile devices */
 @media (max-width: 600px) {
-.couponContainer {
-flex-direction: column;
-align-items: flex-end;
-justify-content: flex-end;
-}
+  .couponContainer {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
 
   .couponInput {
     width: 100% !important;
@@ -3868,59 +3884,61 @@ justify-content: flex-end;
     max-width: 100%;
   }
 }
+
 .imageWrapper {
-    position: relative;
+  position: relative;
 }
 
 .ratingOverlay {
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    background: rgba(255, 255, 255, 0.85);
-    padding: 1px 2px;
-    border-radius: 4px;
-    line-height: 1;
-    gap: 4px; /* spacing between stars & text */
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1px 2px;
+  border-radius: 4px;
+  line-height: 1;
+  gap: 4px;
+  /* spacing between stars & text */
 }
 
 /* Yellow stars */
 .ratingOverlay .sapMRIIconSel {
-    color: #f8c304 !important;
+  color: #f8c304 !important;
 }
 
 /* Grey empty stars */
 .ratingOverlay .sapMRIIconUnsel {
-    color: #d3d3d3 !important;
+  color: #d3d3d3 !important;
 }
 
 .ratingCountText {
-    font-size: 0.7rem;
-    color: #333;
-    margin-left: 2px;
-    margin-bottom: 2px;
+  font-size: 0.7rem;
+  color: #333;
+  margin-left: 2px;
+  margin-bottom: 2px;
 }
 
 .feedbackFormContainer {
-    width: 95%;
-    min-width: 48rem;
-    max-width: 48rem;
-    margin: 0 auto;
-    box-sizing: border-box; 
+  width: 95%;
+  min-width: 48rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Tablet & below */
 @media (max-width: 1024px) {
-    .feedbackFormContainer {
-        width: 80%;
-        min-width: unset;
-    }
+  .feedbackFormContainer {
+    width: 80%;
+    min-width: unset;
+  }
 }
- 
+
 @media (max-width: 600px) {
-    .feedbackFormContainer {
-        width: 100%;
-        min-width: unset !important;
-    }
+  .feedbackFormContainer {
+    width: 100%;
+    min-width: unset !important;
+  }
 }
 
 .feedbackPageWrapper .sapMPageChildCanvas {
@@ -3931,7 +3949,7 @@ justify-content: flex-end;
 }
 
 .Feedbackpage {
-  min-height: calc(100vh - 3.5rem); 
+  min-height: calc(100vh - 3.5rem);
   height: auto !important;
   margin: 0.5rem;
   background-image: url("../image/BedHostel.png");
@@ -3943,12 +3961,13 @@ justify-content: flex-end;
   box-sizing: border-box;
   overflow-y: hidden;
 }
+
 @media screen and (max-width: 600px) {
-    .Feedbackpage {
-        background-attachment: scroll; 
-        margin: 0; 
-        border-radius: 0;
-    }
+  .Feedbackpage {
+    background-attachment: scroll;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 
 .custom-feedback {
@@ -3961,14 +3980,18 @@ justify-content: flex-end;
   text-shadow:
     0 4px 14px rgba(0, 0, 0, 0.6);
 }
+
 @media screen and (max-width: 1024px) {
   .custom-feedback {
-    font-size:  27.8px !important; /* 38px */
-   }
+    font-size: 27.8px !important;
+    /* 38px */
+  }
 }
+
 @media screen and (max-width: 600px) {
   .custom-feedback {
-    font-size: 19.06px !important; /* 26px */
+    font-size: 19.06px !important;
+    /* 26px */
     line-height: 1.2;
     letter-spacing: 1.2px;
   }
@@ -3976,8 +3999,9 @@ justify-content: flex-end;
 
 @media screen and (max-width: 380px) {
   .custom-feedback {
-    font-size:  27.85px !important; /* 22px */
-    letter-spacing: 1px; 
+    font-size: 27.85px !important;
+    /* 22px */
+    letter-spacing: 1px;
   }
 }
 
@@ -4023,6 +4047,7 @@ justify-content: flex-end;
   margin-right: 0;
   margin-bottom: 0;
 }
+
 @media screen and (max-width: 1024px) {
 
   .heroFeedBox {
@@ -4030,7 +4055,9 @@ justify-content: flex-end;
     /*///old 420*/
     padding: 20px 25px;
   }
-}@media screen and (min-width: 601px) and (max-width: 850px) {
+}
+
+@media screen and (min-width: 601px) and (max-width: 850px) {
 
 
   /* 2. Reset the TextBox for centering */
@@ -4043,6 +4070,7 @@ justify-content: flex-end;
 
   }
 }
+
 @media screen and (max-width: 600px) {
   .heroFeedBox {
     width: calc(100% - 2rem);
@@ -4066,69 +4094,87 @@ justify-content: flex-end;
 
     backdrop-filter: blur(12px) saturate(150%);
   }
-}@media screen and (max-width: 380px) {
+}
+
+@media screen and (max-width: 380px) {
   .heroFeedBox {
     padding: 15px 20px;
     margin-top: 1.5rem;
   }
 }
-@media screen and (max-width: 850px) {
-    .heroFeedBox {
-        margin-top: 1vh !important;
-        margin-left: 0 !important; 
-        margin-bottom: 0.5rem !important;
-        margin-right: 1rem !important;
-        width: calc(100% - 2rem) !important; 
-        position: relative !important;
-        flex-shrink: 0 !important;
 
-    }
+@media screen and (max-width: 850px) {
+  .heroFeedBox {
+    margin-top: 1vh !important;
+    margin-left: 0 !important;
+    margin-bottom: 0.5rem !important;
+    margin-right: 1rem !important;
+    width: calc(100% - 2rem) !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+
+  }
 }
-.FacilitySummaryImage{
-width:180px;
-height:140px;
-border-radius: 2px;
+
+.FacilitySummaryImage {
+  width: 180px;
+  height: 140px;
+  border-radius: 2px;
 }
+
 @media (max-width: 600px) {
-.FacilitySummaryImage{
-width:270px;
-height:140px;
+  .FacilitySummaryImage {
+    width: 270px;
+    height: 140px;
+  }
 }
-}
+
 /* Dialog ke scroll container ko image ke liye stretch karna */
 .PG-noPaddingDialog .sapMDialogScrollCont {
-    padding: 0 !important;
-    display: flex !important;
-    height: 100% !important;
-    overflow: hidden !important;
+  padding: 0 !important;
+  display: flex !important;
+  height: 100% !important;
+  overflow: hidden !important;
 }
 
 /* Image ko container ke hisaab se distort (shrink/skew) hone par majboor karna */
 .PG-fitImage {
-    object-fit: fill !important;
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
+  object-fit: fill !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
+
 /* .sapFAvatarXL {
     height: 10rem;
     width: 10rem;
     font-size: 3rem;
 } */
-.customLinkWhiteBg,
+/* .customLinkWhiteBg,
 .customLinkWhiteBg:active,
 .customLinkWhiteBg:focus,
 .customLinkWhiteBg:visited {
     outline: none;
     color:#0070c9;
     background: white;
+} */
+.customLinkWhiteBg.sapMLnk,
+.customLinkWhiteBg.sapMLnk:focus,
+.customLinkWhiteBg.sapMLnk:active,
+.customLinkWhiteBg.sapMLnk:visited,
+.customLinkWhiteBg.sapMLnk:hover {
+  color: #0070c9 !important;
+  background-color: white !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
- .sapFCardHeader {
+
+.sapFCardHeader {
   background: linear-gradient(135deg, #0aa6b5, #0d8fa3);
   color: #fff;
   border-radius: 14px 14px 0 0;
   padding: 1rem;
-} 
+}
 
 .sapFCardHeader .sapFCardTitle {
   font-weight: 600;
@@ -4138,7 +4184,7 @@ height:140px;
 .sapFCardHeader .sapFCardSubtitle {
   font-size: 0.85rem;
   opacity: 0.9;
-} 
+}
 
 /* Force all header texts to white */
 .sapFCardHeader,
@@ -4162,8 +4208,10 @@ height:140px;
 /* Make all card labels bold */
 .sapFCardContent .sapMLabel {
   font-weight: 700 !important;
-  color: #1f2937; /* optional: darker for better emphasis */
+  color: #1f2937;
+  /* optional: darker for better emphasis */
 }
+
 .sapFCardContent .sapUiFormLabel {
   font-weight: 700 !important;
 }
@@ -4236,184 +4284,211 @@ height:140px;
 }
 
 .noExtraSpace {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .noExtraSpace .sapMScrollCont {
-    padding: 0;
+  padding: 0;
 }
 
 .noExtraSpace .sapMTokenizer {
-    margin-top: 0.25rem;
+  margin-top: 0.25rem;
 }
 
 .sapMDialogSection {
-    padding-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
 }
+
 .mobileUploadMargin {
-    margin-left: -10px;
-  } 
-  .defaultBGBlur {
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 100%; 
-  }
-  .defaultBGBlur::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url("../image/BedHostel.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(8px);
-    transform: scale(1.08);
-    z-index: 0;
-  }
-  .defaultBGBlur::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    z-index: 0;
-  }
-  .defaultBGBlur > footer {
-    margin-top: auto; 
-    position: relative;
-    z-index: 2;
-  }
-  .defaultBGBlur > * {
-    position: relative;
-    z-index: 1;
-  }
-  .defaultBGBlur {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-  } 
-  .customRoundedFlex {
-      border-radius: 12px;
-      background-color: white;
-      padding: 5px 15px;
-      border: 1px solid #ddd;
-  }
-  .customRoundedTable {
-      border-radius: 12px !important;
-      overflow: hidden !important; 
-      border: 1px solid #ddd;
-      background-color: white;
-  }
+  margin-left: -10px;
+}
+
+.defaultBGBlur {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.defaultBGBlur::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  transform: scale(1.08);
+  z-index: 0;
+}
+
+.defaultBGBlur::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.defaultBGBlur>footer {
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.defaultBGBlur>* {
+  position: relative;
+  z-index: 1;
+}
+
+.defaultBGBlur {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.customRoundedFlex {
+  border-radius: 12px;
+  background-color: white;
+  padding: 5px 15px;
+  border: 1px solid #ddd;
+}
+
+.customRoundedTable {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid #ddd;
+  background-color: white;
+}
+
 .avatarContainer {
-    position: relative;
-    width: 170px;
-    height: 170px;
-    display: inline-block;
+  position: relative;
+  width: 170px;
+  height: 170px;
+  display: inline-block;
 }
+
 .customLargeAvatar {
-    width: 170px !important;
-    height: 170px !important;
-    border-radius: 15px !important; 
-    border: 3px solid white !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
-    overflow: hidden;
+  width: 170px !important;
+  height: 170px !important;
+  border-radius: 15px !important;
+  border: 3px solid white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden;
 }
+
 .avatarEditBtnOverlay {
-    position: absolute !important;
-    bottom: 7px !important;
-    right: -10px !important;
-    z-index: 10;
+  position: absolute !important;
+  bottom: 7px !important;
+  right: -10px !important;
+  z-index: 10;
 }
+
 .avatarEditBtnOverlay .sapMBtnInner {
-    width: 40px !important;
-    height: 40px !important;
-    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
-    border: 2px solid white !important;
-    border-radius: 10px !important;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.25) !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  border: 2px solid white !important;
+  border-radius: 10px !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25) !important;
 }
+
 .avatarEditBtnOverlay .sapMBtnInner:hover {
-    background: linear-gradient(135deg, #00d4e6, #009aa6) !important;
+  background: linear-gradient(135deg, #00d4e6, #009aa6) !important;
 }
+
 .avatarEditBtnOverlay .sapMBtnIcon {
-    color: white !important;
-    font-size: 1.1rem !important;
-    line-height: 40px !important;
+  color: white !important;
+  font-size: 1.1rem !important;
+  line-height: 40px !important;
 }
+
 .hiddenUploader .sapMBtn {
-    display: none !important;
-    visibility: hidden !important;
+  display: none !important;
+  visibility: hidden !important;
 }
+
 .hiddenUploader input[type="file"] {
-    opacity: 0 !important;
-    width: 0.1px !important;
-    height: 0.1px !important;
-    position: absolute !important;
-    overflow: hidden;
-    z-index: -1 !important;
+  opacity: 0 !important;
+  width: 0.1px !important;
+  height: 0.1px !important;
+  position: absolute !important;
+  overflow: hidden;
+  z-index: -1 !important;
 }
+
 .profileFlex {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
+
 @media (max-width: 600px) {
-    .profileFlex {
-        flex-direction: column !important;
-        align-items: center !important;
-    }
+  .profileFlex {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
 }
+
 @media (max-width: 600px) {
-    .avatarContainer {
-        margin-bottom: 1rem;
-    }
+  .avatarContainer {
+    margin-bottom: 1rem;
+  }
 }
+
 .btnGradientHoverOnly .sapMBtnInner {
   background: transparent !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255,255,255,0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
   transition: background 0.2s ease, transform 0.1s ease, border 0.2s ease;
 }
+
 .btnGradientHoverOnly:hover .sapMBtnInner,
 .btnGradientHoverOnly.sapMBtnHover .sapMBtnInner {
   background: linear-gradient(135deg, #00b7c7, #008b96) !important;
   border: 1px solid transparent !important;
   transform: scale(1.05);
 }
+
 .btnGradientHoverOnly.sapMBtnActive .sapMBtnInner {
   background: linear-gradient(135deg, #1fb7c5, #0f99a6) !important;
   transform: scale(1.05);
 }
+
 .btnGradientHoverOnly .sapMBtnIcon,
 .btnGradientHoverOnly .sapUiIcon {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
+
 .automatedEllipsis {
-    display: block !important; 
-    width: 100%;               
-    overflow: hidden;          
-    text-overflow: ellipsis;   
-    white-space: nowrap;       
+  display: block !important;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 .customActionBox {
-  gap: 0.75rem;  
+  gap: 0.75rem;
 }
+
 .preview-image-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 .preview-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
