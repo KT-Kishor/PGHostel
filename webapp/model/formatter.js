@@ -482,7 +482,13 @@ formatIGSTLabel: function (sGSTValue) {
         },
 
 
-
+canEditComplaint: function (sStatus) {
+    if (!sStatus) {
+        return false;
+    }
+    const status = sStatus.trim().toLowerCase();
+    return status !== "in progress" && status !== "resolved";
+},
 
         
     }

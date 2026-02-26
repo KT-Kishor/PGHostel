@@ -182,7 +182,6 @@ sap.ui.define([
                         AssignedTo: complain.AssignedBy || "",
                     };
                 });
-                console.log("aComplainData:", aComplainData);
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
@@ -1172,12 +1171,6 @@ sap.ui.define([
 
                 const oProfileModel = this.getView().getModel("profileData");
 
-                console.log("Selected BranchCode:", oComplaintData.BranchCode);
-
-                console.log(
-                    "Available BranchCombo:",
-                    this.getView().getModel("profileData").getProperty("/BranchCombo")
-                );
 
                 oProfileModel.setProperty(
                     "/selectedBranchCode",
@@ -1241,7 +1234,6 @@ sap.ui.define([
                     Documents: aDocuments,
                     isEditMode: true
                 });
-                console.log("Edit data:", oComplaintData);
             } else {
                 const oProfileModel = this.getView().getModel("profileData");
                 oProfileModel.setProperty("/selectedBranchCode", "");
@@ -1681,17 +1673,22 @@ sap.ui.define([
             }
         }, 
 
-        onPressComplaintRow: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("profileData");
-            const oComplaint = oContext.getObject();
-            // Do not allow editing if complaint is In Progress or Resolved
-            const status = (oComplaint.ComplaintStatus || "").toLowerCase();
-            if (status === "in progress" || status === "resolved"){
-                MessageToast.show("Complaints with status 'In Progress' or 'Resolved' cannot be edited.");
-                return;
-            }
-            this._openComplaintDialog(oComplaint);
-        },
+onPressComplaintRow: function (oEvent) {
+    const oContext = oEvent.getSource().getBindingContext("profileData");
+    const oComplaint = oContext.getObject();
+
+    const status = (oComplaint.ComplaintStatus || "").trim().toLowerCase();
+
+    const aBlockedStatuses = ["in progress", "resolved"];
+
+    if (aBlockedStatuses.includes(status)) {
+        sap.m.MessageToast.show(
+            "Complaints with status 'In Progress' or 'Resolved' cannot be edited"
+        );
+        return;
+    }
+    this._openComplaintDialog(oComplaint);
+},
         onComBranch: function(oEvent){
             utils._LCstrictValidationComboBox(oEvent);
         },

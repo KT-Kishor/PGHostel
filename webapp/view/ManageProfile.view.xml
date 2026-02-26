@@ -255,7 +255,11 @@
             <IconTabHeader
                 id="id_tabBar1"
                 mode="Standard"
-                select="onTableSelect">
+                select="onTableSelect" class="sapUiSmallMarginBottom" >
+                
+                <layoutData>
+                    <FlexItemData maxWidth="100%" />
+                </layoutData>
 
                 <items>
                     <IconTabFilter
@@ -396,10 +400,11 @@
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
+                <Column hAlign="Center" width="3rem"><Text text=""/></Column>
                    </columns>
 
             <items>
-                <ColumnListItem type="Navigation" press="onPressComplaintRow">
+                <ColumnListItem type="Inactive">
                     <cells>
                         <Text text="{profileData>ComplaintType}"/>
                         <Text text="{profileData>BranchName}" />
@@ -415,6 +420,15 @@
                             text="{profileData>ComplaintStatus}"
                             state="{ path:'profileData>ComplaintStatus',
                                      formatter:'.Formatter.formatObjectStatus'}"/>
+<Button
+    icon="sap-icon://edit"
+    type="Transparent"
+    press="onPressComplaintRow"
+    tooltip="Edit Complaint"
+    visible="{
+        path: 'profileData>ComplaintStatus',
+        formatter: '.Formatter.canEditComplaint'
+    }"/>
                     </cells>
                 </ColumnListItem>
             </items>

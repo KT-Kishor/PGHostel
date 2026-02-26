@@ -39,9 +39,10 @@
                 <Avatar
                     visible="{UIModel>/isLoggedIn}"
                     id="ProfileAvatar"
-                    initials="{profileData>/initials}"
+                    src="{LoginModel>/Photo}"
+                    initials="{= ${LoginModel>/EmployeeName} ? ${LoginModel>/EmployeeName}.charAt(0).toUpperCase() : '' }"
                     displaySize="XS"
-                    tooltip="{i18n>profilePic}"
+                    tooltip="{= ${LoginModel>/UserName} || ${i18n>profilePic} }"
                     press="onPressAvatar"
                 />
             </tnt:ToolHeader>

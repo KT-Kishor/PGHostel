@@ -2073,7 +2073,8 @@ sap.ui.define([
                     Role: "",
                     BranchCode: "",
                     MobileNo: "",
-                    DateofBirth: ""
+                    DateofBirth: "",
+                    Photo: ""
                 });
             }
             this._oLoggedInUser = null;
@@ -3210,6 +3211,13 @@ sap.ui.define([
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateOfBirth || "");
 
+            // 🔥 CRITICAL: Set the photo from backend
+            if (user.FileContent) {
+                oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
+            } else {
+                oLoginModel.setProperty("/Photo", "");
+            }
+
             this._oLoggedInUser = user;
 
             if (user.Role === "Customer") {} else {
@@ -3563,6 +3571,7 @@ sap.ui.define([
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
                 if (!user?.UserID) return MessageToast.show(this.i18nModel.getText("invalidCredentials"));
+                 this._setLoggedInUser(user);
 
                 this._oLoggedInUser = user;
                 oLoginModel.setProperty("/EmployeeID", user.UserID);
