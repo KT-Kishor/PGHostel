@@ -30,12 +30,12 @@
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="ComplainDate" label="Date Range" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<DateRangeSelection id="CD_complain_Date" valueFormat="MM/dd/yyyy" displayFormat="MM/dd/yyyy" change="onFilterChange" />
+								<DateRangeSelection id="CD_complain_Date" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onFilterChange" />
 							</fb:control>
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Year" label="Assigned Staff" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="Select Assigned Staff" selectionChange="onFilterChange" items="{path: 'AssignedStaffModel>/'}">
+							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="Select Assigned Staff"  items="{path: 'AssignedStaffModel>/'}">
 									<items>
 										<core:Item key="{AssignedStaffModel>AssignedBy}" text="{AssignedStaffModel>AssignedBy}" />
 									</items>
@@ -44,7 +44,7 @@
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<ComboBox id="CD_statusFilter" width="400px" placeholder="Select Status" selectionChange="onFilterChange">
+								<ComboBox id="CD_statusFilter" width="400px" placeholder="Select Status" >
 									<items>
 										<core:Item key="Pending" text="Pending" />
 										<core:Item key="In Progress" text="In Progress" />
@@ -74,22 +74,30 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="CD_donutChartStatus" vizType="{ComplaintChartModel>/statusType}" width="100%" vizProperties="{                                                          title: { visible: false },                                                          legend: { label: { color: '#ffffff' } },                                                          plotArea: {                                                            dataLabel: { visible: false },                                                            colorPalette: ['#ec3b14', '#0b8400','#e2f026']                                                          }                                                            }" selectData="onStatusChartSelect">
-													<viz:dataset>
-														<vizData:FlattenedDataset data="{chartData>/statusDistribution}">
-															<vizData:dimensions>
-																<vizData:DimensionDefinition name="Status" value="{chartData>Status}" />
-															</vizData:dimensions>
-															<vizData:measures>
-																<vizData:MeasureDefinition name="Count" value="{chartData>Count}" />
-															</vizData:measures>
-														</vizData:FlattenedDataset>
-													</viz:dataset>
-													<viz:feeds>
-														<vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
-														<vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
-													</viz:feeds>
-												</viz:VizFrame>
+												<viz:VizFrame id="CD_donutChartStatus" vizType="{ComplaintChartModel>/statusType}" width="100%" vizProperties="{
+    title: { visible: false },
+    legend: { label: { color: '#ffffff' } },
+    plotArea: {
+        dataLabel: { visible: false },
+        colorPalette: ['#ec3b14', '#e2f026', '#0b8400']
+    }
+    
+}" selectData="onStatusChartSelect">
+    <viz:dataset>
+        <vizData:FlattenedDataset data="{chartData>/statusDistribution}">
+            <vizData:dimensions>
+                <vizData:DimensionDefinition name="Status" value="{chartData>Status}" />
+            </vizData:dimensions>
+            <vizData:measures>
+                <vizData:MeasureDefinition name="Count" value="{chartData>Count}" />
+            </vizData:measures>
+        </vizData:FlattenedDataset>
+    </viz:dataset>
+    <viz:feeds>
+        <vizFeeds:FeedItem uid="size" type="Measure" values="Count" />
+        <vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
+    </viz:feeds>
+</viz:VizFrame>
 											</com:content>
 										</com:ChartContainerContent>
 									</com:content>
@@ -210,7 +218,7 @@
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/yearlyValue}">
 															<vizData:dimensions>
-																<vizData:DimensionDefinition name="Year" value="{chartData>Year}" />
+																<vizData:DimensionDefinition name="Total" value="{chartData>Total}" />
 															</vizData:dimensions>
 															<vizData:measures>
 															 <vizData:MeasureDefinition name="In Progress" value="{chartData>In Progress}" />
@@ -228,7 +236,7 @@
     <vizFeeds:FeedItem
         uid="categoryAxis"
         type="Dimension"
-        values="Year" />
+        values="Total" />
 
     <vizFeeds:FeedItem
         uid="color"

@@ -77,7 +77,6 @@ sap.ui.define([
             this._oBookingDateDialog.close();
             this.getView().removeStyleClass("blurView")
 
-
         },
         onDatePickerChange:function(oEvent){
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
@@ -93,12 +92,14 @@ sap.ui.define([
             // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
                 this.getView().setBusy(true);
+                     oVisibilityModel.setProperty("/isDataLoaded", false);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     // JoiningDate:Date,
                     BranchCode: sBranchCode,
                 });
                 await this.model(response)
+                oVisibilityModel.setProperty("/isDataLoaded", true);
                 this.getView().setBusy(false);
 
 
@@ -243,13 +244,9 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
                 oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
-
-               
-
-
-
             } catch (err) {
                 console.log(err);
+                 oVisibilityModel.setProperty("/isDataLoaded", false);
             }
         },
         viewDetails: function (oEvent) {

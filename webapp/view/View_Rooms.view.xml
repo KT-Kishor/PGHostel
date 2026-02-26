@@ -89,7 +89,7 @@
                 text="AC Rooms"
                 level="H2"
                 class="roomHeaderTitle sapUiMediumMarginBeginEnd"
-                visible="{= ${VisibilityModel>/ACRooms}.length > 0}"
+                visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}"
             />
 
             <VBox class="sapUiTinyMarginTop">
@@ -215,7 +215,7 @@
                 text="Non-AC Rooms"
                 level="H2"
                 class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
-                visible="{= ${VisibilityModel>/NonACRooms}.length > 0}"
+                visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}"
             />
 
             <VBox class="sapUiTinyMarginTop">

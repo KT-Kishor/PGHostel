@@ -26,9 +26,6 @@ sap.ui.define([
                 paymentBreakdown: [],
             };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
-            // this.getView().setModel(new JSONModel([]), "customers");
-            // this.getView().setModel(new JSONModel({ filterSuffix: "" }), "headerModel");
-            // Initialize the chart type model with the default values.
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "ComplaintChartModel");
             this.getOwnerComponent().getRouter().getRoute("RouteComplainDashboard").attachMatched(this._onRouteMatched, this);
         },
@@ -47,7 +44,7 @@ sap.ui.define([
 
             var LoginFunction = await this.commonLoginFunction("ComplainDashboard");
              if (!LoginFunction) return;
-             this._ViewDatePickersReadOnly(["CD_branchFilter", "CD_complain_Date", "CD_assignedStaffFilter","CD_statusFilter"], this.getView());
+             this._ViewDatePickersReadOnly(["CD_branchFilter", "CD_complain_Date", "CD_statusFilter"], this.getView());
             this.Loginmodel = this.getOwnerComponent().getModel("LoginModel").getData()
                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
@@ -55,6 +52,7 @@ sap.ui.define([
             } else {
                 this._oLoggedInUser = {};
             }
+            this.onClearAndSearch("CD_FilterBar");
            await this._loadBranchCode();
            this._buildBranchMap();
            this._setCurrentMonthDateRange();
@@ -224,7 +222,9 @@ this.getView().setModel(
     }
 },
 onFilterChange: function () {
-    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
     if (!this.rawComplainData) return;
 
     sap.ui.core.BusyIndicator.show(0);
@@ -232,55 +232,45 @@ onFilterChange: function () {
     setTimeout(() => {
         try {
             const aRawData = [...this.rawComplainData];
-
-            // Branch
             const aSelectedBranches = this.byId("CD_branchFilter").getSelectedKeys();
-
-            // 🔹 STEP 1: Filter ONLY by branch (for AssignedBy list)
-            const aBranchFilteredData = aRawData.filter(item => {
-                return (
-                    aSelectedBranches.length === 0 ||
-                    aSelectedBranches.includes(item.BranchCode)
-                );
-            });
-
-            //  STEP 2: Update Assigned Staff dropdown
-            // Status
             const sSelectedStatus = this.byId("CD_statusFilter").getSelectedKey();
-
-            // Assigned Staff
             const sAssignedBy = this.byId("CD_assignedStaffFilter").getSelectedKey();
-
-            // Date Range
             const oDateRange = this.byId("CD_complain_Date");
             const dFrom = oDateRange.getDateValue();
             const dTo = oDateRange.getSecondDateValue();
 
-            // 🔹 STEP 3: Apply ALL filters
-            const aFilteredData = aBranchFilteredData.filter(item => {
+            // Apply ALL filters
+            const aFilteredData = aRawData.filter(item => {
+                // Branch filter
+                if (aSelectedBranches.length > 0 && !aSelectedBranches.includes(item.BranchCode)) {
+                    return false;
+                }
 
+                // Status filter (only if selected)
                 if (sSelectedStatus && item.Status !== sSelectedStatus) {
                     return false;
                 }
 
+                // Assigned Staff filter (only if selected)
                 if (sAssignedBy && item.AssignedBy !== sAssignedBy) {
                     return false;
                 }
 
+                // Date filter
                 const dItemDate = new Date(item.ComplaintRaisedDate || item.InvoiceDate);
                 if (isNaN(dItemDate)) return false;
-
                 dItemDate.setHours(0, 0, 0, 0);
 
                 if (dFrom && dTo) {
                     dFrom.setHours(0, 0, 0, 0);
                     dTo.setHours(23, 59, 59, 999);
-
                     if (dItemDate < dFrom || dItemDate > dTo) {
                         return false;
                     }
-                } else if (dItemDate.getFullYear() !== currentYear) {
-                    return false;
+                } else {
+                    if (dItemDate.getFullYear() !== currentYear || dItemDate.getMonth() !== currentMonth) {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -306,7 +296,6 @@ onFilterChange: function () {
 },
 onBranchChange: function () {
     if (!this.rawComplainData) return;
-
     const aSelectedBranches = this.byId("CD_branchFilter").getSelectedKeys();
 
     // Filter ONLY by branch
@@ -429,7 +418,7 @@ _prepareYearlyStatusData: function (aFilteredData) {
         aStatuses.add(status);
 
         if (!oYearMap[year]) {
-            oYearMap[year] = { Year: year };
+            oYearMap[year] = { Total: year };
         }
 
         oYearMap[year][status] = (oYearMap[year][status] || 0) + 1;
@@ -450,42 +439,49 @@ _prepareYearlyStatusData: function (aFilteredData) {
     };
 },
 
-        _aggregateAndSetAllChartData: function (aFilteredData) {
+       _aggregateAndSetAllChartData: function (aFilteredData) {
     
-           
-            //  Daily Status-wise Complaint Trend
-            const oDailyStatusData = this._prepareDailyStatusData(aFilteredData);
-            const oMonthlyStatusData = this._prepareMonthlyStatusData(aFilteredData);
-            const oYearlyStatusData = this._prepareYearlyStatusData(aFilteredData);
-        
-          
-             const oStatusCount = aFilteredData.reduce((acc, item) => {
-    const sStatus = item.Status || "Unknown";
-    acc[sStatus] = (acc[sStatus] || 0) + 1;
-    return acc;
-}, {});
-const aStatusDistribution = Object.entries(oStatusCount).map(
-    ([status, count]) => ({
-        Status: status,
-        Count: count
-    })
-);
+    //  Daily Status-wise Complaint Trend
+    const oDailyStatusData = this._prepareDailyStatusData(aFilteredData);
+    const oMonthlyStatusData = this._prepareMonthlyStatusData(aFilteredData);
+    const oYearlyStatusData = this._prepareYearlyStatusData(aFilteredData);
 
-            const oChartModel = this.getView().getModel("chartData").getData() || {};
-            //---------------------------------------------------------------------
-            // 1 SET FINAL MODEL DATA
-            //---------------------------------------------------------------------
-            this.getView().getModel("chartData").setData({
-                ...oChartModel, // preserve any existing properties
-                statusDistribution: aStatusDistribution,
-                 dailyValue: oDailyStatusData.dailyValue,
-                 dailyStatuses: oDailyStatusData.statuses,
-                  monthlyValue: oMonthlyStatusData.monthlyValue,
-                  monthlyStatuses: oMonthlyStatusData.statuses,
-                  yearlyValue: oYearlyStatusData.yearlyValue,
-                  yearlyStatuses: oYearlyStatusData.statuses
-            });
-        },
+    // Aggregate Status Distribution
+    const oStatusCount = aFilteredData.reduce((acc, item) => {
+        const sStatus = item.Status || "Unknown";
+        acc[sStatus] = (acc[sStatus] || 0) + 1;
+        return acc;
+    }, {});
+
+    let aStatusDistribution = Object.entries(oStatusCount).map(
+        ([status, count]) => ({
+            Status: status,
+            Count: count
+        })
+    );
+
+    // 🔹 SORT status distribution in consistent order for color mapping
+    const statusOrder = ['Pending', 'In Progress', 'Resolved'];
+    aStatusDistribution.sort((a, b) => {
+        return statusOrder.indexOf(a.Status) - statusOrder.indexOf(b.Status);
+    });
+
+    const oChartModel = this.getView().getModel("chartData").getData() || {};
+    
+    //---------------------------------------------------------------------
+    // 1 SET FINAL MODEL DATA
+    //---------------------------------------------------------------------
+    this.getView().getModel("chartData").setData({
+        ...oChartModel, // preserve any existing properties
+        statusDistribution: aStatusDistribution,
+        dailyValue: oDailyStatusData.dailyValue,
+        dailyStatuses: oDailyStatusData.statuses,
+        monthlyValue: oMonthlyStatusData.monthlyValue,
+        monthlyStatuses: oMonthlyStatusData.statuses,
+        yearlyValue: oYearlyStatusData.yearlyValue,
+        yearlyStatuses: oYearlyStatusData.statuses
+    });
+},
 
       
 
@@ -504,12 +500,29 @@ const aStatusDistribution = Object.entries(oStatusCount).map(
         IN_onPressYearlyBar: function () { this.getView().getModel("ComplaintChartModel").setProperty("/yearlyType", "bar"); },
         IN_onPressYearlyLine: function () { this.getView().getModel("ComplaintChartModel").setProperty("/yearlyType", "line"); },
 
-        onClearFilters: function () {
-
-            this.byId("CD_complain_Date").setValue("");
-            this.byId("CD_statusFilter").setValue("");
-            this.byId("CD_branchFilter").setSelectedKeys([]); 
-        },
+      onClearFilters: function () {
+    // Get current date and calculate month range
+    var oToday = new Date();
+    var oFirstDay = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
+    var oLastDay = new Date(oToday.getFullYear(), oToday.getMonth() + 1, 0);
+    
+    // Clear all filter controls FIRST with proper reset
+    this.byId("CD_statusFilter").setSelectedKey("");
+    this.byId("CD_assignedStaffFilter").setSelectedKey("");
+    this.byId("CD_branchFilter").setSelectedKeys([]);
+    
+    // Then set date range to current month
+    this.byId("CD_complain_Date").setDateValue(oFirstDay);
+    this.byId("CD_complain_Date").setSecondDateValue(oLastDay);
+    
+    // Reset filtered data
+    this._aCurrentFilteredData = null;
+    
+    // Trigger filter with delay
+    setTimeout(() => {
+        this.onFilterChange();
+    }, 100);
+}, 
 
         onPressback: function () {
             this.getRouter().navTo("RouteTilePage");
