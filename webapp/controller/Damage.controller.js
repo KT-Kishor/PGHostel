@@ -409,9 +409,9 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
 
-            var sRoomNo = oView.byId("Dm_id_CustomerName").getSelectedKey() || oView.byId("Dm_id_CustomerName").getValue();
-            var sbedtype = oView.byId("DM_id_RoomNo").getSelectedKey() || oView.byId("DM_id_RoomNo").getValue();
-            var sstatus = oView.byId("DM_id_Status").getSelectedKey() || oView.byId("DM_id_Status").getValue();
+            var sRCustomerName = oView.byId("Dm_id_CustomerName").getSelectedKey() || oView.byId("Dm_id_CustomerName").getValue();
+            var sRoomNo = oView.byId("DM_id_RoomNo").getSelectedKey() || oView.byId("DM_id_RoomNo").getValue();
+            var sStatus = oView.byId("DM_id_Status").getSelectedKey() || oView.byId("DM_id_Status").getValue();
 
 
             let aBranchCodes = [];
@@ -438,12 +438,13 @@ sap.ui.define([
                 filters.RoomNo = sRoomNo
             }
 
-            if (sbedtype) {
-                filters.BedTypeName = sbedtype
+            if (sRCustomerName) {
+                filters.CustomerID = sRCustomerName
             }
-            if (sstatus) {
-                filters.Status = sstatus
+            if (sStatus) {
+                filters.Status = sStatus
             }
+
 
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxReadWithJQuery("HM_Damage", filters).then((oData) => {

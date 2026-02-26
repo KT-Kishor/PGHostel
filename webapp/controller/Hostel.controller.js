@@ -2603,7 +2603,7 @@ sap.ui.define([
                     await this._loadFilteredData(this.City, "", "");
                 }
                 const aUnique = aFiltered.filter((item, index, self) =>
-                    index === self.findIndex(t => t.Name === item.Name)
+                    index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
 

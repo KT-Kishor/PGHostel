@@ -177,7 +177,7 @@
                                                     text="Delete"
                                                     tooltip="Delete"
                                                     class="myUnifiedBtn"
-                                                    press="CID_onPressDelete"
+                                                    press="DM_onPressDelete"
                                                     visible="{VisibleModel>/visible}"
                                                 />
                                                 <!-- <m:ToolbarSeparator /> -->
@@ -232,8 +232,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="{i18n>total}"
-                                                    tooltip="{i18n>total}"
+                                                    text="{i18n>cost}"
+                                                    tooltip="{i18n>cost}"
                                                 />
                                             </m:Column>
                                         </m:columns>
@@ -265,7 +265,10 @@
                                                     </m:ComboBox>
                                                 </m:cells>
                                                 <m:cells>
-                                                    <m:Input value="{DamageModel>Quantity}"  editable="{VisibleModel>/visible}" />
+                                                    <m:Input value="{DamageModel>Quantity}"  
+                                                     editable="{VisibleModel>/visible}" 
+                                                     liveChange="onQuantityInputLiveChange"
+                                                     maxLength="2"/>
                                                 </m:cells>
                                                 <m:cells>
                                                     <m:TextArea
@@ -279,6 +282,7 @@
                                                     <m:Input
                                                         value="{DamageModel>Cost}"
                                                         liveChange="onTotalInputLiveChange"
+                                                         maxLength="7"
                                                         editable="{VisibleModel>/visible}"
                                                     />
                                                 </m:cells>
