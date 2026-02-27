@@ -41,6 +41,7 @@ sap.ui.define([
                 CustomerEmail: "",
                 Type: "",
                 UserID: "",
+                DueAmount: "",
                 Items: []
             });
             this.getView().setModel(model, "DamageModel");
@@ -91,22 +92,35 @@ sap.ui.define([
                         CustomerEmail: Damage.CustomerEmail,
                         UserID: Damage.UserID,
                         TotalCost: Damage.TotalCost,
+                        ReturnDamageAmount: Damage.ReturnDamageAmount,
                         Items: aItemsWithIndex
                     }
 
                     var model = new JSONModel(DamageModel);
                     this.getView().setModel(model, "DamageModel");
+                    if (Damage.Status === "Partially Recovered") {
+                        var dueAmount = parseFloat(DamageModel.TotalCost) - parseFloat(DamageModel.ReturnDamageAmount || 0);
+                        this.getView().getModel("DamageModel").setProperty("/DueAmount", dueAmount.toString());
+                        this.getView().getModel("DamageModel").setProperty("/ReturnDamageAmount", DamageModel.ReturnDamageAmount.toString());
+                    }
                 })
             }
             if (this.decodedPath === "Damage") {
                 this.getView().getModel("VisibleModel").setProperty("/visible", true);
                 this.getView().byId("HD_id_CustomerID1").setEditable(true);
 
-            } else {
+            }else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Recovered") {
+                this.getView().byId("idEditButton").setVisible(false);
+                this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                this.getView().byId("HD_id_DamageDate1").setEditable(false);
+
+
+                    } else {
                 this.getView().getModel("VisibleModel").setProperty("/visible", false);
                 this.getView().byId("HD_id_CustomerID1").setEditable(false);
 
             }
+
             sap.ui.core.BusyIndicator.hide();
 
         },
@@ -120,7 +134,7 @@ sap.ui.define([
 
             }
         },
-        DM_onPressDelete: function () {
+        DM_onPressDelete: async function () {
 
             var oTable = this.byId("CID_id_TableInvoiceItem1");
             var oModel = this.getView().getModel("DamageModel");
@@ -133,12 +147,13 @@ sap.ui.define([
                 return;
             }
 
-            var aSelectedObjects = aSelectedItems.map(function (oItem) {
-                return oItem.getBindingContext("DamageModel").getObject();
+            var aIndexes = aSelectedItems.map(function (oItem) {
+                var sPath = oItem.getBindingContext("DamageModel").getPath();
+                return parseInt(sPath.split("/")[2]);
             });
 
-            var hasSavedItem = aSelectedObjects.some(function (oData) {
-                return !!oData.ItemId;
+            var hasSavedItem = aSelectedItems.some(function (oItem) {
+                return !!oItem.getBindingContext("DamageModel").getObject().ItemId;
             });
 
             var fnDelete = async function () {
@@ -147,23 +162,36 @@ sap.ui.define([
 
                 try {
 
-                    for (let oData of aSelectedObjects) {
-                        var filters = {
-                            ItemID: oData.ItemId
-                        };
-                        if (oData.ItemId) {
+                    for (let oItem of aSelectedItems) {
+                        let oData = oItem.getBindingContext("DamageModel").getObject();
 
+                        if (oData.ItemId) {
                             await that.ajaxDeleteWithJQuery("HM_DamageItem", {
-                                filters
+                                filters: { ItemID: oData.ItemId }
                             });
                         }
                     }
 
-                    var aUpdatedItems = aItems.filter(function (oItem) {
-                        return !aSelectedObjects.includes(oItem);
+                    aIndexes.sort(function (a, b) {
+                        return b - a;
                     });
 
-                    oModel.setProperty("/Items", aUpdatedItems);
+                    aIndexes.forEach(function (index) {
+                        aItems.splice(index, 1);
+                    });
+
+                    aItems.forEach(function (item, i) {
+                        item.IndexNo = i + 1;
+                    });
+
+                    var totalCost = aItems.reduce(function (sum, item) {
+                        return sum + (parseFloat(item.Cost) || 0);
+                    }, 0);
+
+                    oModel.setProperty("/Items", aItems);
+                    oModel.setProperty("/TotalCost", totalCost.toFixed(2));
+                    var dueAmount = parseFloat(oModel.getProperty("/TotalCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
+                    oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
 
                     oTable.removeSelections();
 
@@ -177,7 +205,6 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             };
 
-            // 🔵 If saved item exists → show confirmation
             if (hasSavedItem) {
 
                 sap.m.MessageBox.confirm(
@@ -241,6 +268,9 @@ sap.ui.define([
             });
 
             oModel.setProperty("/TotalCost", totalCost.toFixed(2));
+            var dueAmount = parseFloat(oModel.getProperty("/TotalCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
+            oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
+
         },
         onQuantityInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
@@ -269,7 +299,7 @@ sap.ui.define([
                     return;
                 }
             }
-            if(oData.Items.length === 0){
+            if (oData.Items.length === 0) {
                 sap.m.MessageBox.error("Please add at least one damage item");
                 return;
             }
@@ -372,6 +402,9 @@ sap.ui.define([
                     Items: aItems,
 
                 };
+                if (oData.Status === "Partially Recovered") {
+                    Payload.data.Status = "Partially Recovered";
+                }
                 this.ajaxUpdateWithJQuery("HM_Damage", Payload)
                     .then(() => {
                         sap.ui.core.BusyIndicator.hide();
@@ -392,13 +425,28 @@ sap.ui.define([
                 this.ajaxCreateWithJQuery("HM_Damage", Payload)
                     .then(() => {
                         sap.ui.core.BusyIndicator.hide();
-                        sap.m.MessageToast.show("Damage Created Successfully");
                         this.OnSearch();
                         this.getView().getModel("VisibleModel")
                             .setProperty("/visible", false);
                         this.getView().byId("HD_id_CustomerID1").setEditable(false);
-                        this.getOwnerComponent().getRouter().navTo("RouteDamage");
-
+                        sap.m.MessageBox.confirm(
+                            "Damage Created Successfully",
+                            {
+                                title: "Confirmation",
+                                actions: [
+                                    sap.m.MessageBox.Action.OK,
+                                    "GeneratePDF"
+                                ],
+                                emphasizedAction: sap.m.MessageBox.Action.OK,
+                                onClose: (oAction) => {
+                                    if (oAction === sap.m.MessageBox.Action.OK) {
+                                        this.getOwnerComponent()
+                                            .getRouter()
+                                            .navTo("RouteDamage");
+                                    }
+                                }
+                            }
+                        );
 
 
                     })

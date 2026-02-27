@@ -37,7 +37,8 @@
                 <!-- Damage Amount -->
                 <Label text="Damage Amount"/>
                 <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
-
+                <Label text="Due Amount" visible="{= ${DamageModel>/Status} === 'Partially Recovered' }"/>
+                <Text visible="{= ${DamageModel>/Status} === 'Partially Recovered' }" text="{parts:[{path:'DamageModel>/DueAmount'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
                 <!-- Return Amount -->
                 <Label text="Return Amount" required="true"/>
                 <Input
@@ -53,6 +54,7 @@
                 <ComboBox
                     id="DT_id_ReturnMode"
                     selectedKey="{DamageModel>/ReturnDamageMode}"
+                    placeholder="Select return mode"
                     change="_onReturnModeChange" valueStateText="Select return mode">
                     <core:Item key="CASH" text="Cash"/>
                     <core:Item key="UPI" text="UPI"/>
@@ -64,8 +66,8 @@
                 <Input
                     id="DT_id_ReturnTransactionID"
                     value="{DamageModel>/ReturnDamageTransactionID}"
-                    placeholder="Enter transaction ID"
-                    liveChange="_validateTransactionID" valueStateText="Enter transaction ID"/>
+                    placeholder="Enter transaction / person name"
+                    liveChange="_validateTransactionID" valueStateText="Enter transaction / person name"/>
 
                 <!-- Returning Employee -->
                 <Label text="Returning To"/>

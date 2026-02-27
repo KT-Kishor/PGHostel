@@ -314,6 +314,50 @@
                                                 />
                                             </m:HBox>
                                         </m:VBox>
+
+                                          <m:VBox class="custom-vbox" visible="{= ${DamageModel>/Status} === 'Partially Recovered' }">
+                                            <!-- Sub Total (Non-Taxable) -->
+                                            <m:HBox justifyContent="SpaceBetween">
+                                                <m:Label
+                                                    text="Paid Amount :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{
+                                                        parts: [{
+                                                            path: 'DamageModel>/ReturnDamageAmount'
+                                                        }, {
+                                                            path: 'DamageModel>/Currency'
+                                                        }],
+                                                        formatter: '.Formatter.formatCurrency'
+                                                    }"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
+                                        </m:VBox>
+
+                                          <m:VBox class="custom-vbox" visible="{= ${DamageModel>/Status} === 'Partially Recovered' }">
+                                            <!-- Sub Total (Non-Taxable) -->
+                                            <m:HBox justifyContent="SpaceBetween">
+                                                <m:Label
+                                                    text="Due Amount :"
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{
+                                                        parts: [{
+                                                            path: 'DamageModel>/DueAmount'
+                                                        }, {
+                                                            path: 'DamageModel>/Currency'
+                                                        }],
+                                                        formatter: '.Formatter.formatCurrency'
+                                                    }"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
+                                        </m:VBox>
                                     </m:FlexBox>
                                 </m:VBox>
                             </blocks>
@@ -347,6 +391,7 @@
 
                     />
                     <m:Button
+                    id="idEditButton"
                         text="Edit"
                         press="DM_onPressEdit"
                         class="sendMail myUnifiedBtn"

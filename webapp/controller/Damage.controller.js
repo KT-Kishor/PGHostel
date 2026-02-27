@@ -32,7 +32,8 @@ sap.ui.define([
                 Currency: "",
                 CustomerEmail: "",
                 Type: "",
-                UserID: ""
+                UserID: "",
+                DueAmount: ""
             });
             this.getView().setModel(model, "DamageModel");
             this._makeDatePickersReadOnly(["HD_id_DamageDate"]);
@@ -40,7 +41,7 @@ sap.ui.define([
             var loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.BranchCode = loginModel.getProperty("/BranchCode");
             await this._loadBranchCode()
-            await this.Onsearch()
+            await this.Onsearch(true)
             this.readCustomerData();
         },
         HM_GenearteDamage:function(){
@@ -460,12 +461,12 @@ sap.ui.define([
                     };
                 });
 
-                if (!this._originalRoomdata || flag === "true") {
-                    this._originalRoomdata = mappedData;
+                if (!this._originalRoomdata || flag ===true) {
+                    var _originalRoomdata = JSON.parse(JSON.stringify(mappedData));
                 }
                 var model = new JSONModel(mappedData);
                 this.getView().setModel(model, "Damage");
-                this._populateUniqueFilterValues(this._originalRoomdata);
+                this._populateUniqueFilterValues(_originalRoomdata);
                 sap.ui.core.BusyIndicator.hide();
             })
         },
@@ -486,8 +487,8 @@ sap.ui.define([
             };
 
             data.forEach(item => {
+                uniqueValues.Dm_id_CustomerName.add(item.CustomerName);
                 uniqueValues.DM_id_RoomNo.add(item.RoomNo);
-                uniqueValues.Dm_id_CustomerName.add(item.CustomerID);
                 uniqueValues.DM_id_Status.add(item.Status);
 
             });
@@ -521,8 +522,9 @@ sap.ui.define([
 
             var aAdjustedData = aData.map(item => ({
                 ...item,
-                Cost: item.Cost ? String(item.Cost) : "",
-                Date: item.Date ? this.Formatter.formatDate(item.Date) : ""
+                Cost: item.TotalCost ? String(item.TotalCost) : "",
+                InvoiceDate: item.InvoiceDate ? this.Formatter.formatDate(item.InvoiceDate) : "",
+                ReturnDamageDate: item.ReturnDamageDate ? this.Formatter.formatDate(item.ReturnDamageDate) : ""
             }));
 
             var aColumns = this.createDamageExcelColumns();
@@ -547,11 +549,11 @@ sap.ui.define([
                 { label: "Customer Name", property: "CustomerName", type: "string" },
                 { label: "Room No", property: "RoomNo", type: "string" },
                 { label: "Bed Type", property: "BedTypeName", type: "string" },
-                { label: "Item Name", property: "ItemName", type: "string" },
-                { label: "Description", property: "Description", type: "string" },
-                { label: "Cost", property: "Cost", type: "string" },
-                { label: "Date", property: "Date", type: "String"},
-                { label: "Status", property: "Status", type: "string" }
+                { label: "Cost", property: "TotalCost", type: "string" },
+                { label: "Date", property: "InvoiceDate", type: "String"},
+                { label: "Status", property: "Status", type: "string" },
+                { label: "Return Damage Date", property: "ReturnDamageDate", type: "string" }
+
             ];
         },
 
@@ -588,6 +590,7 @@ sap.ui.define([
                 MessageToast.show("Damage has already been recovered");
                 return;
             }
+           
 
             if (!this._oReturnDialog) {
                 this._oReturnDialog = sap.ui.xmlfragment(
@@ -604,6 +607,13 @@ sap.ui.define([
                 ...oData,
             });
 
+              if (oData.Status === "Partially Recovered") {
+                var dueAmount = parseFloat(oData.TotalCost) - parseFloat(oData.ReturnDamageAmount || 0);
+                this.getView().getModel("DamageModel").setProperty("/DueAmount", dueAmount.toString());
+                this.getView().getModel("DamageModel").setProperty("/ReturnDamageAmount", dueAmount.toString());
+
+            }
+
             // Reset input ValueState
             var aInputIds = [
                 "DT_id_ReturnAmount",
@@ -619,10 +629,10 @@ sap.ui.define([
 
 
             this._oReturnDialog.open();
-            this._initializeTransactionIDState();
+            this._initializeTransactionIDState(oData);
         },
 
-        _initializeTransactionIDState: function() {
+        _initializeTransactionIDState: function(oData) {
             const oView = this.getView();
             const oMode = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
             const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
@@ -630,7 +640,13 @@ sap.ui.define([
             if (!oMode || !oTxn) return;
 
             const mode = oMode.getSelectedKey();
-
+            
+            if(oData.Status === "Partially Recovered"){
+                oMode.setEnabled(true);
+                oMode.setSelectedKey(oData.ReturnDamageMode);
+                oTxn.setValue(oData.ReturnDamageTransactionID);
+                    
+            }else{
             if (mode === "CASH") {
                 oTxn.setEnabled(false);
                 oTxn.setValue("");
@@ -638,6 +654,7 @@ sap.ui.define([
             } else {
                 oTxn.setEnabled(true);
             }
+        }
         },
 
         onSaveReturn: async function() {
@@ -696,9 +713,13 @@ sap.ui.define([
                     ReturnDamageDate: new Date().toISOString().split("T")[0],
                     ReturnDamageMode: mode,
                     ReturnDamageTransactionID: txnID || "",
-                    Status: "Recovered",
                     ReturningEmployeeName: currentUser
                 };
+                if(returnAmount < damageAmount){
+                    payload.Status = "Partially Recovered"
+                }else{
+                    payload.Status = "Recovered"
+                }
 
                 // const payload = {
                 //     Filters: {
@@ -760,16 +781,8 @@ sap.ui.define([
         _onReturnModeChange: function(oEvent) {
          utils._LCstrictValidationComboBox(oEvent);
             const oView = this.getView();
-            // const mode = oEvent.getSource().getSelectedKey();
-            // const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
-
-            // if (mode === "CASH") {
-            //     oTxn.setEnabled(false);
-            //     oTxn.setValue("");
-            //     oTxn.setValueState("None");
-            // } else {
-            //     oTxn.setEnabled(true);
-            // }
+            const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+             oTxn.setValue("");
         },
 
         _validateTransactionID: function(oEvent) {

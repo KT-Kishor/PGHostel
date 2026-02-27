@@ -36,7 +36,7 @@
                                 items="{CustomerModel>/}"
                                 showClearIcon="true">
 								<core:ListItem
-                                    key="{CustomerModel>CustomerID}"
+                                    key="{CustomerModel>CustomerName}"
                                     text="{CustomerModel>CustomerName}"/>
 							</ComboBox>
 						</fb:control>
@@ -129,6 +129,9 @@
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
 					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>RecoverDate}" tooltip="{i18n>RecoverDate}"/>
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem
@@ -147,6 +150,7 @@
 							state="{ path: 'Damage>Status', formatter: '.Formatter.formatObjectStatus'}"
 							class="sapUiTinyMarginBottom"
 							/>
+							<Text text="{path: 'Damage>ReturnDamageDate', formatter: '.Formatter.formatDate'}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
