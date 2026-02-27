@@ -136,6 +136,7 @@ sap.ui.define([
                         currency: booking.Currency,
                         customerID: booking.CustomerID,
                         BookingID: booking.BookingID?.toString() || "",
+                        CustomerName: booking.CustomerName || "",
                     }
 
                 });

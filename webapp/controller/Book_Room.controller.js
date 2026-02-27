@@ -4957,7 +4957,8 @@ if (
                             UserID: p.UserID,
                             GSTType: oData.GSTType || "",
                             GSTValue: oData.GSTValue ? oData.GSTValue.toString() : "0",
-                            GSTIN: oData.GSTIN || ""
+                            GSTIN: oData.GSTIN || "",
+                            CustomerName: p.FullName,
                         });
                     }
                     let paymentDetails;

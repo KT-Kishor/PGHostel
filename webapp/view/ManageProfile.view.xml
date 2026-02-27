@@ -331,7 +331,7 @@
                 <ColumnListItem type="Navigation" press="onPressBookingRow">
                     <cells>
                         <ObjectIdentifier
-                            title="{profileData>customerName}"
+                            title="{profileData>CustomerName}"
                             text="{profileData>BookingID}"/>
                         <Text text="{profileData>BookingDate}"/>
                         <Text text="{profileData>room}"/>
@@ -405,7 +405,6 @@
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>complainDate}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
                 <Column hAlign="Center" width="3rem"><Text text=""/></Column>
                    </columns>
 
@@ -422,10 +421,7 @@
                                 formatter: '.Formatter.formatDate'
                             }}"/>
                          <Text text="{profileData>AssignedTo}"/>
-                          <ObjectStatus
-                            text="{profileData>ComplaintStatus}"
-                            state="{ path:'profileData>ComplaintStatus',
-                                     formatter:'.Formatter.formatObjectStatus'}"/>
+                      
 <Button
     icon="sap-icon://edit"
     type="Transparent"
@@ -445,10 +441,15 @@
             updateFinished="onTableUpdateFinished"
             width="auto" 
           class="sapUiSmallMargin customRoundedTable"
-            items="{ path:'profileData>/damage' }">
+            items="{
+        path: 'profileData>/damage',
+        sorter: [
+            { path: 'Status', descending: false, group: true }
+           
+        ]
+    }">
             <columns>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Damage ID"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Status"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Room No"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Branch"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Item"/></Column>
@@ -462,7 +463,6 @@
                 <ColumnListItem>
                     <cells>
                         <Text text="{profileData>DamageID}"/>
-                        <Text text="{profileData>Status}"/>
                         <Text text="{profileData>RoomNo}"/>
                         <Text text="{profileData>BranchName}"/>
                         <Text text="{profileData>ItemName}"/>
