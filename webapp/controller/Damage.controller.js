@@ -607,12 +607,6 @@ sap.ui.define([
                 ...oData,
             });
 
-              if (oData.Status === "Partially Recovered") {
-                var dueAmount = parseFloat(oData.TotalCost) - parseFloat(oData.ReturnDamageAmount || 0);
-                this.getView().getModel("DamageModel").setProperty("/DueAmount", dueAmount.toString());
-                this.getView().getModel("DamageModel").setProperty("/ReturnDamageAmount", dueAmount.toString());
-
-            }
 
             // Reset input ValueState
             var aInputIds = [
@@ -660,6 +654,8 @@ sap.ui.define([
         onSaveReturn: async function() {
             const oView = this.getView();
             const oDamage = oView.getModel("DamageModel").getData();
+       
+
 
             const oAmountInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount"));
             const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
@@ -707,19 +703,17 @@ sap.ui.define([
 
             try {
                 const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
+               
 
                 const payload = {
                     ReturnDamageAmount: returnAmount,
                     ReturnDamageDate: new Date().toISOString().split("T")[0],
                     ReturnDamageMode: mode,
                     ReturnDamageTransactionID: txnID || "",
-                    ReturningEmployeeName: currentUser
+                    ReturningEmployeeName: currentUser,
+                    Status: "Recovered"
                 };
-                if(returnAmount < damageAmount){
-                    payload.Status = "Partially Recovered"
-                }else{
-                    payload.Status = "Recovered"
-                }
+               
 
                 // const payload = {
                 //     Filters: {

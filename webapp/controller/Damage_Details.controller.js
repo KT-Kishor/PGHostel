@@ -109,13 +109,13 @@ sap.ui.define([
                 this.getView().getModel("VisibleModel").setProperty("/visible", true);
                 this.getView().byId("HD_id_CustomerID1").setEditable(true);
 
-            }else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Recovered") {
+            } else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Recovered") {
                 this.getView().byId("idEditButton").setVisible(false);
                 this.getView().byId("HD_id_CustomerID1").setEditable(false);
                 this.getView().byId("HD_id_DamageDate1").setEditable(false);
 
 
-                    } else {
+            } else {
                 this.getView().getModel("VisibleModel").setProperty("/visible", false);
                 this.getView().byId("HD_id_CustomerID1").setEditable(false);
 
@@ -402,9 +402,7 @@ sap.ui.define([
                     Items: aItems,
 
                 };
-                if (oData.Status === "Partially Recovered") {
-                    Payload.data.Status = "Partially Recovered";
-                }
+                
                 this.ajaxUpdateWithJQuery("HM_Damage", Payload)
                     .then(() => {
                         sap.ui.core.BusyIndicator.hide();
@@ -421,7 +419,6 @@ sap.ui.define([
 
             } else {
 
-                // 🟢 CREATE
                 this.ajaxCreateWithJQuery("HM_Damage", Payload)
                     .then(() => {
                         sap.ui.core.BusyIndicator.hide();
@@ -443,6 +440,8 @@ sap.ui.define([
                                         this.getOwnerComponent()
                                             .getRouter()
                                             .navTo("RouteDamage");
+                                    }else{
+                                        this.DM_onPressGeneratePDF();
                                     }
                                 }
                             }
@@ -498,5 +497,225 @@ sap.ui.define([
             oDamageModel.setProperty("/Currency", SelectedData.Currency);
             oDamageModel.setProperty("/UserID", SelectedData.UserID)
         },
+     DM_onPressGeneratePDF: async function () {
+    try {
+        sap.ui.core.BusyIndicator.show(0);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("portrait", "mm", "a4");
+
+        const oModel = this.getView().getModel("DamageModel").getData();
+        const aItems = oModel.Items || [];
+
+        let filter = {
+            BranchID: [oModel.BranchCode]
+        };
+
+        const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+        var companyImage = oCompanyDetailsModel?.data[0].Photo1 || "";
+
+        const margin = 15;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let currentY = 20;
+
+     
+        doc.setFont("times", "bold");
+        doc.setFontSize(16);
+
+        if (oModel.Status === "Recovered") {
+            doc.text("DAMAGE RECEIPT", pageWidth - margin, currentY, { align: "right" });
+        } else {
+            doc.text("DAMAGE NOTICE", pageWidth - margin, currentY, { align: "right" });
+        }
+
+        currentY += 15;
+
+        if (companyImage && companyImage.trim() !== "") {
+            const imgData = "data:image/png;base64," + companyImage;
+            doc.addImage(imgData, "PNG", margin, 15, 40, 40);
+        }
+
+       
+        doc.setFontSize(12);
+        doc.setFont("times", "bold");
+
+        doc.text(`Damage No : ${oModel.DamageID}`, pageWidth - margin, currentY, { align: "right" });
+        currentY += 6;
+
+        doc.text(`Date : ${oModel.Date}`, pageWidth - margin, currentY, { align: "right" });
+        currentY += 6;
+
+        doc.text(`Room No : ${oModel.RoomNo}`, pageWidth - margin, currentY, { align: "right" });
+        currentY += 6;
+
+        doc.text(`Status : ${oModel.Status}`, pageWidth - margin, currentY, { align: "right" });
+        currentY += 10;
+
+     
+        doc.setFont("times", "bold").setFontSize(11);
+        doc.text("To,", margin, currentY);
+        currentY += 6;
+
+        doc.setFont("times", "normal").setFontSize(12);
+        doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
+        currentY += 6;
+
+        doc.text(`CustomerID : ${oModel.CustomerID}`, margin, currentY);
+        currentY += 6;
+
+        doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
+        currentY += 10;
+
+
+        const body = aItems.map((item, index) => [
+            index + 1,
+            item.ItemName,
+            item.Type,
+            item.Quantity,
+            item.Cost
+        ]);
+
+        doc.autoTable({
+            startY: currentY,
+            head: [['Sl.No', 'Item Name', 'Type', 'Quantity', 'Cost']],
+            body: body,
+            theme: "grid",
+            headStyles: {
+                fillColor: [20, 170, 183]
+            },
+            styles: {
+                font: "times",
+                fontSize: 10,
+                cellPadding: 3,
+                lineWidth: 0.5,
+                lineColor: [30, 30, 30],
+                halign: "center"
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 10;
+
+   
+        const totalAmount = parseFloat(oModel.TotalCost || 0);
+
+
+        let summaryBody = [];
+
+  
+            summaryBody = [
+                ["Sub-Total (" + oModel.Currency + "):", totalAmount.toFixed(2)]
+            ];
+
+            doc.autoTable({
+                startY: currentY,
+                body: summaryBody,
+                theme: "plain",
+                styles: {
+                    font: "times",
+                    fontSize: 11,
+                    halign: "right"
+                },
+                columnStyles: {
+                    0: { halign: "right", cellWidth: 60 },
+                    1: { halign: "right", cellWidth: 40 }
+                },
+                margin: { left: 95 }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 3;
+
+            // Underline
+            doc.setLineWidth(0.5);
+            doc.line(80, currentY, pageWidth - margin, currentY);
+
+            currentY += 8;
+
+            // TOTAL
+            doc.setFont("times", "bold");
+            doc.text("Total(" + oModel.Currency + "):", 150, currentY, { align: "right" });
+            doc.text(totalAmount.toFixed(2), pageWidth - margin, currentY, { align: "right" });
+
+    
+
+        currentY += 12;
+
+       
+        const finalAmount = oModel.Status === "Pending" ? totalAmount : totalAmount;
+        const amountInWords = await this.convertNumberToWords(finalAmount, "INR");
+
+        doc.setFont("times", "bold");
+        doc.text("Amount in Words :", margin, currentY);
+        currentY += 6;
+
+        doc.setFont("times", "normal");
+        const lines = doc.splitTextToSize(amountInWords, pageWidth - 2 * margin);
+        doc.text(lines, margin, currentY);
+
+         this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight);
+
+    
+        doc.save(`${oModel.CustomerName}-${oModel.DamageID}-Damage.pdf`);
+
+    } catch (error) {
+        sap.m.MessageToast.show(error.message);
+    } finally {
+        sap.ui.core.BusyIndicator.hide();
+    }
+},
+   addFooter: function(doc, oCompanyDetailsModel, pageWidth, pageHeight) {
+                const footerHeight = 18;
+                const footerYPosition = pageHeight - footerHeight;
+                const footerWidth = pageWidth;
+
+                const company = oCompanyDetailsModel.data[0];
+
+                // Grey footer background
+                doc.setFillColor(128, 128, 128);
+                doc.rect(0, footerYPosition, footerWidth, footerHeight, 'F');
+
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(255, 255, 255); // White text
+
+                const textYPosition = footerYPosition + 5;
+                const lineHeight = 5;
+                let currentYPosition = textYPosition;
+
+                // Jurisdiction line
+                if (company && company.City) {
+                    doc.setFontSize(8);
+                    doc.text(`SUBJECT TO ${company.City.toUpperCase()} JURISDICTION`, footerWidth / 2, currentYPosition, {
+                        align: 'center'
+                    });
+                    currentYPosition += lineHeight;
+                }
+
+                // GSTIN
+                if (company && company.GSTIN) {
+                    doc.setFontSize(10);
+                    doc.text(`GSTIN : ${company.GSTIN}`, footerWidth - 5, currentYPosition, {
+                        align: 'right'
+                    });
+                }
+
+                if (company && company.Address) {
+                    doc.setFontSize(10);
+
+                    // Combine address + mobile at the end
+                    let fullAddress = company.Address;
+                    if (company.Contact) {
+                        fullAddress += `, Mobile No : ${company.STD}-${company.Contact}`;
+                    }
+
+                    // Wrap text to fit footer width
+                    const addressLines = doc.splitTextToSize(fullAddress, footerWidth - 100);
+                    let currentYPosition = textYPosition + 5;
+
+                    // Render each line
+                    addressLines.forEach((line) => {
+                        doc.text(line, 5, currentYPosition);
+                        currentYPosition += lineHeight;
+                    });
+                }
+            },
     });
 });

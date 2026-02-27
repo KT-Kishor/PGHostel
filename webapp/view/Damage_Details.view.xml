@@ -398,9 +398,10 @@
                           visible="{= !${VisibleModel>/visible} }"
                     />
                     <m:Button
-                        text="Genearte PDF"
-                        press="CID_onPressEdit"
+                        text="Generate PDF"
+                        press="DM_onPressGeneratePDF"
                         class="sendMail myUnifiedBtn"
+                        visible="{= !${VisibleModel>/visible} }"
                     />
                 </m:contentRight>
             </m:Bar>
