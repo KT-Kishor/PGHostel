@@ -807,6 +807,8 @@ sap.ui.define([
                 oTable = this.byId("Id_ProfileaTable1");
             } else if (sSelectedTab === "Complaints") {
                 oTable = this.byId("Id_CompmaintTable");
+            } else if (sSelectedTab === "Damage") {
+                oTable = this.byId("Id_DamageTable");
             }
 
 
@@ -819,10 +821,11 @@ sap.ui.define([
                 oProfileModel.setProperty("/bookingCount", length);
             } else if (sSelectedTab === "Complaints") {
                 oProfileModel.setProperty("/complainCount", length);
+            } else if (sSelectedTab === "Damage") {
+                oProfileModel.setProperty("/damageCount", length);
             }
         },
-
-        onTableSelect: async function (oEvent) {
+     onTableSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("key");
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
@@ -848,7 +851,7 @@ sap.ui.define([
                         TotalAmount: inv.TotalAmount || inv.GrandTotal || 0,
                         DueAmount: inv.DueAmount || inv.DueAmount || 0,
                         currency: inv.Currency || inv.currency || "",
-                        PaymentGroup: inv.Status || "Others"
+                         PaymentGroup: inv.Status || "Others"
                     }));
 
                     oModel.setProperty("/Payments", aPayments);
@@ -861,7 +864,213 @@ sap.ui.define([
                 }
             }
 
+            // When Complaints tab selected, fetch complaints and bind
+            else if (sKey === "Complaints") {
+                await this._loadComplaints();
+            }
+
+            // When Damage tab selected, fetch damages and bind
+            else if (sKey === "Damage") {
+                await this._loadDamage();
+            }
         },
+        _loadComplaints: async function (bSilent) {
+            const oProfileModel = this.getView().getModel("profileData");
+            const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+
+            if (!sUserID) {
+                if (!bSilent) {
+                    MessageToast.show("UserID not found.");
+                }
+                return;
+            }
+
+            try {
+                if (!bSilent) sap.ui.core.BusyIndicator.show(0);
+
+                const resp = await this.ajaxReadWithJQuery("HM_Complaint", { UserID: sUserID });
+
+                // Normalize response shapes: {data:[...]}, {data:{...}}, or legacy keys
+                const aRaw = Array.isArray(resp?.data) ? resp.data
+                    : (resp?.data ? [resp.data]
+                        : (Array.isArray(resp?.ComplaintData) ? resp.ComplaintData
+                            : (Array.isArray(resp?.commentData) ? resp.commentData : [])));
+
+                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+                const aBranchMaster = oBRModel?.getProperty("/") || [];
+
+                const aComplainData = aRaw.map(complain => {
+                    const sBranchCode = complain.BranchCode || "";
+                    const oBranch = aBranchMaster.find(b => b.BranchID === sBranchCode);
+
+                    return {
+                        ComplaintID: complain.ComplaintID || complain.ComplainID || complain.ID || "",
+                        ComplaintType: complain.ComplaintType || "",
+                        Description: complain.Description || "",
+                        ComplaintDescription: complain.Description || "",
+                        ComplaintRaisedDate: complain.ComplaintRaisedDate || complain.RaisedDate || "",
+                        ComplaintStatus: complain.Status || complain.ComplaintStatus || "",
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch?.Name || sBranchCode,
+                        RoomNo: complain.RoomNo || "",
+                        FileName: complain.FileName || "",
+                        FileType: complain.FileType || "",
+                        File: complain.File || "",
+                        ExpectedResolvedDate: complain.EstimatDate || complain.ExpectedResolvedDate || "",
+                        AssignedTo: complain.AssignedBy || complain.AssignedTo || ""
+                    };
+                });
+
+                oProfileModel.setProperty("/complain", aComplainData);
+                oProfileModel.setProperty("/complainCount", aComplainData.length);
+                oProfileModel.updateBindings(true);
+            } catch (err) {
+                console.error("Error loading complaints", err);
+                if (!bSilent) {
+                    MessageToast.show(err.message || err.responseText || "Error loading complaints");
+                }
+            } finally {
+                if (!bSilent) {
+                    sap.ui.core.BusyIndicator.hide();
+                    this._updateRowCount();
+                }
+            }
+        },
+
+        _loadDamage: async function (bSilent) {
+            const oProfileModel = this.getView().getModel("profileData");
+            const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+
+            if (!sUserID) {
+                if (!bSilent) {
+                    MessageToast.show("UserID not found.");
+                }
+                return;
+            }
+
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                // Backend returns: { success:true, data:{ HM_Damage:[...], HM_DamageItem:[...] } }
+                const resp = await this.ajaxReadWithJQuery("getHM_DamageBoth", { UserID: sUserID });
+
+
+                const aHeader = resp?.data?.HM_Damage || [];
+                const aItems = resp?.data?.HM_DamageItem || [];
+
+                // Branch master for BranchName mapping
+                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
+                const aBranchMaster = oBRModel?.getProperty("/") || [];
+
+                const mHeaderByDamageId = new Map();
+                aHeader.forEach(h => {
+                    const sDamageID = h.DamageID || "";
+                    if (!sDamageID) { return; }
+
+                    const sBranchCode = h.BranchCode || "";
+                    const oBranch = aBranchMaster.find(b => b.BranchID === sBranchCode);
+
+                    mHeaderByDamageId.set(sDamageID, {
+                        DamageID: sDamageID,
+                        CustomerID: h.CustomerID || "",
+                        UserID: h.UserID || "",
+                        CustomerName: h.CustomerName || "",
+                        CustomerEmail: h.CustomerEmail || "",
+                        RoomNo: h.RoomNo || "",
+                        Currency: (h.Currency || "").trim(),
+                        Status: h.Status || "",
+                        BedTypeName: h.BedTypeName || "",
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch?.Name || sBranchCode,
+                        TotalCost: h.TotalCost ?? "",
+                        ReturnDamageAmount: h.ReturnDamageAmount ?? "",
+                        ReturnDamageMode: h.ReturnDamageMode ?? "",
+                        ReturnDamageTransactionID: h.ReturnDamageTransactionID ?? "",
+                        ReturnDamageDate: h.ReturnDamageDate || null,
+                        ReturningEmployeeName: h.ReturningEmployeeName || "",
+                        InvoiceDate: h.InvoiceDate || null
+                    });
+                });
+
+                // Build rows at item-level (one row per item). If no items for a damage, still show one row.
+                const mItemsByDamageId = new Map();
+                aItems.forEach(it => {
+                    const sDamageID = it.DamageID || "";
+                    if (!sDamageID) { return; }
+                    if (!mItemsByDamageId.has(sDamageID)) {
+                        mItemsByDamageId.set(sDamageID, []);
+                    }
+                    mItemsByDamageId.get(sDamageID).push(it);
+                });
+
+                const aDamageRows = [];
+                for (const [sDamageID, oHeader] of mHeaderByDamageId.entries()) {
+                    const aIts = mItemsByDamageId.get(sDamageID) || [];
+                    if (aIts.length === 0) {
+                        aDamageRows.push({
+                            ...oHeader,
+                            ItemID: "",
+                            ItemName: "",
+                            Type: "",
+                            Description: "",
+                            Quantity: "",
+                            Cost: "",
+                            ItemCurrency: ""
+                        });
+                    } else {
+                        aIts.forEach(it => {
+                            aDamageRows.push({
+                                ...oHeader,
+                                ItemID: it.ItemID || "",
+                                ItemName: it.ItemName || "",
+                                Type: it.Type || "",
+                                Description: it.Description || "",
+                                Quantity: it.Quantity ?? "",
+                                Cost: it.Cost ?? "",
+                                ItemCurrency: (it.Currency || "").trim()
+                            });
+                        });
+                    }
+                }
+
+                // In case backend returns items with DamageIDs not present in header list
+                aItems.forEach(it => {
+                    const sDamageID = it.DamageID || "";
+                    if (sDamageID && !mHeaderByDamageId.has(sDamageID)) {
+                        aDamageRows.push({
+                            DamageID: sDamageID,
+                            BranchCode: "",
+                            BranchName: "",
+                            RoomNo: "",
+                            Status: "",
+                            Currency: "",
+                            TotalCost: "",
+                            ItemID: it.ItemID || "",
+                            ItemName: it.ItemName || "",
+                            Type: it.Type || "",
+                            Description: it.Description || "",
+                            Quantity: it.Quantity ?? "",
+                            Cost: it.Cost ?? "",
+                            ItemCurrency: (it.Currency || "").trim()
+                        });
+                    }
+                });
+
+                oProfileModel.setProperty("/damage", aDamageRows);
+                oProfileModel.setProperty("/damageCount", aDamageRows.length);
+                oProfileModel.updateBindings(true);
+
+            } catch (err) {
+                console.error("Error loading damage", err);
+                if (!bSilent) {
+                    MessageToast.show(err?.message || err?.responseText || "Error loading damage");
+                }
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+                this._updateRowCount();
+            }
+        },
+    
         onlogout: function () {
 
             this.getView().getModel("profileData").setData({});
@@ -1624,50 +1833,10 @@ sap.ui.define([
             }
         },
         // Helper to refresh complaints table after save
-        _refreshComplaints: async function () {
-            const oProfileModel = this.getView().getModel("profileData");
-            const sUserID = oProfileModel.getProperty("/UserID");
-            try {
-                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", { UserID: sUserID });
-                const aComplain = response?.ComplaintData || [];
-                const oBRModel = this.getOwnerComponent().getModel("sBRModel");
-                const aBranchMaster = oBRModel?.getProperty("/") || [];
-
-                const aComplainData = aComplain.map(complain => {
-
-                    const sBranchCode = complain.BranchCode || "";
-
-                    const oBranch = aBranchMaster.find(
-                        b => b.BranchID === sBranchCode
-                    );
-
-                    return {
-                        ComplaintID: complain.ComplaintID,
-                        ComplaintType: complain.ComplaintType,
-                        Description: complain.Description,
-                        ComplaintDescription: complain.Description,
-                        ComplaintRaisedDate: complain.ComplaintRaisedDate,
-                        ComplaintStatus: complain.Status,
-                        BranchCode: sBranchCode,
-                        BranchName: oBranch?.Name || sBranchCode,   // ← THIS FIXES YOUR ISSUE
-                        RoomNo: complain.RoomNo || "",
-                        FileName: complain.FileName || "",
-                        FileType: complain.FileType || "",
-                        File: complain.File || "",
-                        ExpectedResolvedDate: complain.EstimatDate,
-                        AssignedTo: complain.AssignedBy || "",
-                    };
-                });
-
-
-                oProfileModel.setProperty("/complain", aComplainData);
-                oProfileModel.setProperty("/complainCount", aComplainData.length);
-                oProfileModel.updateBindings(true);
-                oProfileModel.refresh(true);
-            } catch (err) {
-                console.error("Failed to refresh complaints", err);
-            }
-        },
+            _refreshComplaints: async function () {
+            // Backward-compatible: keep existing call sites after save/update
+            await this._loadComplaints(true);
+      },
 
         onPressComplaintRow: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("profileData");

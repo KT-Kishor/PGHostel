@@ -381,16 +381,22 @@
                 </ColumnListItem>
             </items>
         </Table>
-        <Table
-            id="Id_CompmaintTable"
-            visible="{= ${profileData>/selectedTab} === 'Complaints' }"
-            updateFinished="onTableUpdateFinished"
-            items="{
-                path:'profileData>/complain'
-              
-            }"
-            width="auto" 
-          class="sapUiSmallMargin customRoundedTable">
+                <Table
+    id="Id_CompmaintTable"
+    visible="{= ${profileData>/selectedTab} === 'Complaints' }"
+    busy="{profileData>/isTableBusy}"
+    updateFinished="onTableUpdateFinished"
+    busyIndicatorDelay="0"
+    noDataText="No complaints found"
+    width="auto"
+    class="sapUiSmallMargin customRoundedTable"
+    items="{
+        path: 'profileData>/complain',
+        sorter: [
+            { path: 'ComplaintStatus', descending: false, group: true },
+            { path: 'ComplaintRaisedDate', descending: true }
+        ]
+    }"> 
             <columns>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>complainType}"/></Column>
                 <Column demandPopin="true" minScreenWidth="Phone"><Text text="Branch"/></Column>
@@ -433,40 +439,38 @@
                 </ColumnListItem>
             </items>
         </Table>
-         <Table
+        <Table
             id="Id_DamageTable"
             visible="{= ${profileData>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
             width="auto" 
-          class="sapUiSmallMargin customRoundedTable">
+          class="sapUiSmallMargin customRoundedTable"
+            items="{ path:'profileData>/damage' }">
             <columns>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>ItemName}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Phone"><Text text="{i18n>type}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>description}"/></Column>
-                <Column demandPopin="true" ><Text text="{i18n>quantity}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>cost}"/></Column>
-                <!-- <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
-                   </columns>
-
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Damage ID"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Status"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Room No"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Branch"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Item"/></Column>
+                <Column demandPopin="true" minScreenWidth="Phone"><Text text="Type"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="Description"/></Column>
+                <Column demandPopin="true"><Text text="Qty"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Cost"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column>
+            </columns>
             <items>
-                <ColumnListItem type="Navigation" press="onPressComplaintRow">
+                <ColumnListItem>
                     <cells>
-                        <!-- <Text text="{profileData>ComplaintType}"/>
-                        <Text text="{profileData>BranchName}" />
+                        <Text text="{profileData>DamageID}"/>
+                        <Text text="{profileData>Status}"/>
                         <Text text="{profileData>RoomNo}"/>
-                        <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
-                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
-                        <Text  text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
-                                path: 'profileData>ExpectedResolvedDate',
-                                formatter: '.Formatter.formatDate'
-                            }}"/>
-                         <Text text="{profileData>AssignedTo}"/>
-                          <ObjectStatus
-                            text="{profileData>ComplaintStatus}"
-                            state="{ path:'profileData>ComplaintStatus',
-                                     formatter:'.Formatter.formatObjectStatus'}"/> -->
+                        <Text text="{profileData>BranchName}"/>
+                        <Text text="{profileData>ItemName}"/>
+                        <Text text="{profileData>Type}"/>
+                        <Text text="{profileData>Description}"/>
+                        <Text text="{profileData>Quantity}"/>
+                        <Text text="{profileData>Cost}"/>
+                        <Text text="{profileData>TotalCost}"/>
                     </cells>
                 </ColumnListItem>
             </items>
