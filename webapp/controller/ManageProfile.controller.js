@@ -84,7 +84,7 @@ sap.ui.define([
                 const filter = { UserID: sUserID }
                 const response = await this.ajaxReadWithJQuery("HM_Booking", filter);
                 const aBookings = response?.commentData || [];
-            
+
                 const aBranchComboData = this._prepareBranchComboData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -139,8 +139,8 @@ sap.ui.define([
                     }
 
                 });
-            
-              
+
+
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
@@ -201,7 +201,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-      
+
         _applyCountryStateCityFilters: function () {
 
             const oModel = this.getView().getModel("profileData");
@@ -848,7 +848,7 @@ sap.ui.define([
                         TotalAmount: inv.TotalAmount || inv.GrandTotal || 0,
                         DueAmount: inv.DueAmount || inv.DueAmount || 0,
                         currency: inv.Currency || inv.currency || "",
-                         PaymentGroup: inv.Status || "Others"
+                        PaymentGroup: inv.Status || "Others"
                     }));
 
                     oModel.setProperty("/Payments", aPayments);
@@ -860,7 +860,7 @@ sap.ui.define([
                     this._updateRowCount();
                 }
             }
-          
+
         },
         onlogout: function () {
 
@@ -1072,6 +1072,20 @@ sap.ui.define([
 
         MPonMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
+            const oSTD = this.byId("id_std1");
+            //const oMobile = this.byId("id_phone1"); // not needed here
+
+            const std1 = oSTD.getValue();
+            // NOTE: do **not** clear the mobile field on every keystroke –
+            // this was preventing users from typing anything.
+
+            // Dynamic mobile length based on selected STD code
+            // apply to the input itself (oInput) instead of always using oMobile
+            if (std1 === "+91") {
+                oInput.setMaxLength(10);
+            } else {
+                oInput.setMaxLength(18);
+            }
 
             // Digits only
             let val = oInput.getValue().replace(/\D/g, "");
@@ -1145,7 +1159,7 @@ sap.ui.define([
 
         _openComplaintDialog: function (oComplaintData) {
 
-            
+
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
 
@@ -1249,7 +1263,7 @@ sap.ui.define([
                     this._resetComplaintValidationStates();
                 }.bind(this));
             } else {
-                this._oComplaintDialog.setTitle(sDialogTitle); 
+                this._oComplaintDialog.setTitle(sDialogTitle);
                 this._oComplaintDialog.open();
                 this._resetComplaintValidationStates();
             }
@@ -1421,7 +1435,7 @@ sap.ui.define([
                 oUploader.clear();
             }
         },
-            onComplaintPreviewDoc: function (oEvent) {
+        onComplaintPreviewDoc: function (oEvent) {
             const autoDecodeBase64 = function (sBase64) {
                 if (!sBase64 || typeof sBase64 !== "string") {
                     return "";
@@ -1594,9 +1608,9 @@ sap.ui.define([
                 const sSuccessMsg = oData.ComplaintID
                     ? (this.i18nModel.getText("complaintUpdatedSuccessfully"))
                     : (this.i18nModel.getText("complaintSavedSuccessfully"));
-               MessageToast.show(sSuccessMsg);
-               await this._refreshComplaints();
-               
+                MessageToast.show(sSuccessMsg);
+                await this._refreshComplaints();
+
                 sap.ui.core.BusyIndicator.hide();
 
             } catch (err) {
@@ -1653,25 +1667,25 @@ sap.ui.define([
             } catch (err) {
                 console.error("Failed to refresh complaints", err);
             }
-        }, 
+        },
 
-onPressComplaintRow: function (oEvent) {
-    const oContext = oEvent.getSource().getBindingContext("profileData");
-    const oComplaint = oContext.getObject();
+        onPressComplaintRow: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("profileData");
+            const oComplaint = oContext.getObject();
 
-    const status = (oComplaint.ComplaintStatus || "").trim().toLowerCase();
+            const status = (oComplaint.ComplaintStatus || "").trim().toLowerCase();
 
-    const aBlockedStatuses = ["in progress", "resolved"];
+            const aBlockedStatuses = ["in progress", "resolved"];
 
-    if (aBlockedStatuses.includes(status)) {
-        sap.m.MessageToast.show(
-            "Complaints with status 'In Progress' or 'Resolved' cannot be edited"
-        );
-        return;
-    }
-    this._openComplaintDialog(oComplaint);
-},
-        onComBranch: function(oEvent){
+            if (aBlockedStatuses.includes(status)) {
+                sap.m.MessageToast.show(
+                    "Complaints with status 'In Progress' or 'Resolved' cannot be edited"
+                );
+                return;
+            }
+            this._openComplaintDialog(oComplaint);
+        },
+        onComBranch: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
     });
