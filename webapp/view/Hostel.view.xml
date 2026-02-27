@@ -44,6 +44,7 @@
                     displaySize="XS"
                     tooltip="{= ${LoginModel>/UserName} || ${i18n>profilePic} }"
                     press="onPressAvatar"
+                    class="sapUiTinyMarginTop profileAvatar"
                 />
             </tnt:ToolHeader>
         </tnt:header>

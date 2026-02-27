@@ -4492,3 +4492,8 @@ span.sapMBtnInner.sapMBtnEmphasized {
   object-fit: contain;
   display: block;
 }
+.profileAvatar{
+
+height: 45px !important;
+width: 45px !important;
+}

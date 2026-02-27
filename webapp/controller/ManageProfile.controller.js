@@ -860,6 +860,7 @@ sap.ui.define([
                     this._updateRowCount();
                 }
             }
+          
         },
         onlogout: function () {
 
