@@ -440,7 +440,7 @@ sap.ui.define([
             }
 
             if (sRCustomerName) {
-                filters.CustomerID = sRCustomerName
+                filters.CustomerName = sRCustomerName
             }
             if (sStatus) {
                 filters.Status = sStatus

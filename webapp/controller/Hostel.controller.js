@@ -7,7 +7,7 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-], function(BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator) {
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
@@ -16,7 +16,7 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.Hostel", {
         _isProfileRequested: false,
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             this.getView().setModel(new JSONModel({
                 showGlobalFooter: false,
                 showRoomsFooter: false,
@@ -38,7 +38,7 @@ sap.ui.define([
             this.getView().setModel(oDateModel, "controller");
         },
 
-        _getBrowserLocation: function() {
+        _getBrowserLocation: function () {
             if (!navigator.geolocation) return MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
 
             // Options for better reliability
@@ -69,7 +69,7 @@ sap.ui.define([
             );
         },
 
-        _getLocationName: function(lat, lng) {
+        _getLocationName: function (lat, lng) {
             // Debounce: clear previous timer
             if (this._geoTimeout) {
                 clearTimeout(this._geoTimeout);
@@ -102,11 +102,11 @@ sap.ui.define([
                         console.log("Location found:", this.City, this.State, this.Country);
                     }
 
-                } catch (error) {}
+                } catch (error) { }
             }, 1200); // 1 request per second (safe for Nominatim)
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");
             if (oTabHeader) oTabHeader.setSelectedKey(sStoredTab);
@@ -126,7 +126,7 @@ sap.ui.define([
             this.roomtype = false
 
             if (!this.getView().getModel("VisibilityModel")) {
-                this.getView().setModel(new JSONModel({NoData: false,ShowViewMore: false}), "VisibilityModel");
+                this.getView().setModel(new JSONModel({ NoData: false, ShowViewMore: false }), "VisibilityModel");
             }
             const oView = this.getView();
             //  Disable controls initially
@@ -135,10 +135,10 @@ sap.ui.define([
             this.byId("id_Roomtype").setEnabled(true);
 
             //  Create all static local models
-            oView.setModel(new JSONModel({CustomerName: "",MobileNo: "",Gender: "",DateOfBirth: "",CustomerEmail: "",RoomType: ""}), "HostelModel");
+            oView.setModel(new JSONModel({ CustomerName: "", MobileNo: "", Gender: "", DateOfBirth: "", CustomerEmail: "", RoomType: "" }), "HostelModel");
             this.oHostelModel = oView.getModel("HostelModel");
 
-            oView.setModel(new JSONModel({isEditMode: false}), "saveModel");
+            oView.setModel(new JSONModel({ isEditMode: false }), "saveModel");
             // oView.setModel(new JSONModel({ isOtpSelected: false, isPasswordSelected: true }), "LoginViewModel");
             oView.setModel(new JSONModel({
                 isOtpSelected: false,
@@ -205,14 +205,14 @@ sap.ui.define([
             oNav.setDefaultTransitionName("None");
 
         },
-        _clearOtpValidityTimer: function() {
+        _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
                 clearInterval(this._otpValidityInterval);
                 this._otpValidityInterval = null;
             }
         },
         /**/
-        _startOtpValidity: function() {
+        _startOtpValidity: function () {
             const vm = this.oViewModel;
 
             const expiryTs = Date.now() + (10 * 60 * 1000); //1000xx
@@ -240,7 +240,7 @@ sap.ui.define([
             }, 1000);
         },
 
-        _onOtpExpired: function() {
+        _onOtpExpired: function () {
             const vm = this.oViewModel;
 
             this._clearOtpValidityTimer();
@@ -258,8 +258,8 @@ sap.ui.define([
 
             const otpCtrl =
                 vm.getProperty("/authFlow") === "forgot" ?
-                $C("fpOTP") :
-                $C("signInOTP");
+                    $C("fpOTP") :
+                    $C("signInOTP");
 
             otpCtrl?.setValue("");
             otpCtrl?.setEnabled(false);
@@ -268,11 +268,11 @@ sap.ui.define([
             MessageToast.show("OTP expired. Please resend OTP.");
         },
 
-        onUserlivechange: function(oEvent) {
+        onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 id_Branch: new Set(),
             };
@@ -295,7 +295,7 @@ sap.ui.define([
         },
 
 
-        onSelectPricePlan: function(oEvent) {
+        onSelectPricePlan: function (oEvent) {
             const oTile = oEvent.getSource();
             const sType = oTile.data("type"); // "daily", "monthly", or "yearly"
             const oView = this.getView();
@@ -349,7 +349,7 @@ sap.ui.define([
             oTile.addStyleClass("selectedTile");
         },
 
-        onConfirmBooking: function() {
+        onConfirmBooking: function () {
 
             const oView = this.getView();
             const oLocalModel = this.oHostelModel;
@@ -463,7 +463,7 @@ sap.ui.define([
             oRouter.navTo("RouteBookRoom");
         },
 
-        _clearRoomDetailDialog: function() {
+        _clearRoomDetailDialog: function () {
             if (!this._oRoomDetailFragment) return;
 
             const oFrag = this._oRoomDetailFragment;
@@ -500,13 +500,13 @@ sap.ui.define([
             }
         },
 
-        _bindCarousel: function() {
+        _bindCarousel: function () {
 
             const oCarousel =
                 this._oRoomDetailFragment
-                .findAggregatedObjects(true,
-                    obj => obj.isA && obj.isA("sap.m.Carousel")
-                )[0];
+                    .findAggregatedObjects(true,
+                        obj => obj.isA && obj.isA("sap.m.Carousel")
+                    )[0];
 
             if (!oCarousel) return;
 
@@ -529,8 +529,8 @@ sap.ui.define([
 
                 const imgs =
                     this._oRoomDetailFragment
-                    ?.getModel("HostelModel")
-                    ?.getProperty("/ImageList") || [];
+                        ?.getModel("HostelModel")
+                        ?.getProperty("/ImageList") || [];
 
                 if (imgs.length <= 1) return;
 
@@ -577,7 +577,7 @@ sap.ui.define([
             oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
         },
 
-        _convertFacilities: function(list) {
+        _convertFacilities: function (list) {
             const defaultImages = {
                 "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
                 "Laundry Service": "../image/Laundry Service.jpg",
@@ -634,7 +634,7 @@ sap.ui.define([
                 })
                 .filter(Boolean); // remove null
         },
-        _LoadFacilities: async function(sBranchCode) {
+        _LoadFacilities: async function (sBranchCode) {
 
             if (!this._oRoomDetailFragment || !sBranchCode) return;
 
@@ -677,7 +677,7 @@ sap.ui.define([
         },
 
 
-        viewDetails: function(oEvent) {
+        viewDetails: function (oEvent) {
             try {
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
@@ -772,7 +772,7 @@ sap.ui.define([
                 console.log(" viewDetails error:", err);
             }
         },
-        _updateBookTileState: function() {
+        _updateBookTileState: function () {
 
             const oTile =
                 sap.ui.core.Fragment.byId("roomDetailsFrag", "bookTile");
@@ -789,7 +789,7 @@ sap.ui.define([
         },
 
 
-        _LoadAmenities: async function(sBranchCode) {
+        _LoadAmenities: async function (sBranchCode) {
 
             const oAmenityModel = new JSONModel({
                 loading: true,
@@ -825,7 +825,7 @@ sap.ui.define([
             }
             oAmenityModel.setProperty("/loading", false);
         },
-        _convertAmenities: function(list) {
+        _convertAmenities: function (list) {
             const defaultImages = {
                 "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
                 "Bathrooms": "../image/Bathroom.jpg",
@@ -846,7 +846,7 @@ sap.ui.define([
             });
         },
 
-        onRoomDetailOpened: function() {
+        onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
             if (this._oRoomDetailFragment) {
                 const oModel = this._oRoomDetailFragment.getModel("HostelModel");
@@ -857,7 +857,7 @@ sap.ui.define([
             }
         },
 
-        onImageLoadError: function(oEvent) {
+        onImageLoadError: function (oEvent) {
             const oImage = oEvent.getSource();
             const sFallback = sap.ui.require.toUrl("sap/ui/com/project1/image/no-image.png");
 
@@ -867,17 +867,17 @@ sap.ui.define([
             }
         },
 
-        onCloseRoomDetail: function() {
+        onCloseRoomDetail: function () {
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
             this._clearRoomDetailDialog(); // destroy AFTER
         },
 
-        onDialogAfterClose: function() {
+        onDialogAfterClose: function () {
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close(); // close FIRST
             this._clearRoomDetailDialog();
         },
 
-        _navigateTo: function(sKey) {
+        _navigateTo: function (sKey) {
             const oNav = this.byId("pageContainer");
             const oPage = this.byId(sKey);
             if (!oNav || !oPage) return;
@@ -889,8 +889,8 @@ sap.ui.define([
             }
         },
 
-        onTabSelect: async function(oEvent) {
-             const oView = this.getView();
+        onTabSelect: async function (oEvent) {
+            const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
             oVisibilityModel.setProperty("/Branches", {})
             oVisibilityModel.setProperty("/ShowViewMore", false);
@@ -907,7 +907,7 @@ sap.ui.define([
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
-                  
+
 
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
@@ -948,7 +948,7 @@ sap.ui.define([
             }
         },
 
-        _animateExploreButton: function() {
+        _animateExploreButton: function () {
             const oWrapper = this.byId("exploreWrapper");
             if (!oWrapper) return;
             oWrapper.removeStyleClass("explore-enter");
@@ -960,13 +960,13 @@ sap.ui.define([
             oWrapper.addStyleClass("explore-enter");
         },
 
-        onExit: function() {
+        onExit: function () {
             if (this._exploreBtnAnimationTimeout) {
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
         },
 
-        onpressFilter: function() {
+        onpressFilter: function () {
             var oView = this.getView();
             if (!this.ARD_Dialog) {
 
@@ -983,7 +983,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        onpressBookrooms: function() {
+        onpressBookrooms: function () {
             const oTabHeader = this.byId("mainTabHeader");
             const oItem = oTabHeader.getItems().find(i => i.getKey() === "idRooms");
 
@@ -993,7 +993,7 @@ sap.ui.define([
             });
         },
 
-        onpressLogin: function() {
+        onpressLogin: function () {
             if (!this._oSignDialog) {
                 this._oSignDialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.SignInSignup", this);
                 this.getView().addDependent(this._oSignDialog);
@@ -1038,7 +1038,7 @@ sap.ui.define([
             this._oSignDialog.open();
         },
 
-        onDialogClose: function() {
+        onDialogClose: function () {
             // The afterClose event will handle removing the blur class
             this._resetOtpState();
             if (this._oSignDialog) this._oSignDialog.close();
@@ -1048,7 +1048,7 @@ sap.ui.define([
             }
         },
 
-        onSwitchToSignIn: function() {
+        onSwitchToSignIn: function () {
             this.oViewModel.setProperty("/authFlow", "signin");
             this.oViewModel.setProperty("/loginMode", "password");
             this.oViewModel.setProperty("/forgotStep", 0);
@@ -1059,14 +1059,14 @@ sap.ui.define([
 
             // RESET SIGN-IN FIELDS
             ["signInEmail", "signinPassword", "signInOTP"]
-            .forEach(id => {
-                const c = $C(id);
-                if (c) {
-                    c.setValue("");
-                    c.setValueState("None");
-                    c.setValueStateText("");
-                }
-            });
+                .forEach(id => {
+                    const c = $C(id);
+                    if (c) {
+                        c.setValue("");
+                        c.setValueState("None");
+                        c.setValueStateText("");
+                    }
+                });
 
             $C("signinPassword")?.setEnabled(true);
             $C("signInOTP")?.setEnabled(false);
@@ -1074,21 +1074,21 @@ sap.ui.define([
 
             // RESET FORGOT FIELDS
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
-            .forEach(id => {
-                const c = $C(id);
-                if (c) {
-                    c.setValue("");
-                    c.setValueState("None");
-                    c.setValueStateText("");
-                }
-            });
+                .forEach(id => {
+                    const c = $C(id);
+                    if (c) {
+                        c.setValue("");
+                        c.setValueState("None");
+                        c.setValueStateText("");
+                    }
+                });
 
             // 🚫 DISABLE FORGOT FORM
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
-            .forEach(id => {
-                const c = $C(id);
-                if (c) c.setEnabled(false);
-            });
+                .forEach(id => {
+                    const c = $C(id);
+                    if (c) c.setEnabled(false);
+                });
 
             // RESET SIGN-UP FIELDS
             [
@@ -1184,7 +1184,7 @@ sap.ui.define([
         //     this._resetOtpState();
         //     this._addPasswordGenerateIcon();
         // },
-        onSwitchToSignUp: function() {
+        onSwitchToSignUp: function () {
             const oSignInPanel = $C("signInPanel");
             const oSignUpPanel = $C("signUpPanel");
 
@@ -1262,7 +1262,7 @@ sap.ui.define([
 
 
 
-        SM_onGeneratePassword: function() {
+        SM_onGeneratePassword: function () {
             var oPwdInput = $C("signUpPassword");
             var oStrength = $C("passwordStrengthText");
 
@@ -1274,7 +1274,7 @@ sap.ui.define([
             this.getView().getModel("LoginMode").setProperty("/password", pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-        _addPasswordGenerateIcon: function() {
+        _addPasswordGenerateIcon: function () {
             const aInputs = [$C("signUpPassword"), $C("newPass")];
 
             aInputs.forEach((oInput) => {
@@ -1288,7 +1288,7 @@ sap.ui.define([
             });
         },
 
-        SM_onCopyPassword: function(oEvent) {
+        SM_onCopyPassword: function (oEvent) {
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent(); // 👈 actual input owning the icon
             if (!oInput || !oInput.getValue) return;
@@ -1314,11 +1314,11 @@ sap.ui.define([
                 });
         },
 
-        onEmailliveChange: function(oEvent) {
+        onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
-        SM_onTogglePasswordVisibility: function(oEvent) {
+        SM_onTogglePasswordVisibility: function (oEvent) {
             var oInput = oEvent.getSource();
             // 1. Capture value BEFORE type change
             var sValue = oInput.getValue();
@@ -1334,7 +1334,7 @@ sap.ui.define([
             oInput.setValue(sValue);
         },
 
-        SM_onChnageSetAndConfirm: function(oEvent) {
+        SM_onChnageSetAndConfirm: function (oEvent) {
             const oInput = oEvent.getSource();
             const sId = oInput.getId(); // 🔥 Sabse pehle ID lein
             let val = oInput.getValue();
@@ -1359,7 +1359,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
 
-        SM_onGenerateForgotPassword: function() {
+        SM_onGenerateForgotPassword: function () {
             var oPwdInput = $C("newPass");
             var oStrength = $C("fpPasswordStrengthText");
             if (!oPwdInput) return;
@@ -1371,7 +1371,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
 
-        onSignUp: async function() {
+        onSignUp: async function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
@@ -1499,7 +1499,7 @@ sap.ui.define([
                             try {
                                 const oErr = JSON.parse(err.responseText);
                                 return oErr?.message;
-                            } catch (e) {}
+                            } catch (e) { }
                         }
                         return this.i18nModel.getText("registrationFailedPleasetryagain");
                     })();
@@ -1513,7 +1513,7 @@ sap.ui.define([
         },
 
 
-        _triggerBrowserSaveCredentials: function(username, password) {
+        _triggerBrowserSaveCredentials: function (username, password) {
             const form = document.createElement("form");
             form.style.display = "none";
 
@@ -1538,7 +1538,7 @@ sap.ui.define([
                     method: "POST",
                     mode: "no-cors",
                     body: new FormData(form)
-                }).catch(() => {});
+                }).catch(() => { });
             }
 
             // 5. Cleanup
@@ -1548,7 +1548,7 @@ sap.ui.define([
 
 
         // --- Refactored State Change ---
-        onChangeState: function(oEvent) {
+        onChangeState: function (oEvent) {
             const oState = oEvent ? oEvent.getSource() : $C("signUpState");
             const oModel = this.getView().getModel("LoginMode");
             const oCity = $C("signUpCity");
@@ -1593,7 +1593,7 @@ sap.ui.define([
         },
 
         // --- Refactored City Change ---
-        onChangeCity: function(oEvent) {
+        onChangeCity: function (oEvent) {
             const oCityCtrl = oEvent ? oEvent.getSource() : $C("signUpCity");
             const oModel = this.getView().getModel("LoginMode");
             const oCityModel = this.getOwnerComponent().getModel("CityModel");
@@ -1689,7 +1689,7 @@ sap.ui.define([
         //     oModel.setProperty("/City", sCityText);
         // },
 
-        onChangeSalutation: function(oEvent) {
+        onChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = $C("signUpGender");
@@ -1706,10 +1706,10 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onChangeDOB: function(oEventOrControl) {
+        onChangeDOB: function (oEventOrControl) {
             const oDP =
                 (typeof oEventOrControl.getSource === "function") ?
-                oEventOrControl.getSource() : oEventOrControl;
+                    oEventOrControl.getSource() : oEventOrControl;
             if (!oDP) return false;
             const v = oDP.getDateValue();
 
@@ -1743,7 +1743,7 @@ sap.ui.define([
             return true;
         },
 
-        onCityChange: function(oEvent) {
+        onCityChange: function (oEvent) {
             const oCity = oEvent.getSource();
             // Sanitize manual typing
             oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
@@ -1768,11 +1768,11 @@ sap.ui.define([
             oModel.setProperty("/City", sCityText);
         },
 
-        onChangeGender: function(oEvent) {
+        onChangeGender: function (oEvent) {
             utils._LCstrictValidationSelect(oEvent.getSource());
         },
 
-        onMobileLivechnage: function(oEvent) {
+        onMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
             // Digits only
             let val = oInput.getValue().replace(/\D/g, "");
@@ -1801,7 +1801,7 @@ sap.ui.define([
             }
         },
 
-        onAddressChange: function() {
+        onAddressChange: function () {
             utils._LCvalidateAddress($C("signUpAddress"))
         },
 
@@ -1847,7 +1847,7 @@ sap.ui.define([
         //     }
         // },
         // --- Refactored Country Change ---
-        onChangeCountry: function(oEvent) {
+        onChangeCountry: function (oEvent) {
             const oCountry = oEvent ? oEvent.getSource() : $C("signUpCountry");
             if (!oCountry) return;
 
@@ -1906,7 +1906,7 @@ sap.ui.define([
             }
         },
 
-        onSTDChange: function(oEvent) {
+        onSTDChange: function (oEvent) {
             const oSTD = oEvent?.getSource?.() || $C("signUpSTD");
             if (!oSTD) return;
 
@@ -1930,11 +1930,11 @@ sap.ui.define([
             oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
         },
 
-        _LCvalidateName: function(oEvent) {
+        _LCvalidateName: function (oEvent) {
             utils._LCvalidateName(oEvent);
         },
 
-        onCloseManageProfile: function() {
+        onCloseManageProfile: function () {
             if (this._oProfileDialog) {
                 this._oProfileDialog.destroy();
                 this._oProfileDialog = null;
@@ -1942,12 +1942,12 @@ sap.ui.define([
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
         },
 
-        onPressAvatar: async function(oEvent) {
+        onPressAvatar: async function (oEvent) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteManageProfile");
         },
 
-        _applyCountryStateCityFilters: function() {
+        _applyCountryStateCityFilters: function () {
             if (!this._oProfileDialog) return; // safety check
 
             const oModel = this._oProfileDialog.getModel("profileData");
@@ -1992,7 +1992,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource);
         },
 
-        onEditSaveProfile: async function() {
+        onEditSaveProfile: async function () {
             const oModel = this._oProfileDialog.getModel("profileData");
             var data = oModel.getData()
             const isEditMode = oModel.getProperty("/isEditMode");
@@ -2049,21 +2049,21 @@ sap.ui.define([
             }
         },
 
-        onProfileclose: function() {
+        onProfileclose: function () {
             if (this._oProfileDialog) this._oProfileDialog.close()
         },
 
-        onEditProfilePic: function() {
+        onEditProfilePic: function () {
             MessageToast.show(this.i18nModel.getText("profilepictureeditnotimplementedyet"))
         },
 
-        onProfileDialogClose: function() {
+        onProfileDialogClose: function () {
             if (this._oProfileDialog) {
                 this._oProfileDialog.close();
             }
         },
 
-        onLogout: function() {
+        onLogout: function () {
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             if (oLoginModel) {
                 oLoginModel.setData({
@@ -2085,7 +2085,7 @@ sap.ui.define([
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
         },
 
-        _onEnterProfile: async function() {
+        _onEnterProfile: async function () {
             this._oProfileActionSheet.close();
             this._isProfileRequested = true;
             const oTempModel = new JSONModel({
@@ -2097,7 +2097,7 @@ sap.ui.define([
             });
         },
 
-        _onLogout: function() {
+        _onLogout: function () {
             if (this._oProfileActionSheet) {
                 this._oProfileActionSheet.close();
                 this._oProfileActionSheet.destroy();
@@ -2122,7 +2122,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
         },
 
-        createAvatarActionSheet: function() {
+        createAvatarActionSheet: function () {
             if (!this._oProfileActionSheet) {
                 this._oProfileActionSheet = new sap.m.ActionSheet({
                     placement: sap.m.PlacementType.Bottom,
@@ -2144,7 +2144,7 @@ sap.ui.define([
             }
         },
 
-        Bookfragment: function() {
+        Bookfragment: function () {
             if (!this.FCIA_Dialog) {
                 var oView = this.getView();
                 this.FCIA_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Book_Room", this);
@@ -2155,20 +2155,20 @@ sap.ui.define([
             }
         },
 
-        onRoomBookPress: function(oEvent) {
+        onRoomBookPress: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("TilePage")
         },
 
-        onCancelDialog: function() {
+        onCancelDialog: function () {
             this.FCIA_Dialog.close()
         },
 
-        onAdminPress: function() {
+        onAdminPress: function () {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteStudentDetails");
         },
 
-        onWizardNext: function() {
+        onWizardNext: function () {
             const oWizard = $C("idHostelWizard");
             const oNextButton = $C("idWizardNextBtn");
             const oBackButton = $C("idWizardBackBtn");
@@ -2188,7 +2188,7 @@ sap.ui.define([
             oBackButton.setEnabled(true);
         },
 
-        onWizardBack: function() {
+        onWizardBack: function () {
             const oWizard = $C("idHostelWizard");
             const oNextButton = $C("idWizardNextBtn");
             const oBackButton = $C("idWizardBackBtn");
@@ -2204,20 +2204,20 @@ sap.ui.define([
             oSubmitButton.setVisible(false);
         },
 
-        onWizardComplete: function() {
+        onWizardComplete: function () {
             MessageToast.show(this.i18nModel.getText("wizardcompletedsuccessfully"));
         },
 
-        onCancelDialog: function() {
+        onCancelDialog: function () {
             this.FCIA_Dialog.close();
             $C("idHostelWizardDialog").close();
         },
 
-        onDoubleRoomPress: function() {
+        onDoubleRoomPress: function () {
             this.Bookfragment()
         },
 
-        SectionPress: function(oEvent) {
+        SectionPress: function (oEvent) {
             var oSelectedItem = oEvent.getParameter("listItem");
             if (!oSelectedItem) return;
 
@@ -2242,13 +2242,13 @@ sap.ui.define([
             }
         },
 
-        onSearchChange: function(oEvent) {
+        onSearchChange: function (oEvent) {
             var sBranchCode = oEvent.getParameter("value").trim();
             if (!sBranchCode) return MessageToast.show(this.i18nModel.getText("pleaseenterlocationsearch"));
             this._loadFilteredData(sBranchCode);
         },
 
-        FC_onPressClear: function() {
+        FC_onPressClear: function () {
             const oView = this.getView();
             const oBranchCombo = oView.byId("id_Branch");
             const oAreaTypeCombo = oView.byId("id_Area");
@@ -2262,7 +2262,7 @@ sap.ui.define([
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
         },
 
-        onPressBookingRow: function(oEvent) {
+        onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
             // Now reuse your logic exactly as in onEditBooking
@@ -2329,7 +2329,7 @@ sap.ui.define([
             });
         },
 
-        onPressManageInvoice: function(oEvent) {
+        onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
                 sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo),
                 dash: "ManageInvoice"
@@ -2337,7 +2337,7 @@ sap.ui.define([
         },
 
         //  Separated calculation function
-        calculateTotals: function(aPersons, sStartDate, sEndDate, RoomPrice) {
+        calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
@@ -2394,7 +2394,7 @@ sap.ui.define([
         },
 
         // 🗓️ Helper date parser
-        _parseDate: function(sDate) {
+        _parseDate: function (sDate) {
             if (!sDate) return null;
             // If it's already a Date object
             if (sDate instanceof Date) return sDate;
@@ -2407,7 +2407,7 @@ sap.ui.define([
             }
         },
 
-        onBranchSelectionChange: function(oEvent) {
+        onBranchSelectionChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             const oView = this.getView();
             const oAreaCombo = oView.byId("id_Area");
@@ -2422,7 +2422,7 @@ sap.ui.define([
             // 🔹 Fetch existing Branch model data
             const oModelData = oView.getModel("sBRModel").getData();
             // 🔹 Filter the data for the selected branch name
-            const aFiltered = oModelData.filter(function(item) {
+            const aFiltered = oModelData.filter(function (item) {
                 return item.City === sSelectedBranch;
             });
             // 🔹 Update Area model dynamically
@@ -2435,15 +2435,15 @@ sap.ui.define([
         },
 
         // 🔹 When Area is selected, enable Room Type combo
-        onAreaSelectionChange: function(oEvent) {
+        onAreaSelectionChange: function (oEvent) {
             const oRoomType = this.byId("id_Roomtype");
             const oSelectedItem = oEvent.getSource().getSelectedItem();
-            (oSelectedItem) ? oRoomType.setEnabled(true): oRoomType.setEnabled(true);
+            (oSelectedItem) ? oRoomType.setEnabled(true) : oRoomType.setEnabled(true);
         },
 
 
 
-        model: function(response) {
+        model: function (response) {
             const aRooms = response.data.HM_Rooms || [];
             const oRoomModel = new JSONModel({
                 Rooms: aRooms
@@ -2455,7 +2455,7 @@ sap.ui.define([
             const oCustomerModel = new JSONModel(aCustomers);
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
-        onRatingPress: function(oEvent) {
+        onRatingPress: function (oEvent) {
             var oSource = oEvent.getSource();
 
             // Get binding context of the clicked bed type
@@ -2471,7 +2471,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
 
         },
-        viewRooms: function(oEvent) {
+        viewRooms: function (oEvent) {
             var oSource = oEvent.getSource();
 
             // Get binding context of the clicked bed type
@@ -2488,7 +2488,7 @@ sap.ui.define([
                 sPath: oBranchData.BranchID
             });
         },
-        onSearchRooms: async function() {
+        onSearchRooms: async function () {
             this.iTop = 5
             this.iSkip = 0
             this.flag = true
@@ -2534,7 +2534,7 @@ sap.ui.define([
                 oContainer.setBusy(false);
             }
         },
-        onViewMoreRooms: async function() {
+        onViewMoreRooms: async function () {
             // Load next page
             this.flag = false
             this.roomtype = false
@@ -2548,7 +2548,7 @@ sap.ui.define([
         },
 
 
-        Branch: async function(filter) {
+        Branch: async function (filter) {
             const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
             this.RoomCount = response?.HM_RoomCount || 0;
             this.getView().setModel(new JSONModel(response?.data), "BranchModel");
@@ -2558,7 +2558,7 @@ sap.ui.define([
             return Array.isArray(aData) ? aData : [];
         },
 
-        _loadRoomsPageData: async function() {
+        _loadRoomsPageData: async function () {
             this.iTop = 5;
             this.iSkip = 0;
 
@@ -2574,12 +2574,12 @@ sap.ui.define([
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
-      
+
 
 
                 var city = data[0].City
                 var fCity = this.City ? this.City : city;
-             
+
                 var filter = {
                     flag: "true",
                     top: this.iTop,
@@ -2593,9 +2593,9 @@ sap.ui.define([
                 const sCity = this.City ? this.City : data[0].City;
 
                 const aFiltered = oModelData.filter(item => item.City === sCity);
-        
 
-             
+
+
 
                 if (aFiltered.length === 0 || sCity) {
                     await this._loadFilteredData(sCity, "", "");
@@ -2622,16 +2622,16 @@ sap.ui.define([
                 oFooterModel.setProperty("/showRoomsFooter", true);
             }
         },
-        _loadFilteredData: async function(Scity, sBranchCode, BranchName) {
+        _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
             var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
-           var Branchdata=data.filter((item)=>{
-                    return item.City===Scity
-                })
-                this.Branchlength=Branchdata.length
+            var Branchdata = data.filter((item) => {
+                return item.City === Scity
+            })
+            this.Branchlength = Branchdata.length
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -2645,6 +2645,21 @@ sap.ui.define([
                     });
                     aBranchesData = response?.data || [];
                     this.RoomCount = response?.HM_RoomCount || 0;
+                    if (sBranchCode || BranchName) {
+                        this.Branchlength = aBranchesData.length
+                    }
+                    let oAreaModel = this.getView().getModel("AreaModel");
+                    let aExistingData = oAreaModel.getData() || [];
+
+                    let aFilteredData = aBranchesData.filter(newItem => {
+                        return !aExistingData.some(existingItem =>
+                            existingItem.Name === newItem.Name
+                        );
+                    });
+
+                    let aUpdatedData = [...aExistingData, ...aFilteredData];
+
+                this.getView().getModel("AreaModel").setData(aUpdatedData);
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
@@ -2712,7 +2727,7 @@ sap.ui.define([
                     oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
                 }
 
-                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !==this.Branchlength);
+                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !== this.Branchlength);
                 if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
@@ -2724,7 +2739,7 @@ sap.ui.define([
             }
         },
 
-        onBookNow: function(oEvent) {
+        onBookNow: function (oEvent) {
             const oItem = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
 
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
@@ -2747,7 +2762,7 @@ sap.ui.define([
             oRouter.navTo("RouteBookRoom");
         },
 
-        onFormEdit: async function() {
+        onFormEdit: async function () {
             var oSaveModel = this.getView().getModel("saveModel");
             var oedit = oSaveModel.getProperty("/isEditMode");
             var oEdit = this._oProfileDialog.getModel("profileData").getData();
@@ -2774,7 +2789,7 @@ sap.ui.define([
             }
         },
 
-        FSM_onConfirm: function(oEvent) {
+        FSM_onConfirm: function (oEvent) {
             const oInput = oEvent?.getSource();
             if (!oInput) return false;
 
@@ -2797,7 +2812,7 @@ sap.ui.define([
             return true; // ✅ EXPLICIT PASS
         },
 
-        Forget_onConfirm: function(oEvent) {
+        Forget_onConfirm: function (oEvent) {
             const confirm = oEvent.getSource().getValue().trim();
             const pass = $C("newPass").getValue().trim();
             const oInput = $C("confPass");
@@ -2815,7 +2830,7 @@ sap.ui.define([
             oInput.setValueStateText(this.i18nModel.getText("passwordsmatched"));
         },
 
-        onOtpLive: function(oEvent) {
+        onOtpLive: function (oEvent) {
             const sInput = oEvent.getSource();
             const sVal = oEvent.getParameter("value").replace(/\D/g, ""); // allow digits only
             sInput.setValue(sVal);
@@ -2828,12 +2843,12 @@ sap.ui.define([
             }
         },
 
-        onBackToForgot: function() {
+        onBackToForgot: function () {
             this.oViewModel.setProperty("/authFlow", "forgot");
             this.oViewModel.setProperty("/forgotStep", 1); // RESET to step 1
         },
 
-        onForgotPassword: function() {
+        onForgotPassword: function () {
             this._resetOtpState();
             this.oViewModel.setProperty("/authFlow", "forgot");
             this.oViewModel.setProperty("/forgotStep", 1); // safe, runtime only
@@ -2841,7 +2856,7 @@ sap.ui.define([
             this._addPasswordGenerateIcon();
         },
 
-        onSelectLoginMode: function(e) {
+        onSelectLoginMode: function (e) {
             const mode = e.getSource().getText().toLowerCase(); // "password" or "otp"
 
             this.oViewModel.setProperty("/loginMode", mode);
@@ -2868,7 +2883,7 @@ sap.ui.define([
             }
         },
 
-        _clearAllAuthFields: function() {
+        _clearAllAuthFields: function () {
             const ids = ["signInEmail", "signinPassword", "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"];
             ids.forEach(id => {
                 const c = $C(id);
@@ -2882,7 +2897,7 @@ sap.ui.define([
             this._resetOtpState();
         },
 
-        _resetAuthDialog: function() {
+        _resetAuthDialog: function () {
             const oModel = this.getView().getModel("LoginMode");
 
             // Reset LoginMode data (your existing block)
@@ -2942,7 +2957,7 @@ sap.ui.define([
             this.getView().removeStyleClass("blur-background");
         },
 
-        _showPanel: function(panelId) {
+        _showPanel: function (panelId) {
             const aPanels = ["signInPanel", "signUpPanel", "forgotFlowPanel"];
 
             aPanels.forEach(id => {
@@ -2951,7 +2966,7 @@ sap.ui.define([
             });
         },
 
-        onSubmitNewPassword: async function() {
+        onSubmitNewPassword: async function () {
             const oNew = $C("newPass");
             const oConf = $C("confPass");
 
@@ -3030,15 +3045,15 @@ sap.ui.define([
             }
         },
 
-        _resetAllAuthFields: function() {
+        _resetAllAuthFields: function () {
             ["signInEmail", "signinPassword", "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"]
-            .forEach(id => {
-                let o = $C(id);
-                if (o) o.setValue("");
-            });
+                .forEach(id => {
+                    let o = $C(id);
+                    if (o) o.setValue("");
+                });
         },
 
-        _verifyOTPWithBackend: async function(otp) {
+        _verifyOTPWithBackend: async function (otp) {
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oPayload = {
@@ -3060,7 +3075,7 @@ sap.ui.define([
             }
         },
 
-        onLoginOtpLive: function(e) {
+        onLoginOtpLive: function (e) {
             const input = e.getSource();
 
             // allow only digits and enforce 6 max
@@ -3082,7 +3097,7 @@ sap.ui.define([
             }
         },
 
-        onPressOTP: async function() {
+        onPressOTP: async function () {
             const oEmailCtrl = $C("signInEmail");
             const sEmail = oEmailCtrl?.getValue()?.trim() || "";
             // Validate input
@@ -3123,7 +3138,7 @@ sap.ui.define([
             }
         },
 
-        _onVerifyOTP: async function() {
+        _onVerifyOTP: async function () {
             const flow = this.oViewModel.getProperty("/authFlow");
             // Resolve OTP control by flow
             const oOtpInput = (flow === "forgot") ? $C("fpOTP") : $C("signInOTP");
@@ -3178,11 +3193,11 @@ sap.ui.define([
             }
         },
 
-        onShowForgotUser: function() {
+        onShowForgotUser: function () {
             this._showForgotSection("secForgotUser")
         },
 
-        onBackToLogin: function() {
+        onBackToLogin: function () {
             this._clearAllAuthFields();
             // Reset only values (not visibility/enabled state)
             $C("fpEmailId").setValue("");
@@ -3200,7 +3215,7 @@ sap.ui.define([
             this._resetOtpState();
         },
 
-        _setLoggedInUser: function(user) {
+        _setLoggedInUser: function (user) {
             const oLoginModel = this.getView().getModel("LoginModel");
 
             oLoginModel.setProperty("/EmployeeID", user.UserID);
@@ -3220,12 +3235,12 @@ sap.ui.define([
 
             this._oLoggedInUser = user;
 
-            if (user.Role === "Customer") {} else {
+            if (user.Role === "Customer") { } else {
                 this.getOwnerComponent().getRouter().navTo("TilePage");
             }
         },
 
-        onPressAvatarEdit: function(oEvent) {
+        onPressAvatarEdit: function (oEvent) {
             this._oAvatarActionSheet = new sap.m.ActionSheet({
                 buttons: [
                     new sap.m.Button({
@@ -3251,7 +3266,7 @@ sap.ui.define([
             this._oAvatarActionSheet.openBy(oEvent.getSource());
         },
 
-        _StartCamera: function() {
+        _StartCamera: function () {
             var oVideo = document.getElementById("video");
             if (!oVideo) return;
             // Create segmentation instance only once
@@ -3283,7 +3298,7 @@ sap.ui.define([
             this.camera.start();
         },
 
-        _StopCamera: function() {
+        _StopCamera: function () {
             if (this.camera) {
                 this.camera.stop();
                 this.camera = null;
@@ -3298,13 +3313,13 @@ sap.ui.define([
             }
         },
 
-        onTakePhoto: function() {
+        onTakePhoto: function () {
             if (!this.oCameraDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.ui.com.project1.fragment.SelfieCam",
                     controller: this,
                 }).then(
-                    function(oDialog) {
+                    function (oDialog) {
                         this.oCameraDialog = oDialog;
                         this.getView().addDependent(this.oCameraDialog);
                         this.oCameraDialog.attachAfterOpen(this._StartCamera.bind(this));
@@ -3317,7 +3332,7 @@ sap.ui.define([
             }
         },
 
-        IC_onCapturePress: function() {
+        IC_onCapturePress: function () {
             var oVideo = document.getElementById("video");
             if (!oVideo || !this.latestSegmentation) return;
             const oCanvas = document.createElement("canvas");
@@ -3361,14 +3376,14 @@ sap.ui.define([
             this.oCameraDialog.close();
         },
 
-        IC_onPressCloseCameraDialog: function() {
+        IC_onPressCloseCameraDialog: function () {
             this._StopCamera();
             if (this.oCameraDialog) {
                 this.oCameraDialog.close();
             }
         },
 
-        onUploadPhoto: function() {
+        onUploadPhoto: function () {
             const uploader = this.byId("id_fileUploaderAvatar");
             if (!uploader) return;
 
@@ -3385,7 +3400,7 @@ sap.ui.define([
             }, 200);
         },
 
-        onAvatarFileSelected: function(oEvent) {
+        onAvatarFileSelected: function (oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
             const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -3411,7 +3426,7 @@ sap.ui.define([
             reader.readAsDataURL(file);
         },
 
-        onRemovePhoto: async function() {
+        onRemovePhoto: async function () {
             const oModel = this._oProfileDialog.getModel("profileData");
             const initials = oModel.getProperty("/initials");
 
@@ -3424,7 +3439,7 @@ sap.ui.define([
             });
         },
 
-        updateUserPhoto: async function({
+        updateUserPhoto: async function ({
             fileName,
             fileType,
             fileContent
@@ -3445,13 +3460,13 @@ sap.ui.define([
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
 
-                (!fileContent) ? MessageToast.show(this.i18nModel.getText("profilephotoremovedsuccessfully")): MessageToast.show(this.i18nModel.getText("profilephotoupdatedsuccessfully"));
+                (!fileContent) ? MessageToast.show(this.i18nModel.getText("profilephotoremovedsuccessfully")) : MessageToast.show(this.i18nModel.getText("profilephotoupdatedsuccessfully"));
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
 
-        onPreviewProfilePhoto: function() {
+        onPreviewProfilePhoto: function () {
             const sPhoto = this._oProfileDialog.getModel("profileData").getProperty("/photo");
             if (!sPhoto) return MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
 
@@ -3478,11 +3493,11 @@ sap.ui.define([
             this._oPreviewDialog.open();
         },
 
-        onSigninPasswordLive: function(oEvent) {
+        onSigninPasswordLive: function (oEvent) {
             utils._LCvalidatePassword(oEvent.getSource())
         },
 
-        onSignIn: async function() {
+        onSignIn: async function () {
             const vm = this.oViewModel;
             const isOTP = vm.getProperty("/loginMode") === "otp";
             const oLoginModel = this.getView().getModel("LoginModel");
@@ -3571,7 +3586,7 @@ sap.ui.define([
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
                 if (!user?.UserID) return MessageToast.show(this.i18nModel.getText("invalidCredentials"));
-                 this._setLoggedInUser(user);
+                this._setLoggedInUser(user);
 
                 this._oLoggedInUser = user;
                 oLoginModel.setProperty("/EmployeeID", user.UserID);
@@ -3611,19 +3626,19 @@ sap.ui.define([
             }
         },
 
-        onChange: function(oEvent) {
+        onChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onDateChange: function(oEvent) {
+        onDateChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateDate(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onCountrySelectionChange: function(oEvent) {
+        onCountrySelectionChange: function (oEvent) {
             const oCountry = oEvent.getSource();
             const oModel = this._oProfileDialog.getModel("profileData");
             utils._LCvalidateMandatoryField(oEvent);
@@ -3674,16 +3689,16 @@ sap.ui.define([
             }
         },
 
-        _onProfileSTDChange: function() {
+        _onProfileSTDChange: function () {
             const oSTD = this.byId("id_std");
             const oMobile = this.byId("id_phone");
             const std = oSTD.getValue();
             oMobile.setValue("");
             // Dynamic mobile length
-            (std === "+91") ? oMobile.setMaxLength(10): oMobile.setMaxLength(18);
+            (std === "+91") ? oMobile.setMaxLength(10) : oMobile.setMaxLength(18);
         },
 
-        MPonMobileLivechnage: function(oEvent) {
+        MPonMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
             // Digits only
             let val = oInput.getValue().replace(/\D/g, "");
@@ -3709,7 +3724,7 @@ sap.ui.define([
             }
         },
 
-        CC_onChangeState: function(oEvent) {
+        CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oModel = this._oProfileDialog.getModel("profileData");
             const oItem = oEvent.getSource().getSelectedItem();
@@ -3738,7 +3753,7 @@ sap.ui.define([
             ]);
         },
 
-        CC_onChangeCity: function(oEvent) {
+        CC_onChangeCity: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oModel = this._oProfileDialog.getModel("profileData");
             const oItem = oEvent.getSource().getSelectedItem();
@@ -3751,7 +3766,7 @@ sap.ui.define([
             oModel.setProperty("/City", sCityName);
         },
 
-        onValidateUser: async function() {
+        onValidateUser: async function () {
             const oEmailCtrl = $C("fpEmailId");
             const isValid =
                 utils._LCvalidateMandatoryField(oEmailCtrl, "ID") &&
@@ -3789,14 +3804,14 @@ sap.ui.define([
             }
         },
 
-        _clearOtpResendTimer: function() {
+        _clearOtpResendTimer: function () {
             if (this._otpResendInterval) {
                 clearInterval(this._otpResendInterval);
                 this._otpResendInterval = null;
             }
         },
 
-        _startOtpResend: function(seconds = 120) { //120xx
+        _startOtpResend: function (seconds = 120) { //120xx
             let remaining = seconds;
             this._clearOtpResendTimer();
             this.oViewModel.setProperty("/canResendOTP", false);
@@ -3814,7 +3829,7 @@ sap.ui.define([
             }, 1000);
         },
 
-        _resetOtpState: function() {
+        _resetOtpState: function () {
             this._clearOtpResendTimer();
             this._clearOtpValidityTimer();
 
@@ -3832,7 +3847,7 @@ sap.ui.define([
         },
 
 
-        onGlobalSearch: function(oEvent) {
+        onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
             const oProfileModel = this._oProfileDialog.getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
@@ -3877,27 +3892,27 @@ sap.ui.define([
             this._updateRowCount();
         },
 
-        onTableSelect: async function(oEvent) {
+        onTableSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("key");
             const oModel = this._oProfileDialog.getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
         },
 
-        onTableUpdateFinished: function() {
+        onTableUpdateFinished: function () {
             this._updateRowCount()
         },
 
-        _updateRowCount: function() {
+        _updateRowCount: function () {
             const oProfileModel = this._oProfileDialog.getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
             const oTable = sSelectedTab === "Payment" ? this.byId("Id_PaymentTable") : this.byId("Id_ProfileaTable");
             const oBinding = oTable.getBinding("items");
             const length = oBinding ? oBinding.getLength() : 0;
 
-            (sSelectedTab === "Payment") ? oProfileModel.setProperty("/paymentCount", length): oProfileModel.setProperty("/bookingCount", length);
+            (sSelectedTab === "Payment") ? oProfileModel.setProperty("/paymentCount", length) : oProfileModel.setProperty("/bookingCount", length);
         },
 
-        onAdminSIGNUP: function() {
+        onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment("sap.ui.com.project1.fragment.AdminSignup", this);
                 this.getView().addDependent(this._oAdminSignup);
@@ -3961,7 +3976,7 @@ sap.ui.define([
 
 
         },
-        _triggerAutoPopulation: function() {
+        _triggerAutoPopulation: function () {
             const oModel = this.getView().getModel("AdminSignupModel"); // Ya "LoginMode"
 
             if (this.Country) {
@@ -3987,14 +4002,14 @@ sap.ui.define([
             }
         },
 
-        onCloseAdminSignup: function() {
+        onCloseAdminSignup: function () {
             if (this._oAdminSignup) {
                 this._resetAdminSignupForm();
                 this._oAdminSignup.close();
             }
         },
 
-        ADMIN_onChangeCountry: function(oEvent) {
+        ADMIN_onChangeCountry: function (oEvent) {
             const oCountry = oEvent ? oEvent.getSource() : $C("adminsignUpCountry");
             if (!oCountry) return;
 
@@ -4041,7 +4056,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeState: function(oEvent) {
+        ADMIN_onChangeState: function (oEvent) {
             const oState = oEvent ? oEvent.getSource() : $C("adminsignUpState");
             const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
@@ -4078,7 +4093,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onChangeCity: function(oEvent) {
+        ADMIN_onChangeCity: function (oEvent) {
             const oCityCtrl = oEvent ? oEvent.getSource() : $C("adminsignUpCity");
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCityModel = this.getView().getModel("CityModel");
@@ -4100,7 +4115,7 @@ sap.ui.define([
                 oModel.setProperty("/City", sCitySearch);
             }
         },
-        _findBestMatch: function(sInput, aItems, sPropertyName) {
+        _findBestMatch: function (sInput, aItems, sPropertyName) {
             if (!sInput || !aItems || aItems.length === 0) return null;
             const sNormInput = sInput.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
 
@@ -4120,7 +4135,7 @@ sap.ui.define([
 
 
 
-        _autoSelectSTD: function(sCode) {
+        _autoSelectSTD: function (sCode) {
             const oSTD = $C("adminsignUpSTD");
             const oModel = this.getView().getModel("AdminSignupModel");
             const oItem = oSTD.getItems().find(i => i.getAdditionalText() === sCode);
@@ -4129,7 +4144,7 @@ sap.ui.define([
                 oModel.setProperty("/STDCode", oItem.getKey());
             }
         },
-        ADMIN_onChangeSTD: function(oEvent) {
+        ADMIN_onChangeSTD: function (oEvent) {
             const oSTD = oEvent.getSource();
             let sValue = oSTD.getValue() || "";
             sValue = sValue.trim();
@@ -4155,7 +4170,7 @@ sap.ui.define([
             }
         },
 
-        ADMIN_onMobileLiveChange: function(oEvent) {
+        ADMIN_onMobileLiveChange: function (oEvent) {
             const isValid = utils._LCvalidateMandatoryField(oEvent);
             if (!isValid) return;
             const oInput = oEvent.getSource();
@@ -4178,13 +4193,13 @@ sap.ui.define([
             if (!valid) {
                 oInput.setValueStateText(
                     std === "+91" ?
-                    this.i18nModel.getText("MSmobileNoValueStateIN") :
-                    this.i18nModel.getText("MSmobileNoValueStateINT")
+                        this.i18nModel.getText("MSmobileNoValueStateIN") :
+                        this.i18nModel.getText("MSmobileNoValueStateINT")
                 );
             }
         },
 
-        onAdminLiveValidate: function(oEvent) {
+        onAdminLiveValidate: function (oEvent) {
             const id = oEvent.getSource().getId();
             // Vendor name
             if (id.includes("adminVendorName")) return utils._LCvalidateName(oEvent);
@@ -4194,7 +4209,7 @@ sap.ui.define([
             if (id.includes("adminAddress")) return utils._LCvalidateMandatoryField(oEvent);
         },
 
-        ADMIN_onChangeDOB: function(oEvent) {
+        ADMIN_onChangeDOB: function (oEvent) {
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
             const raw = oDatePicker.getDateValue();
@@ -4224,7 +4239,7 @@ sap.ui.define([
             oModel.setProperty("/DOB", `${yyyy}-${mm}-${dd}`);
         },
 
-        onSubmitAdminSignup: async function() {
+        onSubmitAdminSignup: async function () {
             if (!this._validateAdminSignupFields()) return;
             const oModel = this.getView().getModel("AdminSignupModel");
             const data = oModel.getData();
@@ -4262,14 +4277,14 @@ sap.ui.define([
                     "Thank you for signing up.\n\n" +
                     "The team will review all submitted details and documents. Once verification is finished, an email will be shared along with the user credentials.\n\n" +
                     "Please check your inbox (and spam folder) for further updates.", {
-                        title: "Registration Submitted Successfully",
-                        contentWidth: "500px", // Try adding this directly here
-                        // styleClass: "myCustomMessageBoxSize",
-                        emphasizedAction: MessageBox.Action.OK,
-                        onClose: () => {
-                            this._oAdminSignup.close();
-                        }
+                    title: "Registration Submitted Successfully",
+                    contentWidth: "500px", // Try adding this directly here
+                    // styleClass: "myCustomMessageBoxSize",
+                    emphasizedAction: MessageBox.Action.OK,
+                    onClose: () => {
+                        this._oAdminSignup.close();
                     }
+                }
                 );
             } catch (err) {
                 let sErrorMessage = "Registration failed. Please try again later.";
@@ -4302,7 +4317,7 @@ sap.ui.define([
             }
         },
 
-        onAdminFileSelect: function(oEvent) {
+        onAdminFileSelect: function (oEvent) {
             const oUploader = $C("adminFileUploader");
             const oDocType = $C("adminDocType");
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -4386,14 +4401,14 @@ sap.ui.define([
             reader.readAsDataURL(file);
         },
 
-        ADMIN_onChangeGender: function(oEvent) {
+        ADMIN_onChangeGender: function (oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
             this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
             oSelect.setValueState(key ? "None" : "Error");
         },
 
-        _resetAdminSignupForm: function() {
+        _resetAdminSignupForm: function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const oModel = this.getView().getModel("AdminSignupModel");
 
@@ -4432,7 +4447,7 @@ sap.ui.define([
             oModel.setProperty("/DocTypeEnabled", true);
         },
 
-        _validateAdminSignupFields: function() {
+        _validateAdminSignupFields: function () {
             const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
             const M = this.getView().getModel("AdminSignupModel");
             const std = (C("adminsignUpSTD").getValue() || "").trim();
@@ -4477,7 +4492,7 @@ sap.ui.define([
             return true;
         },
 
-        _initAdminSignupModel: function() {
+        _initAdminSignupModel: function () {
             const oModel = new JSONModel({
                 Salutation: "",
                 VendorName: "",
@@ -4498,20 +4513,20 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
-        onAdminDocTypeChange: function(oEvent) {
+        onAdminDocTypeChange: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();
             oModel.setProperty("/UploadEnabled", !!key);
         },
 
-        _isDuplicateFile: function(fileName) {
+        _isDuplicateFile: function (fileName) {
             const docs = this.getView()
                 .getModel("AdminSignupModel")
                 .getProperty("/Documents") || [];
             return docs.some(d => d.FileName === fileName);
         },
 
-        _onCollectAdminSignupPayloadDocs: function() {
+        _onCollectAdminSignupPayloadDocs: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
             const aDocs = oModel.getProperty("/Documents") || [];
             const aPayloadDocs = aDocs.map(d => ({
@@ -4523,7 +4538,7 @@ sap.ui.define([
             return aPayloadDocs;
         },
 
-        onAdminDeleteDoc: function(oEvent) {
+        onAdminDeleteDoc: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const oDocType = $C("adminDocType");
             const table = $C("adminAttachmentTable");
@@ -4546,12 +4561,12 @@ sap.ui.define([
             if (docs.length === 0) table?.addStyleClass("fileErrorHighlight");
         },
 
-        onAdminDocTypeSelected: function() {
+        onAdminDocTypeSelected: function () {
             const uploader = $C("hiddenAdminUploader");
             if (uploader && uploader.openFileDialog) uploader.openFileDialog(); // <--- THIS opens Browse dialog
         },
 
-        onAdminPreviewDoc: function(oEvent) {
+        onAdminPreviewDoc: function (oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -4699,7 +4714,7 @@ sap.ui.define([
             MessageToast.show("Preview not supported.");
         },
 
-        onAdminChangeSalutation: function(oEvent) {
+        onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = $C("adminGender");
@@ -4722,21 +4737,21 @@ sap.ui.define([
             // ✅ Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
-        ADMIN_onAddressChange: function(oEvent) {
+        ADMIN_onAddressChange: function (oEvent) {
             utils._LCvalidateAddress(oEvent.getSource())
         },
 
-        MPonAddressChange: function(oEvent) {
+        MPonAddressChange: function (oEvent) {
             utils._LCvalidateAddress(oEvent.getSource())
         },
 
-        onNameInputLiveChange: function(oEvent) {
+        onNameInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateName(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onAddressClick: function() {
+        onAddressClick: function () {
             try {
                 let oHostelModel = this._oRoomDetailFragment ? this._oRoomDetailFragment.getModel("HostelModel") : this.oHostelModel;
                 if (!oHostelModel) return MessageToast.show("Location data not available.");

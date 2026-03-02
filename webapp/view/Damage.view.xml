@@ -33,11 +33,11 @@
 						<fb:control>
 							<ComboBox
                                 id="Dm_id_CustomerName"
-                                items="{CustomerModel>/}"
+                                items="{CustomerModel1>/}"
                                 showClearIcon="true">
 								<core:ListItem
-                                    key="{CustomerModel>CustomerName}"
-                                    text="{CustomerModel>CustomerName}"/>
+                                    key="{CustomerModel1>CustomerName}"
+                                    text="{CustomerModel1>CustomerName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
