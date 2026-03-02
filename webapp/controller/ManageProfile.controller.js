@@ -58,8 +58,12 @@ sap.ui.define([
         },
 
         ManageData: async function () {
-            let oUser = this._oLoggedInUser;
-            // const fullUserData = this._oLoggedInUser || {};
+            // always read current user from models instead of relying solely on cached variable
+            let oUser = sap.ui.getCore().getModel("LoginModel")?.getData() ||
+                this.getOwnerComponent().getModel("UserModel")?.getData() ||
+                this._oLoggedInUser || {};
+            // update cached copy so future calls are consistent
+            this._oLoggedInUser = oUser;
             let fullUserData = {};
 
             try {
@@ -826,7 +830,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/damageCount", length);
             }
         },
-     onTableSelect: async function (oEvent) {
+        onTableSelect: async function (oEvent) {
             const sKey = oEvent.getParameter("key");
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
@@ -852,7 +856,7 @@ sap.ui.define([
                         TotalAmount: inv.TotalAmount || inv.GrandTotal || 0,
                         DueAmount: inv.DueAmount || inv.DueAmount || 0,
                         currency: inv.Currency || inv.currency || "",
-                         PaymentGroup: inv.Status || "Others"
+                        PaymentGroup: inv.Status || "Others"
                     }));
 
                     oModel.setProperty("/Payments", aPayments);
@@ -1071,12 +1075,20 @@ sap.ui.define([
                 this._updateRowCount();
             }
         },
-    
+
         onlogout: function () {
 
+            // clear profile model and cached user info so next login starts fresh
+            // remove any profile data both locally and globally
             this.getView().getModel("profileData").setData({});
-            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            sap.ui.getCore().setModel(null, "profileData");
+            this._oLoggedInUser = {};
+            const oUserModel = this.getOwnerComponent().getModel("UserModel");
+            if (oUserModel) {
+                oUserModel.setData({});
+            }
 
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
                 oLoginModel.setProperty("/EmployeeID", "");
                 // oLoginModel.setProperty("/UserID", "");
@@ -1834,10 +1846,10 @@ sap.ui.define([
             }
         },
         // Helper to refresh complaints table after save
-            _refreshComplaints: async function () {
+        _refreshComplaints: async function () {
             // Backward-compatible: keep existing call sites after save/update
             await this._loadComplaints(true);
-      },
+        },
 
         onPressComplaintRow: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("profileData");
