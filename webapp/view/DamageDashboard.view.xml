@@ -309,22 +309,12 @@
                                             vizType="{chartTypeModel>/status}"
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
+                                            legend:{visible:true},
                                             title: {visible: false},
                                             plotArea: {
-                                                dataLabel: { visible: true },
-                                                dataPointStyle: {
-                                                    rules: [
-                                                        {
-                                                            dataContext: { Status: 'Recovered' },
-                                                            properties: { color: '#0b8400' }
-                                                        },
-                                                        {
-                                                            dataContext: { Status: 'Pending' },
-                                                            properties: { color: '#9c260c' }
-                                                        }
-                                                    ]
-                                                }
-                                            },
+    colorPalette: ['#0b8400', '#9c260c'],
+    dataLabel: { visible: true }
+},
                                             valueAxis: { 
                                                 title: { text: 'Total records' },
                                                 label: { formatString: '0' } 
@@ -364,6 +354,11 @@
                                                     type="Dimension"
                                                     values="Status"
                                                 />
+                                                <viz.feeds:FeedItem
+    uid="color"
+    type="Dimension"
+    values="Status"
+/>
                                             </viz:feeds>
                                         </viz:VizFrame>
                                     </com:content>
@@ -415,22 +410,12 @@
                                             vizType="{chartTypeModel>/payment}"
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
+                                            legend:{visible:true},
                                             title: {visible: false},
-                                            plotArea: {
-                                                dataLabel: { visible: true },
-                                                dataPointStyle: {
-                                                    rules: [
-                                                        {
-                                                            dataContext: { Type: 'Damage' },
-                                                            properties: { color: '#ff9800' }
-                                                        },
-                                                        {
-                                                            dataContext: { Type: 'Missing' },
-                                                            properties: { color: '#e30613' }
-                                                        }
-                                                    ]
-                                                }
-                                            },
+                                           plotArea: {
+    colorPalette: ['#ff9800', '#e30613'],
+    dataLabel: { visible: true }
+},
                                                     valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Damage type' } }
                                                 }"
@@ -465,6 +450,11 @@
                                                     type="Dimension"
                                                     values="Type"
                                                 />
+                                                <viz.feeds:FeedItem
+    uid="color"
+    type="Dimension"
+    values="Type"
+/>
                                             </viz:feeds>
                                         </viz:VizFrame>
                                     </com:content>
