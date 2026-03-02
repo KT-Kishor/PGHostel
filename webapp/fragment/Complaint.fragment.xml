@@ -11,6 +11,7 @@
 
 <ComboBox
     id="idBranchCombo"
+        placeholder="Select Branch"
    selectedKey="{complaintTemp>/BranchCode}"
     items="{
         path: 'profileData>/BranchCombo'
@@ -29,6 +30,7 @@
  <Label text="Room No" required="true" />
                     <ComboBox
                         id="idComplaintRoom"
+                            placeholder="Select Room No"
                         selectedKey="{complaintTemp>/RoomNo}"
                         items="{
                             path: 'complaintTemp>/RoomCombo'
@@ -57,6 +59,8 @@
 
 <ComboBox
     id="idComplaintType"
+    placeholder="Select Complaint Type"
+    width="100%"
     required="true"
     selectedKey="{complaintTemp>/ComplaintType}"
     value="{complaintTemp>/ComplaintType}"

@@ -1112,11 +1112,27 @@ sap.ui.define([
             const oProfileModel = this.getView().getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
 
-            // Decide Table
-            const oTable = sSelectedTab === "Payment" ? this.byId("Id_PaymentTable1") : this.byId("Id_ProfileaTable1");
-            const oBinding = oTable.getBinding("items");
+            // Decide table by selected tab
+            let oTable = null;
+            if (sSelectedTab === "Payment") {
+                oTable = this.byId("Id_PaymentTable1");
+            } else if (sSelectedTab === "Booking History") {
+                oTable = this.byId("Id_ProfileaTable1");
+            } else if (sSelectedTab === "Complaints") {
+                oTable = this.byId("Id_CompmaintTable");
+            } else if (sSelectedTab === "Damage") {
+                oTable = this.byId("Id_DamageTable");
+            }
+            if (!oTable) {
+                return;
+            }
 
-            // Apply filters for booking or payment table
+            const oBinding = oTable.getBinding("items");
+            if (!oBinding) {
+                return;
+            }
+
+            // Apply filters for current tab table
             let aFilters = [];
             if (sQuery) {
                 if (sSelectedTab === "Payment") {
@@ -1148,9 +1164,40 @@ sap.ui.define([
                             and: false
                         })
                     ];
-                }
-                else if (sSelectedTab === "Complaints") {
-
+                } else if (sSelectedTab === "Complaints") {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter("ComplaintID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ComplaintType", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("BranchName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("RoomNo", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ComplaintDescription", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ComplaintStatus", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ComplaintRaisedDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ExpectedResolvedDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("AssignedTo", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                            ],
+                            and: false
+                        })
+                    ];
+                } else if (sSelectedTab === "Damage") {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter("DamageID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("BranchName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("RoomNo", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ItemName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Type", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Description", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Quantity", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Cost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                            ],
+                            and: false
+                        })
+                    ];
                 }
             }
             oBinding.filter(aFilters);
@@ -1916,9 +1963,11 @@ sap.ui.define([
                     ? (this.i18nModel.getText("complaintUpdatedSuccessfully"))
                     : (this.i18nModel.getText("complaintSavedSuccessfully"));
                 MessageToast.show(sSuccessMsg);
+                oView.getModel("profileData")?.setProperty("/selectedTab", "Complaints");
+                this.byId("id_tabBar1")?.setSelectedKey("Complaints");
                 await this._refreshComplaints();
 
-                sap.ui.core.BusyIndicator.hide();
+                sap.ui.core.BusyIndicator.hide();   
 
             } catch (err) {
                 console.error("AJAX error:", err);
