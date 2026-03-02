@@ -726,6 +726,7 @@ sap.ui.define([
         oLoginModel.setProperty("/UserName", "");
         oLoginModel.setProperty("/EmployeeName", "");
         oLoginModel.setProperty("/Role", "");
+        oLoginModel.setProperty("/BranchCode", "");
       }
       this.getOwnerComponent().getRouter().navTo("RouteHostel");
     },

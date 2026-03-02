@@ -38,7 +38,7 @@
                     id="CD_id_Assignedto"
                     selectedKey="{edit>/Currency}"
                     items="{FilteredStaffModel>/}"
-                    valueStateText="Enter Assigned To"
+                    valueStateText="{i18n>SelectAssignedTo}"
                     width="100%"
                     change=".onNoOfPersonInputLiveChange"
                     placeholder="Enter Assigned To"
@@ -74,7 +74,7 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNoOfPersonInputLiveChange"
-                    valueStateText="{i18n>plaeseSelectDate}"
+                        valueStateText="{i18n>plaeseSelectDate}"
                 />
             </f:content>
         </f:SimpleForm>
