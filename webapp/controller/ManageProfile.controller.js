@@ -36,12 +36,14 @@ sap.ui.define([
                 ComplaintID: "",
                 ComplaintType: "",
                 RoomNo: "",
+                RoomCombo: [],
                 Description: "",
                 BranchCode: "",
                 FileName: "",
                 FileType: "",
                 FileContent: "",
-                Documents: []
+                Documents: [],
+                isEditMode: false
             }), "complaintTemp");
 
             // Router matched
@@ -90,6 +92,7 @@ sap.ui.define([
                 const aBookings = response?.commentData || [];
 
                 const aBranchComboData = this._prepareBranchComboData(aBookings);
+                const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const aBookingData = aBookings.map(booking => {
@@ -169,6 +172,7 @@ sap.ui.define([
                     branchCode: oUser.BranchCode,
                     role: oUser.Role,
                     BranchCombo: aBranchComboData,
+                    AsgnRoomNo: aAssignedRoomData,
                     selectedBranchCode: "",
                     hasAssignedBooking: hasAssignedBooking,
                     bookings: aBookingData,
@@ -1368,27 +1372,91 @@ sap.ui.define([
             });
             return aFinal;
         },
+        _prepareAssignedRoomData: function (aBookingData) {
+            if (!Array.isArray(aBookingData)) {
+                return [];
+            }
+
+            const oUnique = new Set();
+            return aBookingData
+                .filter(function (oBooking) {
+                    return oBooking.Status?.toLowerCase() === "assigned" && oBooking.BranchCode && oBooking.RoomNo;
+                })
+                .map(function (oBooking) {
+                    return {
+                        BranchCode: String(oBooking.BranchCode || "").trim(),
+                        RoomNo: String(oBooking.RoomNo || "").trim()
+                    };
+                })
+                .filter(function (oRoom) {
+                    if (!oRoom.BranchCode || !oRoom.RoomNo) {
+                        return false;
+                    }
+                    const sKey = oRoom.BranchCode + "|" + oRoom.RoomNo;
+                    if (oUnique.has(sKey)) {
+                        return false;
+                    }
+                    oUnique.add(sKey);
+                    return true;
+                });
+        },
+
+
+        _setComplaintRoomComboData: function (sBranchCode, sSelectedRoomNo) {
+            const oView = this.getView();
+            const oProfileModel = oView.getModel("profileData");
+            const oTempModel = oView.getModel("complaintTemp");
+
+            if (!oProfileModel || !oTempModel) {
+                return;
+            }
+
+            const sBranch = (sBranchCode || "").trim();
+            const sRoomNo = (sSelectedRoomNo || "").trim();
+            const aAssignedRooms = oProfileModel.getProperty("/AsgnRoomNo") || [];
+            const aRoomCombo = sBranch ? aAssignedRooms
+                .filter(function (oRoom) {
+                    return oRoom.BranchCode === sBranch;
+                })
+                .map(function (oRoom) {
+                    return {
+                        RoomNo: oRoom.RoomNo
+                    };
+                }) : [];
+
+            oTempModel.setProperty("/RoomCombo", aRoomCombo);
+
+            let sNewRoom = sRoomNo;
+            if (aRoomCombo.length === 1) {
+                sNewRoom = aRoomCombo[0].RoomNo;
+            } else {
+                const bValidRoom = sRoomNo && aRoomCombo.some(function (oRoom) {
+                    return oRoom.RoomNo === sRoomNo;
+                });
+                if (!bValidRoom) sNewRoom = "";
+            }
+
+            oTempModel.setProperty("/RoomNo", sNewRoom);
+
+            const oRoomCombo = this._getComplaintControl("idComplaintRoom");
+            if (oRoomCombo) {
+                oRoomCombo.setEditable(aRoomCombo.length !== 1);
+                // oRoomCombo.isEditMode(aRoomCombo.length !== 1);
+            }
+        },
+
+
 
         onPressRaiseComplaint: function () {
-            const aBranches = this.getView().getModel("profileData").getProperty("/BranchCombo");
-
-            if (aBranches?.length === 1) {
-                this.getView().getModel("profileData")
-                    .setProperty("/selectedBranchCode", aBranches[0].BranchCode);
-            }
             this._openComplaintDialog(); // no data → create mode
         },
 
         _openComplaintDialog: function (oComplaintData) {
-
-
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
+            const oProfileModel = oView.getModel("profileData");
 
             if (oComplaintData) {
-
-                const oProfileModel = this.getView().getModel("profileData");
-
 
                 oProfileModel.setProperty(
                     "/selectedBranchCode",
@@ -1444,6 +1512,7 @@ sap.ui.define([
                     ComplaintID: oComplaintData.ComplaintID,
                     ComplaintType: oComplaintData.ComplaintType,
                     RoomNo: oComplaintData.RoomNo || "",
+                    RoomCombo: [],
                     Description: oComplaintData.Description || oComplaintData.ComplaintDescription || "",
                     BranchCode: oComplaintData.BranchCode?.trim() || "",
                     FileName: sExistingFileName,
@@ -1453,15 +1522,16 @@ sap.ui.define([
                     isEditMode: true
                 });
             } else {
-                const oProfileModel = this.getView().getModel("profileData");
-                oProfileModel.setProperty("/selectedBranchCode", "");
+                const aBranches = oProfileModel.getProperty("/BranchCombo") || [];
+                const sDefaultBranchCode = aBranches.length === 1 ? aBranches[0].BranchCode : "";
                 // New complaint: reset model
                 oTempModel.setData({
                     ComplaintID: "",
                     ComplaintType: "",
                     RoomNo: "",
+                    RoomCombo: [],
                     Description: "",
-                    BranchCode: "",
+                    BranchCode: sDefaultBranchCode,
                     FileName: "",
                     FileType: "",
                     FileContent: "",
@@ -1469,8 +1539,26 @@ sap.ui.define([
                     isEditMode: false
                 });
             }
+            this._setComplaintRoomComboData(
+                oTempModel.getProperty("/BranchCode"),
+                oTempModel.getProperty("/RoomNo")
+            );
 
             const sDialogTitle = oComplaintData ? "Edit Complaint" : "Raise New Complaint";
+
+            const fnUpdateUI = () => {
+                const aBranches = oProfileModel.getProperty("/BranchCombo") || [];
+                const oBranchCombo = this._getComplaintControl("idBranchCombo");
+                if (oBranchCombo) {
+                    oBranchCombo.setEditable(aBranches.length !== 1);
+                }
+
+                const aRooms = oTempModel.getProperty("/RoomCombo") || [];
+                const oRoomCombo = this._getComplaintControl("idComplaintRoom");
+                if (oRoomCombo) {
+                    oRoomCombo.setEditable(aRooms.length !== 1);
+                }
+            };
 
             // Open dialog (your existing logic)
             if (!this._oComplaintDialog) {
@@ -1483,11 +1571,13 @@ sap.ui.define([
                     this._oComplaintDialog.setTitle(sDialogTitle);
                     oDialog.open();
                     this._resetComplaintValidationStates();
+                    fnUpdateUI();
                 }.bind(this));
             } else {
                 this._oComplaintDialog.setTitle(sDialogTitle);
                 this._oComplaintDialog.open();
                 this._resetComplaintValidationStates();
+                fnUpdateUI();
             }
         },
 
@@ -1513,12 +1603,14 @@ sap.ui.define([
                     ComplaintID: "",
                     ComplaintType: "",
                     RoomNo: "",
+                    RoomCombo: [],
                     Description: "",
                     BranchCode: "",
                     FileName: "",
                     FileType: "",
                     FileContent: "",
-                    Documents: []
+                    Documents: [],
+                    isEditMode: false
                 });
             }
 
@@ -1527,6 +1619,11 @@ sap.ui.define([
             if (oBranchCombo) {
                 oBranchCombo.setValue("");
                 oBranchCombo.setSelectedKey("");
+            }
+            const oRoomCombo = this._getComplaintControl("idComplaintRoom");
+            if (oRoomCombo) {
+                oRoomCombo.setValue("");
+                oRoomCombo.setSelectedKey("");
             }
 
             this._resetComplaintValidationStates();
@@ -1565,20 +1662,8 @@ sap.ui.define([
         onComplaintTypeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-        onComplaintRoomLiveChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            const sSanitized = (oInput.getValue() || "")
-                .toUpperCase()
-                .replace(/[^A-Z0-9-]/g, "");
-            if (oInput.getValue() !== sSanitized) {
-                oInput.setValue(sSanitized);
-            }
-            utils._LCvalidateMandatoryField(oInput, "ID");
-        },
         onComplaintRoomChange: function (oEvent) {
-            const oInput = oEvent.getSource();
-            oInput.setValue((oInput.getValue() || "").trim().toUpperCase());
-            utils._LCvalidateMandatoryField(oInput, "ID");
+            utils._LCstrictValidationComboBox(oEvent);
         },
         onComplaintDescLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -1767,7 +1852,7 @@ sap.ui.define([
 
 
             if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID") ||
-                !utils._LCvalidateMandatoryField(oRoomNo, "ID") ||
+                !utils._LCstrictValidationComboBox(oRoomNo, "ID") ||
                 !utils._LCvalidateMandatoryField(oComplaintType, "ID") ||
                 !utils._LCvalidateMandatoryField(oDescription, "ID")) {
                 MessageToast.show("Please fill all required fields.");
@@ -1868,7 +1953,10 @@ sap.ui.define([
             this._openComplaintDialog(oComplaint);
         },
         onComBranch: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent);
+            const oBranchCombo = oEvent.getSource();
+            const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
+            const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
+            this._setComplaintRoomComboData(sBranchCode, "");
         },
     });
 });

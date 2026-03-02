@@ -27,16 +27,20 @@
 
 </ComboBox>
  <Label text="Room No" required="true" />
-                    <Input
+                    <ComboBox
                         id="idComplaintRoom"
-                        value="{complaintTemp>/RoomNo}"
-                        placeholder="e.g. PSK1"
-                        maxLength="10"
+                        selectedKey="{complaintTemp>/RoomNo}"
+                        items="{
+                            path: 'complaintTemp>/RoomCombo'
+                        }"
                         required="true"
-                        liveChange="onComplaintRoomLiveChange"
                         change="onComplaintRoomChange"
-                        valueStateText="{i18n>enterRoomNo}"
-                    />
+                        valueStateText="{i18n>selectRoomNo}"
+                    >
+                        <core:Item
+                            key="{complaintTemp>RoomNo}"
+                            text="{complaintTemp>RoomNo}" />
+                    </ComboBox>
                     <!-- <Label text="Complaint Type" required="true" />
                     <ComboBox
                         id="idComplaintType"
