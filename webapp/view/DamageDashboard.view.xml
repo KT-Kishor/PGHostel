@@ -309,11 +309,30 @@
                                             vizType="{chartTypeModel>/status}"
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
-                                                title: {visible: false},
-                                                    plotArea: { colorPalette: ['#ec3b14','#0b8400'],  dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
-                                                    categoryAxis: { title: { text: 'Status' } }
-                                                }"
+                                            title: {visible: false},
+                                            plotArea: {
+                                                dataLabel: { visible: true },
+                                                dataPointStyle: {
+                                                    rules: [
+                                                        {
+                                                            dataContext: { Status: 'Recovered' },
+                                                            properties: { color: '#0b8400' }
+                                                        },
+                                                        {
+                                                            dataContext: { Status: 'Pending' },
+                                                            properties: { color: '#9c260c' }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            valueAxis: { 
+                                                title: { text: 'Total records' },
+                                                label: { formatString: '0' } 
+                                            },
+                                            categoryAxis: { 
+                                                title: { text: 'Status' } 
+                                            }
+                                        }"
                                         >
                                             <viz:dataset>
                                                 <viz.data:FlattenedDataset
@@ -396,8 +415,22 @@
                                             vizType="{chartTypeModel>/payment}"
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
-                                                title: {visible: false},
-                                                    plotArea: { dataLabel: { visible: true } },
+                                            title: {visible: false},
+                                            plotArea: {
+                                                dataLabel: { visible: true },
+                                                dataPointStyle: {
+                                                    rules: [
+                                                        {
+                                                            dataContext: { Type: 'Damage' },
+                                                            properties: { color: '#ff9800' }
+                                                        },
+                                                        {
+                                                            dataContext: { Type: 'Missing' },
+                                                            properties: { color: '#e30613' }
+                                                        }
+                                                    ]
+                                                }
+                                            },
                                                     valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Damage type' } }
                                                 }"
