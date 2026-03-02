@@ -65,7 +65,7 @@
                                 <Title text="Complain Status Distribution" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
 									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart" />
+									<!-- <Button icon="sap-icon://bar-chart" press="	" tooltip="Bar Chart" /> -->
 									<Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="Donut Chart" />
 								</Toolbar>
 							</f:header>
@@ -110,7 +110,7 @@
 								<Toolbar class="customdashboard">
 									<Title text="Daily Complain Trend" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressDailyPie" tooltip="Vertical Chart" />
+									<!-- <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressDailyPie" tooltip="Vertical Chart" /> -->
 									<Button icon="sap-icon://bar-chart" press="IN_onPressDailyBar" tooltip="Bar Chart" />
 									<Button icon="sap-icon://line-chart" press="IN_onPressDailyLine" tooltip="Line Chart" />
 								</Toolbar>
