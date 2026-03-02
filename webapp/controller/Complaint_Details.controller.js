@@ -420,10 +420,14 @@ sap.ui.define([
                 },
             });
             this.CD_read()
+            var table = this.byId("idPOTable1");
+            table.removeSelections();
             this.CD_Dialog.close();
 
         },
         onAddComplainCancel: function () {
+            var table = this.byId("idPOTable1");
+            table.removeSelections();
             this.CD_Dialog.close();
 
         },

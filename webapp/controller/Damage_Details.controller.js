@@ -246,62 +246,21 @@ sap.ui.define([
 
             oModel.setProperty("/Items", aItems);
         },
-        onTotalInputLiveChange: function (oEvent) {
-
+         onTotalInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
 
+            // Allow only numbers and decimal
             sValue = sValue.replace(/[^0-9.]/g, "");
+
             oInput.setValue(sValue);
 
             var oContext = oInput.getBindingContext("DamageModel");
             var oModel = this.getView().getModel("DamageModel");
-            var sPath = oContext.getPath();
 
-            var oRow = oModel.getProperty(sPath);
+            oModel.setProperty(oContext.getPath() + "/Cost", sValue);
 
-            oModel.setProperty(sPath + "/Cost", sValue);
-
-            // Update base cost when manually edited
-            oRow._baseCost = parseFloat(sValue) || 0;
-
-            this._recalculateTotal();
-        },
-        onQuantityInputLiveChange: function (oEvent) {
-
-            var oInput = oEvent.getSource();
-            var sValue = oEvent.getParameter("value");
-
-            // Allow only numbers
-            sValue = sValue.replace(/[^0-9]/g, "");
-            oInput.setValue(sValue);
-
-            var oContext = oInput.getBindingContext("DamageModel");
-            var oModel = this.getView().getModel("DamageModel");
-            var sPath = oContext.getPath();
-
-            var quantity = parseFloat(sValue) || 0;
-
-            // Get current row object
-            var oRow = oModel.getProperty(sPath);
-
-            // Store base cost only first time
-            if (!oRow._baseCost) {
-                oRow._baseCost = parseFloat(oRow.Cost) || 0;
-            }
-
-            var newTotal = quantity * oRow._baseCost;
-
-            oModel.setProperty(sPath + "/Quantity", quantity);
-            oModel.setProperty(sPath + "/Cost", newTotal.toFixed(2));
-
-            this._recalculateTotal();
-        },
-        _recalculateTotal: function () {
-
-            var oModel = this.getView().getModel("DamageModel");
             var aItems = oModel.getProperty("/Items") || [];
-
             var totalCost = 0;
 
             aItems.forEach(function (item) {
@@ -309,11 +268,18 @@ sap.ui.define([
             });
 
             oModel.setProperty("/TotalCost", totalCost.toFixed(2));
-
-            var returnAmt = parseFloat(oModel.getProperty("/ReturnDamageAmount")) || 0;
-            var dueAmount = totalCost - returnAmt;
-
+            var dueAmount = parseFloat(oModel.getProperty("/TotalCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
             oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
+
+        },
+        onQuantityInputLiveChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            var sValue = oEvent.getParameter("value");
+
+            // Allow only numbers and decimal
+            sValue = sValue.replace(/[^0-9.]/g, "");
+
+            oInput.setValue(sValue);
         },
 
         DM_onPressSubmit: function () {
