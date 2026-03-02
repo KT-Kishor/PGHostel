@@ -10,6 +10,12 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDamageDashboard").attachMatched(this._onRouteMatched, this);
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                monthly: "column",
+                daily: "column",
+                status: "column",
+                payment: "column"
+            }), "chartTypeModel");
         },
 
         _onRouteMatched: async function () {
@@ -21,7 +27,9 @@ sap.ui.define([
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
+                this._selectedBranch = "ALL";
                 await this._loadUserBranches();
+                this._setDefaultDates();
                 await this.DD_search();
             } catch (err) {
                 MessageToast.show("Something went wrong");
@@ -35,12 +43,19 @@ sap.ui.define([
             let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
             let aFiltered = aAllBranches.filter(b =>
                 this._aUserBranches.includes(b.BranchID));
+            aFiltered.unshift({
+                BranchID: "ALL",
+                Name: "All Branches",
+                City: ""
+            });
             this.getView().setModel(new JSONModel(aFiltered), "branchModel");
+            this.byId("id_DD_branch").setSelectedKey("ALL");
         },
 
         DD_onPressClear: function () {
             this.byId("id_DD_branch").setValue("");
             this.byId("id_DD_year").setValue("");
+            this.byId("id_DD_Date").setValue("");
         },
 
         DD_search: async function () {
@@ -48,37 +63,154 @@ sap.ui.define([
             try {
                 const sBranch = this.byId("id_DD_branch").getSelectedKey();
                 const oRange = this.byId("id_DD_year");
-
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "yyyy-MM-dd"
+                });
                 let startDate = null;
                 let endDate = null;
                 if (oRange.getDateValue() && oRange.getSecondDateValue()) {
-                    startDate = oRange.getDateValue().toISOString().split("T")[0];
-                    endDate = oRange.getSecondDateValue().toISOString().split("T")[0];
+                    startDate = oDateFormat.format(oRange.getDateValue());
+                    endDate = oDateFormat.format(oRange.getSecondDateValue());
+                }
+                let branchPayload;
+                if (!sBranch || sBranch === "ALL") {
+                    branchPayload = this._aUserBranches.join(",");
+                } else {
+                    branchPayload = sBranch;
                 }
                 let payload = {
-                    BranchCode: sBranch || this._aUserBranches.join(","),
+                    BranchCode: branchPayload,
                     StartDate: startDate,
                     EndDate: endDate,
-                    StartReturnDamageDate: startDate,
-                    EndReturnDamageDate: endDate
+                    StartReturnDamageDate: "",
+                    EndReturnDamageDate: ""
                 };
                 const oChartResponse = await this.ajaxCreateWithJQuery("HM_DamageChart", payload);
-                console.log("damage chart:", payload);
-                this.getView().setModel(new JSONModel(oChartResponse.data || []), "damageChartModel");
+                console.log("HM_DamageChart FULL RESPONSE:", oChartResponse);
+                const aCharts = oChartResponse?.data || [];
 
+                const oItems = aCharts.find(c => c.chart === "ItemName");
+                const oType = aCharts.find(c => c.chart === "Type");
+                const oStatus = aCharts.find(c => c.chart === "Status");
+                const aItemsData = (oItems?.data || []).map(d => ({ ItemName: d.name, Count: d.count }));
+                const aTypeData = (oType?.data || []).map(d => ({ Type: d.name, Count: d.count }));
+                const aStatusData = (oStatus?.data || []).map(d => ({ Status: d.name, Count: d.count }));
+
+                this.getView().setModel(new JSONModel(aItemsData), "itemsModel");
+                this.getView().setModel(new JSONModel(aTypeData), "typeModel");
+                this.getView().setModel(new JSONModel(aStatusData), "statusModel");
+                console.log("STATUS MODEL:", aStatusData);
+                const oRangeDaily = this.byId("id_DD_Date");
+                let dailyStart = null;
+                let dailyEnd = null;
+                if (oRangeDaily.getDateValue() && oRangeDaily.getSecondDateValue()) {
+                    dailyStart = oDateFormat.format(oRangeDaily.getDateValue());
+                    dailyEnd = oDateFormat.format(oRangeDaily.getSecondDateValue());
+                }
                 const oDailyResponse = await this.ajaxCreateWithJQuery(
                     "HM_DamageCurrentMonthBarChart",
                     {
-                        StartDate: startDate,
-                        EndDate: endDate
+                        StartDate: dailyStart,
+                        EndDate: dailyEnd
                     }
                 );
-                this.getView().setModel(new JSONModel(oDailyResponse.data || []), "dailyModel");
+                console.log("DAILY RESPONSE:", oDailyResponse)
+                const formattedDaily = (oDailyResponse.data || []).map(d => ({
+                    Date: d.Date.split("-")[2],
+                    Recovered: d.Recovered,
+                    Pending: d.Pending
+                }));
+                this.getView().setModel(new JSONModel(formattedDaily), "dailyModel");
             } catch (err) {
                 sap.m.MessageToast.show("Dashboard load failed");
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+        },
+
+        _setDefaultDates: function () {
+            const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                pattern: "yyyy-MM-dd"
+            });
+
+            const today = new Date();
+
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            // Set Year filter
+            const oYearRange = this.byId("id_DD_year");
+            oYearRange.setDateValue(firstDay);
+            oYearRange.setSecondDateValue(lastDay);
+
+            // Set Date filter
+            const oDateRange = this.byId("id_DD_Date");
+            oDateRange.setDateValue(firstDay);
+            oDateRange.setSecondDateValue(lastDay);
+        },
+
+        onColumnChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/monthly", "column");
+        },
+
+        onBarChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/monthly", "bar");
+        },
+
+        onLineChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/monthly", "line");
+        },
+
+        onPieChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/monthly", "pie");
+        },
+
+        ondayColumnChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/daily", "stacked_column");
+        },
+
+        ondayBarChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/daily", "bar");
+        },
+
+        ondayLineChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/daily", "line");
+        },
+
+        ondayPieChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/daily", "pie");
+        },
+
+        onStatusColumnChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/status", "donut");
+        },
+
+        onStatusBarChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/status", "bar");
+        },
+
+        onStatusLineChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/status", "line");
+        },
+
+        onStatusPieChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/status", "pie");
+        },
+
+        onPayColumnChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/payment", "column");
+        },
+
+        onPayBarChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/payment", "bar");
+        },
+
+        onPayLineChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/payment", "donut");
+        },
+
+        onPayPieChart: function () {
+            this.getView().getModel("chartTypeModel").setProperty("/payment", "pie");
         },
 
         onHome: function () {

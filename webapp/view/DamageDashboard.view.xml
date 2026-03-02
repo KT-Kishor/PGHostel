@@ -68,6 +68,22 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="date"
+                        label="{i18n>dashDate}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <DateRangeSelection
+                                id="id_DD_Date"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
             </fb:FilterBar>
 
             <layout:Grid
@@ -96,10 +112,6 @@
                                 icon="sap-icon://line-chart"
                                 press="onLineChart"
                             />
-                            <Button
-                                icon="sap-icon://pie-chart"
-                                press="onPieChart"
-                            />
                         </Toolbar>
                     </f:header>
 
@@ -119,25 +131,25 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                 plotArea: { dataLabel: { visible: true } },
-                                valueAxis: { title: { text: 'Damage Count' } },
+                                valueAxis: { title: { text: 'Damage Count' },label: {formatString: '0'} },
                                 categoryAxis: { title: { text: 'Item Name' } },
                                 legend: { visible: true }
                             }"
                                         >
                                             <viz:dataset>
                                                 <viz.data:FlattenedDataset
-                                                    data="{damageChartModel>/}"
+                                                    data="{itemsModel>/}"
                                                 >
                                                     <viz.data:dimensions>
                                                         <viz.data:DimensionDefinition
                                                             name="Item Name"
-                                                            value="{damageChartModel>ItemName}"
+                                                            value="{itemsModel>ItemName}"
                                                         />
                                                     </viz.data:dimensions>
                                                     <viz.data:measures>
                                                         <viz.data:MeasureDefinition
                                                             name="Damage Count"
-                                                            value="{damageChartModel>Count}"
+                                                            value="{itemsModel>Count}"
                                                         />
                                                     </viz.data:measures>
                                                 </viz.data:FlattenedDataset>
@@ -207,7 +219,7 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Damage Count' } },
+                                                    valueAxis: { title: { text: 'Damage Count' },label: {formatString: '0'}},
                                                     categoryAxis: { title: { text: 'Day of month' } }
                                                 }"
                                         >
@@ -217,14 +229,18 @@
                                                 >
                                                     <viz.data:dimensions>
                                                         <viz.data:DimensionDefinition
-                                                            name="Day"
-                                                            value="{dailyModel>Day}"
+                                                            name="Date"
+                                                            value="{dailyModel>Date}"
                                                         />
                                                     </viz.data:dimensions>
                                                     <viz.data:measures>
                                                         <viz.data:MeasureDefinition
-                                                            name="Damage Count"
-                                                            value="{dailyModel>Count}"
+                                                            name="Recovered"
+                                                            value="{dailyModel>Recovered}"
+                                                        />
+                                                        <viz.data:MeasureDefinition
+                                                            name="Pending"
+                                                            value="{dailyModel>Pending}"
                                                         />
                                                     </viz.data:measures>
                                                 </viz.data:FlattenedDataset>
@@ -234,12 +250,12 @@
                                                 <viz.feeds:FeedItem
                                                     uid="valueAxis"
                                                     type="Measure"
-                                                    values="Damage Count"
+                                                    values="Recovered,Pending"
                                                 />
                                                 <viz.feeds:FeedItem
                                                     uid="categoryAxis"
                                                     type="Dimension"
-                                                    values="Day"
+                                                    values="Date"
                                                 />
                                             </viz:feeds>
                                         </viz:VizFrame>
@@ -294,24 +310,24 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Total records' } },
+                                                    valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Status' } }
                                                 }"
                                         >
                                             <viz:dataset>
                                                 <viz.data:FlattenedDataset
-                                                    data="{damageChartModel>/}"
+                                                    data="{statusModel>/}"
                                                 >
                                                     <viz.data:dimensions>
                                                         <viz.data:DimensionDefinition
                                                             name="Status"
-                                                            value="{damageChartModel>Status}"
+                                                            value="{statusModel>Status}"
                                                         />
                                                     </viz.data:dimensions>
                                                     <viz.data:measures>
                                                         <viz.data:MeasureDefinition
                                                             name="Total Records"
-                                                            value="{damageChartModel>Count}"
+                                                            value="{statusModel>Count}"
                                                         />
                                                     </viz.data:measures>
                                                 </viz.data:FlattenedDataset>
@@ -319,12 +335,12 @@
 
                                             <viz:feeds>
                                                 <viz.feeds:FeedItem
-                                                    uid="size"
+                                                    uid="valueAxis"
                                                     type="Measure"
                                                     values="Total Records"
                                                 />
                                                 <viz.feeds:FeedItem
-                                                    uid="color"
+                                                    uid="categoryAxis"
                                                     type="Dimension"
                                                     values="Status"
                                                 />
@@ -381,24 +397,24 @@
                                             vizProperties="{
                                                 title: {visible: false},
                                                     plotArea: { dataLabel: { visible: true } },
-                                                    valueAxis: { title: { text: 'Total records' } },
+                                                    valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Damage type' } }
                                                 }"
                                         >
                                             <viz:dataset>
                                                 <viz.data:FlattenedDataset
-                                                    data="{damageChartModel>/}"
+                                                    data="{typeModel>/}"
                                                 >
                                                     <viz.data:dimensions>
                                                         <viz.data:DimensionDefinition
-                                                            name="Status"
-                                                            value="{damageChartModel>Status}"
+                                                            name="Type"
+                                                            value="{typeModel>Type}"
                                                         />
                                                     </viz.data:dimensions>
                                                     <viz.data:measures>
                                                         <viz.data:MeasureDefinition
                                                             name="Total Records"
-                                                            value="{damageChartModel>Count}"
+                                                            value="{typeModel>Count}"
                                                         />
                                                     </viz.data:measures>
                                                 </viz.data:FlattenedDataset>
@@ -406,14 +422,14 @@
 
                                             <viz:feeds>
                                                 <viz.feeds:FeedItem
-                                                    uid="size"
+                                                    uid="valueAxis"
                                                     type="Measure"
                                                     values="Total Records"
                                                 />
                                                 <viz.feeds:FeedItem
-                                                    uid="color"
+                                                    uid="categoryAxis"
                                                     type="Dimension"
-                                                    values="Status"
+                                                    values="Type"
                                                 />
                                             </viz:feeds>
                                         </viz:VizFrame>
