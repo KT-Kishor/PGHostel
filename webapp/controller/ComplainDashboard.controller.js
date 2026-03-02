@@ -314,47 +314,51 @@ sap.ui.define([
 
         _prepareDailyStatusData: function (aFilteredData) {
             const oDateRange = this.byId("CD_complain_Date");
-            let year, month;
-
-            // Priority: DateRange → Year Filter → Current Month
-            if (oDateRange.getDateValue()) {
-                const d = oDateRange.getDateValue();
-                year = d.getFullYear();
-                month = d.getMonth();
-            } else {
+            // determine start and end of range (fallback to current month)
+            let dStart = oDateRange.getDateValue();
+            let dEnd = oDateRange.getSecondDateValue();
+            if (!dStart || !dEnd) {
                 const today = new Date();
-                year = today.getFullYear();
-                month = today.getMonth();
+                dStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                dEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             }
-
-            // Number of days in month
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // normalize times
+            dStart = new Date(dStart);
+            dStart.setHours(0, 0, 0, 0);
+            dEnd = new Date(dEnd);
+            dEnd.setHours(23, 59, 59, 999);
 
             // Collect all statuses dynamically
             const aStatuses = [...new Set(aFilteredData.map(i => i.Status || "Unknown"))];
 
-            // Initialize all days
+            // Build daily rows for every date in the selected range
             const aDailyData = [];
-            for (let day = 1; day <= daysInMonth; day++) {
+            for (let d = new Date(dStart); d <= dEnd; d.setDate(d.getDate() + 1)) {
+                // display string includes day and month so multiple months show up distinctly
+                const display = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
                 const oRow = {
-                    day: String(day).padStart(2, "0")
+                    day: display,
+                    // keep full yyyy-mm-dd key if needed for ordering later
+                    date: d.toISOString().slice(0, 10)
                 };
-
-                aStatuses.forEach(status => oRow[status] = 0);
+                aStatuses.forEach(status => (oRow[status] = 0));
                 aDailyData.push(oRow);
             }
 
-            // Aggregate
+            // Aggregate counts within the selected range
             aFilteredData.forEach(item => {
                 if (!item.ComplaintRaisedDate) return;
 
                 const d = new Date(item.ComplaintRaisedDate);
-                if (d.getMonth() !== month || d.getFullYear() !== year) return;
+                if (isNaN(d)) return;
+                if (d < dStart || d > dEnd) return;
 
-                const dayIndex = d.getDate() - 1;
                 const status = item.Status || "Unknown";
-
-                aDailyData[dayIndex][status]++;
+                const display = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
+                const oRow = aDailyData.find(r => r.day === display);
+                if (oRow) {
+                    oRow[status] = (oRow[status] || 0) + 1;
+                }
             });
 
             return {

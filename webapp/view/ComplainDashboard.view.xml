@@ -124,7 +124,7 @@
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/dailyValue}">
 															<vizData:dimensions>
-																<vizData:DimensionDefinition name="Day" value="{chartData>day}" />
+																<vizData:DimensionDefinition name="Day" value="{chartData>date}" />
 															</vizData:dimensions>
 															<vizData:measures>
 																  <vizData:MeasureDefinition name="Pending" value="{chartData>Pending}" />
