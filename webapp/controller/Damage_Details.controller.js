@@ -501,6 +501,7 @@ sap.ui.define([
             oDamageModel.setProperty("/Currency", SelectedData.Currency);
             oDamageModel.setProperty("/UserID", SelectedData.UserID)
         },
+
         DM_onPressGeneratePDF: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
@@ -540,20 +541,63 @@ sap.ui.define([
                 }
 
 
-                doc.setFontSize(12);
+                // ================= DAMAGE META (RIGHT SIDE TABLE STYLE) =================
+                const detailsStartY = currentY;
+                const rowHeight = 7;
+                const columnWidths = [45, 35]; // label width + value width
+
+                // Right side alignment calculation
+                const rightAlignX = pageWidth - margin - columnWidths[0] - columnWidths[1];
+
+                doc.setFontSize(11);
                 doc.setFont("times", "bold");
-                doc.text(`Damage No : ${oModel.DamageID}`, pageWidth - margin, currentY, { align: "right" });
-                currentY += 6;
 
-                doc.text(`Date : ${oModel.Date}`, pageWidth - margin, currentY, { align: "right" });
-                currentY += 6;
+                const damageDetails = [
+                    {
+                        label: "Damage No :",
+                        value: oModel.DamageID || "N/A"
+                    },
+                    {
+                        label: "Date :",
+                        value: oModel.Date || "N/A"
+                    },
+                    {
+                        label: "Room No :",
+                        value: oModel.RoomNo || "N/A"
+                    },
+                    {
+                        label: "Status :",
+                        value: oModel.Status || "N/A"
+                    }
+                ];
 
-                doc.text(`Room No : ${oModel.RoomNo}`, pageWidth - margin, currentY, { align: "right" });
-                currentY += 6;
+                // Print right-aligned structured block
+                currentY = detailsStartY;
 
-                doc.text(`Status : ${oModel.Status}`, pageWidth - margin, currentY, { align: "right" });
-                currentY += 10;
+                damageDetails.forEach(row => {
 
+                    // Label (right aligned inside first column)
+                    doc.text(
+                        row.label,
+                        rightAlignX + columnWidths[0] - doc.getTextWidth(row.label),
+                        currentY + 5
+                    );
+
+                    // Value (left aligned inside second column)
+                    doc.setFont("times", "normal");
+                    doc.text(
+                        String(row.value),
+                        rightAlignX + columnWidths[0] + 5,
+                        currentY + 5
+                    );
+
+                    // Reset bold for next label
+                    doc.setFont("times", "bold");
+
+                    currentY += rowHeight;
+                });
+
+                currentY += 8; // spacing after block
 
                 doc.setFont("times", "bold").setFontSize(11);
                 doc.text("To,", margin, currentY);
@@ -563,7 +607,7 @@ sap.ui.define([
                 doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
                 currentY += 6;
 
-                // doc.text(`CustomerID : ${oModel.CustomerID}`, margin, currentY);
+                // doc.text(`Customer ID : ${oModel.CustomerID}`, margin, currentY);
                 // currentY += 6;
 
                 doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
@@ -573,6 +617,7 @@ sap.ui.define([
                 const body = aItems.map((item, index) => [
                     index + 1,
                     item.ItemName,
+                    item.Description || "-",
                     item.Type,
                     item.Quantity,
                     item.Cost
@@ -580,7 +625,7 @@ sap.ui.define([
 
                 doc.autoTable({
                     startY: currentY,
-                    head: [['Sl.No', 'Item Name', 'Type', 'Quantity', 'Cost']],
+                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Cost']],
                     body: body,
                     theme: "grid",
                     headStyles: {
@@ -593,17 +638,32 @@ sap.ui.define([
                         lineWidth: 0.5,
                         lineColor: [30, 30, 30],
                         halign: "center"
-                    }
-                });
+                   },
+                            columnStyles: {
+                                1: {
+                                    halign: "left"
+                                },
+                                2: {
+                                    halign: "left"
+                                },
+                                3: {
+                                    halign: "center"
+                                },
+                                4: {
+                                    halign: "center"
+                                },
+                                5: {
+                                    halign: "right"
+                                }
+                            }
+                        });
 
-                currentY = doc.lastAutoTable.finalY + 10;
-
-
+                currentY = doc.lastAutoTable.finalY + 8;
+                
                 const totalAmount = parseFloat(oModel.TotalCost || 0);
 
 
                 let summaryBody = [];
-
 
                 summaryBody = [
                     ["Sub-Total (" + oModel.Currency + "):", totalAmount.toFixed(2)]
@@ -615,8 +675,10 @@ sap.ui.define([
                     theme: "plain",
                     styles: {
                         font: "times",
-                        fontSize: 11,
-                        halign: "right"
+                        fontSize: 10,
+                        halign: "right",
+                        cellPadding: 2,
+                        overflow: "ellipsize"
                     },
                     columnStyles: {
                         0: { halign: "right", cellWidth: 60 },
