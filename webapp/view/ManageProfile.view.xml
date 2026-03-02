@@ -450,27 +450,27 @@
     }">
             <columns>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Damage ID"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Room No"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Branch"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Room No"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Item"/></Column>
                 <Column demandPopin="true" minScreenWidth="Phone"><Text text="Type"/></Column>
                 <Column demandPopin="true" minScreenWidth="Desktop"><Text text="Description"/></Column>
                 <Column demandPopin="true"><Text text="Qty"/></Column>
                 <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Cost"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column>
+                <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column> -->
             </columns>
             <items>
                 <ColumnListItem>
                     <cells>
                         <Text text="{profileData>DamageID}"/>
-                        <Text text="{profileData>RoomNo}"/>
                         <Text text="{profileData>BranchName}"/>
+                        <Text text="{profileData>RoomNo}"/>
                         <Text text="{profileData>ItemName}"/>
                         <Text text="{profileData>Type}"/>
                         <Text text="{profileData>Description}"/>
                         <Text text="{profileData>Quantity}"/>
                         <Text text="{profileData>Cost}"/>
-                        <Text text="{profileData>TotalCost}"/>
+                        <!-- <Text text="{profileData>TotalCost}"/> -->
                     </cells>
                 </ColumnListItem>
             </items>
