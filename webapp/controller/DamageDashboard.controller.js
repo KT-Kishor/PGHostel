@@ -23,7 +23,7 @@ sap.ui.define([
             try {
                 this.commonLoginFunction();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this._ViewDatePickersReadOnly(["id_DD_year"], this.getView());
+                this._ViewDatePickersReadOnly(["id_DD_year", "id_DD_Date"], this.getView());
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
@@ -53,9 +53,15 @@ sap.ui.define([
         },
 
         DD_onPressClear: function () {
-            this.byId("id_DD_branch").setValue("");
-            this.byId("id_DD_year").setValue("");
-            this.byId("id_DD_Date").setValue("");
+            this.byId("id_DD_branch").setSelectedKey("ALL");
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const oYearRange = this.byId("id_DD_year");
+            oYearRange.setDateValue(firstDay);
+            oYearRange.setSecondDateValue(lastDay);
+            const oMonthPicker = this.byId("id_DD_Date");
+            oMonthPicker.setDateValue(firstDay);
         },
 
         DD_search: async function () {
@@ -103,9 +109,17 @@ sap.ui.define([
                 const oRangeDaily = this.byId("id_DD_Date");
                 let dailyStart = null;
                 let dailyEnd = null;
-                if (oRangeDaily.getDateValue() && oRangeDaily.getSecondDateValue()) {
-                    dailyStart = oDateFormat.format(oRangeDaily.getDateValue());
-                    dailyEnd = oDateFormat.format(oRangeDaily.getSecondDateValue());
+                if (oRangeDaily.getDateValue()) {
+                    const selectedDate = oRangeDaily.getDateValue();
+
+                    const year = selectedDate.getFullYear();
+                    const month = selectedDate.getMonth();
+
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    dailyStart = oDateFormat.format(firstDay);
+                    dailyEnd = oDateFormat.format(lastDay);
                 }
                 const oDailyResponse = await this.ajaxCreateWithJQuery(
                     "HM_DamageCurrentMonthBarChart",
@@ -134,7 +148,6 @@ sap.ui.define([
             });
 
             const today = new Date();
-
             const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
@@ -146,7 +159,6 @@ sap.ui.define([
             // Set Date filter
             const oDateRange = this.byId("id_DD_Date");
             oDateRange.setDateValue(firstDay);
-            oDateRange.setSecondDateValue(lastDay);
         },
 
         onColumnChart: function () {

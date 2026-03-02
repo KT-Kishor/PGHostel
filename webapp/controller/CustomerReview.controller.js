@@ -164,8 +164,8 @@ sap.ui.define([
         _setDefaultDateRange: function () {
             const oDRS = this.byId("CR_id_BranchCode");
             const oToday = new Date();
-            const oFrom = new Date(oToday.getFullYear(), oToday.getMonth(), 1);
-            const oTo = new Date(oToday.getFullYear(), oToday.getMonth() + 1, 0);
+            const oFrom = new Date( oToday.getFullYear(),0, 1);
+            const oTo = new Date(oToday.getFullYear(), 11, 31);
             oDRS.setDateValue(oFrom);
             oDRS.setSecondDateValue(oTo);
         },

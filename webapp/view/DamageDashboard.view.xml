@@ -76,10 +76,10 @@
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                            <DateRangeSelection
+                            <DatePicker
                                 id="id_DD_Date"
-                                valueFormat="yyyy-MM-dd"
-                                displayFormat="dd/MM/yyyy"
+                                valueFormat="MM-yyyy"
+                                displayFormat="MM/yyyy"
                             />
                         </fb:control>
                     </fb:FilterGroupItem>
