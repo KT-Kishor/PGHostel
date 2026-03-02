@@ -218,7 +218,7 @@
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
                                                 title: {visible: false},
-                                                    plotArea: { dataLabel: { visible: true } },
+                                                    plotArea: { colorPalette: ['#168eff','#ec3b14'], dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Damage Count' },label: {formatString: '0'}},
                                                     categoryAxis: { title: { text: 'Day of month' } }
                                                 }"
@@ -304,12 +304,13 @@
                                 <com:ChartContainerContent>
                                     <com:content>
                                         <viz:VizFrame
+                                            id="idStatusChart"
                                             height="400px"
                                             vizType="{chartTypeModel>/status}"
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
                                                 title: {visible: false},
-                                                    plotArea: { dataLabel: { visible: true } },
+                                                    plotArea: { colorPalette: ['#ec3b14','#0b8400'],  dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Status' } }
                                                 }"
