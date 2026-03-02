@@ -245,6 +245,8 @@ sap.ui.define([
             });
 
             oModel.setProperty("/Items", aItems);
+            var table = this.byId("CID_id_TableInvoiceItem1");
+            table.removeSelections();
         },
          onTotalInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
