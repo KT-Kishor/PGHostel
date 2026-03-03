@@ -28,7 +28,6 @@ sap.ui.define([
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
-                this._selectedBranch = "ALL";
                 await this._loadCustomers();
                 await this._loadUserBranches();
                 await this.loadDashboardData();
@@ -470,26 +469,25 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
             try {
 
-                const sSelected = this.byId("D_id_BranchCode").getSelectedKey();
+                const aSelectedBranches = this.byId("D_id_BranchCode").getSelectedKeys();
                 let aBranchesToUse = [];
 
-                if (!sSelected || sSelected === "" || sSelected === "ALL") {
+                // If nothing selected → use all authorized branches
+                if (!aSelectedBranches || aSelectedBranches.length === 0) {
                     aBranchesToUse = this._aUserBranches || [];
-                    this.byId("D_id_BranchCode").setSelectedKey("ALL");
-                }
-                else {
-                    if (this._aUserBranches.includes(sSelected)) {
-                        aBranchesToUse = [sSelected];
-                    } else {
+                } else {
+                    aBranchesToUse = aSelectedBranches.filter(b =>
+                        this._aUserBranches.includes(b)
+                    );
+                    if (aBranchesToUse.length === 0) {
                         MessageToast.show("Unauthorized branch selected");
                         return;
                     }
                 }
-                if (!aBranchesToUse || aBranchesToUse.length === 0) {
+                if (!aBranchesToUse.length) {
                     MessageToast.show("No authorized branches found");
                     return;
                 }
-
                 const sYear = this.byId("D_id_year").getValue();
                 const sMonth = this.byId("D_id_month").getSelectedKey();
                 const oUserBranch = aBranchesToUse.join(",");
@@ -570,13 +568,7 @@ sap.ui.define([
             let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
             let aFiltered = aAllBranches.filter(b =>
                 this._aUserBranches.includes(b.BranchID));
-            aFiltered.unshift({
-                Name: "All",
-                BranchID: "ALL",
-                City: ""
-            });
             this.getView().setModel(new JSONModel(aFiltered), "branchModel");
-            this.byId("D_id_BranchCode").setSelectedKey("ALL");
         },
 
         switchForAllGraph: function (sType) {
@@ -623,7 +615,7 @@ sap.ui.define([
         D_onPressClear: function () {
             const iMonth = new Date().getMonth() + 1;
             const iYear = new Date().getFullYear();
-            this.byId("D_id_BranchCode").setSelectedKey("ALL");
+            this.byId("D_id_BranchCode").setSelectedKeys([]);
             this.byId("D_id_year").setValue(iYear);
             this.byId("D_id_month").setSelectedKey(iMonth);
 

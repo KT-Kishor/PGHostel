@@ -36,11 +36,11 @@
                         visibleInFilterBar="true"
                     >
                         <fb:control>
-                            <ComboBox
+                            <MultiComboBox
                                 id="id_DD_branch"
                                 items="{branchModel>/}"
+                                placeholder="select branch"
                                 showSecondaryValues="true"
-                                showClearIcon="true"
                                 width="100%"
                             >
                                 <core:ListItem
@@ -48,7 +48,7 @@
                                     text="{branchModel>Name} - {branchModel>BranchID}"
                                     additionalText="{branchModel>City}"
                                 />
-                            </ComboBox>
+                            </MultiComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
@@ -312,9 +312,9 @@
                                             legend:{visible:true},
                                             title: {visible: false},
                                             plotArea: {
-    colorPalette: ['#0b8400', '#ec3b14'],
-    dataLabel: { visible: true }
-},
+                                            colorPalette: ['#0b8400', '#ec3b14'],
+                                            dataLabel: { visible: true }
+                                        },
                                             valueAxis: { 
                                                 title: { text: 'Total records' },
                                                 label: { formatString: '0' } 
@@ -355,10 +355,10 @@
                                                     values="Status"
                                                 />
                                                 <viz.feeds:FeedItem
-    uid="color"
-    type="Dimension"
-    values="Status"
-/>
+                                                    uid="color"
+                                                    type="Dimension"
+                                                    values="Status"
+                                                />
                                             </viz:feeds>
                                         </viz:VizFrame>
                                     </com:content>
@@ -413,9 +413,9 @@
                                             legend:{visible:true},
                                             title: {visible: false},
                                            plotArea: {
-    colorPalette: ['#ff9800', '#e30613'],
-    dataLabel: { visible: true }
-},
+                                            colorPalette: ['#ff9800', '#e30613'],
+                                            dataLabel: { visible: true }
+                                        },
                                                     valueAxis: { title: { text: 'Total records' },label: {formatString: '0'} },
                                                     categoryAxis: { title: { text: 'Damage type' } }
                                                 }"
@@ -451,10 +451,10 @@
                                                     values="Type"
                                                 />
                                                 <viz.feeds:FeedItem
-    uid="color"
-    type="Dimension"
-    values="Type"
-/>
+                                                    uid="color"
+                                                    type="Dimension"
+                                                    values="Type"
+                                                />
                                             </viz:feeds>
                                         </viz:VizFrame>
                                     </com:content>

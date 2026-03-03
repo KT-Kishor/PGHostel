@@ -10,12 +10,7 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDamageDashboard").attachMatched(this._onRouteMatched, this);
-            this.getView().setModel(new sap.ui.model.json.JSONModel({
-                monthly: "column",
-                daily: "column",
-                status: "column",
-                payment: "column"
-            }), "chartTypeModel");
+            this.getView().setModel(new sap.ui.model.json.JSONModel({ monthly: "column", daily: "column", status: "column", payment: "column" }), "chartTypeModel");
         },
 
         _onRouteMatched: async function () {
@@ -27,7 +22,6 @@ sap.ui.define([
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
-                this._selectedBranch = "ALL";
                 await this._loadUserBranches();
                 this._setDefaultDates();
                 await this.DD_search();
@@ -43,17 +37,11 @@ sap.ui.define([
             let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
             let aFiltered = aAllBranches.filter(b =>
                 this._aUserBranches.includes(b.BranchID));
-            aFiltered.unshift({
-                BranchID: "ALL",
-                Name: "All Branches",
-                City: ""
-            });
             this.getView().setModel(new JSONModel(aFiltered), "branchModel");
-            this.byId("id_DD_branch").setSelectedKey("ALL");
         },
 
         DD_onPressClear: function () {
-            this.byId("id_DD_branch").setSelectedKey("ALL");
+            this.byId("id_DD_branch").setSelectedKeys([]);
             const today = new Date();
             const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -67,7 +55,20 @@ sap.ui.define([
         DD_search: async function () {
             sap.ui.core.BusyIndicator.show(0);
             try {
-                const sBranch = this.byId("id_DD_branch").getSelectedKey();
+                const aSelectedBranches = this.byId("id_DD_branch").getSelectedKeys();
+                let aBranchesToUse = [];
+                if (!aSelectedBranches || aSelectedBranches.length === 0) {
+                    aBranchesToUse = this._aUserBranches || [];
+                } else {
+                    aBranchesToUse = aSelectedBranches.filter(b =>
+                        this._aUserBranches.includes(b)
+                    );
+                    if (aBranchesToUse.length === 0) {
+                        sap.m.MessageToast.show("Unauthorized branch selected");
+                        return;
+                    }
+                }
+                const branchPayload = aBranchesToUse.join(",");
                 const oRange = this.byId("id_DD_year");
                 const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
                     pattern: "yyyy-MM-dd"
@@ -77,12 +78,6 @@ sap.ui.define([
                 if (oRange.getDateValue() && oRange.getSecondDateValue()) {
                     startDate = oDateFormat.format(oRange.getDateValue());
                     endDate = oDateFormat.format(oRange.getSecondDateValue());
-                }
-                let branchPayload;
-                if (!sBranch || sBranch === "ALL") {
-                    branchPayload = this._aUserBranches.join(",");
-                } else {
-                    branchPayload = sBranch;
                 }
                 let payload = {
                     BranchCode: branchPayload,

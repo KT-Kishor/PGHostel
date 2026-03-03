@@ -32,7 +32,6 @@ sap.ui.define([
         getBranch: async function () {
             const oComponent = this.getOwnerComponent();
             let oBRModel = oComponent.getModel("sBRModel");
-
             if (!oBRModel) {
                 await oComponent._fetchCommonData("HM_Branch", "sBRModel");
                 oBRModel = oComponent.getModel("sBRModel");
@@ -44,7 +43,6 @@ sap.ui.define([
         _buildBranchMap: async function () {
             const aBranches = await this.getBranch();
             const mBranchMap = {};
-
             aBranches.forEach(b => {
                 const sBranchCode = b.BranchID;
                 mBranchMap[sBranchCode] = b.Name;
@@ -63,7 +61,6 @@ sap.ui.define([
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
-
             const oDRS = this.byId("CR_id_BranchCode");
             const oRatingCB = this.byId("CR_id_Rating");
             const oSortCB = this.byId("CR_id_Sort");
@@ -74,7 +71,6 @@ sap.ui.define([
             const sSortKey = oSortCB.getSelectedKey();
 
             // var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
-
             var filters = {
                 // BedType: BedTypeName,
                 StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
@@ -85,12 +81,12 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchCode = "";
-            } else if(data){
-                filters.BranchCode =  data.BranchID;
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
+            } else if (data) {
+                filters.BranchCode = data.BranchID;
             } else {
-                filters.BranchCode =  oExistingModel.BranchCode;
+                filters.BranchCode = oExistingModel.BranchCode;
             }
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
@@ -99,7 +95,6 @@ sap.ui.define([
 
             this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
                 const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-
                 that._aAllFeedbacks = aFeedbacks;
                 that._applyFilters();
                 sap.ui.core.BusyIndicator.hide();
@@ -154,11 +149,9 @@ sap.ui.define([
             return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
                 const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
                 const mCustomerMap = {};
-
                 aCustomers.forEach(c => {
                     mCustomerMap[c.CustomerID] = c.CustomerName || c.Name;
                 });
-
                 this._mCustomerMap = mCustomerMap;
             });
         },
@@ -166,7 +159,7 @@ sap.ui.define([
         _setDefaultDateRange: function () {
             const oDRS = this.byId("CR_id_BranchCode");
             const oToday = new Date();
-            const oFrom = new Date( oToday.getFullYear(),0, 1);
+            const oFrom = new Date(oToday.getFullYear(), 0, 1);
             const oTo = new Date(oToday.getFullYear(), 11, 31);
             oDRS.setDateValue(oFrom);
             oDRS.setSecondDateValue(oTo);
@@ -185,6 +178,7 @@ sap.ui.define([
                 )
                 return;
             }
+            oBox.addStyleClass("reviewGrid");
             aFiltered.forEach(f => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/CustomerCard.json",
@@ -210,21 +204,20 @@ sap.ui.define([
         _showIllustration: function (type, title, description) {
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
+            oBox.removeStyleClass("reviewGrid");
             const oIllustration = new sap.m.IllustratedMessage({
                 illustrationType: type,
                 illustrationSize: sap.m.IllustratedMessageSize.Scene,
                 title: title,
                 description: description
             });
-
-            const oWrapper = new sap.m.VBox({
+            const oWrapper = new sap.m.FlexBox({
                 width: "100%",
-                height: "100%",
-                alignItems: "Center",
+                height: "70vh",
                 justifyContent: "Center",
+                alignItems: "Center",
                 items: [oIllustration]
             });
-
             oBox.addItem(oWrapper);
         },
 
@@ -244,7 +237,7 @@ sap.ui.define([
             this.byId("CR_id_Sort").setSelectedKey("");
 
             oFilterBar.clear();
-                this._setDefaultDateRange();
+            this._setDefaultDateRange();
         }
     })
 })
