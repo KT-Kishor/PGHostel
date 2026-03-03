@@ -336,10 +336,14 @@ sap.ui.define([
             for (let d = new Date(dStart); d <= dEnd; d.setDate(d.getDate() + 1)) {
                 // display string includes day and month so multiple months show up distinctly
                 const display = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
+                // Format date as yyyy-mm-dd using local date components (not UTC) to match timezone
+                const dateStr = String(d.getFullYear()).padStart(4, "0") + "-" +
+                    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(d.getDate()).padStart(2, "0");
                 const oRow = {
                     day: display,
-                    // keep full yyyy-mm-dd key if needed for ordering later
-                    date: d.toISOString().slice(0, 10)
+                    // keep full yyyy-mm-dd key using local date components
+                    date: dateStr
                 };
                 aStatuses.forEach(status => (oRow[status] = 0));
                 aDailyData.push(oRow);
