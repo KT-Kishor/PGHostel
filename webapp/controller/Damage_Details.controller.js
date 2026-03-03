@@ -660,18 +660,27 @@ sap.ui.define([
 
                 currentY = doc.lastAutoTable.finalY + 8;
                 
+                // ================= SUMMARY =================
                 const totalAmount = parseFloat(oModel.TotalCost || 0);
+                const summary = [];
 
+                if (totalAmount > 0) {
+                    summary.push([
+                        `Sub-Total (${oModel.Currency})`,
+                        totalAmount.toFixed(2)
+                    ]);
+                }
 
-                let summaryBody = [];
+                const totalRowIndex = summary.length;
 
-                summaryBody = [
-                    ["Sub-Total (" + oModel.Currency + "):", totalAmount.toFixed(2)]
-                ];
+                summary.push([
+                    `Total (${oModel.Currency})`,
+                    totalAmount.toFixed(2)
+                ]);
 
                 doc.autoTable({
                     startY: currentY,
-                    body: summaryBody,
+                    body: summary,
                     theme: "plain",
                     styles: {
                         font: "times",
@@ -681,30 +690,34 @@ sap.ui.define([
                         overflow: "ellipsize"
                     },
                     columnStyles: {
-                        0: { halign: "right", cellWidth: 60 },
-                        1: { halign: "right", cellWidth: 40 }
+                        0: {
+                            halign: "right",
+                            cellWidth: 60
+                        },
+                        1: {
+                            halign: "right",
+                            cellWidth: 40
+                        }
                     },
-                    margin: { left: 95 }
+                    margin: {
+                        left: 95
+                    },
+                    didParseCell: function (data) {
+                        if (data.row.index === totalRowIndex) {
+                            data.cell.styles.lineWidth = {
+                                top: 0.5,
+                                right: 0,
+                                bottom: 0,
+                                left: 0
+                            };
+
+                            data.cell.styles.lineColor = [0, 0, 0];
+                            data.cell.styles.fontStyle = "bold";
+                        }
+                    }
                 });
 
-                currentY = doc.lastAutoTable.finalY + 3;
-
-                // Underline
-                doc.setLineWidth(0.5);
-                doc.line(80, currentY, pageWidth - margin, currentY);
-
-                currentY += 8;
-
-                // TOTAL
-                doc.setFont("times", "bold");
-                doc.text("Total(" + oModel.Currency + "):", 150, currentY, { align: "right" });
-                doc.text(totalAmount.toFixed(2), pageWidth - margin, currentY, { align: "right" });
-
-
-
-                currentY += 12;
-
-
+                currentY = doc.lastAutoTable.finalY + 8;   
                 const finalAmount = oModel.Status === "Pending" ? totalAmount : totalAmount;
                 const amountInWords = await this.convertNumberToWords(finalAmount, "INR");
 
@@ -727,6 +740,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
+
         addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight) {
             const footerHeight = 18;
             const footerYPosition = pageHeight - footerHeight;
