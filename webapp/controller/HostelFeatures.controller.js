@@ -207,7 +207,7 @@ sap.ui.define([
             });
 
             if (bDuplicate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("facilitywiththeSameNameAlreadyExists!"));
+                sap.m.MessageToast.show(this.i18nModel.getText("facilitywiththeSameNameAlreadyExists"));
                 return;
             }
             sap.ui.core.BusyIndicator.show(0);

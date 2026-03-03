@@ -904,68 +904,115 @@
              <m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
              <m:Link
                 text="{i18n>devlopby}"
-                href="https://kvrikshatechnologies.com/"
+                href="https://kalpavrikshatechnologies.com/"
                 target="_blank"
                 class="customLinkWhiteBg"
             />
             
             </m:contentLeft>
 				<m:contentRight>
-					<m:Button
-                            visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
-                                &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
-                                &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin')
-                                &amp;&amp; ${visiablityPlay>/merge}
-                            }"
-                            text="{i18n>refundAmount}"
-                            tooltip="{i18n>refundAmount}"
-                            press="CID_onPressrefundAmount"
-                            class="myUnifiedBtn"
-                        />
-					<m:Button
-                        visible="{= ${visiablityPlay>/createVisi} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
+                    <!-- Refund Amount -->
+                    <m:Button
+                        visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
+                            &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                            &amp;&amp; ${visiablityPlay>/merge}
+                        }"
+                        text="{i18n>refundAmount}"
+                        tooltip="{i18n>refundAmount}"
+                        press="CID_onPressrefundAmount"
+                        class="myUnifiedBtn"
+                    />
+
+                    <!-- Submit -->
+                    <m:Button
+                        visible="{= ${visiablityPlay>/createVisi}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                        }"
                         text="{i18n>submit}"
                         tooltip="{i18n>submit}"
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
-					<!-- <m:Button
-                        visible="{= ${visiablityPlay>/payByDate} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
+
+                    <!-- <m:Button
+                         visible="{= ${visiablityPlay>/Edit}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                        }"
                         text="{i18n>companyInvoiceSendEmail}"
                         press="CID_onPressSendEmail"
                         tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
                     /> -->
-					<m:Button
-                        visible="{= ${visiablityPlay>/Edit} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
+
+                    <!-- Edit / Save -->
+                    <m:Button
+                        visible="{= ${visiablityPlay>/Edit}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                        }"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
                         press="CID_onPressEdit"
                         class="sendMail myUnifiedBtn"
                     />
-					<m:Button
-                        visible="{= ${visiablityPlay>/MultiEmail} &amp;&amp; ( ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' ) }"
+
+                    <!-- Multi Email -->
+                    <m:Button
+                        visible="{= ${visiablityPlay>/MultiEmail}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                        }"
                         text="{i18n>sendInvoiceText}"
                         tooltip="{i18n>sendInvoiceText}"
                         press="CID_onPressSendMultipalEmail"
                         class="myUnifiedBtn"
                     />
-					<m:MenuButton visible="{visiablityPlay>/merge}" text="{i18n>GeneratePDF}"
-                    tooltip="{i18n>GeneratePDF}" class="myUnifiedBtn">
-						<m:menu>
-							<m:Menu>
-								<m:MenuItem
-                                text="{i18n>GeneratePDF}"
-                                press="CID_onPressGeneratePdf" />
-								<m:MenuItem
-                                text="{i18n>printInvoice}"
-                                press="CID_onPressGenerateSelectedPDF" />
-								<m:MenuItem
-                                text="{i18n>summaryInvoice}"
-                                press="CID_onPressGenerateSummaryPDF" />
-							</m:Menu>
-						</m:menu>
-					</m:MenuButton>
-				</m:contentRight>
+
+                    <!-- Generate PDF -->
+                    <m:MenuButton
+                        visible="{= ${visiablityPlay>/merge}
+                            &amp;&amp; (
+                                ${LoginModel>/Role} === 'Admin'
+                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'BranchManager'
+                            )
+                        }"
+                        text="{i18n>GeneratePDF}"
+                        tooltip="{i18n>GeneratePDF}"
+                        class="myUnifiedBtn">
+                        <m:menu>
+                            <m:Menu>
+                                <m:MenuItem
+                                    text="{i18n>GeneratePDF}"
+                                    press="CID_onPressGeneratePdf" />
+                                <m:MenuItem
+                                    text="{i18n>printInvoice}"
+                                    press="CID_onPressGenerateSelectedPDF" />
+                                <m:MenuItem
+                                    text="{i18n>summaryInvoice}"
+                                    press="CID_onPressGenerateSummaryPDF" />
+                            </m:Menu>
+                        </m:menu>
+                    </m:MenuButton>
+                </m:contentRight>
 			</m:Bar>
 		</m:footer>
 	</m:Page>

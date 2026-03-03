@@ -121,7 +121,7 @@ sap.ui.define([
             const oBox = this.byId("CR_id_ReviewContainer");
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
-            if (sRole === "Admin") {
+            if (sRole === "Admin" || sRole === "BranchManager" || sRole === "FrontOfficeEmployee") {
                 this.getOwnerComponent().getRouter().navTo("TilePage");
             } else {
                 const sTabKey = "idRooms"

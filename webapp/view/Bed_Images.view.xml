@@ -293,7 +293,7 @@
                 <m:contentLeft>
                     <m:Link
                         text="{i18n>devlopby}"
-                        href="https://kvrikshatechnologies.com/"
+                        href="https://kalpavrikshatechnologies.com/"
                         target="_blank"
                         class="customLinkWhiteBg"
                     />
