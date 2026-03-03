@@ -12,15 +12,14 @@
     height="100%"
     busyIndicatorDelay="0"
 >
-    <tnt:ToolPage>
+    <tnt:ToolPage class="sapUiTinyMarginTop">
         <tnt:header>
             <tnt:ToolHeader>
                 <Image
                     src="./image/LOGO.png"
-                    height="250px"
-                    width="250px"
-                    class="sapUiTinyMarginTop weblogo"
+                    height="120px"
                     tooltip="{i18n>companyLogo}"
+                    class="sapUiSmallMarginTop"
                 />
                 <!-- <Title level="H1" text="SHAH HOSTEL" class="custom-text"/> -->
                 <ToolbarSpacer />
@@ -28,7 +27,7 @@
                     text="{i18n>sIGNINUP}"
                     id="loginButton"
                     tooltip="{i18n>signInorSignUp}"
-                    class=" sapUiSmallMarginTop loginButton"
+                    class="sapUiSmallMarginTop loginButton"
                     press="onpressLogin"
                     visible="{= !${UIModel>/isLoggedIn} }"
                 >
@@ -41,10 +40,9 @@
                     id="ProfileAvatar"
                     src="{LoginModel>/Photo}"
                     initials="{= ${LoginModel>/EmployeeName} ? ${LoginModel>/EmployeeName}.charAt(0).toUpperCase() : '' }"
-                    displaySize="XS"
                     tooltip="{= ${LoginModel>/UserName} || ${i18n>profilePic} }"
                     press="onPressAvatar"
-                    class="sapUiTinyMarginTop profileAvatar"
+                    class="profileAvatar"
                 />
             </tnt:ToolHeader>
         </tnt:header>
