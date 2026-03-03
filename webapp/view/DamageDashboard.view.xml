@@ -218,7 +218,7 @@
                                             uiConfig="{applicationSet:'fiori'}"
                                             vizProperties="{
                                                 title: {visible: false},
-                                                    plotArea: { colorPalette: ['#168eff','#ec3b14'], dataLabel: { visible: true } },
+                                                    plotArea: { colorPalette: ['#0b8400','#ec3b14'], dataLabel: { visible: true } },
                                                     valueAxis: { title: { text: 'Damage Count' },label: {formatString: '0'}},
                                                     categoryAxis: { title: { text: 'Day of month' } }
                                                 }"
@@ -312,7 +312,7 @@
                                             legend:{visible:true},
                                             title: {visible: false},
                                             plotArea: {
-    colorPalette: ['#0b8400', '#9c260c'],
+    colorPalette: ['#0b8400', '#ec3b14'],
     dataLabel: { visible: true }
 },
                                             valueAxis: { 
