@@ -666,7 +666,7 @@ sap.ui.define([
 
                 if (totalAmount > 0) {
                     summary.push([
-                        `Sub-Total (${oModel.Currency})`,
+                        `Sub-Total (${oModel.Currency}) :`,
                         totalAmount.toFixed(2)
                     ]);
                 }
@@ -674,7 +674,7 @@ sap.ui.define([
                 const totalRowIndex = summary.length;
 
                 summary.push([
-                    `Total (${oModel.Currency})`,
+                    `Total (${oModel.Currency}) :`,
                     totalAmount.toFixed(2)
                 ]);
 

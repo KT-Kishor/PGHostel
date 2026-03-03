@@ -5,15 +5,15 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/ui/export/Spreadsheet",
-], function(BaseController, JSONModel, utils, MessageToast, Formatter, Spreadsheet) {
+], function (BaseController, JSONModel, utils, MessageToast, Formatter, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Damage", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDamage").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             sap.ui.core.BusyIndicator.show(0);
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.commonLoginFunction();
@@ -44,12 +44,12 @@ sap.ui.define([
             await this.Onsearch(true)
             this.readCustomerData();
         },
-        HM_GenearteDamage:function(){
-                   
-             this.getOwnerComponent().getRouter().navTo("RouteDamageDetails",{sPath: "Damage"});
+        HM_GenearteDamage: function () {
+
+            this.getOwnerComponent().getRouter().navTo("RouteDamageDetails", { sPath: "Damage" });
         },
 
-        _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -81,30 +81,30 @@ sap.ui.define([
             }
         },
 
-        readCustomerData: function() {
-                sap.ui.core.BusyIndicator.show(0);
+        readCustomerData: function () {
+            sap.ui.core.BusyIndicator.show(0);
 
-                var filter = {
-                    BranchCode: this.BranchCode
-                };
+            var filter = {
+                BranchCode: this.BranchCode
+            };
 
-                this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter).then((oData) => {
-                    var aData = Array.isArray(oData.commentData) ?
-                        oData.commentData : [oData.commentData];
+            this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter).then((oData) => {
+                var aData = Array.isArray(oData.commentData) ?
+                    oData.commentData : [oData.commentData];
 
-                    const aFilteredData = aData.filter(item =>
-                        item.Status === "Assigned" || item.Status === "Completed"
-                    );
+                const aFilteredData = aData.filter(item =>
+                    item.Status === "Assigned" || item.Status === "Completed"
+                );
 
-                    this.getView().setModel(
-                        new sap.ui.model.json.JSONModel(aFilteredData),
-                        "CustomerModel"
-                    );
+                this.getView().setModel(
+                    new sap.ui.model.json.JSONModel(aFilteredData),
+                    "CustomerModel"
+                );
 
-                })
+            })
         },
 
-        onChangeAddCustomer: function(oEvent) {
+        onChangeAddCustomer: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             this.SelectKey = oEvent.getSource().getSelectedKey();
             const allData = this.getView().getModel("CustomerModel").getData();
@@ -123,7 +123,7 @@ sap.ui.define([
             oDamageModel.setProperty("/UserID", SelectedData.UserID)
         },
 
-        HM_AddRoom: function(oEvent) {
+        HM_AddRoom: function (oEvent) {
             var oView = this.getView();
             this.byId("HD_id_ARD_Table").removeSelections();
 
@@ -169,7 +169,7 @@ sap.ui.define([
                 "HD_id_Type"
             ];
 
-            aInputIds.forEach(function(sId) {
+            aInputIds.forEach(function (sId) {
                 var oInput = oView.byId(sId);
                 if (oInput && oInput.setValueState) {
                     oInput.setValueState("None");
@@ -180,7 +180,7 @@ sap.ui.define([
             this.AR_Dialog.open();
         },
 
-        HM_EditRoom: function(oEvent) {
+        HM_EditRoom: function (oEvent) {
             var oView = this.getView();
             var oTable = this.byId("HD_id_ARD_Table");
             var oSelected = oTable.getSelectedItems();
@@ -229,7 +229,7 @@ sap.ui.define([
                 "HD_id_DamageDate",
                 "HD_id_Type"
             ];
-            aInputIds.forEach(function(sId) {
+            aInputIds.forEach(function (sId) {
                 var oInput = oView.byId(sId);
                 if (oInput && oInput.setValueState) {
                     oInput.setValueState("None");
@@ -240,13 +240,13 @@ sap.ui.define([
             this.AR_Dialog.open();
         },
 
-        HD_onCancelButtonPress: function() {
+        HD_onCancelButtonPress: function () {
             this.AR_Dialog.close();
             var table = this.byId("HD_id_ARD_Table");
             table.removeSelections(true);
         },
 
-        HD_onsavebuttonpress: async function() {
+        HD_onsavebuttonpress: async function () {
             const oView = this.getView();
             var oDamageModel = oView.getModel("DamageModel");
             var Payload = oDamageModel.getData();
@@ -280,8 +280,8 @@ sap.ui.define([
                 Date: Payload.Date ? Payload.Date.split("/").reverse().join("-") : "",
                 Status: Payload.Status,
                 Currency: Payload.Currency,
-                Type : Payload.Type,
-                UserID : Payload.UserID
+                Type: Payload.Type,
+                UserID: Payload.UserID
             };
 
             delete Payload.CustomerIDEditable;
@@ -320,33 +320,33 @@ sap.ui.define([
             }
         },
 
-        onLiveChangeItemName: function(oEvent) {
+        onLiveChangeItemName: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onLiveChangeDescription: function(oEvent) {
+        onLiveChangeDescription: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onLiveChangeCost: function(oEvent) {
+        onLiveChangeCost: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateAmount(oEvent.getSource(), "ID");
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onChangeDamageDate: function(oEvent) {
+        onChangeDamageDate: function (oEvent) {
             utils._LCvalidateDate(oEvent);
         },
 
-        onchangeType: function(oEvent) {
+        onchangeType: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
 
-        HM_DeleteRoom: async function() {
+        HM_DeleteRoom: async function () {
             var oTable = this.byId("HD_id_ARD_Table");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -364,48 +364,48 @@ sap.ui.define([
 
             sap.m.MessageBox.confirm(
                 `Are you sure you want to delete the selected damages: ${sNames}?`, {
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    title: "Confirm Deletion",
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    emphasizedAction: sap.m.MessageBox.Action.NO,
+                icon: sap.m.MessageBox.Icon.WARNING,
+                title: "Confirm Deletion",
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                emphasizedAction: sap.m.MessageBox.Action.NO,
 
-                    onClose: async function(sAction) {
-                        if (sAction !== sap.m.MessageBox.Action.YES) {
-                            oTable.removeSelections(true);
-                            return;
-                        }
+                onClose: async function (sAction) {
+                    if (sAction !== sap.m.MessageBox.Action.YES) {
+                        oTable.removeSelections(true);
+                        return;
+                    }
 
-                        try {
-                            sap.ui.core.BusyIndicator.show(0);
-                            const aDeletePromises = aSelectedItems.map(item => {
-                                var oData = item.getBindingContext("Damage").getObject();
+                    try {
+                        sap.ui.core.BusyIndicator.show(0);
+                        const aDeletePromises = aSelectedItems.map(item => {
+                            var oData = item.getBindingContext("Damage").getObject();
 
-                                if (!oData.DamageID) return Promise.resolve(); // safety
+                            if (!oData.DamageID) return Promise.resolve(); // safety
 
-                                return that.ajaxDeleteWithJQuery("HM_Damage", {
-                                    filters: {
-                                        DamageID: oData.DamageID
-                                    }
-                                });
+                            return that.ajaxDeleteWithJQuery("HM_Damage", {
+                                filters: {
+                                    DamageID: oData.DamageID
+                                }
                             });
+                        });
 
-                            await Promise.all(aDeletePromises);
+                        await Promise.all(aDeletePromises);
 
-                            MessageToast.show(that.i18nModel.getText("damagesdeletedsuccessfully"));
-                            that.Onsearch("true");
-                        } catch (err) {
-                            console.error(err);
-                            MessageToast.show(err.message || err.responseText || "Delete failed");
-                        } finally {
-                            sap.ui.core.BusyIndicator.hide();
-                            oTable.removeSelections(true);
-                        }
+                        MessageToast.show(that.i18nModel.getText("damagesdeletedsuccessfully"));
+                        that.Onsearch("true");
+                    } catch (err) {
+                        console.error(err);
+                        MessageToast.show(err.message || err.responseText || "Delete failed");
+                    } finally {
+                        sap.ui.core.BusyIndicator.hide();
+                        oTable.removeSelections(true);
                     }
                 }
+            }
             );
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
@@ -454,31 +454,35 @@ sap.ui.define([
 
                 // Map BranchCode → BranchName
                 const mappedData = roomData.map(bed => {
-                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);   
+                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
-                        BranchName: branch ? branch.Name : bed.BranchCode // fallback
+                        BranchName: branch ? branch.Name : bed.BranchCode
                     };
                 });
 
-                if (!this._originalRoomdata || flag ===true) {
-                    var _originalRoomdata = JSON.parse(JSON.stringify(mappedData));
+                if (!this._originalRoomdata || flag === true) {
+                    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
                 }
-                var model = new JSONModel(mappedData);
-                this.getView().setModel(model, "Damage");
-                this._populateUniqueFilterValues(_originalRoomdata);
+
+                // Set filtered data to table
+                this.getView().setModel(new JSONModel(mappedData), "Damage");
+
+                // Always pass full original data for filter values
+                this._populateUniqueFilterValues(this._originalRoomdata);
+
                 sap.ui.core.BusyIndicator.hide();
-            })
+            });
         },
-        DM_onPressEditDetails: function(oEvent) {
+        DM_onPressEditDetails: function (oEvent) {
             var oSelected = oEvent.getSource().getBindingContext("Damage").getObject();
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteDamageDetails",{
-               sPath: encodeURIComponent(oSelected.DamageID)
-            }); 
+            oRouter.navTo("RouteDamageDetails", {
+                sPath: encodeURIComponent(oSelected.DamageID)
+            });
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 Dm_id_CustomerName: new Set(),
                 DM_id_RoomNo: new Set(),
@@ -506,13 +510,13 @@ sap.ui.define([
             });
         },
 
-        HD_onPressClear: function() {
+        HD_onPressClear: function () {
             this.getView().byId("Dm_id_CustomerName").setSelectedKey("")
             this.getView().byId("DM_id_RoomNo").setSelectedKey("")
             this.getView().byId("DM_id_Status").setSelectedKey("")
         },
 
-        RD_onDownload: function() {
+        RD_onDownload: function () {
             var aData = this.getView().getModel("Damage").getData();
 
             if (!aData || aData.length === 0) {
@@ -538,7 +542,7 @@ sap.ui.define([
             };
             MessageToast.show("Downloading Damage Report...");
             var oSheet = new Spreadsheet(oSettings);
-            oSheet.build().finally(function() {
+            oSheet.build().finally(function () {
                 oSheet.destroy();
             });
         },
@@ -550,25 +554,25 @@ sap.ui.define([
                 { label: "Room No", property: "RoomNo", type: "string" },
                 { label: "Bed Type", property: "BedTypeName", type: "string" },
                 { label: "Cost", property: "TotalCost", type: "string" },
-                { label: "Date", property: "InvoiceDate", type: "String"},
+                { label: "Date", property: "InvoiceDate", type: "String" },
                 { label: "Status", property: "Status", type: "string" },
                 { label: "Return Damage Date", property: "ReturnDamageDate", type: "string" }
 
             ];
         },
 
-        onHome: function() {
+        onHome: function () {
             this.CommonLogoutFunction();
             this.getView().getModel("Damage").setData({});
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("Damage").setData({});
         },
 
-        HM_ReturnDamage: function() {
+        HM_ReturnDamage: function () {
             const oView = this.getView();
             var oTable = this.byId("HD_id_ARD_Table");
             var oSelected = oTable.getSelectedItems();
@@ -590,7 +594,7 @@ sap.ui.define([
                 MessageToast.show("Damage has already been recovered");
                 return;
             }
-           
+
 
             if (!this._oReturnDialog) {
                 this._oReturnDialog = sap.ui.xmlfragment(
@@ -614,7 +618,7 @@ sap.ui.define([
                 "DT_id_ReturnMode",
                 "DT_id_ReturnTransactionID"
             ];
-            aInputIds.forEach(function(sId) {
+            aInputIds.forEach(function (sId) {
                 var oInput = oView.byId(sId);
                 if (oInput && oInput.setValueState) {
                     oInput.setValueState("None");
@@ -626,7 +630,7 @@ sap.ui.define([
             this._initializeTransactionIDState(oData);
         },
 
-        _initializeTransactionIDState: function(oData) {
+        _initializeTransactionIDState: function (oData) {
             const oView = this.getView();
             const oMode = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
             const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
@@ -634,34 +638,34 @@ sap.ui.define([
             if (!oMode || !oTxn) return;
 
             const mode = oMode.getSelectedKey();
-            
-            if(oData.Status === "Partially Recovered"){
+
+            if (oData.Status === "Partially Recovered") {
                 oMode.setEnabled(true);
                 oMode.setSelectedKey(oData.ReturnDamageMode);
                 oTxn.setValue(oData.ReturnDamageTransactionID);
-                    
-            }else{
-            if (mode === "CASH") {
-                oTxn.setEnabled(false);
-                oTxn.setValue("");
-                oTxn.setValueState("None");
+
             } else {
-                oTxn.setEnabled(true);
+                if (mode === "CASH") {
+                    oTxn.setEnabled(false);
+                    oTxn.setValue("");
+                    oTxn.setValueState("None");
+                } else {
+                    oTxn.setEnabled(true);
+                }
             }
-        }
         },
 
-        onSaveReturn: async function() {
+        onSaveReturn: async function () {
             const oView = this.getView();
             const oDamage = oView.getModel("DamageModel").getData();
-       
+
 
 
             const oAmountInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount"));
             const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
             const oTxnInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
 
-             var isMandatoryValid = (
+            var isMandatoryValid = (
                 utils.onNumber(sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID")), "ID")
@@ -703,7 +707,7 @@ sap.ui.define([
 
             try {
                 const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
-               
+
 
                 const payload = {
                     ReturnDamageAmount: returnAmount,
@@ -713,7 +717,7 @@ sap.ui.define([
                     ReturningEmployeeName: currentUser,
                     Status: "Recovered"
                 };
-               
+
 
                 // const payload = {
                 //     Filters: {
@@ -723,10 +727,10 @@ sap.ui.define([
                 // };
 
                 const res = await this.ajaxUpdateWithJQuery("HM_Damage", {
-                  data: payload,
-                filters: {
-                     DamageID: oDamage.DamageID
-                }
+                    data: payload,
+                    filters: {
+                        DamageID: oDamage.DamageID
+                    }
                 });
 
                 if (!res.success) throw new Error(res.message);
@@ -741,21 +745,21 @@ sap.ui.define([
             }
         },
 
-        onDialogClose: function() {
+        onDialogClose: function () {
             this._clearTableSelection(); // Clear table selection
             if (this._oReturnDialog) {
                 this._oReturnDialog.close();
             }
         },
 
-        _clearTableSelection: function() {
+        _clearTableSelection: function () {
             var oTable = this.byId("HD_id_ARD_Table");
             if (oTable) {
                 oTable.removeSelections(true);
             }
         },
 
-        _validateReturnAmount: function(oEvent) {
+        _validateReturnAmount: function (oEvent) {
             utils.onNumber(oEvent)
             const oInput = oEvent.getSource();
             const oDamage = this.getView().getModel("DamageModel").getData();
@@ -772,14 +776,14 @@ sap.ui.define([
             return true;
         },
 
-        _onReturnModeChange: function(oEvent) {
-         utils._LCstrictValidationComboBox(oEvent);
+        _onReturnModeChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
             const oView = this.getView();
             const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
-             oTxn.setValue("");
+            oTxn.setValue("");
         },
 
-        _validateTransactionID: function(oEvent) {
+        _validateTransactionID: function (oEvent) {
             const oInput = oEvent.getSource();
             const oView = this.getView();
             const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
@@ -802,10 +806,10 @@ sap.ui.define([
             return true;
         },
 
-        HM_onPressGenerateDamageReceipt: async function() {
+        HM_onPressGenerateDamageReceipt: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                const {jsPDF} = window.jspdf;
+                const { jsPDF } = window.jspdf;
 
                 // ===== Get Selected Row Data =====
                 var oTable = this.byId("HD_id_ARD_Table");
@@ -830,7 +834,7 @@ sap.ui.define([
                     return;
                 }
 
-                let filter = {BranchID: [oData.BranchCode]};
+                let filter = { BranchID: [oData.BranchCode] };
                 const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                 const company = oCompanyDetailsModel.data[0] || {};
 
@@ -894,17 +898,17 @@ sap.ui.define([
                 doc.setFontSize(11).setFont("times", "bold");
 
                 const receiptDetails = [{
-                        label: "Receipt Date :",
-                        value: this.Formatter.formatDate(oData.ReturnDamageDate) || "N/A"
-                    },
-                    {
-                        label: "Room No :",
-                        value: NA(oData.RoomNo)
-                    },
-                    {
-                        label: "Customer ID :",
-                        value: NA(oData.CustomerID)
-                    }
+                    label: "Receipt Date :",
+                    value: this.Formatter.formatDate(oData.ReturnDamageDate) || "N/A"
+                },
+                {
+                    label: "Room No :",
+                    value: NA(oData.RoomNo)
+                },
+                {
+                    label: "Customer ID :",
+                    value: NA(oData.CustomerID)
+                }
                 ];
 
                 // Print right-aligned meta block
@@ -1005,7 +1009,7 @@ sap.ui.define([
             }
         },
 
-        addFooter: function(doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
+        addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
             const footerHeight = 18;
             const footerYPosition = pageHeight - footerHeight;
             const footerWidth = pageWidth;
