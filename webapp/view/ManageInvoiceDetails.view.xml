@@ -919,6 +919,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                             &amp;&amp; ${visiablityPlay>/merge}
                         }"
@@ -935,6 +936,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                         }"
                         text="{i18n>submit}"
@@ -949,6 +951,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                         }"
                         text="{i18n>companyInvoiceSendEmail}"
@@ -964,6 +967,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                         }"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
@@ -978,6 +982,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                         }"
                         text="{i18n>sendInvoiceText}"
@@ -993,6 +998,7 @@
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
                                 || ${LoginModel>/Role} === 'BranchManager'
+                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
                             )
                         }"
                         text="{i18n>GeneratePDF}"
