@@ -325,7 +325,6 @@ sap.ui.define([
             // BranchCode applied based on role
             if (oExistingModel.Role === "Admin") {
                 filters.BranchCode = aBranchCodes;
-                filters.Role = "Admin";
             } else if (oExistingModel.Role === "SuperAdmin" ) {
                     filters.BranchCode = "";
             } else {
