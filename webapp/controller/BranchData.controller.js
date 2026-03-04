@@ -117,6 +117,7 @@ sap.ui.define([
 
             if (oLoginmodel.Role === "Admin") {
                 filters.BranchID = Branch ? Branch : oExistingModel.BranchCode;
+                filters.Role = "Admin"
             } else if (oExistingModel.Role === "SuperAdmin") {
                 filters.BranchID = "";
             }
