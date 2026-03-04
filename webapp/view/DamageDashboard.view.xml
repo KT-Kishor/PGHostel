@@ -179,7 +179,7 @@
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="Daily Damage"
+                                text="Current Month Daily Damages"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"

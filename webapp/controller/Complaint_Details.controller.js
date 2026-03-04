@@ -24,10 +24,11 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteComplaintDetails").attachMatched(this._onRouteMatched, this);
         },
-        _onRouteMatched:async function (oEvent) {
 
+        _onRouteMatched:async function (oEvent) {
            this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
            this.getView().byId("CD_id_Status").setSelectedKey("")
+           this.commonLoginFunction();
            await this.CD_read()
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._ViewDatePickersReadOnly(["CD_id_EstimatedDate", "CD_id_ResolutionDate"], sap.ui.getCore());

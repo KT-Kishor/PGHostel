@@ -12,6 +12,7 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.commonLoginFunction();
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             this._resetFiltersOnEntry();
             this._setDefaultDateRange();

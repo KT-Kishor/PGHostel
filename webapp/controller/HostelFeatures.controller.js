@@ -463,8 +463,12 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisRoom"));
-                return;
+                  sap.m.MessageBox.information(
+                    "No image is uploaded.",
+                    {
+                        title: "Information"
+                    }
+                );
             }
 
             var sBase64 = oData.Photo1.replace(/\s/g, "");
