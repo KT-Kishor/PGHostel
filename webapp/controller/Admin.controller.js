@@ -16,7 +16,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            this.commonLoginFunction();
+            var LoginFUnction = await this.commonLoginFunction("ManageCustomer");
+            if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this._isClearPressed = false; // ensure full data is not requested'
             const currentYear = new Date().getFullYear();

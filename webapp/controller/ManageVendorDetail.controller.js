@@ -23,7 +23,8 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
-                // this.commonLoginFunction();
+                // var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+                // if (!LoginFUnction) return;
                 var Layout = this.byId("MV_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("MV_id_OrderHeaderSection1"));
                 this.commonLoginFunction();

@@ -16,7 +16,8 @@ sap.ui.define([
         _onRouteMatched: async function () {
             sap.ui.core.BusyIndicator.show(0);
             try {
-                this.commonLoginFunction();
+                var LoginFUnction = await this.commonLoginFunction("ManageDamage");
+                if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._ViewDatePickersReadOnly(["id_DD_year", "id_DD_Date"], this.getView());
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();

@@ -11,7 +11,8 @@ sap.ui.define([
 
         _onRouteMatched: async function() {
             try {
-                this.commonLoginFunction();
+                var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
+                if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Main form model
                 this.getView().setModel(new sap.ui.model.json.JSONModel({

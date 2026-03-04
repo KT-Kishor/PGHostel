@@ -15,16 +15,19 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             try {
-                   var oView = this.getView();
-        var oModel = oView.getModel("BedDetails");
+                var LoginFUnction = await this.commonLoginFunction("ManageBedType");
+                if (!LoginFUnction) return;
 
-        if (!oModel) {
-            oModel = new sap.ui.model.json.JSONModel({});
-            oView.setModel(oModel, "BedDetails");
-        } else {
-            oModel.setData({});
-        }
-                this.commonLoginFunction();
+                   var oView = this.getView();
+                var oModel = oView.getModel("BedDetails");
+
+                if (!oModel) {
+                    oModel = new sap.ui.model.json.JSONModel({});
+                    oView.setModel(oModel, "BedDetails");
+                } else {
+                    oModel.setData({});
+                }
+                
                 var model = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",

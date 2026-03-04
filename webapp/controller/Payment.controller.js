@@ -18,6 +18,8 @@ sap.ui.define([
         _onRouteMatched: async function () {
             sap.ui.core.BusyIndicator.show(0);
             try {
+                var LoginFUnction = await this.commonLoginFunction("ManagePaymentHistory");
+                if (!LoginFUnction) return;
                 this.isFirstLoad = true;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();

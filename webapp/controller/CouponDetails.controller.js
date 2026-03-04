@@ -62,8 +62,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            const ok = await this.commonLoginFunction();
-            if (!ok) return;
+            var LoginFUnction = await this.commonLoginFunction("ManageCoupon");
+            if (!LoginFUnction) return;
 
 
             // 🔑 Bind LoginModel to the view (same pattern as other controller)

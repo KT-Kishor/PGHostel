@@ -17,7 +17,8 @@ sap.ui.define([
         _onRouteMatched: async function () {
             sap.ui.core.BusyIndicator.show(0);
             try {
-                this.commonLoginFunction();
+                var LoginFUnction = await this.commonLoginFunction("ManageBookingDashboard");
+                if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._ViewDatePickersReadOnly(["D_id_year"], this.getView());
                 const oNow = new Date();

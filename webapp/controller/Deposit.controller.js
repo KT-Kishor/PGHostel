@@ -82,8 +82,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            const ok = await this.commonLoginFunction();
-            if (!ok) return;
+            var LoginFUnction = await this.commonLoginFunction("ManageSecurityDeposit");
+            if (!LoginFUnction) return;
 
             // Bind LoginModel to the view
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");

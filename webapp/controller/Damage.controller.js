@@ -15,6 +15,8 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             sap.ui.core.BusyIndicator.show(0);
+            var LoginFUnction = await this.commonLoginFunction("DamageDashboard");
+            if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.commonLoginFunction();
             var model = new JSONModel({

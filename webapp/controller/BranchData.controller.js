@@ -55,7 +55,8 @@ sap.ui.define([
         _onRouteMatched: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                this.commonLoginFunction();
+                 var LoginFUnction = await this.commonLoginFunction("ManageBranch");
+                if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ imageTokens: [] }), "tokenImageModel");

@@ -14,6 +14,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var LoginFUnction = await this.commonLoginFunction("ManageRooms");
+            if (!LoginFUnction) return;
 
             var oView = this.getView();
             var oModel = oView.getModel("RoomDetailsModel");
@@ -25,7 +27,6 @@ sap.ui.define([
                 oModel.setData({});
             }
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.commonLoginFunction();
 
             var model = new JSONModel({
                 BranchCode: "",

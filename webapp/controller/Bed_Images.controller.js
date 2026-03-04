@@ -15,6 +15,8 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
+                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
+                if (!LoginFUnction) return;
                 var Layout = this.byId("ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
 
@@ -84,7 +86,6 @@ sap.ui.define([
             }
             sap.ui.core.BusyIndicator.show(0);
             try {
-                 this.commonLoginFunction();
 
                 const oView = this.getView();
 
