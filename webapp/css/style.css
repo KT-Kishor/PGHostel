@@ -2018,6 +2018,41 @@ span.sapMBtnInner.sapMBtnEmphasized {
   border: none !important;
 }
 
+.fa-admin-btn .sapMBtnContent,
+.fa-admin-btn .sapMBtnContent bdi,
+.fa-admin-btn .sapMBtnContent span,
+.fa-admin-btn .sapMBtnContent > span {
+  color: #fff !important;
+}
+
+/* Keep text white on hover and active states - override any hover styles */
+.fa-admin-btn:hover .sapMBtnContent,
+.fa-admin-btn:hover .sapMBtnContent bdi,
+.fa-admin-btn:hover .sapMBtnContent span,
+.fa-admin-btn:hover .sapMBtnContent > span,
+.fa-admin-btn.sapMBtnActive .sapMBtnContent,
+.fa-admin-btn.sapMBtnActive .sapMBtnContent bdi,
+.fa-admin-btn.sapMBtnActive .sapMBtnContent span,
+.fa-admin-btn.sapMBtnActive .sapMBtnContent > span,
+.fa-admin-btn:active .sapMBtnContent,
+.fa-admin-btn:active .sapMBtnContent bdi,
+.fa-admin-btn:active .sapMBtnContent span,
+.fa-admin-btn:active .sapMBtnContent > span,
+.fa-admin-btn.sapMBtnFocus .sapMBtnContent,
+.fa-admin-btn.sapMBtnFocus .sapMBtnContent bdi,
+.fa-admin-btn.sapMBtnFocus .sapMBtnContent span,
+.fa-admin-btn.sapMBtnFocus .sapMBtnContent > span,
+.fa-admin-btn.sapMBtnHover .sapMBtnContent,
+.fa-admin-btn.sapMBtnHover .sapMBtnContent bdi,
+.fa-admin-btn.sapMBtnHover .sapMBtnContent span,
+.fa-admin-btn.sapMBtnHover .sapMBtnContent > span {
+  color: #fff !important;
+}
+
+/* Add spacing between icon and text */
+.fa-admin-btn .sapMBtnIcon {
+  margin-right: 0.75rem;
+}
 
 
 .fileErrorHighlight {

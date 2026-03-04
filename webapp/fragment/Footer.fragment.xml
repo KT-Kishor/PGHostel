@@ -27,6 +27,7 @@
                         tooltip="{i18n>adminVendorRegistration}"
                         type="Transparent"
                         icon="sap-icon://employee"
+                        text="Admin / Vendor Signup"
                         class="fa-admin-btn"
                     />
                     <core:HTML
