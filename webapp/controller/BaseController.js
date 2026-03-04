@@ -160,7 +160,7 @@ sap.ui.define([
     getBusyDialog: function () {
       if (!this._pBusyDialog) {
         this._pBusyDialog = sap.ui.core.Fragment.load({
-          name: "sap.kt.com.minihrsolution.fragment.BusyIndicator",
+          name: "sap.ui.com.project1.fragment.BusyIndicator",
           controller: this
         }).then(function (oBusyDialog) {
           this.getView().addDependent(oBusyDialog);
