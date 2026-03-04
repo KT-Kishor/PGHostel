@@ -19,7 +19,7 @@
                 useToolbar="false"
                 clear="HD_onPressClear"
                 showClearOnFB="true"
-                search="Onsearch"
+                search="DamageOnsearch"
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"

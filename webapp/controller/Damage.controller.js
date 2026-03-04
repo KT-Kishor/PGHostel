@@ -27,7 +27,7 @@ sap.ui.define([
                 Description: "",
                 Cost: "",
                 Date: "",
-                Status: "Pending",
+                Status: "Damage Raised",
                 DamageID: "",
                 Currency: "",
                 CustomerEmail: "",
@@ -41,7 +41,7 @@ sap.ui.define([
             var loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.BranchCode = loginModel.getProperty("/BranchCode");
             await this._loadBranchCode()
-            await this.Onsearch(true)
+            await this.Onsearch("true")
             this.readCustomerData();
         },
         HM_GenearteDamage: function () {
@@ -150,7 +150,7 @@ sap.ui.define([
                     Description: "",
                     Cost: "",
                     Date: this.Formatter.formatDate(new Date()), // Set current date
-                    Status: "Pending",
+                    Status: "Damage Raised",
                     DamageID: "",
                     Currency: "",
                     CustomerEmail: "",
@@ -197,8 +197,8 @@ sap.ui.define([
             var oContext = oSelected[0].getBindingContext("Damage");
             var oData = oContext.getObject();
 
-            if (oData.Status === "Recovered") {
-                MessageToast.show("Damage has already been recovered");
+            if (oData.Status === "Damage Claimed") {
+                MessageToast.show("Damage has already been Claimed");
                 return;
             }
 
@@ -318,6 +318,9 @@ sap.ui.define([
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+        },
+        DamageOnsearch:function(){
+            this.Onsearch("false");
         },
 
         onLiveChangeItemName: function (oEvent) {
@@ -461,9 +464,11 @@ sap.ui.define([
                     };
                 });
 
-                if (!this._originalRoomdata || flag === true) {
-                    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
-                }
+              if (flag === "true") {
+    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
+} else if (!this._originalRoomdata) {
+    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
+}
 
                 // Set filtered data to table
                 this.getView().setModel(new JSONModel(mappedData), "Damage");
@@ -590,8 +595,8 @@ sap.ui.define([
             var oContext = oSelected[0].getBindingContext("Damage");
             var oData = oContext.getObject();
 
-            if (oData.Status === "Recovered") {
-                MessageToast.show("Damage has already been recovered");
+            if (oData.Status === "Damage Claimed") {
+                MessageToast.show("Damage has already been Claimed");
                 return;
             }
 
@@ -715,7 +720,7 @@ sap.ui.define([
                     ReturnDamageMode: mode,
                     ReturnDamageTransactionID: txnID || "",
                     ReturningEmployeeName: currentUser,
-                    Status: "Recovered"
+                    Status: "Damage Claimed"
                 };
 
 
@@ -735,8 +740,9 @@ sap.ui.define([
 
                 if (!res.success) throw new Error(res.message);
 
-                MessageToast.show("Damage recovered successfully");
+                MessageToast.show("Damage claimed successfully");
                 this._oReturnDialog.close();
+                this.byId("HD_id_ARD_Table").removeSelections(true);
                 await this.Onsearch("true");
             } catch (e) {
                 MessageToast.show(e.message);
@@ -829,8 +835,8 @@ sap.ui.define([
                 var oData = oContext.getObject();
 
                 // ===== Status Check =====
-                if (oData.Status !== "Recovered") {
-                    MessageToast.show("Receipt can be generated only for Recovered status");
+                if (oData.Status !== "Damage Claimed") {
+                    MessageToast.show("Receipt can be generated only for Damage Claimed status");
                     return;
                 }
 

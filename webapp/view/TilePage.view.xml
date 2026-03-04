@@ -251,7 +251,7 @@
                 >
                     <TileContent unit="{i18n>damageDetails}">
                         <ImageContent
-                            src="sap-icon://bbyd-dashboard"
+                            src="sap-icon://clinical-task-tracker"
                         />
                     </TileContent>
                 </GenericTile>

@@ -35,7 +35,7 @@ sap.ui.define([
                 Description: "",
                 Cost: "",
                 Date: Formatter.formatDate(new Date()),
-                Status: "Pending",
+                Status: "Damage Raised",
                 DamageID: "",
                 Currency: "",
                 CustomerEmail: "",
@@ -109,7 +109,7 @@ sap.ui.define([
                 this.getView().getModel("VisibleModel").setProperty("/visible", true);
                 this.getView().byId("HD_id_CustomerID1").setEditable(true);
 
-            } else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Recovered") {
+            } else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Damage Claimed") {
                 this.getView().byId("idEditButton").setVisible(false);
                 this.getView().byId("HD_id_CustomerID1").setEditable(false);
                 this.getView().byId("HD_id_DamageDate1").setEditable(false);
@@ -348,7 +348,7 @@ sap.ui.define([
                     InvoiceDate: oData.Date.split('/').reverse().join('-'),
                     RoomNo: oData.RoomNo,
                     Currency: oData.Currency,
-                    Status: "Pending",
+                    Status: "Damage Raised",
                     BedTypeName: oData.BedTypeName,
                     TotalCost: oData.TotalCost,
                     BranchCode: oData.BranchCode
@@ -527,7 +527,7 @@ sap.ui.define([
                 doc.setFont("times", "bold");
                 doc.setFontSize(16);
 
-                if (oModel.Status === "Recovered") {
+                if (oModel.Status === "Damage Claimed") {
                     doc.text("DAMAGE RECEIPT", pageWidth - margin, currentY, { align: "right" });
                 } else {
                     doc.text("DAMAGE NOTICE", pageWidth - margin, currentY, { align: "right" });
@@ -718,7 +718,7 @@ sap.ui.define([
                 });
 
                 currentY = doc.lastAutoTable.finalY + 8;   
-                const finalAmount = oModel.Status === "Pending" ? totalAmount : totalAmount;
+                const finalAmount = oModel.Status === "Damage Raised" ? totalAmount : totalAmount;
                 const amountInWords = await this.convertNumberToWords(finalAmount, "INR");
 
                 doc.setFont("times", "bold");

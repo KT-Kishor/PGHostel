@@ -231,7 +231,7 @@ sap.ui.define([
                     return "Indication01"
                     case "In Progress":
                     return "Warning"
-                    case "Resolved":
+                    case "Damage Claimed":
                     return "Success"
                       case "Partially Recovered":
                     return "Indication06"
