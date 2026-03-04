@@ -438,7 +438,7 @@ sap.ui.define([
                                     sap.m.MessageBox.Action.OK,
                                     "GeneratePDF"
                                 ],
-                                emphasizedAction: sap.m.MessageBox.Action.OK,
+                                // emphasizedAction: sap.m.MessageBox.Action.OK,
                                 onClose: async (oAction) => {
                                     if (oAction === sap.m.MessageBox.Action.OK) {
                                         this.getOwnerComponent()

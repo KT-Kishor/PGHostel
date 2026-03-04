@@ -135,6 +135,16 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
+                            text="{i18n>branchCode}"
+                            tooltip="{i18n>branchCode}"
+                        />
+                    </Column>
+                    
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
                             text="{i18n>MVgender}"
                             tooltip="{i18n>MVgender}"
                         />
@@ -193,6 +203,7 @@
                                 text="{mainModel>Salutation} {mainModel>UserName}"
                             />
                             <Text text="{mainModel>EmailID}" />
+                            <Text text="{mainModel>BranchCode}" />
                             <Text text="{mainModel>Gender}" />
                             <Text
                                 text="{mainModel>STDCode} {mainModel>MobileNo}"
