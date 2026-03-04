@@ -88,8 +88,8 @@ sap.ui.define([
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
 
                 const filter = { UserID: sUserID }
-                const response = await this.ajaxReadWithJQuery("HM_Booking", filter);
-                const aBookings = response?.commentData || [];
+                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
+                const aBookings = response?.BookingData || [];
 
                 const aBranchComboData = this._prepareBranchComboData(aBookings);
                 const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
