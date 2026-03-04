@@ -108,6 +108,7 @@
                         />
                         <Button
                             text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
                             tooltip="{i18n>downloadBedDetails}"
                             press="BD_onDownload"
                             class="myUnifiedBtn"

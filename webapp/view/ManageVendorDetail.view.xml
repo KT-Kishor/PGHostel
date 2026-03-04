@@ -320,6 +320,7 @@
                                                 <m:Button
                                                     id="AdminDownloadButton"
                                                     text="{i18n>download}"
+                                                    icon="sap-icon://excel-attachment"
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>download}"
                                                     press="onAdminDownloadFiles"

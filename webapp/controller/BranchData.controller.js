@@ -32,7 +32,6 @@ sap.ui.define([
                 Penalty: "",
             });
             this.getView().setModel(oMDmodel, "MDmodel");
-
             var oeditable = new sap.ui.model.json.JSONModel({
                 isEdit: false
             });
@@ -56,12 +55,12 @@ sap.ui.define([
         _onRouteMatched: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
+                this.commonLoginFunction();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ imageTokens: [] }), "tokenImageModel");
                 this.onClearAndSearch("MD_id_Filterbar");
                 await this.Onsearch();
-                this.commonLoginFunction();
                 await this.Customerdata()
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -1395,16 +1394,8 @@ sap.ui.define([
             const sValue = oInput.getValue().trim();
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
-            const taxInput = this.byId("CC_id_custValue");
-
-            if (!visiModel.getProperty("/isIndia")) {
-                oInput.setValueState("None");
-                visiModel.setProperty("/CC_id_CustInput", false);
-                return true;
-            }
-
+            const previousGST = dataModel.getProperty("/GSTIN_PREV");
             const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
-
             if (!sValue) {
                 oInput.setValueState("None");
                 visiModel.setProperty("/CC_id_CustInput", false);
@@ -1413,7 +1404,6 @@ sap.ui.define([
                 dataModel.setProperty("/Value", "");
                 return true;
             }
-
             if (!GST_REGEX.test(sValue)) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("gstError"));
@@ -1421,39 +1411,31 @@ sap.ui.define([
                 visiModel.setProperty("/selectedIndex", -1);
                 return false;
             }
-
             oInput.setValueState("None");
-            oInput.setValueStateText("");
             visiModel.setProperty("/CC_id_CustInput", true);
-
             const stateCode = sValue.substring(0, 2);
-            const currentTaxValue = dataModel.getProperty("/Value");
-            const taxInputValue = taxInput ? taxInput.getValue() : "";
-
-            // Determine GST type based on state code
-            if (stateCode === "29") {
-                visiModel.setProperty("/selectedIndex", 0); // CGST
-                dataModel.setProperty("/Type", "CGST/SGST");
-            } else {
-                visiModel.setProperty("/selectedIndex", 1); // IGST
-                dataModel.setProperty("/Type", "IGST");
+            if (previousGST && previousGST !== sValue) {
+                dataModel.setProperty("/Value", "");   // clear tax %
             }
-
-            // Only set default value if no value exists yet AND user hasn't typed anything
-            if (!currentTaxValue && (!taxInputValue || taxInputValue === "")) {
-                if (stateCode === "29") {
+            // Determine GST type
+            if (stateCode === "29") {
+                visiModel.setProperty("/selectedIndex", 0);
+                dataModel.setProperty("/Type", "CGST/SGST");
+                if (!dataModel.getProperty("/Value")) {
                     dataModel.setProperty("/Value", "9");
-                } else {
+                }
+            } else {
+                visiModel.setProperty("/selectedIndex", 1);
+                dataModel.setProperty("/Type", "IGST");
+                if (!dataModel.getProperty("/Value")) {
                     dataModel.setProperty("/Value", "18");
                 }
             }
-            // If user has typed something in tax field, keep their input
-            else if (taxInputValue && taxInputValue !== currentTaxValue) {
-                dataModel.setProperty("/Value", taxInputValue);
-            }
-
+            // store current GST as previous
+            dataModel.setProperty("/GSTIN_PREV", sValue);
             return true;
         },
+
         onTaxPercentageChange: function (oEvent) {
             const oInput = oEvent.getSource();
             const sValue = oInput.getValue();

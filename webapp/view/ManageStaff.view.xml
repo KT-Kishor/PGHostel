@@ -71,7 +71,7 @@
                             class="myUnifiedBtn"/>
 						<Button text="{i18n>MSdelete}" press="HM_DeleteHostelFeature" tooltip="{i18n>MSdelete}"
                             class="myUnifiedBtn"/>
-						<Button text="{i18n>download}" tooltip="{i18n>download}" press="MS_onDownload"
+						<Button text="{i18n>download}" tooltip="{i18n>download}" press="MS_onDownload" icon="sap-icon://excel-attachment"
                             class="myUnifiedBtn"/>
 					</OverflowToolbar>
 				</headerToolbar>

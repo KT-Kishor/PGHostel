@@ -109,6 +109,7 @@
                         />
                         <Button
                             text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
                             tooltip="{i18n>downloadBranchData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
@@ -123,12 +124,12 @@
                             tooltip="{i18n>MSbranchCode}"
                         />
                     </Column>
-                    <Column demandPopin="true">
+                    <!-- <Column demandPopin="true">
                         <Text
                             text="{i18n>branchName}"
                             tooltip="{i18n>branchName}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -138,7 +139,7 @@
                             tooltip="{i18n>address}"
                         />
                     </Column>
-                    <Column
+                    <!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -146,7 +147,7 @@
                             text="Landmark"
                             tooltip="Landmark"
                         />
-                    </Column>
+                    </Column> -->
 
                     <Column
                         demandPopin="true"
@@ -167,6 +168,15 @@
                         />
                     </Column>
                     <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="GSTIN"
+                            tooltip="GSTIN"
+                        />
+                    </Column>
+                    <!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -192,7 +202,7 @@
                             text="{i18n>city}"
                             tooltip="{i18n>city}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -208,7 +218,7 @@
                             tooltip="{i18n>logo}"
                         />
                     </Column>
-                      <Column demandPopin="true">
+                    <Column demandPopin="true">
                         <Text
                             text="{i18n>image}"
                             tooltip="{i18n>image}"
@@ -218,18 +228,34 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{mainModel>BranchID}" />
-                            <Text text="{mainModel>Name}" />
+                            <VBox>
+                                <Text
+                                    text="{mainModel>BranchID}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <Text text="{mainModel>Name}" />
+                            </VBox>
                             <ExpandableText
-                                text="{mainModel>Address}"
+                                text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
                                 maxCharacters="20"
                             />
-                            <Text text="{mainModel>LandMark}"/>
+                            <!-- <Text text="{mainModel>LandMark}" /> -->
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
-                            <Text text="{mainModel>Country}" />
+                            <VBox>
+                                <Text text="{mainModel>GSTIN}" />
+                                <Text
+                                    text="{mainModel>Type}"
+                                    visible="{= !!${mainModel>Type} }"
+                                />
+                                <Text
+                                    text="{= ${mainModel>Value} + '%'}"
+                                    visible="{= !!${mainModel>Value} }"
+                                />
+                            </VBox>
+                            <!-- <Text text="{mainModel>Country}" />
                             <Text text="{mainModel>State}" />
-                            <Text text="{mainModel>City}" />
+                            <Text text="{mainModel>City}" /> -->
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />

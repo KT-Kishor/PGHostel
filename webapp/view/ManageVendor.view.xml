@@ -103,6 +103,7 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
                             tooltip="{i18n>download}"
                             press="MS_onDownload"
                             class="myUnifiedBtn"

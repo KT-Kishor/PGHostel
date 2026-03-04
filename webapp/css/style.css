@@ -3834,11 +3834,14 @@ span.sapMBtnInner.sapMBtnEmphasized {
 }
 
 .todayCardsRow {
-  width: 100%;
   display: flex;
   gap: 16px;
-  padding: 8px 12px;
-  box-sizing: border-box;
+  width: 100%;
+}
+
+.dynamicCard {
+  flex: 1 1 300px;
+  min-width: 300px;
 }
 
 /* Base card style */

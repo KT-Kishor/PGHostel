@@ -176,6 +176,7 @@
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
                             press="onDownloadCoupons"
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"

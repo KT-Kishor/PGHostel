@@ -115,6 +115,7 @@
                         <ToolbarSpacer />
                         <Button
                             text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
                             class="myUnifiedBtn"
                             tooltip="{i18n>invoicedownload}"
                             press="CI_onPressDownload"
