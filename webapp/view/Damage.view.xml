@@ -69,11 +69,15 @@
 						<fb:control>
 							<ComboBox
                                 id="DM_id_Status"
-                                items="{RoomDetailsModel>/}"
                                 showClearIcon="true">
-								<core:ListItem
-                                    key="{RoomDetailsModel>Status}"
-                                    text="{RoomDetailsModel>Status}"/>
+                                <core:ListItem
+                                    key="Damage Raised"
+                                    text="Damage Raised"
+                                />
+								  <core:ListItem
+                                    key="Damage Claimed"
+                                    text="Damage Claimed"
+                                />
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

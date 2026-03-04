@@ -319,7 +319,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-        DamageOnsearch:function(){
+        DamageOnsearch: function () {
             this.Onsearch("false");
         },
 
@@ -464,11 +464,11 @@ sap.ui.define([
                     };
                 });
 
-              if (flag === "true") {
-    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
-} else if (!this._originalRoomdata) {
-    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
-}
+                if (flag === "true") {
+                    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
+                } else if (!this._originalRoomdata) {
+                    this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
+                }
 
                 // Set filtered data to table
                 this.getView().setModel(new JSONModel(mappedData), "Damage");
@@ -491,19 +491,17 @@ sap.ui.define([
             let uniqueValues = {
                 Dm_id_CustomerName: new Set(),
                 DM_id_RoomNo: new Set(),
-                DM_id_Status: new Set(),
 
             };
 
             data.forEach(item => {
                 uniqueValues.Dm_id_CustomerName.add(item.CustomerName);
                 uniqueValues.DM_id_RoomNo.add(item.RoomNo);
-                uniqueValues.DM_id_Status.add(item.Status);
 
             });
 
             let oView = this.getView();
-            ["Dm_id_CustomerName", "DM_id_RoomNo", "DM_id_Status"].forEach(field => {
+            ["Dm_id_CustomerName", "DM_id_RoomNo"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 oComboBox.destroyItems();
                 Array.from(uniqueValues[field]).sort().forEach(value => {
