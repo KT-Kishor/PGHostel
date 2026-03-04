@@ -62,12 +62,12 @@
                                                         text="PAN Card"
                                                     />
                                                     <core:ListItem
-                                                        key="Driving License"
-                                                        text="Driving License"
+                                                        key="Company Registration Certificate"
+                                                        text="Company Registration Certificate"
                                                     />
                                                     <core:ListItem
-                                                        key="Bank Account Proof"
-                                                        text="Bank Account Proof"
+                                                        key="Bank Account"
+                                                        text="Bank Account"
                                                     />
                                                     <core:ListItem
                                                         key="Other"

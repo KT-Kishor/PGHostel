@@ -149,7 +149,7 @@
                             icon="sap-icon://action"
                             tooltip="Share Coupon"
                             press="onShareCouponPress"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
 
                         <Button
@@ -157,28 +157,28 @@
                             tooltip="{i18n>MSadd}"
                             press="onAddCoupon"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                         <Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="onEditCoupon"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="onDeleteCoupon"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="onDownloadCoupons"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

@@ -918,8 +918,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                             &amp;&amp; ${visiablityPlay>/merge}
                         }"
@@ -935,8 +935,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                         }"
                         text="{i18n>submit}"
@@ -950,8 +950,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                         }"
                         text="{i18n>companyInvoiceSendEmail}"
@@ -966,8 +966,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                         }"
                         text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
@@ -981,8 +981,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                         }"
                         text="{i18n>sendInvoiceText}"
@@ -997,8 +997,8 @@
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'Super Admin'
-                                || ${LoginModel>/Role} === 'BranchManager'
-                                || ${LoginModel>/Role} === 'FrontOfficeEmployee'
+                                || ${LoginModel>/Role} === 'Branch Manager'
+                                || ${LoginModel>/Role} === 'Front Office Employee'
                             )
                         }"
                         text="{i18n>GeneratePDF}"

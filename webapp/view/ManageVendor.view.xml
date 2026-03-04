@@ -1,5 +1,4 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.ManageVendor"
+<mvc:View controllerName="sap.ui.com.project1.controller.ManageVendor"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:c="sap.ui.core"
@@ -7,8 +6,7 @@
     xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
-    busyIndicatorDelay="0"
->
+    busyIndicatorDelay="0">
     <Page showHeader="true">
         <headerContent>
             <core:Fragment
@@ -68,6 +66,25 @@
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        name="Status"
+                        label="{i18n>status}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="MV_id_Status"
+                                items="{mainModel>/}"
+                                showClearIcon="true"
+                            >
+                                <core:Item
+                                    key="{mainModel>Status}"
+                                    text="{mainModel>Status}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
@@ -76,7 +93,7 @@
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'mainModel>/', sorter: {path: 'Status',descending: false,group: true}}"
+                items="{path: 'mainModel>/'}"
             >
                 <headerToolbar>
                     <OverflowToolbar>

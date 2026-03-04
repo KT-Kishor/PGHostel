@@ -96,21 +96,21 @@
                             tooltip="{i18n>addFacility}"
                             press="FD_RoomDetails"
                             class="myUnifiedBtn"
-							visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+							visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                         <Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="HM_DeleteDetails"
                             class="myUnifiedBtn"
-							visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+							visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                         <Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
-							visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+							visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

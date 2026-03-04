@@ -648,7 +648,7 @@ sap.ui.define([
 
             const statusMap = {
                 "Approve": "Approved",
-                "Send Back": "Send back"
+                "Send Back": "Send Back"
             };
 
             if (!remark) {

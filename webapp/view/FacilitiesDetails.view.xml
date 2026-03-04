@@ -268,7 +268,7 @@
                 <m:contentRight>
                     <m:Button
                         id="FD_id_editButton"
-                        visible="{= !${editable>/Edit} &amp;&amp; ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"
+                        visible="{= !${editable>/Edit} &amp;&amp; ${LoginModel>/Role} !== 'Front Office Employee' }"
                         text="{i18n>MSedit}"
                         tooltip="{i18n>MSedit}"
                         class="myUnifiedBtn"

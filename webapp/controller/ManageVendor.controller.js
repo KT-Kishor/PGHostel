@@ -85,6 +85,9 @@ sap.ui.define([
             var sUserName = oView.byId("MV_id_UserName").getSelectedKey() ||
                 oView.byId("MV_id_UserName").getValue();
 
+            var sStatus = oView.byId("MV_id_Status").getSelectedKey() ||
+                oView.byId("MV_id_Status").getValue();
+
             // Build Filters for backend
             let filters = {};
 
@@ -101,9 +104,21 @@ sap.ui.define([
                 filters.UserName = sUserName;
             }
 
+            // Apply Status Filter
+            if (sStatus) {
+                filters.Status = sStatus;
+            }
+
             sap.ui.core.BusyIndicator.show(0);
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
+
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                const aStatusOrder = ["New", "Resubmitted", "Send Back", "Approved", "Active"];
+
+                response.forEach(item => {
+                    const index = aStatusOrder.indexOf(item.Status);
+                    item._StatusPriority = index === -1 ? 999 : index;
+                });
 
                 if (!this._originalStaffData || flag === "true") {
                     this._originalStaffData = response;
@@ -116,9 +131,12 @@ sap.ui.define([
                     finalData = response;
                 }
 
-                const model = new sap.ui.model.json.JSONModel(finalData);
+                const model = new sap.ui.model.json.JSONModel(response);
+                var oTable = this.byId("MV_id_ManageVendor");
+                oTable.attachEventOnce("updateFinished", function () {
+                    this._applyStatusGrouping();
+                }.bind(this));
                 this.getView().setModel(model, "mainModel");
-
                 this._populateUniqueFilterValues(this._originalStaffData);
             }).catch((err) => {
                 sap.ui.core.BusyIndicator.hide();
@@ -128,20 +146,38 @@ sap.ui.define([
             });
         },
 
+        _applyStatusGrouping: function () {
+            var oTable = this.byId("MV_id_ManageVendor");
+            var oBinding = oTable.getBinding("items");
+
+            if (!oBinding) return;
+
+            var oSorter = new sap.ui.model.Sorter("_StatusPriority", false, function (oContext) {
+                return {
+                    key: oContext.getProperty("Status"),
+                    text: oContext.getProperty("Status")
+                };
+            });
+
+            oBinding.sort(oSorter);
+        },
+
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 MV_id_UserID: new Set(),
-                MV_id_UserName: new Set()
+                MV_id_UserName: new Set(),
+                MV_id_Status : new Set()
             };
 
             data.forEach(item => {
                 if (item.UserID) uniqueValues.MV_id_UserID.add(item.UserID);
                 if (item.UserName) uniqueValues.MV_id_UserName.add(item.UserName);
+                if (item.Status) uniqueValues.MV_id_Status.add(item.Status);
             });
 
             let oView = this.getView();
 
-            ["MV_id_UserID", "MV_id_UserName"].forEach(field => {
+            ["MV_id_UserID", "MV_id_UserName", "MV_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -159,6 +195,7 @@ sap.ui.define([
         FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");
             this.getView().byId("MV_id_UserName").setSelectedKey("")
+            this.getView().byId("MV_id_Status").setSelectedKey("")
         },
 
         onNavBack: function () {

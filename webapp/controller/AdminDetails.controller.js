@@ -280,7 +280,7 @@ sap.ui.define([
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
                 oUIModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-            } else if(sRole === "Admin" || sRole === "BranchManager" || sRole === "FrontOfficeEmployee"){
+            } else if(sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee"){
                 this.getOwnerComponent().getRouter().navTo("RouteAdmin");
             }else{
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");

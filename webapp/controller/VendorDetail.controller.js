@@ -97,7 +97,7 @@ sap.ui.define([
                 // ✅ Must exist AND must be in Send Back status
                 return (
                     oResp?.data?.length === 1 &&
-                    oResp.data[0].Status === "Send back"
+                    oResp.data[0].Status === "Send Back"
                 );
             } catch (err) {
                 return false;
@@ -379,7 +379,7 @@ sap.ui.define([
                         State: oData.State,
                         City: oData.City,
                         DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
-                        Status: "Submitted"
+                        Status: "Resubmitted"
                     },
                     filters: {
                         UserID: oData.UserID

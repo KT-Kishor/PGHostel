@@ -99,7 +99,7 @@
                             tooltip="{i18n>ReturnDamage}"
                             press="HM_ReturnDamage"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
 							<Button
                             text="Create Damage"
                             tooltip="Create Damage"
@@ -111,7 +111,7 @@
                             tooltip="{i18n>download}"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'FrontOfficeEmployee' }"/>
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
