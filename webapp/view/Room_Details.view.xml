@@ -114,6 +114,7 @@
                             tooltip="{i18n>download}"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
+                            icon="sap-icon://excel-attachment"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
                     </OverflowToolbar>

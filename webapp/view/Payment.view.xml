@@ -115,7 +115,7 @@
 					<OverflowToolbar>
 						<Title text="{i18n>invoicePaymentTitle} ({= ${mainModel>/}.length})"/>
 						<ToolbarSpacer />
-						<Button text="{i18n>download}" tooltip="{i18n>download}" press="P_onDownload" class="myUnifiedBtn"/>
+						<Button text="{i18n>download}" tooltip="{i18n>download}" press="P_onDownload" class="myUnifiedBtn" icon="sap-icon://excel-attachment"/>
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
