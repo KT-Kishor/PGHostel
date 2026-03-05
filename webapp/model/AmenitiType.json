@@ -1,23 +1,21 @@
 [
-    {
-        "ID": 1,
-        "AmenitiName": "Wi-Fi"
-    },
-    {
-        "ID": 2,
-        "AmenitiName": "Bathrooms"
-    },
-    {
-        "ID": 3,
-        "AmenitiName": "Personal lockers"
-    },
-    {
-        "ID": 4,
-        "AmenitiName": "Communal spaces"
-    },
-    {
-        "ID": 5,
-        "AmenitiName": "Lounge areas"
-    }
-    
+  { "ID": 1, "AmenitiName": "Wi-Fi" },
+  { "ID": 2, "AmenitiName": "CCTV Surveillance" },
+  { "ID": 3, "AmenitiName": "Drinking Water" },
+  { "ID": 4, "AmenitiName": "Geyser" },
+  { "ID": 5, "AmenitiName": "Ceiling Fan" },
+  { "ID": 6, "AmenitiName": "Washing Machine" },
+  { "ID": 7, "AmenitiName": "Wardrobe" },
+  { "ID": 8, "AmenitiName": "Study Table" },
+  { "ID": 9, "AmenitiName": "Refrigerator" },
+  { "ID": 10, "AmenitiName": "Attached Bathroom" },
+  { "ID": 11, "AmenitiName": "Parking" },
+  { "ID": 12, "AmenitiName": "Lift" },
+  { "ID": 13, "AmenitiName": "Washing Machine" },
+  { "ID": 14, "AmenitiName": "Room Cleaning" },
+  { "ID": 15, "AmenitiName": "Mess Facility" },
+  { "ID": 17, "AmenitiName": "Kitchen Access" },
+  { "ID": 18, "AmenitiName": "Personal Lockers" },
+  { "ID": 19, "AmenitiName": "Communal Spaces" },
+  { "ID": 20, "AmenitiName": "Lounge Areas" }
 ]
