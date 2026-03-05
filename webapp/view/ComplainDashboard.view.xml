@@ -33,7 +33,22 @@
 								<DateRangeSelection id="CD_complain_Date" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onFilterChange" />
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Year" label="Assigned Staff" groupName="Group1" visibleInFilterBar="true">
+
+						<fb:FilterGroupItem name="Complainpermonth"
+    label="Daily Complain date"
+    groupName="Group1"
+    visibleInFilterBar="true">
+
+    <fb:control>
+        <DatePicker
+            id="CD_complain_Permonth"
+            valueFormat="MM/yyyy"
+            displayFormat="MM/yyyy"
+            change="onMonthChange"/>
+    </fb:control>
+
+</fb:FilterGroupItem>
+						<fb:FilterGroupItem name="Staff" label="Assigned Staff" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
 							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="Select Assigned Staff"  items="{path: 'AssignedStaffModel>/'}">
 									<items>
@@ -108,7 +123,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Monthly Complain Trend" level="H5"
+									<Title text="Current Month Complain Trend" level="H5"
 									
                                   wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
