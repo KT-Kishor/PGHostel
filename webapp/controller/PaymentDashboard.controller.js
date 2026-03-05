@@ -136,7 +136,7 @@ sap.ui.define([
 
         readInvoiceData: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 // Prepare filters based on role
                 let invoiceFilters = {};
@@ -205,7 +205,7 @@ sap.ui.define([
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -244,7 +244,7 @@ sap.ui.define([
 
         onFilterChange: function () {
             if (!this.rawInvoiceData) return;
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             setTimeout(() => {
                 try {
@@ -352,7 +352,7 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             }, 100);
         },

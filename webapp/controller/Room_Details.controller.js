@@ -36,13 +36,13 @@ sap.ui.define([
             });
             this.getView().setModel(model, "RoomModel")
             this.onClearAndSearch("RD_id_FilterbarEmployee");
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this.BedTypedetails()
             await this._loadBranchCode()
             await this.Onsearch()
             this.Customerdata()
 
-            //  sap.ui.core.BusyIndicator.hide();
+            //  this.closeBusyDialog()
 
         },
         Customerdata: function () {
@@ -72,7 +72,7 @@ sap.ui.define([
                 const oModel = new sap.ui.model.json.JSONModel(response.Customers);
                 this.getView().setModel(oModel, "HostelModel");
 
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }).catch(() => sap.ui.core.BusyIndicator.hide());
         },
         _loadBranchCode: async function () {
@@ -664,7 +664,7 @@ sap.ui.define([
                 }
 
                 delete Payload._isEditing;
-              sap.ui.core.BusyIndicator.show(0);
+              this.getBusyDialog()
 
                 $.ajax({
                     url: sUrl,
@@ -766,7 +766,7 @@ sap.ui.define([
                     ],
                     onClose: async function (sAction) {
                         if (sAction === sap.m.MessageBox.Action.OK) {
-                            sap.ui.core.BusyIndicator.show(0);
+                            this.getBusyDialog()
                             try {
                                 const deletePromises = aDeletableRooms.map(roomObj => {
                                     var data = roomObj.item
@@ -804,7 +804,7 @@ sap.ui.define([
                                     this.i18nModel.getText("errorwhileDeletingRoomPleasetryagain")
                                 );
                             } finally {
-                                // sap.ui.core.BusyIndicator.hide();
+                                // this.closeBusyDialog()
                                 table.removeSelections(true);
                             }
                         }
@@ -855,7 +855,7 @@ sap.ui.define([
                 filters.BedTypeName = sbedtype
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
 
                 const roomData = Array.isArray(oData.commentData) ? oData.commentData : [];
@@ -877,7 +877,7 @@ sap.ui.define([
                 var model = new JSONModel(mappedData);
                 this.getView().setModel(model, "RoomDetailsModel");
                 this._populateUniqueFilterValues(this._originalRoomdata);
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             })
         },
 

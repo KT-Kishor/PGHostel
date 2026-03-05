@@ -16,7 +16,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManagePaymentHistory");
                 if (!LoginFUnction) return;
@@ -36,7 +36,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -59,7 +59,7 @@ sap.ui.define([
             } else {
                 filters.BranchID = aBranchCodes;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -68,7 +68,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -161,7 +161,7 @@ sap.ui.define([
                     filters.GetAll = true;
                 }
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_Payment", filters).then((oResponse) => {
                 const aDatas = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
                 const branchData = this.getView().getModel("BranchModel")?.getData() || [];
@@ -190,7 +190,7 @@ sap.ui.define([
                     MessageToast.show(err.message || err.responseText);
                 })
                 .finally(() => {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 });
         },
 

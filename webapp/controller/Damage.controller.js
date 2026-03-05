@@ -14,7 +14,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("DamageDashboard");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -71,20 +71,20 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
 
         readCustomerData: function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             var filter = {
                 BranchCode: this.BranchCode
@@ -288,7 +288,7 @@ sap.ui.define([
 
             delete Payload.CustomerIDEditable;
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 // ================= UPDATE =================
                 if (Payload.DamageID) {
@@ -318,7 +318,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.responseText || "Failed to save damage.");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
         DamageOnsearch: function () {
@@ -381,7 +381,7 @@ sap.ui.define([
                     }
 
                     try {
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         const aDeletePromises = aSelectedItems.map(item => {
                             var oData = item.getBindingContext("Damage").getObject();
 
@@ -402,7 +402,7 @@ sap.ui.define([
                         console.error(err);
                         MessageToast.show(err.message || err.responseText || "Delete failed");
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                        that.closeBusyDialog()
                         oTable.removeSelections(true);
                     }
                 }
@@ -452,7 +452,7 @@ sap.ui.define([
             }
 
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_Damage", filters).then((oData) => {
                 const roomData = Array.isArray(oData.data) ? oData.data : [];
                 const branchData = this.getView().getModel("BranchModel")?.getData() || [];
@@ -478,7 +478,7 @@ sap.ui.define([
                 // Always pass full original data for filter values
                 this._populateUniqueFilterValues(this._originalRoomdata);
 
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             });
         },
         DM_onPressEditDetails: function (oEvent) {
@@ -708,7 +708,7 @@ sap.ui.define([
             //     return;
             // }
 
-            sap.ui.core.BusyIndicator.show();
+            this.getBusyDialog()
 
             try {
                 const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
@@ -747,7 +747,7 @@ sap.ui.define([
             } catch (e) {
                 MessageToast.show(e.message);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -814,7 +814,7 @@ sap.ui.define([
 
         HM_onPressGenerateDamageReceipt: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const { jsPDF } = window.jspdf;
 
                 // ===== Get Selected Row Data =====
@@ -1011,7 +1011,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

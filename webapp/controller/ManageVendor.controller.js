@@ -21,10 +21,10 @@ sap.ui.define([
                 await this._loadBranchCode();
                 await this.Onsearch("true");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -64,14 +64,14 @@ sap.ui.define([
                 };
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
@@ -110,7 +110,7 @@ sap.ui.define([
                 filters.Status = sStatus;
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
 
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -140,10 +140,10 @@ sap.ui.define([
                 this.getView().setModel(model, "mainModel");
                 this._populateUniqueFilterValues(this._originalStaffData);
             }).catch((err) => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             });
         },
 

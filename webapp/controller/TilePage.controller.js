@@ -15,7 +15,7 @@ sap.ui.define([
 
         AppVisibilityReadCall: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 this.commonLoginFunction();
                 const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 let filter = { Role: oLoginModel.getProperty("/Role") }
@@ -23,10 +23,10 @@ sap.ui.define([
                 var oModel = new JSONModel(oData.data[0]);
                 this.getOwnerComponent().setModel(oModel, "TileVisibility");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

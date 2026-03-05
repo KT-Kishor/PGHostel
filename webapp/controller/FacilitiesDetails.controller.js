@@ -37,12 +37,12 @@ sap.ui.define([
                 });
                 this.getView().setModel(oFacilityModel, "FacilitiesModel");
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 this.BedID = oEvent.getParameter("arguments").sPath;
                 await this._loadBranchCode()
                 await this.Onsearch()
                 await this._refreshFacilityDetails(this.BedID);
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
             } finally {}
@@ -70,7 +70,7 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 this.commonLoginFunction();
 
@@ -86,7 +86,7 @@ sap.ui.define([
                 oView.setModel(oBranchModel, "BranchModel");
 
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             }
         },
@@ -243,7 +243,7 @@ sap.ui.define([
         },
 
         Onsearch: function() {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_ExtraFacilities", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new JSONModel(oFCIAerData);
@@ -359,7 +359,7 @@ sap.ui.define([
                     }
 
                     // Send AJAX update
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     await this.ajaxUpdateWithJQuery("HM_ExtraFacilities", {
                         data: oData,
                         filters: {
@@ -373,7 +373,7 @@ sap.ui.define([
                 } catch (err) {
                     MessageToast.show(err.message || err.responseText);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             }
         },
@@ -409,11 +409,11 @@ sap.ui.define([
                     DisplayImages: aDisplayImages,
                     CanAddMore: bCanAddMore
                 }), "DisplayImagesModel");
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

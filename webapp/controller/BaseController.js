@@ -737,7 +737,7 @@ sap.ui.define([
         const TileModel = this.getView().getModel("TileVisibility");
 
         const fail = () => {
-          sap.ui.core.BusyIndicator.hide();
+          this.closeBusyDialog()
           this.getOwnerComponent().getRouter().navTo("RouteHostel");
           resolve(false);
         };

@@ -50,10 +50,10 @@ sap.ui.define([
                 await this.Onsearch()
                 this.Customerdata()
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
         Customerdata:function(){
@@ -81,7 +81,7 @@ sap.ui.define([
                         const oModel = new sap.ui.model.json.JSONModel(response.Customers);
                         this.getView().setModel(oModel, "HostelModel");
 
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                     }).catch(() => sap.ui.core.BusyIndicator.hide());
         },
 
@@ -107,7 +107,7 @@ sap.ui.define([
             } else{
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oView = this.getView();
 
@@ -121,7 +121,7 @@ sap.ui.define([
                 oView.setModel(oBranchModel, "BranchModel");
 
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
@@ -276,7 +276,7 @@ sap.ui.define([
                 oData.Attachment.BranchCode = Payload.BranchCode
 
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     await this.ajaxCreateWithJQuery("HM_BedType", {
                         data: oData
                     });
@@ -294,7 +294,7 @@ sap.ui.define([
                         this.ARD_Dialog = null;
                     }
                 } catch (err) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     sap.m.MessageToast.show(err.message || err.responseText);
                 }
             } else {
@@ -477,7 +477,7 @@ sap.ui.define([
             if (sCustomerName) filters.Name = sCustomerName;
             if (sCustomerID) filters.ACType = sCustomerID;
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             return this.ajaxReadWithJQuery("HM_BedType", filters)
                 .then((oData) => {
@@ -527,7 +527,7 @@ sap.ui.define([
                     sap.m.MessageBox.error(this.i18nModel.getText("failedtoLoadBedDetails"));
                 })
                 .finally(() => {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 });
         },
 
@@ -681,7 +681,7 @@ sap.ui.define([
             ],
             onClose: async function (sAction) {
                 if (sAction === sap.m.MessageBox.Action.OK) {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     try {
                         const deletePromises = aDeletableBeds.map(bedObj => {
                             const data = bedObj.item
@@ -714,7 +714,7 @@ sap.ui.define([
                             this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain")
                         );
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         table.removeSelections(true);
                     }
                 }

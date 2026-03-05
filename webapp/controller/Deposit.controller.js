@@ -123,7 +123,7 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -159,7 +159,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error while loading branch data:", err);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -195,7 +195,7 @@ sap.ui.define([
 
         onDepositSearch: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 const oFilterBar = this.byId("depositFilterBar");
                 const aItems = oFilterBar.getFilterGroupItems();
@@ -446,7 +446,7 @@ sap.ui.define([
                     "Failed to load deposit data."
                 );
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 this._isDateRangeCleared = false;
             }
         },
@@ -752,7 +752,7 @@ sap.ui.define([
                 }
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 // Always set status to Returned if any amount is being returned
                 const newStatus = "Returned";
@@ -804,7 +804,7 @@ sap.ui.define([
                     err?.responseJSON?.message || err.message || "Failed to process deposit return."
                 );
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

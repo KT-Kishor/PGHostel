@@ -85,14 +85,14 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
@@ -149,7 +149,7 @@ sap.ui.define([
 
         Cust_read: function (flag) {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
@@ -263,10 +263,10 @@ sap.ui.define([
                     this.getView().setModel(oModel, "HostelModel");
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }).catch(() => sap.ui.core.BusyIndicator.hide());
             } catch (e) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -791,7 +791,7 @@ sap.ui.define([
             /* ================= API CALL ================= */
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
 
 
@@ -847,7 +847,7 @@ sap.ui.define([
                 } else if (oError.statusText) {
                     sErrorMsg = oError.statusText;
                 }
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
 
                 sap.m.MessageBox.error(sErrorMsg);
                 sap.m.MessageBox.error(sErrorMsg, {

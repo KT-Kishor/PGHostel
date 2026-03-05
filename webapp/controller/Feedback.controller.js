@@ -35,7 +35,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function(oEvent) {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             try {
                 const encodedBookingID = oEvent.getParameter("arguments")?.bookingId;
@@ -79,7 +79,7 @@ sap.ui.define([
             } catch (e) {
                 this._goToNotFound();
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -257,7 +257,7 @@ sap.ui.define([
                     }
                 };
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 await this.ajaxCreateWithJQuery("HM_Feedback", payload);
 
                 MessageBox.success("Thank you for your feedback!", {
@@ -270,7 +270,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err?.message || "Failed to submit feedback");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

@@ -57,7 +57,7 @@ sap.ui.define([
             }.bind(this));
                 await this.refershModel(this.BedID)
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {}
         },
@@ -84,7 +84,7 @@ sap.ui.define([
             } else{
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
 
                 const oView = this.getView();
@@ -99,13 +99,13 @@ sap.ui.define([
                 oView.setModel(oBranchModel, "BranchModel");
 
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
 
         Onsearch: function() {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_BedType", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(oFCIAerData);
@@ -117,7 +117,7 @@ sap.ui.define([
         },
 
         refershModel: async function (sBedID) {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BedType", {
                     ID: sBedID
@@ -170,7 +170,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -293,7 +293,7 @@ sap.ui.define([
                     });
                 };
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 // Wait for all image conversions
                 const convertedImages = await Promise.all(DisplayImagesModel.DisplayImages.map(toBase64));
 
@@ -335,7 +335,7 @@ sap.ui.define([
                     ...oData
                 };
                 delete payloadWithoutID.ID;
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 if (Payload.ID) {
                     await this.ajaxUpdateWithJQuery("HM_BedType", {
                         data: payloadWithoutID,
@@ -352,7 +352,7 @@ sap.ui.define([
                     });
                 }
                 await this.Onsearch();
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(this.i18nModel.getText("bedsavedsuccessfully"));
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));

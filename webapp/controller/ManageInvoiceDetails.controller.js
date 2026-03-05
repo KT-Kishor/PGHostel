@@ -16,7 +16,7 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function(oEvent) {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
@@ -198,7 +198,7 @@ sap.ui.define([
                     oCustomerCombo.setEditable(true);
                         await this.onSearch(); 
                     }
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     return;
                 }
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -213,7 +213,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/merge", true);
                 this.visiablityPlay.setProperty("/MultiEmail", true);
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 try {
                     const oData = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                         InvNo: this.decodedPath
@@ -320,13 +320,13 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
             onSearch: function() {
                 return new Promise((resolve, reject) => {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
 
                     var filter = {
                         BranchCode: this.BranchCode
@@ -350,7 +350,7 @@ sap.ui.define([
                             resolve(); // ✅ VERY IMPORTANT
                         }).catch((err) => {
                             MessageToast.show(err.responseText || "Failed to Load Customer Data.");
-                            sap.ui.core.BusyIndicator.hide();
+                            this.closeBusyDialog()
                         })
                 });
             },
@@ -373,7 +373,6 @@ sap.ui.define([
 
             onChangeAddCustomer: async function(oEvent) {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
                     utils._LCvalidateMandatoryField(oEvent);
 
                     this.SelectKey = oEvent.getSource().getSelectedKey();
@@ -382,8 +381,6 @@ sap.ui.define([
                     // Filter selected customer record
                     const SelectedData = allData.find(item => item.CustomerID === this.SelectKey);
                     if (!SelectedData) return;
-
-                    sap.ui.core.BusyIndicator.show(0);
 
                     // Filter booking list for selected customer
                     const bookingList = allData.filter(item => item.CustomerID === this.SelectKey).map(i => ({
@@ -402,7 +399,7 @@ sap.ui.define([
                 } catch (err) {
                     MessageToast.show(err.message);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
@@ -413,7 +410,7 @@ sap.ui.define([
 
                     if (!bookingID && !customerID) return;
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
 
                     const oData = await this.ajaxCreateWithJQuery("HM_getAllInvoiceData", {
                         data: {
@@ -608,7 +605,7 @@ sap.ui.define([
                 } catch (err) {
                     MessageToast.show(err.message);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
@@ -1099,14 +1096,14 @@ sap.ui.define([
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     MessageToast.show(this.i18nModel.getText("companyTableValidation"));
                     return false;
                 }
                 for (let i = 0; i < aItemsRaw.length; i++) {
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
                         return false;
                     }
@@ -1177,10 +1174,10 @@ sap.ui.define([
                     if (!bIsValid) {
                         return MessageToast.show(that.i18nModel.getText("mandatoryFieldsError"));
                     }
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     const oPayload = await this.SubmitPayload("Create");
                     if (oPayload === false) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         return;
                     }
                     try {
@@ -1367,11 +1364,11 @@ sap.ui.define([
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     }
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     const oPayload = await this.SubmitPayload("update");
 
                     if (oPayload === false) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         return;
                     } else {
                         var Status = oPayload.payload.Status;
@@ -1394,13 +1391,13 @@ sap.ui.define([
                             this.visiablityPlay.setProperty("/Edit", false);
                         }
                         MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         MessageToast.show(error.responseText || this.i18nModel.getText("invoiceUpdateMessFailed"));
                     }
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     MessageToast.show(this.i18nModel.getText("technicalError"));
                 }
             },
@@ -1613,7 +1610,7 @@ sap.ui.define([
                     return;
                 }
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const jsonData = {
                     InvNo: String(paymentModel.InvNo),
                     TransactionId: String(paymentModel.TransactionId),
@@ -1664,7 +1661,7 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
@@ -1974,21 +1971,21 @@ sap.ui.define([
                         "CCEmailId": oModel.CCEmail,
                         "attachments": oModel.attachments
                     };
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     this.ajaxCreateWithJQuery("CompanyInvoiceEmail", oPayload).then((oData) => {
                         MessageToast.show(this.i18nModel.getText("emailSuccess"));
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         SelectedModel.setProperty("/Status", "Invoice Sent");
                         SelectedModel.refresh(true);
                         this.loginModel.setProperty("/RichText", false);
                         this.loginModel.setProperty("/SimpleForm", true);
                     }).catch((error) => {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         MessageToast.show(error.responseText);
                     });
                     this.Mail_onPressClose();
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     MessageToast.show(error.responseText);
                 }
             },
@@ -2011,7 +2008,7 @@ sap.ui.define([
 
             CID_onPressGeneratePdf: async function() {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
@@ -2425,10 +2422,10 @@ sap.ui.define([
 
                     doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
                 } catch (error) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     MessageToast.show(error.message || error.responseText);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
@@ -2490,7 +2487,7 @@ sap.ui.define([
 
             CID_onPressGenerateSelectedPDF: async function() {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
 
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
@@ -2844,13 +2841,13 @@ sap.ui.define([
                 } catch (e) {
                     MessageToast.show(e.message || "PDF generation failed");
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
             CID_onPressGenerateSummaryPDF: async function() {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
@@ -3232,7 +3229,7 @@ sap.ui.define([
                 } catch (e) {
                     MessageToast.show(e.message || "Error generating summary invoice");
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 
@@ -3289,7 +3286,7 @@ sap.ui.define([
                         return;
                     }
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const jsonData = {
                     InvNo: String(RefundModel.InvNo),
                     BankTransactionID: String(RefundModel.TransactionId),
@@ -3346,7 +3343,7 @@ sap.ui.define([
                 } catch (error) {
                     MessageToast.show(error.responseText);
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             },
 

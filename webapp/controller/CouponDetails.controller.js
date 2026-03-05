@@ -106,7 +106,7 @@ sap.ui.define([
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const oFilterBar = this.byId("couponFilterBar");
                 const aItems = oFilterBar.getFilterGroupItems();
                 const oRange = this.byId("fEndRange");
@@ -227,7 +227,7 @@ sap.ui.define([
                     "Failed to filter coupons."
                 );
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -253,7 +253,7 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -411,7 +411,7 @@ sap.ui.define([
                             return;
                         }
 
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         try {
                             for (let oItem of aSelectedItems) {
                                 const oCtx = oItem.getBindingContext("CouponModel");
@@ -431,7 +431,7 @@ sap.ui.define([
                             console.error("Delete failed:", err);
                             MessageBox.error(this.i18nModel.getText("errorwhiledeletingcoupons"));
                         } finally {
-                            sap.ui.core.BusyIndicator.hide();
+                            this.closeBusyDialog()
                         }
                     }.bind(this)
                 }
@@ -578,7 +578,7 @@ sap.ui.define([
             if (bBusy) {
                 sap.ui.core.BusyIndicator.show(0, { domRef: oDom });
             } else {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
         _validateDiscountValueLogic: function () {
@@ -680,7 +680,7 @@ sap.ui.define([
             if (sMode === "Add") {
                 oCoupon.Status = "Active";
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 if (sMode === "Add") {
                     oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -730,7 +730,7 @@ sap.ui.define([
                     err?.responseJSON?.message || "Failed to save coupon."
                 );
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -1039,7 +1039,7 @@ sap.ui.define([
 
         async _loadRecipientContacts() {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const sRole = this._oLoggedInUser?.Role || "";
 
                 // Decide filter STRICTLY by role
@@ -1085,7 +1085,7 @@ sap.ui.define([
                 return [];
 
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -1198,14 +1198,14 @@ sap.ui.define([
             });
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 await this.ajaxCreateWithJQuery("CouponCodeEmail", { users: aUsers });
                 MessageToast.show(this.i18nModel.getText("couponsent"));
                 this._oShareDialog.close();
             } catch (err) {
                 sap.m.MessageBox.error(err?.responseJSON?.message || "Failed to send coupon.");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

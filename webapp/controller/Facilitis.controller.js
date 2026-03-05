@@ -49,10 +49,10 @@ sap.ui.define([
                     await this.FC_onSearch(); // Filter function for trainee
                 }
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -81,7 +81,7 @@ sap.ui.define([
             await this.readCallForFacilities(params).catch((error) => {
                 MessageToast.show(error.message || error.responseText);
             }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             });
         },
 
@@ -115,7 +115,7 @@ sap.ui.define([
                 filter.BranchCode = oExistingModel.BranchCode;
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", filter);
                 let responseData = [];
@@ -157,7 +157,7 @@ sap.ui.define([
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -186,14 +186,14 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             }
         },
@@ -343,7 +343,7 @@ sap.ui.define([
                 oData.Attachment[`Photo${i}Type`] = "";
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {
                     data: oData
@@ -358,10 +358,10 @@ sap.ui.define([
                 }
                 return this.readCallForFacilities("Initial");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -554,7 +554,7 @@ sap.ui.define([
                 onClose: async function (sAction) {
                     if (sAction === sap.m.MessageBox.Action.YES) {
                         try {
-                            sap.ui.core.BusyIndicator.show(0);
+                            that.getBusyDialog()
                             const aDeletePromises = aSelectedItems.map(async (item) => {
                                 var oData = item.getBindingContext("Facilities").getObject();
                                 await that.ajaxDeleteWithJQuery("HM_ExtraFacilities", {
@@ -568,10 +568,10 @@ sap.ui.define([
                             MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
                             return that.readCallForFacilities("Initial");
                         } catch (err) {
-                            sap.ui.core.BusyIndicator.hide();
+                            that.closeBusyDialog()
                             MessageToast.show(err.message || err.responseText);
                         } finally {
-                            sap.ui.core.BusyIndicator.hide();
+                            that.closeBusyDialog()
                             oTable.removeSelections(true);
                         }
                     } else {
@@ -626,7 +626,7 @@ sap.ui.define([
             // No data validation
             if (!oModel || oModel.length === 0) return MessageToast.show(this.i18nModel.getText("MSnodata"));
             // Show busy indicator during download
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             // Adjust data (price + currency)
             const adjustedData = oModel.map(function (item) {
                 return {
@@ -658,7 +658,7 @@ sap.ui.define([
                     this.i18nModel.getText("MSdownloadfailed") || "Download failed"
                 );
             }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 oSheet.destroy();
             });
         }

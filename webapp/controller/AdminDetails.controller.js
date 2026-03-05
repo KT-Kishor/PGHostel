@@ -71,7 +71,7 @@ sap.ui.define([
             var sPath = oEvent.getParameter("arguments").sPath;
             this.decodedPath = atob(decodeURIComponent(sPath));
             this.valuestate()
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             await this.OnRoom();
 
@@ -185,7 +185,7 @@ sap.ui.define([
             };
 
             // Send payload
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
@@ -305,7 +305,7 @@ sap.ui.define([
 
         AD_onSearch: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const filter = {
                     CustomerID: this.decodedPath
                 };
@@ -550,7 +550,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -761,7 +761,7 @@ sap.ui.define([
             } else {
                 // Save (update)
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
 
                     // Construct payload for update
                     const oPayload = {
@@ -792,7 +792,7 @@ sap.ui.define([
                 } catch (err) {
                     sap.m.MessageBox.error("Failed to Update Data: " + (err.message || err.responseText));
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             }
         },
@@ -1322,9 +1322,9 @@ sap.ui.define([
             this.applyCountryStateCityFilters()
             const oMobile = this.byId("CD_ID_idPhone");
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             const response = await this.ajaxReadWithJQuery("HM_Customer", "");
-            sap.ui.core.BusyIndicator.hide();
+            this.closeBusyDialog()
             const oCustomer = response?.Customers || response?.value?.[0] || {};
 
             this.getView().getModel("VisibleModel").setProperty("/visible", true)
@@ -2806,7 +2806,7 @@ sap.ui.define([
                 return;
             }
             // Send payload
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
@@ -2830,7 +2830,7 @@ sap.ui.define([
         oneditsavebooking: function (Payload) {
             var CustomerData = this.getView().getModel("CustomerData").getData();
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
@@ -2920,7 +2920,7 @@ sap.ui.define([
                             FacilityItems: facilityData
                         }];
 
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         const custid = oData.BookingID; // FIXED
 
                         await that.ajaxUpdateWithJQuery("HM_Customer", {
@@ -2940,7 +2940,7 @@ sap.ui.define([
                         that.byId("idcancel")?.setVisible(false);
 
                     } catch (err) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show(err.message || err.responseText);
                     } finally {
                     }
@@ -3235,14 +3235,14 @@ sap.ui.define([
                 CouponCode: sEnteredCode,
                 Status: "Active"
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this.ajaxReadWithJQuery("HM_Coupon", filter).then((oData) => {
                 var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(aCoupon);
                 this.getView().setModel(model, "CouponModel")
 
             });
-            sap.ui.core.BusyIndicator.hide();
+            this.closeBusyDialog()
             var oCouponData = this.getView().getModel("CouponModel").getData();
 
             // user entered code
@@ -3347,14 +3347,14 @@ sap.ui.define([
                 CouponCode: sEnteredCode,
                 Status: "Active"
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this.ajaxReadWithJQuery("HM_CouponFacilityCount", filter).then((oData) => {
                 var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
                 var model = new sap.ui.model.json.JSONModel(aCoupon);
                 this.getView().setModel(model, "CouponModel")
 
             });
-            sap.ui.core.BusyIndicator.hide();
+            this.closeBusyDialog()
             var oCouponData = this.getView().getModel("CouponModel").getData();
 
 
@@ -3697,7 +3697,7 @@ sap.ui.define([
                     "CustomerGSTIN": oInput ? oInput.trim().toUpperCase() : CustData.GSTNumber || ""
                 }
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 this.ajaxUpdateWithJQuery("HM_Booking", {
                     data: Payload,
                     filters: {

@@ -16,7 +16,7 @@ sap.ui.define([
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             this._resetFiltersOnEntry();
             this._setDefaultDateRange();
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews();
@@ -92,15 +92,15 @@ sap.ui.define([
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
             oBox.removeAllItems();
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
                 const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 that._aAllFeedbacks = aFeedbacks;
                 that._applyFilters();
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog()
             }).catch(function () {
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog()
                 MessageToast.show("Failed to load customer reviews");
             });
         },

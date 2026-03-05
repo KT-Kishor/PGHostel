@@ -223,7 +223,7 @@ sap.ui.define([
                             FacilityItems: facilityData
                         }];
 
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         var custid = bookingData[0].Customerid; -
                             await that.ajaxUpdateWithJQuery("HM_Customer", {
                                 data: personData,
@@ -249,10 +249,10 @@ sap.ui.define([
                         }
 
                     } catch (err) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show(err.message || err.responseText);
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                     }
                 },
             }

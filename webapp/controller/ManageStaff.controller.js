@@ -33,10 +33,10 @@ sap.ui.define([
                 await this.Onsearch("true");
                 this._makeDatePickersReadOnly(["MS_id_signUpDOB"]);
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -86,14 +86,14 @@ sap.ui.define([
                 filters.BranchID = aBranchCodes;
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
@@ -264,7 +264,7 @@ sap.ui.define([
 
             const isUpdate = !!data.UserID;
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 if (isUpdate) {
                     await this.ajaxUpdateWithJQuery("HM_Login", {
@@ -287,10 +287,10 @@ sap.ui.define([
                 this.FD_onCancelButtonPress();
                 await this.Onsearch("true");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -342,7 +342,7 @@ sap.ui.define([
                 filters.UserName = sUserName;
             }
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
@@ -362,10 +362,10 @@ sap.ui.define([
 
                 this._populateUniqueFilterValues(this._originalStaffData);
             }).catch((err) => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             });
         },
 
@@ -420,7 +420,7 @@ sap.ui.define([
                     onClose: async function(sAction) {
                         if (sAction === MessageBox.Action.YES) {
                             try {
-                                sap.ui.core.BusyIndicator.show(0);
+                                that.getBusyDialog()
 
                                 await that.ajaxDeleteWithJQuery("HM_Login", {
                                     filters: {
@@ -433,7 +433,7 @@ sap.ui.define([
                             } catch (err) {
                                 sap.m.MessageToast.show(err.message || err.responseText);
                             } finally {
-                                sap.ui.core.BusyIndicator.hide();
+                                that.closeBusyDialog()
                                 oTable.removeSelections(true);
                             }
                         } else {

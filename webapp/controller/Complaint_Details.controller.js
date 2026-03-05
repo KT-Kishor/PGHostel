@@ -68,7 +68,7 @@ sap.ui.define([
                    
 
             })
-            sap.ui.core.BusyIndicator.hide();
+            this.closeBusyDialog()
         },
         CD_read: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -103,7 +103,7 @@ sap.ui.define([
                 if (sRoomNo) filters.RoomNo = sRoomNo;
                 if (sStatus) filters.Status = sStatus;
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             await this.ajaxReadWithJQuery("HM_Complaint", filters).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
 
@@ -126,7 +126,7 @@ sap.ui.define([
                 this._populateUniqueFilterValues(this._originalRoomdata);
 
             })
-            sap.ui.core.BusyIndicator.hide();
+            this.closeBusyDialog()
 
         },
           _populateUniqueFilterValues: function (data) {
@@ -412,7 +412,7 @@ sap.ui.define([
                 Status:"Resolved"
             };
         }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             await this.ajaxUpdateWithJQuery("HM_Complaint", {
                 data: payload,

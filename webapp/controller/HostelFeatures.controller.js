@@ -38,10 +38,10 @@ sap.ui.define([
                 await this._loadBranchCode()
                 await this.Onsearch("true");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -66,14 +66,14 @@ sap.ui.define([
             } else{
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
@@ -219,7 +219,7 @@ sap.ui.define([
                 }
             }
             
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oPayload = {
                     BranchCode: Payload.BranchCode,
@@ -255,10 +255,10 @@ sap.ui.define([
 
                 await this.Onsearch("true");
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -327,7 +327,7 @@ sap.ui.define([
             }
 
             if (sFacilityName) filters.FacilityName = sFacilityName;
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_HostelFeatures", filters).then((oData) => {
                     let response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
@@ -358,10 +358,10 @@ sap.ui.define([
                     this.getView().setModel(model, "HostelFeatures");
                     this._populateUniqueFilterValues(this._originalBedData);
                 }).catch((err) => {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                     sap.m.MessageToast.show(err.message || err.responseText);
                 }).finally(() => {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 });
         },
 
@@ -413,7 +413,7 @@ sap.ui.define([
                     onClose: async function(sAction) {
                         if (sAction === MessageBox.Action.YES) {
                             try {
-                                sap.ui.core.BusyIndicator.show(0);
+                                that.getBusyDialog()
 
                                 // Collect all delete promises
                                 const aDeletePromises = aSelectedItems.map(async (item) => {
@@ -431,10 +431,10 @@ sap.ui.define([
                                 sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
                                 await that.Onsearch("true"); // refresh table
                             } catch (err) {
-                                sap.ui.core.BusyIndicator.hide();
+                                that.closeBusyDialog()
                                 sap.m.MessageToast.show(err.message || err.responseText);
                             } finally {
-                                sap.ui.core.BusyIndicator.hide();
+                                that.closeBusyDialog()
                                 oTable.removeSelections(true);
                             }
                         } else {

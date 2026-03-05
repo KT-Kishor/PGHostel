@@ -143,7 +143,7 @@ sap.ui.define([
 
         readComplainData: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 // Prepare filters based on role
                 let ComplaintFilters = {};
@@ -191,7 +191,7 @@ sap.ui.define([
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
         onHome: function () {
@@ -228,7 +228,7 @@ sap.ui.define([
             const currentMonth = today.getMonth();
             if (!this.rawComplainData) return;
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             setTimeout(() => {
                 try {
@@ -291,7 +291,7 @@ sap.ui.define([
                 } catch (e) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             }, 0);
         },

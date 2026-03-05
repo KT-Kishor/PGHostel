@@ -54,7 +54,7 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 var LoginFUnction = await this.commonLoginFunction("ManageBranch");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -66,7 +66,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -151,7 +151,7 @@ sap.ui.define([
         },
 
         MD_onSearch: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 await this.Onsearch();
                 const oView = this.getView();
@@ -190,7 +190,7 @@ sap.ui.define([
                 oBinding.filter(aFilters);
                 this._updateRowCount();
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -534,7 +534,7 @@ sap.ui.define([
                 CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
             };
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const aMainData = oView.getModel("mainModel").getData() || [];
                 if (this.isEdit && Payload.BranchID) {
@@ -560,7 +560,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -772,7 +772,7 @@ sap.ui.define([
 
                     onClose: async (sAction) => {
                         if (sAction === sap.m.MessageBox.Action.YES) {
-                            sap.ui.core.BusyIndicator.show(0);
+                            this.getBusyDialog()
 
                             try {
                                 var sUserID = this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID;
@@ -790,7 +790,7 @@ sap.ui.define([
                                 console.error("Delete failed:", err);
                                 sap.m.MessageBox.error(this.i18nModel.getText("errorwhileDeletingRecordsPleasetryagain"));
                             } finally {
-                                sap.ui.core.BusyIndicator.hide();
+                                this.closeBusyDialog()
                                 oTable.removeSelections(true);
                             }
                         }

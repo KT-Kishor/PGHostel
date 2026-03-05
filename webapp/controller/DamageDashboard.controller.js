@@ -14,7 +14,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageDamage");
                 if (!LoginFUnction) return;
@@ -29,7 +29,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Something went wrong");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -54,7 +54,7 @@ sap.ui.define([
         },
 
         DD_search: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const aSelectedBranches = this.byId("id_DD_branch").getSelectedKeys();
                 let aBranchesToUse = [];
@@ -131,10 +131,12 @@ sap.ui.define([
                     Pending: d.Pending
                 }));
                 this.getView().setModel(new JSONModel(formattedDaily), "dailyModel");
+                this.closeBusyDialog()
             } catch (err) {
+                this.closeBusyDialog()
                 sap.m.MessageToast.show("Dashboard load failed");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

@@ -16,58 +16,77 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDamageDetails").attachMatched(this._onRouteMatched, this);
         },
+        
         _onRouteMatched: async function (oEvent) {
+            try {
+                this.getBusyDialog();
 
-            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            var sDamageID = decodeURIComponent(oEvent.getParameter("arguments").sPath);
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                var sDamageID = decodeURIComponent(oEvent.getParameter("arguments").sPath);
 
-            this._ViewDatePickersReadOnly(["HD_id_DamageDate1"], this.getView());
+                this._ViewDatePickersReadOnly(["HD_id_DamageDate1"], this.getView());
 
-            this.decodedPath = sDamageID;
+                this.decodedPath = sDamageID;
 
-            var model = new JSONModel({
-                CustomerID: "",
-                CustomerName: "",
-                RoomNo: "",
-                BedTypeName: "",
-                BranchCode: "",
-                ItemName: "",
-                Description: "",
-                Cost: "",
-                Date: Formatter.formatDate(new Date()),
-                Status: "Damage Raised",
-                DamageID: "",
-                Currency: "",
-                CustomerEmail: "",
-                Type: "",
-                UserID: "",
-                DueAmount: "",
-                Items: []
-            });
-            this.getView().setModel(model, "DamageModel");
-            var loginModel = this.getOwnerComponent().getModel("LoginModel");
-            var model = new JSONModel({
-                visible: false,
-            });
-            this.getView().setModel(model, "VisibleModel")
-            this.BranchCode = loginModel.getProperty("/BranchCode");
-            sap.ui.core.BusyIndicator.show(0);
+                var oDamageModel = new JSONModel({
+                    CustomerID: "",
+                    CustomerName: "",
+                    RoomNo: "",
+                    BedTypeName: "",
+                    BranchCode: "",
+                    ItemName: "",
+                    Description: "",
+                    Cost: "",
+                    Date: Formatter.formatDate(new Date()),
+                    Status: "Damage Raised",
+                    DamageID: "",
+                    Currency: "",
+                    CustomerEmail: "",
+                    Type: "",
+                    UserID: "",
+                    DueAmount: "",
+                    Items: []
+                });
 
-            await this.readCustomerData();
+                this.getView().setModel(oDamageModel, "DamageModel");
 
-            this.OnSearch()
+                var loginModel = this.getOwnerComponent().getModel("LoginModel");
 
+                var oVisibleModel = new JSONModel({
+                    visible: false
+                });
+
+                this.getView().setModel(oVisibleModel, "VisibleModel");
+
+                this.BranchCode = loginModel.getProperty("/BranchCode");
+
+                await this.readCustomerData();
+                await this.OnSearch();
+
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
         },
+
+
         OnSearch: async function () {
-            const filter = {
-                DamageID: this.decodedPath
-            };
-            sap.ui.core.BusyIndicator.show(0);
-            if (this.decodedPath !== "Damage") {
-                await this.ajaxReadWithJQuery("HM_DamageItem", filter).then((oData) => {
+            try {
+
+                const filter = {
+                    DamageID: this.decodedPath
+                };
+
+                if (this.decodedPath !== "Damage") {
+
+                    const oData = await this.ajaxReadWithJQuery("HM_DamageItem", filter);
+
                     var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
                     var Damage = oFCIAerData[0].HM_Damage[0];
                     var Items = oFCIAerData[0].HM_DamageItem;
+
                     var aItemsWithIndex = Items.map(function (item, index) {
                         return {
                             IndexNo: index + 1,
@@ -79,6 +98,7 @@ sap.ui.define([
                             ItemId: item.ItemID
                         };
                     });
+
                     var DamageModel = {
                         DamageID: Damage.DamageID,
                         CustomerID: Damage.CustomerID,
@@ -94,36 +114,49 @@ sap.ui.define([
                         TotalCost: Damage.TotalCost,
                         ReturnDamageAmount: Damage.ReturnDamageAmount,
                         Items: aItemsWithIndex
-                    }
+                    };
 
-                    var model = new JSONModel(DamageModel);
-                    this.getView().setModel(model, "DamageModel");
+                    this.getView().setModel(new JSONModel(DamageModel), "DamageModel");
+
                     if (Damage.Status === "Partially Recovered") {
-                        var dueAmount = parseFloat(DamageModel.TotalCost) - parseFloat(DamageModel.ReturnDamageAmount || 0);
+
+                        var dueAmount =
+                            parseFloat(DamageModel.TotalCost) -
+                            parseFloat(DamageModel.ReturnDamageAmount || 0);
+
                         this.getView().getModel("DamageModel").setProperty("/DueAmount", dueAmount.toString());
-                        this.getView().getModel("DamageModel").setProperty("/ReturnDamageAmount", DamageModel.ReturnDamageAmount.toString());
+
+                        this.getView().getModel("DamageModel").setProperty(
+                            "/ReturnDamageAmount",
+                            DamageModel.ReturnDamageAmount.toString()
+                        );
                     }
-                })
+                }
+
+                if (this.decodedPath === "Damage") {
+
+                    this.getView().getModel("VisibleModel").setProperty("/visible", true);
+                    this.getView().byId("HD_id_CustomerID1").setEditable(true);
+
+                } else if (
+                    this.getView().getModel("DamageModel").getProperty("/Status") === "Damage Claimed"
+                ) {
+
+                    this.getView().byId("idEditButton").setVisible(false);
+                    this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                    this.getView().byId("HD_id_DamageDate1").setEditable(false);
+
+                } else {
+
+                    this.getView().getModel("VisibleModel").setProperty("/visible", false);
+                    this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                }
+
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
             }
-            if (this.decodedPath === "Damage") {
-                this.getView().getModel("VisibleModel").setProperty("/visible", true);
-                this.getView().byId("HD_id_CustomerID1").setEditable(true);
-
-            } else if (this.getView().getModel("DamageModel").getProperty("/Status") === "Damage Claimed") {
-                this.getView().byId("idEditButton").setVisible(false);
-                this.getView().byId("HD_id_CustomerID1").setEditable(false);
-                this.getView().byId("HD_id_DamageDate1").setEditable(false);
-
-
-            } else {
-                this.getView().getModel("VisibleModel").setProperty("/visible", false);
-                this.getView().byId("HD_id_CustomerID1").setEditable(false);
-
-            }
-
-            sap.ui.core.BusyIndicator.hide();
-
         },
+
         DM_onPressEdit: function () {
             this.getView().getModel("VisibleModel").setProperty("/visible", true);
             if (this.decodedPath === "Damage") {
@@ -158,7 +191,7 @@ sap.ui.define([
 
             var fnDelete = async function () {
 
-                sap.ui.core.BusyIndicator.show(0);
+                that.getBusyDialog()
 
                 try {
 
@@ -198,11 +231,12 @@ sap.ui.define([
                     sap.m.MessageToast.show("Selected Item(s) Deleted");
 
                 } catch (err) {
+                    that.closeBusyDialog()
                     console.error(err);
                     sap.m.MessageToast.show("Error while deleting");
                 }
 
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog()
             };
 
             if (hasSavedItem) {
@@ -364,7 +398,7 @@ sap.ui.define([
                 })
             };
 
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog()
 
             if (oData.DamageID) {
 
@@ -408,14 +442,14 @@ sap.ui.define([
 
                 this.ajaxUpdateWithJQuery("HM_Damage", Payload)
                     .then(() => {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show("Damage Updated Successfully");
                         this.OnSearch();
                         this.getView().getModel("VisibleModel")
                             .setProperty("/visible", false);
                     })
                     .catch(err => {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show("Error while updating");
                         console.error(err);
                     });
@@ -425,7 +459,7 @@ sap.ui.define([
                 this.ajaxCreateWithJQuery("HM_Damage", Payload)
                     .then((Data) => {
                         this.decodedPath = Data.InvoiceNo;
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         this.OnSearch();
                         this.getView().getModel("VisibleModel")
                             .setProperty("/visible", false);
@@ -454,24 +488,32 @@ sap.ui.define([
 
                     })
                     .catch(err => {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show("Error while saving");
                         console.error(err);
                     });
             }
         },
-        readCustomerData: function () {
 
-            var filter = {
-                BranchCode: this.BranchCode
-            };
+        readCustomerData: async function () {
 
-            this.ajaxReadWithJQuery("HM_BookingCustomerReadCall", filter).then((oData) => {
-                var aData = Array.isArray(oData.commentData) ?
-                    oData.commentData : [oData.commentData];
+            try {
 
-                const aFilteredData = aData.filter(item =>
-                    item.Status === "Assigned" || item.Status === "Completed"
+                var filter = {
+                    BranchCode: this.BranchCode
+                };
+
+                const oData = await this.ajaxReadWithJQuery(
+                    "HM_BookingCustomerReadCall",
+                    filter
+                );
+
+                var aData = Array.isArray(oData.commentData)
+                    ? oData.commentData
+                    : [oData.commentData];
+
+                const aFilteredData = aData.filter(
+                    item => item.Status === "Assigned" || item.Status === "Completed"
                 );
 
                 this.getView().setModel(
@@ -479,8 +521,9 @@ sap.ui.define([
                     "CustomerModel"
                 );
 
-            })
-
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
+            }
         },
 
         onChangeAddCustomer: function (oEvent) {
@@ -504,7 +547,7 @@ sap.ui.define([
 
         DM_onPressGeneratePDF: async function () {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF("portrait", "mm", "a4");
 
@@ -737,7 +780,7 @@ sap.ui.define([
             } catch (error) {
                 sap.m.MessageToast.show(error.message);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

@@ -41,12 +41,12 @@ sap.ui.define([
                 await this._loadVendorDetails(this.sUserID);
                 this._applyCountryStateCityFilters();
                 this._makeDatePickersReadOnly(["MV_id_VendorDOB"]);
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             } catch (err) {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -118,7 +118,7 @@ sap.ui.define([
 
         _loadVendorDetails: async function(sUserID) {
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
                     UserID: sUserID
@@ -163,7 +163,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("vendorLoadError"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -206,7 +206,7 @@ sap.ui.define([
                         }
                     };
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
                     await that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
                     MessageToast.show(that.i18nModel.getText("docUploadSuccess"));
                     await that._loadVendorDetails(oModel.getProperty("/UserID"));
@@ -215,7 +215,7 @@ sap.ui.define([
                 } catch (err) {
                     MessageToast.show(that.i18nModel.getText("docUploadError"));
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             };
 
@@ -315,17 +315,17 @@ sap.ui.define([
                     }
                 };
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show(this.i18nModel.getText("vendorSuccess"));
                 return true;
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
                 return false;
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -357,7 +357,7 @@ sap.ui.define([
                 "Are you sure you want to delete this document?",
                 async () => {
                         try {
-                            sap.ui.core.BusyIndicator.show(0);
+                            this.getBusyDialog()
 
                             await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
                                 filters: {
@@ -372,7 +372,7 @@ sap.ui.define([
                         } catch (err) {
                             sap.m.MessageToast.show(err.message || "Delete failed");
                         } finally {
-                            sap.ui.core.BusyIndicator.hide();
+                            this.closeBusyDialog()
                         }
                     },
                     () => {
@@ -659,7 +659,7 @@ sap.ui.define([
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog()
 
                 const oData = this.getView().getModel("AdminSignupModel").getData();
 
@@ -704,7 +704,7 @@ sap.ui.define([
                     i18n.getText("errorResendMessage")
                 );
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -991,7 +991,7 @@ sap.ui.define([
                         }
                     };
 
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog()
 
                     await that.ajaxCreateWithJQuery(
                         "HM_CustomerDocument",
@@ -1016,7 +1016,7 @@ sap.ui.define([
                         that.i18nModel.getText("docUploadError")
                     );
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog()
                 }
             };
 

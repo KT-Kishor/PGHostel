@@ -16,7 +16,7 @@ sap.ui.define(
 
                 _onRouteMatched: async function() {
                     try {
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                          var LoginFUnction = await this.commonLoginFunction("ManageInvoice");
                         if (!LoginFUnction) return;
                         this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -41,10 +41,10 @@ sap.ui.define(
                         await this.ManageInvoice_onSearch();
 
                     } catch (error) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         MessageToast.show(error.message || error.responseText);
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                     }
                 },
 
@@ -95,7 +95,7 @@ sap.ui.define(
                     let invoiceDateProvided = false;
 
                     try {
-                        sap.ui.core.BusyIndicator.show(0);
+                        this.getBusyDialog()
                         let aBranchCodes = "";
 
                         if (Array.isArray(omainModel) && omainModel.length) {
@@ -235,9 +235,9 @@ sap.ui.define(
 
                         /* ---------------- Build Customer Filter ---------------- */
                         this._buildUniqueCustomerModel(aFinalData);
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                     } catch (err) {
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog()
                         sap.m.MessageToast.show(err.message || err.responseText);
                     }
                 },
