@@ -299,7 +299,19 @@ sap.ui.define([
 
             if (bDuplicate) return MessageToast.show(this.i18nModel.getText("facilitywiththesameratetypealreadyexistsforthisbranch"));
 
-            if (attachments.length > 3) return MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+            // Attachment validations
+            if (Payload.Type === "Others") {
+                if (attachments.length === 0) { // At least 1 image required
+                    MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof1imagesonly"));
+                    return;
+                }
+            } else {
+                if (attachments.length > 3) { // Maximum 3 images allowed for other types
+                    MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+                    return;
+                }
+
+            }
 
             const oData = {
                 data: {

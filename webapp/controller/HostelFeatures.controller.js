@@ -211,6 +211,14 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("facilitywiththeSameNameAlreadyExists"));
                 return;
             }
+
+            if (Payload.Type === "Others") {
+                if (!oUpload.Photo1 || !oUpload.Photo1Name || !oUpload.Photo1Type) {
+                    sap.m.MessageToast.show("Please upload at least 1 image for 'Others' type.");
+                    return;
+                }
+            }
+            
             sap.ui.core.BusyIndicator.show(0);
             try {
                 const oPayload = {

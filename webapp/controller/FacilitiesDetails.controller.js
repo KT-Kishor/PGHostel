@@ -268,9 +268,17 @@ sap.ui.define([
                 var uploadedImages = attachments.filter(function(item) {
                     return !item.isPlaceholder;
                 });
-                if (uploadedImages.length > 3) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
-                    return;
+
+                if (Payload.Type === "Others") {
+                    if (uploadedImages.length === 0) {
+                        MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof1imagesonly"));
+                        return;
+                    }
+                } else {
+                    if (uploadedImages.length > 3) {
+                        sap.m.MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+                        return;
+                    }
                 }
 
                 //  Duplicate check
@@ -286,6 +294,8 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("facilitywithSameRatetypeExistsforBranch"));
                     return;
                 }
+
+
 
                 if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) &&
                     (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0) &&
