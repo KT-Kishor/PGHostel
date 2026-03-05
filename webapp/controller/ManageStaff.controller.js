@@ -50,7 +50,7 @@ sap.ui.define([
                 MobileNo: "",
                 // password: "",
                 // comfirmpass: "",
-                STDCode: "",
+                STDCode: "+91",
                 Address: "",
                 Country: "",
                 State: "",

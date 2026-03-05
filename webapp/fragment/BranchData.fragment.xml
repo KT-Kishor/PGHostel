@@ -347,7 +347,7 @@
                     </ScrollContainer>
                 </VBox>
                 <Label
-                    text="{i18n>addImage}"
+                    text="{i18n>branchaddImage}"
                     required="true"
                 />
                 <VBox

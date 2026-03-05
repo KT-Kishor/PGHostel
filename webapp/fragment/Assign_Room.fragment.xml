@@ -135,7 +135,6 @@
                 text="Assign"
                 tooltip="Assign"
                 press="ARNO_onsavebuttonpress"
-                type="Accept"
                 id="HM_id_saveButton"
                 class="marginRight myUnifiedBtn"
             />
@@ -145,7 +144,6 @@
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="HM_onCancelButtonPress"
-                type="Reject"
                 id="HM_id_CancelButton"
                 class="marginRight myUnifiedBtn"
             />

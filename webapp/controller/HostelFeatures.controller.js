@@ -469,14 +469,13 @@ sap.ui.define([
                         title: "Information"
                     }
                 );
+                return;
             }
 
             var sBase64 = oData.Photo1.replace(/\s/g, "");
-
             if (sBase64 && !sBase64.startsWith("data:image")) {
                 sBase64 = "data:image/jpeg;base64," + sBase64;
             }
-
             var oImage = new sap.m.Image({
                 src: sBase64,
                 densityAware: false,
@@ -485,7 +484,6 @@ sap.ui.define([
                 height: "100%",
                 style: "object-fit: cover; display:block; margin:0; padding:0;"
             });
-
             var oDialog = new sap.m.Dialog({
                 title: "Amenities",
                 contentWidth: "50%",
@@ -503,10 +501,10 @@ sap.ui.define([
                     oDialog.destroy();
                 }
             });
-
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
         },
+        
         onAmenitieTypeChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);

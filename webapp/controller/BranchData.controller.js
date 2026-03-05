@@ -380,7 +380,7 @@ sap.ui.define([
                 GeoLocation: "",
                 Pincode: "",
                 Contact: "",
-                stdCode: "",
+                stdCode: "+91",
                 country: "",
                 state: "",
                 baseLocation: "",
@@ -503,7 +503,7 @@ sap.ui.define([
 
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
-                sap.m.MessageToast.show("Please upload branch image");
+                sap.m.MessageToast.show("Please upload main image");
                 return;
             }
             var oData = {
@@ -1352,13 +1352,11 @@ sap.ui.define([
                 );
                 return;
             }
-
             var sBase64 = oData.Photo1.replace(/\s/g, "");
             var sPhotoName = oData.Photo1Name || "Room Photo";
             if (sBase64 && !sBase64.startsWith("data:image")) {
                 sBase64 = "data:image/jpeg;base64," + sBase64;
             }
-
             var oImage = new sap.m.Image({
                 src: sBase64,
                 densityAware: false,
@@ -1367,7 +1365,6 @@ sap.ui.define([
                 height: "100%",
                 style: "object-fit: cover; display:block; margin:0; padding:0;"
             })
-
             var oDialog = new sap.m.Dialog({
                 title: sPhotoName,
                 contentWidth: "50%",
@@ -1385,7 +1382,6 @@ sap.ui.define([
                     oDialog.destroy();
                 }
             }).addStyleClass("barheader");
-
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
         },

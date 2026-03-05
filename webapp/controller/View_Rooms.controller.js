@@ -869,7 +869,7 @@ sap.ui.define([
                 RoomType: oData.Name + " (" + oData.ACType + ")",
                 Salutation: "",
                 UserName: "",
-                STDCode: "",
+                STDCode: "+91",
                 Mobile: "",
                 Comments: "",
                 Email: ""
