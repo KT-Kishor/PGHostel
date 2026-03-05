@@ -253,7 +253,9 @@ sap.ui.define([
                         EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
                         GrossPriceEditable: false,
                         UnitEditable: false,
-                        DurationEditable: false
+                        DurationEditable: false,
+                        StartDateEditable : false, 
+                        EndDateEditable : false
                         // editable :false
                     }));
 
@@ -528,7 +530,9 @@ sap.ui.define([
                         Currency: bookingDetails.Currency,
                         GrossPriceEditable: false,
                         UnitEditable: false,
-                        DurationEditable: false
+                        DurationEditable: false,
+                        StartDateEditable : false, 
+                        EndDateEditable : false
                     });
 
                     facilityArray.forEach((item, index) => {
@@ -565,7 +569,9 @@ sap.ui.define([
                             Currency: item.Currency,
                             GrossPriceEditable: false,
                             UnitEditable: false,
-                            DurationEditable: false
+                            DurationEditable: false,
+                            StartDateEditable : false, 
+                            EndDateEditable : false
                         });
                     });
 
@@ -590,7 +596,9 @@ sap.ui.define([
                             Currency: bookingDetails.Currency,
                             GrossPriceEditable: false,
                             UnitEditable: false,
-                            DurationEditable: false
+                            DurationEditable: false,
+                            StartDateEditable : false, 
+                            EndDateEditable : false
                         });
                     }
                 
@@ -718,7 +726,9 @@ sap.ui.define([
                     Total: "",
                     GrossPriceEditable: true,
                     UnitEditable: true,
-                    DurationEditable: true
+                    DurationEditable: true,
+                    StartDateEditable : true, 
+                    EndDateEditable : true
                 };
 
                 if (this.Update) {

@@ -615,7 +615,7 @@
                                                         value="{ManageInvoiceItemModel>StartDate}"
                                                         change=".onPaymentDateChange"
                                                         valueStateText="{i18n>selectPaymentDate}"
-                                                        editable="{visiablityPlay>/editable}"
+                                                        editable="{ManageInvoiceItemModel>StartDateEditable}"
                                                     />
 												</m:cells>
 												<m:cells>
@@ -625,7 +625,7 @@
                                                         value="{ManageInvoiceItemModel>EndDate}"
                                                         change=".onPaymentDateChange"
                                                         valueStateText="{i18n>selectPaymentDate}"
-                                                        editable="{visiablityPlay>/editable}"
+                                                        editable="{ManageInvoiceItemModel>EndDateEditable}"
                                                     />
 												</m:cells>
 												<m:cells>
