@@ -633,7 +633,7 @@
 													<m:Input
                                                         value="{path:'ManageInvoiceItemModel>GrossPrice',formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="End"
-                                                        editable="false"
+                                                        editable="{ManageInvoiceItemModel>GrossPriceEditable}"
                                                     />
 												</m:cells>
 												<m:cells>
@@ -642,8 +642,8 @@
                                                         selectedKey="Per Day"
                                                         value="{ManageInvoiceItemModel>UnitText}"
                                                         change="onChangeUnitText"
-                                                        editable="false"
-                                                        width="100%"
+                                                        editable="{ManageInvoiceItemModel>UnitEditable}"
+                                                        width="100%" 
                                                     >
 														<core:Item
                                                             key="{Rate>ID}"
@@ -652,7 +652,7 @@
 													</m:ComboBox>
 												</m:cells>
                                                 <m:cells>
-                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="false"/>
+                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="{ManageInvoiceItemModel>DurationEditable}"/>
                                                 </m:cells>
 												<m:cells>
 													<m:Input

@@ -251,6 +251,9 @@ sap.ui.define([
                         IndexNo: index + 1,
                         StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
                         EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                        GrossPriceEditable: false,
+                        UnitEditable: false,
+                        DurationEditable: false
                         // editable :false
                     }));
 
@@ -523,7 +526,9 @@ sap.ui.define([
                         StartDate: this.Formatter.DateFormat(bookingDetails.StartDate),
                         EndDate: this.Formatter.DateFormat(bookingDetails.EndDate),
                         Currency: bookingDetails.Currency,
-                        // editable: false
+                        GrossPriceEditable: false,
+                        UnitEditable: false,
+                        DurationEditable: false
                     });
 
                     facilityArray.forEach((item, index) => {
@@ -557,7 +562,10 @@ sap.ui.define([
                             Total: parseFloat(item.FacilityPrice),
                             StartDate: this.Formatter.DateFormat(item.StartDate),
                             EndDate: this.Formatter.DateFormat(item.EndDate),
-                            Currency: item.Currency
+                            Currency: item.Currency,
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false
                         });
                     });
 
@@ -579,7 +587,10 @@ sap.ui.define([
                             Total: -refundAmount,
                             StartDate: this.Formatter.DateFormat(new Date()),
                             EndDate: this.Formatter.DateFormat(new Date()),
-                            Currency: bookingDetails.Currency
+                            Currency: bookingDetails.Currency,
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false
                         });
                     }
                 
@@ -704,7 +715,10 @@ sap.ui.define([
                     Currency: currency,
                     Discount: "0.00",
                     GrossPrice: "0.00",
-                    Total: ""
+                    Total: "",
+                    GrossPriceEditable: true,
+                    UnitEditable: true,
+                    DurationEditable: true
                 };
 
                 if (this.Update) {
@@ -2212,13 +2226,6 @@ sap.ui.define([
                         ]);
                     }
 
-                    if (parseFloat(oModel.CouponDiscount) > 0) {
-                        summaryBody.push([
-                            `Discount (${oModel.CouponCode}) :`,
-                            Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
-                        ]);
-                    }
-
                     if (data.Currency !== "USD" && oModel.Type) {
                         const percentageText = oModel.Value && oModel.Value !== "0" ? `(${oModel.Value}%)` : "";
 
@@ -2234,6 +2241,13 @@ sap.ui.define([
                         if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue) {
                             summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
+                    }
+
+                    if (parseFloat(oModel.CouponDiscount) > 0) {
+                        summaryBody.push([
+                            `Discount (${oModel.CouponCode}) :`,
+                          "- " +  Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                        ]);
                     }
 
                     // if (parseFloat(oModel.RefundAmount) > 0) {
@@ -2508,8 +2522,19 @@ sap.ui.define([
                     let totalWithGST = 0;
                     let totalWithoutGST = 0;
 
+                    // ================= ROOM TOTAL (FOR COUPON) =================
+                    let roomTotal = 0;
+
                     aInvoiceItems.forEach(item => {
                         const amount = parseFloat(item.Total) || 0;
+
+                        // Identify Room items
+                        const isRoomItem = item.Particulars &&
+                            item.Particulars.toLowerCase().includes("room rent");
+
+                        if (isRoomItem) {
+                            roomTotal += amount;
+                        }
 
                         const isGSTApplicable =
                             isGSTEnabled && item.GSTCalculation === "YES"; 
@@ -2543,10 +2568,19 @@ sap.ui.define([
                         }
                     }
 
-                    // ================= COUPON AFTER GST =================
-                    const couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
+                    // ================= COUPON AFTER GST (ROOM ONLY) =================
+                    let couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
+
+                    // Coupon cannot exceed Room Total
+                    if (couponDiscount > roomTotal) {
+                        couponDiscount = roomTotal;
+                    }
+
                     finalAmount -= couponDiscount;
-                    if (finalAmount < 0) finalAmount = 0;
+
+                    if (finalAmount < 0) {
+                        finalAmount = 0;
+                    }
 
                     // ================= ROUND OFF =================
                     const roundedAmount = Math.round(finalAmount);
@@ -2557,6 +2591,7 @@ sap.ui.define([
                     oCustomerModel.CGST = cgst.toFixed(2);
                     oCustomerModel.SGST = sgst.toFixed(2);
                     oCustomerModel.IGST = igst.toFixed(2);
+                    oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
                     oCustomerModel.TotalAmount = roundedAmount.toFixed(2);
 
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
@@ -2717,19 +2752,25 @@ sap.ui.define([
                     const summary = [];
 
                     if (totalWithoutGST > 0)
-                        summary.push(["Sub-Total (Non-Taxable)", Formatter.fromatNumber(totalWithoutGST)]);
+                        summary.push(["Sub-Total (Non-Taxable) :", Formatter.fromatNumber(totalWithoutGST)]);
 
                     if (totalWithGST > 0)
-                        summary.push(["Sub-Total (Taxable)", Formatter.fromatNumber(totalWithGST)]);
+                        summary.push(["Sub-Total (Taxable) :", Formatter.fromatNumber(totalWithGST)]);
 
                     const pct = taxRate ? `(${taxRate}%)` : "";
 
-                    if (cgst > 0) summary.push([`CGST ${pct}`, Formatter.fromatNumber(cgst)]);
-                    if (sgst > 0) summary.push([`SGST ${pct}`, Formatter.fromatNumber(sgst)]);
-                    if (igst > 0) summary.push([`IGST ${pct}`, Formatter.fromatNumber(igst)]);
+                    if (cgst > 0) summary.push([`CGST ${pct} :`, Formatter.fromatNumber(cgst)]);
+                    if (sgst > 0) summary.push([`SGST ${pct} :`, Formatter.fromatNumber(sgst)]);
+                    if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
+
+                    if (couponDiscount > 0)
+                    summary.push([
+                        `Discount (${oCustomerModel.CouponCode}) :`,
+                        "- " + Formatter.fromatNumber(couponDiscount)
+                    ]);
 
                     const totalRowIndex = summary.length;
-                    summary.push(["Total", Formatter.fromatNumber(roundedAmount)]);
+                    summary.push(["Total :", Formatter.fromatNumber(roundedAmount)]);
 
                     doc.autoTable({
                         startY: currentY,
@@ -3050,6 +3091,13 @@ sap.ui.define([
                             if (sgst > 0) {
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
+                        }
+
+                        if (parseFloat(oModel.CouponDiscount) > 0) {
+                            summaryBody.push([
+                                `Discount (${oModel.CouponCode}) :`,
+                            "- " +  Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                            ]);
                         }
 
                         // Total
