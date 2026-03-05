@@ -173,7 +173,7 @@
                     selectedIndex="{visiblePlay>/selectedIndex}"
                     id="MC_id_groupCustGst"
                     columns="2"
-                    editable="false"
+                    editable="true"
                 >
                     <RadioButton text="{i18n>cgst}" />
                     <RadioButton text="{i18n>igst}" />

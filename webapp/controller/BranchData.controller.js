@@ -55,7 +55,7 @@ sap.ui.define([
         _onRouteMatched: async function () {
             try {
                 sap.ui.core.BusyIndicator.show(0);
-                 var LoginFUnction = await this.commonLoginFunction("ManageBranch");
+                var LoginFUnction = await this.commonLoginFunction("ManageBranch");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
@@ -1412,21 +1412,23 @@ sap.ui.define([
             visiModel.setProperty("/CC_id_CustInput", true);
             const stateCode = sValue.substring(0, 2);
             if (previousGST && previousGST !== sValue) {
-                dataModel.setProperty("/Value", "");   // clear tax %
+                dataModel.setProperty("/Value", "");
             }
-            // Determine GST type
             if (stateCode === "29") {
                 visiModel.setProperty("/selectedIndex", 0);
                 dataModel.setProperty("/Type", "CGST/SGST");
                 if (!dataModel.getProperty("/Value")) {
                     dataModel.setProperty("/Value", "9");
                 }
-            } else {
+            } else if (stateCode === "22") {
                 visiModel.setProperty("/selectedIndex", 1);
                 dataModel.setProperty("/Type", "IGST");
                 if (!dataModel.getProperty("/Value")) {
                     dataModel.setProperty("/Value", "18");
                 }
+            } else {
+                visiModel.setProperty("/selectedIndex", 0);
+                dataModel.setProperty("/Type", "CGST/SGST");
             }
             // store current GST as previous
             dataModel.setProperty("/GSTIN_PREV", sValue);

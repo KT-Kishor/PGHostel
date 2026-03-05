@@ -176,33 +176,6 @@
                             tooltip="GSTIN"
                         />
                     </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>MVDcountry}"
-                            tooltip="{i18n>MVDcountry}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>MVDstate}"
-                            tooltip="{i18n>MVDstate}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>city}"
-                            tooltip="{i18n>city}"
-                        />
-                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -239,23 +212,19 @@
                                 text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
                                 maxCharacters="20"
                             />
-                            <!-- <Text text="{mainModel>LandMark}" /> -->
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <VBox>
                                 <Text text="{mainModel>GSTIN}" />
-                                <Text
-                                    text="{mainModel>Type}"
-                                    visible="{= !!${mainModel>Type} }"
-                                />
-                                <Text
-                                    text="{= ${mainModel>Value} + '%'}"
+                               <Text
+                                    text="{= ${mainModel>Type} + ':' + ${mainModel>Value} }"
                                     visible="{= !!${mainModel>Value} }"
                                 />
+                                <!-- <Text
+                                    text="{= ${mainModel>Value} + '%'}"
+                                    visible="{= !!${mainModel>Value} }"
+                                /> -->
                             </VBox>
-                            <!-- <Text text="{mainModel>Country}" />
-                            <Text text="{mainModel>State}" />
-                            <Text text="{mainModel>City}" /> -->
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
