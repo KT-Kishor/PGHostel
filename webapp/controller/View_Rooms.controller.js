@@ -805,11 +805,24 @@ sap.ui.define([
         },
         _convertAmenities: function (list) {
             const defaultImages = {
-                "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
-                "Bathrooms": "../image/Bathroom.jpg",
-                "Personal lockers": "../image/locker.jpg",
-                "Communal spaces": "../image/CommonSpace.jpg",
-                "Lounge areas": "../image/LoungeArea.jpg"
+                 "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "CCTV Surveillance":"../image/CCTV Surveillance.jpeg",
+                "Drinking Water": "../image/Drinking Water.jpg",
+                "Geyser": "../image/Geyser.jpeg",
+                "Ceiling Fan": "../image/Ceiling Fan.jpg",
+                "Washing Machine": "../image/Washing Machine.jpg",
+                "Wardrobe": "../image/Wardrobe.jpg",
+                "Study Table": "../image/Study Table.jpg",
+                "Refrigerator": "../image/Refrigerator.png",
+                "Attached Bathroom": "../image/Attached Bathroom.jpg",
+                "Parking":"../image/Parking1.jpeg",
+                "Lift": "../image/Lift.jpg",
+                "Room Cleaning":"../image/Room Cleaning.jpg",
+                "Mess Facility":"../image/Mess Facility.jpeg",
+                "Kitchen Access":"../image/Kitchen Access.png",
+                "Personal Lockers": "../image/locker.jpg",
+                "Communal Spaces": "../image/CommonSpace.jpg",
+                "Lounge Areas": "../image/LoungeArea.jpg"
             };
 
             return list.map(item => {

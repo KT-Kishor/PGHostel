@@ -790,7 +790,6 @@ sap.ui.define([
 
 
         _LoadAmenities: async function (sBranchCode) {
-
             const oAmenityModel = new JSONModel({
                 loading: true,
                 Amenities: [],
@@ -825,6 +824,7 @@ sap.ui.define([
             }
             oAmenityModel.setProperty("/loading", false);
         },
+
         _convertAmenities: function (list) {
             const defaultImages = {
                 "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
@@ -842,9 +842,9 @@ sap.ui.define([
                 "Room Cleaning":"../image/Room Cleaning.jpg",
                 "Mess Facility":"../image/Mess Facility.jpeg",
                 "Kitchen Access":"../image/Kitchen Access.png",
-                "Personal lockers": "../image/locker.jpg",
+                "Personal Lockers": "../image/locker.jpg",
                 "Communal Spaces": "../image/CommonSpace.jpg",
-                "Lounge areas": "../image/LoungeArea.jpg"
+                "Lounge Areas": "../image/LoungeArea.jpg"
             };
 
             return list.map(item => {
